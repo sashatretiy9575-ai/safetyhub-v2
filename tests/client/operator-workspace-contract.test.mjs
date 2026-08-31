@@ -105,6 +105,11 @@ test('workspace seed provides at least one hundred participants and authenticate
   assert.match(seed, /admin@safetyhub\.local/);
   assert.match(seed, /participant@safetyhub\.local/);
   assert.match(seed, /ALLOW_TEST_DATA/);
+  assert.match(seed, /const authenticatedE2eUsers = users\.slice\(0, 2\)/);
+  assert.match(
+    seed,
+    /from\('account_controls'\)[\s\S]*?approval_state: 'approved'[\s\S]*?authenticatedE2eUsers\.map\(\(user\) => user\.id\)/,
+  );
   assert.match(seed, /current_revision_id/);
   assert.match(seed, /variants:test_revision_variants\(id,variant_number,question_count\)/);
   for (const frozenAttemptField of [

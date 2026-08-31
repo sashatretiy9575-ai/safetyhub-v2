@@ -170,6 +170,29 @@ must(
   ),
 );
 
+// The two authenticated release-E2E identities exercise their actual admin
+// and learner workspaces. New accounts correctly start as profile_incomplete,
+// so this disposable fixture must approve those identities explicitly before
+// the learner dashboard is tested.
+const authenticatedE2eUsers = users.slice(0, 2);
+must(
+  'approve authenticated E2E identities',
+  await supabase
+    .from('account_controls')
+    .update({
+      approval_state: 'approved',
+      approval_requested_at: null,
+      approval_due_at: null,
+      approval_decided_at: null,
+      approval_decided_by: null,
+      approval_rejection_reason: null,
+    })
+    .in(
+      'user_id',
+      authenticatedE2eUsers.map((user) => user.id),
+    ),
+);
+
 const currentLegalDocuments = must(
   'read current legal documents',
   await supabase
