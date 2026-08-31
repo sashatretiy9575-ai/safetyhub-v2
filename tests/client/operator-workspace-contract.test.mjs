@@ -78,7 +78,9 @@ test('materials and course editors keep primary content central and protect draf
   assert.match(testStatusControls, /<NotePencil/);
   assert.match(testStatusControls, /<Trash/);
   assert.match(testStatusControls, /<DestructiveDialog/);
-  assert.match(testEditor, /Локальный черновик включён/);
+  assert.match(testEditor, /Черновик хранится только в памяти до отправки/);
+  assert.match(testEditor, /data-course-editor-key-boundary/);
+  assert.doesNotMatch(testEditor, /readTestEditorDraft|writeTestEditorDraft|clearTestEditorDraft/);
   assert.match(testEditor, /useUnsavedChangesGuard/);
   assert.match(unsavedChangesGuard, /window\.addEventListener\('beforeunload'/);
   assert.match(unsavedChangesGuard, /window\.addEventListener\('popstate'/);

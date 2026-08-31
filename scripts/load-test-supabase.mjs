@@ -316,21 +316,45 @@ async function timedRpc(client, name, args) {
   return { data: result.data, duration };
 }
 
-async function createAuthenticatedClient(url, publishableKey, user, password) {
+async function createAuthenticatedClient(admin, url, publishableKey, user) {
   const client = createClient(url, publishableKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
   for (let attempt = 1; attempt <= 8; attempt += 1) {
-    const signedIn = await client.auth.signInWithPassword({ email: user.email, password });
+    // A disposable test session must exercise the same passwordless Auth
+    // provider boundary as production. The service-only link is never sent or
+    // logged; its single-use hash is verified in this process only.
+    const generated = await admin.auth.admin.generateLink({
+      type: 'magiclink',
+      email: user.email,
+    });
+    if (generated.error) {
+      const retryable =
+        generated.error.status === 429 || TRANSIENT_NETWORK_ERROR.test(generated.error.message);
+      if (!retryable || attempt === 8) {
+        throw new Error(`generate passwordless test link: ${generated.error.message}`);
+      }
+      await wait(attempt * 1_000);
+      continue;
+    }
+    const tokenHash = generated.data?.properties?.hashed_token;
+    if (typeof tokenHash !== 'string' || tokenHash.length < 16) {
+      throw new Error('generate passwordless test link: missing token hash');
+    }
+
+    const signedIn = await client.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: 'magiclink',
+    });
     if (!signedIn.error) return client;
     const retryable =
       signedIn.error.status === 429 || TRANSIENT_NETWORK_ERROR.test(signedIn.error.message);
     if (!retryable || attempt === 8) {
-      throw new Error(`signInWithPassword: ${signedIn.error.message}`);
+      throw new Error(`verify passwordless test link: ${signedIn.error.message}`);
     }
     await wait(attempt * 1_000);
   }
-  throw new Error('signInWithPassword exhausted its retry budget');
+  throw new Error('passwordless test-session creation exhausted its retry budget');
 }
 
 async function main() {
@@ -439,9 +463,7 @@ async function main() {
     .order('slug');
   if (revisionsResult.error) throw revisionsResult.error;
   const revisions = revisionsResult.data;
-  const loadRevision = revisions.find(
-    (revision) => revision.slug === 'pozharnaya-bezopasnost',
-  );
+  const loadRevision = revisions.find((revision) => revision.slug === 'pozharnaya-bezopasnost');
   if (!loadRevision) {
     throw new Error(
       'Canonical pozharnaya-bezopasnost revision is required before destructive load seeding',
@@ -472,15 +494,10 @@ async function main() {
   const adminAccess = await admin.rpc('restore_admin_access', { p_user_id: createdUsers[0].id });
   if (adminAccess.error) throw adminAccess.error;
   const sessionUsers = createdUsers.slice(0, sessionCount);
-  const loadPassword = `SafetyHub-load-${crypto.randomBytes(18).toString('base64url')}!`;
-  await mapLimit(sessionUsers, 12, async (user) => {
-    const updated = await admin.auth.admin.updateUserById(user.id, { password: loadPassword });
-    if (updated.error) throw new Error(`set load password: ${updated.error.message}`);
-  });
   const clients = [];
   for (let index = 0; index < sessionUsers.length; index += 1) {
     const user = sessionUsers[index];
-    clients.push(await createAuthenticatedClient(url, publishableKey, user, loadPassword));
+    clients.push(await createAuthenticatedClient(admin, url, publishableKey, user));
     if ((index + 1) % 10 === 0 || index + 1 === sessionUsers.length) {
       process.stdout.write(`LOAD_SESSIONS_READY=${index + 1}/${sessionUsers.length}\n`);
     }

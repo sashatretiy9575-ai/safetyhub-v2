@@ -860,12 +860,21 @@ class EncryptedPayloadWriter {
   }
 }
 
-class EncryptedTarWriter {
-  static async create(file, passphrase, modifiedAtSeconds) {
+export class EncryptedTarWriter {
+  static async create(
+    file,
+    passphrase,
+    modifiedAtSeconds,
+    contentType = 'application/x-tar; profile=safetyhub-avatar-backup-v1',
+  ) {
+    requireCondition(
+      typeof contentType === 'string' && contentType.length > 0,
+      'ARCHIVE_CONTENT_TYPE_INVALID',
+    );
     const payload = await EncryptedPayloadWriter.create(
       file,
       passphrase,
-      'application/x-tar; profile=safetyhub-avatar-backup-v1',
+      contentType,
     );
     return new EncryptedTarWriter(payload, modifiedAtSeconds);
   }
@@ -883,6 +892,50 @@ class EncryptedTarWriter {
     if (padding > 0) await this.payload.write(Buffer.alloc(padding));
   }
 
+  async addWebStream(name, expectedByteSize, stream) {
+    requireCondition(
+      Number.isSafeInteger(expectedByteSize) && expectedByteSize >= 0,
+      'ARCHIVE_TAR_SIZE_INVALID',
+    );
+    requireCondition(
+      stream !== null && typeof stream === 'object' && typeof stream.getReader === 'function',
+      'STORAGE_DOWNLOAD_STREAM_MALFORMED',
+    );
+
+    await this.payload.write(createTarHeader(name, expectedByteSize, this.modifiedAtSeconds));
+    const reader = stream.getReader();
+    const hash = createHash('sha256');
+    let totalBytes = 0;
+    try {
+      for (;;) {
+        const result = await reader.read();
+        requireCondition(isPlainObject(result), 'STORAGE_DOWNLOAD_STREAM_MALFORMED');
+        if (result.done === true) break;
+        requireCondition(result.done === false, 'STORAGE_DOWNLOAD_STREAM_MALFORMED');
+        requireCondition(result.value instanceof Uint8Array, 'STORAGE_DOWNLOAD_STREAM_MALFORMED');
+        totalBytes += result.value.byteLength;
+        if (totalBytes > expectedByteSize) {
+          await reader.cancel().catch(() => {});
+          fail('STORAGE_DOWNLOAD_SIZE_MISMATCH');
+        }
+        const chunk = Buffer.from(result.value);
+        hash.update(chunk);
+        await this.payload.write(chunk);
+      }
+    } catch (error) {
+      await reader.cancel().catch(() => {});
+      if (error instanceof OperatorToolError) throw error;
+      throw normalizeError(error, 'STORAGE_DOWNLOAD_READ_FAILED');
+    } finally {
+      reader.releaseLock?.();
+    }
+
+    requireCondition(totalBytes === expectedByteSize, 'STORAGE_DOWNLOAD_SIZE_MISMATCH');
+    const padding = (512 - (totalBytes % 512)) % 512;
+    if (padding > 0) await this.payload.write(Buffer.alloc(padding));
+    return { byteLength: totalBytes, sha256: hash.digest('hex') };
+  }
+
   async finish() {
     await this.payload.write(Buffer.alloc(1_024));
     await this.payload.finish();
@@ -893,7 +946,7 @@ class EncryptedTarWriter {
   }
 }
 
-async function encryptBufferToFile(file, passphrase, contentType, buffer) {
+export async function encryptBufferToFile(file, passphrase, contentType, buffer) {
   const writer = await EncryptedPayloadWriter.create(file, passphrase, contentType);
   try {
     await writer.write(buffer);
@@ -1098,10 +1151,15 @@ class TarVerifier {
   }
 }
 
-export async function verifyEncryptedTar(file, passphrase, expectedEntries) {
+export async function verifyEncryptedTar(
+  file,
+  passphrase,
+  expectedEntries,
+  expectedContentType = 'application/x-tar; profile=safetyhub-avatar-backup-v1',
+) {
   const payload = await openEncryptedPayload(file, passphrase);
   requireCondition(
-    payload.contentType === 'application/x-tar; profile=safetyhub-avatar-backup-v1',
+    payload.contentType === expectedContentType,
     'ARCHIVE_CONTENT_TYPE_MISMATCH',
   );
   const verifier = new TarVerifier(expectedEntries);

@@ -149,17 +149,19 @@ export function createRequestGuard({
     }
   }
 
-  async function fetchBounded(fetchImpl, input, init = {}, code = 'REMOTE_FETCH', deadlineOverride) {
+  async function fetchBounded(
+    fetchImpl,
+    input,
+    init = {},
+    code = 'REMOTE_FETCH',
+    deadlineOverride,
+  ) {
     if (typeof fetchImpl !== 'function') fail(`${code}_UNAVAILABLE`);
     const timeoutSignal = AbortSignal.timeout(duration(deadlineOverride));
     const signals = [timeoutSignal];
     if (init.signal instanceof AbortSignal) signals.push(init.signal);
     const signal = signals.length === 1 ? signals[0] : AbortSignal.any(signals);
-    return call(
-      () => fetchImpl(input, { ...init, signal }),
-      code,
-      deadlineOverride,
-    );
+    return call(() => fetchImpl(input, { ...init, signal }), code, deadlineOverride);
   }
 
   return Object.freeze({ call, fetch: fetchBounded });
@@ -516,18 +518,11 @@ async function assertCleanStorageBaseline(admin, request = createRequestGuard(),
   if (listed.data.length !== 0) fail('CLEAN_STORAGE_BASELINE_REQUIRED');
 }
 
-async function downloadBytes(
-  client,
-  objectKey,
-  code,
-  request = createRequestGuard(),
-  deadline,
-) {
+async function downloadBytes(client, objectKey, code, request = createRequestGuard(), deadline) {
   let result;
   try {
     result = await request.call(
-      () =>
-        client.storage.from(AVATAR_BUCKET).download(objectKey, {}, { cache: 'no-store' }),
+      () => client.storage.from(AVATAR_BUCKET).download(objectKey, {}, { cache: 'no-store' }),
       code,
       deadline,
     );
@@ -663,11 +658,17 @@ export async function runHostedStorageGates({
   });
 
   const begun = parseOperation(
-    await rpcData(admin, 'begin_profile_avatar_upload', {
-      p_user_id: userId,
-      p_expected_sha256: sha256,
-      p_expected_bytes: bytes.byteLength,
-    }, request, deadline),
+    await rpcData(
+      admin,
+      'begin_profile_avatar_upload',
+      {
+        p_user_id: userId,
+        p_expected_sha256: sha256,
+        p_expected_bytes: bytes.byteLength,
+      },
+      request,
+      deadline,
+    ),
     userId,
     'prepared',
   );
@@ -732,22 +733,34 @@ export async function runHostedStorageGates({
   assertExactBytes(backendBytes, bytes, sha256, 'ADMIN_UPLOAD_READBACK_MISMATCH');
 
   parseOperation(
-    await rpcData(admin, 'finish_profile_avatar_storage_write', {
-      p_user_id: userId,
-      p_operation_token: begun.operationToken,
-      p_error_code: null,
-    }, request, deadline),
+    await rpcData(
+      admin,
+      'finish_profile_avatar_storage_write',
+      {
+        p_user_id: userId,
+        p_operation_token: begun.operationToken,
+        p_error_code: null,
+      },
+      request,
+      deadline,
+    ),
     userId,
     'prepared',
     begun.operationToken,
   );
   parseOperation(
-    await rpcData(admin, 'mark_profile_avatar_staged', {
-      p_user_id: userId,
-      p_operation_token: begun.operationToken,
-      p_observed_sha256: sha256,
-      p_observed_bytes: bytes.byteLength,
-    }, request, deadline),
+    await rpcData(
+      admin,
+      'mark_profile_avatar_staged',
+      {
+        p_user_id: userId,
+        p_operation_token: begun.operationToken,
+        p_observed_sha256: sha256,
+        p_observed_bytes: bytes.byteLength,
+      },
+      request,
+      deadline,
+    ),
     userId,
     'staged',
     begun.operationToken,
@@ -758,10 +771,16 @@ export async function runHostedStorageGates({
   }
 
   parseOperation(
-    await rpcData(admin, 'finalize_profile_avatar_upload', {
-      p_user_id: userId,
-      p_operation_token: begun.operationToken,
-    }, request, deadline),
+    await rpcData(
+      admin,
+      'finalize_profile_avatar_upload',
+      {
+        p_user_id: userId,
+        p_operation_token: begun.operationToken,
+      },
+      request,
+      deadline,
+    ),
     userId,
     'committed',
     begun.operationToken,
@@ -771,13 +790,7 @@ export async function runHostedStorageGates({
   onOperation(undefined);
 
   const serviceManifest = parseManifest(
-    await rpcData(
-      admin,
-      'get_profile_avatar_manifest',
-      { p_user_id: userId },
-      request,
-      deadline,
-    ),
+    await rpcData(admin, 'get_profile_avatar_manifest', { p_user_id: userId }, request, deadline),
     userId,
     begun.operationToken,
     sha256,
@@ -818,8 +831,7 @@ export async function runHostedStorageGates({
   let signed;
   try {
     signed = await request.call(
-      () =>
-        admin.storage.from(AVATAR_BUCKET).createSignedUrl(serviceManifest.objectKey, 600),
+      () => admin.storage.from(AVATAR_BUCKET).createSignedUrl(serviceManifest.objectKey, 600),
       'SIGNED_URL_CREATION',
       deadline,
     );
@@ -934,12 +946,7 @@ function safeStorageEntryName(value) {
   return value;
 }
 
-async function listStoragePrefix(
-  admin,
-  userId,
-  request = createRequestGuard(),
-  deadline,
-) {
+async function listStoragePrefix(admin, userId, request = createRequestGuard(), deadline) {
   const pendingFolders = [userId];
   const knownFolders = new Set(pendingFolders);
   const visitedFolders = new Set();
@@ -995,12 +1002,7 @@ async function listStoragePrefix(
   return [...objects];
 }
 
-async function removeStorageObjects(
-  admin,
-  objects,
-  request = createRequestGuard(),
-  deadline,
-) {
+async function removeStorageObjects(admin, objects, request = createRequestGuard(), deadline) {
   for (let index = 0; index < objects.length; index += STORAGE_PAGE_SIZE) {
     const batch = objects.slice(index, index + STORAGE_PAGE_SIZE);
     let result;
@@ -1073,8 +1075,7 @@ export async function runOfficialAccountPurge({
 }) {
   uuid(userId, 'CLEANUP_USER_ID_INVALID');
   const cleanupDeadline = deadline ?? now() + timeoutMs;
-  const requestGuard =
-    request ?? createRequestGuard({ now, getDeadline: () => cleanupDeadline });
+  const requestGuard = request ?? createRequestGuard({ now, getDeadline: () => cleanupDeadline });
   const begun = await rpcData(
     admin,
     'begin_user_account_purge',
@@ -1106,10 +1107,16 @@ export async function runOfficialAccountPurge({
     await waitUntil({ target: nextClaimNotBefore, deadline: cleanupDeadline, now, sleep, pollMs });
     const workerId = uuid(randomUUID(), 'CLEANUP_WORKER_ID_INVALID');
     const claim = parseCleanupClaim(
-      await rpcData(admin, 'claim_account_storage_cleanup', {
-        p_worker_id: workerId,
-        p_limit: 1,
-      }, requestGuard, cleanupDeadline),
+      await rpcData(
+        admin,
+        'claim_account_storage_cleanup',
+        {
+          p_worker_id: workerId,
+          p_limit: 1,
+        },
+        requestGuard,
+        cleanupDeadline,
+      ),
       userId,
       tombstoneId,
     );
@@ -1145,12 +1152,18 @@ export async function runOfficialAccountPurge({
     const remaining = await listStoragePrefix(admin, userId, requestGuard, cleanupDeadline);
     const outcome = remaining.length === 0 ? 'empty' : 'nonempty';
     const advanced = parseCleanupAdvance(
-      await rpcData(admin, 'advance_account_storage_cleanup', {
-        p_tombstone_id: tombstoneId,
-        p_worker_id: workerId,
-        p_outcome: outcome,
-        p_error_code: remaining.length === 0 ? null : 'HOSTED_GATE_PREFIX_NOT_EMPTY',
-      }, requestGuard, cleanupDeadline),
+      await rpcData(
+        admin,
+        'advance_account_storage_cleanup',
+        {
+          p_tombstone_id: tombstoneId,
+          p_worker_id: workerId,
+          p_outcome: outcome,
+          p_error_code: remaining.length === 0 ? null : 'HOSTED_GATE_PREFIX_NOT_EMPTY',
+        },
+        requestGuard,
+        cleanupDeadline,
+      ),
       tombstoneId,
     );
     state = advanced.state;
@@ -1292,7 +1305,9 @@ async function verifyProbeKeysAbsent({ admin, userId, probeKeys, request, deadli
   for (const key of probeKeys) {
     await assertObjectMissing(admin, key, 'PROBE_OBJECT_SURVIVED_CLEANUP', request, deadline);
   }
-  for (const prefix of new Set([...probeKeys].map(probePrefix).filter((value) => value !== userId))) {
+  for (const prefix of new Set(
+    [...probeKeys].map(probePrefix).filter((value) => value !== userId),
+  )) {
     if ((await listStoragePrefix(admin, prefix, request, deadline)).length !== 0) {
       fail('PROBE_PREFIX_NOT_EMPTY_AFTER_CLEANUP');
     }
@@ -1398,7 +1413,8 @@ export async function runHostedSecurityGates({
   let email;
   const probeKeys = new Set();
   const sleepImpl =
-    sleep ?? ((milliseconds) => new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds)));
+    sleep ??
+    ((milliseconds) => new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds)));
 
   try {
     config = resolveHostedGateConfig(env);
@@ -1446,7 +1462,6 @@ export async function runHostedSecurityGates({
 
     runToken = randomBytes(12).toString('hex');
     email = `safetyhub-hosted-gate-${runToken}@example.test`;
-    const password = `Shg-${randomBytes(24).toString('base64url')}!Aa1`;
     report.cleanup = {
       required: true,
       terminal: false,
@@ -1461,7 +1476,6 @@ export async function runHostedSecurityGates({
         () =>
           admin.auth.admin.createUser({
             email,
-            password,
             email_confirm: true,
             user_metadata: {
               name: 'Hosted',
@@ -1511,15 +1525,37 @@ export async function runHostedSecurityGates({
       config.publishableKey,
       supabaseOptions(boundedSupabaseFetch),
     );
-    let signedIn;
+    let generatedLink;
     try {
-      signedIn = await request.call(
-        () => authenticated.auth.signInWithPassword({ email, password }),
-        'TEST_IDENTITY_SIGN_IN',
+      generatedLink = await request.call(
+        () =>
+          admin.auth.admin.generateLink({
+            type: 'magiclink',
+            email,
+          }),
+        'TEST_IDENTITY_GENERATE_OTP_LINK',
         runDeadline,
       );
     } catch (error) {
-      rethrowOrFail(error, 'TEST_IDENTITY_SIGN_IN_UNAVAILABLE');
+      rethrowOrFail(error, 'TEST_IDENTITY_GENERATE_OTP_LINK_UNAVAILABLE');
+    }
+    const tokenHash = generatedLink?.data?.properties?.hashed_token;
+    if (generatedLink?.error || typeof tokenHash !== 'string' || tokenHash.length < 16) {
+      fail('TEST_IDENTITY_GENERATE_OTP_LINK_FAILED');
+    }
+    let signedIn;
+    try {
+      signedIn = await request.call(
+        () =>
+          authenticated.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'magiclink',
+          }),
+        'TEST_IDENTITY_VERIFY_OTP_LINK',
+        runDeadline,
+      );
+    } catch (error) {
+      rethrowOrFail(error, 'TEST_IDENTITY_VERIFY_OTP_LINK_UNAVAILABLE');
     }
     if (
       signedIn?.error ||
@@ -1527,7 +1563,7 @@ export async function runHostedSecurityGates({
       typeof signedIn?.data?.session?.access_token !== 'string' ||
       signedIn.data.session.access_token.length === 0
     ) {
-      fail('TEST_IDENTITY_SIGN_IN_FAILED');
+      fail('TEST_IDENTITY_VERIFY_OTP_LINK_FAILED');
     }
 
     await assertServiceRpcPresence({

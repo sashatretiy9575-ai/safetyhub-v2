@@ -4,18 +4,21 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, UserCircleCheck } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
 import { AvatarUploader } from '@/features/profile/avatar-uploader';
+import { PhoneInput } from '@/features/profile/phone-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import {
-  normalizeProfileValues,
+  normalizeProfileSubmissionValues,
   PROFILE_FIELD_LIMITS,
-  validateProfileValues,
-  type ProfileValues as OnboardingProfileValues,
+  validateProfileSubmissionValues,
+  type ProfileField,
+  type ProfileSubmissionField,
+  type ProfileSubmissionValues as OnboardingProfileValues,
 } from '@/features/profile/fields';
 
-type FieldErrors = Partial<Record<keyof OnboardingProfileValues | 'avatar', string>>;
+type FieldErrors = Partial<Record<ProfileSubmissionField | 'avatar', string>>;
 
 type OrganizationResponse = {
   organizations?: string[];
@@ -68,7 +71,7 @@ export function OnboardingForm({
   }, [form.organization]);
 
   const update =
-    (field: keyof OnboardingProfileValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (field: ProfileField) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setForm((current) => ({ ...current, [field]: event.target.value }));
       setFieldErrors((current) => ({ ...current, [field]: undefined }));
     };
@@ -78,7 +81,7 @@ export function OnboardingForm({
       ? nameRef.current
       : errors.surname
         ? surnameRef.current
-        : errors.job
+          : errors.job
           ? jobRef.current
           : errors.organization
             ? organizationRef.current
@@ -88,7 +91,7 @@ export function OnboardingForm({
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const errors: FieldErrors = validateProfileValues(form);
+    const errors: FieldErrors = validateProfileSubmissionValues(form);
     if (!avatarReady) errors.avatar = 'Добавьте фотографию перед продолжением.';
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -103,7 +106,7 @@ export function OnboardingForm({
       const result = await clientRequest('/api/profile/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(normalizeProfileValues(form)),
+        body: JSON.stringify(normalizeProfileSubmissionValues(form)),
       });
       if (!result.ok) {
         const payload = await readClientResponseJson<ErrorResponse>(result.response);
@@ -116,7 +119,7 @@ export function OnboardingForm({
         setMessage(clientRequestMessage(result.error, 'Не удалось завершить заполнение профиля.'));
         return;
       }
-      router.replace('/topics');
+      router.replace('/profile');
       router.refresh();
     } catch (error) {
       setMessage(clientRequestMessage(error, 'Не удалось завершить заполнение профиля.'));
@@ -235,6 +238,28 @@ export function OnboardingForm({
             </p>
           ) : null}
         </div>
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="onboarding-phone">Номер телефона</Label>
+          <PhoneInput
+            id="onboarding-phone"
+            value={form.phone}
+            onChange={(phone) => {
+              setForm((current) => ({ ...current, phone }));
+              setFieldErrors((current) => ({ ...current, phone: undefined }));
+            }}
+            invalid={Boolean(fieldErrors.phone)}
+            describedBy={fieldErrors.phone ? 'onboarding-phone-error' : 'onboarding-phone-help'}
+            disabled={busy}
+          />
+          <p id="onboarding-phone-help" className="text-xs text-[var(--color-text-muted)]">
+            Номер нужен только для связи по заявке. SMS-коды на него не отправляются.
+          </p>
+          {fieldErrors.phone ? (
+            <p id="onboarding-phone-error" role="alert" className="text-xs text-[var(--color-danger)]">
+              {fieldErrors.phone}
+            </p>
+          ) : null}
+        </div>
       </div>
 
       <section
@@ -268,7 +293,7 @@ export function OnboardingForm({
       <div className="space-y-3">
         <Button type="submit" className="w-full" disabled={busy}>
           <UserCircleCheck size={19} />
-          {busy ? 'Сохраняем…' : 'Сохранить и перейти к курсам'}
+          {busy ? 'Сохраняем…' : 'Отправить заявку на проверку'}
           {!busy ? <ArrowRight size={18} /> : null}
         </Button>
         {message ? (

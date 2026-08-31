@@ -33,5 +33,12 @@ type SchemaProfileValues = z.infer<typeof profileSchema>;
 const _profileTypeCheck: ProfileValues = {} as SchemaProfileValues;
 void _profileTypeCheck;
 
-export const onboardingProfileSchema = profileSchema;
-export type OnboardingProfileValues = ProfileValues;
+export const profileSubmissionSchema = profileSchema.extend({
+  phone: z.object({
+    countryIso2: z.string().trim().toUpperCase().regex(/^[A-Z]{2}$/),
+    nationalNumber: z.string().trim().min(1).max(64),
+  }),
+});
+
+export const onboardingProfileSchema = profileSubmissionSchema;
+export type OnboardingProfileValues = z.infer<typeof onboardingProfileSchema>;

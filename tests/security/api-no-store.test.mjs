@@ -63,8 +63,13 @@ test('API response facade disables browser and CDN storage', async () => {
   assert.match(source, /Expires: ['"]0/);
 });
 
-test('Auth callback redirects carrying session state are never cacheable', async () => {
-  const source = await readFile(path.join(root, 'app/(account)/callback/route.ts'), 'utf8');
-  assert.match(source, /@\/lib\/security\/api-response/);
-  assert.doesNotMatch(source, /from ['"]next\/server['"]/);
+test('retired Auth callback redirects remain behind the no-store response facade', async () => {
+  const [callback, retiredHelper] = await Promise.all([
+    readFile(path.join(root, 'app/(account)/callback/route.ts'), 'utf8'),
+    readFile(path.join(root, 'features/auth/password-auth-retired.tsx'), 'utf8'),
+  ]);
+  assert.match(callback, /redirectFromRetiredPasswordLink\(\)/u);
+  assert.match(retiredHelper, /@\/lib\/security\/api-response/u);
+  assert.match(retiredHelper, /'Cache-Control', 'no-store'/u);
+  assert.doesNotMatch(callback, /from ['"]next\/server['"]/);
 });

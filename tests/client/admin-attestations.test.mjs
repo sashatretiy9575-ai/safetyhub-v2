@@ -163,7 +163,10 @@ test('attestation list keeps personal details compact and loads the avatar only 
   assert.match(managerSurface, /mailto:\$\{history\.email\}/);
   assert.match(historyRoute, /requireCapability\('user\.read'\)/);
   assert.match(historyRoute, /auth\.admin\.getUserById/);
-  assert.match(avatarRoute, /requireCapability\('identity\.read'\)/);
+  assert.match(
+    avatarRoute,
+    /requireAnyCapability\(\['identity\.read', 'identity\.manage'\]\)/,
+  );
   assert.match(avatarRoute, /rpc\('get_profile_avatar_manifest'/);
   assert.match(avatarRoute, /isOwnedAvatarObjectKey\(/);
   assert.match(avatarRoute, /createSignedUrl\(manifest\.data\.objectKey, 10 \* 60\)/);

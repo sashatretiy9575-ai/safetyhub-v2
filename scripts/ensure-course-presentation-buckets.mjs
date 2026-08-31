@@ -20,7 +20,9 @@ const EXPECTED_BUCKETS = [
   },
   {
     id: 'course-presentations',
-    public: true,
+    // Published material is delivered by the approval-gated same-origin route.
+    // Object paths are immutable but must never be public bearer URLs.
+    public: false,
     fileSizeLimit: 25 * 1024 * 1024,
     allowedMimeTypes: ['application/pdf', 'image/webp'],
   },

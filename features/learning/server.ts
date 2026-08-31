@@ -37,16 +37,6 @@ const questionSchema = z.object({
   // v3 publication RPC remains the strict 3 x 10 x 4 enforcement boundary.
   options: z.array(optionSchema).min(2).max(6),
 });
-const reviewItemSchema = z.object({
-  questionId: z.string().uuid(),
-  selectedOptionId: z.string().uuid(),
-  correctOptionId: z.string().uuid(),
-  isCorrect: z.boolean(),
-  explanation: z
-    .string()
-    .nullable()
-    .transform((value) => value ?? ''),
-});
 const timestampSchema = z.string().refine((value) => Number.isFinite(Date.parse(value)));
 const attemptPayloadSchema = z
   .object({
@@ -71,7 +61,6 @@ const attemptPayloadSchema = z
     serverNow: timestampSchema,
     retryAt: timestampSchema.nullable(),
     questions: z.array(questionSchema).min(LEGACY_QUESTION_COUNT).max(QUIZ_POLICY.questionCount),
-    review: z.array(reviewItemSchema).max(QUIZ_POLICY.questionCount),
   })
   .strict()
   .superRefine((payload, context) => {
@@ -92,14 +81,8 @@ const attemptPayloadSchema = z
     if (payload.score !== null && payload.score > payload.total) {
       context.addIssue({ code: 'custom', message: 'score' });
     }
-    if (payload.status === 'passed' && payload.review.length !== payload.total) {
-      context.addIssue({ code: 'custom', message: 'passedReview' });
-    }
     if ((payload.status === 'passed' || payload.status === 'failed') && payload.score === null) {
       context.addIssue({ code: 'custom', message: 'completedScore' });
-    }
-    if (payload.status !== 'passed' && payload.review.length !== 0) {
-      context.addIssue({ code: 'custom', message: 'prematureReview' });
     }
     if (
       payload.status !== 'started' &&

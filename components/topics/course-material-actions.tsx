@@ -13,15 +13,72 @@ import { resolveCourseIcon } from '@/lib/course-icons';
 import type { Course } from '@/lib/content/topics';
 import { ROUTES } from '@/lib/constants';
 
+export type CourseMaterialAccess =
+  | 'anonymous'
+  | 'legal_required'
+  | 'profile_incomplete'
+  | 'pending'
+  | 'rejected'
+  | 'approved';
+
 function presentationDownloadUrl(url: string, slug: string) {
   const separator = url.includes('?') ? '&' : '?';
   return `${url}${separator}download=${encodeURIComponent(`${slug}.pdf`)}`;
 }
 
-export function CourseMaterialActions({ course }: { course: Course }) {
+function accessCta(access: CourseMaterialAccess, slug: string) {
+  if (access === 'approved') return null;
+  if (access === 'anonymous') {
+    return {
+      title: 'Войдите, чтобы открыть обучение',
+      description: 'После входа заполните профиль и отправьте заявку на проверку администратору.',
+      href: `/auth/login?return=${encodeURIComponent(`/topics/${slug}`)}`,
+      label: 'Войти по email-коду',
+    };
+  }
+  if (access === 'legal_required') {
+    return {
+      title: 'Нужно принять документы',
+      description: 'После принятия текущих документов можно завершить заявку на обучение.',
+      href: '/auth/legal',
+      label: 'Открыть документы',
+    };
+  }
+  if (access === 'profile_incomplete') {
+    return {
+      title: 'Сначала заполните профиль',
+      description: 'Добавьте контактный телефон и фотографию, затем отправьте заявку администратору.',
+      href: '/onboarding',
+      label: 'Заполнить профиль',
+    };
+  }
+  if (access === 'pending') {
+    return {
+      title: 'Заявка проверяется администратором',
+      description: 'До подтверждения презентация, вопросы и тест недоступны. Статус и обратный отсчёт есть в личном кабинете.',
+      href: '/profile',
+      label: 'Открыть статус заявки',
+    };
+  }
+  return {
+    title: 'Заявка требует уточнений',
+    description: 'Проверьте комментарий администратора и отправьте данные повторно.',
+    href: '/profile',
+    label: 'Уточнить данные',
+  };
+}
+
+export function CourseMaterialActions({
+  course,
+  access,
+}: {
+  course: Course;
+  access: CourseMaterialAccess;
+}) {
   const courseIcon = resolveCourseIcon(course.icon);
   const CourseIcon = courseIcon.component;
   const filename = `${course.slug}.pdf`;
+  const cta = accessCta(access, course.slug);
 
   return (
     <section className="py-8 sm:py-12 lg:py-14">
@@ -73,7 +130,17 @@ export function CourseMaterialActions({ course }: { course: Course }) {
               </div>
 
               <div data-course-material-actions className="grid w-full gap-3">
-                {course.presentation ? (
+                {cta ? (
+                  <div className="space-y-3 rounded-xl border border-[var(--color-warning)] bg-[var(--color-surface-muted)] p-4 text-left">
+                    <p className="font-bold">{cta.title}</p>
+                    <p className="text-sm leading-6 text-[var(--color-text-muted)]">{cta.description}</p>
+                    <Button asChild size="lg" className="w-full">
+                      <Link href={cta.href} prefetch={false}>{cta.label}</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    {course.presentation ? (
                   <Button asChild variant="secondary" size="xl" className="w-full">
                     <a
                       href={presentationDownloadUrl(course.presentation.url, course.slug)}
@@ -88,14 +155,16 @@ export function CourseMaterialActions({ course }: { course: Course }) {
                     <DownloadSimple size={20} weight="bold" aria-hidden="true" />
                     Презентация недоступна
                   </Button>
-                )}
+                    )}
 
-                <Button asChild size="xl" className="w-full">
-                  <Link href={ROUTES.test(course.slug)} prefetch={false}>
-                    <ListChecks size={20} weight="bold" aria-hidden="true" />
-                    Начать тест
-                  </Link>
-                </Button>
+                    <Button asChild size="xl" className="w-full">
+                      <Link href={ROUTES.test(course.slug)} prefetch={false}>
+                        <ListChecks size={20} weight="bold" aria-hidden="true" />
+                        Начать тест
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </CardContent>

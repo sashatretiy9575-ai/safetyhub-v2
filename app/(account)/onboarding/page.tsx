@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { AuthenticationError, requireUser } from '@/features/auth/server';
 import { OnboardingForm } from '@/features/profile/onboarding-form';
 import { getProfileAvatarUrl } from '@/features/profile/server';
+import { phoneInputValueFromE164 } from '@/lib/phone';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 
@@ -15,6 +16,9 @@ export default async function OnboardingPage() {
     if (error instanceof AuthenticationError && error.status === 401) {
       redirect('/auth/login?return=/onboarding');
     }
+    if (error instanceof AuthenticationError && error.code === 'LEGAL_ACCEPTANCE_REQUIRED') {
+      redirect('/auth/legal');
+    }
     throw error;
   }
 
@@ -23,7 +27,9 @@ export default async function OnboardingPage() {
     onboarding_completed_at?: string | null;
   };
   const avatarUrl = profile.avatar_updated_at ? await getProfileAvatarUrl(context.user.id) : null;
-  if (profile.onboarding_completed_at && avatarUrl) redirect('/topics');
+  if (profile.onboarding_completed_at && avatarUrl) {
+    redirect(context.approval.state === 'approved' ? '/topics' : '/profile');
+  }
 
   return (
     <section className="py-8 md:py-14">
@@ -33,8 +39,8 @@ export default async function OnboardingPage() {
             <p className="text-sm font-semibold text-[var(--color-primary)]">Первый шаг</p>
             <h1 className="font-display mt-1 text-3xl font-black md:text-4xl">Заполните профиль</h1>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[var(--color-text-muted)]">
-              Эти данные понадобятся для результатов и сертификата. Их можно будет изменить в личном
-              кабинете.
+              После отправки заявки администратор проверит данные в течение 24 часов. До подтверждения
+              вопросы курсов и тесты недоступны.
             </p>
           </div>
           <Card>
@@ -45,6 +51,10 @@ export default async function OnboardingPage() {
                   surname: profile.surname,
                   job: profile.job,
                   organization: profile.organization ?? '',
+                  phone: phoneInputValueFromE164(
+                    context.profile.phone_country_iso2,
+                    context.profile.phone_e164,
+                  ),
                 }}
                 initialAvatarUrl={avatarUrl}
               />

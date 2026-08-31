@@ -1,60 +1,60 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import {
-  PASSWORD_MAX_CHARACTERS,
-  PASSWORD_MIN_CHARACTERS,
-  signUpSchema,
-  updatePasswordSchema,
-} from '../../lib/validation/auth.ts';
+import { emailOtpStartSchema, emailOtpVerifySchema } from '../../lib/validation/auth.ts';
 
-const valid = 'SafetyHub2026';
+const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('registration, recovery, invite and current-password changes share one strong policy', () => {
-  assert.equal(PASSWORD_MIN_CHARACTERS, 12);
-  assert.equal(PASSWORD_MAX_CHARACTERS, 72);
-  assert.equal(
-    signUpSchema.safeParse({
+test('passwordless verification accepts only the email and six-digit code, not browser mode or consent claims', () => {
+  assert.deepEqual(
+    emailOtpStartSchema.parse({ email: 'learner@example.com', intent: 'register' }),
+    { email: 'learner@example.com', intent: 'register' },
+  );
+  assert.deepEqual(
+    emailOtpVerifySchema.parse({
       email: 'learner@example.com',
-      password: valid,
-      passwordConfirm: valid,
+      code: '123456',
+      intent: 'register',
       legalAccepted: true,
-    }).success,
-    true,
+    }),
+    { email: 'learner@example.com', code: '123456' },
   );
-  assert.equal(
-    updatePasswordSchema.safeParse({ password: valid, passwordConfirm: valid }).success,
-    true,
-  );
-
-  for (const password of ['shortA1', 'alllowercase2026', 'ALLUPPERCASE2026', 'NoDigitsHereXX']) {
-    assert.equal(
-      updatePasswordSchema.safeParse({ password, passwordConfirm: password }).success,
-      false,
-      password,
-    );
-  }
 });
 
-test('password UI uses shared limits and the current-password path enforces Auth reauthentication', async () => {
-  const [registration, passwordChange, passwordRoute] = await Promise.all([
-    readFile(new URL('../../app/(account)/auth/register/page.tsx', import.meta.url), 'utf8'),
-    readFile(new URL('../../features/auth/password-change-form.tsx', import.meta.url), 'utf8'),
-    readFile(new URL('../../app/api/auth/password/route.ts', import.meta.url), 'utf8'),
+test('browser-facing entry pages have no password fields and route through the email-code flow', async () => {
+  const [login, registration, flow, requestRoute, verifyRoute] = await Promise.all([
+    read('app/(account)/auth/login/page.tsx'),
+    read('app/(account)/auth/register/page.tsx'),
+    read('features/auth/email-otp-flow.tsx'),
+    read('app/api/auth/email-otp/request/route.ts'),
+    read('app/api/auth/email-otp/verify/route.ts'),
   ]);
-  for (const source of [registration, passwordChange]) {
-    assert.match(source, /minLength=\{PASSWORD_MIN_CHARACTERS\}/u);
-    assert.match(source, /maxLength=\{PASSWORD_MAX_CHARACTERS\}/u);
-    assert.match(source, /Минимум 12 символов/u);
+  for (const source of [login, registration, flow]) {
+    assert.doesNotMatch(source, /PasswordInput|type="password"|reset-password|change-password/u);
   }
-  assert.match(passwordRoute, /current_password:\s*parsed\.data\.currentPassword/u);
-  const contextBranch = passwordRoute.slice(passwordRoute.indexOf('const session ='));
-  assert.doesNotMatch(contextBranch, /current_password/u);
+  assert.match(login, /<EmailOtpFlow intent="login"/u);
+  assert.match(registration, /<EmailOtpFlow intent="register"/u);
+  assert.match(requestRoute, /signInWithOtp/u);
+  assert.doesNotMatch(requestRoute, /signInWithPassword|auth\.signUp\(/u);
+  assert.match(verifyRoute, /verifyOtp/u);
+  assert.doesNotMatch(verifyRoute, /signInWithPassword|updateUser\(\{[\s\S]*password/u);
 });
 
-test('the direct Supabase Auth boundary enforces the same password policy', async () => {
-  const config = await readFile(new URL('../../supabase/config.toml', import.meta.url), 'utf8');
-  assert.match(config, /^minimum_password_length = 12$/mu);
-  assert.match(config, /^password_requirements = "lower_upper_letters_digits"$/mu);
-  assert.match(config, /^secure_password_change = true$/mu);
+test('local Auth configuration sends six-digit email OTPs for both login and registration', async () => {
+  const [config, loginTemplate, confirmationTemplate] = await Promise.all([
+    read('supabase/config.toml'),
+    read('supabase/templates/magic-link.html'),
+    read('supabase/templates/confirmation.html'),
+  ]);
+  assert.match(config, /\[auth\][\s\S]*?enable_signup = true/u);
+  assert.match(config, /\[auth\.email\][\s\S]*?enable_signup = true/u);
+  assert.match(config, /\[auth\.email\][\s\S]*?enable_confirmations = true/u);
+  assert.match(config, /^otp_length = 6$/mu);
+  assert.match(config, /^otp_expiry = 3600$/mu);
+  assert.match(config, /\[auth\.email\.template\.magic_link\]/u);
+  assert.match(config, /\[auth\.email\.template\.confirmation\]/u);
+  for (const template of [loginTemplate, confirmationTemplate]) {
+    assert.match(template, /\{\{ \.Token \}\}/u);
+    assert.doesNotMatch(template, /ConfirmationURL/u);
+  }
 });

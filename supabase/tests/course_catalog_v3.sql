@@ -19,6 +19,7 @@ declare
   v_status_definition text;
   v_finalize_definition text;
   v_retire_definition text;
+  v_approval_gate_definition text;
 begin
   foreach v_relation in array array[
     'public.course_presentations',
@@ -86,8 +87,17 @@ begin
       'public.save_course_draft_v3(uuid,uuid,bigint,text,text,text,text,integer,uuid,integer,integer,integer,text,jsonb,jsonb,jsonb)',
       'execute'
     )
-    or not has_function_privilege(
+    or has_function_privilege(
       'authenticated', 'public.get_course_editor_payload_v3(uuid,uuid)', 'execute'
+    )
+    or has_function_privilege(
+      'service_role', 'public.get_course_editor_payload_v3(uuid,uuid)', 'execute'
+    )
+    or has_function_privilege(
+      'authenticated', 'public.get_test_editor_payload(uuid,uuid)', 'execute'
+    )
+    or has_function_privilege(
+      'authenticated', 'public.get_test_editor_payload_v2(uuid,uuid)', 'execute'
     )
     or not has_function_privilege(
       'authenticated', 'public.delete_admin_learning_history(uuid,uuid,text,uuid)', 'execute'
@@ -183,11 +193,20 @@ begin
     raise exception 'course draft, variant, or answer-key direct surface is unsafe';
   end if;
 
-  if not has_column_privilege(
+  if has_column_privilege(
       'anon', 'public.course_presentations', 'storage_path', 'select'
     )
     or has_column_privilege(
-      'anon', 'public.course_presentations', 'source_filename', 'select'
+      'authenticated', 'public.course_presentations', 'storage_path', 'select'
+    )
+    or has_column_privilege(
+      'anon', 'public.course_presentations', 'thumbnail_path', 'select'
+    )
+    or has_column_privilege(
+      'authenticated', 'public.course_presentations', 'source_filename', 'select'
+    )
+    or not has_column_privilege(
+      'anon', 'public.course_presentations', 'page_count', 'select'
     )
     or not has_table_privilege(
       'service_role', 'public.course_presentations', 'insert'
@@ -198,17 +217,44 @@ begin
   if not exists (
     select 1 from pg_policies
     where schemaname = 'public' and tablename = 'course_presentations'
-      and policyname = 'course_presentations_public_read'
+      and policyname = 'course_presentations_catalog_read'
   ) or not exists (
     select 1 from pg_policies
     where schemaname = 'storage' and tablename = 'objects'
       and policyname = 'course_presentations_staging_admin_read'
+  ) or not exists (
+    select 1 from pg_policies
+    where schemaname = 'storage' and tablename = 'objects'
+      and policyname = 'course_presentations_browser_access_denied'
+      and permissive = 'RESTRICTIVE'
   ) or exists (
     select 1 from pg_policies
     where schemaname = 'storage' and tablename = 'objects'
       and policyname = 'course_presentations_staging_admin_insert'
   ) then
     raise exception 'presentation RLS or signed-upload-only boundary invalid';
+  end if;
+
+  if to_regprocedure('private.require_approved_learner()') is null
+    or to_regprocedure('public.get_approved_course_presentation(text,text)') is null
+    or has_function_privilege('anon', 'public.get_approved_course_presentation(text,text)', 'execute')
+    or not has_function_privilege(
+      'authenticated', 'public.get_approved_course_presentation(text,text)', 'execute'
+    )
+    or has_function_privilege(
+      'authenticated', 'private.require_approved_learner()', 'execute'
+    )
+    or (select public from storage.buckets where id = 'course-presentations') is distinct from false then
+    raise exception 'approval-gated private presentation access contract invalid';
+  end if;
+
+  select pg_get_functiondef('private.require_approved_learner()'::regprocedure)
+  into v_approval_gate_definition;
+  if position('control.status = ''active''' in v_approval_gate_definition) = 0
+    or position('not control.deletion_pending' in v_approval_gate_definition) = 0
+    or position('for share' in lower(v_approval_gate_definition)) = 0
+    or position('ACCOUNT_APPROVAL_REQUIRED' in v_approval_gate_definition) = 0 then
+    raise exception 'approved learner gate must lock and recheck active/deletion state';
   end if;
 
   if not exists (
@@ -432,11 +478,14 @@ begin
   ));
   if position('variantnumber' in v_payload_definition) > 0
     or position('''variantid''' in v_payload_definition) > 0
+    or position('correctoptionid' in v_payload_definition) > 0
+    or position('test_revision_variant_answer_keys' in v_payload_definition) > 0
+    or position('''review''' in v_payload_definition) > 0
     or position('''passscore''' in v_payload_definition) = 0
     or position('''courseid''' in v_payload_definition) = 0
     or position('''revisionid''' in v_payload_definition) = 0
     or position('''startedat''' in v_payload_definition) = 0 then
-    raise exception 'learner attempt payload exposes variant or omits policy';
+    raise exception 'learner attempt payload exposes answer/variant key data or omits policy';
   end if;
 
   v_complete_definition := lower(pg_get_functiondef(

@@ -3,14 +3,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import {
-  clearTestEditorDraft,
-  parseTestEditorDraft,
-  readTestEditorDraft,
-  testEditorDraftStorageKey,
-  validateTestEditor,
-  writeTestEditorDraft,
-} from '../../lib/admin-test-editor.ts';
+import { serializeTestEditorPayload, validateTestEditor } from '../../lib/admin-test-editor.ts';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
@@ -60,15 +53,6 @@ function validPayload() {
   };
 }
 
-function memoryStorage() {
-  const values = new Map();
-  return {
-    getItem: (key) => values.get(key) ?? null,
-    setItem: (key, value) => values.set(key, value),
-    removeItem: (key) => values.delete(key),
-  };
-}
-
 test('publication validation enforces three variants with ten questions and four stable options', () => {
   const valid = validateTestEditor(validPayload());
   assert.equal(valid.valid, true);
@@ -112,19 +96,21 @@ test('duplicate question and option wording warns without blocking publication',
   assert.match(result.fieldWarnings['variant-0-question-0-option-1'], /повторяется/iu);
 });
 
-test('versioned local drafts are scoped to one course editor and reject malformed data', () => {
-  const storage = memoryStorage();
+test('editor comparison serialization stays in memory and omits revision history', () => {
   const payload = validPayload();
-  const savedAt = writeTestEditorDraft(storage, 'new', payload, 1_750_000_000_000);
-  assert.equal(savedAt, 1_750_000_000_000);
-  assert.match(testEditorDraftStorageKey('new'), /^safetyhub:course-editor-draft:v2:/);
-  assert.deepEqual(readTestEditorDraft(storage, 'new')?.test, payload);
-  assert.equal(readTestEditorDraft(storage, 'another-editor'), null);
-  assert.equal(parseTestEditorDraft('{broken', 'new'), null);
-  assert.equal(parseTestEditorDraft('x'.repeat(1_000_001), 'new'), null);
-
-  clearTestEditorDraft(storage, 'new');
-  assert.equal(readTestEditorDraft(storage, 'new'), null);
+  payload.revisionHistory = [
+    {
+      id: stableUuid(123_456),
+      version: 1,
+      publishedAt: '2026-08-31T00:00:00.000Z',
+      contentHash: 'b'.repeat(64),
+      presentationId: payload.presentationId,
+      current: true,
+    },
+  ];
+  const serialized = JSON.parse(serializeTestEditorPayload(payload));
+  assert.equal('revisionHistory' in serialized, false);
+  assert.equal(serialized.questionVariants.length, 3);
 });
 
 test('course editor exposes presentation, policy, three variants, stable ids and canonical routes', async () => {
@@ -143,7 +129,12 @@ test('course editor exposes presentation, policy, three variants, stable ids and
   assert.match(component, /attemptResetTimezone: 'Asia\/Oral'/);
   assert.match(component, /clientRequest\('\/api\/admin\/courses'/);
   assert.match(component, /router\.replace\(`\/admin\/courses\//);
-  assert.match(component, /writeTestEditorDraft\(/);
+  assert.match(component, /freshTestFromSeed/);
+  assert.match(component, /questionVariants: empty\.questionVariants/);
+  assert.match(component, /data-course-editor-key-boundary/);
+  assert.match(component, /removeItem\(key\)/);
+  assert.doesNotMatch(component, /readTestEditorDraft|writeTestEditorDraft|clearTestEditorDraft/);
+  assert.doesNotMatch(component, /localStorage\.getItem|localStorage\.setItem/);
   assert.match(component, /useUnsavedChangesGuard\(dirty\)/);
   assert.match(component, /<EditorActionBar/);
   assert.match(component, /7\. Проверка перед публикацией/);

@@ -1,10 +1,9 @@
 import 'server-only';
 
 import { createHash, randomBytes } from 'node:crypto';
-import { createClient as createSupabaseClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import type { NextResponse } from 'next/server';
-import { clientFetch } from '@/lib/client-request';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Database } from '@/lib/supabase/types';
 
@@ -70,19 +69,7 @@ async function createContext(
   return token;
 }
 
-export function createEphemeralAuthClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_NOT_CONFIGURED');
-  return createSupabaseClient<Database>(url, key, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-      detectSessionInUrl: false,
-    },
-    global: { fetch: clientFetch },
-  });
-}
+export { createEphemeralAuthClient } from '@/lib/supabase/ephemeral-auth';
 
 export async function verifiedSessionId(
   client: SupabaseClient<Database>,

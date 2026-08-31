@@ -162,7 +162,7 @@ test('Management API metadata must prove the exact ref and disposable project na
   await assertDisposableProjectMarker({
     projectRef: DISPOSABLE_REF,
     accessToken: 'test-management-token',
-      fetchImpl: async (...args) => {
+    fetchImpl: async (...args) => {
       request = args;
       return response({
         id: DISPOSABLE_REF,
@@ -325,4 +325,7 @@ test('load harness completes every safety preflight before its first seed write'
   assert.match(harness, /mark_profile_avatar_staged/u);
   assert.match(harness, /finalize_profile_avatar_upload/u);
   assert.match(harness, /upsert: false/u);
+  assert.match(harness, /admin\.auth\.admin\.generateLink\(/u);
+  assert.match(harness, /client\.auth\.verifyOtp\(/u);
+  assert.doesNotMatch(harness, /signInWithPassword|updateUserById\([^)]*password/u);
 });

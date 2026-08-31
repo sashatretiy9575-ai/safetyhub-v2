@@ -4,92 +4,91 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('registration asks only for credentials and defers verified identity', async () => {
-  const [register, registerRoute, signupLegal, validation] = await Promise.all([
+test('registration asks for email only and defers explicit legal consent until after verified identity', async () => {
+  const [register, flow, requestRoute, verifyRoute, legalPage, legalGate, validation] = await Promise.all([
     read('app/(account)/auth/register/page.tsx'),
-    read('app/api/auth/register/route.ts'),
-    read('features/auth/signup-legal.ts'),
+    read('features/auth/email-otp-flow.tsx'),
+    read('app/api/auth/email-otp/request/route.ts'),
+    read('app/api/auth/email-otp/verify/route.ts'),
+    read('app/(account)/auth/legal/page.tsx'),
+    read('features/auth/legal-acceptance-gate.tsx'),
     read('lib/validation/auth.ts'),
   ]);
 
-  assert.doesNotMatch(register, /firstName|lastName|profile-job/);
-  assert.match(register, /signUpSchema\.safeParse/);
-  assert.match(register, /clientRequest\('\/api\/auth\/register'/);
-  assert.match(registerRoute, /auth\.signUp/);
-  assert.match(registerRoute, /emailRedirectTo/);
-  assert.match(registerRoute, /if \(error && !isExistingAccountSignupError\(error\)\)/);
-  assert.match(registerRoute, /throw error/);
-  assert.match(registerRoute, /prepareSignupLegalOperation\(parsed\.data\.email\)/);
-  assert.match(registerRoute, /finalizeSignupLegalOperation\(operation, data\.user\.id\)/);
-  assert.match(
-    registerRoute,
-    /data:\s*\{\s*safetyhubSignupOperationId: operation\.operationId,\s*safetyhubSignupNonce: operation\.signupNonce,?\s*\}/s,
-  );
+  assert.match(register, /<EmailOtpFlow intent="register"/u);
+  assert.doesNotMatch(register, /firstName|lastName|profile-job|PasswordInput|type="password"/u);
+  assert.match(flow, /emailOtpStartSchema\.safeParse/u);
+  assert.match(flow, /clientRequest\('\/api\/auth\/email-otp\/request'/u);
+  assert.match(requestRoute, /createEphemeralAuthClient\(\)\.auth\.signInWithOtp/u);
+  assert.match(requestRoute, /shouldCreateUser: parsed\.data\.intent === 'register'/u);
   assert.doesNotMatch(
-    registerRoute,
-    /raw_user_meta_data|legalAcceptance|\.identities\b|deleteUser\(|mark_signup_legal_acceptance/,
+    requestRoute,
+    /prepareSignupLegalOperation|createAdminClient|auth\.admin\.createUser|email_confirm|raw_user_meta_data|\.identities\b|deleteUser\(/u,
   );
-  assert.match(signupLegal, /p_privacy_version:\s*PRIVACY_POLICY\.version/);
-  assert.match(signupLegal, /p_terms_version:\s*TERMS_POLICY\.version/);
-  assert.doesNotMatch(registerRoute, /data:\s*\{\s*(?:name|surname|job):/);
-  assert.match(validation, /export const signUpSchema = z[\s\S]*email:[\s\S]*passwordConfirm:/);
-  assert.doesNotMatch(validation, /firstName|lastName/);
+  assert.match(verifyRoute, /return '\/auth\/legal'/u);
+  assert.doesNotMatch(verifyRoute, /accept_current_legal_documents|legalAccepted|parsed\.data\.intent/u);
+  assert.match(legalPage, /requireUser\(\{ enforceLegal: false \}\)/u);
+  assert.match(legalPage, /<LegalAcceptanceGate/u);
+  assert.match(legalGate, /<LegalAcceptancePanel/u);
+  assert.match(legalGate, /router\.replace\(continueTo\)/u);
+  assert.match(validation, /export const emailOtpStartSchema = z[\s\S]*intent/u);
+  const verificationSchema = validation.slice(validation.indexOf('export const emailOtpVerifySchema'));
+  assert.doesNotMatch(verificationSchema, /intent|legalAccepted/u);
+  assert.doesNotMatch(validation, /firstName|lastName/u);
 });
 
-test('registration success explains repeated signup without exposing account existence', async () => {
-  const register = await read('app/(account)/auth/register/page.tsx');
+test('registration start is neutral about whether the email already has an account', async () => {
+  const [flow, requestRoute] = await Promise.all([
+    read('features/auth/email-otp-flow.tsx'),
+    read('app/api/auth/email-otp/request/route.ts'),
+  ]);
 
-  assert.match(register, /Если для этого email ещё нет аккаунта/);
-  assert.match(register, /Если аккаунт уже существует, войдите или восстановите пароль/);
-  assert.match(register, /href="\/auth\/login"/);
-  assert.match(register, /href="\/auth\/reset-password"/);
-  assert.doesNotMatch(register, /Проверьте почту и подтвердите регистрацию/);
+  assert.match(flow, /Если этот адрес можно использовать, код отправлен/u);
+  assert.match(requestRoute, /return NextResponse\.json\(\{ sent: true \}, \{ status: 202 \}\)/u);
+  assert.doesNotMatch(flow, /reset-password|восстановите пароль|Пароль/u);
 });
 
-test('auth forms expose inline errors and focus the first invalid field', async () => {
-  const [register, login, reset, passwordChange, controls] = await Promise.all([
-    read('app/(account)/auth/register/page.tsx'),
-    read('app/(account)/auth/login/page.tsx'),
-    read('features/auth/password-recovery-flow.tsx'),
-    read('features/auth/password-change-form.tsx'),
+test('email-code form exposes inline errors and focuses the first invalid field', async () => {
+  const [flow, controls] = await Promise.all([
+    read('features/auth/email-otp-flow.tsx'),
     read('features/auth/form-controls.tsx'),
   ]);
 
-  for (const source of [register, login, reset, passwordChange]) {
-    assert.match(source, /noValidate/);
-    assert.match(source, /FieldError/);
-    assert.match(source, /requestAnimationFrame/);
-    assert.match(source, /aria-describedby/);
+  for (const source of [flow]) {
+    assert.match(source, /noValidate/u);
+    assert.match(source, /FieldError/u);
+    assert.match(source, /requestAnimationFrame/u);
+    assert.match(source, /aria-describedby/u);
   }
-  assert.match(controls, /role="alert"/);
-  assert.match(controls, /forwardRef<HTMLInputElement/);
+  assert.match(controls, /role="alert"/u);
+  assert.match(controls, /forwardRef<HTMLInputElement/u);
 });
 
-test('mobile fields prevent zoom and passwords have accessible visibility controls', async () => {
+test('mobile fields prevent zoom and preserve accessible controls', async () => {
   const [input, textarea, controls] = await Promise.all([
     read('components/ui/input.tsx'),
     read('components/ui/textarea.tsx'),
     read('features/auth/form-controls.tsx'),
   ]);
 
-  assert.match(input, /text-base[\s\S]*sm:text-sm/);
-  assert.match(textarea, /text-base[\s\S]*sm:text-sm/);
-  assert.match(input, /aria-invalid=\{invalid \|\| undefined\}/);
-  assert.match(textarea, /aria-invalid=\{invalid \|\| undefined\}/);
-  assert.match(controls, /aria-pressed=\{visible\}/);
-  assert.match(controls, /aria-label=\{visible/);
-  assert.match(controls, /min-h-11 min-w-11/);
+  assert.match(input, /text-base[\s\S]*sm:text-sm/u);
+  assert.match(textarea, /text-base[\s\S]*sm:text-sm/u);
+  assert.match(input, /aria-invalid=\{invalid \|\| undefined\}/u);
+  assert.match(textarea, /aria-invalid=\{invalid \|\| undefined\}/u);
+  assert.match(controls, /aria-pressed=\{visible\}/u);
+  assert.match(controls, /aria-label=\{visible/u);
+  assert.match(controls, /min-h-11 min-w-11/u);
 });
 
-test('login and registration enforce configured Turnstile at the server boundary', async () => {
-  const [loginRoute, registerRoute] = await Promise.all([
-    read('app/api/auth/login/route.ts'),
-    read('app/api/auth/register/route.ts'),
+test('login and registration enforce configured Turnstile at the OTP server boundary', async () => {
+  const [startRoute, verifyRoute] = await Promise.all([
+    read('app/api/auth/email-otp/request/route.ts'),
+    read('app/api/auth/email-otp/verify/route.ts'),
   ]);
 
-  for (const route of [loginRoute, registerRoute]) {
-    assert.match(route, /NEXT_PUBLIC_TURNSTILE_SITE_KEY/);
-    assert.match(route, /!parsed\.data\.captchaToken/);
-    assert.match(route, /INVALID_REQUEST/);
-  }
+  assert.match(startRoute, /NEXT_PUBLIC_TURNSTILE_SITE_KEY/u);
+  assert.match(startRoute, /!parsed\.data\.captchaToken/u);
+  assert.match(startRoute, /INVALID_REQUEST/u);
+  assert.match(verifyRoute, /isSameOriginRequest\(request\)/u);
+  assert.match(verifyRoute, /INVALID_REQUEST/u);
 });

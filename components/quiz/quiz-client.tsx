@@ -56,6 +56,8 @@ function retryDate(value?: string) {
 
 function policyMessage(payload: AttemptErrorPayload, status: number) {
   switch (payload.error) {
+    case 'ACCOUNT_APPROVAL_REQUIRED':
+      return 'Заявка ещё ожидает подтверждения администратора. До подтверждения вопросы и тест недоступны.';
     case 'PROFILE_ONBOARDING_REQUIRED':
       return 'Перед первым тестом заполните имя, должность и компанию, затем добавьте фотографию.';
     case 'AVATAR_REQUIRED':
@@ -459,6 +461,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
 
   if (!attempt) {
     const onboardingAction = errorCode === 'PROFILE_ONBOARDING_REQUIRED';
+    const approvalAction = errorCode === 'ACCOUNT_APPROVAL_REQUIRED';
     return (
       <section className="py-16">
         <Container size="narrow">
@@ -472,6 +475,8 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   </Button>
                 ) : onboardingAction ? (
                   <Button onClick={() => router.push('/onboarding')}>Заполнить профиль</Button>
+                ) : approvalAction ? (
+                  <Button onClick={() => router.push('/profile')}>Открыть статус заявки</Button>
                 ) : errorCode === 'ATTEMPT_NOT_FOUND' ? (
                   <Button onClick={() => void loadAttempt(true)}>Начать новую попытку</Button>
                 ) : (
@@ -540,51 +545,10 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                       </p>
                     </div>
                   ) : null}
-                  <div className="space-y-3 text-left">
-                    <h2 className="font-display text-xl font-bold">Разбор ответов</h2>
-                    {attempt.review.map((item, index) => {
-                      const question = attempt.questions.find(
-                        (candidate) => candidate.id === item.questionId,
-                      );
-                      const selected = question?.options.find(
-                        (option) => option.id === item.selectedOptionId,
-                      );
-                      const correct = question?.options.find(
-                        (option) => option.id === item.correctOptionId,
-                      );
-                      if (!question || !selected || !correct) return null;
-                      return (
-                        <article
-                          key={item.questionId}
-                          className="rounded-xl border border-[var(--color-border)] p-4"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <h3 className="font-bold">
-                              {index + 1}. {question.text}
-                            </h3>
-                            <span
-                              className={`shrink-0 text-xs font-bold ${item.isCorrect ? 'text-[var(--color-primary)]' : 'text-[var(--color-danger)]'}`}
-                            >
-                              {item.isCorrect ? 'Верно' : 'Ошибка'}
-                            </span>
-                          </div>
-                          <p className="mt-2 text-sm">
-                            Ваш ответ: <strong>{selected.text}</strong>
-                          </p>
-                          {!item.isCorrect && (
-                            <p className="mt-1 text-sm">
-                              Правильный ответ: <strong>{correct.text}</strong>
-                            </p>
-                          )}
-                          {item.explanation ? (
-                            <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-                              {item.explanation}
-                            </p>
-                          ) : null}
-                        </article>
-                      );
-                    })}
-                  </div>
+                  <p className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4 text-left text-sm leading-6 text-[var(--color-text-muted)]">
+                    Итог сохранён в личном кабинете. Правильные варианты и ключи ответов не
+                    показываются: повторите материал курса перед следующей попыткой.
+                  </p>
                 </>
               ) : expired ? (
                 <div className="space-y-2 border-y border-dashed border-[var(--color-border)] py-5">

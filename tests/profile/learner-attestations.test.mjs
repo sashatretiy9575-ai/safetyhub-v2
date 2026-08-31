@@ -11,7 +11,8 @@ test('learner dashboard exposes one best-result model without attempt analytics'
   ]);
 
   assert.match(loader, /rpc\('get_profile_dashboard'\)/);
-  assert.match(profile, /identityStatus/);
+  assert.match(profile, /const canAccessLearning = context\.approval\.state === 'approved'/);
+  assert.match(profile, /\{canAccessLearning \? \(/);
   assert.match(profile, /Следующий шаг/);
   assert.match(profile, /Мои курсы/);
   assert.match(profile, /Результат/);
@@ -40,10 +41,11 @@ test('quiz reveals a failed score and explains the calendar-day limit without us
   assert.doesNotMatch(payload, /attemptsRemaining|limitWindowEndsAt/);
 });
 
-test('profile editing includes organization and preserves a single compact confirmation status', async () => {
-  const [form, profile, schema, fields, route] = await Promise.all([
+test('profile editing includes organization and renders the account-approval status', async () => {
+  const [form, profile, approvalStatus, schema, fields, route] = await Promise.all([
     read('features/auth/profile-form.tsx'),
     read('app/(account)/profile/page.tsx'),
+    read('features/profile/account-approval-status.tsx'),
     read('lib/validation/profile.ts'),
     read('features/profile/fields.ts'),
     read('app/api/profile/route.ts'),
@@ -53,11 +55,13 @@ test('profile editing includes organization and preserves a single compact confi
   assert.match(fields, /organization: 160/);
   assert.match(form, /Данные профиля сохранены/);
   assert.match(form, /Изменить данные/);
-  assert.match(profile, /Изменения на проверке/);
+  assert.match(profile, /AccountApprovalStatus/);
+  assert.match(approvalStatus, /Заявка на проверке/);
+  assert.match(approvalStatus, /Осталось до контрольного срока/);
   assert.doesNotMatch(form, /Сейчас в действующих сертификатах/);
   assert.doesNotMatch(profile, /Данные для сертификата/);
   assert.match(form, /api\/profile\/organizations/);
-  assert.match(route, /rpc\('update_profile'/);
+  assert.match(route, /rpc\(\s*'submit_profile_for_approval_from_trusted_server'/);
   assert.doesNotMatch(form, /supabase\/client|\/api\/identity/);
   assert.doesNotMatch(form, /появится автоматически/);
 });

@@ -1,7 +1,7 @@
 import { NextResponse } from '@/lib/security/api-response';
 import { z } from 'zod';
 import { apiError } from '@/features/auth/api-error';
-import { requireCapability } from '@/features/auth/server';
+import { requireAnyCapability } from '@/features/auth/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 const paramsSchema = z.object({ userId: z.string().uuid() });
@@ -34,7 +34,10 @@ type AvatarAdminClient = ReturnType<typeof createAdminClient> & {
 
 export async function GET(_request: Request, context: { params: Promise<{ userId: string }> }) {
   try {
-    await requireCapability('identity.read');
+    // The manual account-approval queue needs to inspect the submitted avatar
+    // before deciding course access. Keep the signed URL behind one of the
+    // two identity capabilities; no Storage path reaches the browser.
+    await requireAnyCapability(['identity.read', 'identity.manage']);
     const parsed = paramsSchema.safeParse(await context.params);
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });

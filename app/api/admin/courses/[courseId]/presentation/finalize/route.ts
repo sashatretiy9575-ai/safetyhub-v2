@@ -172,9 +172,6 @@ async function cleanupFinalizedStaging(
 function readyPresentationResponse(result: FinalizedMetadata, replayed = result.replayed) {
   return NextResponse.json({
     id: result.presentation.id,
-    bucket: result.presentation.storageBucket,
-    path: result.presentation.storagePath,
-    thumbnailPath: result.presentation.thumbnailPath,
     pageCount: result.presentation.pageCount,
     sha256: result.presentation.sha256,
     byteSize: result.presentation.byteSize,
@@ -296,9 +293,6 @@ export async function POST(request: Request, context: { params: Promise<{ course
       // cannot be re-leased during this request, serving it is safe.
       return NextResponse.json({
         id: presentationRecord.id,
-        bucket: presentationRecord.storage_bucket,
-        path: presentationRecord.storage_path,
-        thumbnailPath: presentationRecord.thumbnail_path,
         pageCount: presentationRecord.page_count,
         sha256: presentationRecord.sha256,
         byteSize: presentationRecord.byte_size,

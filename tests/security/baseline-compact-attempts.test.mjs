@@ -102,16 +102,23 @@ test('completion accepts the full answer set once and atomically maintains the b
   assert.match(client, /setInterval\(updateTimer, 1000\)/);
 });
 
-test('answer keys stay private and review is disclosed only for a passing result', async () => {
-  const baseline = await read('supabase/migrations/20260813000000_safetyhub_baseline.sql');
+test('effective learner payload keeps answer keys private after completion', async () => {
+  const [baseline, payloadMigration, types, client] = await Promise.all([
+    read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
+    read('supabase/migrations/20260831113000_no_answer_key_learner_payload.sql'),
+    read('features/learning/types.ts'),
+    read('components/quiz/quiz-client.tsx'),
+  ]);
+  const payload = sqlFunction(payloadMigration, 'attempt_payload', 'private');
 
   assert.match(baseline, /create table private\.test_revision_answer_keys/);
   assert.match(
     baseline,
     /revoke all on all tables in schema private from public, anon, authenticated, service_role/,
   );
-  assert.match(baseline, /if v_attempt\.status = 'passed' then[\s\S]*'correctOptionId'/);
-  assert.match(baseline, /'review', v_review/);
+  assert.doesNotMatch(payload, /correctOptionId|test_revision_variant_answer_keys|v_key|v_review|'review'/);
+  assert.doesNotMatch(types, /correctOptionId|isCorrect|review:/);
+  assert.doesNotMatch(client, /Правильный ответ|Разбор ответов|correctOptionId/);
   assert.doesNotMatch(
     baseline,
     /grant (?:select|execute)[\s\S]{0,120}test_revision_answer_keys[\s\S]{0,80}to (?:anon|authenticated)/,

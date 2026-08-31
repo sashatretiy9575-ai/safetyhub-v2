@@ -4,10 +4,11 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('new registrations continue to use email auth and enter required onboarding', async () => {
-  const [register, registerRoute, callback, constants, page, form, route] = await Promise.all([
+test('email-OTP registration enters required onboarding without a password callback', async () => {
+  const [register, requestRoute, verifyRoute, callback, constants, page, form, route] = await Promise.all([
     read('app/(account)/auth/register/page.tsx'),
-    read('app/api/auth/register/route.ts'),
+    read('app/api/auth/email-otp/request/route.ts'),
+    read('app/api/auth/email-otp/verify/route.ts'),
     read('app/(account)/callback/route.ts'),
     read('lib/constants.ts'),
     read('app/(account)/onboarding/page.tsx'),
@@ -15,21 +16,27 @@ test('new registrations continue to use email auth and enter required onboarding
     read('app/api/profile/onboarding/route.ts'),
   ]);
 
-  assert.match(register, /clientRequest\('\/api\/auth\/register'/);
-  assert.match(registerRoute, /auth\.signUp/);
-  assert.match(registerRoute, /auth\/callback\?next=\/onboarding/);
-  assert.match(callback, /safeRedirectPath/);
+  assert.match(register, /<EmailOtpFlow intent="register"/u);
+  assert.match(requestRoute, /auth\.signInWithOtp/u);
+  assert.match(requestRoute, /shouldCreateUser: parsed\.data\.intent === 'register'/u);
+  assert.match(verifyRoute, /verifyOtp/u);
+  assert.match(callback, /redirectFromRetiredPasswordLink\(\)/u);
+  assert.doesNotMatch(callback, /exchangeCodeForSession|safeRedirectPath/u);
   assert.match(constants, /onboarding: '\/onboarding'/);
   assert.match(constants, /\^\\\/onboarding/);
   assert.match(page, /onboarding_completed_at/);
-  assert.match(page, /redirect\('\/topics'\)/);
+  assert.match(page, /context\.approval\.state === 'approved' \? '\/topics' : '\/profile'/);
   assert.match(form, /name/);
   assert.match(form, /surname/);
   assert.match(form, /job/);
   assert.match(form, /organization/);
+  assert.match(form, /<PhoneInput/);
   assert.match(form, /<AvatarUploader/);
   assert.match(route, /requireUser\(\)/);
-  assert.match(route, /complete_profile_onboarding/);
+  assert.match(route, /createAdminClient/);
+  assert.match(route, /submit_profile_for_approval_from_trusted_server/);
+  assert.match(route, /normalizeUserPhone/);
+  assert.match(route, /consumeBusinessQuota\('profile\.update', context\.user\.id\)/);
   assert.match(route, /context\.profile\.avatar_updated_at/);
   assert.doesNotMatch(route, /storage\.from|\.list\(/);
   assert.match(route, /AVATAR_REQUIRED/);
@@ -82,10 +89,11 @@ test('avatar flow supports camera, system fallback, crop controls, and mandatory
 });
 
 test('a missing committed avatar sends an already-onboarded learner back to photo setup', async () => {
-  const [page, profileServer, migration, policy, quiz] = await Promise.all([
+  const [page, profileServer, baselineMigration, approvalMigration, policy, quiz] = await Promise.all([
     read('app/(account)/onboarding/page.tsx'),
     read('features/profile/server.ts'),
     read('supabase/migrations/20260813070000_persistent_actor_quota.sql'),
+    read('supabase/migrations/20260831110000_profile_approval_submission.sql'),
     read('features/learning/policy-error.ts'),
     read('components/quiz/quiz-client.tsx'),
   ]);
@@ -93,14 +101,14 @@ test('a missing committed avatar sends an already-onboarded learner back to phot
   assert.doesNotMatch(page, /profile\.onboarding_completed_at && profile\.avatar_updated_at/);
   assert.match(page, /profile\.onboarding_completed_at && avatarUrl/);
   assert.match(profileServer, /rpc\('get_my_profile_avatar_manifest'\)/);
-  assert.match(migration, /create table private\.profile_avatar_manifests/);
+  assert.match(baselineMigration, /create table private\.profile_avatar_manifests/);
   assert.match(
-    migration,
-    /create or replace function public\.complete_profile_onboarding[\s\S]*private\.profile_avatar_manifests/,
+    approvalMigration,
+    /create function public\.submit_profile_for_approval_from_trusted_server[\s\S]*private\.profile_avatar_manifests/,
   );
   assert.match(
-    migration,
-    /complete_profile_onboarding[\s\S]*manifest\.legacy_imported[\s\S]*\/avatar\.webp/,
+    approvalMigration,
+    /submit_profile_for_approval_from_trusted_server[\s\S]*manifest\.legacy_imported[\s\S]*\/avatar\.webp/,
   );
   assert.match(policy, /'AVATAR_REQUIRED'/);
   assert.match(quiz, /payload\.error === 'AVATAR_REQUIRED'/);

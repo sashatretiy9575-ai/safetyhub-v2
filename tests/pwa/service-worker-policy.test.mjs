@@ -45,16 +45,19 @@ test('authenticated navigations and generated downloads bypass the service worke
   assert.match(worker, /CACHE_PREFIX\}v6/u);
 });
 
-test('signup callbacks consume navigation preload while recovery no longer navigates from email', async () => {
-  const [worker, register, recovery, authCallback] = await Promise.all([
+test('retired legacy auth links still bypass the service worker without exchanging state', async () => {
+  const [worker, register, recovery, callback, authCallback] = await Promise.all([
     read('public/sw.js'),
     read('app/api/auth/register/route.ts'),
     read('app/api/auth/password/recovery/route.ts'),
+    read('app/(account)/callback/route.ts'),
     read('app/(account)/auth/callback/route.ts'),
   ]);
 
-  assert.match(register, /\/auth\/callback\?next=\/onboarding/u);
-  assert.doesNotMatch(recovery, /\/auth\/callback|password_ticket|redirectTo/u);
+  assert.match(register, /passwordAuthRetiredResponse\(\)/u);
+  assert.match(recovery, /passwordAuthRetiredResponse\(\)/u);
+  assert.match(callback, /redirectFromRetiredPasswordLink\(\)/u);
+  assert.doesNotMatch(callback, /exchangeCodeForSession|verifyOtp|setSession/u);
   assert.match(authCallback, /export \{ GET \} from '\.\.\/\.\.\/callback\/route'/u);
   assert.match(worker, /AUTH_CALLBACK_PATH/u);
   assert.match(worker, /event\.respondWith\(authCallbackResponse\(event\)\)/u);

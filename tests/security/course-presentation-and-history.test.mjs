@@ -8,7 +8,7 @@ import { buildContentSecurityPolicy } from '../../lib/security/content-security-
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (file) => readFile(path.join(root, file), 'utf8');
 
-test('presentation upload uses a signed path-bound TUS grant and immutable public paths', async () => {
+test('presentation upload uses a signed path-bound TUS grant and immutable private paths', async () => {
   const [grant, client, finalize, retire, renderValidation] = await Promise.all([
     read('app/api/admin/courses/[courseId]/presentation/upload-token/route.ts'),
     read('components/admin/course-presentation-input.tsx'),
@@ -80,8 +80,15 @@ test('presentation upload uses a signed path-bound TUS grant and immutable publi
   assert.match(client, /DOMException\('UPLOAD_ABORTED', 'AbortError'\)/);
   assert.match(client, /if \(cancelled\) return/);
   assert.match(retire, /retireCoursePresentation\(/);
-  assert.doesNotMatch(retire, /\.storage\s*\.from/);
-  assert.doesNotMatch(retire, /\.from\('course_presentations'\)/);
+  assert.match(retire, /export async function GET/);
+  assert.match(retire, /requireCapability\('test\.manage'\)/);
+  assert.match(retire, /\.from\('course_presentations'\)/);
+  assert.match(retire, /admin\.storage[\s\S]*\.download\(objectPath\)/);
+  assert.match(retire, /'Cache-Control': 'private, no-store, max-age=0'/);
+  assert.match(retire, /'Referrer-Policy': 'no-referrer'/);
+  assert.match(retire, /'X-Content-Type-Options': 'nosniff'/);
+  assert.match(retire, /Content-Disposition/);
+  assert.doesNotMatch(retire, /createSignedUrl|storage\/v1\/object\/(?:public|sign)|NextResponse\.redirect/);
 });
 
 test('catalog cutover API is same-origin, capability-gated, bounded and RPC-envelope aware', async () => {
@@ -153,11 +160,27 @@ test('catalog activation permanently retires legacy course mutation contracts', 
   );
 });
 
-test('course material downloads directly, stays out of precache, and precedes the test CTA', async () => {
-  const [actions, topicPage, localAsset, serviceWorker, csp] = await Promise.all([
+test('course material is approval-gated, private, and stays out of precache', async () => {
+  const [
+    actions,
+    topicPage,
+    localAsset,
+    topicSource,
+    bucketScript,
+    migration,
+    adminInput,
+    contentSync,
+    serviceWorker,
+    csp,
+  ] = await Promise.all([
     read('components/topics/course-material-actions.tsx'),
     read('app/(public)/topics/[slug]/page.tsx'),
     read('app/course-presentations/[slug]/[asset]/route.ts'),
+    read('lib/content/topics.ts'),
+    read('scripts/ensure-course-presentation-buckets.mjs'),
+    read('supabase/migrations/20260831104000_approved_course_presentation_access.sql'),
+    read('components/admin/course-presentation-input.tsx'),
+    read('scripts/content-sync-linked.mjs'),
     read('public/sw.js'),
     read('lib/security/content-security-policy.ts'),
   ]);
@@ -168,15 +191,44 @@ test('course material downloads directly, stays out of precache, and precedes th
   assert.doesNotMatch(actions, /pdfjs-dist|canvas|iframe|dangerouslySetInnerHTML/);
   assert.match(topicPage, /<CourseMaterialActions course=\{topic\}/);
   assert.doesNotMatch(topicPage, /CoursePresentationViewer/);
-  assert.match(localAsset, /Accept-Ranges': 'bytes'/);
-  assert.match(localAsset, /Content-Range/);
-  assert.match(localAsset, /MAX_RANGE_BYTES = 2 \* 1024 \* 1024/);
-  assert.match(localAsset, /createReadStream/);
+  assert.match(localAsset, /await requireUser\(\)/);
+  assert.match(localAsset, /get_approved_course_presentation/);
+  assert.match(localAsset, /const admin = createAdminClient\(\)/);
+  assert.match(localAsset, /admin\.storage/);
+  assert.match(localAsset, /\.from\(PRESENTATION_BUCKET\)\s*\.download/);
+  assert.match(localAsset, /'Cache-Control': 'private, no-store, max-age=0'/);
+  assert.match(localAsset, /'X-Robots-Tag': 'noindex, nofollow, noarchive'/);
   assert.match(localAsset, /Content-Disposition/);
   assert.match(localAsset, /attachment; filename=/);
-  assert.match(localAsset, /searchParams\.has\('download'\)/);
   assert.match(localAsset, /X-Content-Type-Options': 'nosniff'/);
-  assert.doesNotMatch(localAsset, /readFile\(/);
+  assert.doesNotMatch(localAsset, /createReadStream|readFile|storage\/v1\/object\/public/);
+  assert.match(topicSource, /protectedPresentationUrl/);
+  assert.doesNotMatch(topicSource, /publicStorageUrl|storage\/v1\/object\/public|storage_path,thumbnail_path/);
+  assert.match(bucketScript, /id: 'course-presentations',[\s\S]*?public: false/);
+  assert.match(migration, /create or replace function private\.require_approved_learner\(\)/);
+  assert.match(migration, /private\.require_active_user\(\)/);
+  assert.match(migration, /for share/);
+  assert.match(
+    migration,
+    /where control\.user_id = v_user_id[\s\S]*?control\.status = 'active'[\s\S]*?not control\.deletion_pending[\s\S]*?for share/,
+  );
+  assert.match(
+    migration,
+    /if not found[\s\S]*?v_approval_state is distinct from 'approved'::public\.account_approval_state/,
+  );
+  assert.match(migration, /ACCOUNT_APPROVAL_REQUIRED/);
+  assert.match(migration, /public = false/);
+  assert.match(migration, /as restrictive[\s\S]*for all to anon, authenticated/);
+  assert.match(migration, /get_approved_course_presentation\([\s\S]*private\.require_approved_learner\(\)/);
+  assert.match(migration, /revoke select on public\.course_presentations from anon, authenticated/);
+  assert.match(migration, /revoke select \([\s\S]*storage_path[\s\S]*\) on public\.course_presentations from anon, authenticated/);
+  assert.match(migration, /grant execute on function public\.get_approved_course_presentation\(text,text\)[\s\S]*to authenticated/);
+  assert.match(adminInput, /function adminPresentationUrl/);
+  assert.match(adminInput, /asset: 'presentation' \| 'thumbnail'/);
+  assert.match(adminInput, /download', '1'/);
+  assert.doesNotMatch(adminInput, /storage\/v1\/object\/(?:public|sign)/);
+  assert.match(contentSync, /downloadPublishedPresentationAsset\(storage, row\.storage_bucket, row\.storage_path\)/);
+  assert.doesNotMatch(contentSync, /storage\/v1\/object\/public/);
   assert.doesNotMatch(serviceWorker, /presentation\.pdf|course-presentations/);
   assert.match(csp, /worker-src/);
   assert.doesNotMatch(buildContentSecurityPolicy({ development: false }), /unsafe-eval/);
@@ -192,10 +244,7 @@ test('rolling Stage-A learner parsing accepts only legacy five or canonical ten 
   assert.match(server, /const LEGACY_QUESTION_COUNT = 5/);
   assert.match(server, /SUPPORTED_ATTEMPT_TOTALS/);
   assert.match(server, /payload\.questions\.length !== payload\.total/);
-  assert.match(
-    server,
-    /payload\.status === 'passed' && payload\.review\.length !== payload\.total/,
-  );
+  assert.doesNotMatch(server, /correctOptionId|reviewItemSchema|payload\.review/);
   assert.match(
     server,
     /payload\.total === QUIZ_POLICY\.questionCount[\s\S]*question\.options\.length !== 4/,

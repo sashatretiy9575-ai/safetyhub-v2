@@ -240,28 +240,6 @@ function asTimestamp(value) {
   return new Date(value).toISOString();
 }
 
-function storagePublicUrl(bucket, objectPath) {
-  const configured = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/u, '');
-  if (!configured) throw new Error('NEXT_PUBLIC_SUPABASE_URL is required.');
-  const parsed = new URL(configured);
-  if (!parsed.hostname.endsWith('.supabase.co')) {
-    throw new Error('Refusing a non-Supabase linked Storage host.');
-  }
-  const encoded = objectPath.split('/').map(encodeURIComponent).join('/');
-  return `${configured}/storage/v1/object/public/${encodeURIComponent(bucket)}/${encoded}`;
-}
-
-async function downloadPublicObject(bucket, objectPath) {
-  const response = await fetch(storagePublicUrl(bucket, objectPath), {
-    headers: { accept: 'application/octet-stream' },
-    redirect: 'error',
-  });
-  if (!response.ok) {
-    throw new Error(`Published Storage object is unavailable (${response.status}).`);
-  }
-  return Buffer.from(await response.arrayBuffer());
-}
-
 function linkedStorageAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/u, '');
   const secret = process.env.SUPABASE_SECRET_KEY;
@@ -285,6 +263,14 @@ async function downloadPublishedContentAsset(storage, storageKey) {
   return Buffer.from(await data.arrayBuffer());
 }
 
+async function downloadPublishedPresentationAsset(storage, bucket, storagePath) {
+  const { data, error } = await storage.storage.from(bucket).download(storagePath);
+  if (error || !data) {
+    throw new Error('Published presentation object is unavailable.');
+  }
+  return Buffer.from(await data.arrayBuffer());
+}
+
 const connection = linkedConnection();
 const client = new Client({
   ...connection,
@@ -293,6 +279,7 @@ const client = new Client({
   statement_timeout: 2 * 60 * 1000,
   query_timeout: 2 * 60 * 1000,
 });
+const storage = linkedStorageAdmin();
 
 let courseRows;
 let variantRows;
@@ -468,13 +455,15 @@ const publishedPresentationAssets = new Map(
       if (
         row.storage_bucket !== 'course-presentations' ||
         row.mime_type !== 'application/pdf' ||
-        row.aspect_ratio !== '16:9'
+        row.aspect_ratio !== '16:9' ||
+        typeof row.storage_path !== 'string' ||
+        typeof row.thumbnail_path !== 'string'
       ) {
         throw new Error(`${row.slug}: published presentation metadata is invalid.`);
       }
       const [pdf, thumbnail] = await Promise.all([
-        downloadPublicObject(row.storage_bucket, row.storage_path),
-        downloadPublicObject(row.storage_bucket, row.thumbnail_path),
+        downloadPublishedPresentationAsset(storage, row.storage_bucket, row.storage_path),
+        downloadPublishedPresentationAsset(storage, row.storage_bucket, row.thumbnail_path),
       ]);
       const pdfHash = sha256(pdf);
       if (pdfHash !== row.sha256 || pdf.length !== Number(row.byte_size)) {
@@ -738,7 +727,6 @@ for (const assetId of referencedAssetIds) {
 
 const mediaAssets = [];
 if (referencedAssetIds.size > 0) {
-  const storage = linkedStorageAdmin();
   for (const assetId of [...referencedAssetIds].sort()) {
     const asset = assetsById.get(assetId);
     if (

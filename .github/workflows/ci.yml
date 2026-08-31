@@ -54,14 +54,10 @@ jobs:
           npx --no-install supabase db reset
           npx --no-install supabase status -o env > "$RUNNER_TEMP/supabase.env"
           source "$RUNNER_TEMP/supabase.env"
-          E2E_CI_PASSWORD="SafetyHub-CI-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-Aa1!"
-          echo "::add-mask::$E2E_CI_PASSWORD"
           {
             echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
             echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY"
             echo "SUPABASE_SECRET_KEY=$SERVICE_ROLE_KEY"
-            echo "SAFETYHUB_SEED_PASSWORD=$E2E_CI_PASSWORD"
-            echo "E2E_PASSWORD=$E2E_CI_PASSWORD"
           } >> "$GITHUB_ENV"
 
       - run: npx --no-install supabase db lint --local --level error

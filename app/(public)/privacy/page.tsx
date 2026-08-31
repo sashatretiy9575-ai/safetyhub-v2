@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { PrivacyPolicyV12 } from '@/components/legal/privacy-policy-v1-2';
 import { LegalContacts } from '@/components/legal/legal-contacts';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
@@ -23,6 +24,7 @@ export default async function PrivacyPage({ searchParams }: PrivacyPageProps) {
   const requestedVersion = Array.isArray(requested) ? requested[0] : requested;
   const policy = resolveLegalDocumentVersion('privacy', requestedVersion);
   if (!policy) notFound();
+  if (policy.bodyRevision === 'privacy-1.2') return <PrivacyPolicyV12 policy={policy} />;
   if (policy.bodyRevision !== 'privacy-1.1') notFound();
 
   const effectiveDate = formatLegalDate(policy.effectiveDate);

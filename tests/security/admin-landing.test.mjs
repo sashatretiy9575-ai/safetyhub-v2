@@ -4,27 +4,29 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('password login uses the server-authorized role landing instead of a hard-coded profile', async () => {
-  const [route, page, auth] = await Promise.all([
-    read('app/api/auth/login/route.ts'),
-    read('app/(account)/auth/login/page.tsx'),
+test('email-code verification uses the server-authorized role landing instead of a hard-coded profile', async () => {
+  const [route, flow, auth] = await Promise.all([
+    read('app/api/auth/email-otp/verify/route.ts'),
+    read('features/auth/email-otp-flow.tsx'),
     read('features/auth/server.ts'),
   ]);
 
   assert.match(route, /rpc\('get_auth_context'\)/u);
-  assert.match(route, /redirectTo: authenticatedLandingPath\(authContext\.role\)/u);
-  assert.match(page, /payload\?\.redirectTo === '\/admin'/u);
-  assert.doesNotMatch(page, /router\.replace\('\/profile'\)/u);
+  assert.match(route, /redirectTo: landingPath\(authContext\)/u);
+  assert.match(flow, /value === '\/admin'[\s\S]*value === '\/auth\/legal'[\s\S]*value === '\/onboarding'[\s\S]*value === '\/profile'/u);
+  assert.match(flow, /router\.replace\(safeLanding\(payload\?\.redirectTo\)\)/u);
+  assert.doesNotMatch(flow, /router\.replace\('\/profile'\)/u);
   assert.match(auth, /return role === 'admin' \? '\/admin' : '\/profile'/u);
 });
 
-test('confirmation callback and direct participant workspace route admins to the console', async () => {
+test('retired callback discards legacy links and direct participant workspace routes admins to the console', async () => {
   const [callback, profile] = await Promise.all([
     read('app/(account)/callback/route.ts'),
     read('app/(account)/profile/page.tsx'),
   ]);
 
-  assert.match(callback, /destination = authenticatedLandingPath\(authContext\.role\)/u);
+  assert.match(callback, /redirectFromRetiredPasswordLink\(\)/u);
+  assert.doesNotMatch(callback, /exchangeCodeForSession|verifyOtp|setSession|authenticatedLandingPath/u);
   assert.match(profile, /if \(context\.role === 'admin'\) redirect\('\/admin'\)/u);
 });
 

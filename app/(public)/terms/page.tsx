@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation';
+import { TermsPolicyV22 } from '@/components/legal/terms-policy-v2-2';
 import { LegalContacts } from '@/components/legal/legal-contacts';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
-import { QUIZ_POLICY } from '@/lib/constants';
 import {
   formatLegalDate,
-  PRIVACY_POLICY,
+  PRIVACY_POLICY_V1_1,
   resolveLegalDocumentVersion,
   TERMS_POLICY,
 } from '@/lib/legal';
@@ -29,6 +29,7 @@ export default async function TermsPage({ searchParams }: TermsPageProps) {
   const requestedVersion = Array.isArray(requested) ? requested[0] : requested;
   const policy = resolveLegalDocumentVersion('terms', requestedVersion);
   if (!policy) notFound();
+  if (policy.bodyRevision === 'terms-2.2') return <TermsPolicyV22 policy={policy} />;
   if (policy.bodyRevision !== 'terms-2.1') notFound();
 
   const effectiveDate = formatLegalDate(policy.effectiveDate);
@@ -71,7 +72,7 @@ export default async function TermsPage({ searchParams }: TermsPageProps) {
               Эти условия регулируют использование сайта и PWA SafetyHub.kz, материалов, аккаунта,
               тестов, сертификатов и функций их проверки. Создавая аккаунт или явно принимая текущую
               версию в профиле, пользователь подтверждает, что прочитал условия и связанную Политику
-              конфиденциальности версии {PRIVACY_POLICY.version}.
+              конфиденциальности версии {PRIVACY_POLICY_V1_1.version}.
             </p>
             <p>
               Если пользователь не согласен, он не должен регистрироваться или продолжать работу с
@@ -110,13 +111,12 @@ export default async function TermsPage({ searchParams }: TermsPageProps) {
               Обучение, тесты и попытки
             </h2>
             <p>
-              Для успешного результата нужно правильно ответить не менее чем на{' '}
-              {QUIZ_POLICY.passScore} вопроса из {QUIZ_POLICY.questionCount}, то есть набрать{' '}
-              {QUIZ_POLICY.passPercent}%. Ответы, время, статус и результат попытки фиксируются. Для
-              каждого курса в интерфейсе показывается один лучший результат. При равном балле
-              используется более свежая завершённая сдача. Технический лимит — не более шести
-              начатых попыток одной версии теста за любые последние 30 суток; счётчик не
-              показывается, а при блокировке сообщается дата следующей доступности.
+              Для успешного результата нужно правильно ответить не менее чем на 7 вопроса из 10, то
+              есть набрать 70%. Ответы, время, статус и результат попытки фиксируются. Для каждого
+              курса в интерфейсе показывается один лучший результат. При равном балле используется
+              более свежая завершённая сдача. Технический лимит — не более шести начатых попыток
+              одной версии теста за любые последние 30 суток; счётчик не показывается, а при
+              блокировке сообщается дата следующей доступности.
             </p>
             <p>
               Запрещено использовать ботов, извлекать или распространять ключи ответов, вмешиваться
@@ -197,8 +197,8 @@ export default async function TermsPage({ searchParams }: TermsPageProps) {
               удаляются профиль, фотография, попытки, сертификаты и связанный аудит, а QR-проверка
               прежнего документа прекращается. Уже скачанный внешний PDF физически отозвать с
               устройства нельзя. Категории, поставщики и порядок удаления описаны в{' '}
-              <a className={linkClass} href={`/privacy?version=${PRIVACY_POLICY.version}`}>
-                Политике конфиденциальности версии {PRIVACY_POLICY.version}
+              <a className={linkClass} href={`/privacy?version=${PRIVACY_POLICY_V1_1.version}`}>
+                Политике конфиденциальности версии {PRIVACY_POLICY_V1_1.version}
               </a>
               .
             </p>

@@ -1,11 +1,12 @@
 'use client';
 
 import { ArrowDown, ArrowUp } from '@phosphor-icons/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type {
   AdminTestQuestion,
   AdminTestVariant,
+  TestEditorSeed,
   TestEditorPayload,
 } from '@/features/admin/types';
 import { Badge } from '@/components/ui/badge';
@@ -15,13 +16,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  clearTestEditorDraft,
-  readTestEditorDraft,
   serializeTestEditorPayload,
   TEST_EDITOR_LIMITS,
   validateTestEditor,
-  writeTestEditorDraft,
-  type TestEditorDraftPayload,
 } from '@/lib/admin-test-editor';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { defaultContentSeo } from '@/lib/validation/content-seo';
@@ -35,7 +32,6 @@ import { useUnsavedChangesGuard } from '@/components/admin/use-unsaved-changes-g
 import { cn, formatDateTime } from '@/lib/utils';
 
 type PublicationState = NonNullable<TestEditorPayload['publicationState']>;
-const AUTOSAVE_DELAY_MS = 800;
 const PUBLICATION_LABEL: Record<PublicationState, string> = {
   never_published: 'Ещё не публиковался',
   draft: 'Снят с публикации',
@@ -85,37 +81,36 @@ const emptyTest = (): TestEditorPayload => ({
   revisionHistory: [],
 });
 
-function clonePayload(value: TestEditorDraftPayload): TestEditorPayload {
+function freshTestFromSeed(seed?: TestEditorSeed): TestEditorPayload {
+  const empty = emptyTest();
+  if (!seed) return empty;
+
+  // Never spread a persisted payload into the client editor. This explicit
+  // allowlist intentionally creates new variants/questions and only carries
+  // catalogue metadata that is safe for an administrator to see.
   return {
-    ...(value.id ? { id: value.id } : {}),
-    ...(value.status ? { status: value.status } : {}),
-    ...(value.draftVersion ? { draftVersion: value.draftVersion } : {}),
-    ...(value.publicationState ? { publicationState: value.publicationState } : {}),
-    ...(value.contentHash ? { contentHash: value.contentHash } : {}),
-    slug: value.slug,
-    title: value.title,
-    description: value.description,
-    icon: resolveCourseIcon(value.icon).id,
-    displayOrder: value.displayOrder,
-    durationMinutes: value.durationMinutes,
-    passScore: value.passScore,
-    attemptsPerCalendarDay: value.attemptsPerCalendarDay,
-    attemptResetTimezone: value.attemptResetTimezone,
-    presentationId: value.presentationId,
-    presentation: value.presentation ? { ...value.presentation } : null,
-    jurisdiction: value.jurisdiction ?? '',
-    effectiveDate: value.effectiveDate ?? '',
-    sources: (value.sources ?? []).map((source) => ({ ...source })),
-    seo: { ...(value.seo ?? defaultContentSeo(value.title, value.description)) },
-    revisionHistory: (value.revisionHistory ?? []).map((revision) => ({ ...revision })),
-    questionVariants: value.questionVariants.map((variant) => ({
-      id: variant.id,
-      variantNumber: variant.variantNumber,
-      questions: variant.questions.map((question) => ({
-        ...question,
-        options: question.options.map((option) => ({ ...option })),
-      })),
-    })) as [AdminTestVariant, AdminTestVariant, AdminTestVariant],
+    ...(seed.id ? { id: seed.id } : {}),
+    slug: seed.slug,
+    title: seed.title,
+    description: seed.description,
+    icon: resolveCourseIcon(seed.icon).id,
+    displayOrder: seed.displayOrder,
+    durationMinutes: seed.durationMinutes,
+    passScore: seed.passScore,
+    attemptsPerCalendarDay: seed.attemptsPerCalendarDay,
+    attemptResetTimezone: seed.attemptResetTimezone,
+    presentationId: seed.presentationId,
+    presentation: seed.presentation ? { ...seed.presentation } : null,
+    jurisdiction: seed.jurisdiction,
+    effectiveDate: seed.effectiveDate,
+    sources: seed.sources.map((source) => ({ ...source })),
+    ...(seed.status ? { status: seed.status } : {}),
+    ...(seed.publicationState ? { publicationState: seed.publicationState } : {}),
+    ...(seed.draftVersion !== undefined ? { draftVersion: seed.draftVersion } : {}),
+    ...(seed.contentHash ? { contentHash: seed.contentHash } : {}),
+    seo: { ...seed.seo },
+    revisionHistory: seed.revisionHistory.map((revision) => ({ ...revision })),
+    questionVariants: empty.questionVariants,
   };
 }
 
@@ -135,14 +130,9 @@ function FieldWarning({ id, message }: { id: string; message?: string }) {
   ) : null;
 }
 
-function formatDraftTime(value: number) {
-  return new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' }).format(value);
-}
-
-export function TestEditor({ initial }: { initial?: TestEditorPayload }) {
+export function TestEditor({ initial }: { initial?: TestEditorSeed }) {
   const router = useRouter();
-  const normalizedInitial = useMemo(() => clonePayload(initial ?? emptyTest()), [initial]);
-  const editorIdRef = useRef(initial?.id ?? 'new');
+  const normalizedInitial = useMemo(() => freshTestFromSeed(initial), [initial]);
   const [course, setCourse] = useState<TestEditorPayload>(normalizedInitial);
   const [savedSnapshot, setSavedSnapshot] = useState(() =>
     serializeTestEditorPayload(normalizedInitial),
@@ -153,14 +143,8 @@ export function TestEditor({ initial }: { initial?: TestEditorPayload }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [validationAttempted, setValidationAttempted] = useState(false);
-  const [draftReady, setDraftReady] = useState(false);
-  const [draftMessage, setDraftMessage] = useState('Локальный черновик включён');
 
   const snapshot = useMemo(() => serializeTestEditorPayload(course), [course]);
-  const initialSnapshot = useMemo(
-    () => serializeTestEditorPayload(normalizedInitial),
-    [normalizedInitial],
-  );
   const dirty = snapshot !== savedSnapshot;
   const approveNavigation = useUnsavedChangesGuard(dirty);
   const validation = useMemo(() => validateTestEditor(course), [course]);
@@ -177,32 +161,23 @@ export function TestEditor({ initial }: { initial?: TestEditorPayload }) {
   const currentQuestion = currentVariant?.questions[activeQuestion];
 
   useEffect(() => {
-    const draft = readTestEditorDraft(window.localStorage, editorIdRef.current);
-    if (draft && serializeTestEditorPayload(draft.test) !== initialSnapshot) {
-      setCourse({
-        ...clonePayload(draft.test),
-        revisionHistory: normalizedInitial.revisionHistory,
-      });
-      setDraftMessage(`Восстановлен локальный черновик · ${formatDraftTime(draft.savedAt)}`);
+    // Previous releases stored full question sets (including answer keys) in
+    // browser storage. Remove those keys by name without reading their values.
+    try {
+      for (let index = window.localStorage.length - 1; index >= 0; index -= 1) {
+        const key = window.localStorage.key(index);
+        if (
+          key?.startsWith('safetyhub:course-editor-draft:v2:') ||
+          key?.startsWith('safetyhub:editor-draft:v1:course:')
+        ) {
+          window.localStorage.removeItem(key);
+        }
+      }
+    } catch {
+      // Storage may be unavailable in a hardened browser. The editor never
+      // writes a local copy, so absence of cleanup does not create a new leak.
     }
-    setDraftReady(true);
-  }, [initialSnapshot, normalizedInitial.revisionHistory]);
-
-  useEffect(() => {
-    if (!draftReady) return;
-    if (!dirty) {
-      clearTestEditorDraft(window.localStorage, editorIdRef.current);
-      return;
-    }
-    setDraftMessage('Сохраняем локально…');
-    const timer = window.setTimeout(() => {
-      const savedAt = writeTestEditorDraft(window.localStorage, editorIdRef.current, course);
-      setDraftMessage(
-        savedAt ? `Автосохранено · ${formatDraftTime(savedAt)}` : 'Автосохранение недоступно',
-      );
-    }, AUTOSAVE_DELAY_MS);
-    return () => window.clearTimeout(timer);
-  }, [course, dirty, draftReady]);
+  }, []);
 
   const updateQuestion = (update: Partial<AdminTestQuestion>) => {
     setCourse((current) => ({
@@ -301,9 +276,7 @@ export function TestEditor({ initial }: { initial?: TestEditorPayload }) {
       } satisfies TestEditorPayload;
       setCourse(next);
       setSavedSnapshot(serializeTestEditorPayload(next));
-      clearTestEditorDraft(window.localStorage, editorIdRef.current);
       if (!course.id) {
-        editorIdRef.current = payload.id;
         approveNavigation();
         router.replace(`/admin/courses/${payload.id}`);
       } else router.refresh();
@@ -334,11 +307,24 @@ export function TestEditor({ initial }: { initial?: TestEditorPayload }) {
         }
         hasDraftChanges={publicationState === 'published_with_draft_changes'}
         progress={`${validation.completedCount}/30`}
-        liveMessage={`${dirty ? 'Есть изменения. ' : ''}${draftMessage}`}
+        liveMessage={
+          dirty ? 'Есть несохранённые изменения.' : 'Черновик хранится только в памяти до отправки.'
+        }
         onTogglePreview={() => setPreview((value) => !value)}
         onSave={() => void save(false)}
         onPublish={() => void save(true)}
       />
+
+      {course.id ? (
+        <p
+          data-course-editor-key-boundary
+          className="rounded-xl border border-[var(--color-warning)] bg-[var(--color-surface-muted)] p-4 text-sm leading-6"
+        >
+          Сохранённые вопросы, варианты и ключи ответов не загружаются в браузер. Для новой редакции
+          заполните свежий набор из 30 вопросов: прежняя опубликованная редакция останется активной,
+          пока вы не опубликуете новую.
+        </p>
+      ) : null}
 
       {error ? (
         <p

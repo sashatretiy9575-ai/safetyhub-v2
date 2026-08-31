@@ -5,26 +5,28 @@ import { PencilSimple, X } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import {
-  normalizeProfileValues,
+  normalizeProfileSubmissionValues,
   PROFILE_FIELD_LIMITS,
-  validateProfileValues,
+  validateProfileSubmissionValues,
   type ProfileField,
-  type ProfileValues,
+  type ProfileSubmissionField,
+  type ProfileSubmissionValues,
 } from '@/features/profile/fields';
+import { PhoneInput } from '@/features/profile/phone-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 type OrganizationResponse = { organizations?: string[] };
 type UpdateResponse = {
-  profile?: ProfileValues;
+  approvalState?: unknown;
 };
 
-export function ProfileForm({ initial }: { initial: ProfileValues }) {
+export function ProfileForm({ initial }: { initial: ProfileSubmissionValues }) {
   const router = useRouter();
   const [form, setForm] = useState(initial);
   const [savedProfile, setSavedProfile] = useState(initial);
-  const [errors, setErrors] = useState<Partial<Record<ProfileField, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<ProfileSubmissionField, string>>>({});
   const [organizations, setOrganizations] = useState<string[]>([]);
   const [editing, setEditing] = useState(false);
   const [message, setMessage] = useState('');
@@ -59,14 +61,14 @@ export function ProfileForm({ initial }: { initial: ProfileValues }) {
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const validation = validateProfileValues(form);
+    const validation = validateProfileSubmissionValues(form);
     if (Object.keys(validation).length > 0) {
       setErrors(validation);
       setMessage('Проверьте обязательные поля.');
       return;
     }
 
-    const normalized = normalizeProfileValues(form);
+    const normalized = normalizeProfileSubmissionValues(form);
     setBusy(true);
     setMessage('');
     try {
@@ -80,11 +82,14 @@ export function ProfileForm({ initial }: { initial: ProfileValues }) {
         setMessage(clientRequestMessage(result.error, 'Не удалось сохранить профиль.'));
         return;
       }
-      const saved = payload?.profile ? normalizeProfileValues(payload.profile) : normalized;
-      setForm(saved);
-      setSavedProfile(saved);
+      setForm(normalized);
+      setSavedProfile(normalized);
       setEditing(false);
-      setMessage('Данные профиля сохранены.');
+      setMessage(
+        payload?.approvalState === 'pending'
+          ? 'Данные сохранены и направлены администратору на проверку.'
+          : 'Данные профиля сохранены.',
+      );
       router.refresh();
     } catch (requestError) {
       setMessage(clientRequestMessage(requestError, 'Не удалось сохранить профиль.'));
@@ -177,6 +182,28 @@ export function ProfileForm({ initial }: { initial: ProfileValues }) {
             </datalist>
             {errors.organization ? (
               <p className="text-xs text-[var(--color-danger)]">{errors.organization}</p>
+            ) : null}
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label htmlFor="profile-phone">Номер телефона</Label>
+            <PhoneInput
+              id="profile-phone"
+              value={form.phone}
+              onChange={(phone) => {
+                setForm((current) => ({ ...current, phone }));
+                setErrors((current) => ({ ...current, phone: undefined }));
+              }}
+              invalid={Boolean(errors.phone)}
+              describedBy={errors.phone ? 'profile-phone-error' : 'profile-phone-help'}
+              disabled={busy}
+            />
+            <p id="profile-phone-help" className="text-xs text-[var(--color-text-muted)]">
+              Номер используется только для связи по заявке. SMS-коды не отправляются.
+            </p>
+            {errors.phone ? (
+              <p id="profile-phone-error" className="text-xs text-[var(--color-danger)]">
+                {errors.phone}
+              </p>
             ) : null}
           </div>
           <div className="flex flex-wrap gap-2 sm:col-span-2">

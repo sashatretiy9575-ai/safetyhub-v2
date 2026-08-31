@@ -157,12 +157,15 @@ async function tusUpload(
   }).finally(() => rememberCancel(null));
 }
 
-function publicUrl(presentation: AdminPresentation, thumbnail = false) {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/u, '');
-  const objectPath = thumbnail ? presentation.thumbnailPath : presentation.path;
-  return base
-    ? `${base}/storage/v1/object/public/${encodeURIComponent(presentation.bucket)}/${objectPath.split('/').map(encodeURIComponent).join('/')}`
-    : '';
+function adminPresentationUrl(
+  courseId: string,
+  presentationId: string,
+  asset: 'presentation' | 'thumbnail',
+  download = false,
+) {
+  const query = new URLSearchParams({ asset });
+  if (download) query.set('download', '1');
+  return `/api/admin/courses/${encodeURIComponent(courseId)}/presentation/${encodeURIComponent(presentationId)}?${query.toString()}`;
 }
 
 export function CoursePresentationInput({
@@ -347,16 +350,19 @@ export function CoursePresentationInput({
       ) : null}
       {value ? (
         <div className="flex flex-col gap-4 rounded-xl border border-[var(--color-border)] p-4 sm:flex-row sm:items-center">
-          {publicUrl(value, true) ? (
-            // This URL is the exact immutable object that was server-validated.
+          {courseId ? (
+            // The same-origin route checks the administrator capability and
+            // streams the private bytes with no-store. Immutable Storage paths
+            // never enter this browser bundle as public or signed URLs.
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={publicUrl(value, true)}
+              src={adminPresentationUrl(courseId, value.id, 'thumbnail')}
               alt="Первая страница презентации"
               width={320}
               height={180}
               loading="lazy"
               decoding="async"
+              referrerPolicy="no-referrer"
               className="aspect-video w-full rounded-lg bg-slate-100 object-cover sm:w-48"
             />
           ) : (
@@ -370,15 +376,24 @@ export function CoursePresentationInput({
             <p className="truncate text-xs text-[var(--color-text-subtle)]" title={value.sha256}>
               SHA-256: {value.sha256}
             </p>
-            {publicUrl(value) ? (
-              <a
-                href={publicUrl(value)}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-2 inline-flex min-h-11 items-center text-sm font-bold text-[var(--color-primary)] underline"
-              >
-                Открыть PDF
-              </a>
+            {courseId ? (
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                <a
+                  href={adminPresentationUrl(courseId, value.id, 'presentation')}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-11 items-center text-sm font-bold text-[var(--color-primary)] underline"
+                >
+                  Открыть PDF
+                </a>
+                <a
+                  href={adminPresentationUrl(courseId, value.id, 'presentation', true)}
+                  rel="noreferrer"
+                  className="inline-flex min-h-11 items-center text-sm font-bold text-[var(--color-primary)] underline"
+                >
+                  Скачать PDF
+                </a>
+              </div>
             ) : null}
           </div>
           <Button

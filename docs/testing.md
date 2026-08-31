@@ -40,13 +40,44 @@ snapshot. После изменения схемы обновите `lib/supabas
 сотрудников. Скрипт отказывается от remote Supabase без явного test-only флага;
 production использовать запрещено.
 
-Для browser tests нужны `E2E_ADMIN_EMAIL`, `E2E_PARTICIPANT_EMAIL` и
-`E2E_PASSWORD`. CI требует, чтобы authenticated сценарии не были skipped.
+В localhost-режиме release runner использует только уже подтверждённые fixture
+аккаунты из `seed:workspace`: локальный service key создаёт одноразовый
+email OTP через Auth admin API, Supabase проверяет его через `verifyOtp`, а `@supabase/ssr`
+собирает две временные HttpOnly Playwright state files. Они создаются в системной
+временной папке, передаются только рабочим процессам Playwright и удаляются после
+прогона. Ни пароль, ни password endpoint, ни значение cookie в environment не
+используются. CI требует, чтобы authenticated сценарии не были skipped.
 
 ```powershell
 npm run seed:workspace
 npm run test:e2e:release
 ```
+
+Для remote preview/staging локальный service bootstrap намеренно запрещён: он
+никогда не должен выпускать session для удалённого проекта. Сначала завершите
+настоящий вход по шестицифровому email OTP в контролируемый fixture mailbox и
+создайте по одному state-файлу для admin и participant. Скрипт открывает
+видимый Chromium, запускает login OTP и ждёт, пока оператор вручную пройдёт
+Turnstile и введёт код из SMTP-письма; mailbox, код и cookie в stdout не
+читаются.
+
+```powershell
+$stateRoot = Join-Path $env:TEMP 'safetyhub-e2e-states'
+New-Item -ItemType Directory -Force $stateRoot | Out-Null
+npm run e2e:otp-state -- --email <admin-fixture-email> --role admin --output "$stateRoot/admin.json"
+npm run e2e:otp-state -- --email <participant-fixture-email> --role participant --output "$stateRoot/participant.json"
+$env:E2E_ADMIN_STORAGE_STATE = "$stateRoot/admin.json"
+$env:E2E_PARTICIPANT_STORAGE_STATE = "$stateRoot/participant.json"
+npm run test:e2e:release
+```
+
+State files содержат HttpOnly refresh/session cookie, поэтому они обязаны быть
+абсолютными путями вне репозитория и secret mount в CI. Runner отбрасывает
+localStorage, все посторонние cookies и source-domain атрибуты; принимает только
+project-scoped Supabase auth cookie, перед запуском пересобирает временную
+минимальную state file и удаляет её. Не сохраняйте эти файлы как artifact и
+удаляйте исходные файлы после smoke. `--replace` у capture-команды используйте
+только для осознанного обновления истёкшей сессии.
 
 ## Обязательные browser проверки
 
@@ -55,6 +86,9 @@ npm run test:e2e:release
   страница курса показывает полноширинные кнопки скачивания и начала теста;
 - 240–280 px: нет page-level horizontal overflow;
 - редакторы на 390 и 1440 px; sticky action bar не выше 64 px;
+- при открытии существующего курса в DevTools network/HTML не появляются
+  сохранённые варианты, correct option, пояснения или Storage path; editor
+  показывает чистые три варианта и не создаёт course-draft в localStorage;
 - Turnstile не загружается на open/focus/input, запускается после submit и
   продолжает pending action один раз;
 - light/dark `theme-color`, `html/body` и верхний/нижний safe area;

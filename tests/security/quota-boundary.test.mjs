@@ -14,6 +14,8 @@ test('actor quota is consumed exactly once at the trusted mutation boundary', as
     startRoute,
     completeRoute,
     avatarRoute,
+    profileRoute,
+    onboardingRoute,
     exportRoute,
     rateLimit,
   ] = await Promise.all([
@@ -23,6 +25,8 @@ test('actor quota is consumed exactly once at the trusted mutation boundary', as
     read('app/api/attempts/route.ts'),
     read('app/api/attempts/[attemptId]/complete/route.ts'),
     read('app/api/profile/avatar/route.ts'),
+    read('app/api/profile/route.ts'),
+    read('app/api/profile/onboarding/route.ts'),
     read('app/api/admin/attestations/export/route.ts'),
     read('lib/security/rate-limit.ts'),
   ]);
@@ -43,11 +47,15 @@ test('actor quota is consumed exactly once at the trusted mutation boundary', as
 
   // Avatar crosses a service-only boundary, so its actor quota lives in app.
   assert.match(avatarRoute, /consumeBusinessQuota\('avatar\.upload', context\.user\.id\)/);
+  // Profile submission crosses the service-only approval boundary, so retain
+  // the durable per-actor quota in addition to the coarse network budget.
+  assert.match(profileRoute, /consumeBusinessQuota\('profile\.update', context\.user\.id\)/);
+  assert.match(onboardingRoute, /consumeBusinessQuota\('profile\.update', context\.user\.id\)/);
   // Export resolution is authenticated and atomically consumes its actor quota
   // in SQL; app code keeps only the independent network budget.
   assert.match(exportRoute, /consumeCoarseQuota\('certificate\.export'/);
   assert.doesNotMatch(exportRoute, /consumeBusinessQuota/);
-  assert.match(rateLimit, /type BusinessQuotaAction = 'avatar\.upload' \| 'certificate\.pdf'/);
+  assert.match(rateLimit, /type BusinessQuotaAction = 'avatar\.upload' \| 'certificate\.pdf' \| 'profile\.update'/);
   assert.match(rateLimit, /rpc\('consume_business_quota_for_actor'/);
   assert.doesNotMatch(rateLimit, /rpc\('consume_business_quota',/);
 
@@ -81,7 +89,7 @@ test('arbitrary actor quota actions are not exposed to browser roles', async () 
     persistent,
     /grant execute on function public\.consume_business_quota(?:_for_actor)?\([^)]*\)\s+to (?:anon|authenticated)/,
   );
-  assert.match(rateLimit, /type BusinessQuotaAction = 'avatar\.upload' \| 'certificate\.pdf'/);
+  assert.match(rateLimit, /type BusinessQuotaAction = 'avatar\.upload' \| 'certificate\.pdf' \| 'profile\.update'/);
   assert.doesNotMatch(databaseTypes, /\bconsume_business_quota:\s*\{/);
 });
 

@@ -1,6 +1,5 @@
 /** Shared browser/server contract for the administrative course editor. */
 import { contentMetadataSchema } from './content/content-metadata.ts';
-import { clearEditorDraft, readEditorDraft, writeEditorDraft } from './editor-drafts.ts';
 import { courseSeoSchema } from './validation/course.ts';
 import { defaultContentSeo, type ContentSeo } from './validation/content-seo.ts';
 import { isCourseIconId } from './course-icons.ts';
@@ -48,9 +47,6 @@ export type TestEditorVariant = Readonly<{
 
 export type TestEditorPresentation = Readonly<{
   id: string;
-  bucket: string;
-  path: string;
-  thumbnailPath: string;
   pageCount: number;
   sha256: string;
   byteSize: number;
@@ -66,7 +62,12 @@ export type TestEditorRevisionSummary = Readonly<{
   current: boolean;
 }>;
 
-export type TestEditorDraftPayload = Readonly<{
+/**
+ * In-memory input for a newly authored course revision. It is deliberately
+ * not a persisted browser draft: existing answer keys are never restored to a
+ * client, while a content manager may submit a fresh question set once.
+ */
+export type TestEditorInput = Readonly<{
   id?: string;
   slug: string;
   title: string;
@@ -102,21 +103,7 @@ export type TestEditorValidation = Readonly<{
   firstInvalidQuestionIndex: number | null;
 }>;
 
-export type StoredTestEditorDraft = Readonly<{
-  version: 2;
-  editorId: string;
-  savedAt: number;
-  test: TestEditorDraftPayload;
-}>;
-
-const DRAFT_PREFIX = 'safetyhub:course-editor-draft:v2:';
-const MAX_DRAFT_BYTES = 1_000_000;
-
-export function testEditorDraftStorageKey(editorId: string) {
-  return `${DRAFT_PREFIX}${editorId}`;
-}
-
-export function serializeTestEditorPayload(test: TestEditorDraftPayload) {
+export function serializeTestEditorPayload(test: TestEditorInput) {
   const { revisionHistory: _revisionHistory, ...editable } = test;
   return JSON.stringify(editable);
 }
@@ -152,7 +139,7 @@ function validPresentation(presentation: TestEditorPresentation | null) {
 }
 
 export function validateTestEditor(
-  test: TestEditorDraftPayload,
+  test: TestEditorInput,
   options: { publish?: boolean } = { publish: true },
 ): TestEditorValidation {
   const publish = options.publish ?? true;
@@ -331,85 +318,4 @@ export function validateTestEditor(
     firstInvalidVariantIndex: match ? Number(match[1]) : null,
     firstInvalidQuestionIndex: match ? Number(match[2]) : null,
   };
-}
-
-function isDraftPayload(value: unknown, editorId: string): value is TestEditorDraftPayload {
-  if (!value || typeof value !== 'object') return false;
-  const test = value as Partial<TestEditorDraftPayload>;
-  return Boolean(
-    (test.id === undefined || typeof test.id === 'string') &&
-    (editorId === 'new' ? test.id === undefined : test.id === editorId) &&
-    typeof test.slug === 'string' &&
-    typeof test.title === 'string' &&
-    typeof test.description === 'string' &&
-    typeof test.displayOrder === 'number' &&
-    typeof test.durationMinutes === 'number' &&
-    typeof test.passScore === 'number' &&
-    typeof test.attemptsPerCalendarDay === 'number' &&
-    typeof test.attemptResetTimezone === 'string' &&
-    Array.isArray(test.questionVariants) &&
-    test.questionVariants.length === TEST_EDITOR_LIMITS.variantCount &&
-    test.questionVariants.every((variant) => typeof variant.id === 'string'),
-  );
-}
-
-export function parseTestEditorDraft(
-  raw: string | null,
-  editorId: string,
-): StoredTestEditorDraft | null {
-  if (!raw || new TextEncoder().encode(raw).byteLength > MAX_DRAFT_BYTES) return null;
-  try {
-    const value = JSON.parse(raw) as Partial<StoredTestEditorDraft>;
-    if (
-      value.version !== 2 ||
-      value.editorId !== editorId ||
-      !Number.isSafeInteger(value.savedAt) ||
-      Number(value.savedAt) <= 0 ||
-      !isDraftPayload(value.test, editorId)
-    ) {
-      return null;
-    }
-    return value as StoredTestEditorDraft;
-  } catch {
-    return null;
-  }
-}
-
-export function readTestEditorDraft(storage: Storage, editorId: string) {
-  try {
-    const current = readEditorDraft(
-      storage,
-      'course',
-      editorId,
-      (value): value is TestEditorDraftPayload => isDraftPayload(value, editorId),
-    );
-    return current
-      ? ({
-          version: 2,
-          editorId,
-          savedAt: current.savedAt,
-          test: current.payload,
-        } satisfies StoredTestEditorDraft)
-      : parseTestEditorDraft(storage.getItem(testEditorDraftStorageKey(editorId)), editorId);
-  } catch {
-    return null;
-  }
-}
-
-export function writeTestEditorDraft(
-  storage: Storage,
-  editorId: string,
-  test: TestEditorDraftPayload,
-  savedAt = Date.now(),
-) {
-  return writeEditorDraft(storage, 'course', editorId, test, savedAt);
-}
-
-export function clearTestEditorDraft(storage: Storage, editorId: string) {
-  try {
-    clearEditorDraft(storage, 'course', editorId);
-    storage.removeItem(testEditorDraftStorageKey(editorId));
-  } catch {
-    // Storage can be unavailable in private or hardened browser contexts.
-  }
 }

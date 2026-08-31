@@ -36,6 +36,7 @@ for (const [index, update] of (dependabot?.updates ?? []).entries()) {
 }
 
 const workflow = await readYaml('.github/workflows/ci.yml');
+const workflowSource = await readFile('.github/workflows/ci.yml', 'utf8');
 const verifySteps = workflow?.jobs?.verify?.steps ?? [];
 const runCommands = verifySteps
   .map((step) => step?.run)
@@ -49,6 +50,10 @@ assert(runCommands.includes('npm run test:e2e:release'), 'CI must run strict aut
 assert(
   workflow?.jobs?.verify?.env?.E2E_REQUIRE_AUTH === '1',
   'CI must require authenticated E2E credentials.',
+);
+assert(
+  !/SAFETYHUB_SEED_PASSWORD|E2E_(?:CI_)?PASSWORD/u.test(workflowSource),
+  'CI must not restore a password credential path for authenticated E2E.',
 );
 
 if (failures.length) {

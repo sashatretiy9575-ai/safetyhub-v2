@@ -1,100 +1,221 @@
-import { createReadStream } from 'node:fs';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { Readable } from 'node:stream';
+import { AuthenticationError, requireUser } from '@/features/auth/server';
 import { isContentSlug } from '@/lib/content/slug';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const PRESENTATION_BUCKET = 'course-presentations';
 const ASSETS = {
-  presentation: { filename: 'presentation.pdf', contentType: 'application/pdf' },
-  thumbnail: { filename: 'thumbnail.webp', contentType: 'image/webp' },
+  presentation: { contentType: 'application/pdf', filenameSuffix: '.pdf' },
+  thumbnail: { contentType: 'image/webp', filenameSuffix: '-thumbnail.webp' },
 } as const;
 
-const MAX_RANGE_BYTES = 2 * 1024 * 1024;
+type Asset = keyof typeof ASSETS;
+type ApprovedPresentation = {
+  presentation_id: string;
+  content_type: string;
+  byte_size: number | null;
+};
 
-function requestedRange(value: string | null, size: number) {
-  if (!value) return null;
-  const match = /^bytes=(\d*)-(\d*)$/u.exec(value.trim());
-  if (!match || (!match[1] && !match[2])) return false;
-  const start = match[1]
-    ? Number(match[1])
-    : Math.max(0, size - Math.min(Number(match[2]), MAX_RANGE_BYTES));
-  const requestedEnd = match[2] ? Number(match[2]) : size - 1;
-  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(requestedEnd) || start >= size) {
+type ApprovedPresentationRpcClient = {
+  rpc(
+    name: 'get_approved_course_presentation',
+    args: { p_course_slug: string; p_asset: Asset },
+  ): PromiseLike<{
+    data: ApprovedPresentation[] | null;
+    error: { code?: string; message?: string } | null;
+  }>;
+};
+
+function securityHeaders() {
+  return {
+    'Cache-Control': 'private, no-store, max-age=0',
+    'Cross-Origin-Resource-Policy': 'same-origin',
+    'Referrer-Policy': 'same-origin',
+    Vary: 'Cookie',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Robots-Tag': 'noindex, nofollow, noarchive',
+  };
+}
+
+function blockedResponse(status: 401 | 403 | 404 | 503) {
+  const message =
+    status === 401
+      ? 'Authentication required'
+      : status === 403
+        ? 'Account approval required'
+        : status === 503
+          ? 'Course material is temporarily unavailable'
+          : 'Not found';
+  return new Response(message, { status, headers: securityHeaders() });
+}
+
+function isAsset(value: string): value is Asset {
+  return value in ASSETS;
+}
+
+function isSafeStoragePath(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length < 1 || value.length > 1024) return false;
+  if (value.startsWith('/') || value.includes('\\') || /[\u0000-\u001f\u007f]/u.test(value)) {
     return false;
   }
-  const end = Math.min(size - 1, requestedEnd, start + MAX_RANGE_BYTES - 1);
-  if (end < start) return false;
-  return { start, end };
+  return value.split('/').every((segment) => segment.length > 0 && segment !== '.' && segment !== '..');
+}
+
+function isUuid(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
+      value,
+    )
+  );
+}
+
+function parseApprovedPresentation(value: unknown, asset: Asset): ApprovedPresentation | null {
+  if (!value || typeof value !== 'object') return null;
+  const candidate = value as Partial<ApprovedPresentation>;
+  const expectedType = ASSETS[asset].contentType;
+  if (!isUuid(candidate.presentation_id) || candidate.content_type !== expectedType) return null;
+  if (asset === 'presentation') {
+    if (
+      typeof candidate.byte_size !== 'number' ||
+      !Number.isSafeInteger(candidate.byte_size) ||
+      candidate.byte_size < 1 ||
+      candidate.byte_size > 25 * 1024 * 1024
+    ) {
+      return null;
+    }
+  } else if (candidate.byte_size !== null) {
+    return null;
+  }
+  return {
+    presentation_id: candidate.presentation_id,
+    content_type: candidate.content_type,
+    byte_size: candidate.byte_size ?? null,
+  };
+}
+
+type AuthorizedAsset = {
+  slug: string;
+  asset: Asset;
+  presentation: ApprovedPresentation;
+};
+
+async function authorizeAsset(
+  context: { params: Promise<{ slug: string; asset: string }> },
+): Promise<AuthorizedAsset | Response> {
+  const { slug, asset } = await context.params;
+  if (!isContentSlug(slug) || !isAsset(asset)) return blockedResponse(404);
+
+  try {
+    // This checks the cookie-backed session before the DB function repeats the
+    // active-account and manual-approval checks in one protected SQL call.
+    await requireUser();
+  } catch (error) {
+    if (error instanceof AuthenticationError) return blockedResponse(error.status);
+    return blockedResponse(503);
+  }
+
+  try {
+    const client = (await createClient()) as unknown as ApprovedPresentationRpcClient;
+    const { data, error } = await client.rpc('get_approved_course_presentation', {
+      p_course_slug: slug,
+      p_asset: asset,
+    });
+    if (error) {
+      return error.message === 'ACCOUNT_APPROVAL_REQUIRED'
+        ? blockedResponse(403)
+        : blockedResponse(404);
+    }
+    if (!data || data.length !== 1) return blockedResponse(404);
+    const presentation = parseApprovedPresentation(data[0], asset);
+    return presentation ? { slug, asset, presentation } : blockedResponse(503);
+  } catch {
+    return blockedResponse(503);
+  }
+}
+
+function assetHeaders(resource: AuthorizedAsset, contentLength?: number) {
+  const descriptor = ASSETS[resource.asset];
+  const filename = `${resource.slug}${descriptor.filenameSuffix}`;
+  const disposition =
+    resource.asset === 'presentation'
+      ? `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`
+      : `inline; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
+  const headers = new Headers({
+    ...securityHeaders(),
+    'Content-Disposition': disposition,
+    'Content-Type': descriptor.contentType,
+  });
+  if (contentLength !== undefined) headers.set('Content-Length', String(contentLength));
+  return headers;
 }
 
 async function serveAsset(
-  request: Request,
   context: { params: Promise<{ slug: string; asset: string }> },
   headOnly: boolean,
 ) {
-  const { slug, asset } = await context.params;
-  if (!isContentSlug(slug) || !(asset in ASSETS)) {
-    return new Response('Not found', { status: 404 });
-  }
-  const descriptor = ASSETS[asset as keyof typeof ASSETS];
-  const filePath = path.join(
-    process.cwd(),
-    'content',
-    'snapshots',
-    'courses',
-    slug,
-    descriptor.filename,
-  );
-  try {
-    const metadata = await fs.stat(filePath);
-    if (!metadata.isFile()) return new Response('Not found', { status: 404 });
-    const size = metadata.size;
-    const etag = `W/\"${size}-${Math.trunc(metadata.mtimeMs)}\"`;
-    const range = requestedRange(request.headers.get('range'), size);
-    if (range === false) {
-      return new Response('Range not satisfiable', {
-        status: 416,
-        headers: { 'Content-Range': `bytes */${size}` },
-      });
-    }
-    if (!range && request.headers.get('if-none-match') === etag) {
-      return new Response(null, { status: 304, headers: { ETag: etag } });
-    }
-    const headers = new Headers({
-      'Accept-Ranges': 'bytes',
-      'Content-Type': descriptor.contentType,
-      'Content-Length': String(range ? range.end - range.start + 1 : size),
-      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
-      ETag: etag,
-      'X-Content-Type-Options': 'nosniff',
+  const authorized = await authorizeAsset(context);
+  if (authorized instanceof Response) return authorized;
+
+  if (headOnly) {
+    return new Response(null, {
+      status: 200,
+      headers: assetHeaders(
+        authorized,
+        authorized.asset === 'presentation' ? authorized.presentation.byte_size ?? undefined : undefined,
+      ),
     });
-    if (asset === 'presentation' && new URL(request.url).searchParams.has('download')) {
-      const filename = `${slug}.pdf`;
-      headers.set(
-        'Content-Disposition',
-        `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
-      );
+  }
+
+  try {
+    const admin = createAdminClient();
+    const { data: record, error: recordError } = await admin
+      .from('course_presentations')
+      .select('storage_bucket,storage_path,thumbnail_path,status')
+      .eq('id', authorized.presentation.presentation_id)
+      .maybeSingle();
+    if (
+      recordError ||
+      !record ||
+      record.status !== 'ready' ||
+      record.storage_bucket !== PRESENTATION_BUCKET
+    ) {
+      return blockedResponse(404);
     }
-    if (range) headers.set('Content-Range', `bytes ${range.start}-${range.end}/${size}`);
-    if (headOnly) return new Response(null, { status: range ? 206 : 200, headers });
-    const source = createReadStream(filePath, range ? { start: range.start, end: range.end } : {});
-    const body = Readable.toWeb(source) as ReadableStream<Uint8Array>;
-    return new Response(body, { status: range ? 206 : 200, headers });
+    const objectPath =
+      authorized.asset === 'presentation' ? record.storage_path : record.thumbnail_path;
+    if (!isSafeStoragePath(objectPath)) return blockedResponse(503);
+
+    const { data, error } = await admin.storage.from(PRESENTATION_BUCKET).download(objectPath);
+    if (error || !data) return blockedResponse(404);
+    if (
+      authorized.asset === 'presentation' &&
+      (authorized.presentation.byte_size === null || data.size !== authorized.presentation.byte_size)
+    ) {
+      return blockedResponse(503);
+    }
+    return new Response(data.stream(), {
+      status: 200,
+      headers: assetHeaders(authorized, data.size),
+    });
   } catch {
-    return new Response('Not found', { status: 404 });
+    return blockedResponse(503);
   }
 }
 
 export async function GET(
-  request: Request,
+  _request: Request,
   context: { params: Promise<{ slug: string; asset: string }> },
 ) {
-  return serveAsset(request, context, false);
+  return serveAsset(context, false);
 }
 
 export async function HEAD(
-  request: Request,
+  _request: Request,
   context: { params: Promise<{ slug: string; asset: string }> },
 ) {
-  return serveAsset(request, context, true);
+  return serveAsset(context, true);
 }

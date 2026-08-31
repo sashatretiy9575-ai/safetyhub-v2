@@ -41,6 +41,13 @@ test('catalog maintenance is a safe temporary learner outage', () => {
   assert.equal(error.retryAt, undefined);
 });
 
+test('manual approval denial stays an explicit learner 403', () => {
+  const error = parseAttemptRpcError({ message: 'ACCOUNT_APPROVAL_REQUIRED' });
+  assert.ok(error instanceof AttemptPolicyError);
+  assert.equal(error.code, 'ACCOUNT_APPROVAL_REQUIRED');
+  assert.equal(error.status, 403);
+});
+
 test('onboarding conflicts remain explicit 409 errors', () => {
   const error = parseAttemptRpcError({ message: 'PROFILE_ONBOARDING_REQUIRED' });
   assert.ok(error instanceof AttemptPolicyError);

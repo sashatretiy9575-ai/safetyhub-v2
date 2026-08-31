@@ -114,11 +114,12 @@ test('public course page offers presentation download before the test and preser
   assert.doesNotMatch(topicSource, /\.eq\('presentation\.status', 'ready'\)/);
 });
 
-test('admin course surface uses v3 draft publication and the canonical course routes', async () => {
-  const [adminPage, editor, server, route] = await Promise.all([
+test('admin course surface uses v3 publication without loading saved answer keys', async () => {
+  const [adminPage, editor, server, editPage, route] = await Promise.all([
     read('app/(admin)/admin/courses/page.tsx'),
     read('components/admin/test-editor.tsx'),
     read('features/admin/server.ts'),
+    read('app/(admin)/admin/courses/[id]/page.tsx'),
     read('app/api/admin/courses/route.ts'),
   ]);
   assert.match(adminPage, /Черновик/);
@@ -126,7 +127,11 @@ test('admin course surface uses v3 draft publication and the canonical course ro
   assert.match(adminPage, /Есть черновик/);
   assert.match(editor, /<CoursePresentationInput/);
   assert.match(editor, /Вариант \{variant\.variantNumber\}/);
-  assert.match(server, /get_course_editor_payload_v3/);
+  assert.match(server, /getTestEditorSeed/);
+  assert.match(editPage, /getTestEditorSeed/);
+  assert.doesNotMatch(server, /get_course_editor_payload_v3/);
+  assert.doesNotMatch(editPage, /getTestEditorPayload|TestEditorPayload/);
+  assert.doesNotMatch(editor, /readTestEditorDraft|writeTestEditorDraft|clearTestEditorDraft/);
   assert.match(server, /save_course_draft_v3/);
   assert.match(server, /save_and_publish_course_v3/);
   assert.match(route, /saveTestSchema/);
@@ -134,7 +139,7 @@ test('admin course surface uses v3 draft publication and the canonical course ro
   assert.doesNotMatch(editor, /CourseContentEditor|reviewReady|reviewedContentHash/);
 });
 
-test('learner payload parsing rejects hidden variant identifiers while retaining post-submit review', async () => {
+test('learner payload parsing rejects hidden variant identifiers and all answer-key fields', async () => {
   const [learning, types] = await Promise.all([
     read('features/learning/server.ts'),
     read('features/learning/types.ts'),
@@ -142,5 +147,9 @@ test('learner payload parsing rejects hidden variant identifiers while retaining
   assert.match(learning, /\.strict\(\)/);
   assert.doesNotMatch(types, /variantId|variantNumber/);
   assert.doesNotMatch(learning, /variantId|variantNumber/);
-  assert.match(types, /correctOptionId/);
+  assert.doesNotMatch(types, /correctOptionId|isCorrect|review:/);
+  assert.doesNotMatch(
+    learning,
+    /correctOptionId|test_revision_variant_answer_keys|reviewItemSchema/,
+  );
 });

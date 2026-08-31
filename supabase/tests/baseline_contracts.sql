@@ -423,9 +423,17 @@ begin
 
   if (select count(*) from public.legal_document_versions where is_current) <> 2
     or not exists (select 1 from public.legal_document_versions
-      where document_type = 'privacy' and version = '1.1' and body_revision = 'privacy-1.1')
+      where document_type = 'privacy' and version = '1.1' and body_revision = 'privacy-1.1'
+        and not is_current)
     or not exists (select 1 from public.legal_document_versions
-      where document_type = 'terms' and version = '2.1' and body_revision = 'terms-2.1') then
+      where document_type = 'terms' and version = '2.1' and body_revision = 'terms-2.1'
+        and not is_current)
+    or not exists (select 1 from public.legal_document_versions
+      where document_type = 'privacy' and version = '1.2' and body_revision = 'privacy-1.2'
+        and is_current)
+    or not exists (select 1 from public.legal_document_versions
+      where document_type = 'terms' and version = '2.2' and body_revision = 'terms-2.2'
+        and is_current) then
     raise exception 'current legal versions invalid';
   end if;
 
@@ -439,14 +447,14 @@ begin
   end if;
 
   perform public.publish_legal_document_version(
-    'privacy', '1.2-test', 'privacy-1.2-test', statement_timestamp()
+    'privacy', '1.3-test', 'privacy-1.3-test', statement_timestamp()
   );
   if not exists (
     select 1 from public.legal_document_versions
-    where document_type = 'privacy' and version = '1.2-test' and is_current
+    where document_type = 'privacy' and version = '1.3-test' and is_current
   ) or exists (
     select 1 from public.legal_document_versions
-    where document_type = 'privacy' and version = '1.1' and is_current
+    where document_type = 'privacy' and version = '1.2' and is_current
   ) then
     raise exception 'controlled legal version rotation failed';
   end if;

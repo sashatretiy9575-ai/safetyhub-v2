@@ -18,6 +18,7 @@ type Acceptance = Omit<LegalAcceptanceRow, 'user_id'>;
 type LegalAcceptancePanelProps = {
   initialAcceptances: Acceptance[];
   initiallyUnavailable: boolean;
+  onAccepted?: () => void;
 };
 
 const currentDocuments = [PRIVACY_POLICY, TERMS_POLICY] as const;
@@ -82,6 +83,7 @@ function acceptedAtLabel(value: string) {
 export function LegalAcceptancePanel({
   initialAcceptances,
   initiallyUnavailable,
+  onAccepted,
 }: LegalAcceptancePanelProps) {
   const [acceptances, setAcceptances] = useState(initialAcceptances);
   const [historyUnavailable, setHistoryUnavailable] = useState(initiallyUnavailable);
@@ -126,6 +128,7 @@ export function LegalAcceptancePanel({
       setHistoryUnavailable(false);
       setConfirmed(false);
       setMessage('Текущие версии приняты. Запись добавлена в историю.');
+      onAccepted?.();
     } catch {
       setMessage('Не удалось записать согласие. Проверьте соединение и попробуйте ещё раз.');
     } finally {

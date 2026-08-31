@@ -17,6 +17,21 @@ export type AdminUserListItem = {
   status: AccountStatus;
 };
 
+/** Minimal PII read model for the capability-gated manual learner-approval queue. */
+export type AdminAccountApprovalItem = {
+  id: string;
+  email: string;
+  name: string;
+  surname: string;
+  job: string;
+  organization: string;
+  phoneCountryIso2: string | null;
+  phoneE164: string | null;
+  avatarAvailable: boolean;
+  requestedAt: string;
+  dueAt: string;
+};
+
 /** Deletion-specific directory entry; deliberately excludes capabilities and history detail. */
 export type LearningHistoryTarget = {
   id: string;
@@ -181,9 +196,6 @@ export type AdminAuditEvent = {
 
 export type AdminPresentation = {
   id: string;
-  bucket: string;
-  path: string;
-  thumbnailPath: string;
   pageCount: number;
   sha256: string;
   byteSize: number;
@@ -316,3 +328,11 @@ export type TestEditorPayload = {
   questionVariants: [AdminTestVariant, AdminTestVariant, AdminTestVariant];
   revisionHistory: AdminCourseRevisionSummary[];
 };
+
+/**
+ * Safe server-to-client seed for the course editor. Existing question
+ * variants, correct options, explanations and variant identifiers are
+ * intentionally absent: an operator may only author a fresh set in memory
+ * and submit it through the protected mutation route.
+ */
+export type TestEditorSeed = Omit<TestEditorPayload, 'questionVariants'>;

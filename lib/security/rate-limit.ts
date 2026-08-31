@@ -12,6 +12,11 @@ export type AdminMutationQuotaAction =
 
 type QuotaAction =
   | 'auth.register'
+  | 'auth.otp.start'
+  | 'auth.otp.start.email'
+  | 'auth.otp.verify'
+  | 'auth.otp.verify.email'
+  | 'profile.update'
   | 'attempt.start'
   | 'attempt.complete'
   | 'certificate.pdf'
@@ -22,7 +27,7 @@ type QuotaAction =
   | 'admin.reconcile'
   | AdminMutationQuotaAction;
 
-type BusinessQuotaAction = 'avatar.upload' | 'certificate.pdf';
+type BusinessQuotaAction = 'avatar.upload' | 'certificate.pdf' | 'profile.update';
 
 type QuotaPayload = { allowed?: unknown; retryAfter?: unknown };
 type RpcClient = {

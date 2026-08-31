@@ -15,6 +15,17 @@ function hmacSecret() {
   return secret;
 }
 
+/**
+ * A deterministic HMAC identifier for coarse anti-abuse quotas. It is not an
+ * audit value and must never be returned to the browser, logged, or used as a
+ * substitute for an account identifier.
+ */
+export function requestSubjectHash(value: string) {
+  return createHmac('sha256', hmacSecret())
+    .update(`safetyhub:quota-subject:v1:${value.trim().toLowerCase()}`, 'utf8')
+    .digest('hex');
+}
+
 function coarseIp(value: string | null) {
   const ip = (value ?? '').split(',')[0]?.trim() ?? '';
   if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(ip)) {

@@ -1,6 +1,7 @@
 import type { AttemptPayload } from './types';
 
 export type AttemptPolicyCode =
+  | 'ACCOUNT_APPROVAL_REQUIRED'
   | 'PROFILE_ONBOARDING_REQUIRED'
   | 'AVATAR_REQUIRED'
   | 'ATTEMPT_DAILY_LIMIT'
@@ -33,11 +34,11 @@ function retryAtFromDetails(details?: string | null) {
 
 export class AttemptPolicyError extends Error {
   public readonly code: AttemptPolicyCode;
-  public readonly status: 409 | 429 | 503;
+  public readonly status: 403 | 409 | 429 | 503;
   public readonly retryAt?: string;
   public readonly retryAfterSeconds?: number;
 
-  constructor(code: AttemptPolicyCode, status: 409 | 429 | 503, retryAt?: string) {
+  constructor(code: AttemptPolicyCode, status: 403 | 409 | 429 | 503, retryAt?: string) {
     super(code);
     this.code = code;
     this.status = status;
@@ -62,6 +63,7 @@ export class AttemptExpiredError extends AttemptPolicyError {
 
 export function parseAttemptRpcError(error: { message: string; details?: string | null }) {
   const codes: AttemptPolicyCode[] = [
+    'ACCOUNT_APPROVAL_REQUIRED',
     'PROFILE_ONBOARDING_REQUIRED',
     'AVATAR_REQUIRED',
     'ATTEMPT_DAILY_LIMIT',
@@ -75,7 +77,9 @@ export function parseAttemptRpcError(error: { message: string; details?: string 
   if (!code) return new Error(error.message);
   return new AttemptPolicyError(
     code,
-    code === 'ATTEMPT_ROLLING_LIMIT' || code === 'ATTEMPT_DAILY_LIMIT'
+    code === 'ACCOUNT_APPROVAL_REQUIRED'
+      ? 403
+      : code === 'ATTEMPT_ROLLING_LIMIT' || code === 'ATTEMPT_DAILY_LIMIT'
       ? 429
       : code === 'COURSE_CATALOG_MAINTENANCE'
         ? 503

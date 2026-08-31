@@ -8,7 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const read = (file) => readFile(path.join(root, file), 'utf8');
 const h1Count = (source) => source.match(/<h1(?:\s|>)/g)?.length ?? 0;
 
-test('admin shell exposes five product sections and switches chrome at the laptop breakpoint', async () => {
+test('admin shell exposes six product sections and switches chrome at the laptop breakpoint', async () => {
   const [group, layout, navLink, rootLayout, publicShell, globals] = await Promise.all([
     read('app/(admin)/layout.tsx'),
     read('app/(admin)/admin/layout.tsx'),
@@ -23,6 +23,7 @@ test('admin shell exposes five product sections and switches chrome at the lapto
   }
   for (const [href, label] of [
     ['/admin', 'В работе'],
+    ['/admin/approvals', 'Заявки'],
     ['/admin/courses', 'Курсы'],
     ['/admin/articles', 'Материалы'],
     ['/admin/settings', 'Настройки'],
@@ -43,7 +44,7 @@ test('admin shell exposes five product sections and switches chrome at the lapto
   assert.match(layout, /<aside[\s\S]+min-\[1180px\]:flex/);
   assert.match(layout, /<header[\s\S]+min-\[1180px\]:hidden/);
   assert.match(layout, /<nav[\s\S]+fixed inset-x-0 bottom-0[\s\S]+min-\[1180px\]:hidden/);
-  assert.match(layout, /grid[^"\n]*grid-cols-5/);
+  assert.match(layout, /grid[^"\n]*grid-cols-6/);
   assert.doesNotMatch(layout, /overflow-x-auto/);
   assert.match(layout, /size="admin"/);
   assert.match(layout, /admin-workspace-container/);

@@ -72,66 +72,30 @@ function rememberTopic(slug: string, topic: Topic | null) {
   }
 }
 
-function publicStorageUrl(bucket: string, storagePath: string) {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/u, '');
-  if (!base || !bucket || !storagePath) return '';
-  const encodedPath = storagePath.split('/').filter(Boolean).map(encodeURIComponent).join('/');
-  return `${base}/storage/v1/object/public/${encodeURIComponent(bucket)}/${encodedPath}`;
-}
-
 type PresentationRecord = {
   id?: unknown;
-  bucket?: unknown;
-  storageBucket?: unknown;
-  storage_bucket?: unknown;
-  path?: unknown;
-  storagePath?: unknown;
-  storage_path?: unknown;
-  thumbnailPath?: unknown;
-  thumbnail_path?: unknown;
   pageCount?: unknown;
   page_count?: unknown;
   sha256?: unknown;
-  url?: unknown;
-  thumbnailUrl?: unknown;
+  status?: unknown;
 };
 
-function presentationFromRecord(value: PresentationRecord | null | undefined) {
-  if (!value || typeof value.id !== 'string') return null;
-  const bucket =
-    typeof value.bucket === 'string'
-      ? value.bucket
-      : typeof value.storageBucket === 'string'
-        ? value.storageBucket
-        : typeof value.storage_bucket === 'string'
-          ? value.storage_bucket
-          : 'course-presentations';
-  const storagePath =
-    typeof value.path === 'string'
-      ? value.path
-      : typeof value.storagePath === 'string'
-        ? value.storagePath
-        : typeof value.storage_path === 'string'
-          ? value.storage_path
-          : '';
-  const thumbnailPath =
-    typeof value.thumbnailPath === 'string'
-      ? value.thumbnailPath
-      : typeof value.thumbnail_path === 'string'
-        ? value.thumbnail_path
-        : '';
-  const url =
-    typeof value.url === 'string' && value.url ? value.url : publicStorageUrl(bucket, storagePath);
-  const thumbnailUrl =
-    typeof value.thumbnailUrl === 'string' && value.thumbnailUrl
-      ? value.thumbnailUrl
-      : publicStorageUrl(bucket, thumbnailPath);
+function protectedPresentationUrl(slug: string, asset: 'presentation' | 'thumbnail') {
+  return `/course-presentations/${encodeURIComponent(slug)}/${asset}`;
+}
+
+function presentationFromRecord(value: PresentationRecord | null | undefined, slug: string) {
+  if (!value || typeof value.id !== 'string' || !isContentSlug(slug)) return null;
+  if (value.status !== undefined && value.status !== 'ready') return null;
   const pageCount = Number(value.pageCount ?? value.page_count);
-  if (!url || !Number.isInteger(pageCount) || pageCount <= 0) return null;
+  if (!Number.isInteger(pageCount) || pageCount <= 0) return null;
+
+  // A course page may safely expose only a same-origin authorization endpoint.
+  // Its immutable Storage object path never reaches the rendered catalogue.
   return {
     id: value.id,
-    url,
-    thumbnailUrl,
+    url: protectedPresentationUrl(slug, 'presentation'),
+    thumbnailUrl: protectedPresentationUrl(slug, 'thumbnail'),
     pageCount,
     sha256: typeof value.sha256 === 'string' ? value.sha256 : '',
   } satisfies CoursePresentation;
@@ -151,14 +115,7 @@ function topicFromLocalRecord(raw: Record<string, unknown>): Topic | null {
     raw.presentation && typeof raw.presentation === 'object'
       ? (raw.presentation as PresentationRecord)
       : null;
-  const presentation = presentationFromRecord(presentationRecord);
-  const localPresentation = presentation
-    ? {
-        ...presentation,
-        url: `/course-presentations/${encodeURIComponent(raw.slug)}/presentation`,
-        thumbnailUrl: `/course-presentations/${encodeURIComponent(raw.slug)}/thumbnail`,
-      }
-    : null;
+  const localPresentation = presentationFromRecord(presentationRecord, raw.slug);
   return {
     id: typeof raw.id === 'string' ? raw.id : raw.slug,
     slug: raw.slug,
@@ -246,7 +203,7 @@ function topicFromDatabase(record: PublicCourseRecord): Topic {
     passScore: record.pass_score,
     attemptsPerDay: record.attempts_per_calendar_day,
     attemptResetTimezone: record.attempt_reset_timezone,
-    presentation: presentationFromRecord(joinedPresentation),
+    presentation: presentationFromRecord(joinedPresentation, record.slug),
     updatedAt: record.published_at,
     seo: topicSeo(record.seo, record.title, record.description),
     ...metadataFields(record as unknown as Record<string, unknown>),
@@ -254,7 +211,7 @@ function topicFromDatabase(record: PublicCourseRecord): Topic {
 }
 
 const publicCourseSelection =
-  'test_id,slug,title,description,icon,display_order,duration_minutes,pass_score,question_count,attempts_per_calendar_day,attempt_reset_timezone,seo,published_at,jurisdiction,effective_date,sources,presentation:course_presentations!test_revisions_presentation_id_fkey(id,storage_bucket,storage_path,thumbnail_path,page_count,sha256,status),test:tests!tests_current_revision_fk!inner(status)';
+  'test_id,slug,title,description,icon,display_order,duration_minutes,pass_score,question_count,attempts_per_calendar_day,attempt_reset_timezone,seo,published_at,jurisdiction,effective_date,sources,presentation:course_presentations!test_revisions_presentation_id_fkey(id,page_count,sha256,status),test:tests!tests_current_revision_fk!inner(status)';
 
 async function getTopicsFromSource(): Promise<Topic[]> {
   const localTopics = getLocalTopics();

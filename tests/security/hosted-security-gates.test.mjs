@@ -66,17 +66,13 @@ test('hosted config requires an exact disposable ref, confirmation, and high-fri
 test('hosted config requires a strict bounded request timeout', () => {
   assert.equal(resolveHostedGateConfig(hostedEnv()).requestTimeoutMs, 15_000);
   assert.equal(
-    resolveHostedGateConfig(
-      hostedEnv({ SAFETYHUB_HOSTED_REQUEST_TIMEOUT_MS: '1000' }),
-    ).requestTimeoutMs,
+    resolveHostedGateConfig(hostedEnv({ SAFETYHUB_HOSTED_REQUEST_TIMEOUT_MS: '1000' }))
+      .requestTimeoutMs,
     1_000,
   );
   for (const value of ['0', '999', '30001', '1.5', 'not-a-number']) {
     assert.throws(
-      () =>
-        resolveHostedGateConfig(
-          hostedEnv({ SAFETYHUB_HOSTED_REQUEST_TIMEOUT_MS: value }),
-        ),
+      () => resolveHostedGateConfig(hostedEnv({ SAFETYHUB_HOSTED_REQUEST_TIMEOUT_MS: value })),
       /INVALID_SAFETYHUB_HOSTED_REQUEST_TIMEOUT_MS/u,
     );
   }
@@ -117,7 +113,8 @@ test('hosted config hard-denies production in the URL, explicit ref, and confirm
   ]) {
     assert.throws(
       () => resolveHostedGateConfig(hostedEnv(overrides)),
-      (error) => error instanceof HostedSecurityGateError && error.code === 'TARGET_PREFLIGHT_REFUSED',
+      (error) =>
+        error instanceof HostedSecurityGateError && error.code === 'TARGET_PREFLIGHT_REFUSED',
     );
   }
 });
@@ -130,7 +127,10 @@ test('denial helpers accept provider ACL statuses but reject success and transpo
     assert.equal(assertPostgrestDenied({ status }), status);
   }
 
-  assert.throws(() => assertStorageDenied({ data: null, error: null }), /STORAGE_OPERATION_NOT_DENIED/u);
+  assert.throws(
+    () => assertStorageDenied({ data: null, error: null }),
+    /STORAGE_OPERATION_NOT_DENIED/u,
+  );
   assert.throws(
     () => assertStorageDenied({ error: new Error('network') }),
     /STORAGE_OPERATION_NOT_DENIED/u,
@@ -303,7 +303,8 @@ test('hosted Storage gates enforce the exact begin/upload/finish/stage/finalize 
   const admin = {
     async rpc(name, args) {
       rpcCalls.push({ name, args });
-      if (name === 'begin_profile_avatar_upload') return { data: operation('prepared'), error: null };
+      if (name === 'begin_profile_avatar_upload')
+        return { data: operation('prepared'), error: null };
       if (name === 'finish_profile_avatar_storage_write') {
         return { data: operation('prepared'), error: null };
       }
@@ -394,10 +395,7 @@ test('hosted Storage gates enforce the exact begin/upload/finish/stage/finalize 
       'get_profile_avatar_manifest',
     ],
   );
-  assert.deepEqual(operationCallbacks, [
-    { operationToken: OPERATION_ID, objectKey },
-    undefined,
-  ]);
+  assert.deepEqual(operationCallbacks, [{ operationToken: OPERATION_ID, objectKey }, undefined]);
   assert.deepEqual(objects.get(objectKey), avatarBytes);
 });
 
@@ -761,6 +759,12 @@ test('a post-create gate failure still completes official cleanup and returns on
         admin.calls.push({ operation: 'createUser' });
         return { data: { user: { id: USER_ID } }, error: null };
       },
+      async generateLink() {
+        return {
+          data: { properties: { hashed_token: 'passwordless-hosted-test-token' } },
+          error: null,
+        };
+      },
     },
   };
 
@@ -770,7 +774,7 @@ test('a post-create gate failure still completes official cleanup and returns on
     if (clientNumber === 1) return admin;
     return {
       auth: {
-        async signInWithPassword() {
+        async verifyOtp() {
           return { data: { user: null, session: null }, error: { status: 400 } };
         },
       },
@@ -808,7 +812,7 @@ test('a post-create gate failure still completes official cleanup and returns on
   }
 
   assert.ok(thrown instanceof HostedSecurityGateRunError);
-  assert.equal(thrown.code, 'TEST_IDENTITY_SIGN_IN_FAILED');
+  assert.equal(thrown.code, 'TEST_IDENTITY_VERIFY_OTP_LINK_FAILED');
   assert.equal(thrown.report.cleanup.terminal, true);
   assert.equal(thrown.report.cleanup.state, 'db_purged');
   assert.equal(thrown.report.gates.target, true);
@@ -821,10 +825,7 @@ test('a post-create gate failure still completes official cleanup and returns on
   assert.doesNotMatch(serialized, /management-test-value/u);
   assert.doesNotMatch(serialized, /safetyhub-hosted-gate-/u);
   assert.doesNotMatch(serialized, new RegExp(DISPOSABLE_REF, 'u'));
-  assert.equal(
-    admin.calls.filter(({ operation }) => operation === 'createUser').length,
-    1,
-  );
+  assert.equal(admin.calls.filter(({ operation }) => operation === 'createUser').length, 1);
 });
 
 test('an ambiguous create result is reconciled by exact private marker and officially purged', async () => {
@@ -987,12 +988,18 @@ test('an unexpectedly accepted foreign-prefix probe is removed and verified befo
       async createUser() {
         return { data: { user: { id: USER_ID } }, error: null };
       },
+      async generateLink() {
+        return {
+          data: { properties: { hashed_token: 'passwordless-hosted-test-token' } },
+          error: null,
+        };
+      },
     },
   };
 
   const authenticated = {
     auth: {
-      async signInWithPassword() {
+      async verifyOtp() {
         return {
           data: {
             user: { id: USER_ID },
@@ -1028,7 +1035,14 @@ test('an unexpectedly accepted foreign-prefix probe is removed and verified befo
     if (clientNumber === 2) return authenticated;
     return anonymous;
   };
-  const randomValues = [WORKER_ID, absentUserId, WORKER_ID, foreignUserId, foreignToken, wrongToken];
+  const randomValues = [
+    WORKER_ID,
+    absentUserId,
+    WORKER_ID,
+    foreignUserId,
+    foreignToken,
+    wrongToken,
+  ];
   let clock = 1_700_000_000_000;
   let thrown;
   try {
@@ -1081,7 +1095,10 @@ test('hosted harness orders all fail-closed preflights before its first write an
   const runStart = source.indexOf('export async function runHostedSecurityGates');
   const marker = source.indexOf('assertDisposableProjectMarker({', runStart);
   const dataBaseline = source.indexOf('await assertCleanLoadTestBaseline(admin, {', runStart);
-  const storageBaseline = source.indexOf('await assertCleanStorageBaseline(admin, request, runDeadline);', runStart);
+  const storageBaseline = source.indexOf(
+    'await assertCleanStorageBaseline(admin, request, runDeadline);',
+    runStart,
+  );
   const firstWrite = source.indexOf('admin.auth.admin.createUser({', runStart);
 
   assert.ok(target >= 0);
@@ -1100,7 +1117,10 @@ test('hosted harness orders all fail-closed preflights before its first write an
   assert.match(source, /advance_account_storage_cleanup/u);
   assert.match(source, /purge_user_account/u);
   assert.match(source, /state === 'db_purged'/u);
+  assert.match(source, /admin\.auth\.admin\.generateLink\(/u);
+  assert.match(source, /authenticated\.auth\.verifyOtp\(/u);
   assert.doesNotMatch(source, /deleteUser/u);
+  assert.doesNotMatch(source, /signInWithPassword|password:\s*/u);
   assert.doesNotMatch(source, /\.env\.local/u);
   assert.doesNotMatch(source, /error\.message/u);
   assert.doesNotMatch(source, /console\.(?:log|error|warn)/u);

@@ -4,11 +4,13 @@ import test from 'node:test';
 
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 
-test('invite reconciliation binds only a claimed target with exact email and correlation', async () => {
-  const [source, types, data] = await Promise.all([
+test('outbox claims stay bounded and historical password invites are terminally retired', async () => {
+  const [source, types, data, apiError, retryRoute] = await Promise.all([
     read('features/admin/server.ts'),
     read('features/admin/types.ts'),
     read('features/admin/data.ts'),
+    read('features/auth/api-error.ts'),
+    read('app/api/admin/outbox/[operationId]/retry/route.ts'),
   ]);
 
   assert.match(source, /operationType: 'invite' \| 'suspend' \| 'restore';/u);
@@ -18,20 +20,27 @@ test('invite reconciliation binds only a claimed target with exact email and cor
   assert.doesNotMatch(source, /operationType: [^;]*'delete'/u);
   assert.doesNotMatch(types, /operationType: [^;]*'delete'/u);
   assert.doesNotMatch(data, /z\.enum\(\[[^\]]*'delete'[^\]]*\]\)/u);
-  assert.doesNotMatch(source, /listUsers|users.*find|find.*email/iu);
-  assert.match(source, /normalizeEmail\(user\.email\) === normalizeEmail\(email\)/u);
-  assert.match(source, /user\.user_metadata\?\.safetyhubInviteCorrelation === inviteCorrelation/u);
-  assert.match(source, /throw new Error\('OUTBOX_INVITE_TARGET_MISMATCH'\)/u);
 
-  const targetlessBranch = source.match(
-    /if \(!resolvedUserId\) \{[\s\S]*?resolvedUserId = invite\.data\.user\.id;\s*\}/u,
-  )?.[0];
-  assert.ok(targetlessBranch, 'targetless invite branch must remain explicit');
-  assert.equal(
-    targetlessBranch.match(/inviteUserByEmail\(/gu)?.length,
-    1,
-    'a targetless claimed operation must issue one invite attempt',
+  // New accounts are created only through email OTP. The retired admin-invite
+  // entry point must not retain a dormant path to Supabase password invites.
+  assert.doesNotMatch(source, /export async function inviteUser\b/u);
+  assert.doesNotMatch(
+    source,
+    /inviteUserByEmail|createPendingInviteContext|newPasswordContextToken|prepare_user_invite|auth\/invite/iu,
   );
+
+  const reconciliation = source.slice(source.indexOf('export async function reconcileAuthAdminOperation'));
+  assert.match(
+    reconciliation,
+    /if \(operation\.operationType === 'invite'\) \{[\s\S]*?advanceOutbox\(handle, 'failed', operation\.externalTargetId, retirement\);[\s\S]*?throw retirement;/u,
+  );
+  assert.doesNotMatch(
+    reconciliation,
+    /inviteUserByEmail|createPendingInviteContext|passwordTicket|auth\/invite|inviteUserMatches/iu,
+  );
+  assert.match(retryRoute, /await reconcileAuthAdminOperation\(/u);
+  assert.match(apiError, /message\.includes\('PASSWORDLESS_INVITE_RETIRED'\)/u);
+  assert.match(apiError, /\{ error: 'PASSWORDLESS_INVITE_RETIRED' \}, \{ status: 410 \}/u);
 });
 
 test('outbox transitions persist a bounded category instead of an upstream message', async () => {

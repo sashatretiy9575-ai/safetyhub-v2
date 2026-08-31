@@ -4,12 +4,11 @@ import { createClient } from '@supabase/supabase-js';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const secret = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
-const password = process.env.SAFETYHUB_SEED_PASSWORD;
 const allowRemote = process.argv.includes('--allow-remote') || process.env.ALLOW_TEST_DATA === '1';
 
-if (!url || !secret || !password) {
+if (!url || !secret) {
   throw new Error(
-    'Set NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY), and SAFETYHUB_SEED_PASSWORD.',
+    'Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY).',
   );
 }
 
@@ -19,9 +18,6 @@ if (!allowRemote && !['127.0.0.1', 'localhost'].includes(hostname)) {
     'The workspace seed is local-only. Pass --allow-remote or ALLOW_TEST_DATA=1 for an isolated staging project.',
   );
 }
-
-if (password.length < 12)
-  throw new Error('SAFETYHUB_SEED_PASSWORD must contain at least 12 characters.');
 
 const supabase = createClient(url, secret, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -129,7 +125,6 @@ const users = await mapLimit(accounts, 6, async (account) => {
       `create ${account.email}`,
       await supabase.auth.admin.createUser({
         email: account.email,
-        password,
         email_confirm: true,
         user_metadata: { name: account.name, surname: account.surname, job: account.job },
       }),
@@ -139,7 +134,6 @@ const users = await mapLimit(accounts, 6, async (account) => {
     must(
       `refresh ${account.email}`,
       await supabase.auth.admin.updateUserById(user.id, {
-        password,
         email_confirm: true,
         user_metadata: { name: account.name, surname: account.surname, job: account.job },
       }),

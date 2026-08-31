@@ -1,22 +1,27 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Key } from '@phosphor-icons/react';
+import { SignIn, UserPlus } from '@phosphor-icons/react';
 import Link from 'next/link';
-import { PasswordChangeForm } from '@/features/auth/password-change-form';
+import { useRouter } from 'next/navigation';
 import { FieldError } from '@/features/auth/form-controls';
 import { Turnstile, type TurnstileHandle } from '@/features/auth/turnstile';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
-import { recoveryStartSchema, recoveryVerifySchema } from '@/lib/validation/auth';
+import { emailOtpStartSchema, emailOtpVerifySchema } from '@/lib/validation/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-type RecoveryStage = 'email' | 'code' | 'password';
+type EmailOtpIntent = 'login' | 'register';
+type EmailOtpStage = 'email' | 'code';
 type BusyAction = 'send' | 'verify' | null;
-type StoredAttempt = { email: string; stage: 'code'; sentAt: number };
+type StoredAttempt = {
+  email: string;
+  intent: EmailOtpIntent;
+  sentAt: number;
+};
+type FieldErrors = Partial<Record<'email' | 'code' | 'captcha', string>>;
 
-const ATTEMPT_STORAGE_KEY = 'safetyhub-password-recovery-attempt';
 const ATTEMPT_TTL_MS = 60 * 60 * 1000;
 const RESEND_DELAY_SECONDS = 60;
 
@@ -24,34 +29,42 @@ const sendErrorMessages: Record<string, string> = {
   CAPTCHA_FAILED: 'Проверка безопасности истекла. Пройдите её снова.',
   RATE_LIMITED: 'Слишком много запросов. Попробуйте немного позже.',
   INVALID_REQUEST: 'Проверьте введённый email.',
-  RECOVERY_UNAVAILABLE: 'Не удалось отправить код. Повторите позже.',
+  OTP_UNAVAILABLE: 'Не удалось отправить код. Повторите позже.',
 };
 
 const verifyErrorMessages: Record<string, string> = {
-  RECOVERY_CODE_INVALID: 'Код неверен или уже истёк. Проверьте код либо запросите новый.',
+  OTP_CODE_INVALID: 'Код неверен, истёк или уже использован. Проверьте его либо запросите новый.',
   RATE_LIMITED: 'Слишком много попыток. Попробуйте немного позже.',
   INVALID_REQUEST: 'Введите email и шестизначный код.',
-  RECOVERY_UNAVAILABLE: 'Не удалось проверить код. Повторите позже.',
+  OTP_UNAVAILABLE: 'Не удалось проверить код. Повторите позже.',
+  AUTH_CONTEXT_UNAVAILABLE: 'Сессия подтверждена, но профиль пока недоступен. Повторите позже.',
 };
 
-function readStoredAttempt(): StoredAttempt | null {
+function storageKey(intent: EmailOtpIntent) {
+  return `safetyhub-email-otp:${intent}`;
+}
+
+function readStoredAttempt(intent: EmailOtpIntent): StoredAttempt | null {
   try {
-    const value = JSON.parse(sessionStorage.getItem(ATTEMPT_STORAGE_KEY) ?? 'null') as unknown;
-    if (!value || typeof value !== 'object') return null;
+    const value = JSON.parse(sessionStorage.getItem(storageKey(intent)) ?? 'null') as unknown;
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
     const candidate = value as Partial<StoredAttempt>;
-    const parsedEmail = recoveryStartSchema.safeParse({ email: candidate.email });
+    const parsedEmail = emailOtpStartSchema.safeParse({
+      email: candidate.email,
+      intent,
+    });
     if (
       !parsedEmail.success ||
-      candidate.stage !== 'code' ||
+      candidate.intent !== intent ||
       typeof candidate.sentAt !== 'number' ||
       Date.now() - candidate.sentAt > ATTEMPT_TTL_MS
     ) {
-      sessionStorage.removeItem(ATTEMPT_STORAGE_KEY);
+      sessionStorage.removeItem(storageKey(intent));
       return null;
     }
     return {
       email: parsedEmail.data.email,
-      stage: 'code',
+      intent,
       sentAt: candidate.sentAt,
     };
   } catch {
@@ -59,27 +72,41 @@ function readStoredAttempt(): StoredAttempt | null {
   }
 }
 
-function storeAttempt(email: string, sentAt: number) {
+function storeAttempt(intent: EmailOtpIntent, email: string, sentAt: number) {
   try {
     sessionStorage.setItem(
-      ATTEMPT_STORAGE_KEY,
-      JSON.stringify({ email, stage: 'code', sentAt } satisfies StoredAttempt),
+      storageKey(intent),
+      JSON.stringify({
+        email,
+        intent,
+        sentAt,
+      } satisfies StoredAttempt),
     );
   } catch {
-    // A storage-denied browser can still complete the flow while this page stays open.
+    // A storage-denied browser can still complete the flow while the page stays open.
   }
 }
 
-function clearStoredAttempt() {
+function clearStoredAttempt(intent: EmailOtpIntent) {
   try {
-    sessionStorage.removeItem(ATTEMPT_STORAGE_KEY);
+    sessionStorage.removeItem(storageKey(intent));
   } catch {
-    // The server-held recovery context remains authoritative.
+    // Nothing client-side is authoritative for an OTP session.
   }
 }
 
-export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boolean }) {
-  const [stage, setStage] = useState<RecoveryStage>(initialVerified ? 'password' : 'email');
+function safeLanding(value: unknown) {
+  return value === '/admin' ||
+    value === '/auth/legal' ||
+    value === '/onboarding' ||
+    value === '/profile'
+    ? value
+    : '/profile';
+}
+
+export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
+  const router = useRouter();
+  const [stage, setStage] = useState<EmailOtpStage>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [sentAt, setSentAt] = useState(0);
@@ -87,20 +114,17 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
   const [busy, setBusy] = useState<BusyAction>(null);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<'email' | 'code', string>>>({});
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [captchaVersion, setCaptchaVersion] = useState(0);
   const emailRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
   const turnstileRef = useRef<TurnstileHandle>(null);
   const pendingCaptchaSubmitRef = useRef<((token: string) => void) | null>(null);
   const captchaRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+  const isRegister = intent === 'register';
 
   useEffect(() => {
-    if (initialVerified) {
-      clearStoredAttempt();
-      return;
-    }
-    const stored = readStoredAttempt();
+    const stored = readStoredAttempt(intent);
     if (!stored) return;
     setEmail(stored.email);
     setSentAt(stored.sentAt);
@@ -109,48 +133,48 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
     );
     setStage('code');
     setStatus('Введите код из письма. Если письмо не пришло, запросите новый код.');
-  }, [initialVerified]);
+  }, [intent]);
 
   useEffect(() => {
     if (retrySeconds <= 0) return;
-    const timer = window.setInterval(() => {
-      setRetrySeconds((value) => Math.max(0, value - 1));
-    }, 1000);
+    const timer = window.setInterval(() => setRetrySeconds((value) => Math.max(0, value - 1)), 1000);
     return () => window.clearInterval(timer);
   }, [retrySeconds]);
 
   useEffect(() => {
-    if (stage === 'password') clearStoredAttempt();
-    const hasEmail = recoveryStartSchema.safeParse({ email: emailRef.current?.value }).success;
-    const target =
-      stage === 'code'
-        ? hasEmail
-          ? codeRef.current
-          : emailRef.current
-        : stage === 'email'
-          ? emailRef.current
-          : null;
-    if (target) requestAnimationFrame(() => target.focus());
+    requestAnimationFrame(() => {
+      if (stage === 'code') codeRef.current?.focus();
+      else emailRef.current?.focus();
+    });
   }, [stage]);
+
+  const resetCaptcha = () => {
+    pendingCaptchaSubmitRef.current = null;
+    setCaptchaVersion((value) => value + 1);
+  };
 
   const sendCode = async (normalizedEmail: string, captchaToken?: string) => {
     setBusy('send');
     setError('');
     setFieldErrors({});
     try {
-      const result = await clientRequest('/api/auth/password/recovery', {
+      const result = await clientRequest('/api/auth/email-otp/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: normalizedEmail, captchaToken }),
+        body: JSON.stringify({
+          email: normalizedEmail,
+          intent,
+          captchaToken,
+        }),
       });
-      const payload = await readClientResponseJson<{ sent?: boolean; error?: string }>(
-        result.response,
-      );
+      const payload = await readClientResponseJson<{ sent?: unknown; error?: unknown }>(result.response);
       if (!result.ok || payload?.sent !== true) {
-        const fallback = 'Не удалось отправить код. Повторите позже.';
+        const errorCode = typeof payload?.error === 'string' ? payload.error : null;
+        const fallbackMessage = result.ok
+          ? 'Не удалось отправить код. Повторите позже.'
+          : clientRequestMessage(result.error, 'Не удалось отправить код. Повторите позже.');
         setError(
-          (payload?.error && sendErrorMessages[payload.error]) ||
-            (result.ok ? fallback : clientRequestMessage(result.error, fallback)),
+          (errorCode && sendErrorMessages[errorCode]) || fallbackMessage,
         );
         return;
       }
@@ -161,23 +185,32 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
       setSentAt(nextSentAt);
       setRetrySeconds(RESEND_DELAY_SECONDS);
       setStage('code');
-      setStatus('Если аккаунт существует, код отправлен на указанную почту.');
-      storeAttempt(normalizedEmail, nextSentAt);
+      setStatus(
+        isRegister
+          ? 'Если этот адрес можно использовать, код отправлен. Введите шесть цифр из письма.'
+          : 'Если для этого email доступен вход, код отправлен. Введите шесть цифр из письма.',
+      );
+      storeAttempt(intent, normalizedEmail, nextSentAt);
     } catch (requestError) {
       setError(clientRequestMessage(requestError, 'Не удалось отправить код. Повторите позже.'));
     } finally {
-      pendingCaptchaSubmitRef.current = null;
-      setCaptchaVersion((value) => value + 1);
+      resetCaptcha();
       setBusy(null);
     }
   };
 
-  const requestCode = (event: React.FormEvent) => {
-    event.preventDefault();
+  const requestCode = (event?: React.FormEvent | React.MouseEvent) => {
+    event?.preventDefault();
     if (busy || (stage === 'code' && retrySeconds > 0)) return;
-    const parsed = recoveryStartSchema.safeParse({ email });
+    const parsed = emailOtpStartSchema.safeParse({
+      email,
+      intent,
+    });
     if (!parsed.success) {
-      setFieldErrors({ email: 'Введите корректный email.' });
+      const nextErrors: FieldErrors = {};
+      const flattened = parsed.error.flatten().fieldErrors;
+      if (flattened.email?.length) nextErrors.email = 'Введите корректный email.';
+      setFieldErrors(nextErrors);
       setError('');
       requestAnimationFrame(() => emailRef.current?.focus());
       return;
@@ -196,10 +229,13 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
   const verifyCode = async (event: React.FormEvent) => {
     event.preventDefault();
     if (busy) return;
-    const parsed = recoveryVerifySchema.safeParse({ email, code });
+    const parsed = emailOtpVerifySchema.safeParse({
+      email,
+      code,
+    });
     if (!parsed.success) {
+      const nextErrors: FieldErrors = {};
       const flattened = parsed.error.flatten().fieldErrors;
-      const nextErrors: typeof fieldErrors = {};
       if (flattened.email?.length) nextErrors.email = 'Введите корректный email.';
       if (flattened.code?.length) nextErrors.code = 'Введите шестизначный код.';
       setFieldErrors(nextErrors);
@@ -212,31 +248,32 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
     setError('');
     setFieldErrors({});
     try {
-      const result = await clientRequest('/api/auth/password/recovery/verify', {
+      const result = await clientRequest('/api/auth/email-otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(parsed.data),
       });
-      const payload = await readClientResponseJson<{ verified?: boolean; error?: string }>(
+      const payload = await readClientResponseJson<{ verified?: unknown; redirectTo?: unknown; error?: unknown }>(
         result.response,
       );
       if (!result.ok || payload?.verified !== true) {
-        const fallback = 'Не удалось проверить код. Повторите позже.';
+        const errorCode = typeof payload?.error === 'string' ? payload.error : null;
+        const fallbackMessage = result.ok
+          ? 'Не удалось проверить код. Повторите позже.'
+          : clientRequestMessage(result.error, 'Не удалось проверить код. Повторите позже.');
         setError(
-          (payload?.error && verifyErrorMessages[payload.error]) ||
-            (result.ok ? fallback : clientRequestMessage(result.error, fallback)),
+          (errorCode && verifyErrorMessages[errorCode]) || fallbackMessage,
         );
-        if (payload?.error === 'RECOVERY_CODE_INVALID') {
+        if (errorCode === 'OTP_CODE_INVALID') {
           setCode('');
           requestAnimationFrame(() => codeRef.current?.focus());
         }
         return;
       }
 
-      setCode('');
-      setStatus('Код подтверждён. Придумайте новый пароль.');
-      clearStoredAttempt();
-      setStage('password');
+      clearStoredAttempt(intent);
+      router.replace(safeLanding(payload?.redirectTo));
+      router.refresh();
     } catch (requestError) {
       setError(clientRequestMessage(requestError, 'Не удалось проверить код. Повторите позже.'));
     } finally {
@@ -245,7 +282,7 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
   };
 
   const changeEmail = () => {
-    clearStoredAttempt();
+    clearStoredAttempt(intent);
     setStage('email');
     setCode('');
     setSentAt(0);
@@ -255,21 +292,20 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
     setFieldErrors({});
   };
 
+  const Icon = isRegister ? UserPlus : SignIn;
+  const title = isRegister ? 'Создать аккаунт' : 'Вход в аккаунт';
+
   return (
     <>
       <div className="space-y-2 text-center">
         <span className="mx-auto grid size-12 place-items-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-          <Key size={24} />
+          <Icon size={24} />
         </span>
-        <h1 className="font-display text-2xl font-bold">
-          {stage === 'password' ? 'Придумайте новый пароль' : 'Восстановить пароль'}
-        </h1>
+        <h1 className="font-display text-2xl font-bold">{title}</h1>
         <p className="text-sm text-[var(--color-text-muted)]">
           {stage === 'email'
-            ? 'Пришлём шестизначный код на вашу почту.'
-            : stage === 'code'
-              ? 'Введите email и шестизначный код из письма.'
-              : 'Подтверждение действует 15 минут и сработает только один раз.'}
+            ? 'Укажите email — пришлём одноразовый шестизначный код.'
+            : 'Введите код из письма. Он действует ограниченное время и используется один раз.'}
         </p>
       </div>
 
@@ -282,9 +318,9 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
       {stage === 'email' && (
         <form onSubmit={requestCode} className="space-y-4" noValidate>
           <div className="space-y-2">
-            <Label htmlFor="recovery-email">Email</Label>
+            <Label htmlFor={`${intent}-email`}>Email</Label>
             <Input
-              id="recovery-email"
+              id={`${intent}-email`}
               ref={emailRef}
               type="email"
               autoComplete="email"
@@ -294,11 +330,12 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
                 setFieldErrors((value) => ({ ...value, email: undefined }));
               }}
               invalid={Boolean(fieldErrors.email)}
-              aria-describedby={fieldErrors.email ? 'recovery-email-error' : undefined}
+              aria-describedby={fieldErrors.email ? `${intent}-email-error` : undefined}
               required
             />
-            <FieldError id="recovery-email-error" message={fieldErrors.email} />
+            <FieldError id={`${intent}-email-error`} message={fieldErrors.email} />
           </div>
+
           <Button type="submit" className="min-h-11 w-full" disabled={busy !== null}>
             {busy === 'send' ? 'Отправляем...' : 'Получить код'}
           </Button>
@@ -321,9 +358,9 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
       {stage === 'code' && (
         <form onSubmit={verifyCode} className="space-y-4" noValidate>
           <div className="space-y-2">
-            <Label htmlFor="recovery-code-email">Email</Label>
+            <Label htmlFor={`${intent}-code-email`}>Email</Label>
             <Input
-              id="recovery-code-email"
+              id={`${intent}-code-email`}
               ref={emailRef}
               type="email"
               autoComplete="email"
@@ -331,20 +368,23 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
               onChange={(event) => {
                 const nextEmail = event.target.value;
                 setEmail(nextEmail);
-                const parsed = recoveryStartSchema.safeParse({ email: nextEmail });
-                if (sentAt > 0 && parsed.success) storeAttempt(parsed.data.email, sentAt);
+                const parsed = emailOtpStartSchema.safeParse({
+                  email: nextEmail,
+                  intent,
+                });
+                if (sentAt > 0 && parsed.success) storeAttempt(intent, parsed.data.email, sentAt);
                 setFieldErrors((value) => ({ ...value, email: undefined }));
               }}
               invalid={Boolean(fieldErrors.email)}
-              aria-describedby={fieldErrors.email ? 'recovery-code-email-error' : undefined}
+              aria-describedby={fieldErrors.email ? `${intent}-code-email-error` : undefined}
               required
             />
-            <FieldError id="recovery-code-email-error" message={fieldErrors.email} />
+            <FieldError id={`${intent}-code-email-error`} message={fieldErrors.email} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="recovery-code">Код из письма</Label>
+            <Label htmlFor={`${intent}-code`}>Код из письма</Label>
             <Input
-              id="recovery-code"
+              id={`${intent}-code`}
               ref={codeRef}
               type="text"
               inputMode="numeric"
@@ -358,10 +398,10 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
               }}
               className="text-center font-mono text-xl tracking-[0.3em] sm:text-xl"
               invalid={Boolean(fieldErrors.code)}
-              aria-describedby={fieldErrors.code ? 'recovery-code-error' : undefined}
+              aria-describedby={fieldErrors.code ? `${intent}-code-error` : undefined}
               required
             />
-            <FieldError id="recovery-code-error" message={fieldErrors.code} />
+            <FieldError id={`${intent}-code-error`} message={fieldErrors.code} />
           </div>
           <Button type="submit" className="min-h-11 w-full" disabled={busy !== null}>
             {busy === 'verify' ? 'Проверяем...' : 'Подтвердить код'}
@@ -389,18 +429,17 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
         </form>
       )}
 
-      {stage !== 'password' && (
-        <Turnstile
-          key={captchaVersion}
-          ref={turnstileRef}
-          onToken={(token) => {
-            if (!token) return;
-            const pending = pendingCaptchaSubmitRef.current;
-            pendingCaptchaSubmitRef.current = null;
-            pending?.(token);
-          }}
-        />
-      )}
+      <Turnstile
+        key={captchaVersion}
+        ref={turnstileRef}
+        onToken={(token) => {
+          if (!token) return;
+          const pending = pendingCaptchaSubmitRef.current;
+          pendingCaptchaSubmitRef.current = null;
+          pending?.(token);
+        }}
+      />
+      <FieldError id={`${intent}-captcha-error`} message={fieldErrors.captcha} />
 
       {error && (
         <p role="alert" className="text-sm text-[var(--color-danger)]">
@@ -408,15 +447,12 @@ export function PasswordRecoveryFlow({ initialVerified }: { initialVerified: boo
         </p>
       )}
 
-      {stage === 'password' ? (
-        <PasswordChangeForm mode="recovery" />
-      ) : (
-        <p className="text-center text-sm">
-          <Link href="/auth/login" className="text-[var(--color-primary)] hover:underline">
-            Вернуться ко входу
-          </Link>
-        </p>
-      )}
+      <p className="text-center text-sm text-[var(--color-text-muted)]">
+        {isRegister ? 'Уже есть аккаунт? ' : 'Нет аккаунта? '}
+        <Link href={isRegister ? '/auth/login' : '/auth/register'} className="font-medium text-[var(--color-primary)] hover:underline">
+          {isRegister ? 'Войти' : 'Регистрация'}
+        </Link>
+      </p>
     </>
   );
 }

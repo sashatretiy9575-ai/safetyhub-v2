@@ -37,6 +37,31 @@ export const signUpSchema = z
   });
 export type SignUpValues = z.infer<typeof signUpSchema>;
 
+const normalizedEmailSchema = z.string().trim().toLowerCase().email().max(254);
+const captchaTokenSchema = z.string().min(1).max(4096).optional();
+
+/**
+ * Passwordless email entry point. `register` intentionally accepts the same
+ * email as an existing account: the server returns a neutral result and never
+ * exposes whether an address is already registered.
+ */
+export const emailOtpStartSchema = z
+  .object({
+    email: normalizedEmailSchema,
+    intent: z.enum(['login', 'register']),
+    captchaToken: captchaTokenSchema,
+  });
+export type EmailOtpStartValues = z.infer<typeof emailOtpStartSchema>;
+
+// Verification deliberately receives only the proof supplied by the Auth
+// provider. UI mode and legal consent are not properties of a code and must
+// never be inferred from browser-controlled values at this boundary.
+export const emailOtpVerifySchema = z.object({
+  email: normalizedEmailSchema,
+  code: z.string().regex(/^\d{6}$/),
+});
+export type EmailOtpVerifyValues = z.infer<typeof emailOtpVerifySchema>;
+
 export const resetSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
   captchaToken: z.string().min(1).optional(),

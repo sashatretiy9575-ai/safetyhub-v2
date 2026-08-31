@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 
-import Link from 'next/link';
 import { AdminAvatarUploader } from '@/features/profile/admin-avatar-uploader';
 import { AccountDeletion } from '@/features/profile/account-deletion';
 import { getProfileAvatarUrl } from '@/features/profile/server';
@@ -8,7 +7,7 @@ import { ProfileForm } from '@/features/auth/profile-form';
 import { requireRole } from '@/features/auth/server';
 import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { phoneInputValueFromE164 } from '@/lib/phone';
 
 export default async function AdminAccountPage() {
   const actor = await requireRole(['admin']);
@@ -50,6 +49,10 @@ export default async function AdminAccountPage() {
                 surname: actor.profile.surname,
                 job: actor.profile.job,
                 organization: actor.profile.organization,
+                phone: phoneInputValueFromE164(
+                  actor.profile.phone_country_iso2,
+                  actor.profile.phone_e164,
+                ),
               }}
             />
           </div>
@@ -61,12 +64,9 @@ export default async function AdminAccountPage() {
           <div>
             <h2 className="text-xl font-bold">Настройки входа</h2>
             <p className="text-sm text-[var(--color-text-muted)]">
-              Пароль, установка приложения и управление аккаунтом.
+              Вход выполняется одноразовым кодом, который приходит на email. Пароль не используется.
             </p>
           </div>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/auth/change-password">Сменить пароль</Link>
-          </Button>
           <PwaManualInstall />
           <AccountDeletion />
         </CardContent>

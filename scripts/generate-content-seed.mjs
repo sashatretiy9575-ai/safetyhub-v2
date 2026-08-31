@@ -595,8 +595,10 @@ $seed$;
 insert into public.legal_document_versions (
   document_type, version, body_revision, is_current, effective_at
 ) values
-  ('privacy', '1.1', 'privacy-1.1', true, timestamptz '2026-08-13T00:00:00Z'),
-  ('terms', '2.1', 'terms-2.1', true, timestamptz '2026-08-13T00:00:00Z')
+  ('privacy', '1.1', 'privacy-1.1', false, timestamptz '2026-08-13T00:00:00Z'),
+  ('privacy', '1.2', 'privacy-1.2', true, timestamptz '2026-08-31T00:00:00Z'),
+  ('terms', '2.1', 'terms-2.1', false, timestamptz '2026-08-13T00:00:00Z'),
+  ('terms', '2.2', 'terms-2.2', true, timestamptz '2026-08-31T00:00:00Z')
 on conflict (document_type, version) do nothing;
 
 insert into public.site_settings (

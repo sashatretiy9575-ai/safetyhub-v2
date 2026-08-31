@@ -30,29 +30,22 @@ test('production and preview link origins ignore a caller-controlled request hos
   );
 });
 
-test('email redirects, invite outbox, PDF QR and callback redirects use only canonical origin', async () => {
-  const files = await Promise.all(
-    [
-      'app/api/admin/users/invite/route.ts',
-      'app/api/auth/register/route.ts',
-      'app/api/auth/password/recovery/route.ts',
-      'app/api/admin/attestations/export/route.ts',
-      'app/api/certificates/[certificateId]/route.ts',
-      'app/(account)/callback/route.ts',
-    ].map(read),
-  );
-  const adminServer = await read('features/admin/server.ts');
+test('generated links and retired callback redirects use only a canonical origin', async () => {
+  const [exportRoute, certificateRoute, callback, retiredHelper] = await Promise.all([
+    read('app/api/admin/attestations/export/route.ts'),
+    read('app/api/certificates/[certificateId]/route.ts'),
+    read('app/(account)/callback/route.ts'),
+    read('features/auth/password-auth-retired.tsx'),
+  ]);
   const proxy = await read('proxy.ts');
 
-  for (const source of files) {
+  for (const source of [exportRoute, certificateRoute, callback]) {
     assert.doesNotMatch(source, /getSiteUrl\([^)]/u);
   }
-  assert.doesNotMatch(files.join('\n'), /new URL\([^\n]*url\.origin/u);
-  assert.doesNotMatch(files[0], /getSiteUrl|request\.url|url\.origin/u);
-  assert.match(adminServer, /export async function inviteUser\(\s*values: InviteUserValues,\s*metadata:/u);
-  assert.match(adminServer, /const origin = getSiteUrl\(\)\.replace/u);
-  assert.doesNotMatch(adminServer, /requiredString\(operation\.payload, 'redirectOrigin'\)/u);
-  assert.match(files[5], /const redirectOrigin = getSiteUrl\(\)/u);
+  assert.doesNotMatch([exportRoute, certificateRoute, callback, retiredHelper].join('\n'), /new URL\([^\n]*url\.origin/u);
+  assert.match(callback, /redirectFromRetiredPasswordLink\(\)/u);
+  assert.match(retiredHelper, /new URL\('\/auth\/login', getSiteUrl\(\)\)/u);
+  assert.doesNotMatch(retiredHelper, /request\.url|url\.origin/u);
   assert.match(proxy, /new URL\('\/auth\/login', resolveSiteOrigin\(\)\)/u);
   assert.doesNotMatch(proxy, /new URL\('\/auth\/login', request\.url\)/u);
 });

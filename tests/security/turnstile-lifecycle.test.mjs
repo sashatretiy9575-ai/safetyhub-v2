@@ -50,12 +50,7 @@ test('Turnstile failures invalidate the token and a retry executes the native wi
 });
 
 test('auth callers defer one pending submit and continue it once after token delivery', async () => {
-  const callers = await Promise.all([
-    read('app/(account)/auth/login/page.tsx'),
-    read('app/(account)/auth/register/page.tsx'),
-    read('features/auth/password-recovery-flow.tsx'),
-    read('features/auth/password-change-form.tsx'),
-  ]);
+  const callers = [await read('features/auth/email-otp-flow.tsx')];
 
   for (const source of callers) {
     assert.match(source, /useRef<TurnstileHandle>\(null\)/u);

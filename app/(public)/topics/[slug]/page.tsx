@@ -5,6 +5,9 @@ import { JsonLd } from '@/components/shared/json-ld';
 import { breadcrumbsJsonLd, buildMetadata, courseJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { TopicSourcesCard } from '@/components/topics/topic-sources-card';
+import { getAuthContext } from '@/features/auth/server';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   return (await getTopicSlugs()).map((slug) => ({ slug }));
@@ -42,6 +45,13 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
     notFound();
   }
 
+  const auth = await getAuthContext();
+  const access = !auth
+    ? 'anonymous'
+    : !auth.hasCurrentLegalAcceptance
+      ? 'legal_required'
+      : auth.approval.state;
+
   return (
     <>
       <JsonLd
@@ -58,7 +68,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
           ]),
         ]}
       />
-      <CourseMaterialActions course={topic} />
+      <CourseMaterialActions course={topic} access={access} />
       <TopicSourcesCard topic={topic} />
     </>
   );

@@ -1,3 +1,5 @@
+import { isPhoneCountryCode, type PhoneInputValue } from '@/lib/phone';
+
 export type ProfileValues = Readonly<{
   name: string;
   surname: string;
@@ -6,6 +8,13 @@ export type ProfileValues = Readonly<{
 }>;
 
 export type ProfileField = keyof ProfileValues;
+
+export type ProfileSubmissionValues = ProfileValues &
+  Readonly<{
+    phone: PhoneInputValue;
+  }>;
+
+export type ProfileSubmissionField = ProfileField | 'phone';
 
 export type ApprovedIdentity = ProfileValues &
   Readonly<{
@@ -55,4 +64,30 @@ export function normalizeProfileValues(values: ProfileValues): ProfileValues {
     job: normalizeProfileText(values.job),
     organization: normalizeProfileText(values.organization),
   };
+}
+
+export function normalizeProfileSubmissionValues(
+  values: ProfileSubmissionValues,
+): ProfileSubmissionValues {
+  return {
+    ...normalizeProfileValues(values),
+    phone: {
+      countryIso2: values.phone.countryIso2,
+      nationalNumber: values.phone.nationalNumber.trim(),
+    },
+  };
+}
+
+export function validateProfileSubmissionValues(values: ProfileSubmissionValues) {
+  const errors: Partial<Record<ProfileSubmissionField, string>> = validateProfileValues(values);
+  if (!isPhoneCountryCode(values.phone.countryIso2)) {
+    errors.phone = 'Выберите страну номера.';
+  } else if (
+    !values.phone.nationalNumber.trim() ||
+    values.phone.nationalNumber.trim().length > 64 ||
+    !/[0-9]/u.test(values.phone.nationalNumber)
+  ) {
+    errors.phone = 'Введите действующий номер телефона.';
+  }
+  return errors;
 }

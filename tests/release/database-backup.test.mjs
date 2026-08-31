@@ -109,3 +109,26 @@ test('private avatar backup has a portable recovery path independent of DPAPI', 
   assert.match(verifier, /SAFETYHUB-AVATAR-RECOVERY-KEY-V1/u);
   assert.match(verifier, /keyProtection = 'portable-recovery-key'/u);
 });
+
+test('generic Storage byte backup requires the full allowlist and a portable recovery verification path', async () => {
+  const [runner, verifier, core] = await Promise.all([
+    readFile('scripts/backup-linked-storage.mjs', 'utf8'),
+    readFile('scripts/verify-linked-storage-backup.mjs', 'utf8'),
+    readFile('scripts/storage-byte-backup-tools.mjs', 'utf8'),
+  ]);
+  assert.match(runner, /--expected-project-ref/u);
+  assert.match(runner, /--allow-bucket/u);
+  assert.match(runner, /--recovery-key-output/u);
+  assert.match(runner, /SAFETYHUB-STORAGE-RECOVERY-KEY-V1/u);
+  assert.match(runner, /assertRecoveryKeyOutsideOutput/u);
+  assert.match(verifier, /--recovery-key-file/u);
+  assert.match(verifier, /SAFETYHUB-STORAGE-RECOVERY-KEY-V1/u);
+  assert.match(verifier, /verifyStorageByteBackup/u);
+  assert.match(core, /SAFETYHUB_STORAGE_BUCKET_ALLOWLIST/u);
+  assert.match(core, /STORAGE_BACKUP_BUCKET_SET_INCOMPLETE/u);
+  assert.match(core, /downloadedEveryListedVisibleObject:\s*true/u);
+  assert.match(core, /sourceConsistencyOrWriteDrainVerifiedByTool:\s*false/u);
+  assert.match(core, /physicalBackendOrVersionInventoryPerformed:\s*false/u);
+  assert.match(core, /verifyEncryptedTar\(/u);
+  assert.match(core, /objectSetSha256/u);
+});

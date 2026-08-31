@@ -23,11 +23,4 @@ export type AttemptPayload = {
     selectedOptionId: string | null;
     options: Array<{ id: string; text: string; position: number }>;
   }>;
-  review: Array<{
-    questionId: string;
-    selectedOptionId: string;
-    correctOptionId: string;
-    isCorrect: boolean;
-    explanation: string;
-  }>;
 };

@@ -44,9 +44,28 @@ max_frequency = "1m"
 otp_length = 6
 otp_expiry = 3600
 
+[auth.email.template.magic_link]
+subject = "Код для входа в SafetyHub"
+content_path = "./supabase/templates/magic-link.html"
+
+[auth.email.template.confirmation]
+subject = "Код для создания аккаунта SafetyHub"
+content_path = "./supabase/templates/confirmation.html"
+
 [auth.email.template.recovery]
-subject = "Код для восстановления пароля SafetyHub"
+subject = "Пароль в SafetyHub не используется"
 content_path = "./supabase/templates/recovery.html"
+
+[auth.email.template.invite]
+subject = "Приглашения с паролем в SafetyHub отключены"
+content_path = "./supabase/templates/invite.html"
+
+# This runs before every Auth access token is issued. The target function is
+# created by migration 20260831115000_passwordless_auth_provider_guard.sql, so
+# apply database migrations before pushing this Auth config to a new project.
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/enforce_email_otp_access_token"
 
 # A scheduler has no user JWT. The function verifies its own high-entropy
 # STORAGE_RECONCILER_SECRET bearer before it creates a service-role client.

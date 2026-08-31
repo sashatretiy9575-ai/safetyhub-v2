@@ -57,6 +57,7 @@ test('application contact surfaces use ContactLink instead of duplicated literal
     'components/shared/contact-actions.tsx',
     'components/legal/legal-contacts.tsx',
     'components/marketing/faq-accordion.tsx',
+    'features/profile/account-approval-status.tsx',
   ];
   for (const relative of checked) {
     const source = await read(relative);
@@ -64,6 +65,10 @@ test('application contact surfaces use ContactLink instead of duplicated literal
     assert.doesNotMatch(source, /href=\{[^}]*wa\.me/);
     assert.doesNotMatch(source, /\+7\s*701\s*729\s*0349/);
   }
+
+  const approvalStatus = await read('features/profile/account-approval-status.tsx');
+  assert.match(approvalStatus, /<ContactLink\s+kind="phone"\s+contacts=\{contacts\}/);
+  assert.match(approvalStatus, /<ContactLink\s+kind="whatsapp"\s+contacts=\{contacts\}/);
 });
 
 test('article WhatsApp actions resolve through current global contacts instead of stored wa.me links', async () => {

@@ -17,6 +17,8 @@ export type AuthProfile = Readonly<{
   surname: string;
   job: string;
   organization: string;
+  phone_country_iso2: string | null;
+  phone_e164: string | null;
   avatar_updated_at: string | null;
   onboarding_completed_at: string | null;
   created_at: string;
@@ -24,6 +26,7 @@ export type AuthProfile = Readonly<{
 }>;
 
 export type IdentityState = 'pending' | 'verified' | 'changed' | 'revoked';
+export type AccountApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
 
 export type AuthContext = Readonly<{
   user: { id: string; email: string | null };
@@ -32,6 +35,13 @@ export type AuthContext = Readonly<{
   role: AppRole;
   status: AccountStatus;
   deletionPending: boolean;
+  approval: Readonly<{
+    state: AccountApprovalState;
+    requestedAt: string | null;
+    dueAt: string | null;
+    decidedAt: string | null;
+    rejectionReason: string | null;
+  }>;
   capabilities: AdminCapability[];
   hasCurrentLegalAcceptance: boolean;
 }>;
@@ -44,6 +54,8 @@ const authContextRowSchema = z.object({
   profile_surname: z.string(),
   profile_job: z.string(),
   profile_organization: z.string(),
+  profile_phone_country_iso2: z.string().nullable(),
+  profile_phone_e164: z.string().nullable(),
   profile_avatar_updated_at: z.string().nullable(),
   profile_onboarding_completed_at: z.string().nullable(),
   profile_identity_state: z.enum(['pending', 'verified', 'changed', 'revoked']),
@@ -52,6 +64,11 @@ const authContextRowSchema = z.object({
   role: z.enum(['participant', 'admin']),
   status: z.enum(['active', 'suspended']),
   deletion_pending: z.boolean(),
+  approval_state: z.enum(['profile_incomplete', 'pending', 'approved', 'rejected']),
+  approval_requested_at: z.string().nullable(),
+  approval_due_at: z.string().nullable(),
+  approval_decided_at: z.string().nullable(),
+  approval_rejection_reason: z.string().nullable(),
   capabilities: z.array(z.string()),
   has_current_legal_acceptance: z.boolean(),
 });
@@ -119,6 +136,8 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
       surname: row.profile_surname,
       job: row.profile_job,
       organization: row.profile_organization,
+      phone_country_iso2: row.profile_phone_country_iso2,
+      phone_e164: row.profile_phone_e164,
       avatar_updated_at: row.profile_avatar_updated_at,
       onboarding_completed_at: row.profile_onboarding_completed_at,
       created_at: row.profile_created_at,
@@ -128,6 +147,13 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
     role: row.role,
     status: row.status,
     deletionPending: row.deletion_pending,
+    approval: {
+      state: row.approval_state,
+      requestedAt: row.approval_requested_at,
+      dueAt: row.approval_due_at,
+      decidedAt: row.approval_decided_at,
+      rejectionReason: row.approval_rejection_reason,
+    },
     capabilities,
     hasCurrentLegalAcceptance: row.has_current_legal_acceptance,
   };

@@ -1,16 +1,15 @@
 import { notFound } from 'next/navigation';
-import { getTestEditorPayload } from '@/features/admin/server';
-import type { TestEditorPayload } from '@/features/admin/types';
+import { getTestEditorSeed } from '@/features/admin/server';
 import { TestEditor } from '@/components/admin/test-editor';
 
 export default async function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const payload = await getTestEditorPayload(id);
-  if (!payload) notFound();
+  const seed = await getTestEditorSeed(id);
+  if (!seed) notFound();
   return (
     <section className="space-y-6">
-      <h1 className="font-display text-3xl font-bold">Редактирование курса</h1>
-      <TestEditor initial={payload as unknown as TestEditorPayload} />
+      <h1 className="font-display text-3xl font-bold">Новая редакция курса</h1>
+      <TestEditor initial={seed} />
     </section>
   );
 }

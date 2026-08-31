@@ -10,6 +10,7 @@ import {
 import { AuthenticationError, requireUser } from '@/features/auth/server';
 import { ProfileForm } from '@/features/auth/profile-form';
 import { AccountDeletion } from '@/features/profile/account-deletion';
+import { AccountApprovalStatus } from '@/features/profile/account-approval-status';
 import { AvatarUploader } from '@/features/profile/avatar-uploader';
 import { LegalAcceptancePanel } from '@/features/profile/legal-acceptance-panel';
 import {
@@ -24,6 +25,8 @@ import { Button } from '@/components/ui/button';
 import { DataLoadFailure } from '@/components/shared/data-load-failure';
 import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
 import { CertificateDownloadButton } from '@/features/certificates/download-button';
+import { phoneInputValueFromE164 } from '@/lib/phone';
+import { getSiteContacts } from '@/lib/site-contacts';
 
 function certificateLabel(state: ProfileAttestation['certificateState']) {
   if (state === 'pending_identity') return 'Ожидает проверки';
@@ -52,11 +55,11 @@ function resultVariant(state: ProfileAttestation['resultState']): BadgeProps['va
   return 'outline';
 }
 
-function identityStatus(state: 'pending' | 'verified' | 'changed' | 'revoked') {
-  if (state === 'verified') return { label: 'Данные проверены', variant: 'success' as const };
-  if (state === 'changed') return { label: 'Изменения на проверке', variant: 'warning' as const };
-  if (state === 'revoked') return { label: 'Нужна повторная проверка', variant: 'danger' as const };
-  return { label: 'Ожидает проверки', variant: 'warning' as const };
+function approvalStatus(state: 'profile_incomplete' | 'pending' | 'approved' | 'rejected') {
+  if (state === 'approved') return { label: 'Данные подтверждены', variant: 'success' as const };
+  if (state === 'rejected') return { label: 'Нужны уточнения', variant: 'danger' as const };
+  if (state === 'pending') return { label: 'На проверке', variant: 'warning' as const };
+  return { label: 'Заполните профиль', variant: 'warning' as const };
 }
 
 function NextStep({ rows, needsProfileAction }: { rows: ProfileAttestation[]; needsProfileAction: boolean }) {
@@ -233,9 +236,10 @@ export default async function ProfilePage() {
 
   if (context.role === 'admin') redirect('/admin');
 
-  const [dashboardResult, avatarUrl] = await Promise.all([
+  const [dashboardResult, avatarUrl, contacts] = await Promise.all([
     getProfileDashboard(),
     context.profile.avatar_updated_at ? getProfileAvatarUrl(context.user.id) : Promise.resolve(null),
+    getSiteContacts(),
   ]);
   const dashboard = dashboardResult.state === 'ready' ? dashboardResult.data : null;
   const profile = dashboard?.profile ?? {
@@ -249,17 +253,21 @@ export default async function ProfilePage() {
     createdAt: context.profile.created_at,
     updatedAt: context.profile.updated_at,
   };
-  const identityState = dashboard?.identityState ?? context.identityState;
   const fullName = `${profile.name} ${profile.surname}`.trim() || 'Пользователь';
   const initials = fullName.split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('');
-  const identity = identityStatus(identityState);
+  const approval = approvalStatus(context.approval.state);
+  const canAccessLearning = context.approval.state === 'approved';
 
   return (
     <section className="py-7 md:py-12">
       <Container size="content" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-3xl font-black md:text-4xl">Личный кабинет</h1>
-          <Button asChild><Link href="/topics">К курсам <ArrowRight /></Link></Button>
+          <Button asChild>
+            <Link href={canAccessLearning ? '/topics' : '#my-data'}>
+              {canAccessLearning ? 'К курсам' : 'Мои данные'} <ArrowRight />
+            </Link>
+          </Button>
         </div>
 
         {!context.hasCurrentLegalAcceptance ? (
@@ -273,11 +281,20 @@ export default async function ProfilePage() {
           </Card>
         ) : null}
 
-        <LearningDashboard
-          rows={dashboard?.attestations ?? null}
-          failureId={dashboardResult.state === 'failed' ? dashboardResult.correlationId : undefined}
-          needsProfileAction={!profile.organization}
+        <AccountApprovalStatus
+          state={context.approval.state}
+          dueAt={context.approval.dueAt}
+          rejectionReason={context.approval.rejectionReason}
+          contacts={contacts}
         />
+
+        {canAccessLearning ? (
+          <LearningDashboard
+            rows={dashboard?.attestations ?? null}
+            failureId={dashboardResult.state === 'failed' ? dashboardResult.correlationId : undefined}
+            needsProfileAction={!profile.organization || !context.profile.phone_e164}
+          />
+        ) : null}
 
         <Card id="my-data">
           <CardContent className="p-0">
@@ -290,9 +307,7 @@ export default async function ProfilePage() {
                   </span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
-                  <Badge variant={profile.onboardingCompletedAt ? identity.variant : 'warning'}>
-                    {profile.onboardingCompletedAt ? identity.label : 'Заполните профиль'}
-                  </Badge>
+                  <Badge variant={approval.variant}>{approval.label}</Badge>
                   <CaretDown className="transition-transform group-open:rotate-180" />
                 </span>
               </summary>
@@ -306,7 +321,18 @@ export default async function ProfilePage() {
                       <Buildings /><span className="break-words">{profile.organization || 'Компания не указана'}</span>
                     </p>
                   </div>
-                  <ProfileForm initial={{ name: profile.name, surname: profile.surname, job: profile.job, organization: profile.organization }} />
+                  <ProfileForm
+                    initial={{
+                      name: profile.name,
+                      surname: profile.surname,
+                      job: profile.job,
+                      organization: profile.organization,
+                      phone: phoneInputValueFromE164(
+                        context.profile.phone_country_iso2,
+                        context.profile.phone_e164,
+                      ),
+                    }}
+                  />
                   <div className="flex flex-wrap gap-2">
                     {!profile.onboardingCompletedAt ? (
                       <Button asChild size="sm"><Link href="/onboarding">Завершить профиль</Link></Button>
@@ -326,7 +352,9 @@ export default async function ProfilePage() {
                 <CaretDown className="transition-transform group-open:rotate-180" />
               </summary>
               <div className="space-y-4 border-t p-4 md:p-6">
-                <Button asChild size="sm" variant="outline"><Link href="/auth/change-password">Сменить пароль</Link></Button>
+                <p className="text-sm text-[var(--color-text-muted)]">
+                  Вход выполняется одноразовым кодом, который приходит на email. Пароль не используется.
+                </p>
                 <PwaManualInstall />
                 <AccountDeletion />
               </div>

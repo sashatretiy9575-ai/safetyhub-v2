@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { AccountStatus, AppRole } from '@/lib/supabase/types';
 import type {
   AdminAccessUser,
+  AdminAccountApprovalItem,
   AdminAuditEvent,
   AdminDataResult,
   AdminDataSummary,
@@ -52,6 +53,11 @@ export type AdminAccessOutboxQuery = {
   cursorId: string | null;
 };
 
+export type AdminAccountApprovalQuery = {
+  cursorAt: string | null;
+  cursorId: string | null;
+};
+
 export type LearningHistoryTargetQuery = {
   query: string;
   cursorAt: string | null;
@@ -66,6 +72,7 @@ type ReadRpcClient = {
       | 'list_admin_audit_page'
       | 'list_admin_access_users_page'
       | 'list_admin_access_outbox_page'
+      | 'list_pending_account_approval_page'
       | 'list_learning_history_targets_page',
     args?: Record<string, unknown>,
   ): PromiseLike<{ data: unknown; error: { code?: string; message?: string } | null }>;
@@ -154,6 +161,20 @@ const adminAccessUserSchema = z.object({
   email: z.string(),
   label: z.string(),
   capabilities: z.array(adminCapabilitySchema),
+});
+
+const adminAccountApprovalItemSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  name: z.string().max(80),
+  surname: z.string().max(80),
+  job: z.string().max(160),
+  organization: z.string().max(160),
+  phoneCountryIso2: z.string().regex(/^[A-Z]{2}$/u).nullable(),
+  phoneE164: z.string().regex(/^\+[1-9][0-9]{1,14}$/u).nullable(),
+  avatarAvailable: z.boolean(),
+  requestedAt: isoDateSchema,
+  dueAt: isoDateSchema,
 });
 
 const authAdminOutboxSchema = z.object({
@@ -292,6 +313,13 @@ export function parseAdminAccessOutboxQuery(params: RawAdminSearchParams): Admin
   };
 }
 
+export function parseAdminAccountApprovalQuery(
+  params: RawAdminSearchParams,
+): AdminAccountApprovalQuery {
+  const cursor = pairedCursor(cursorDate(params), uuidCursor(params));
+  return { cursorAt: cursor.at, cursorId: cursor.id };
+}
+
 export function parseLearningHistoryTargetQuery(
   params: RawAdminSearchParams,
 ): LearningHistoryTargetQuery {
@@ -422,6 +450,22 @@ export async function getAdminAccessOutboxPage(
       p_cursor_id: query.cursorId,
     });
     return { state: 'ready', data: pageEnvelope(authAdminOutboxSchema).parse(data) };
+  } catch (error) {
+    return loadFailure(error);
+  }
+}
+
+export async function getPendingAccountApprovalPage(
+  query: AdminAccountApprovalQuery,
+): Promise<AdminDataResult<AdminPage<AdminAccountApprovalItem>>> {
+  await requireCapability('identity.manage');
+  try {
+    const data = await readRpc('list_pending_account_approval_page', {
+      p_limit: ADMIN_PAGE_SIZE,
+      p_cursor_due_at: query.cursorAt,
+      p_cursor_user_id: query.cursorId,
+    });
+    return { state: 'ready', data: pageEnvelope(adminAccountApprovalItemSchema).parse(data) };
   } catch (error) {
     return loadFailure(error);
   }

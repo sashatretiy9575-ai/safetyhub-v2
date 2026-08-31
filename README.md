@@ -33,8 +33,9 @@ npm run dev
 - `CONTENT_REVALIDATE_SECRET` — минимум 32 криптографически случайных байта;
 - content runtime: `CONTENT_UPSTREAM_TIMEOUT_MS`, `CONTENT_FALLBACK_ENABLED`;
 - Storage worker: `STORAGE_RECONCILER_SECRET`;
-- локальные E2E: `SAFETYHUB_SEED_PASSWORD`, `E2E_ADMIN_EMAIL`,
-  `E2E_PARTICIPANT_EMAIL`, `E2E_PASSWORD`.
+- passwordless E2E: `E2E_ADMIN_EMAIL`, `E2E_PARTICIPANT_EMAIL`; для remote
+  preview — пары абсолютных путей `E2E_ADMIN_STORAGE_STATE` и
+  `E2E_PARTICIPANT_STORAGE_STATE` вне репозитория.
 
 Секреты не должны иметь префикс `NEXT_PUBLIC_`, попадать в Git или выводиться в
 логи. Production `NEXT_PUBLIC_SITE_URL` — только `https://safetyhub.kz` без пути.
@@ -52,6 +53,7 @@ npm run db:reset            # чистая локальная база и все
 npm run check:db-types      # соответствие сгенерированных DB-типов
 npm run test:db             # SQL contracts/security tests
 npm run seed:workspace      # локальные admin/participant fixtures
+npm run e2e:otp-state -- --email <email> --role <admin|participant> --output <absolute-state-path>
 npm run test:e2e:release    # release Playwright matrix
 npm run verify:release      # application + database + authenticated E2E
 ```

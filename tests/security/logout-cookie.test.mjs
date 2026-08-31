@@ -14,10 +14,9 @@ test('logout recognizes canonical and chunked Supabase session cookies only', ()
 });
 
 test('local logout is idempotent while global revocation reports Auth failure', async () => {
-  const [route, menu, passwordForm] = await Promise.all([
+  const [route, menu] = await Promise.all([
     read('app/api/auth/logout/route.ts'),
     read('components/shared/user-menu.tsx'),
-    read('features/auth/password-change-form.tsx'),
   ]);
 
   assert.match(route, /try \{[\s\S]*client\.auth\.signOut\(\{ scope \}\)/u);
@@ -28,6 +27,5 @@ test('local logout is idempotent while global revocation reports Auth failure', 
   assert.match(route, /clearPasswordContextCookie\(response\)/u);
   assert.match(route, /Clear-Site-Data/u);
   assert.match(menu, /window\.location\.replace\('\/auth\/login\?signedOut=1'\)/u);
-  assert.match(passwordForm, /window\.location\.replace\('\/auth\/login\?signedOut=1'\)/u);
   assert.match(menu, /role="alert"/u);
 });

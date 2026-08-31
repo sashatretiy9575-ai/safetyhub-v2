@@ -21,6 +21,17 @@ export function apiError(error: unknown) {
     );
   }
   if (error instanceof RpcMutationError) {
+    if (
+      [
+        'ACCOUNT_APPROVAL_NOT_PENDING',
+        'IDEMPOTENCY_KEY_REUSED',
+      ].includes(error.message)
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
+    if (error.message === 'ACCOUNT_APPROVAL_SELF_DECISION_FORBIDDEN') {
+      return NextResponse.json({ error: error.message }, { status: 403 });
+    }
     if (error.message === 'COURSE_CATALOG_MAINTENANCE') {
       return NextResponse.json({ error: 'COURSE_CATALOG_MAINTENANCE' }, { status: 503 });
     }
@@ -71,6 +82,12 @@ export function apiError(error: unknown) {
     return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 });
   if (message.includes('SUSPENDED'))
     return NextResponse.json({ error: 'ACCOUNT_SUSPENDED' }, { status: 403 });
+  if (message.includes('PASSWORDLESS_INVITE_RETIRED')) {
+    return NextResponse.json({ error: 'PASSWORDLESS_INVITE_RETIRED' }, { status: 410 });
+  }
+  if (message.includes('ACCOUNT_APPROVAL_REQUIRED')) {
+    return NextResponse.json({ error: 'ACCOUNT_APPROVAL_REQUIRED' }, { status: 403 });
+  }
   if (message.includes('ALREADY_COMPLETED'))
     return NextResponse.json({ error: 'ATTEMPT_ALREADY_COMPLETED' }, { status: 409 });
   if (message.includes('COURSE_CATALOG_MAINTENANCE')) {

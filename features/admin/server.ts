@@ -5,12 +5,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { requireCapability, requireRole } from '@/features/auth/server';
-import {
-  createPendingInviteContext,
-  newPasswordContextToken,
-} from '@/features/auth/password-change';
 import type { AppRole, Json, TestRow } from '@/lib/supabase/types';
-import type { InviteUserValues, SaveTestValues } from '@/lib/validation/admin';
+import type { SaveTestValues } from '@/lib/validation/admin';
 import type { AdminCapability } from '@/lib/security/capabilities';
 import type {
   ActivatedCourseCatalogBatch,
@@ -20,11 +16,11 @@ import type {
   CourseCatalogMaintenanceState,
   CoursePresentationRetirement,
   PreparedCourseCatalogBatch,
+  TestEditorSeed,
 } from '@/features/admin/types';
 import type { AdminRequestMetadata } from '@/lib/security/request-metadata';
 import { consumeCoarseQuota } from '@/lib/security/rate-limit';
 import { CONTENT_CACHE_TAG, TOPICS_CACHE_TAG } from '@/lib/content/cache-policy';
-import { getSiteUrl } from '@/features/auth/server';
 import { invalidateCertificateVerificationCache } from '@/features/certificates/server';
 
 type RpcError = { message: string; code?: string };
@@ -45,6 +41,7 @@ type ClaimedOutbox = OutboxHandle & {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const OUTBOX_COMPLETION_TOKEN_PATTERN = /^[0-9a-f]{64}$/u;
+const PASSWORDLESS_INVITE_RETIRED = 'PASSWORDLESS_INVITE_RETIRED';
 
 function untypedClient(client: unknown) {
   return client as UntypedRpcClient;
@@ -80,11 +77,15 @@ type OutboxErrorCategory =
   | 'AUTH_ADMIN_CONFLICT'
   | 'AUTH_ADMIN_NOT_FOUND'
   | 'AUTH_ADMIN_REJECTED'
+  | 'AUTH_ADMIN_RETIRED'
   | 'AUTH_ADMIN_UNAVAILABLE'
   | 'AUTH_ADMIN_UNKNOWN';
 
 function outboxErrorCategory(error: unknown): OutboxErrorCategory {
   const message = externalErrorMessage(error).toLowerCase();
+  if (message.includes(PASSWORDLESS_INVITE_RETIRED.toLowerCase())) {
+    return 'AUTH_ADMIN_RETIRED';
+  }
   const status =
     error && typeof error === 'object' && 'status' in error ? Number(error.status) : Number.NaN;
   if (status === 404 || message.includes('not found')) return 'AUTH_ADMIN_NOT_FOUND';
@@ -148,53 +149,6 @@ function invalidateTestContent(slug?: string | null) {
   revalidateTag(TOPICS_CACHE_TAG, { expire: 0 });
   for (const path of ['/', '/topics', '/sitemap.xml', '/admin']) revalidatePath(path);
   if (slug) revalidatePath(`/topics/${slug}`);
-}
-
-export async function inviteUser(values: InviteUserValues, metadata: AdminRequestMetadata) {
-  await requireCapability('user.invite');
-  await consumeCoarseQuota('admin.invite', metadata.ipHash);
-  const admin = createAdminClient();
-  const origin = getSiteUrl().replace(/\/$/, '');
-  const passwordTicket = newPasswordContextToken();
-  const handle = outboxHandle(
-    await authenticatedRpc('prepare_user_invite', {
-      p_email: values.email,
-      p_name: values.name,
-      p_surname: values.surname,
-      p_job: values.job,
-      p_requested_role: values.role === 'participant' ? 'user' : 'admin',
-      p_password_ticket: passwordTicket,
-      p_redirect_origin: origin,
-      ...metadataArgs(metadata),
-    }),
-  );
-  const { data, error } = await admin.auth.admin.inviteUserByEmail(values.email, {
-    data: {
-      name: values.name,
-      surname: values.surname,
-      job: values.job,
-      safetyhubInviteCorrelation: metadata.correlationId,
-    },
-    // Admin invites use the implicit flow: unlike signup/recovery, they do not
-    // support PKCE. The browser bridge sends its tokens to a server endpoint;
-    // the opaque ticket is independently checked and consumed server-side.
-    redirectTo: `${origin}/auth/invite?ticket=${encodeURIComponent(passwordTicket)}`,
-  });
-  if (error) {
-    await advanceOutbox(handle, 'retryable', null, error);
-    throw error;
-  }
-  try {
-    await advanceOutbox(handle, 'external_succeeded', data.user.id);
-    await createPendingInviteContext(data.user.id, passwordTicket);
-    await advanceOutbox(handle, 'committed', data.user.id);
-  } catch (contextError) {
-    // The exact Auth target is durable and can be reconciled idempotently.
-    // Direct Auth deletion would bypass the all-account Storage tombstone gate.
-    await advanceOutbox(handle, 'retryable', data.user.id, contextError);
-    throw contextError;
-  }
-  return data.user.id;
 }
 
 export async function setUserSuspended(
@@ -334,36 +288,101 @@ export async function listTests(): Promise<AdminTestRow[]> {
   });
 }
 
-export async function getTestEditorPayload(testId: string) {
-  const actor = await requireCapability('test.manage');
+export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed | null> {
+  await requireCapability('test.manage');
   const admin = createAdminClient();
-  const [{ data, error }, revisions, current] = await Promise.all([
-    (await createClient()).rpc('get_course_editor_payload_v3', {
-      p_actor_id: actor.user.id,
-      p_test_id: testId,
-    }),
+  const [testResult, draftResult, revisions] = await Promise.all([
+    admin
+      .from('tests')
+      .select('id,status,current_revision_id,content_hash')
+      .eq('id', testId)
+      .maybeSingle(),
+    admin
+      .from('course_drafts')
+      .select(
+        'test_id,slug,title,description,icon,display_order,presentation_id,duration_minutes,pass_score,attempts_per_calendar_day,attempt_reset_timezone,jurisdiction,effective_date,sources,seo,draft_version,content_hash',
+      )
+      .eq('test_id', testId)
+      .maybeSingle(),
     admin
       .from('test_revisions')
       .select('id,version,published_at,content_hash,presentation_id')
       .eq('test_id', testId)
       .order('version', { ascending: false })
       .limit(100),
-    admin.from('tests').select('current_revision_id').eq('id', testId).maybeSingle(),
   ]);
-  if (error) throw error;
-  if (revisions.error || current.error) throw revisions.error ?? current.error;
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new Error('COURSE_EDITOR_PAYLOAD_INVALID');
+  if (testResult.error || draftResult.error || revisions.error) {
+    throw testResult.error ?? draftResult.error ?? revisions.error;
   }
+  if (!testResult.data || !draftResult.data) return null;
+
+  const presentationId = draftResult.data.presentation_id;
+  const presentationResult = presentationId
+    ? await admin
+        .from('course_presentations')
+        .select('id,page_count,sha256,byte_size,status')
+        .eq('id', presentationId)
+        .eq('course_id', testResult.data.id)
+        .maybeSingle()
+    : { data: null, error: null };
+  if (presentationResult.error) throw presentationResult.error;
+
+  const presentation = presentationResult.data;
+  const safePresentation =
+    presentation &&
+    Number.isInteger(presentation.page_count) &&
+    presentation.page_count > 0 &&
+    typeof presentation.sha256 === 'string' &&
+    /^[0-9a-f]{64}$/u.test(presentation.sha256) &&
+    Number.isSafeInteger(presentation.byte_size) &&
+    Number(presentation.byte_size) > 0 &&
+    ['staging', 'validating', 'ready', 'rejected', 'retired'].includes(presentation.status)
+      ? {
+          id: presentation.id,
+          pageCount: presentation.page_count,
+          sha256: presentation.sha256,
+          byteSize: Number(presentation.byte_size),
+          status: presentation.status,
+        }
+      : null;
+
+  const test = testResult.data;
+  const draft = draftResult.data;
   return {
-    ...(data as Record<string, unknown>),
+    id: test.id,
+    slug: draft.slug,
+    title: draft.title,
+    description: draft.description,
+    icon: draft.icon as TestEditorSeed['icon'],
+    displayOrder: draft.display_order,
+    durationMinutes: draft.duration_minutes,
+    passScore: draft.pass_score,
+    attemptsPerCalendarDay: draft.attempts_per_calendar_day,
+    attemptResetTimezone: draft.attempt_reset_timezone,
+    presentationId: draft.presentation_id,
+    presentation: safePresentation,
+    jurisdiction: draft.jurisdiction ?? '',
+    effectiveDate: draft.effective_date ?? '',
+    sources: draft.sources as TestEditorSeed['sources'],
+    status: test.status === 'published' ? 'published' : 'draft',
+    publicationState:
+      test.current_revision_id === null
+        ? 'never_published'
+        : test.status !== 'published'
+          ? 'draft'
+          : test.content_hash === draft.content_hash
+            ? 'published'
+            : 'published_with_draft_changes',
+    draftVersion: draft.draft_version,
+    contentHash: draft.content_hash,
+    seo: draft.seo as TestEditorSeed['seo'],
     revisionHistory: (revisions.data ?? []).map((revision) => ({
       id: revision.id,
       version: revision.version,
       publishedAt: revision.published_at,
       contentHash: revision.content_hash,
       presentationId: revision.presentation_id,
-      current: revision.id === current.data?.current_revision_id,
+      current: revision.id === test.current_revision_id,
     })),
   };
 }
@@ -422,7 +441,16 @@ export async function saveTest(values: SaveTestValues) {
       invalidateTestContent(previousPublishedSlug);
     }
   }
-  return saved;
+
+  // Do not relay an open-ended RPC object to the browser. The current SQL
+  // mutation is intentionally compact, but an explicit response allowlist
+  // keeps a later SQL change from reviving an answer-key read path.
+  return {
+    id: saved.id,
+    slug: saved.slug,
+    draftVersion: saved.draftVersion,
+    contentHash: saved.contentHash,
+  };
 }
 
 export async function setTestStatus(testId: string, status: 'draft' | 'published') {
@@ -726,29 +754,6 @@ async function claimOutbox(
   return value as ClaimedOutbox;
 }
 
-function passwordContextAlreadyExists(error: unknown) {
-  return externalErrorMessage(error).toLowerCase().includes('duplicate key');
-}
-
-function normalizeEmail(value: string) {
-  return value.trim().toLowerCase();
-}
-
-function inviteUserMatches(
-  user: {
-    email?: string | null;
-    user_metadata?: Record<string, unknown> | null;
-  },
-  email: string,
-  inviteCorrelation: string,
-) {
-  return (
-    typeof user.email === 'string' &&
-    normalizeEmail(user.email) === normalizeEmail(email) &&
-    user.user_metadata?.safetyhubInviteCorrelation === inviteCorrelation
-  );
-}
-
 export async function reconcileAuthAdminOperation(
   operationId: string,
   reason: string,
@@ -759,6 +764,16 @@ export async function reconcileAuthAdminOperation(
   await consumeCoarseQuota('admin.reconcile', metadata.ipHash);
   const operation = await claimOutbox(operationId, reason, metadata);
   const handle: OutboxHandle = operation;
+
+  // The old password-invite flow has been retired. Historical outbox rows may
+  // still exist, but a retry must never create, resend, or complete a password
+  // invitation. Close the claimed row terminally so it cannot be retried.
+  if (operation.operationType === 'invite') {
+    const retirement = new Error(PASSWORDLESS_INVITE_RETIRED);
+    await advanceOutbox(handle, 'failed', operation.externalTargetId, retirement);
+    throw retirement;
+  }
+
   const admin = createAdminClient();
   let externalTargetId = operation.externalTargetId;
   const affectsCertificateVisibility =
@@ -769,45 +784,7 @@ export async function reconcileAuthAdminOperation(
     invalidateCertificateVerificationCache();
   }
   try {
-    if (operation.operationType === 'invite') {
-      const email = requiredString(operation.payload, 'email');
-      const passwordTicket = requiredString(operation.payload, 'passwordTicket');
-      // Never trust a persisted request-derived origin during an outbox retry.
-      // Resolve the deployment's canonical origin again at execution time.
-      const origin = getSiteUrl().replace(/\/$/, '');
-      const inviteCorrelation = requiredString(operation.payload, 'inviteCorrelation');
-      let resolvedUserId = operation.externalTargetId;
-      if (resolvedUserId) {
-        const lookup = await admin.auth.admin.getUserById(resolvedUserId);
-        if (lookup.error) throw lookup.error;
-        if (!inviteUserMatches(lookup.data.user, email, inviteCorrelation)) {
-          throw new Error('OUTBOX_INVITE_TARGET_MISMATCH');
-        }
-        resolvedUserId = lookup.data.user.id;
-      }
-      if (!resolvedUserId) {
-        const invite = await admin.auth.admin.inviteUserByEmail(email, {
-          data: {
-            name: requiredString(operation.payload, 'name'),
-            surname: requiredString(operation.payload, 'surname'),
-            job: requiredString(operation.payload, 'job'),
-            safetyhubInviteCorrelation: inviteCorrelation,
-          },
-          redirectTo: `${origin}/auth/invite?ticket=${encodeURIComponent(passwordTicket)}`,
-        });
-        if (invite.error) throw invite.error;
-        resolvedUserId = invite.data.user.id;
-      }
-      externalTargetId = resolvedUserId;
-      if (operation.state !== 'external_succeeded') {
-        await advanceOutbox(handle, 'external_succeeded', externalTargetId);
-      }
-      try {
-        await createPendingInviteContext(externalTargetId, passwordTicket);
-      } catch (error) {
-        if (!passwordContextAlreadyExists(error)) throw error;
-      }
-    } else if (operation.operationType === 'suspend' || operation.operationType === 'restore') {
+    if (operation.operationType === 'suspend' || operation.operationType === 'restore') {
       externalTargetId = requiredString(operation.payload, 'targetId');
       const update = await admin.auth.admin.updateUserById(externalTargetId, {
         ban_duration: operation.operationType === 'suspend' ? '876000h' : 'none',
