@@ -61,5 +61,9 @@ test('first-admin bootstrap verifies all current legal documents inside a servic
     sqlContract,
     /public\.publish_legal_document_version\(/u,
   );
+  assert.match(
+    sqlContract,
+    /v_bootstrapped_user_id := public\.bootstrap_email_otp_admin\(v_accepted_user_id\)/u,
+  );
   assert.match(appTypes, /bootstrap_email_otp_admin: \{ Args: \{ p_user_id: string \}; Returns: string \}/u);
 });

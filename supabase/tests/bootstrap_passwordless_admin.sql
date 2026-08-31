@@ -6,6 +6,7 @@ declare
   v_accepted_user_id uuid := '5e190000-0000-4000-8000-000000000002';
   v_blocked boolean := false;
   v_rotated_terms_version text := 'bootstrap-terms-9.9';
+  v_bootstrapped_user_id uuid;
   v_definition text;
 begin
   if to_regprocedure('public.bootstrap_email_otp_admin(uuid)') is null then
@@ -101,7 +102,12 @@ begin
   insert into public.legal_acceptances (user_id, document_type, version, source)
   values (v_accepted_user_id, 'terms', v_rotated_terms_version, 'profile');
 
-  if public.bootstrap_email_otp_admin(v_accepted_user_id) is distinct from v_accepted_user_id
+  -- Execute the mutating RPC before inspecting its effects. PostgreSQL may
+  -- reorder boolean subexpressions, so combining the call with EXISTS would
+  -- make this contract depend on an unspecified evaluation order.
+  v_bootstrapped_user_id := public.bootstrap_email_otp_admin(v_accepted_user_id);
+
+  if v_bootstrapped_user_id is distinct from v_accepted_user_id
     or not exists (
       select 1
       from public.user_roles role
