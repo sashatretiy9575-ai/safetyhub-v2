@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   private: {
     Tables: {
+      account_approval_decision_receipts: {
+        Row: {
+          actor_user_id: string
+          created_at: string
+          expires_at: string
+          idempotency_key: string
+          request_hash: string
+          result: Json
+        }
+        Insert: {
+          actor_user_id: string
+          created_at?: string
+          expires_at?: string
+          idempotency_key: string
+          request_hash: string
+          result: Json
+        }
+        Update: {
+          actor_user_id?: string
+          created_at?: string
+          expires_at?: string
+          idempotency_key?: string
+          request_hash?: string
+          result?: Json
+        }
+        Relationships: []
+      }
       account_storage_cleanup_tombstones: {
         Row: {
           attempt_count: number
@@ -868,6 +895,7 @@ export type Database = {
         Args: { p_capabilities: string[] }
         Returns: string
       }
+      require_approved_learner: { Args: never; Returns: string }
       require_capability: { Args: { p_capability: string }; Returns: string }
       resolve_certificate_export_unmetered: {
         Args: { p_attestation_ids: string[] }
@@ -1049,6 +1077,12 @@ export type Database = {
     Tables: {
       account_controls: {
         Row: {
+          approval_decided_at: string | null
+          approval_decided_by: string | null
+          approval_due_at: string | null
+          approval_rejection_reason: string | null
+          approval_requested_at: string | null
+          approval_state: Database["public"]["Enums"]["account_approval_state"]
           deletion_pending: boolean
           status: Database["public"]["Enums"]["account_status"]
           suspended_at: string | null
@@ -1058,6 +1092,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approval_decided_at?: string | null
+          approval_decided_by?: string | null
+          approval_due_at?: string | null
+          approval_rejection_reason?: string | null
+          approval_requested_at?: string | null
+          approval_state?: Database["public"]["Enums"]["account_approval_state"]
           deletion_pending?: boolean
           status?: Database["public"]["Enums"]["account_status"]
           suspended_at?: string | null
@@ -1067,6 +1107,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approval_decided_at?: string | null
+          approval_decided_by?: string | null
+          approval_due_at?: string | null
+          approval_rejection_reason?: string | null
+          approval_requested_at?: string | null
+          approval_state?: Database["public"]["Enums"]["account_approval_state"]
           deletion_pending?: boolean
           status?: Database["public"]["Enums"]["account_status"]
           suspended_at?: string | null
@@ -1997,6 +2043,8 @@ export type Database = {
           onboarding_completed_at: string | null
           organization: string
           organization_id: string | null
+          phone_country_iso2: string | null
+          phone_e164: string | null
           surname: string
           updated_at: string
         }
@@ -2009,6 +2057,8 @@ export type Database = {
           onboarding_completed_at?: string | null
           organization?: string
           organization_id?: string | null
+          phone_country_iso2?: string | null
+          phone_e164?: string | null
           surname?: string
           updated_at?: string
         }
@@ -2021,6 +2071,8 @@ export type Database = {
           onboarding_completed_at?: string | null
           organization?: string
           organization_id?: string | null
+          phone_country_iso2?: string | null
+          phone_e164?: string | null
           surname?: string
           updated_at?: string
         }
@@ -2518,14 +2570,6 @@ export type Database = {
         }
         Returns: Json
       }
-      begin_profile_avatar_upload: {
-        Args: {
-          p_expected_bytes: number
-          p_expected_sha256: string
-          p_user_id: string
-        }
-        Returns: Json
-      }
       begin_initial_course_import: {
         Args: {
           p_actor_id: string
@@ -2535,7 +2579,19 @@ export type Database = {
         }
         Returns: Json
       }
+      begin_profile_avatar_upload: {
+        Args: {
+          p_expected_bytes: number
+          p_expected_sha256: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       begin_user_account_purge: { Args: { p_target_id: string }; Returns: Json }
+      bootstrap_email_otp_admin: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
       bootstrap_superadmin: { Args: { p_user_id: string }; Returns: string }
       bulk_update_participants: {
         Args: { p_field: string; p_user_ids: string[]; p_value: string }
@@ -2624,6 +2680,15 @@ export type Database = {
         Args: { p_attestation_ids: string[] }
         Returns: Json
       }
+      decide_account_approval: {
+        Args: {
+          p_decision: string
+          p_idempotency_key: string
+          p_reason?: string
+          p_target_user_id: string
+        }
+        Returns: Json
+      }
       delete_admin_learning_history: {
         Args: {
           p_actor_id: string
@@ -2649,6 +2714,7 @@ export type Database = {
         Args: { p_actor_id: string; p_asset_id: string }
         Returns: Json
       }
+      enforce_email_otp_access_token: { Args: { event: Json }; Returns: Json }
       execute_admin_attestation_action: {
         Args: {
           p_action: string
@@ -2704,9 +2770,22 @@ export type Database = {
         Returns: Json
       }
       get_admin_work_queue: { Args: never; Returns: Json }
+      get_approved_course_presentation: {
+        Args: { p_asset: string; p_course_slug: string }
+        Returns: {
+          byte_size: number
+          content_type: string
+          presentation_id: string
+        }[]
+      }
       get_auth_context: {
         Args: never
         Returns: {
+          approval_decided_at: string
+          approval_due_at: string
+          approval_rejection_reason: string
+          approval_requested_at: string
+          approval_state: Database["public"]["Enums"]["account_approval_state"]
           capabilities: string[]
           deletion_pending: boolean
           email: string
@@ -2719,6 +2798,8 @@ export type Database = {
           profile_name: string
           profile_onboarding_completed_at: string
           profile_organization: string
+          profile_phone_country_iso2: string
+          profile_phone_e164: string
           profile_surname: string
           profile_updated_at: string
           role: Database["public"]["Enums"]["product_role"]
@@ -2847,6 +2928,14 @@ export type Database = {
         Args: { p_limit?: number }
         Returns: Json
       }
+      list_pending_account_approval_page: {
+        Args: {
+          p_cursor_due_at?: string
+          p_cursor_user_id?: string
+          p_limit?: number
+        }
+        Returns: Json
+      }
       manage_user_role_confirmed: {
         Args: {
           p_correlation_id: string
@@ -2931,6 +3020,10 @@ export type Database = {
         Returns: boolean
       }
       provision_admin_by_email: { Args: { p_email: string }; Returns: string }
+      prune_account_approval_decision_receipts: {
+        Args: { p_limit?: number }
+        Returns: number
+      }
       prune_account_storage_cleanup_tombstones: {
         Args: { p_limit?: number }
         Returns: Json
@@ -3228,10 +3321,26 @@ export type Database = {
         Returns: Json
       }
       stage_initial_course_import: {
-        Args: { p_catalog_hash: string; p_operation_id: string; p_payload: Json }
+        Args: {
+          p_catalog_hash: string
+          p_operation_id: string
+          p_payload: Json
+        }
         Returns: Json
       }
       start_test_attempt: { Args: { p_test_slug: string }; Returns: Json }
+      submit_profile_for_approval_from_trusted_server: {
+        Args: {
+          p_job: string
+          p_name: string
+          p_organization: string
+          p_phone_country_iso2: string
+          p_phone_e164: string
+          p_surname: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       update_profile: {
         Args: {
           p_job: string
@@ -3263,6 +3372,11 @@ export type Database = {
       }
     }
     Enums: {
+      account_approval_state:
+        | "profile_incomplete"
+        | "pending"
+        | "approved"
+        | "rejected"
       account_status: "active" | "suspended"
       app_role: "user" | "admin" | "superadmin"
       article_status: "draft" | "published"
@@ -3412,6 +3526,12 @@ export const Constants = {
   },
   public: {
     Enums: {
+      account_approval_state: [
+        "profile_incomplete",
+        "pending",
+        "approved",
+        "rejected",
+      ],
       account_status: ["active", "suspended"],
       app_role: ["user", "admin", "superadmin"],
       article_status: ["draft", "published"],
