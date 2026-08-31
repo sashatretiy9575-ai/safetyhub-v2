@@ -309,6 +309,51 @@ export type Database = {
         }
         Relationships: []
       }
+      initial_course_import_operations: {
+        Row: {
+          batch_id: string | null
+          catalog_hash: string
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          id: string
+          payload_hash: string | null
+          post_receipt: Json | null
+          pre_receipt: Json
+          project_ref: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          batch_id?: string | null
+          catalog_hash: string
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          payload_hash?: string | null
+          post_receipt?: Json | null
+          pre_receipt: Json
+          project_ref: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          batch_id?: string | null
+          catalog_hash?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          payload_hash?: string | null
+          post_receipt?: Json | null
+          pre_receipt?: Json
+          project_ref?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       learning_history_delete_receipts: {
         Row: {
           actor_user_id: string
@@ -697,6 +742,21 @@ export type Database = {
         Returns: boolean
       }
       identity_state: { Args: { p_user_id: string }; Returns: string }
+      initial_import_expected_courses: {
+        Args: never
+        Returns: {
+          byte_size: number
+          content_hash: string
+          course_id: string
+          display_order: number
+          page_count: number
+          pdf_sha256: string
+          presentation_id: string
+          slug: string
+          thumbnail_sha256: string
+          title: string
+        }[]
+      }
       issue_certificate_for_attestation: {
         Args: {
           p_actor_id: string
@@ -2431,6 +2491,14 @@ export type Database = {
         }
         Returns: Json
       }
+      activate_initial_course_import: {
+        Args: {
+          p_catalog_hash: string
+          p_idempotency_key: string
+          p_operation_id: string
+        }
+        Returns: Json
+      }
       advance_account_storage_cleanup: {
         Args: {
           p_error_code?: string
@@ -2455,6 +2523,15 @@ export type Database = {
           p_expected_bytes: number
           p_expected_sha256: string
           p_user_id: string
+        }
+        Returns: Json
+      }
+      begin_initial_course_import: {
+        Args: {
+          p_actor_id: string
+          p_catalog_hash: string
+          p_confirmation: string
+          p_project_ref: string
         }
         Returns: Json
       }
@@ -2502,6 +2579,10 @@ export type Database = {
       }
       complete_course_presentation_cleanup: {
         Args: { p_presentation_ids: string[] }
+        Returns: Json
+      }
+      complete_initial_course_import: {
+        Args: { p_catalog_hash: string; p_operation_id: string }
         Returns: Json
       }
       complete_profile_avatar_reconciliation: {
@@ -2803,6 +2884,10 @@ export type Database = {
       }
       prepare_course_catalog_batch: {
         Args: { p_actor_id: string; p_test_ids: string[] }
+        Returns: Json
+      }
+      prepare_initial_course_import: {
+        Args: { p_catalog_hash: string; p_operation_id: string }
         Returns: Json
       }
       prepare_signup_legal_operation: {
@@ -3140,6 +3225,10 @@ export type Database = {
           p_target_id: string
           p_user_agent?: string
         }
+        Returns: Json
+      }
+      stage_initial_course_import: {
+        Args: { p_catalog_hash: string; p_operation_id: string; p_payload: Json }
         Returns: Json
       }
       start_test_attempt: { Args: { p_test_slug: string }; Returns: Json }

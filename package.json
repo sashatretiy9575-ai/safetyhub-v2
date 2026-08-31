@@ -46,6 +46,7 @@
     "content:pull:linked": "node --env-file-if-exists=.env.local scripts/content-sync-linked.mjs --pull",
     "content:snapshot:validate": "node scripts/course-content/validate-snapshot.mjs",
     "content:initial-import:validate": "node scripts/course-content/validate-snapshot.mjs --initial-import",
+    "content:initial-import": "node --env-file-if-exists=.env.local scripts/initial-course-import.mjs",
     "content:catalog-batch:check": "node --env-file-if-exists=.env.local scripts/check-course-catalog-batch.mjs",
     "content:seed:generate": "node scripts/generate-content-seed.mjs",
     "content:assets:seed:local": "node scripts/seed-course-presentation-assets.mjs",

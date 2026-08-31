@@ -657,6 +657,31 @@ export type Database = {
         Args: { p_actor_id: string; p_batch_id: string; p_idempotency_key: string };
         Returns: Json;
       };
+      begin_initial_course_import: {
+        Args: {
+          p_actor_id: string;
+          p_project_ref: string;
+          p_catalog_hash: string;
+          p_confirmation: string;
+        };
+        Returns: Json;
+      };
+      stage_initial_course_import: {
+        Args: { p_operation_id: string; p_catalog_hash: string; p_payload: Json };
+        Returns: Json;
+      };
+      prepare_initial_course_import: {
+        Args: { p_operation_id: string; p_catalog_hash: string };
+        Returns: Json;
+      };
+      activate_initial_course_import: {
+        Args: { p_operation_id: string; p_catalog_hash: string; p_idempotency_key: string };
+        Returns: Json;
+      };
+      complete_initial_course_import: {
+        Args: { p_operation_id: string; p_catalog_hash: string };
+        Returns: Json;
+      };
       get_course_catalog_maintenance: {
         Args: { p_actor_id: string };
         Returns: Json;

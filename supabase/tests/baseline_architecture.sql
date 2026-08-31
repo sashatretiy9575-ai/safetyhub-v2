@@ -22,7 +22,8 @@ begin
   if to_regclass('private.test_revision_answer_keys') is null
     or to_regclass('private.business_rate_limits') is null
     or to_regclass('private.coarse_ip_rate_limits') is null
-    or to_regclass('private.auth_admin_outbox') is null then
+    or to_regclass('private.auth_admin_outbox') is null
+    or to_regclass('private.initial_course_import_operations') is null then
     raise exception 'required private table missing';
   end if;
 
