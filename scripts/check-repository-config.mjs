@@ -45,11 +45,34 @@ const runCommands = verifySteps
 assert(runCommands.includes('npm run seed:workspace'), 'CI must seed authenticated workspaces.');
 assert(runCommands.includes('supabase db reset'), 'CI must rebuild Supabase from every migration.');
 assert(runCommands.includes('npm run test:db'), 'CI must run SQL contract tests.');
+assert(
+  runCommands.includes('npm run db:types:check:local'),
+  'CI must reject stale exact generated database types from the clean local schema.',
+);
 assert(runCommands.includes('npm run check:db-types'), 'CI must check Supabase type contracts.');
 assert(runCommands.includes('npm run test:e2e:release'), 'CI must run strict authenticated E2E.');
 assert(
   workflow?.jobs?.verify?.env?.E2E_REQUIRE_AUTH === '1',
   'CI must require authenticated E2E credentials.',
+);
+assert(
+  String(
+    workflow?.jobs?.verify?.steps?.find((step) => step?.uses?.startsWith('actions/setup-node@'))
+      ?.with?.['node-version'],
+  ) === '24',
+  'CI must run the supported Node.js 24 toolchain.',
+);
+assert(workflow?.permissions?.contents === 'read', 'CI must use read-only repository permissions.');
+assert(
+  workflowSource.includes('::add-mask::$SERVICE_ROLE_KEY'),
+  'CI must mask the disposable local service-role key before later steps can log it.',
+);
+const generatedTypesArtifact = workflow?.jobs?.verify?.steps?.find(
+  (step) => step?.name === 'Upload verified database types',
+);
+assert(
+  generatedTypesArtifact && !generatedTypesArtifact.if,
+  'CI must upload database types only after the exact local type check succeeds.',
 );
 assert(
   !/SAFETYHUB_SEED_PASSWORD|E2E_(?:CI_)?PASSWORD/u.test(workflowSource),

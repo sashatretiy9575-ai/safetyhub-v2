@@ -54,6 +54,13 @@ jobs:
           npx --no-install supabase db reset
           npx --no-install supabase status -o env > "$RUNNER_TEMP/supabase.env"
           source "$RUNNER_TEMP/supabase.env"
+          if [[ -z "${API_URL:-}" || -z "${ANON_KEY:-}" || -z "${SERVICE_ROLE_KEY:-}" ]]; then
+            echo "Local Supabase did not expose the expected CI credentials." >&2
+            exit 1
+          fi
+          # The disposable service-role key is needed by local fixtures only.
+          # Mask it before it is forwarded to later steps or a failure reporter.
+          printf '%s\n' "::add-mask::$SERVICE_ROLE_KEY"
           {
             echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
             echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY"
@@ -63,14 +70,12 @@ jobs:
       - run: npx --no-install supabase db lint --local --level error
       - run: npm run storage:buckets:ensure:local
       - run: npm run content:assets:seed:local
+      - run: npm run db:types:check:local
       - run: npm run check:db-types
       - run: npm run test:db
       - run: npm run seed:workspace
 
-      - run: npm run db:types:generate:local
-
-      - name: Upload generated database types
-        if: always()
+      - name: Upload verified database types
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: database-generated-types-${{ github.run_id }}-${{ github.run_attempt }}

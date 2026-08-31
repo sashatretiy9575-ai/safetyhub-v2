@@ -25,6 +25,7 @@ Docker Desktop и локальный Supabase должны быть запуще
 ```powershell
 npm run db:reset
 npx supabase db lint --local --level error
+npm run db:types:check:local
 npm run check:db-types
 npm run test:db
 ```
@@ -32,7 +33,10 @@ npm run test:db
 Reset должен применить migrations с нуля и сгенерированный `supabase/seed.sql`.
 SQL contracts проверяют capabilities/grants, два lifecycle-статуса, прямую
 публикацию, version conflicts, физическое удаление и сохранение certificate
-snapshot. После изменения схемы обновите `lib/supabase/types.ts` из чистой базы.
+snapshot. `db:types:check:local` сравнивает закоммиченный
+`lib/supabase/database.generated.ts` с точным выводом CLI из этой чистой базы;
+после изменения схемы сначала сгенерируйте и проверьте типы, затем обновите
+`lib/supabase/types.ts`.
 
 ## Локальные authenticated fixtures
 

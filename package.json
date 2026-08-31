@@ -28,7 +28,7 @@
     "check:config": "node scripts/check-repository-config.mjs",
     "check:bundles": "node scripts/check-bundle-budgets.mjs",
     "verify": "npm run check:security && npm run check:contacts && npm run check:config && npm run lint && npm run type-check && npm test && npm run build && npm run check:bundles && npm audit --audit-level=moderate && npm audit signatures",
-    "verify:release": "npm run verify && npm run db:reset && npm run check:db-types && npm run test:db && npm run seed:workspace && npm run test:e2e:release",
+    "verify:release": "npm run verify && npm run db:reset && npm run db:types:check:local && npm run check:db-types && npm run test:db && npm run seed:workspace && npm run test:e2e:release",
     "format": "prettier --write \"**/*.{ts,tsx,json}\"",
     "db:types": "npm run db:types:generate:local",
     "db:types:generate": "node scripts/generate-supabase-types.mjs --linked",
