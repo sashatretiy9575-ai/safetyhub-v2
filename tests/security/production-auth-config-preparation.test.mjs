@@ -14,6 +14,7 @@ import {
   productionSiteUrl,
   repositoryRoot,
   safeConfigPushCommand,
+  templateSha256,
 } from '../../scripts/prepare-production-auth-config.mjs';
 
 async function listRelativeFiles(root, current = root) {
@@ -92,6 +93,20 @@ test('production config hashes and the two-line allowlist stay source-controlled
 
   const crlfSource = sourceConfiguration.replaceAll('\r\n', '\n').replaceAll('\n', '\r\n');
   assert.equal(configurationSha256(crlfSource), expectedSourceConfigurationSha256);
+
+  const recoveryTemplate = await readFile(
+    path.join(repositoryRoot, 'supabase', 'templates', 'recovery.html'),
+    'utf8',
+  );
+  const crlfTemplate = recoveryTemplate.replaceAll('\r\n', '\n').replaceAll('\n', '\r\n');
+  assert.equal(
+    templateSha256(recoveryTemplate),
+    expectedTemplateSha256['supabase/templates/recovery.html'],
+  );
+  assert.equal(
+    templateSha256(crlfTemplate),
+    expectedTemplateSha256['supabase/templates/recovery.html'],
+  );
 });
 
 test('the tool refuses to create its temporary workdir inside the repository', async () => {

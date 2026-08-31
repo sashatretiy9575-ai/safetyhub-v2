@@ -51,7 +51,7 @@ export const expectedTemplateSha256 = Object.freeze({
   'supabase/templates/confirmation.html':
     '2acfa9e9e97cd449e6dbc0f58475f5a7104c87f34ac45e3b9675ee7433844c36',
   'supabase/templates/recovery.html':
-    '85053f13fc27c3185c4f46af756a527dd342b71ad4d00eb2abf283186918f96d',
+    'e9879969f6f2f1fecc5c3f20708d180733760523e08cbe4726b384603f841317',
   'supabase/templates/invite.html':
     '1d050c0cd78d364a57bf26a7a13f286018211cdd778593148672a2146f808f08',
 });
@@ -70,6 +70,15 @@ function fail(code) {
 
 function sha256(contents) {
   return createHash('sha256').update(contents).digest('hex');
+}
+
+function canonicalTemplateContents(contents) {
+  if (typeof contents !== 'string') fail('TEMPLATE_SOURCE_INVALID');
+  return contents.replaceAll('\r\n', '\n');
+}
+
+export function templateSha256(contents) {
+  return sha256(Buffer.from(canonicalTemplateContents(contents), 'utf8'));
 }
 
 export function configurationSha256(configuration) {
@@ -185,11 +194,13 @@ export async function prepareProductionAuthConfig({
   const templateContents = new Map();
   for (const relativePath of templateRelativePaths) {
     const templatePath = await resolveRequiredFile(resolvedRepositoryRoot, relativePath);
-    const contents = await readFile(templatePath).catch(() => fail('TEMPLATE_SOURCE_UNREADABLE'));
+    const contents = await readFile(templatePath, 'utf8').catch(() =>
+      fail('TEMPLATE_SOURCE_UNREADABLE'),
+    );
     const portablePath = toPortableRelativePath(relativePath);
-    if (sha256(contents) !== expectedTemplateSha256[portablePath])
+    if (templateSha256(contents) !== expectedTemplateSha256[portablePath])
       fail('TEMPLATE_SOURCE_HASH_MISMATCH');
-    templateContents.set(relativePath, contents);
+    templateContents.set(relativePath, canonicalTemplateContents(contents));
   }
 
   const productionConfiguration = createProductionConfiguration(sourceConfiguration);
