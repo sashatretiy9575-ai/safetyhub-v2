@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "operation": "visible-inventory",
+  "classificationMode": "pre-700-visible-metadata",
+  "productionProjectRef": "vezgxdooijznpjqrpvcv",
+  "supabaseUrl": "https://vezgxdooijznpjqrpvcv.supabase.co",
+  "bucket": "profile-avatars",
+  "serviceRoleKeyEnv": "SUPABASE_SECRET_KEY",
+  "pageSize": 100,
+  "requestTimeoutMs": 30000,
+  "evidenceSaltEnv": "STORAGE_INVENTORY_EVIDENCE_SALT"
+}

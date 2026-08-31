@@ -1,0 +1,458 @@
+{
+  "schemaVersion": 1,
+  "slug": "pozharnaya-bezopasnost",
+  "file": "presentation.pdf",
+  "thumbnail": "thumbnail.webp",
+  "mimeType": "application/pdf",
+  "byteSize": 642302,
+  "sha256": "69f2e4cbe8d284996aa891862cf6228116cfda997775a7caa1d51bd9ee648eef",
+  "pageCount": 41,
+  "aspectRatio": "16:9",
+  "renderedPageCount": 41,
+  "renderSize": {
+    "width": 1600,
+    "height": 900
+  },
+  "validation": {
+    "automated": {
+      "status": "passed",
+      "checks": [
+        "signature",
+        "size",
+        "page-count",
+        "16:9-render",
+        "nonblank-pages",
+        "text-layer",
+        "final-cta"
+      ]
+    },
+    "visual": {
+      "status": "passed",
+      "method": "all-pages-contact-sheets",
+      "reviewedPageCount": 41,
+      "contactSheetCount": 4,
+      "reviewedAt": "2026-08-25"
+    },
+    "safety": {
+      "status": "passed",
+      "encrypted": false,
+      "unsafeActionCount": 0,
+      "embeddedFileCount": 0
+    }
+  },
+  "finalPageCta": "Нажмите «Начать тест»",
+  "notesIncluded": false,
+  "thumbnailSha256": "f66043fa245ec4fa8511acad85397eb3fe26e48948c464f47e26b5408cacbbca",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "8db9825e55be3f0b44b5be25c18c83f0e4624e3aace2e8817a121fbdafc71c67",
+      "textSha256": "b0ca8b07985d5bcb17aafdd4c9bf51ae41eeb2e7386c4ced701997dd76cd7ea0",
+      "textCharacters": 176,
+      "luminanceMean": 221.488,
+      "colorStdevTotal": 190.311
+    },
+    {
+      "pageNumber": 2,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "fe2fd360a5c9c37042ff4a9ab24c79c24b101366e045d11f285ba6395505a30d",
+      "textSha256": "0b4aff931c328b519b880ac7b39738c6a120815d6a9cf06dec4a79295d43ccf4",
+      "textCharacters": 461,
+      "luminanceMean": 241.504,
+      "colorStdevTotal": 128.206
+    },
+    {
+      "pageNumber": 3,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "04d545958a4be64498fdfa1a51c009e068aada9a2da6231f678b71c56e3f0a4d",
+      "textSha256": "6a5e821affce49c637a6572ed59014e5a25f68ec1d2b4b1bbff6fceee2f74ab6",
+      "textCharacters": 257,
+      "luminanceMean": 245.786,
+      "colorStdevTotal": 109.909
+    },
+    {
+      "pageNumber": 4,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "17bbde9a9ff41c90f83d29bbf9a5a780ff67ec51b9aa7979b5bf490ca3cfb22d",
+      "textSha256": "4217179d0fe954809036a03e760aa331a633cb553724ed00448544d8a61d98d2",
+      "textCharacters": 129,
+      "luminanceMean": 214.846,
+      "colorStdevTotal": 167.393
+    },
+    {
+      "pageNumber": 5,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "7dce90d21b579684b3e80b009948472bd8f3c3760486a68c3950a1a1abee787d",
+      "textSha256": "d0bb747055b8bc030a6932e3825a2415804dd9a4939c46e4b6c5ed261b6574f2",
+      "textCharacters": 512,
+      "luminanceMean": 238.058,
+      "colorStdevTotal": 142.027
+    },
+    {
+      "pageNumber": 6,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "cec061ad559143e51d9b91ffbe23844470ab38e6da191b2e3db60bf20e1ce281",
+      "textSha256": "9d6b0d6a1ba4fec99d1ee02d604804a2ab6daacc07ca3443e601234a7ab3320a",
+      "textCharacters": 427,
+      "luminanceMean": 241.471,
+      "colorStdevTotal": 132.932
+    },
+    {
+      "pageNumber": 7,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "e3de977c574eece3283d54c0c115188ee3cc3fc1db2cb3c9389c440667fb7475",
+      "textSha256": "7181fa78a0f60382e96098a8bf14289689e93a1a29adcaabf6927795ef0ca09e",
+      "textCharacters": 496,
+      "luminanceMean": 242.57,
+      "colorStdevTotal": 120.61
+    },
+    {
+      "pageNumber": 8,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "2e3fcf44473057996cf20c79a03e15c304acfa7067686cac7dc83eefff1ca5bb",
+      "textSha256": "f819d3a67c2143191193beab3e73c25b41baefd8df4c938c2b4e8069cecb6830",
+      "textCharacters": 407,
+      "luminanceMean": 226.084,
+      "colorStdevTotal": 193.389
+    },
+    {
+      "pageNumber": 9,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "12c81d4291f3b359bafce15a8fbd0850caafee6e9b97570da25e6eb46d8e5d1c",
+      "textSha256": "6c5640f9b9d59668b7a884ab86e2a5b5666140e2e92f8fc5fbe1ea73d5d3e707",
+      "textCharacters": 397,
+      "luminanceMean": 241.812,
+      "colorStdevTotal": 130.45
+    },
+    {
+      "pageNumber": 10,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "7b059b40e70916faf9bcbbee7ba5abd216e29bcf8f8313a03bde81f52073442b",
+      "textSha256": "e90c5f75be38992655d0becde25895bcafa755d57cd8ff2fe692cbd5c2622a24",
+      "textCharacters": 368,
+      "luminanceMean": 241.773,
+      "colorStdevTotal": 131.38
+    },
+    {
+      "pageNumber": 11,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "2150568be9a2c077d79f6d94f94f8b48cdce4d47f901ec97fe84a885c5386919",
+      "textSha256": "9a20f02d20d5a1ef708a93759624edcbcbdf71d7838765e4cae40cc6a7d6c21a",
+      "textCharacters": 428,
+      "luminanceMean": 237.852,
+      "colorStdevTotal": 144.374
+    },
+    {
+      "pageNumber": 12,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "841476edf9125cbadc315b8751962471d271fd5548fceb50d9e0cef101f19622",
+      "textSha256": "f79a87a25f5e4486a0a1f318dc97ea7be403753333c3a5e5ded1e54450543a39",
+      "textCharacters": 146,
+      "luminanceMean": 232.137,
+      "colorStdevTotal": 112.57
+    },
+    {
+      "pageNumber": 13,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "c641bd7a7bac6c994ed6054d0854b6e8de92c12dac3f54988350f0fae8812a1b",
+      "textSha256": "aa2edd235bb9068a8ea37393bd048a672935c5bc7dc246ff48d4c6073dc75f2f",
+      "textCharacters": 502,
+      "luminanceMean": 240.794,
+      "colorStdevTotal": 136.524
+    },
+    {
+      "pageNumber": 14,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "f36af83150dc569b579f4eb1dca469f0f994f8e2731a48ff6cc4386d1f2d31ef",
+      "textSha256": "580f9f0a7aa05507b954de44c37742b09124353c8d23b818fc9ec6f96e0edfb6",
+      "textCharacters": 469,
+      "luminanceMean": 242.009,
+      "colorStdevTotal": 161.04
+    },
+    {
+      "pageNumber": 15,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "9564f8ad78b9245c3da471d2e0a4ebd793caf2599a76406675ab0bf44ec57a56",
+      "textSha256": "af7f50e69f87bd4ce6e96d194c0e6a62a814a6625df9b9d2bf1b3eee318422f5",
+      "textCharacters": 530,
+      "luminanceMean": 239.771,
+      "colorStdevTotal": 142.103
+    },
+    {
+      "pageNumber": 16,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "7ee45ee62bcec33aa21d214e9aa070c8add76da8d6d5794b598f9d37d601a579",
+      "textSha256": "b678294107294ca634b512badbe44c849d03987396d7ab0e761f947faf4267ba",
+      "textCharacters": 548,
+      "luminanceMean": 243.752,
+      "colorStdevTotal": 110.953
+    },
+    {
+      "pageNumber": 17,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "162e6836940a9d5736e490afcebc5d244e65b5ab90eb2111da398cd8036e8f59",
+      "textSha256": "890652f3768fdc3ccbf53892b121c347e46adce155b5d160bc31e98926696a10",
+      "textCharacters": 461,
+      "luminanceMean": 240.569,
+      "colorStdevTotal": 137.95
+    },
+    {
+      "pageNumber": 18,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "e31d8278a0ff8d8bc88b6348ca2495ed925c9d41851b918aec5138188cc7d134",
+      "textSha256": "86756840f412f263a3e1af4e9420fbae66a11a7fbcca21fbc95c79d1031a05b6",
+      "textCharacters": 449,
+      "luminanceMean": 238.289,
+      "colorStdevTotal": 141.677
+    },
+    {
+      "pageNumber": 19,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "28ae791824dcddcd31538bdbfbeac256dd156021a69e7e51617f69faaf594bee",
+      "textSha256": "1ee0fa3666e1663a857c4dd5ed4d7b1bf82015873409bfecfc76bc51cb6af16d",
+      "textCharacters": 530,
+      "luminanceMean": 240.193,
+      "colorStdevTotal": 139.953
+    },
+    {
+      "pageNumber": 20,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "91a09a5f205bbba4cf6971674bee8044f6bd067bcfa18278dfda8658cf24d48f",
+      "textSha256": "82f9d1603e7c517f597b349eefa7931648ac4ad7efd414a0ea435377f5ff24ea",
+      "textCharacters": 490,
+      "luminanceMean": 242.802,
+      "colorStdevTotal": 156.196
+    },
+    {
+      "pageNumber": 21,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "8e4834917c9075a8e236616a77e162f164905b0c8b18f71f222f00e64b9fe714",
+      "textSha256": "8e5005eefffd6420414a2c64874aff4804d5cff4af94b30e4a906c83bd13b1e2",
+      "textCharacters": 424,
+      "luminanceMean": 238.629,
+      "colorStdevTotal": 139.856
+    },
+    {
+      "pageNumber": 22,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "be952ec0d5ac9b9d3b6172f2adf5a51b5f3baa87bcb745e413af9628ade3b34c",
+      "textSha256": "e0f2cd728cbe8eee2c913884c8ca21c094dd9f6b8859c99432a23c760b58ac79",
+      "textCharacters": 430,
+      "luminanceMean": 241.994,
+      "colorStdevTotal": 129.738
+    },
+    {
+      "pageNumber": 23,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "5ef0e15b296a131729e54da10106532211234506c4860d527b04c069e2a00e83",
+      "textSha256": "b3151a7b5be5cfd3b8c58f6a388c13fb68f2b2ef054d57d5655c00c303236d9e",
+      "textCharacters": 427,
+      "luminanceMean": 242.932,
+      "colorStdevTotal": 156.628
+    },
+    {
+      "pageNumber": 24,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "0f35c0b302462df97ed9456bebf1ecaa73623d8c45dad9da5b509d9922fdb771",
+      "textSha256": "ea77cd1d4f460c07c19ffac81c626615fcc04b10ac011b1203c30d80e6e8942c",
+      "textCharacters": 122,
+      "luminanceMean": 208.719,
+      "colorStdevTotal": 186.616
+    },
+    {
+      "pageNumber": 25,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "bf27d3834fdf4a731d2315e04a95dd61f91c22fa5134972ed427cfce3ee93d2b",
+      "textSha256": "ef63c8befa35953906c00e6dfab11a3afdcbf4a1d3db862e6792da5fafda0758",
+      "textCharacters": 435,
+      "luminanceMean": 240.948,
+      "colorStdevTotal": 135.429
+    },
+    {
+      "pageNumber": 26,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "04f95f9b9821d127ed3541dce744129bd88f88d94b80907e7eb0e5a86f1bc0c7",
+      "textSha256": "52632eacbffbf5c7645a969ed2238d7a5cda57efd1c0fce836f90631541772e2",
+      "textCharacters": 394,
+      "luminanceMean": 233.391,
+      "colorStdevTotal": 159.269
+    },
+    {
+      "pageNumber": 27,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "4db6bd8604bf7878dacddb1b335a046110d7c400c2371c38f25b849fcf6b82a6",
+      "textSha256": "b226365cd5856312c5b2358142f0ce8784e707544e5489fddb21f1a9713c5e39",
+      "textCharacters": 432,
+      "luminanceMean": 238.948,
+      "colorStdevTotal": 137.822
+    },
+    {
+      "pageNumber": 28,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "7e675e3818e0f134e163fcbf8275f68106017b8e9d377a1f083ef55eb2320583",
+      "textSha256": "f0cfc4ae8134d5fe37878b8d68c458e7502bdfd58e3b74b7b203d5bd53d0b5f7",
+      "textCharacters": 416,
+      "luminanceMean": 241.506,
+      "colorStdevTotal": 132.044
+    },
+    {
+      "pageNumber": 29,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "9ba6b8453a9805e8a4f526d6ba0fee03f7989db2185738da6b3a82fda4db3d1b",
+      "textSha256": "8a32819f131f7632e8cd377c69c7081bc89cb566876a728627897cad9f549292",
+      "textCharacters": 380,
+      "luminanceMean": 241.925,
+      "colorStdevTotal": 130.181
+    },
+    {
+      "pageNumber": 30,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "7ab2ad55080fbf4eb093623b21146c978f9f330b66214b208952a0b418b2ca1f",
+      "textSha256": "a033e6f70ab627dbe2456a6a23c27b4e404ac9951c4b679380e4ec61f1f3addf",
+      "textCharacters": 452,
+      "luminanceMean": 242.422,
+      "colorStdevTotal": 159.349
+    },
+    {
+      "pageNumber": 31,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "0d5d60342f61fa4d824df553743ed7a0b562cafba07cd1e48228f64cbda6436d",
+      "textSha256": "8f033f5fee4131f4e72f73376b787c37fc240d6a06bdac848d06a86a7068ce4a",
+      "textCharacters": 165,
+      "luminanceMean": 230.86,
+      "colorStdevTotal": 121.543
+    },
+    {
+      "pageNumber": 32,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "fd8a912840d80cab1823ee66d12d3af51e8da5c111a424b31109d405f4a33a3e",
+      "textSha256": "9b11bd3d9fcc799f953e44eb8b06e566789c152ddb3753257e523e885f5b0a2c",
+      "textCharacters": 422,
+      "luminanceMean": 241.507,
+      "colorStdevTotal": 132.327
+    },
+    {
+      "pageNumber": 33,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "398bf5150529994856669ecfe1f852ce32f35f33767c66bb59c02553043d7167",
+      "textSha256": "a854ccfb9c7394dbcb2262071dc0602fe29ff16e7457dcdea789dda1d6a913f8",
+      "textCharacters": 473,
+      "luminanceMean": 240.086,
+      "colorStdevTotal": 140.37
+    },
+    {
+      "pageNumber": 34,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "9771d0738f9897cdf4211511211fdf049cd97f5b5ece9e64ee4aeded851b6689",
+      "textSha256": "6cd7d1ee0cc5769dbf5a08167015777a92a59df18ffb79d903d37bd55c7be3de",
+      "textCharacters": 462,
+      "luminanceMean": 240.385,
+      "colorStdevTotal": 138.858
+    },
+    {
+      "pageNumber": 35,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "8c4a4ca550cec54be39ad069fdbe8895dcf55cbda395e272c447983f87121d1a",
+      "textSha256": "c8952265ad5d05e8e548a943415b7c0198aa839d76eee08cd501b7b9bf291523",
+      "textCharacters": 469,
+      "luminanceMean": 241.076,
+      "colorStdevTotal": 134.703
+    },
+    {
+      "pageNumber": 36,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "03db5813f45ca9ae610ca87fa1977d69bd273e0976602f53f46ebf51e4ece14c",
+      "textSha256": "e91ca0716bc68c735c0c05b30393a858a660e7a1effe6a533c82f2ddebeb85c4",
+      "textCharacters": 476,
+      "luminanceMean": 238.204,
+      "colorStdevTotal": 141.606
+    },
+    {
+      "pageNumber": 37,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "1a72623370cbf0ea089bcd2579ca6b7df479c79c73e4ade1f39c17aeb60b9d63",
+      "textSha256": "07fc9c9b77e176d6c552b65427c9c6bcb5a8661744a12976775b9ca5dd636798",
+      "textCharacters": 445,
+      "luminanceMean": 241.079,
+      "colorStdevTotal": 135.913
+    },
+    {
+      "pageNumber": 38,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "20fa5124126ea35c30332c21d915cdcd771995465f4376e3304697676b1be748",
+      "textSha256": "da08d4789b8189f29993af2f5e76a2bb4715f24569f8ae0fbcd59fc7362e1c8e",
+      "textCharacters": 469,
+      "luminanceMean": 238.073,
+      "colorStdevTotal": 143.194
+    },
+    {
+      "pageNumber": 39,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "ec0026030c270e5f60ea173e509c45be6832553b2f116cc56a07d42be6ddebae",
+      "textSha256": "b4dad5d9beb363af26dadab1128d17a968ec47b500af978f3c046ddeb4f4a164",
+      "textCharacters": 428,
+      "luminanceMean": 241.076,
+      "colorStdevTotal": 135.041
+    },
+    {
+      "pageNumber": 40,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "8b3823d8b61f4a989a833a669519399b566e69f95116a2cba09ebd78ac3d3953",
+      "textSha256": "396d5af6bcaa35340abda9f61213347e43b452ba0d9a0329754967b825ec8061",
+      "textCharacters": 454,
+      "luminanceMean": 241.182,
+      "colorStdevTotal": 133.768
+    },
+    {
+      "pageNumber": 41,
+      "width": 1600,
+      "height": 900,
+      "pngSha256": "c24789a5b65d3e4673034f4855b053ca1094ba3db24be70b1faee0e6630db7cd",
+      "textSha256": "3fbe7e2abffcad97dfdded37c48e18b94669cca88a61d17b5cd90c8aaf903bda",
+      "textCharacters": 417,
+      "luminanceMean": 16.802,
+      "colorStdevTotal": 129.952
+    }
+  ]
+}

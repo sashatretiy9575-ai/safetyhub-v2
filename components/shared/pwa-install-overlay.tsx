@@ -1,0 +1,157 @@
+'use client';
+
+import * as React from 'react';
+import { usePathname } from 'next/navigation';
+import { DownloadSimple, X } from '@phosphor-icons/react';
+import { usePWA } from '@/components/shared/pwa-provider';
+import { Button } from '@/components/ui/button';
+
+const DISMISSAL_KEY = 'safetyhub:pwa-install-dismissal:v2';
+const SESSION_KEY = 'safetyhub:pwa-install-shown:v1';
+const DISMISSAL_DURATION = 30 * 24 * 60 * 60 * 1_000;
+const PROMPT_DELAY_MS = 15_000;
+
+function hasActiveDismissal() {
+  try {
+    const until = Number(window.localStorage.getItem(DISMISSAL_KEY));
+    return Number.isFinite(until) && until > Date.now();
+  } catch {
+    return false;
+  }
+}
+
+function saveDismissal() {
+  try {
+    window.localStorage.setItem(DISMISSAL_KEY, String(Date.now() + DISMISSAL_DURATION));
+  } catch {
+    // The compact banner still closes if storage is unavailable.
+  }
+}
+
+function alreadyShownThisSession() {
+  try {
+    return window.sessionStorage.getItem(SESSION_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markShownThisSession() {
+  try {
+    window.sessionStorage.setItem(SESSION_KEY, '1');
+  } catch {
+    // Session limiting is best effort in privacy-restricted browsers.
+  }
+}
+
+function routeAllowsAutomaticPrompt(pathname: string) {
+  return !(
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/onboarding') ||
+    pathname.startsWith('/profile') ||
+    pathname.startsWith('/install') ||
+    /^\/topics\/[^/]+\/test(?:\/|$)/.test(pathname)
+  );
+}
+
+export function PWAInstallOverlay() {
+  const pathname = usePathname();
+  const { isInstallable, install, isStandalone } = usePWA();
+  const [isPhone, setIsPhone] = React.useState(false);
+  const [delayElapsed, setDelayElapsed] = React.useState(false);
+  const [hasInteracted, setHasInteracted] = React.useState(false);
+  const [isDismissed, setIsDismissed] = React.useState(true);
+  const [isInstalling, setIsInstalling] = React.useState(false);
+
+  React.useEffect(() => {
+    const query = window.matchMedia('(max-width: 767px) and (pointer: coarse)');
+    const sync = () => setIsPhone(query.matches);
+    sync();
+    query.addEventListener('change', sync);
+    setIsDismissed(hasActiveDismissal() || alreadyShownThisSession());
+
+    const timer = window.setTimeout(() => setDelayElapsed(true), PROMPT_DELAY_MS);
+    const interact = () => setHasInteracted(true);
+    window.addEventListener('pointerdown', interact, { once: true, passive: true });
+    window.addEventListener('keydown', interact, { once: true });
+    window.addEventListener('scroll', interact, { once: true, passive: true });
+    return () => {
+      query.removeEventListener('change', sync);
+      window.clearTimeout(timer);
+      window.removeEventListener('pointerdown', interact);
+      window.removeEventListener('keydown', interact);
+      window.removeEventListener('scroll', interact);
+    };
+  }, []);
+
+  const visible =
+    isPhone &&
+    isInstallable &&
+    !isStandalone &&
+    !isDismissed &&
+    delayElapsed &&
+    hasInteracted &&
+    routeAllowsAutomaticPrompt(pathname);
+
+  React.useEffect(() => {
+    document.documentElement.style.setProperty('--pwa-banner-space', visible ? '88px' : '0px');
+    if (visible) markShownThisSession();
+    return () => document.documentElement.style.setProperty('--pwa-banner-space', '0px');
+  }, [visible]);
+
+  const dismiss = React.useCallback(() => {
+    saveDismissal();
+    setIsDismissed(true);
+  }, []);
+
+  const handleInstall = React.useCallback(async () => {
+    setIsInstalling(true);
+    try {
+      const outcome = await install();
+      if (outcome !== 'unavailable') dismiss();
+    } finally {
+      setIsInstalling(false);
+    }
+  }, [dismiss, install]);
+
+  if (!visible) return null;
+
+  return (
+    <aside
+      className="fixed right-[max(.5rem,var(--safe-area-right))] bottom-[calc(var(--mobile-fixed-bottom-space)+.5rem)] left-[max(.5rem,var(--safe-area-left))] z-[60] mx-auto flex min-h-16 max-w-md items-center gap-3 rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface-elevated)] p-2.5 text-[var(--color-text)] shadow-[var(--shadow-pop)]"
+      role="region"
+      aria-live="polite"
+      aria-labelledby="pwa-install-title"
+    >
+      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+        <DownloadSimple size={20} weight="bold" aria-hidden="true" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p id="pwa-install-title" className="truncate text-sm font-black">
+          Установить SafetyHub
+        </p>
+        <p className="truncate text-xs text-[var(--color-text-muted)]">
+          Быстрый запуск с экрана телефона
+        </p>
+      </div>
+      <Button
+        type="button"
+        size="sm"
+        onClick={() => void handleInstall()}
+        disabled={isInstalling}
+        className="min-h-11 shrink-0 px-3"
+      >
+        {isInstalling ? 'Открываем…' : 'Установить'}
+      </Button>
+      <button
+        type="button"
+        onClick={dismiss}
+        className="grid size-11 shrink-0 place-items-center rounded-full text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]"
+        aria-label="Закрыть предложение установки"
+      >
+        <X size={19} aria-hidden="true" />
+      </button>
+    </aside>
+  );
+}

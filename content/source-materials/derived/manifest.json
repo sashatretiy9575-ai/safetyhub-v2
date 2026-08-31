@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "valid": true,
+  "finalCta": "Нажмите «Начать тест»",
+  "slideCount": 198,
+  "presentations": [
+    {
+      "slug": "plotnik",
+      "sourceSha256": "d3b84cbe64a5376c61168ee798b5130c4e593ba39c302f785a13293125766948",
+      "derivedSha256": "8a0ab52560b8c424b8bd8f116a3338807d0c766eac02c9e58fb219bfb226b797",
+      "slideCount": 25,
+      "speakerNoteParts": 0,
+      "themePreserved": true,
+      "unchangedNonFinalSlideTextCount": 24,
+      "approvedVisibleTextChanges": 1,
+      "finalCta": "Нажмите «Начать тест»"
+    },
+    {
+      "slug": "armaturshchik",
+      "sourceSha256": "480cd55c460114d9210fae0a1b7232a71345587c676cdecc644351ec2497ffbe",
+      "derivedSha256": "dca7ef29d82b24756a927831daaf566317e7de5653b7aab43d98492c385701f2",
+      "slideCount": 31,
+      "speakerNoteParts": 0,
+      "themePreserved": true,
+      "unchangedNonFinalSlideTextCount": 30,
+      "approvedVisibleTextChanges": 1,
+      "finalCta": "Нажмите «Начать тест»"
+    },
+    {
+      "slug": "lesomontazhnye-raboty",
+      "sourceSha256": "7b8b4b247ba1fe3ff3480ded219417ece9710daa0fd12875f81db10d058228d6",
+      "derivedSha256": "582338c561283acc27a932f586eaccc31e14adaee0d6a4c4648a70355d738c27",
+      "slideCount": 42,
+      "speakerNoteParts": 0,
+      "themePreserved": true,
+      "unchangedNonFinalSlideTextCount": 41,
+      "approvedVisibleTextChanges": 1,
+      "finalCta": "Нажмите «Начать тест»"
+    },
+    {
+      "slug": "biot",
+      "sourceSha256": "aaca0cb2b612774e7d574f66d0bf2c103536333bb575dca43db4cf657b601c8f",
+      "derivedSha256": "625d6bdc8fe58f207e5a670380f7106c3ae5917ca1e8a60eac2bbed60390c6f3",
+      "slideCount": 59,
+      "speakerNoteParts": 0,
+      "themePreserved": true,
+      "unchangedNonFinalSlideTextCount": 58,
+      "approvedVisibleTextChanges": 1,
+      "finalCta": "Нажмите «Начать тест»"
+    },
+    {
+      "slug": "pozharnaya-bezopasnost",
+      "sourceSha256": "eb0c64b3aa83a3d63d74631d899def9f7683d06858baca516cc8fc254b46d68a",
+      "derivedSha256": "4e75a28d8b2a55fd272a34e9674babc09709b4d35b837c111ff73cfeb6f0e9b8",
+      "slideCount": 41,
+      "speakerNoteParts": 0,
+      "themePreserved": true,
+      "unchangedNonFinalSlideTextCount": 40,
+      "approvedVisibleTextChanges": 1,
+      "finalCta": "Нажмите «Начать тест»"
+    }
+  ]
+}

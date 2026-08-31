@@ -1,0 +1,93 @@
+import { Suspense } from 'react';
+import { ArticleCard } from '@/components/marketing/article-card';
+import { Container } from '@/components/ui/container';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/ui/page-header';
+import { getArticles } from '@/lib/content/articles';
+import { buildMetadata } from '@/lib/seo';
+
+export const metadata = buildMetadata({
+  title: 'Статьи по охране труда и безопасности в Казахстане',
+  description:
+    'Практические статьи по охране труда, промышленной и пожарной безопасности в Казахстане.',
+  path: '/blog',
+  keywords: ['блог по охране труда', 'промышленная безопасность статьи'],
+});
+
+function ArticleGridSkeleton() {
+  return (
+    <div
+      className="grid gap-5 min-[1100px]:grid-cols-3 sm:grid-cols-2 lg:gap-6"
+      aria-label="Загружаем статьи"
+    >
+      {Array.from({ length: 3 }, (_, index) => (
+        <div
+          key={index}
+          className="min-h-[25rem] overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/70"
+          aria-hidden="true"
+        >
+          <div className="aspect-[16/8] animate-pulse bg-[var(--color-surface-muted)]" />
+          <div className="space-y-3 p-5">
+            <div className="h-5 w-4/5 animate-pulse rounded bg-[var(--color-surface-muted)]" />
+            <div className="h-4 w-full animate-pulse rounded bg-[var(--color-surface-muted)]" />
+            <div className="h-4 w-2/3 animate-pulse rounded bg-[var(--color-surface-muted)]" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+async function ArticlesGrid() {
+  const articles = await getArticles();
+
+  if (articles.length === 0) {
+    return (
+      <EmptyState
+        title="Статей пока нет"
+        description="Скоро здесь появятся практические статьи по безопасности."
+      />
+    );
+  }
+
+  return (
+    <div
+      className="grid items-stretch gap-5 min-[1100px]:grid-cols-3 sm:grid-cols-2 lg:gap-6"
+      aria-label="Статьи по безопасности"
+    >
+      {articles.map((article, index) => (
+        <ArticleCard
+          key={article.slug}
+          slug={article.slug}
+          title={article.title}
+          description={article.description}
+          coverImage={article.coverImage}
+          priority={false}
+          featured={index === 0}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default function BlogPage() {
+  return (
+    <>
+      <PageHeader
+        title="Блог, который помогает действовать безопасно"
+        description="Разбираем реальные рабочие ситуации простыми словами: от первой смены и СИЗ до пожарной тревоги, первой помощи и подготовки к тесту."
+        eyebrow="10 практических материалов SafetyHub"
+        variant="compact"
+      />
+
+      <section className="py-9 sm:py-12 lg:py-16">
+        <Container size="wide">
+          <h2 className="sr-only">Список статей</h2>
+          <Suspense fallback={<ArticleGridSkeleton />}>
+            <ArticlesGrid />
+          </Suspense>
+        </Container>
+      </section>
+    </>
+  );
+}

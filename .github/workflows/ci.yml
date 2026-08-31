@@ -1,0 +1,105 @@
+name: SafetyHub CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: safetyhub-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_PUBLIC_SITE_URL: http://localhost:3100
+      PLAYWRIGHT_PORT: '3100'
+      E2E_ADMIN_EMAIL: admin@safetyhub.local
+      E2E_PARTICIPANT_EMAIL: participant@safetyhub.local
+      E2E_REQUIRE_AUTH: '1'
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm audit --audit-level=moderate
+      - run: npm audit signatures
+      - run: npm run check:security
+      - run: npm run check:contacts
+      - run: npm run check:config
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm test
+      - run: npm run content:snapshot:validate
+      - run: npm run content:initial-import:validate
+      - run: npm run content:seed:generate
+      - run: git diff --exit-code -- supabase/seed.sql
+
+      - name: Start local Supabase
+        shell: bash
+        run: |
+          npx --no-install supabase start
+          npx --no-install supabase db reset
+          npx --no-install supabase status -o env > "$RUNNER_TEMP/supabase.env"
+          source "$RUNNER_TEMP/supabase.env"
+          E2E_CI_PASSWORD="SafetyHub-CI-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-Aa1!"
+          echo "::add-mask::$E2E_CI_PASSWORD"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY"
+            echo "SUPABASE_SECRET_KEY=$SERVICE_ROLE_KEY"
+            echo "SAFETYHUB_SEED_PASSWORD=$E2E_CI_PASSWORD"
+            echo "E2E_PASSWORD=$E2E_CI_PASSWORD"
+          } >> "$GITHUB_ENV"
+
+      - run: npx --no-install supabase db lint --local --level error
+      - run: npm run storage:buckets:ensure:local
+      - run: npm run content:assets:seed:local
+      - run: npm run check:db-types
+      - run: npm run test:db
+      - run: npm run seed:workspace
+
+      - run: npm run db:types:generate:local
+
+      - name: Upload generated database types
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: database-generated-types-${{ github.run_id }}-${{ github.run_attempt }}
+          path: lib/supabase/database.generated.ts
+          if-no-files-found: error
+          retention-days: 14
+
+      - run: npm run build
+      - run: npm run check:bundles
+
+      - name: Install Chromium
+        run: npx --no-install playwright install --with-deps chromium
+
+      - run: npm run test:e2e:release
+      - run: git diff --exit-code -- lib/supabase/database.generated.ts
+
+      - name: Upload sanitized E2E summary
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test-results/release-e2e-report.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Stop local Supabase
+        if: always()
+        run: npx --no-install supabase stop --no-backup

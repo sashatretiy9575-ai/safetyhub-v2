@@ -1,0 +1,129 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import test from 'node:test';
+import { fileURLToPath } from 'node:url';
+import {
+  ContentSourceError,
+  classifyContentFailure,
+  fallbackAfterContentFailure,
+  isContentFallbackEnabled,
+  isContentTransportError,
+} from '../../lib/content/fallback-policy.ts';
+
+const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
+
+test('public navigation uses one clear neutral account link on every surface', async () => {
+  const layout = await read('app/(public)/layout.tsx');
+  const header = await read('components/layout/header.tsx');
+  const bottom = await read('components/layout/bottom-tab-bar.tsx');
+  const navigationItems = await read('components/layout/navigation-items.ts');
+
+  assert.match(layout, /<AppShell accountMode="neutral">/);
+  assert.match(navigationItems, /neutral: \{ href: ROUTES\.profile, label: 'Аккаунт' \}/);
+  assert.match(navigationItems, /guest: \{ href: ROUTES\.signIn, label: 'Войти' \}/);
+  assert.match(navigationItems, /authenticated: \{ href: ROUTES\.profile, label: 'Профиль' \}/);
+  for (const source of [header, bottom]) {
+    assert.match(source, /ACCOUNT_NAV_ITEMS\[accountMode\]/);
+    assert.doesNotMatch(source, /Кабинет/);
+  }
+  assert.doesNotMatch(header, /MobileNav/);
+  assert.doesNotMatch(header, /href=\{ROUTES\.profile\}[\s\S]{0,240}?\{accountItem\.label\}/);
+  assert.match(header, /accountMode === 'authenticated' \? \(\s*accountMenu\s*\)/);
+  const userMenu = await read('components/shared/user-menu.tsx');
+  assert.doesNotMatch(userMenu, />\{email\}<\/p>/);
+  assert.match(userMenu, /isAdmin \? 'Админ-панель' : 'Профиль'/u);
+  assert.match(userMenu, /router\.push\(isAdmin \? ROUTES\.admin : ROUTES\.profile\)/u);
+  assert.doesNotMatch(layout, /getAuthContext|createClient|supabase/iu);
+});
+
+test('fallback flag is explicit', () => {
+  const previous = process.env.CONTENT_FALLBACK_ENABLED;
+  delete process.env.CONTENT_FALLBACK_ENABLED;
+  try {
+    assert.equal(isContentFallbackEnabled(), false);
+    assert.equal(isContentFallbackEnabled('false'), false);
+    assert.equal(isContentFallbackEnabled('1'), false);
+    assert.equal(isContentFallbackEnabled(' TRUE '), true);
+  } finally {
+    if (previous === undefined) delete process.env.CONTENT_FALLBACK_ENABLED;
+    else process.env.CONTENT_FALLBACK_ENABLED = previous;
+  }
+});
+
+test('successful remote responses stay authoritative even when they contain zero rows', () => {
+  assert.deepEqual(
+    classifyContentFailure({ configured: true, error: null, fallbackEnabled: true }),
+    { action: 'remote' },
+  );
+});
+
+test('missing configuration and opted-in transport failure use bundled content', () => {
+  assert.deepEqual(classifyContentFailure({ configured: false }), {
+    action: 'fallback',
+    reason: 'unconfigured',
+  });
+  assert.deepEqual(
+    classifyContentFailure({
+      configured: true,
+      error: { message: 'FetchError: request failed' },
+      fallbackEnabled: true,
+      status: 0,
+    }),
+    { action: 'fallback', reason: 'transport' },
+  );
+  assert.equal(isContentTransportError(new TypeError('fetch failed')), true);
+  assert.equal(isContentTransportError(new Error('bad mapping')), false);
+  assert.deepEqual(
+    classifyContentFailure({
+      configured: true,
+      error: { code: 'PGRST200', message: 'new relationship is not in the schema cache yet' },
+      status: 400,
+    }),
+    { action: 'fallback', reason: 'unconfigured' },
+  );
+});
+
+test('transport failures require degraded mode and backend errors are never masked', () => {
+  assert.deepEqual(
+    classifyContentFailure({
+      configured: true,
+      error: { message: 'fetch failed' },
+      fallbackEnabled: false,
+      status: 0,
+    }),
+    { action: 'throw', reason: 'transport-disabled' },
+  );
+  assert.deepEqual(
+    classifyContentFailure({
+      configured: true,
+      error: { code: '42P01', message: 'relation does not exist' },
+      fallbackEnabled: true,
+      status: 500,
+    }),
+    { action: 'throw', reason: 'backend' },
+  );
+
+  assert.throws(
+    () =>
+      fallbackAfterContentFailure({
+        configured: true,
+        error: { code: '42501', message: 'permission denied' },
+        fallback: () => ['local'],
+        operation: 'test backend failure',
+        status: 403,
+      }),
+    (error) => error instanceof ContentSourceError && error.failure === 'backend',
+  );
+});
+
+test('content readers preserve empty and not-found remote results', async () => {
+  for (const file of ['lib/content/articles.ts', 'lib/content/topics.ts']) {
+    const source = await read(file);
+    assert.doesNotMatch(source, /error\s*\|\|\s*!data/);
+    assert.doesNotMatch(source, /!data\?\.length/);
+    assert.match(source, /\(data \?\? \[\]\)\.map/);
+    assert.match(source, /if \(!data\)\s*\{[\s\S]{0,160}?return null;/);
+  }
+});

@@ -1,0 +1,67 @@
+# dependencies
+node_modules
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+coverage
+playwright-report/
+test-results/
+
+# next.js
+.next/
+.next*/
+out/
+build
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+*.log
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env
+.env*.local
+
+# generated reports and local scratch work
+tmp/
+artifacts/
+*.local-notes.md
+*.progress.md
+playwright-report/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# supabase
+.branches
+.temp
+supabase/.branches
+supabase/.temp
+supabase/.temp-old-project-untrusted
+
+# vercel
+.vercel
+
+# editors
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# project-specific
+content/extracted/
+"тест safetyhub"/
+.claude/

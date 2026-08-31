@@ -1,0 +1,5 @@
+# Generated content is hashed byte-for-byte. Keep its line endings identical
+# on Windows workstations and Linux CI runners.
+.gitattributes text eol=lf
+content/**/*.json text eol=lf
+supabase/seed.sql text eol=lf

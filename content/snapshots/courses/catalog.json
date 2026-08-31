@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "2026-08-25-new-five-course-catalog",
+  "updatedAt": "2026-08-25T00:00:00.000Z",
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "totals": {
+    "courseCount": 5,
+    "presentationCount": 5,
+    "presentationPageCount": 198,
+    "variantCount": 15,
+    "questionCount": 150,
+    "optionCount": 600,
+    "correctAnswerCount": 150
+  },
+  "courses": [
+    {
+      "id": "f1d89c10-ca34-4223-8c04-de97790a3292",
+      "slug": "plotnik",
+      "title": "Плотник",
+      "displayOrder": 1,
+      "contentHash": "deca2868066fc4bac15a20cac2cda38ae877451c34fff975e124be538cf6908e",
+      "dbContentHash": "deca2868066fc4bac15a20cac2cda38ae877451c34fff975e124be538cf6908e",
+      "snapshotContentHash": "708cef990b7fb3b59c0c64673debed451dccd2d48103eddcd2f400a8a0b7b535",
+      "presentationSha256": "8a33e78a3f0546b3dd9af99500e1575ac1f6dae21c3a2dedd04e6e49e03c3ea8",
+      "pageCount": 25
+    },
+    {
+      "id": "edfaf13a-6111-4940-bc06-28d655c3001d",
+      "slug": "armaturshchik",
+      "title": "Арматурщик",
+      "displayOrder": 2,
+      "contentHash": "2f7a23db13eee141b55babca50e180de202ce60c7939e7aed771cd3d71f84585",
+      "dbContentHash": "2f7a23db13eee141b55babca50e180de202ce60c7939e7aed771cd3d71f84585",
+      "snapshotContentHash": "cbc41898f80dbc720ca392a5c2a1e9860a550b2b02c89c8348a07176fd1713ff",
+      "presentationSha256": "b76f7b404953629d78972bb197a8fb01c004741270f487ae492f2f5749684c32",
+      "pageCount": 31
+    },
+    {
+      "id": "697acb0f-4761-4eef-bdd3-191939cf0afb",
+      "slug": "lesomontazhnye-raboty",
+      "title": "Лесомонтажные работы",
+      "displayOrder": 3,
+      "contentHash": "2f260a510155afc0fb2bc20271deecd24b05afa6e68a7da13b68d3a90d9dcf01",
+      "dbContentHash": "2f260a510155afc0fb2bc20271deecd24b05afa6e68a7da13b68d3a90d9dcf01",
+      "snapshotContentHash": "1ff50fbdb46faeb0c2473bdd6ff82bd193ab4f975e04b021a08d0735b96a8584",
+      "presentationSha256": "84034f4073330e9de1de1fd7cf4a12c25751435ab4ec6cac3251944e0500cf8e",
+      "pageCount": 42
+    },
+    {
+      "id": "56c7fac7-7181-47e9-91cc-aa88e3c59191",
+      "slug": "biot",
+      "title": "БИОТ",
+      "displayOrder": 4,
+      "contentHash": "25d6cb6a6e881ee40d255dcf4374e5c384af2d255b6aa1a5cd3de29cbdb2ceb4",
+      "dbContentHash": "25d6cb6a6e881ee40d255dcf4374e5c384af2d255b6aa1a5cd3de29cbdb2ceb4",
+      "snapshotContentHash": "1546e6b9d2068aa56a4f7b94fbfbcd0624e973022225e262120728ab25b2fa26",
+      "presentationSha256": "a68cdfab938ab90cc8e847cd6fa5c0309c9caaa856795cbd70289eeb091afd9c",
+      "pageCount": 59
+    },
+    {
+      "id": "5641b254-4aa5-4a8c-a7cf-4364a1de6db0",
+      "slug": "pozharnaya-bezopasnost",
+      "title": "Пожарная безопасность",
+      "displayOrder": 5,
+      "contentHash": "68e9a7f2651ec2697385d880e910c5b5bac2b3f4d91fc1c50c732ef59cd853e9",
+      "dbContentHash": "68e9a7f2651ec2697385d880e910c5b5bac2b3f4d91fc1c50c732ef59cd853e9",
+      "snapshotContentHash": "5e9c6a18acc409bac0857a7faf7bf74b6bfd77ed04f1ac5d1757f0a1d7f5ea0a",
+      "presentationSha256": "69f2e4cbe8d284996aa891862cf6228116cfda997775a7caa1d51bd9ee648eef",
+      "pageCount": 41
+    }
+  ],
+  "sourceDocument": {
+    "filename": "06_Тестовые_задания.docx",
+    "sha256": "3b36bba9f031c233cd10a4a80e1f7dd2a89af523b5df2145056dc7366086ce00"
+  },
+  "answerKeyMatrix": {
+    "plotnik": [
+      [
+        "В",
+        "А",
+        "Г",
+        "Б",
+        "В",
+        "Г",
+        "А",
+        "В",
+        "Б",
+        "Г"
+      ],
+      [
+        "Б",
+        "Г",
+        "А",
+        "В",
+        "Б",
+        "Г",
+        "В",
+        "А",
+        "Г",
+        "Б"
+      ],
+      [
+        "А",
+        "В",
+        "Б",
+        "Г",
+        "В",
+        "А",
+        "Г",
+        "Б",
+        "А",
+        "В"
+      ]
+    ],
+    "armaturshchik": [
+      [
+        "Г",
+        "Б",
+        "В",
+        "А",
+        "Г",
+        "В",
+        "Б",
+        "Г",
+        "А",
+        "В"
+      ],
+      [
+        "А",
+        "Б",
+        "Г",
+        "В",
+        "Б",
+        "А",
+        "Г",
+        "Б",
+        "В",
+        "Г"
+      ],
+      [
+        "В",
+        "А",
+        "Б",
+        "В",
+        "Г",
+        "А",
+        "В",
+        "Б",
+        "Г",
+        "А"
+      ]
+    ],
+    "lesomontazhnye-raboty": [
+      [
+        "А",
+        "Г",
+        "В",
+        "Б",
+        "Г",
+        "А",
+        "В",
+        "Г",
+        "Б",
+        "В"
+      ],
+      [
+        "В",
+        "Б",
+        "Г",
+        "А",
+        "Б",
+        "Г",
+        "В",
+        "Б",
+        "А",
+        "Г"
+      ],
+      [
+        "Б",
+        "В",
+        "А",
+        "Г",
+        "В",
+        "А",
+        "Б",
+        "В",
+        "Г",
+        "А"
+      ]
+    ],
+    "biot": [
+      [
+        "Б",
+        "В",
+        "Г",
+        "А",
+        "В",
+        "Г",
+        "Б",
+        "А",
+        "Г",
+        "В"
+      ],
+      [
+        "Г",
+        "А",
+        "Б",
+        "Г",
+        "В",
+        "Б",
+        "А",
+        "Г",
+        "В",
+        "Б"
+      ],
+      [
+        "А",
+        "Г",
+        "В",
+        "Б",
+        "А",
+        "В",
+        "Г",
+        "А",
+        "Б",
+        "В"
+      ]
+    ],
+    "pozharnaya-bezopasnost": [
+      [
+        "Г",
+        "В",
+        "А",
+        "Б",
+        "В",
+        "Г",
+        "А",
+        "В",
+        "Г",
+        "Б"
+      ],
+      [
+        "Б",
+        "А",
+        "Г",
+        "Б",
+        "В",
+        "Г",
+        "Б",
+        "А",
+        "Г",
+        "В"
+      ],
+      [
+        "В",
+        "Б",
+        "А",
+        "В",
+        "Г",
+        "Б",
+        "А",
+        "В",
+        "Г",
+        "А"
+      ]
+    ]
+  },
+  "approvedWordingCorrection": {
+    "courseSlug": "lesomontazhnye-raboty",
+    "variantNumber": 2,
+    "questionNumber": 5,
+    "sourceTextSha256": "9aec0cb03055ee407f9a32ae2810a90335124e2325c90af9a3d99d256cd28015",
+    "after": "Можно ли определять шаг анкеров по одной универсальной цифре?",
+    "legacyReferenceRemoved": true
+  },
+  "catalogChecksum": "9d34b6b4f106b6886a540e0b67c2f7be27ffa6b1e3e4656013e6192ed39c228a",
+  "catalogHash": "11b5486025cbb94c02ea0ed021ce8a8afc3f1e4c997c9cccbf5497e8fb42c026"
+}

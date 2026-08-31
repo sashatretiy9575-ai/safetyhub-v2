@@ -1,0 +1,71 @@
+{
+  "id": "/",
+  "name": "SafetyHub.kz — охрана труда",
+  "short_name": "SafetyHub",
+  "description": "Обучение и проверка знаний по охране труда и промышленной безопасности.",
+  "lang": "ru-KZ",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "background_color": "#f7f8fa",
+  "theme_color": "#f7f8fa",
+  "categories": ["education", "business"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/safetyhub-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Главная SafetyHub на мобильном устройстве"
+    },
+    {
+      "src": "/screenshots/safetyhub-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Главная SafetyHub на компьютере"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Темы обучения",
+      "short_name": "Темы",
+      "url": "/topics",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Полезные статьи",
+      "short_name": "Блог",
+      "url": "/blog",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Личный кабинет",
+      "short_name": "Кабинет",
+      "url": "/profile",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "operation": "avatar-backup",
+  "classificationMode": "pre-700-visible-metadata",
+  "productionProjectRef": "vezgxdooijznpjqrpvcv",
+  "supabaseUrl": "https://vezgxdooijznpjqrpvcv.supabase.co",
+  "bucket": "profile-avatars",
+  "serviceRoleKeyEnv": "SUPABASE_SECRET_KEY",
+  "pageSize": 100,
+  "requestTimeoutMs": 30000,
+  "archivePassphraseEnv": "STORAGE_BACKUP_ARCHIVE_PASSPHRASE",
+  "privateOutputAcknowledgement": "private-directory-outside-repository-with-encryption-at-rest"
+}
