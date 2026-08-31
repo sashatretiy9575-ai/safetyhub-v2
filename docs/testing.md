@@ -18,6 +18,11 @@ npm audit signatures
 `npm run verify` выполняет этот набор последовательно. Он не заменяет SQL и
 authenticated browser checks.
 
+Обычный GitHub workflow публикует два независимых обязательных результата:
+`application` для статических, unit и build-проверок и `database` для clean
+reset, exact types, SQL/RLS и authenticated E2E. Это позволяет branch protection
+запрещать merge при отказе любой половины release gate.
+
 ## Database gate
 
 Docker Desktop и локальный Supabase должны быть запущены.
@@ -37,6 +42,13 @@ snapshot. `db:types:check:local` сравнивает закоммиченный
 `lib/supabase/database.generated.ts` с точным выводом CLI из этой чистой базы;
 после изменения схемы сначала сгенерируйте и проверьте типы, затем обновите
 `lib/supabase/types.ts`.
+
+Если локальный Docker недоступен, запустите вручную workflow
+`Supabase Schema Receipt`. Одноразовый GitHub-hosted runner пересобирает базу из
+всех migrations, генерирует exact CLI types, запускает type-contract и SQL/RLS
+tests и сохраняет `database.generated.ts`, его SHA-256 и обезличенный receipt в
+artifact. Скачанный файл сначала сравнивается с рабочим деревом и только затем
+коммитится. Обычный `SafetyHub CI` типы не переписывает и обязан отклонять drift.
 
 ## Локальные authenticated fixtures
 

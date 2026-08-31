@@ -42,9 +42,9 @@ const expectedConfigurationLineChanges = Object.freeze([
 // Updating either value is an intentional release-review step. These hashes pin
 // exactly the committed localhost source and the only permitted production copy.
 export const expectedSourceConfigurationSha256 =
-  '0e3dc330c6c3aec75e0d319c359150d0a115d6dd0fd43f2fc606a9944accb0fb';
+  '8ac8d08309a92aac2c09a9d60e762b27bbed396978fb3b688b255b3671ca6db7';
 export const expectedProductionConfigurationSha256 =
-  '8865da234efe7e9e842e488da40a88983b30abb2c58f7302a23e7de6fa476604';
+  '6276d00815e81af5d8c6fc6ab6a52fbec17feeed0c85ebc82f12af5ab98fac1a';
 export const expectedTemplateSha256 = Object.freeze({
   'supabase/templates/magic-link.html':
     'efcea98cd3cc116a6e4d1bd68d1a36d13618ab0583427df0994014b1d4598c89',
@@ -70,6 +70,11 @@ function fail(code) {
 
 function sha256(contents) {
   return createHash('sha256').update(contents).digest('hex');
+}
+
+export function configurationSha256(configuration) {
+  if (typeof configuration !== 'string') fail('CONFIGURATION_SOURCE_INVALID');
+  return sha256(Buffer.from(configuration.replaceAll('\r\n', '\n'), 'utf8'));
 }
 
 function isInsideOrEqual(parent, child) {
@@ -173,7 +178,7 @@ export async function prepareProductionAuthConfig({
   const sourceConfiguration = await readFile(configurationPath, 'utf8').catch(() =>
     fail('CONFIGURATION_SOURCE_UNREADABLE'),
   );
-  if (sha256(Buffer.from(sourceConfiguration, 'utf8')) !== expectedSourceConfigurationSha256) {
+  if (configurationSha256(sourceConfiguration) !== expectedSourceConfigurationSha256) {
     fail('CONFIGURATION_SOURCE_HASH_MISMATCH');
   }
 
@@ -189,7 +194,7 @@ export async function prepareProductionAuthConfig({
 
   const productionConfiguration = createProductionConfiguration(sourceConfiguration);
   if (
-    sha256(Buffer.from(productionConfiguration, 'utf8')) !== expectedProductionConfigurationSha256
+    configurationSha256(productionConfiguration) !== expectedProductionConfigurationSha256
   ) {
     fail('CONFIGURATION_PRODUCTION_HASH_MISMATCH');
   }
@@ -236,7 +241,7 @@ export async function prepareProductionAuthConfig({
 
     const preparedConfiguration = await readFile(preparedConfigurationPath, 'utf8');
     if (
-      sha256(Buffer.from(preparedConfiguration, 'utf8')) !== expectedProductionConfigurationSha256
+      configurationSha256(preparedConfiguration) !== expectedProductionConfigurationSha256
     ) {
       fail('PREPARED_CONFIGURATION_HASH_MISMATCH');
     }

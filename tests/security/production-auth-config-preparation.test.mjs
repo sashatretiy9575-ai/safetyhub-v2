@@ -5,6 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import {
   ProductionAuthConfigPreparationError,
+  configurationSha256,
   createProductionConfiguration,
   expectedProductionConfigurationSha256,
   expectedSourceConfigurationSha256,
@@ -86,10 +87,11 @@ test('production config hashes and the two-line allowlist stay source-controlled
     'utf8',
   );
   const productionConfiguration = createProductionConfiguration(sourceConfiguration);
-  const hash = (value) => createHash('sha256').update(value).digest('hex');
+  assert.equal(configurationSha256(sourceConfiguration), expectedSourceConfigurationSha256);
+  assert.equal(configurationSha256(productionConfiguration), expectedProductionConfigurationSha256);
 
-  assert.equal(hash(sourceConfiguration), expectedSourceConfigurationSha256);
-  assert.equal(hash(productionConfiguration), expectedProductionConfigurationSha256);
+  const crlfSource = sourceConfiguration.replaceAll('\r\n', '\n').replaceAll('\n', '\r\n');
+  assert.equal(configurationSha256(crlfSource), expectedSourceConfigurationSha256);
 });
 
 test('the tool refuses to create its temporary workdir inside the repository', async () => {

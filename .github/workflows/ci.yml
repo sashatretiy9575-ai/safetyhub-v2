@@ -13,15 +13,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify:
+  application:
+    name: application
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       NEXT_PUBLIC_SITE_URL: http://localhost:3100
-      PLAYWRIGHT_PORT: '3100'
-      E2E_ADMIN_EMAIL: admin@safetyhub.local
-      E2E_PARTICIPANT_EMAIL: participant@safetyhub.local
-      E2E_REQUIRE_AUTH: '1'
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -46,6 +43,31 @@ jobs:
       - run: npm run content:initial-import:validate
       - run: npm run content:seed:generate
       - run: git diff --exit-code -- supabase/seed.sql
+      - run: npm run build
+      - run: npm run check:bundles
+
+  database:
+    name: database
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_PUBLIC_SITE_URL: http://localhost:3100
+      PLAYWRIGHT_PORT: '3100'
+      E2E_ADMIN_EMAIL: admin@safetyhub.local
+      E2E_PARTICIPANT_EMAIL: participant@safetyhub.local
+      E2E_REQUIRE_AUTH: '1'
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
 
       - name: Start local Supabase
         shell: bash
@@ -82,9 +104,6 @@ jobs:
           path: lib/supabase/database.generated.ts
           if-no-files-found: error
           retention-days: 14
-
-      - run: npm run build
-      - run: npm run check:bundles
 
       - name: Install Chromium
         run: npx --no-install playwright install --with-deps chromium

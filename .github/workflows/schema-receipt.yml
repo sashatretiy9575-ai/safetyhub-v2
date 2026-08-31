@@ -1,0 +1,71 @@
+name: Supabase Schema Receipt
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: safetyhub-schema-receipt-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  schema-receipt:
+    name: database-schema-receipt
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Rebuild disposable Supabase from migrations
+        run: |
+          npx --no-install supabase start
+          npx --no-install supabase db reset
+
+      - run: npx --no-install supabase db lint --local --level error
+      - run: npm run storage:buckets:ensure:local
+      - run: npm run content:assets:seed:local
+
+      - name: Generate exact database types
+        run: npm run db:types:generate:local
+
+      - run: npm run db:types:check:local
+      - run: npm run check:db-types
+      - run: npm run test:db
+
+      - name: Build sanitized schema receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          receipt_dir="${RUNNER_TEMP}/schema-receipt"
+          mkdir -p "$receipt_dir"
+          cp lib/supabase/database.generated.ts "$receipt_dir/database.generated.ts"
+          generated_sha256="$(sha256sum "$receipt_dir/database.generated.ts" | awk '{print $1}')"
+          printf '%s  %s\n' "$generated_sha256" 'database.generated.ts' \
+            > "$receipt_dir/database.generated.ts.sha256"
+          printf 'commit=%s\nsupabase_cli=%s\ndatabase_generated_sha256=%s\n' \
+            "$GITHUB_SHA" "$(npx --no-install supabase --version)" "$generated_sha256" \
+            > "$receipt_dir/receipt.txt"
+
+      - name: Upload verified schema receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: schema-receipt-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/schema-receipt
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Stop disposable Supabase
+        if: always()
+        run: npx --no-install supabase stop --no-backup

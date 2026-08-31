@@ -49,9 +49,10 @@ test('registration start is neutral about whether the email already has an accou
 });
 
 test('email-code form exposes inline errors and focuses the first invalid field', async () => {
-  const [flow, controls] = await Promise.all([
+  const [flow, controls, input] = await Promise.all([
     read('features/auth/email-otp-flow.tsx'),
     read('features/auth/form-controls.tsx'),
+    read('components/ui/input.tsx'),
   ]);
 
   for (const source of [flow]) {
@@ -61,23 +62,26 @@ test('email-code form exposes inline errors and focuses the first invalid field'
     assert.match(source, /aria-describedby/u);
   }
   assert.match(controls, /role="alert"/u);
-  assert.match(controls, /forwardRef<HTMLInputElement/u);
+  assert.match(input, /forwardRef<HTMLInputElement/u);
+  assert.doesNotMatch(flow, /PasswordInput|type="password"/u);
 });
 
-test('mobile fields prevent zoom and preserve accessible controls', async () => {
-  const [input, textarea, controls] = await Promise.all([
+test('mobile fields prevent zoom and keep OTP controls accessible', async () => {
+  const [input, textarea, flow] = await Promise.all([
     read('components/ui/input.tsx'),
     read('components/ui/textarea.tsx'),
-    read('features/auth/form-controls.tsx'),
+    read('features/auth/email-otp-flow.tsx'),
   ]);
 
   assert.match(input, /text-base[\s\S]*sm:text-sm/u);
   assert.match(textarea, /text-base[\s\S]*sm:text-sm/u);
   assert.match(input, /aria-invalid=\{invalid \|\| undefined\}/u);
   assert.match(textarea, /aria-invalid=\{invalid \|\| undefined\}/u);
-  assert.match(controls, /aria-pressed=\{visible\}/u);
-  assert.match(controls, /aria-label=\{visible/u);
-  assert.match(controls, /min-h-11 min-w-11/u);
+  assert.match(flow, /inputMode="numeric"/u);
+  assert.match(flow, /autoComplete="one-time-code"/u);
+  assert.match(flow, /pattern="\[0-9\]\{6\}"/u);
+  assert.match(flow, /className="min-h-11 w-full"/u);
+  assert.doesNotMatch(flow, /aria-pressed|показать пароль|скрыть пароль/iu);
 });
 
 test('login and registration enforce configured Turnstile at the OTP server boundary', async () => {
