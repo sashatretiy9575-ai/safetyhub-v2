@@ -339,36 +339,6 @@ export type Database = {
         }
         Relationships: []
       }
-      password_change_contexts: {
-        Row: {
-          consumed_at: string | null
-          created_at: string
-          expires_at: string
-          purpose: string
-          session_id: string | null
-          token_hash: string
-          user_id: string | null
-        }
-        Insert: {
-          consumed_at?: string | null
-          created_at?: string
-          expires_at: string
-          purpose: string
-          session_id?: string | null
-          token_hash: string
-          user_id?: string | null
-        }
-        Update: {
-          consumed_at?: string | null
-          created_at?: string
-          expires_at?: string
-          purpose?: string
-          session_id?: string | null
-          token_hash?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       profile_avatar_manifests: {
         Row: {
           byte_length: number
@@ -2518,15 +2488,6 @@ export type Database = {
         }
         Returns: Json
       }
-      claim_password_change_context: {
-        Args: {
-          p_context_kind: string
-          p_session_id: string
-          p_token_hash: string
-          p_user_id: string
-        }
-        Returns: boolean
-      }
       claim_profile_avatar_reconciliation: {
         Args: { p_limit?: number; p_worker_id: string }
         Returns: Json
@@ -2578,28 +2539,9 @@ export type Database = {
         Args: { p_action: string; p_ip_hash: string }
         Returns: Json
       }
-      consume_password_change_context: {
-        Args: {
-          p_context_kind: string
-          p_session_id: string
-          p_token_hash: string
-          p_user_id: string
-        }
-        Returns: string
-      }
       create_certificate_export_job: {
         Args: { p_attestation_ids: string[] }
         Returns: Json
-      }
-      create_password_change_context: {
-        Args: {
-          p_context_kind: string
-          p_expires_at: string
-          p_session_id: string
-          p_token_hash: string
-          p_user_id: string
-        }
-        Returns: undefined
       }
       delete_admin_learning_history: {
         Args: {
@@ -2621,10 +2563,6 @@ export type Database = {
           p_test_id: string
         }
         Returns: Json
-      }
-      delete_password_change_context: {
-        Args: { p_token_hash: string }
-        Returns: undefined
       }
       delete_verified_orphan_asset: {
         Args: { p_actor_id: string; p_asset_id: string }
@@ -2752,10 +2690,6 @@ export type Database = {
         Returns: Json
       }
       get_user_identity: { Args: { p_target_id?: string }; Returns: Json }
-      inspect_password_change_context: {
-        Args: { p_session_id: string; p_token_hash: string; p_user_id: string }
-        Returns: string
-      }
       issue_certificates: {
         Args: { p_attestation_ids: string[] }
         Returns: Json

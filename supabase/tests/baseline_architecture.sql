@@ -20,11 +20,19 @@ begin
   end if;
 
   if to_regclass('private.test_revision_answer_keys') is null
-    or to_regclass('private.password_change_contexts') is null
     or to_regclass('private.business_rate_limits') is null
     or to_regclass('private.coarse_ip_rate_limits') is null
     or to_regclass('private.auth_admin_outbox') is null then
     raise exception 'required private table missing';
+  end if;
+
+  if to_regclass('private.password_change_contexts') is not null
+    or to_regprocedure('public.create_password_change_context(text,uuid,text,uuid,timestamptz)') is not null
+    or to_regprocedure('public.claim_password_change_context(text,text,uuid,uuid)') is not null
+    or to_regprocedure('public.inspect_password_change_context(text,uuid,uuid)') is not null
+    or to_regprocedure('public.consume_password_change_context(text,text,uuid,uuid)') is not null
+    or to_regprocedure('public.delete_password_change_context(text)') is not null then
+    raise exception 'retired password context survived';
   end if;
 
   if to_regclass('public.attempt_items') is not null

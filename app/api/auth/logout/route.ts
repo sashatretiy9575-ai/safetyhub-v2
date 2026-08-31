@@ -1,6 +1,5 @@
 import type { NextRequest, NextResponse as FrameworkNextResponse } from 'next/server';
 import { NextResponse } from '@/lib/security/api-response';
-import { clearPasswordContextCookie } from '@/features/auth/password-change';
 import { isSameOriginRequest } from '@/features/auth/request-origin';
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -22,7 +21,16 @@ function clearLocalSession(
       maxAge: 0,
     });
   }
-  clearPasswordContextCookie(response);
+  // Versions before the passwordless cutover could leave this cookie behind.
+  // It no longer represents an active server-side context, but clear it so a
+  // shared-device logout remains compatible with those browser sessions.
+  response.cookies.set('safetyhub-password-context', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+  });
   // Quiz drafts are intentionally stored on-device. A shared-device logout
   // must remove them (and private HTTP/Cache Storage entries) before another
   // person uses the same browser profile.

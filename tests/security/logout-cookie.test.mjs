@@ -24,7 +24,8 @@ test('local logout is idempotent while global revocation reports Auth failure', 
   assert.match(route, /request\.cookies\.getAll\(\)/u);
   assert.match(route, /isSupabaseAuthCookieName\(cookie\.name\)/u);
   assert.match(route, /maxAge: 0/u);
-  assert.match(route, /clearPasswordContextCookie\(response\)/u);
+  assert.match(route, /safetyhub-password-context/u);
+  assert.doesNotMatch(route, /password-change/u);
   assert.match(route, /Clear-Site-Data/u);
   assert.match(menu, /window\.location\.replace\('\/auth\/login\?signedOut=1'\)/u);
   assert.match(menu, /role="alert"/u);

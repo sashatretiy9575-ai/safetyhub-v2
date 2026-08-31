@@ -771,11 +771,6 @@ export type Database = {
         Args: { p_object_name: string };
         Returns: boolean;
       };
-      create_password_change_context: JsonRpc;
-      claim_password_change_context: JsonRpc;
-      inspect_password_change_context: JsonRpc;
-      consume_password_change_context: JsonRpc;
-      delete_password_change_context: JsonRpc;
       prepare_user_invite: {
         Args: {
           p_email: string;

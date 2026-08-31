@@ -24,9 +24,7 @@ begin
     or has_function_privilege('anon', 'public.get_capacity_metrics()', 'EXECUTE')
     or has_function_privilege('authenticated', 'public.get_capacity_metrics()', 'EXECUTE')
     or has_function_privilege('authenticated',
-      'public.publish_legal_document_version(public.legal_document_type,text,text,timestamp with time zone)', 'EXECUTE')
-    or has_function_privilege('authenticated',
-      'public.consume_password_change_context(text,text,uuid,uuid)', 'EXECUTE') then
+      'public.publish_legal_document_version(public.legal_document_type,text,text,timestamp with time zone)', 'EXECUTE') then
     raise exception 'service-only function leaked to browser roles';
   end if;
 
@@ -34,9 +32,7 @@ begin
     or not has_function_privilege('service_role', 'public.begin_user_account_purge(uuid)', 'EXECUTE')
     or not has_function_privilege('service_role', 'public.get_capacity_metrics()', 'EXECUTE')
     or not has_function_privilege('service_role',
-      'public.publish_legal_document_version(public.legal_document_type,text,text,timestamp with time zone)', 'EXECUTE')
-    or not has_function_privilege('service_role',
-      'public.consume_password_change_context(text,text,uuid,uuid)', 'EXECUTE') then
+      'public.publish_legal_document_version(public.legal_document_type,text,text,timestamp with time zone)', 'EXECUTE') then
     raise exception 'service-only function lacks service_role grant';
   end if;
 
