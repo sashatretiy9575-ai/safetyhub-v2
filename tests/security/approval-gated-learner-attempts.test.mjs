@@ -88,3 +88,19 @@ test('SQL regression scenario distinguishes pending/rejected from approved', asy
   assert.match(sql, /sqlerrm = 'ACCOUNT_APPROVAL_REQUIRED'/);
   assert.match(sql, /sqlerrm = 'ATTEMPT_NOT_FOUND'/);
 });
+
+test('downstream attempt fixtures satisfy approval before testing later guards', async () => {
+  const [catalog, hardening] = await Promise.all([
+    read('supabase/tests/course_catalog_v3.sql'),
+    read('supabase/tests/security_hardening.sql'),
+  ]);
+
+  assert.match(
+    catalog,
+    /update public\.account_controls[\s\S]*?approval_state = 'approved'[\s\S]*?where user_id = v_participant_b;[\s\S]*?public\.start_test_attempt\('db-v3-behavior-fixture'\)/,
+  );
+  assert.match(
+    hardening,
+    /update public\.account_controls[\s\S]*?approval_state = 'approved'[\s\S]*?where user_id = v_user_id;[\s\S]*?public\.start_test_attempt\('quota-calendar-regression'\)/,
+  );
+});

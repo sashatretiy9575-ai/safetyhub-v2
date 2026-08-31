@@ -1084,7 +1084,18 @@ begin
 
   -- Eight new rows in the Asia/Oral calendar day are accepted. Each is
   -- submitted with 0/10 only to permit creation of the next one; every new
-  -- row still counts regardless of its result.
+  -- row still counts regardless of its result. Satisfy the learner-approval
+  -- prerequisite explicitly so this scenario continues to isolate the
+  -- downstream calendar-limit contract.
+  update public.account_controls
+  set approval_state = 'approved',
+      approval_requested_at = null,
+      approval_due_at = null,
+      approval_decided_at = null,
+      approval_decided_by = null,
+      approval_rejection_reason = null
+  where user_id = v_participant_b;
+
   perform set_config('request.jwt.claim.sub', v_participant_b::text, true);
   for v_index in 1..8 loop
     v_result := public.start_test_attempt('db-v3-behavior-fixture');

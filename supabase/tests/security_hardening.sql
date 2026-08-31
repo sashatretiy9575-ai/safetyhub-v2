@@ -797,6 +797,17 @@ begin
   where document.is_current
   on conflict do nothing;
 
+  -- This scenario validates the downstream calendar-limit envelope. Satisfy
+  -- the learner-approval prerequisite so it cannot mask that assertion.
+  update public.account_controls
+  set approval_state = 'approved',
+      approval_requested_at = null,
+      approval_due_at = null,
+      approval_decided_at = null,
+      approval_decided_by = null,
+      approval_rejection_reason = null
+  where user_id = v_user_id;
+
   insert into public.tests (
     id, slug, title, description, draft_content, duration_minutes,
     pass_score, status
