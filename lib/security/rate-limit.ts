@@ -8,6 +8,7 @@ export type AdminMutationQuotaAction =
   | 'admin.certificate.revoke'
   | 'admin.access.mutate'
   | 'admin.test.mutate'
+  | 'content.article.mutate'
   | 'site.settings.update';
 
 type QuotaAction =
@@ -76,10 +77,7 @@ export async function consumeBusinessQuota(action: BusinessQuotaAction, actorId:
   parseQuota(data);
 }
 
-export async function consumeAdminMutationQuota(
-  action: AdminMutationQuotaAction,
-  ipHash: string,
-) {
+export async function consumeAdminMutationQuota(action: AdminMutationQuotaAction, ipHash: string) {
   // Actor quotas are consumed atomically inside each authenticated mutation
   // RPC. The app layer independently limits a compromised actor/network before
   // entering the mutation, without double-counting successful operations.

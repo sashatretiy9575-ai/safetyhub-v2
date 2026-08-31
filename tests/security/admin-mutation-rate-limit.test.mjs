@@ -15,6 +15,7 @@ const guardedRoutes = new Map([
   ['app/api/admin/courses/[courseId]/presentation/upload-token/route.ts', 'admin.test.mutate'],
   ['app/api/admin/courses/[courseId]/presentation/finalize/route.ts', 'admin.test.mutate'],
   ['app/api/admin/courses/[courseId]/presentation/[presentationId]/route.ts', 'admin.test.mutate'],
+  ['app/api/admin/articles/initial-import/route.ts', 'content.article.mutate'],
   ['app/api/admin/users/[userId]/learning-history/route.ts', 'admin.test.mutate'],
   ['app/api/admin/attestations/actions/route.ts', 'admin.attestation.mutate'],
   ['app/api/admin/organizations/merge/route.ts', 'admin.attestation.mutate'],
@@ -49,10 +50,13 @@ test('every live privileged mutation applies same-origin and shared actor/IP quo
 });
 
 test('shared admin mutation limiter consumes the app-layer coarse-IP budget', async () => {
-  const [rateLimit, baseline] = await Promise.all([
+  const [rateLimit, baseline, securityHardening, emailOtpLimits] = await Promise.all([
     read('lib/security/rate-limit.ts'),
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
+    read('supabase/migrations/20260813020000_security_hardening.sql'),
+    read('supabase/migrations/20260831100000_email_otp_rate_limits.sql'),
   ]);
+  const quotaContracts = [baseline, securityHardening, emailOtpLimits].join('\n');
   assert.match(rateLimit, /export async function consumeAdminMutationQuota/);
   assert.match(rateLimit, /await consumeCoarseQuota\(action, ipHash\)/);
   assert.match(
@@ -60,7 +64,7 @@ test('shared admin mutation limiter consumes the app-layer coarse-IP budget', as
     /Actor quotas are consumed atomically inside each authenticated mutation/u,
   );
   for (const action of new Set(guardedRoutes.values())) {
-    assert.match(baseline, new RegExp(`when '${action.replaceAll('.', '\\.')}' then`));
+    assert.match(quotaContracts, new RegExp(`when '${action.replaceAll('.', '\\.')}' then`));
   }
 });
 
