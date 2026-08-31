@@ -2,11 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  Buildings,
-  CaretDown,
-} from '@phosphor-icons/react/dist/ssr';
+import { ArrowRight, Buildings, CaretDown } from '@phosphor-icons/react/dist/ssr';
 import { AuthenticationError, requireUser } from '@/features/auth/server';
 import { ProfileForm } from '@/features/auth/profile-form';
 import { AccountDeletion } from '@/features/profile/account-deletion';
@@ -44,8 +40,10 @@ function certificateVariant(state: ProfileAttestation['certificateState']): Badg
 }
 
 function resultLabel(item: ProfileAttestation) {
-  if (item.resultState === 'passed') return item.score === null ? 'Сдан' : `${item.score}/${item.total}`;
-  if (item.resultState === 'failed') return item.score === null ? 'Не сдан' : `${item.score}/${item.total}`;
+  if (item.resultState === 'passed')
+    return item.score === null ? 'Сдан' : `${item.score}/${item.total}`;
+  if (item.resultState === 'failed')
+    return item.score === null ? 'Не сдан' : `${item.score}/${item.total}`;
   return 'Не начат';
 }
 
@@ -62,7 +60,13 @@ function approvalStatus(state: 'profile_incomplete' | 'pending' | 'approved' | '
   return { label: 'Заполните профиль', variant: 'warning' as const };
 }
 
-function NextStep({ rows, needsProfileAction }: { rows: ProfileAttestation[]; needsProfileAction: boolean }) {
+function NextStep({
+  rows,
+  needsProfileAction,
+}: {
+  rows: ProfileAttestation[];
+  needsProfileAction: boolean;
+}) {
   const current = rows.filter((item) => item.isCurrent);
   const waiting = current.find(
     (item) =>
@@ -89,14 +93,26 @@ function NextStep({ rows, needsProfileAction }: { rows: ProfileAttestation[]; ne
             <div className="rounded-xl bg-[var(--color-accent-amber-soft)] p-3 text-sm">
               <strong>Нужно действие:</strong> проверьте название компании в профиле.
               <div className="mt-3">
-                <Button asChild size="sm"><a href="#my-data">Исправить данные</a></Button>
+                <Button asChild size="sm">
+                  <a href="#my-data">Исправить данные</a>
+                </Button>
               </div>
             </div>
           ) : (
             <div className="space-y-1 text-sm text-[var(--color-text-muted)]">
-              <p><strong className="text-[var(--color-text)]">Сейчас:</strong> данные ожидают проверки администратора.</p>
-              <p><strong className="text-[var(--color-text)]">Дальше:</strong> после проверки здесь станет доступен сертификат PDF.</p>
-              <p><strong className="text-[var(--color-text)]">От вас сейчас ничего не требуется.</strong></p>
+              <p>
+                <strong className="text-[var(--color-text)]">Сейчас:</strong> данные ожидают
+                проверки администратора.
+              </p>
+              <p>
+                <strong className="text-[var(--color-text)]">Дальше:</strong> после проверки здесь
+                станет доступен сертификат PDF.
+              </p>
+              <p>
+                <strong className="text-[var(--color-text)]">
+                  От вас сейчас ничего не требуется.
+                </strong>
+              </p>
             </div>
           )}
         </CardContent>
@@ -110,10 +126,16 @@ function NextStep({ rows, needsProfileAction }: { rows: ProfileAttestation[]; ne
         <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
           <div>
             <p className="text-sm text-[var(--color-text-muted)]">Следующий шаг</p>
-            <h2 className="font-display text-lg font-bold">Повторить курс «{failed.courseTitle}»</h2>
-            <p className="text-sm">Результат: {failed.score}/{failed.total}</p>
+            <h2 className="font-display text-lg font-bold">
+              Повторить курс «{failed.courseTitle}»
+            </h2>
+            <p className="text-sm">
+              Результат: {failed.score}/{failed.total}
+            </p>
           </div>
-          <Button asChild size="sm"><Link href={`/topics/${failed.testSlug}`}>К курсу</Link></Button>
+          <Button asChild size="sm">
+            <Link href={`/topics/${failed.testSlug}`}>К курсу</Link>
+          </Button>
         </CardContent>
       </Card>
     );
@@ -143,24 +165,27 @@ function CourseRow({ item }: { item: ProfileAttestation }) {
     <article className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-3 py-3 first:border-t-0 min-[760px]:min-h-[68px] min-[760px]:grid-cols-[minmax(0,2fr)_7rem_10rem_8rem] min-[760px]:items-center min-[760px]:px-4">
       <div className="min-w-0">
         <h3 className="font-semibold break-words">{item.courseTitle}</h3>
-        {!item.isCurrent ? <p className="text-xs text-[var(--color-text-muted)]">Архивная версия</p> : null}
+        {!item.isCurrent ? (
+          <p className="text-xs text-[var(--color-text-muted)]">Архивная версия</p>
+        ) : null}
       </div>
       <div className="flex items-center justify-between gap-2 min-[760px]:block">
-        <span className="text-xs text-[var(--color-text-muted)] min-[760px]:sr-only">Результат</span>
+        <span className="text-xs text-[var(--color-text-muted)] min-[760px]:sr-only">
+          Результат
+        </span>
         <Badge variant={resultVariant(item.resultState)}>{resultLabel(item)}</Badge>
       </div>
       <div className="flex items-center justify-between gap-2 min-[760px]:block">
-        <span className="text-xs text-[var(--color-text-muted)] min-[760px]:sr-only">Сертификат</span>
+        <span className="text-xs text-[var(--color-text-muted)] min-[760px]:sr-only">
+          Сертификат
+        </span>
         <Badge variant={certificateVariant(item.certificateState)}>
           {certificateLabel(item.certificateState)}
         </Badge>
       </div>
       <div>
         {item.certificateState === 'issued' && item.certificateId ? (
-          <CertificateDownloadButton
-            certificateId={item.certificateId}
-            className="w-full"
-          >
+          <CertificateDownloadButton certificateId={item.certificateId} className="w-full">
             Скачать
           </CertificateDownloadButton>
         ) : (
@@ -186,37 +211,52 @@ function LearningDashboard({
 }) {
   if (!rows) {
     return (
-      <DataLoadFailure
-        correlationId={failureId ?? 'profile-dashboard'}
-        message="Результаты обучения временно не загрузились. Настройки аккаунта продолжают работать."
-      />
+      <div data-learning-dashboard data-state="failed">
+        <DataLoadFailure
+          correlationId={failureId ?? 'profile-dashboard'}
+          message="Результаты обучения временно не загрузились. Настройки аккаунта продолжают работать."
+        />
+      </div>
     );
   }
   const current = rows.filter((item) => item.isCurrent);
   const passed = current.filter((item) => item.resultState === 'passed').length;
-  const issued = rows.filter((item) => item.certificateState === 'issued' && item.certificateId).length;
+  const issued = rows.filter(
+    (item) => item.certificateState === 'issued' && item.certificateId,
+  ).length;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" data-learning-dashboard data-state="ready">
       <NextStep rows={rows} needsProfileAction={needsProfileAction} />
       <section aria-labelledby="my-courses-title" className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 id="my-courses-title" className="font-display text-xl font-bold">Мои курсы</h2>
+            <h2 id="my-courses-title" className="font-display text-xl font-bold">
+              Мои курсы
+            </h2>
             <p className="mt-1 text-sm font-semibold text-[var(--color-text-muted)]">
               Сдано {passed} из {current.length} · Сертификатов {issued}
             </p>
           </div>
           <Button asChild size="sm" variant="outline">
-            <Link href="/topics">Все курсы <ArrowRight /></Link>
+            <Link href="/topics">
+              Все курсы <ArrowRight />
+            </Link>
           </Button>
         </div>
         <div className="overflow-hidden rounded-2xl border bg-[var(--color-surface)]">
           <div className="hidden min-h-11 grid-cols-[minmax(0,2fr)_7rem_10rem_8rem] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] min-[760px]:grid">
-            <span>Курс</span><span>Результат</span><span>Сертификат</span><span>Действие</span>
+            <span>Курс</span>
+            <span>Результат</span>
+            <span>Сертификат</span>
+            <span>Действие</span>
           </div>
-          {rows.length ? rows.map((item) => <CourseRow key={item.attestationId} item={item} />) : (
-            <p className="p-6 text-center text-sm text-[var(--color-text-muted)]">Курсы пока не опубликованы.</p>
+          {rows.length ? (
+            rows.map((item) => <CourseRow key={item.attestationId} item={item} />)
+          ) : (
+            <p className="p-6 text-center text-sm text-[var(--color-text-muted)]">
+              Курсы пока не опубликованы.
+            </p>
           )}
         </div>
       </section>
@@ -230,7 +270,8 @@ export default async function ProfilePage() {
     context = await requireUser({ enforceLegal: false });
   } catch (error) {
     if (error instanceof AuthenticationError && error.status === 401) redirect('/auth/login');
-    if (error instanceof AuthenticationError && error.code === 'ACCOUNT_SUSPENDED') redirect('/auth/login');
+    if (error instanceof AuthenticationError && error.code === 'ACCOUNT_SUSPENDED')
+      redirect('/auth/login');
     throw error;
   }
 
@@ -238,7 +279,9 @@ export default async function ProfilePage() {
 
   const [dashboardResult, avatarUrl, contacts] = await Promise.all([
     getProfileDashboard(),
-    context.profile.avatar_updated_at ? getProfileAvatarUrl(context.user.id) : Promise.resolve(null),
+    context.profile.avatar_updated_at
+      ? getProfileAvatarUrl(context.user.id)
+      : Promise.resolve(null),
     getSiteContacts(),
   ]);
   const dashboard = dashboardResult.state === 'ready' ? dashboardResult.data : null;
@@ -254,7 +297,11 @@ export default async function ProfilePage() {
     updatedAt: context.profile.updated_at,
   };
   const fullName = `${profile.name} ${profile.surname}`.trim() || 'Пользователь';
-  const initials = fullName.split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('');
+  const initials = fullName
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
   const approval = approvalStatus(context.approval.state);
   const canAccessLearning = context.approval.state === 'approved';
 
@@ -291,7 +338,9 @@ export default async function ProfilePage() {
         {canAccessLearning ? (
           <LearningDashboard
             rows={dashboard?.attestations ?? null}
-            failureId={dashboardResult.state === 'failed' ? dashboardResult.correlationId : undefined}
+            failureId={
+              dashboardResult.state === 'failed' ? dashboardResult.correlationId : undefined
+            }
             needsProfileAction={!profile.organization || !context.profile.phone_e164}
           />
         ) : null}
@@ -312,13 +361,23 @@ export default async function ProfilePage() {
                 </span>
               </summary>
               <div className="grid gap-5 border-t p-4 sm:grid-cols-[auto_minmax(0,1fr)] md:p-6">
-                <AvatarUploader initialUrl={avatarUrl} initials={initials || 'SH'} required compact />
+                <AvatarUploader
+                  initialUrl={avatarUrl}
+                  initials={initials || 'SH'}
+                  required
+                  compact
+                />
                 <div className="min-w-0 space-y-4">
                   <div>
                     <h2 className="font-display text-xl font-bold break-words">{fullName}</h2>
-                    <p className="text-sm text-[var(--color-text-muted)]">{profile.job || 'Должность не указана'}</p>
+                    <p className="text-sm text-[var(--color-text-muted)]">
+                      {profile.job || 'Должность не указана'}
+                    </p>
                     <p className="mt-1 flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
-                      <Buildings /><span className="break-words">{profile.organization || 'Компания не указана'}</span>
+                      <Buildings />
+                      <span className="break-words">
+                        {profile.organization || 'Компания не указана'}
+                      </span>
                     </p>
                   </div>
                   <ProfileForm
@@ -335,7 +394,9 @@ export default async function ProfilePage() {
                   />
                   <div className="flex flex-wrap gap-2">
                     {!profile.onboardingCompletedAt ? (
-                      <Button asChild size="sm"><Link href="/onboarding">Завершить профиль</Link></Button>
+                      <Button asChild size="sm">
+                        <Link href="/onboarding">Завершить профиль</Link>
+                      </Button>
                     ) : null}
                   </div>
                 </div>
@@ -353,7 +414,8 @@ export default async function ProfilePage() {
               </summary>
               <div className="space-y-4 border-t p-4 md:p-6">
                 <p className="text-sm text-[var(--color-text-muted)]">
-                  Вход выполняется одноразовым кодом, который приходит на email. Пароль не используется.
+                  Вход выполняется одноразовым кодом, который приходит на email. Пароль не
+                  используется.
                 </p>
                 <PwaManualInstall />
                 <AccountDeletion />

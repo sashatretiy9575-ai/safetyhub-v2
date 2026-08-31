@@ -284,12 +284,30 @@ test.describe('authenticated operator and participant workspaces', () => {
       test.setTimeout(120_000);
       await assertAuthenticatedLanding(page, 'profile');
       await page.goto('/profile', { waitUntil: 'domcontentloaded' });
+      const learningDashboard = page.locator('[data-learning-dashboard]');
       for (const viewport of viewportMatrix) {
         await page.setViewportSize(viewport);
-        await expect(page.getByText('Следующий шаг', { exact: true })).toBeVisible();
-        await expect(page.getByText(/Сдано \d+ из \d+ · Сертификатов \d+/u)).toBeVisible();
-        await expect(page.getByText(/attempt|попыток|revision|UUID/iu)).toHaveCount(0);
-        await expect(page.getByText('Мои данные')).toBeVisible();
+        const viewportLabel = `${viewport.width}x${viewport.height}`;
+        await expect(
+          learningDashboard,
+          `participant learning dashboard must be ready at ${viewportLabel}`,
+        ).toHaveAttribute('data-state', 'ready');
+        await expect(
+          learningDashboard.getByText('Следующий шаг', { exact: true }),
+          `participant next action must be visible at ${viewportLabel}`,
+        ).toBeVisible();
+        await expect(
+          learningDashboard.getByText(/Сдано \d+ из \d+ · Сертификатов \d+/u),
+          `participant course summary must be visible at ${viewportLabel}`,
+        ).toBeVisible();
+        await expect(
+          learningDashboard.getByText(/attempt|попыток|revision|UUID/iu),
+          `participant learning dashboard must hide technical attempt state at ${viewportLabel}`,
+        ).toHaveCount(0);
+        await expect(
+          page.getByText('Мои данные'),
+          `participant profile editor must be visible at ${viewportLabel}`,
+        ).toBeVisible();
         await expectNoPageOverflow(page, `participant ${viewport.width}x${viewport.height}`);
         await captureViewport(page, testInfo, 'participant-profile', viewport);
       }

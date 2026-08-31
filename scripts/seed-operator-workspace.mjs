@@ -175,7 +175,7 @@ must(
 // so this disposable fixture must approve those identities explicitly before
 // the learner dashboard is tested.
 const authenticatedE2eUsers = users.slice(0, 2);
-must(
+const approvedE2eControls = must(
   'approve authenticated E2E identities',
   await supabase
     .from('account_controls')
@@ -190,8 +190,17 @@ must(
     .in(
       'user_id',
       authenticatedE2eUsers.map((user) => user.id),
-    ),
+    )
+    .select('user_id,approval_state'),
 );
+const approvedE2eUserIds = new Set(approvedE2eControls.map((control) => control.user_id));
+if (
+  approvedE2eControls.length !== authenticatedE2eUsers.length ||
+  approvedE2eControls.some((control) => control.approval_state !== 'approved') ||
+  authenticatedE2eUsers.some((user) => !approvedE2eUserIds.has(user.id))
+) {
+  throw new Error('Authenticated E2E identities were not approved deterministically.');
+}
 
 const currentLegalDocuments = must(
   'read current legal documents',

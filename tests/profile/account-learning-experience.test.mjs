@@ -52,6 +52,8 @@ test('profile uses one dashboard contract and keeps attempt analytics hidden', a
   assert.match(profile, /Скачать/);
   assert.match(profile, /compact/);
   assert.match(profile, /Мои данные/);
+  assert.match(profile, /data-learning-dashboard data-state="ready"/);
+  assert.match(profile, /data-learning-dashboard data-state="failed"/);
   assert.doesNotMatch(profile, /Лучшие результаты|Ваше обучение|Данные для сертификата/);
   assert.match(server, /getProfileDashboard/);
   assert.match(server, /rpc\('get_profile_dashboard'\)/);

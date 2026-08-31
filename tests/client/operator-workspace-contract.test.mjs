@@ -110,6 +110,8 @@ test('workspace seed provides at least one hundred participants and authenticate
     seed,
     /from\('account_controls'\)[\s\S]*?approval_state: 'approved'[\s\S]*?authenticatedE2eUsers\.map\(\(user\) => user\.id\)/,
   );
+  assert.match(seed, /\.select\('user_id,approval_state'\)/);
+  assert.match(seed, /approvedE2eControls\.length !== authenticatedE2eUsers\.length/);
   assert.match(seed, /current_revision_id/);
   assert.match(seed, /variants:test_revision_variants\(id,variant_number,question_count\)/);
   for (const frozenAttemptField of [
@@ -160,6 +162,9 @@ test('workspace seed provides at least one hundred participants and authenticate
   assert.match(e2e, /font-size: 200%/);
   assert.match(e2e, /forcedColors: 'active'/);
   assert.match(e2e, /toBeFocused\(\)/);
+  assert.match(e2e, /const learningDashboard = page\.locator\('\[data-learning-dashboard\]'\)/);
+  assert.match(e2e, /learningDashboard\.getByText\(\/attempt\|попыток\|revision\|UUID\/iu\)/);
+  assert.doesNotMatch(e2e, /page\.getByText\(\/attempt\|попыток\|revision\|UUID\/iu\)/);
   assert.match(packageJson, /"seed:workspace"/);
   assert.match(packageJson, /"test:e2e:auth"/);
 });
