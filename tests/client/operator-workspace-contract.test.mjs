@@ -165,6 +165,8 @@ test('workspace seed provides at least one hundred participants and authenticate
   assert.match(e2e, /const learningDashboard = page\.locator\('\[data-learning-dashboard\]'\)/);
   assert.match(e2e, /learningDashboard\.getByText\(\/attempt\|попыток\|revision\|UUID\/iu\)/);
   assert.doesNotMatch(e2e, /page\.getByText\(\/attempt\|попыток\|revision\|UUID\/iu\)/);
+  assert.match(e2e, /page\.locator\('#my-data'\)/);
+  assert.doesNotMatch(e2e, /page\.getByText\('Мои данные'\)/);
   assert.match(packageJson, /"seed:workspace"/);
   assert.match(packageJson, /"test:e2e:auth"/);
 });

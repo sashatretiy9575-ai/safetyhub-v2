@@ -305,7 +305,7 @@ test.describe('authenticated operator and participant workspaces', () => {
           `participant learning dashboard must hide technical attempt state at ${viewportLabel}`,
         ).toHaveCount(0);
         await expect(
-          page.getByText('Мои данные'),
+          page.locator('#my-data'),
           `participant profile editor must be visible at ${viewportLabel}`,
         ).toBeVisible();
         await expectNoPageOverflow(page, `participant ${viewport.width}x${viewport.height}`);
