@@ -21,6 +21,7 @@
     "test:load": "node scripts/load-test-supabase.mjs",
     "seed:workspace": "node --env-file-if-exists=.env.local scripts/seed-operator-workspace.mjs",
     "admin:bootstrap": "node --env-file-if-exists=.env.local scripts/bootstrap-passwordless-admin.mjs",
+    "auth:config:prepare:production": "node scripts/prepare-production-auth-config.mjs",
     "test:e2e:install": "playwright install chromium",
     "check:contacts": "node scripts/check-contact-literals.mjs",
     "check:security": "node scripts/check-security-baseline.mjs",
