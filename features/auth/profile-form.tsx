@@ -16,13 +16,20 @@ import { PhoneInput } from '@/features/profile/phone-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import type { PhoneCountryOption } from '@/lib/phone';
 
 type OrganizationResponse = { organizations?: string[] };
 type UpdateResponse = {
   approvalState?: unknown;
 };
 
-export function ProfileForm({ initial }: { initial: ProfileSubmissionValues }) {
+export function ProfileForm({
+  initial,
+  countryOptions,
+}: {
+  initial: ProfileSubmissionValues;
+  countryOptions: readonly PhoneCountryOption[];
+}) {
   const router = useRouter();
   const [form, setForm] = useState(initial);
   const [savedProfile, setSavedProfile] = useState(initial);
@@ -188,6 +195,7 @@ export function ProfileForm({ initial }: { initial: ProfileSubmissionValues }) {
             <Label htmlFor="profile-phone">Номер телефона</Label>
             <PhoneInput
               id="profile-phone"
+              countryOptions={countryOptions}
               value={form.phone}
               onChange={(phone) => {
                 setForm((current) => ({ ...current, phone }));

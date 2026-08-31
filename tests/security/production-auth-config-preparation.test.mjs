@@ -10,6 +10,7 @@ import {
   expectedProductionConfigurationSha256,
   expectedSourceConfigurationSha256,
   expectedTemplateSha256,
+  localSupabaseCliPath,
   prepareProductionAuthConfig,
   productionSiteUrl,
   repositoryRoot,
@@ -74,7 +75,12 @@ test('production Auth config preparation is isolated, exact, and does not push',
       const actualTemplate = await readFile(path.join(prepared.temporaryRoot, relativePath));
       assert.equal(createHash('sha256').update(actualTemplate).digest('hex'), expectedHash);
     }
-    assert.match(prepared.nextCommand, /^npx --no-install supabase config push --workdir /u);
+    assert.match(prepared.nextCommand, /^Push-Location /u);
+    assert.match(prepared.nextCommand, /; try \{ & /u);
+    assert.equal(prepared.nextCommand.includes(localSupabaseCliPath), true);
+    assert.match(prepared.nextCommand, / config push --project-ref /u);
+    assert.match(prepared.nextCommand, /\} finally \{ Pop-Location \}$/u);
+    assert.doesNotMatch(prepared.nextCommand, /--workdir|\bnpx\b/u);
     assert.match(prepared.nextCommand, /REPLACE_WITH_NEW_PROJECT_REF/u);
     assert.doesNotMatch(prepared.nextCommand, /(?:password|secret|token|key)=/iu);
   } finally {
@@ -120,6 +126,9 @@ test('the tool refuses to create its temporary workdir inside the repository', a
 
 test('the printed command has a harmless explicit project-ref placeholder', () => {
   const command = safeConfigPushCommand(path.resolve('C:/safe-temporary-workdir'));
-  assert.match(command, /--project-ref 'REPLACE_WITH_NEW_PROJECT_REF'$/u);
+  assert.match(command, /--project-ref 'REPLACE_WITH_NEW_PROJECT_REF' \} finally/u);
+  assert.equal(path.isAbsolute(localSupabaseCliPath), true);
+  assert.equal(command.indexOf('Push-Location'), 0);
+  assert.equal(command.indexOf(localSupabaseCliPath) > command.indexOf('try {'), true);
   assert.doesNotMatch(command, /SUPABASE_|NEXT_PUBLIC_|process\.env/u);
 });

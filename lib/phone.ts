@@ -12,6 +12,13 @@ export type PhoneInputValue = Readonly<{
   nationalNumber: string;
 }>;
 
+export type PhoneCountryOption = Readonly<{
+  countryIso2: CountryCode;
+  flag: string;
+  label: string;
+  callingCode: string;
+}>;
+
 export function isPhoneCountryCode(value: string): value is CountryCode {
   return (getCountries() as readonly string[]).includes(value);
 }
@@ -34,6 +41,20 @@ export function phoneCountries(locale = 'ru'): CountryCode[] {
     .filter((country) => !priority.includes(country as (typeof priority)[number]))
     .sort((left, right) => countryLabel(left, locale).localeCompare(countryLabel(right, locale), locale));
   return [...priority, ...rest];
+}
+
+/**
+ * Build display labels on the server and serialize them into client forms.
+ * Browser and Node ICU data can use different region names for the same ISO
+ * code, so recomputing these labels during hydration is not deterministic.
+ */
+export function phoneCountryOptions(locale = 'ru'): PhoneCountryOption[] {
+  return phoneCountries(locale).map((countryIso2) => ({
+    countryIso2,
+    flag: countryFlag(countryIso2),
+    label: countryLabel(countryIso2, locale),
+    callingCode: phoneCallingCode(countryIso2),
+  }));
 }
 
 export function phoneCallingCode(country: CountryCode) {

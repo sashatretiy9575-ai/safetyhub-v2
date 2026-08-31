@@ -7,7 +7,7 @@ import { ProfileForm } from '@/features/auth/profile-form';
 import { requireRole } from '@/features/auth/server';
 import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
 import { Card, CardContent } from '@/components/ui/card';
-import { phoneInputValueFromE164 } from '@/lib/phone';
+import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
 
 export default async function AdminAccountPage() {
   const actor = await requireRole(['admin']);
@@ -44,6 +44,7 @@ export default async function AdminAccountPage() {
               </p>
             </div>
             <ProfileForm
+              countryOptions={phoneCountryOptions()}
               initial={{
                 name: actor.profile.name,
                 surname: actor.profile.surname,

@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { AuthenticationError, requireUser } from '@/features/auth/server';
 import { OnboardingForm } from '@/features/profile/onboarding-form';
 import { getProfileAvatarUrl } from '@/features/profile/server';
-import { phoneInputValueFromE164 } from '@/lib/phone';
+import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 
@@ -46,6 +46,7 @@ export default async function OnboardingPage() {
           <Card>
             <CardContent className="p-4 sm:p-6 md:p-8">
               <OnboardingForm
+                countryOptions={phoneCountryOptions()}
                 initial={{
                   name: profile.name,
                   surname: profile.surname,

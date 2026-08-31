@@ -17,6 +17,7 @@ import {
   type ProfileSubmissionField,
   type ProfileSubmissionValues as OnboardingProfileValues,
 } from '@/features/profile/fields';
+import type { PhoneCountryOption } from '@/lib/phone';
 
 type FieldErrors = Partial<Record<ProfileSubmissionField | 'avatar', string>>;
 
@@ -31,9 +32,11 @@ type ErrorResponse = {
 export function OnboardingForm({
   initial,
   initialAvatarUrl,
+  countryOptions,
 }: {
   initial: OnboardingProfileValues;
   initialAvatarUrl: string | null;
+  countryOptions: readonly PhoneCountryOption[];
 }) {
   const router = useRouter();
   const [form, setForm] = useState(initial);
@@ -242,6 +245,7 @@ export function OnboardingForm({
           <Label htmlFor="onboarding-phone">Номер телефона</Label>
           <PhoneInput
             id="onboarding-phone"
+            countryOptions={countryOptions}
             value={form.phone}
             onChange={(phone) => {
               setForm((current) => ({ ...current, phone }));

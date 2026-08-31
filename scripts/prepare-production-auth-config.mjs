@@ -19,6 +19,13 @@ const scriptFile = fileURLToPath(import.meta.url);
 export const repositoryRoot = path.resolve(path.dirname(scriptFile), '..');
 export const productionSiteUrl = 'https://safetyhub.kz';
 export const temporaryDirectoryPrefix = 'safetyhub-production-auth-config-';
+export const localSupabaseCliPath = path.join(
+  repositoryRoot,
+  'node_modules',
+  'supabase',
+  'dist',
+  'supabase.js',
+);
 
 const configurationRelativePath = path.join('supabase', 'config.toml');
 const templateRelativePaths = Object.freeze([
@@ -160,9 +167,11 @@ function quotePowerShell(value) {
 export function safeConfigPushCommand(temporaryRoot) {
   if (!path.isAbsolute(temporaryRoot)) fail('TEMPORARY_DIRECTORY_MUST_BE_ABSOLUTE');
   return [
-    'npx --no-install supabase config push',
-    `--workdir ${quotePowerShell(temporaryRoot)}`,
-    "--project-ref 'REPLACE_WITH_NEW_PROJECT_REF'",
+    `Push-Location ${quotePowerShell(temporaryRoot)};`,
+    'try {',
+    `& ${quotePowerShell(process.execPath)} ${quotePowerShell(localSupabaseCliPath)}`,
+    "config push --project-ref 'REPLACE_WITH_NEW_PROJECT_REF'",
+    '} finally { Pop-Location }',
   ].join(' ');
 }
 

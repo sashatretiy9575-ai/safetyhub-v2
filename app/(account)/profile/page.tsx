@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { DataLoadFailure } from '@/components/shared/data-load-failure';
 import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
 import { CertificateDownloadButton } from '@/features/certificates/download-button';
-import { phoneInputValueFromE164 } from '@/lib/phone';
+import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
 import { getSiteContacts } from '@/lib/site-contacts';
 
 function certificateLabel(state: ProfileAttestation['certificateState']) {
@@ -381,6 +381,7 @@ export default async function ProfilePage() {
                     </p>
                   </div>
                   <ProfileForm
+                    countryOptions={phoneCountryOptions()}
                     initial={{
                       name: profile.name,
                       surname: profile.surname,

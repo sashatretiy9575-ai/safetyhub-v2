@@ -31,7 +31,8 @@ export async function POST(request: Request) {
       p_terms_version: TERMS_POLICY.version,
       p_terms_body_revision: TERMS_POLICY.bodyRevision,
     });
-    return NextResponse.json(unwrapRpcMutationResponse(response));
+    const acceptances = unwrapRpcMutationResponse(response);
+    return NextResponse.json({ acceptances });
   } catch (error) {
     return apiError(error);
   }

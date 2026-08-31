@@ -139,6 +139,10 @@ test('profile reads immutable acceptance history and records consent through a s
   assert.match(legalRoute, /accept_current_legal_documents/);
   assert.match(legalRoute, /p_privacy_body_revision:\s*PRIVACY_POLICY\.bodyRevision/);
   assert.match(legalRoute, /p_terms_body_revision:\s*TERMS_POLICY\.bodyRevision/);
+  assert.match(
+    legalRoute,
+    /const acceptances = unwrapRpcMutationResponse\(response\);[\s\S]*NextResponse\.json\(\{ acceptances \}\)/u,
+  );
   assert.match(panel, /type="checkbox"/);
   assert.match(panel, /Открыть принятую версию/);
   assert.match(panel, /legalDocumentHref\(acceptance\.document_type, acceptance\.version\)/);

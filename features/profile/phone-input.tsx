@@ -3,10 +3,8 @@
 import { AsYouType, type CountryCode } from 'libphonenumber-js/min';
 import { Input } from '@/components/ui/input';
 import {
-  countryFlag,
-  countryLabel,
   phoneCallingCode,
-  phoneCountries,
+  type PhoneCountryOption,
   type PhoneInputValue,
 } from '@/lib/phone';
 
@@ -19,6 +17,7 @@ export function PhoneInput({
   invalid,
   describedBy,
   disabled = false,
+  countryOptions,
 }: {
   id: string;
   value: PhoneFieldValue;
@@ -26,8 +25,8 @@ export function PhoneInput({
   invalid?: boolean;
   describedBy?: string;
   disabled?: boolean;
+  countryOptions: readonly PhoneCountryOption[];
 }) {
-  const countries = phoneCountries();
   const formatNationalNumber = (country: CountryCode, next: string) =>
     new AsYouType(country).input(next.replace(/[^\d+]/gu, ''));
 
@@ -49,9 +48,9 @@ export function PhoneInput({
         }}
         className="flex min-h-11 w-full rounded-[var(--radius-control)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 text-base text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
       >
-        {countries.map((country) => (
-          <option key={country} value={country}>
-            {countryFlag(country)} {countryLabel(country)} ({phoneCallingCode(country)})
+        {countryOptions.map((option) => (
+          <option key={option.countryIso2} value={option.countryIso2}>
+            {option.flag} {option.label} ({option.callingCode})
           </option>
         ))}
       </select>
