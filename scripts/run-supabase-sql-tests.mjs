@@ -23,6 +23,7 @@ if (testFiles.length === 0) {
 }
 
 const databaseContainer = `supabase_db_${projectId}`;
+const failures = [];
 
 for (const testFile of testFiles) {
   console.log(`Running ${testFile}`);
@@ -59,12 +60,20 @@ for (const testFile of testFiles) {
 
   if (result.error) {
     console.error(`Unable to run Docker for ${testFile}: ${result.error.message}`);
-    process.exit(1);
+    failures.push(testFile);
+    break;
   }
 
   if (result.status !== 0) {
-    process.exit(result.status ?? 1);
+    failures.push(testFile);
   }
+}
+
+if (failures.length > 0) {
+  console.error(
+    `Supabase SQL regression tests failed (${failures.length}/${testFiles.length}): ${failures.join(', ')}`,
+  );
+  process.exit(1);
 }
 
 console.log(`Supabase SQL regression tests passed (${testFiles.length}/${testFiles.length}).`);

@@ -175,7 +175,9 @@ begin
   if not has_column_privilege('anon', 'public.tests', 'id', 'select')
     or has_column_privilege('anon', 'public.tests', 'title', 'select')
     or has_column_privilege('anon', 'public.tests', 'draft_content', 'select')
-    or not has_column_privilege('anon', 'public.test_revisions', 'content', 'select')
+    or not has_column_privilege('anon', 'public.test_revisions', 'title', 'select')
+    or has_column_privilege('anon', 'public.test_revisions', 'content', 'select')
+    or has_column_privilege('anon', 'public.test_revisions', 'questions', 'select')
     or has_column_privilege('anon', 'public.test_revisions', 'published_by', 'select') then
     raise exception 'public course revision projection is unsafe';
   end if;
