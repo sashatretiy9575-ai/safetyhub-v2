@@ -65,7 +65,10 @@ async function main() {
     auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
   });
   const user = await findExactlyOneUser(client, email);
-  const { data, error } = await client.rpc('restore_admin_access', { p_user_id: user.id });
+  const { data, error } = await client.rpc('bootstrap_email_otp_admin', { p_user_id: user.id });
+  if (error?.message === 'LEGAL_ACCEPTANCE_REQUIRED') {
+    throw new Error('BOOTSTRAP_ADMIN_LEGAL_ACCEPTANCE_REQUIRED');
+  }
   if (error || data !== user.id) throw new Error('BOOTSTRAP_ADMIN_ROLE_GRANT_FAILED');
 
   // Do not echo the email or service configuration into terminal history/logs.

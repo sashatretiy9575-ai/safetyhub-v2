@@ -32,6 +32,10 @@ begin
     raise exception 'Supabase Auth cannot execute the email OTP token hook';
   end if;
 
+  if not has_schema_privilege('supabase_auth_admin', 'public', 'USAGE') then
+    raise exception 'Supabase Auth cannot resolve the email OTP token hook schema';
+  end if;
+
   foreach v_method in array array['email/signup', 'otp', 'magiclink', 'token_refresh'] loop
     select public.enforce_email_otp_access_token(
       jsonb_build_object(

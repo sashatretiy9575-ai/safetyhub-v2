@@ -5,8 +5,9 @@ import test from 'node:test';
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 
 test('provider-level Auth hook permits only email-code session issuance', async () => {
-  const [migration, sqlContract] = await Promise.all([
+  const [migration, schemaUsageMigration, sqlContract] = await Promise.all([
     read('supabase/migrations/20260831115000_passwordless_auth_provider_guard.sql'),
+    read('supabase/migrations/20260831120000_auth_hook_public_schema_usage.sql'),
     read('supabase/tests/passwordless_provider_guard.sql'),
   ]);
 
@@ -24,6 +25,10 @@ test('provider-level Auth hook permits only email-code session issuance', async 
     migration,
     /grant execute on function public\.enforce_email_otp_access_token\(jsonb\)[\s\S]*?to supabase_auth_admin/u,
   );
+  assert.match(
+    schemaUsageMigration,
+    /grant usage on schema public to supabase_auth_admin/u,
+  );
 
   assert.match(sqlContract, /array\['email\/signup', 'otp', 'magiclink', 'token_refresh'\]/u);
   assert.match(
@@ -31,6 +36,7 @@ test('provider-level Auth hook permits only email-code session issuance', async 
     /array\['password', 'recovery', 'invite', 'oauth', 'anonymous', 'totp'\]/u,
   );
   assert.match(sqlContract, /EMAIL_OTP_REQUIRED/u);
+  assert.match(sqlContract, /has_schema_privilege\(\s*'supabase_auth_admin', 'public', 'USAGE'\s*\)/u);
 });
 
 test('password recovery and invitation templates are controlled static retirement notices', async () => {

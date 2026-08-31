@@ -26,9 +26,12 @@
 - Supabase технически создаёт внутренний случайный hash и для первого native
   email-OTP signup; не проверяйте и не ограничивайте
   `auth.users.encrypted_password`. После применения
-  `20260831115000_passwordless_auth_provider_guard.sql` **сначала** примените
-  Auth config из `supabase/config.toml`: Custom Access Token Hook
-  `public.enforce_email_otp_access_token` выдаёт JWT только для
+  `20260831115000_passwordless_auth_provider_guard.sql` и
+  `20260831120000_auth_hook_public_schema_usage.sql` **сначала** примените
+  Auth config из `supabase/config.toml`: второй migration даёт
+  `supabase_auth_admin` только `USAGE` на схему `public`, необходимый для
+  разрешения hook-функции (не доступ к таблицам или другим функциям). Custom
+  Access Token Hook `public.enforce_email_otp_access_token` выдаёт JWT только для
   `email/signup`, `otp`, `magiclink` и `token_refresh`, а password/recovery/
   invite/OAuth/phone/anonymous session issuance получает `EMAIL_OTP_REQUIRED`.
 
@@ -100,12 +103,24 @@ npm run admin:bootstrap -- --email <owner-email> --confirm-email <owner-email> -
 ```
 
 Команда требует два совпадающих email-аргумента, находит ровно одного уже
-подтверждённого Auth-пользователя и вызывает только service-role RPC
-`restore_admin_access`. Она не создаёт пользователя, не отправляет invitation,
-не принимает пароль и не выводит email или ключи в консоль. `--allow-remote`
+подтверждённого Auth-пользователя и через service-role RPC атомарно проверяет
+все актуальные версии юридических документов перед выдачей роли. Если не
+принята хотя бы одна актуальная версия, она безопасно завершается без выдачи
+admin-доступа с кодом `BOOTSTRAP_ADMIN_LEGAL_ACCEPTANCE_REQUIRED`. Команда не
+создаёт пользователя, не отправляет invitation, не принимает пароль и не
+выводит email или ключи в консоль. `--allow-remote`
 нужен специально для постоянного Supabase-проекта; без него команда безопасно
 отказывается работать вне localhost. После успешного одноразового bootstrap
 первый администратор открывает `/admin/approvals` и может принимать заявки.
+
+### Release gate для bootstrap RPC
+
+`20260831119000_bootstrap_admin_legal_gate.sql` добавляет RPC
+`bootstrap_email_otp_admin`. После применения migration к доступному linked
+project выполните `npm run db:types:generate` и закоммитьте точный вывод CLI в
+`lib/supabase/database.generated.ts`. Не редактируйте этот generated-файл
+вручную: DB-release остаётся незавершённым до обычных clean-reset,
+type-contract и SQL regression проверок.
 
 ## Production smoke
 

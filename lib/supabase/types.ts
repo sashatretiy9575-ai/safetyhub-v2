@@ -850,6 +850,7 @@ export type Database = {
         Returns: Json;
       };
       prune_terminal_auth_admin_outbox: { Args: { p_limit?: number }; Returns: Json };
+      bootstrap_email_otp_admin: { Args: { p_user_id: string }; Returns: string };
       bootstrap_superadmin: { Args: { p_user_id: string }; Returns: string };
       restore_admin_access: { Args: { p_user_id: string }; Returns: string };
       provision_admin_by_email: { Args: { p_email: string }; Returns: string };
