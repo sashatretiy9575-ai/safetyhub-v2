@@ -19,7 +19,16 @@ declare
     ''
   );
 begin
-  new.locale := coalesce(v_requested::public.app_locale, 'ru'::public.app_locale);
+  -- Only the locale-aware RPC may select a non-RU attempt locale. Direct
+  -- privileged inserts are retained for operational/legacy compatibility,
+  -- but they cannot trust a caller-supplied row value and are pinned to RU.
+  -- Browser roles have no INSERT grant on the attempts table.
+  if v_requested is null then
+    new.locale := 'ru'::public.app_locale;
+    return new;
+  end if;
+
+  new.locale := v_requested::public.app_locale;
   if not exists (
     select 1
     from public.test_revision_localizations localization
@@ -30,19 +39,10 @@ begin
     where localization.revision_id = new.revision_id
       and localization.locale = new.locale
   ) then
-    -- Properly localized revisions fail closed when the requested locale is
-    -- absent. A revision with no locale receipts at all can only come from a
-    -- legacy/direct writer, so keep that rolling-deployment insert contract
-    -- by pinning it to RU.
-    if exists (
-      select 1
-      from public.test_revision_localizations localization
-      where localization.revision_id = new.revision_id
-    ) then
-      raise exception using errcode = 'object_not_in_prerequisite_state',
-        message = 'ATTEMPT_LOCALIZATION_NOT_FOUND';
-    end if;
-    new.locale := 'ru'::public.app_locale;
+    -- Every application RPC supplies request_locale, so a missing requested
+    -- revision/variant localization remains fail-closed.
+    raise exception using errcode = 'object_not_in_prerequisite_state',
+      message = 'ATTEMPT_LOCALIZATION_NOT_FOUND';
   end if;
   return new;
 end;

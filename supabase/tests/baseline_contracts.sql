@@ -361,8 +361,12 @@ begin
     raise exception 'persistent actor quota error envelope missing';
   end if;
 
-  if position('pg_exception_detail' in
-      pg_get_functiondef('public.start_test_attempt(text)'::regprocedure)) = 0
+  if position('pg_exception_detail' in (
+      pg_get_functiondef('public.start_test_attempt(text)'::regprocedure)
+      || pg_get_functiondef(
+        'public.start_test_attempt_locale(text,public.app_locale)'::regprocedure
+      )
+    )) = 0
     or position('ATTEMPT_DAILY_LIMIT' in
       pg_get_functiondef('private.rpc_error_envelope(text,text,text)'::regprocedure)) = 0
     or position('ATTEMPT_ROLLING_LIMIT' in
