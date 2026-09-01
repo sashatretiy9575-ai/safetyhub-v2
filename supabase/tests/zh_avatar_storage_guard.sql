@@ -148,7 +148,6 @@ begin
   perform public.mark_zh_registration_storage_written(
     v_live_operation_id, v_live_user_id, v_live_key, repeat('5', 64), 100
   );
-  delete from storage.objects where id = v_live_object_id;
   v_failed := false;
   begin
     insert into storage.objects (id, bucket_id, name)

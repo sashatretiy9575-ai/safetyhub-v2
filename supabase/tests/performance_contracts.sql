@@ -134,7 +134,6 @@ begin
       select test.id, test.current_revision_id
       from public.tests test
       where test.slug = 'pozharnaya-bezopasnost'
-        and test.status = 'published'
     $query$,
     array['tests_slug_key']
   );

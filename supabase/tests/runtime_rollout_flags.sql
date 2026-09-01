@@ -82,7 +82,8 @@ begin
   end if;
 
   update public.account_controls
-  set approval_requested_at = v_requested_at + interval '1 second'
+  set approval_requested_at = v_requested_at + interval '1 second',
+      approval_due_at = v_requested_at + interval '24 hours 1 second'
   where user_id = v_user_id;
   if (select count(*) from private.notification_events event
       where event.aggregate_id = v_user_id) <> 1 then
