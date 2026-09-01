@@ -142,7 +142,9 @@ Execute these phases one at a time and record post-counts after every phase.
     `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_DISPATCHER_SECRET` and
     `SAFETYHUB_SITE_URL` in a dedicated ignored/access-restricted Function env
     file; put `SUPABASE_SECRET_KEY` and the exact same
-    `TELEGRAM_DISPATCHER_SECRET` in a separate operator env file. Then run:
+    `TELEGRAM_DISPATCHER_SECRET` in a separate operator env file, or retain those
+    two Vault values only in memory for the strict `--secret-stdin` contract
+    documented in `docs/notifications-and-telegram.md`. Then run:
 
     ```powershell
     npx --no-install supabase secrets set `
@@ -163,6 +165,9 @@ Execute these phases one at a time and record post-counts after every phase.
     `secrets list` must show names only; never use `NAME=VALUE` arguments. The
     Vault CLI derives the one allowed current-project Function URL, calls the
     service-only reasoned/idempotent RPC and emits only the two Vault names.
+    For a diskless Vault call replace `--env-file ...` with `--secret-stdin` and
+    pipe the exact ordered two-line assignment payload from the approved secret
+    systems; never construct either value in argv.
     Only after the dispatcher smoke succeeds enable the database
     `telegram_delivery` flag. Telegram remains informational and cannot mutate
     approval state.
@@ -175,9 +180,10 @@ Execute these phases one at a time and record post-counts after every phase.
 
 Database runtime flags are changed only through the reasoned, idempotent
 service-only `set_runtime_feature_flag` RPC. Enable events before Telegram;
-disable them in the reverse order. The operator file contains only
-`SUPABASE_SECRET_KEY`; use a new UUID for each logical change and reuse that UUID
-only when retrying the exact same request:
+disable them in the reverse order. The controlled operator file contains only
+`SUPABASE_SECRET_KEY`; alternatively, pipe the raw in-memory key to
+`--secret-stdin` as documented in `docs/operations.md`. Use a new UUID for each
+logical change and reuse that UUID only when retrying the exact same request:
 
 ```powershell
 npm run runtime:flag:set -- `

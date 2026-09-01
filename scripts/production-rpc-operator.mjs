@@ -12,14 +12,17 @@ function fail(code) {
   throw new ProductionOperatorError(code);
 }
 
-export async function readProductionServiceCredential(environmentFile, additionalNames = []) {
-  const names = ['SUPABASE_SECRET_KEY', ...additionalNames];
-  const environment = await readOperatorEnvironmentFile(environmentFile, names);
+export function productionServiceCredential(environment) {
   const serviceKey = readServiceCredential(
     { serviceRoleKeyEnv: 'SUPABASE_SECRET_KEY' },
     environment,
   );
   return { environment, serviceKey };
+}
+
+export async function readProductionServiceCredential(environmentFile, additionalNames = []) {
+  const names = ['SUPABASE_SECRET_KEY', ...additionalNames];
+  return productionServiceCredential(await readOperatorEnvironmentFile(environmentFile, names));
 }
 
 export async function callProductionServiceRpc({

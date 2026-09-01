@@ -162,7 +162,7 @@ export async function readOperatorEnvironmentFile(environmentFile, requiredNames
   }
 }
 
-export async function readRawSecretFromStdin(input = process.stdin) {
+async function readSecretTextFromStdin(input, parse) {
   requireCondition(
     input && typeof input[Symbol.asyncIterator] === 'function',
     'OPERATOR_STDIN_UNAVAILABLE',
@@ -187,16 +187,50 @@ export async function readRawSecretFromStdin(input = process.stdin) {
       }
       const value = combined.subarray(0, end).toString('utf8');
       requireCondition(
-        value.length > 0 && !/[\r\n\u0000]/u.test(value),
+        value.length > 0 && !value.includes('\u0000') && !value.includes('\ufffd'),
         'OPERATOR_STDIN_SECRET_INVALID',
       );
-      return value;
+      return parse(value);
     } finally {
       combined.fill(0);
     }
   } finally {
     for (const chunk of chunks) chunk.fill(0);
   }
+}
+
+export async function readRawSecretFromStdin(input = process.stdin) {
+  return readSecretTextFromStdin(input, (value) => {
+    requireCondition(!/[\r\n]/u.test(value), 'OPERATOR_STDIN_SECRET_INVALID');
+    return value;
+  });
+}
+
+export async function readExactSecretAssignmentsFromStdin(requiredNames, input = process.stdin) {
+  requireCondition(
+    Array.isArray(requiredNames) &&
+      requiredNames.length > 0 &&
+      new Set(requiredNames).size === requiredNames.length &&
+      requiredNames.every((name) => /^[A-Z][A-Z0-9_]*$/u.test(name)),
+    'OPERATOR_STDIN_REQUIRED_NAMES_INVALID',
+  );
+  return readSecretTextFromStdin(input, (serialized) => {
+    const lines = serialized.split(/\r?\n/u);
+    requireCondition(lines.length === requiredNames.length, 'OPERATOR_STDIN_ASSIGNMENT_INVALID');
+    const selected = Object.create(null);
+    for (const [index, name] of requiredNames.entries()) {
+      const prefix = `${name}=`;
+      const line = lines[index];
+      requireCondition(line.startsWith(prefix), 'OPERATOR_STDIN_ASSIGNMENT_INVALID');
+      const value = line.slice(prefix.length);
+      requireCondition(
+        value.length > 0 && !/[\u0000-\u001f\u007f]/u.test(value),
+        'OPERATOR_STDIN_SECRET_INVALID',
+      );
+      selected[name] = value;
+    }
+    return selected;
+  });
 }
 
 export async function readBoundedJsonResponse(response, { maxBytes = 16 * 1024 } = {}) {

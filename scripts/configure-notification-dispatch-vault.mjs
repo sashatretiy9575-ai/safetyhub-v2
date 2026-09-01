@@ -9,14 +9,16 @@ import {
   assertProductionMutationConfirmation,
   assertReason,
   productionSupabaseUrl,
+  readExactSecretAssignmentsFromStdin,
 } from './production-operator-safety.mjs';
 import {
   callProductionServiceRpc,
+  productionServiceCredential,
   readProductionServiceCredential,
 } from './production-rpc-operator.mjs';
 
 const USAGE =
-  'Usage: --expected-project-ref <current-production-ref> --confirm-project-ref <same-ref> --reason <8-500 chars> --idempotency-key <new-or-retried-uuid> --env-file <absolute-secret-env-file-with-SUPABASE_SECRET_KEY-and-TELEGRAM_DISPATCHER_SECRET>';
+  'Usage: --expected-project-ref <current-production-ref> --confirm-project-ref <same-ref> --reason <8-500 chars> --idempotency-key <new-or-retried-uuid> (--env-file <absolute-secret-env-file-with-SUPABASE_SECRET_KEY-and-TELEGRAM_DISPATCHER_SECRET> | --secret-stdin)';
 const VAULT_NAMES = ['notification_dispatch_url', 'notification_dispatch_secret'];
 
 function fail(code) {
@@ -34,23 +36,42 @@ export function parseArguments(argv) {
     '--reason',
     '--idempotency-key',
     '--env-file',
+    '--secret-stdin',
   ]);
   const values = Object.create(null);
-  for (let index = 0; index < argv.length; index += 2) {
+  for (let index = 0; index < argv.length; ) {
     const name = argv[index];
-    const value = argv[index + 1];
     requireCondition(allowed.has(name), 'VAULT_CONFIG_CLI_UNKNOWN_ARGUMENT');
+    if (name === '--secret-stdin') {
+      requireCondition(values[name] === undefined, 'VAULT_CONFIG_CLI_DUPLICATE_ARGUMENT');
+      values[name] = true;
+      index += 1;
+      continue;
+    }
+    const value = argv[index + 1];
     requireCondition(
       typeof value === 'string' && value.length > 0 && !value.startsWith('--'),
       'VAULT_CONFIG_CLI_ARGUMENT_VALUE_REQUIRED',
     );
     requireCondition(values[name] === undefined, 'VAULT_CONFIG_CLI_DUPLICATE_ARGUMENT');
     values[name] = value;
+    index += 2;
   }
-  for (const name of allowed) {
+  for (const name of [
+    '--expected-project-ref',
+    '--confirm-project-ref',
+    '--reason',
+    '--idempotency-key',
+  ]) {
     requireCondition(values[name] !== undefined, 'VAULT_CONFIG_CLI_REQUIRED_ARGUMENT_MISSING');
   }
-  requireCondition(path.isAbsolute(values['--env-file']), 'VAULT_CONFIG_ENV_FILE_PATH_INVALID');
+  requireCondition(
+    (typeof values['--env-file'] === 'string') !== (values['--secret-stdin'] === true),
+    'VAULT_CONFIG_CREDENTIAL_SOURCE_INVALID',
+  );
+  if (values['--env-file'] !== undefined) {
+    requireCondition(path.isAbsolute(values['--env-file']), 'VAULT_CONFIG_ENV_FILE_PATH_INVALID');
+  }
   return {
     projectRef: assertProductionMutationConfirmation(
       values['--expected-project-ref'],
@@ -59,6 +80,7 @@ export function parseArguments(argv) {
     reason: assertReason(values['--reason']),
     idempotencyKey: assertIdempotencyKey(values['--idempotency-key']),
     environmentFile: values['--env-file'],
+    secretStdin: values['--secret-stdin'] === true,
   };
 }
 
@@ -97,15 +119,26 @@ function validateResult(result, request) {
 
 export async function main(
   argv = process.argv.slice(2),
-  { fetchImpl = globalThis.fetch, writeOutput = (value) => process.stdout.write(value) } = {},
+  {
+    fetchImpl = globalThis.fetch,
+    input = process.stdin,
+    writeOutput = (value) => process.stdout.write(value),
+  } = {},
 ) {
   const request = parseArguments(argv);
   let serviceKey = '';
   let dispatcherSecret = '';
   try {
-    const loaded = await readProductionServiceCredential(request.environmentFile, [
-      'TELEGRAM_DISPATCHER_SECRET',
-    ]);
+    const loaded = request.secretStdin
+      ? productionServiceCredential(
+          await readExactSecretAssignmentsFromStdin(
+            ['SUPABASE_SECRET_KEY', 'TELEGRAM_DISPATCHER_SECRET'],
+            input,
+          ),
+        )
+      : await readProductionServiceCredential(request.environmentFile, [
+          'TELEGRAM_DISPATCHER_SECRET',
+        ]);
     serviceKey = loaded.serviceKey;
     dispatcherSecret = validateDispatcherSecret(loaded.environment.TELEGRAM_DISPATCHER_SECRET);
     const dispatchUrl = `${productionSupabaseUrl(request.projectRef)}/functions/v1/telegram-dispatcher`;

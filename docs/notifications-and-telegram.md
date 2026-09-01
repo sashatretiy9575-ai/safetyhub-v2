@@ -90,7 +90,8 @@ either in the Function file.
 
 3. Store the derived current-project function URL and dispatcher bearer through
    the service-only Vault RPC. The CLI requires an exact ref confirmation,
-   reason and retry-safe UUID and never logs either configured value:
+   reason and retry-safe UUID and never logs either configured value. A
+   controlled env-file remains supported:
 
    ```powershell
    npm run notifications:vault:configure -- `
@@ -99,6 +100,25 @@ either in the Function file.
      --reason 'Configure Telegram dispatcher Vault values for release' `
      --idempotency-key '<NEW_UUID>' `
      --env-file 'C:\secure-operator\telegram-vault.env'
+   ```
+
+   To avoid a Vault operator file, populate `$ServiceKey` and
+   `$DispatcherSecret` only in memory through the approved secret systems. The
+   `--secret-stdin` contract is exactly these two nonempty lines in this order,
+   is bounded to 8 KiB, rejects TTY/extra/duplicate lines, and is mutually
+   exclusive with `--env-file`:
+
+   ```powershell
+   (@(
+       "SUPABASE_SECRET_KEY=$ServiceKey"
+       "TELEGRAM_DISPATCHER_SECRET=$DispatcherSecret"
+     ) -join "`n") | npm run notifications:vault:configure -- `
+     --expected-project-ref $ProjectRef `
+     --confirm-project-ref $ProjectRef `
+     --reason 'Configure Telegram dispatcher Vault values for release' `
+     --idempotency-key '<NEW_UUID>' `
+     --secret-stdin
+   Remove-Variable ServiceKey, DispatcherSecret -ErrorAction SilentlyContinue
    ```
 
 4. Enable event creation and, only after inbox/dispatcher smoke, Telegram

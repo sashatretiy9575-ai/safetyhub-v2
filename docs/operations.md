@@ -169,10 +169,13 @@ reason и новым idempotency UUID для каждого логическог
 повторное использование UUID с другими параметрами и включение Telegram раньше
 event emission отклоняются контрактом БД.
 
-RPC вызывается только через fail-closed operator CLI. В отдельном абсолютном,
-не symlink, access-restricted env-file должна быть ровно одна assignment
-`SUPABASE_SECRET_KEY`; значение не передаётся в argv и не выводится. Перед каждым
-вызовом дважды задаётся один и тот же reviewed current production ref:
+RPC вызывается только через fail-closed operator CLI. Controlled operator может
+использовать абсолютный, не symlink, access-restricted env-file с ровно одной
+assignment `SUPABASE_SECRET_KEY` или взаимоисключающий `--secret-stdin`. Второй
+режим принимает только raw key, не более 8 KiB, запрещает TTY/multiline input и
+не сохраняет значение на диск. Оба режима исключают secret из argv, output и
+receipt. Перед каждым вызовом дважды задаётся один и тот же reviewed current
+production ref:
 
 ```powershell
 $ProjectRef = '<CURRENT_PRODUCTION_PROJECT_REF>'
@@ -193,6 +196,22 @@ npm run runtime:flag:set -- `
   --reason 'Enable Telegram after dispatcher smoke' `
   --idempotency-key '<ANOTHER_NEW_UUID>' `
   --env-file 'C:\secure-operator\production-service.env'
+```
+
+Без дискового operator-файла получите `$ServiceKey` только в памяти через
+утверждённый secret manager/точный current-project Management API, затем замените
+последний аргумент команды на `--secret-stdin` и передайте raw value через pipe:
+
+```powershell
+$ServiceKey | npm run runtime:flag:set -- `
+  --expected-project-ref $ProjectRef `
+  --confirm-project-ref $ProjectRef `
+  --feature notification_events `
+  --enabled true `
+  --reason 'Enable notification events after release migration' `
+  --idempotency-key '<NEW_UUID>' `
+  --secret-stdin
+Remove-Variable ServiceKey -ErrorAction SilentlyContinue
 ```
 
 Rollback использует те же команды с новыми UUID: сначала

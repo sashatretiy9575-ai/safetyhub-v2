@@ -8,15 +8,17 @@ import {
   assertIdempotencyKey,
   assertProductionMutationConfirmation,
   assertReason,
+  readRawSecretFromStdin,
 } from './production-operator-safety.mjs';
 import {
   callProductionServiceRpc,
+  productionServiceCredential,
   readProductionServiceCredential,
 } from './production-rpc-operator.mjs';
 
 const FEATURES = new Set(['notification_events', 'telegram_delivery']);
 const USAGE =
-  'Usage: --expected-project-ref <current-production-ref> --confirm-project-ref <same-ref> --feature <notification_events|telegram_delivery> --enabled <true|false> --reason <8-500 chars> --idempotency-key <new-or-retried-uuid> --env-file <absolute-secret-env-file>';
+  'Usage: --expected-project-ref <current-production-ref> --confirm-project-ref <same-ref> --feature <notification_events|telegram_delivery> --enabled <true|false> --reason <8-500 chars> --idempotency-key <new-or-retried-uuid> (--env-file <absolute-secret-env-file> | --secret-stdin)';
 
 function fail(code) {
   throw new ProductionOperatorError(code);
@@ -35,25 +37,46 @@ export function parseArguments(argv) {
     '--reason',
     '--idempotency-key',
     '--env-file',
+    '--secret-stdin',
   ]);
   const values = Object.create(null);
-  for (let index = 0; index < argv.length; index += 2) {
+  for (let index = 0; index < argv.length; ) {
     const name = argv[index];
-    const value = argv[index + 1];
     requireCondition(allowed.has(name), 'RUNTIME_FLAG_CLI_UNKNOWN_ARGUMENT');
+    if (name === '--secret-stdin') {
+      requireCondition(values[name] === undefined, 'RUNTIME_FLAG_CLI_DUPLICATE_ARGUMENT');
+      values[name] = true;
+      index += 1;
+      continue;
+    }
+    const value = argv[index + 1];
     requireCondition(
       typeof value === 'string' && value.length > 0 && !value.startsWith('--'),
       'RUNTIME_FLAG_CLI_ARGUMENT_VALUE_REQUIRED',
     );
     requireCondition(values[name] === undefined, 'RUNTIME_FLAG_CLI_DUPLICATE_ARGUMENT');
     values[name] = value;
+    index += 2;
   }
-  for (const name of allowed) {
+  for (const name of [
+    '--expected-project-ref',
+    '--confirm-project-ref',
+    '--feature',
+    '--enabled',
+    '--reason',
+    '--idempotency-key',
+  ]) {
     requireCondition(values[name] !== undefined, 'RUNTIME_FLAG_CLI_REQUIRED_ARGUMENT_MISSING');
   }
+  requireCondition(
+    (typeof values['--env-file'] === 'string') !== (values['--secret-stdin'] === true),
+    'RUNTIME_FLAG_CREDENTIAL_SOURCE_INVALID',
+  );
   requireCondition(FEATURES.has(values['--feature']), 'RUNTIME_FLAG_FEATURE_INVALID');
   requireCondition(['true', 'false'].includes(values['--enabled']), 'RUNTIME_FLAG_ENABLED_INVALID');
-  requireCondition(path.isAbsolute(values['--env-file']), 'RUNTIME_FLAG_ENV_FILE_PATH_INVALID');
+  if (values['--env-file'] !== undefined) {
+    requireCondition(path.isAbsolute(values['--env-file']), 'RUNTIME_FLAG_ENV_FILE_PATH_INVALID');
+  }
   return {
     projectRef: assertProductionMutationConfirmation(
       values['--expected-project-ref'],
@@ -64,6 +87,7 @@ export function parseArguments(argv) {
     reason: assertReason(values['--reason']),
     idempotencyKey: assertIdempotencyKey(values['--idempotency-key']),
     environmentFile: values['--env-file'],
+    secretStdin: values['--secret-stdin'] === true,
   };
 }
 
@@ -92,12 +116,22 @@ function validateResult(result, request) {
 
 export async function main(
   argv = process.argv.slice(2),
-  { fetchImpl = globalThis.fetch, writeOutput = (value) => process.stdout.write(value) } = {},
+  {
+    fetchImpl = globalThis.fetch,
+    input = process.stdin,
+    writeOutput = (value) => process.stdout.write(value),
+  } = {},
 ) {
   const request = parseArguments(argv);
   let serviceKey = '';
+  let stdinSecret = '';
   try {
-    ({ serviceKey } = await readProductionServiceCredential(request.environmentFile));
+    if (request.secretStdin) {
+      stdinSecret = await readRawSecretFromStdin(input);
+      ({ serviceKey } = productionServiceCredential({ SUPABASE_SECRET_KEY: stdinSecret }));
+    } else {
+      ({ serviceKey } = await readProductionServiceCredential(request.environmentFile));
+    }
     const result = await callProductionServiceRpc({
       projectRef: request.projectRef,
       rpcName: 'set_runtime_feature_flag',
@@ -115,6 +149,7 @@ export async function main(
     return summary;
   } finally {
     serviceKey = '';
+    stdinSecret = '';
   }
 }
 
