@@ -27,6 +27,7 @@ const LOAD_WAVES = [25, 50, 100];
 const APP_LOCALES = ['ru', 'kk', 'en', 'zh'];
 const ROW_CHUNK = 400;
 const PREPARATION_RETRY_LIMIT = 5;
+const PREPARATION_CONCURRENCY = 4;
 const TRANSIENT_NETWORK_ERROR =
   /fetch failed|network|econnreset|etimedout|socket hang up|und_err|http 50[234]|temporarily unavailable|connection (?:terminated|reset)/iu;
 const ZH_RP_ID = 'safetyhub.kz';
@@ -203,6 +204,52 @@ function buildProfile(user, index, timestamp) {
   };
 }
 
+async function avatarObjectMatches(admin, objectKey, avatar, avatarSha256) {
+  const downloaded = await admin.storage
+    .from('profile-avatars')
+    .download(objectKey, {}, { cache: 'no-store' });
+  if (downloaded.error || !downloaded.data || downloaded.data.size !== avatar.length) return false;
+  const bytes = Buffer.from(await downloaded.data.arrayBuffer());
+  return crypto.createHash('sha256').update(bytes).digest('hex') === avatarSha256;
+}
+
+function isRetryableStorageError(error) {
+  const status = Number(error?.statusCode ?? error?.status);
+  return (
+    status === 408 ||
+    status === 429 ||
+    status >= 500 ||
+    TRANSIENT_NETWORK_ERROR.test(error?.message ?? String(error))
+  );
+}
+
+async function uploadZhLoadTestAvatar(admin, objectKey, avatar, avatarSha256, index) {
+  for (let attempt = 1; attempt <= PREPARATION_RETRY_LIMIT; attempt += 1) {
+    const uploaded = await admin.storage.from('profile-avatars').upload(objectKey, avatar, {
+      contentType: 'image/webp',
+      cacheControl: '600',
+      upsert: false,
+    });
+    if (!uploaded.error) {
+      if (uploaded.data?.path !== objectKey) {
+        throw new Error(`zh registration ${index + 1}: AVATAR_UPLOAD_CONTRACT_MISMATCH`);
+      }
+      return;
+    }
+
+    // Storage may commit the object and lose the HTTP response. Mirror the
+    // production registration path and prove exact bytes before retrying.
+    if (await avatarObjectMatches(admin, objectKey, avatar, avatarSha256)) return;
+    if (!isRetryableStorageError(uploaded.error) || attempt === PREPARATION_RETRY_LIMIT) {
+      const status = Number(uploaded.error?.statusCode ?? uploaded.error?.status);
+      const category =
+        Number.isInteger(status) && status >= 400 && status <= 599 ? status : 'UNKNOWN';
+      throw new Error(`zh registration ${index + 1}: AVATAR_UPLOAD_FAILED_HTTP_${category}`);
+    }
+    await wait(250 * 2 ** (attempt - 1));
+  }
+}
+
 async function createZhLoadTestUser(admin, index, avatar, avatarSha256, legal) {
   const id = crypto.randomUUID();
   const operationId = crypto.randomUUID();
@@ -240,14 +287,7 @@ async function createZhLoadTestUser(admin, index, avatar, avatarSha256, legal) {
   });
 
   const objectKey = `${id}/objects/${operationId}.webp`;
-  const uploaded = await admin.storage.from('profile-avatars').upload(objectKey, avatar, {
-    contentType: 'image/webp',
-    cacheControl: '600',
-    upsert: false,
-  });
-  if (uploaded.error || uploaded.data?.path !== objectKey) {
-    throw new Error(`zh registration ${index + 1}: AVATAR_UPLOAD_FAILED`);
-  }
+  await uploadZhLoadTestAvatar(admin, objectKey, avatar, avatarSha256, index);
   await rpcData(admin, 'mark_zh_registration_storage_written', {
     p_operation_id: operationId,
     p_user_id: id,
@@ -812,7 +852,7 @@ async function main() {
   };
 
   const indexes = Array.from({ length: userCount }, (_, index) => index);
-  const createdUsers = await mapLimit(indexes, 12, (index) =>
+  const createdUsers = await mapLimit(indexes, PREPARATION_CONCURRENCY, (index) =>
     createZhLoadTestUser(admin, index, avatar, avatarSha256, currentLegal),
   );
   process.stdout.write(`LOAD_PREP_USERS=${createdUsers.length}\n`);
