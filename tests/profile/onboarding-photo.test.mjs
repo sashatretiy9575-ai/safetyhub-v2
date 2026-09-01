@@ -18,7 +18,7 @@ test('email-OTP registration enters required onboarding without a password callb
 
   assert.match(register, /<EmailOtpFlow intent="register"/u);
   assert.match(requestRoute, /auth\.signInWithOtp/u);
-  assert.match(requestRoute, /shouldCreateUser: parsed\.data\.intent === 'register'/u);
+  assert.match(requestRoute, /shouldCreateUser: true/u);
   assert.match(verifyRoute, /verifyOtp/u);
   assert.match(callback, /redirectFromRetiredPasswordLink\(\)/u);
   assert.doesNotMatch(callback, /exchangeCodeForSession|safeRedirectPath/u);

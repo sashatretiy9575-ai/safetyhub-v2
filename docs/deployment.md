@@ -136,8 +136,9 @@ type-contract и SQL regression проверок.
   идентификатор варианта и правильные ответы;
 - возобновление сохраняет вопросы и deadline, а девятая новая попытка по одному
   курсу до следующего 00:00 `Asia/Oral` получает `ATTEMPT_DAILY_LIMIT`;
-- registration/login запускают один deferred Turnstile после submit и отправляют
-  только шестизначный email OTP; recovery/invite templates не содержат секрета;
+- registration/login запускают один deferred Turnstile после submit, используют
+  единый auto-create native OTP flow и отправляют только шестизначный email OTP;
+  recovery/invite templates не содержат секрета;
 - native email OTP создаёт/подтверждает пользователя и получает сессию;
   внутренняя provider-запись password hash не считается пользовательским
   паролем; прямой password login, recovery и invite не получают SafetyHub JWT

@@ -185,11 +185,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       setSentAt(nextSentAt);
       setRetrySeconds(RESEND_DELAY_SECONDS);
       setStage('code');
-      setStatus(
-        isRegister
-          ? 'Если этот адрес можно использовать, код отправлен. Введите шесть цифр из письма.'
-          : 'Если для этого email доступен вход, код отправлен. Введите шесть цифр из письма.',
-      );
+      setStatus('Если этот адрес можно использовать, код отправлен. Введите шесть цифр из письма.');
       storeAttempt(intent, normalizedEmail, nextSentAt);
     } catch (requestError) {
       setError(clientRequestMessage(requestError, 'Не удалось отправить код. Повторите позже.'));
@@ -293,7 +289,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
   };
 
   const Icon = isRegister ? UserPlus : SignIn;
-  const title = isRegister ? 'Создать аккаунт' : 'Вход в аккаунт';
+  const title = isRegister ? 'Создать аккаунт' : 'Вход или регистрация';
 
   return (
     <>

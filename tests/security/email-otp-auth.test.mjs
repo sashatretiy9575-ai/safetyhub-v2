@@ -51,7 +51,8 @@ test('email OTP request is origin-bound, native, enumeration-neutral, and rate-l
     /consumeCoarseQuota\('auth\.otp\.start\.email', requestSubjectHash\(parsed\.data\.email\)\)/u,
   );
   assert.match(route, /createEphemeralAuthClient\(\)\.auth\.signInWithOtp\(/u);
-  assert.match(route, /shouldCreateUser: parsed\.data\.intent === 'register'/u);
+  assert.match(route, /shouldCreateUser: true/u);
+  assert.doesNotMatch(route, /shouldCreateUser: parsed\.data\.intent/u);
   assert.match(route, /captchaToken: parsed\.data\.captchaToken/u);
   assert.match(route, /return NextResponse\.json\(\{ sent: true \}, \{ status: 202 \}\)/u);
   assert.doesNotMatch(

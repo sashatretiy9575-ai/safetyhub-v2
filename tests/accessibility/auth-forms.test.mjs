@@ -20,7 +20,7 @@ test('registration asks for email only and defers explicit legal consent until a
   assert.match(flow, /emailOtpStartSchema\.safeParse/u);
   assert.match(flow, /clientRequest\('\/api\/auth\/email-otp\/request'/u);
   assert.match(requestRoute, /createEphemeralAuthClient\(\)\.auth\.signInWithOtp/u);
-  assert.match(requestRoute, /shouldCreateUser: parsed\.data\.intent === 'register'/u);
+  assert.match(requestRoute, /shouldCreateUser: true/u);
   assert.doesNotMatch(
     requestRoute,
     /prepareSignupLegalOperation|createAdminClient|auth\.admin\.createUser|email_confirm|raw_user_meta_data|\.identities\b|deleteUser\(/u,

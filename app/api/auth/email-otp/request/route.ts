@@ -43,13 +43,14 @@ export async function POST(request: Request) {
     await consumeCoarseQuota('auth.otp.start', security.ipHash);
     await consumeCoarseQuota('auth.otp.start.email', requestSubjectHash(parsed.data.email));
 
-    // Native passwordless signup keeps CAPTCHA verification, email delivery,
-    // and identity creation in the Auth provider's single flow. Never create
-    // a user through the service role from this public endpoint.
+    // Both public entry pages are one passwordless email-code gateway. Let the
+    // provider create an unknown address so a login attempt never turns into a
+    // silent no-email response. CAPTCHA and both quotas still run first, and
+    // the endpoint remains enumeration-neutral.
     const { error } = await createEphemeralAuthClient().auth.signInWithOtp({
       email: parsed.data.email,
       options: {
-        shouldCreateUser: parsed.data.intent === 'register',
+        shouldCreateUser: true,
         captchaToken: parsed.data.captchaToken,
       },
     });

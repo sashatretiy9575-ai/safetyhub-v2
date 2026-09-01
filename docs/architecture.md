@@ -150,7 +150,10 @@ recovery, invite, OAuth, phone и anonymous methods получают отказ 
 JWT. Это делает email-код единственным способом получить рабочую SafetyHub
 сессию, хотя внутренний provider hash существует и никогда не выдаётся человеку.
 Код отправляется через Supabase Auth после server-side проверки Turnstile,
-same-origin и coarse IP quota, а проверка кода создаёт обычную Supabase-сессию.
+same-origin и coarse IP quota. Login и registration используют единый
+`signInWithOtp`-шлюз с разрешённым созданием неизвестного email: поэтому форма
+входа не подтверждает существование аккаунта и не оставляет нового пользователя
+без письма. Проверка кода создаёт обычную Supabase-сессию.
 
 Шаблоны email для password recovery и legacy invite — статические уведомления
 без token, hash, redirect URL или password reset promise. Они остаются явной
