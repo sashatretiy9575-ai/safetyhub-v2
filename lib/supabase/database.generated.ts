@@ -541,6 +541,30 @@ export type Database = {
           },
         ]
       }
+      notification_dispatch_vault_receipts: {
+        Row: {
+          created_at: string
+          idempotency_key: string
+          reason: string
+          request_hash: string
+          result: Json
+        }
+        Insert: {
+          created_at?: string
+          idempotency_key: string
+          reason: string
+          request_hash: string
+          result: Json
+        }
+        Update: {
+          created_at?: string
+          idempotency_key?: string
+          reason?: string
+          request_hash?: string
+          result?: Json
+        }
+        Relationships: []
+      }
       notification_events: {
         Row: {
           aggregate_id: string | null
@@ -604,6 +628,54 @@ export type Database = {
           sha256?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      runtime_feature_flag_receipts: {
+        Row: {
+          created_at: string
+          feature_name: string
+          idempotency_key: string
+          reason: string
+          requested_enabled: boolean
+          result: Json
+        }
+        Insert: {
+          created_at?: string
+          feature_name: string
+          idempotency_key: string
+          reason: string
+          requested_enabled: boolean
+          result: Json
+        }
+        Update: {
+          created_at?: string
+          feature_name?: string
+          idempotency_key?: string
+          reason?: string
+          requested_enabled?: boolean
+          result?: Json
+        }
+        Relationships: []
+      }
+      runtime_feature_flags: {
+        Row: {
+          enabled: boolean
+          feature_name: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          feature_name: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          feature_name?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -1164,6 +1236,14 @@ export type Database = {
         }
         Returns: Json
       }
+      claim_notification_deliveries_unmetered: {
+        Args: {
+          p_lease_seconds?: number
+          p_limit?: number
+          p_worker_id: string
+        }
+        Returns: Json
+      }
       complete_test_attempt_unmetered: {
         Args: { p_answers: Json; p_attempt_id: string }
         Returns: Json
@@ -1261,6 +1341,14 @@ export type Database = {
       editor_course_question_variants: {
         Args: { p_variants: Json }
         Returns: Json
+      }
+      emit_system_notification_alert_unmetered: {
+        Args: {
+          p_admin_path?: string
+          p_correlation_id: string
+          p_machine_code: string
+        }
+        Returns: string
       }
       enforce_actor_quota: { Args: { p_action: string }; Returns: undefined }
       ensure_legacy_revision_variant: {
@@ -1528,6 +1616,10 @@ export type Database = {
         Args: { p_detail?: string; p_message: string; p_sqlstate: string }
         Returns: Json
       }
+      runtime_feature_enabled: {
+        Args: { p_feature_name: string }
+        Returns: boolean
+      }
       sanitize_bulk_mutation_result: {
         Args: { p_payload: Json }
         Returns: Json
@@ -1669,6 +1761,10 @@ export type Database = {
           p_target_id: string
         }
         Returns: Json
+      }
+      zh_session_epoch_is_current: {
+        Args: { p_user_id: string }
+        Returns: boolean
       }
     }
     Enums: {
@@ -3728,6 +3824,15 @@ export type Database = {
         }
         Returns: Json
       }
+      configure_notification_dispatch_vault: {
+        Args: {
+          p_dispatch_secret: string
+          p_dispatch_url: string
+          p_idempotency_key: string
+          p_reason: string
+        }
+        Returns: Json
+      }
       confirm_admin_identities: {
         Args: { p_user_ids: string[] }
         Returns: Json
@@ -4653,6 +4758,15 @@ export type Database = {
       }
       set_preferred_locale: {
         Args: { p_locale: Database["public"]["Enums"]["app_locale"] }
+        Returns: Json
+      }
+      set_runtime_feature_flag: {
+        Args: {
+          p_enabled: boolean
+          p_feature_name: string
+          p_idempotency_key: string
+          p_reason: string
+        }
         Returns: Json
       }
       set_test_status: {
