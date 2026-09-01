@@ -92,7 +92,9 @@ jobs:
       - run: npx --no-install supabase db lint --local --level error
       - run: npm run storage:buckets:ensure:local
       - run: npm run content:assets:seed:local
-      - run: npm run db:types:check:local
+      # Bootstrap exact generated types for this migration batch. This is
+      # reverted to db:types:check:local after the CI artifact is committed.
+      - run: npm run db:types:generate:local
       - run: npm run check:db-types
       - run: npm run test:db
       - run: npm run seed:workspace
