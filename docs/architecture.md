@@ -234,7 +234,11 @@ ZH challenge хранится только как SHA-256 receipt, живёт н
 monotonic counter, user handle и salted/peppered recovery digest; browser grants
 на эти данные отсутствуют. Создание Auth user и immutable avatar связано durable
 registration operation: orphan Auth или Storage объект переводится в cleanup
-state и удаляется bounded lease-worker. После успешной регистрации профиль
+state и удаляется bounded lease-worker. Запись immutable avatar в Storage
+разрешена только server-side `service_role` для точной операции в состоянии
+`auth_created`, совпадающих user/object key и ещё живого неприменённого
+registration challenge; обычный authenticated avatar upload по-прежнему требует
+отдельную `avatar_upload_operations` lease. После успешной регистрации профиль
 сразу получает `preferred_locale = 'zh'` и `pending`; существующие approval/RLS
 gates продолжают закрывать обучение.
 
