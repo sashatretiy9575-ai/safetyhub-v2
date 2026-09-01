@@ -89,6 +89,8 @@ begin
     'public.import_course_assessment_localization(uuid,uuid,public.app_locale,bigint,jsonb)'::regprocedure
   )) into v_definition;
   if position('auth.role() is distinct from ''service_role''' in v_definition) = 0
+    or position('consume_business_quota_for_actor' in v_definition) = 0
+    or position('admin.test.mutate' in v_definition) = 0
     or position('localized_assessment_structure' in v_definition) = 0
     or position('assessment_localization_structure_mismatch' in v_definition) = 0
     or position('test_revision_variant_answer_keys' in v_definition) > 0

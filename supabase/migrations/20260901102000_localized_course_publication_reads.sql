@@ -434,10 +434,26 @@ declare
   v_option record;
   v_hash text;
   v_qa jsonb;
+  v_quota jsonb;
 begin
   if auth.role() is distinct from 'service_role'
     or not private.actor_has_capability(p_actor_id, 'test.manage') then
     raise exception using errcode = 'insufficient_privilege', message = 'FORBIDDEN';
+  end if;
+  -- This RPC is intentionally service-role-only, so auth.uid() is absent and
+  -- enforce_actor_quota(text) cannot identify the reviewed operator. Meter the
+  -- explicit capability-checked actor through the same durable quota ledger.
+  v_quota := private.consume_business_quota_for_actor(
+    p_actor_id,
+    'admin.test.mutate'
+  );
+  if coalesce((v_quota ->> 'allowed')::boolean, false) is not true then
+    raise exception using
+      errcode = 'program_limit_exceeded',
+      message = 'RATE_LIMITED:' || greatest(
+        1,
+        coalesce((v_quota ->> 'retryAfter')::integer, 1)
+      );
   end if;
   if p_locale is null or p_locale = 'ru' then
     raise exception using errcode = 'invalid_parameter_value',
