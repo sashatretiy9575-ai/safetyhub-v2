@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "locale": "zh",
+  "sourceSlug": "pervyy-den-na-novom-rabochem-meste",
+  "slug": "pervyy-den-na-novom-rabochem-meste",
+  "title": "新职场第一天：开始前的12个问题",
+  "description": "新手在尝试第一个独立任务之前应该了解有关风险、路线、设备、PPE 和通信的知识。",
+  "coverImage": "/images/generated/article-new-worker.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "第一天，你要表现出独立性，不要问“愚蠢”的问题。但不熟悉的路线、信号和不成文的习惯让新手特别容易受到伤害。一个好的开始不在于速度，而在于清晰度。"
+    },
+    {
+      "tone": "success",
+      "type": "callout",
+      "title": "提问是安全工作的一部分",
+      "content": "如果解释不清楚，要求再看一遍动作，并用自己的话重复顺序。确认理解比礼貌点头更有用。"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "关于地点的四个问题"
+    },
+    {
+      "type": "list",
+      "items": [
+        "哪里可以步行？哪些区域必须经过许可才能进入？",
+        "最近的正常和紧急出口、集合点和安全庇护所（如果有）在哪里？",
+        "交通如何移动以及行人在哪些地方能见度有限？",
+        "急救箱、手动呼叫点、电话或其他通讯方式位于哪里？"
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "关于任务的四个问题"
+    },
+    {
+      "type": "list",
+      "items": [
+        "正常启动、执行和安全关闭是什么样的？",
+        "这里最可能发生的危险是什么以及如何控制它们？",
+        "此特定操作需要什么PPE、工具、防护装置或许可证？",
+        "我什么时候必须停止以及我应该通知谁？"
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "四个求助问题"
+    },
+    {
+      "type": "list",
+      "items": [
+        "谁是我的直接主管以及谁将接替他？",
+        "如果设备出现故障或PPE 短缺，我应该联系谁？",
+        "如何报告危险、伤害或险情？",
+        "如何呼叫紧急援助以及谁将在入口处迎接服务？"
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "用行动检验理解"
+    },
+    {
+      "rows": [
+        [
+          "疏散",
+          "我可以在没有提示的情况下向您展示两条路径和一个集合点"
+        ],
+        [
+          "停止",
+          "我知道停止操作的安全方法"
+        ],
+        [
+          "PPE",
+          "我知道如何检查、穿戴和调整必要的防护措施"
+        ],
+        [
+          "通讯",
+          "已保存所需号码或了解可用频道"
+        ],
+        [
+          "边界",
+          "我了解自己还无法执行哪些操作"
+        ]
+      ],
+      "type": "table",
+      "caption": "不仅能够听到，而且能够展示",
+      "headers": [
+        "主题",
+        "自检"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "不要复制危险的习惯"
+    },
+    {
+      "type": "paragraph",
+      "content": "“我们总是这样做”并不能证明安全。将所示技术与说明、标志和保护装置进行比较。如果经验丰富的同事建议绕过障碍、删除PPE或缩短程序，请停下来并与您的经理核实。"
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "第一班结束时",
+      "content": "写下三件事：不清楚的地方，你在哪里注意到风险，以及哪些技能需要与导师重复。这是安全第二天的简短计划。"
+    },
+    {
+      "type": "paragraph",
+      "content": "培训和安全交底 提供了基础，但新任务、新设备或变化的条件需要新的澄清。不要自动将昨天的方法转移到今天的工作中。"
+    },
+    {
+      "url": "/topics",
+      "text": "在SafetyHub开始训练",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "新职场第一天：开始前的12个问题",
+    "ogImage": "/images/generated/article-new-worker.webp",
+    "ogTitle": "新职场第一天：开始前的12个问题",
+    "indexable": true,
+    "description": "新手在尝试第一个独立任务之前应该了解有关风险、路线、设备、PPE 和通信的知识。",
+    "ogDescription": "新手在尝试第一个独立任务之前应该了解有关风险、路线、设备、PPE 和通信的知识。"
+  },
+  "jurisdiction": "哈萨克斯坦共和国",
+  "effectiveDate": "2026-08-12",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K1500000414",
+      "title": "哈萨克斯坦共和国劳动法"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500012665",
+      "title": "安全劳动防护知识培训、指导和检测规则"
+    }
+  ],
+  "createdAt": "2026-08-02T00:00:00.000Z",
+  "updatedAt": "2026-08-02T00:00:00.000Z"
+}

@@ -25,9 +25,7 @@ function validPayload() {
     presentationId,
     presentation: {
       id: presentationId,
-      bucket: 'course-presentations',
-      path: 'course/presentation/file.pdf',
-      thumbnailPath: 'course/presentation/thumb.webp',
+      locale: 'ru',
       pageCount: 25,
       sha256: 'a'.repeat(64),
       byteSize: 1_024,

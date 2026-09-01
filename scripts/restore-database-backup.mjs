@@ -1,8 +1,12 @@
+import { spawnSync } from 'node:child_process';
 import { createDecipheriv, createHash } from 'node:crypto';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
-import { spawnSync } from 'node:child_process';
+import {
+  assertPhysicalPathRelationship,
+  readDatabaseBackupReceipt,
+} from './database-backup-security.mjs';
 
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 2) {
@@ -20,25 +24,79 @@ if (!backupDirectory || !outputDirectory) {
 
 const backup = path.resolve(backupDirectory);
 const output = path.resolve(outputDirectory);
-await mkdir(output, { recursive: false });
-const receipt = JSON.parse(await readFile(path.join(backup, 'receipt.json'), 'utf8'));
-if (receipt.kind !== 'safetyhub-database-backup-v1' || !Array.isArray(receipt.artifacts)) {
-  throw new Error('Unsupported database backup receipt.');
+const receiptLocation = await assertPhysicalPathRelationship({
+  directoryPath: backup,
+  candidatePath: path.join(backup, 'receipt.json'),
+  relationship: 'inside',
+  directoryExpectation: 'directory',
+  candidateExpectation: 'file',
+  directoryLabel: 'Encrypted backup directory',
+  candidateLabel: 'Database backup receipt',
+  relationshipError: 'The database backup receipt must stay inside the encrypted backup directory.',
+});
+const expectedBackupPhysicalPath = receiptLocation.directory.physicalPath;
+const receipt = await readDatabaseBackupReceipt(receiptLocation.candidate.absolutePath);
+const initialOutputBoundary = await assertPhysicalPathRelationship({
+  directoryPath: backup,
+  candidatePath: output,
+  relationship: 'outside',
+  directoryExpectation: 'directory',
+  candidateExpectation: 'absent',
+  directoryLabel: 'Encrypted backup directory',
+  candidateLabel: 'Plaintext restore directory',
+  expectedDirectoryPhysicalPath: expectedBackupPhysicalPath,
+  relationshipError: 'The plaintext restore directory must be outside the encrypted backup directory.',
+});
+const expectedOutputPhysicalPath = initialOutputBoundary.candidate.physicalPath;
+
+async function existingBackupFile(name, label, expectedPhysicalPath) {
+  const result = await assertPhysicalPathRelationship({
+    directoryPath: backup,
+    candidatePath: path.join(backup, name),
+    relationship: 'inside',
+    directoryExpectation: 'directory',
+    candidateExpectation: 'file',
+    directoryLabel: 'Encrypted backup directory',
+    candidateLabel: label,
+    expectedDirectoryPhysicalPath: expectedBackupPhysicalPath,
+    expectedCandidatePhysicalPath: expectedPhysicalPath,
+    relationshipError: `${label} must stay inside the encrypted backup directory.`,
+  });
+  return result.candidate;
 }
+
+const encryptedArtifactPaths = new Map();
+for (const artifact of receipt.artifacts) {
+  encryptedArtifactPaths.set(
+    artifact.name,
+    await existingBackupFile(artifact.name, 'Encrypted database artifact'),
+  );
+}
+
 let recoveryKey;
 let key;
 if (recoveryKeyFile) {
-  if (!receipt.portableRecovery) throw new Error('This backup has no portable recovery envelope.');
-  const serializedRecoveryKey = (await readFile(path.resolve(recoveryKeyFile), 'utf8')).trim();
-  const recoveryPrefix = 'SAFETYHUB-RECOVERY-KEY-V1:';
-  if (!serializedRecoveryKey.startsWith(recoveryPrefix)) {
+  const serializedRecoveryKeyBytes = await readFile(path.resolve(recoveryKeyFile));
+  if (serializedRecoveryKeyBytes.byteLength > 256) {
     throw new Error('Portable recovery key format is invalid.');
   }
-  recoveryKey = Buffer.from(serializedRecoveryKey.slice(recoveryPrefix.length), 'base64url');
-  if (recoveryKey.byteLength !== 32) throw new Error('Portable recovery key is invalid.');
-  const recoveryEnvelope = await readFile(
-    path.join(backup, receipt.portableRecovery.wrappedKeyFile),
+  const serializedRecoveryKey = serializedRecoveryKeyBytes.toString('utf8');
+  const recoveryKeyMatch = serializedRecoveryKey.match(
+    /^SAFETYHUB-RECOVERY-KEY-V1:([A-Za-z0-9_-]{43})(?:\r?\n)?$/u,
   );
+  if (!recoveryKeyMatch) throw new Error('Portable recovery key format is invalid.');
+  recoveryKey = Buffer.from(recoveryKeyMatch[1], 'base64url');
+  if (
+    recoveryKey.byteLength !== 32 ||
+    recoveryKey.toString('base64url') !== recoveryKeyMatch[1]
+  ) {
+    throw new Error('Portable recovery key is invalid.');
+  }
+  const recoveryEnvelopeLocation = await existingBackupFile(
+    receipt.portableRecovery.wrappedKeyFile,
+    'Portable recovery envelope',
+  );
+  const recoveryEnvelope = await readFile(recoveryEnvelopeLocation.absolutePath);
   if (
     createHash('sha256').update(recoveryEnvelope).digest('hex') !==
     receipt.portableRecovery.encryptedSha256
@@ -46,7 +104,10 @@ if (recoveryKeyFile) {
     throw new Error('Portable recovery envelope checksum mismatch.');
   }
   const recoveryMagic = Buffer.from('SAFETYHUB-DB-KEY-V1\0');
-  if (!recoveryEnvelope.subarray(0, recoveryMagic.byteLength).equals(recoveryMagic)) {
+  if (
+    recoveryEnvelope.byteLength !== recoveryMagic.byteLength + 12 + 16 + 32 ||
+    !recoveryEnvelope.subarray(0, recoveryMagic.byteLength).equals(recoveryMagic)
+  ) {
     throw new Error('Portable recovery envelope header mismatch.');
   }
   const recoveryIv = recoveryEnvelope.subarray(
@@ -63,7 +124,11 @@ if (recoveryKeyFile) {
   recoveryDecipher.setAuthTag(recoveryTag);
   key = Buffer.concat([recoveryDecipher.update(encryptedKey), recoveryDecipher.final()]);
 } else {
-  const protectedKey = await readFile(path.join(backup, 'database-backup.key.dpapi'), 'utf8');
+  const protectedKeyLocation = await existingBackupFile(
+    'database-backup.key.dpapi',
+    'Windows DPAPI backup key',
+  );
+  const protectedKey = await readFile(protectedKeyLocation.absolutePath, 'utf8');
   const cleanPowerShellEnvironment = Object.fromEntries(
     Object.entries(process.env).filter(([name]) => name.toLowerCase() !== 'psmodulepath'),
   );
@@ -89,14 +154,61 @@ if (recoveryKeyFile) {
       `Windows DPAPI key recovery failed: ${unprotected.stderr.trim() || 'unknown error'}`,
     );
   }
-  key = Buffer.from(unprotected.stdout.trim(), 'base64');
+  const encodedKey = unprotected.stdout.trim();
+  if (!/^[A-Za-z0-9+/]{43}=$/u.test(encodedKey)) {
+    throw new Error('Recovered backup key is invalid.');
+  }
+  key = Buffer.from(encodedKey, 'base64');
+  if (key.toString('base64') !== encodedKey) throw new Error('Recovered backup key is invalid.');
 }
 if (key.byteLength !== 32) throw new Error('Recovered backup key is invalid.');
 
+async function assertCreatedOutputDirectory() {
+  return assertPhysicalPathRelationship({
+    directoryPath: output,
+    candidatePath: backup,
+    relationship: 'outside',
+    directoryExpectation: 'directory',
+    candidateExpectation: 'directory',
+    directoryLabel: 'Plaintext restore directory',
+    candidateLabel: 'Encrypted backup directory',
+    expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+    expectedCandidatePhysicalPath: expectedBackupPhysicalPath,
+    relationshipError: 'The plaintext restore directory must be outside the encrypted backup directory.',
+  });
+}
+
+async function assertOutputFile(outputName, expectation) {
+  return assertPhysicalPathRelationship({
+    directoryPath: output,
+    candidatePath: path.join(output, outputName),
+    relationship: 'inside',
+    directoryExpectation: 'directory',
+    candidateExpectation: expectation,
+    directoryLabel: 'Plaintext restore directory',
+    candidateLabel: 'Restored database artifact',
+    expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+    relationshipError: 'A restored database artifact escaped the plaintext restore directory.',
+  });
+}
+
+let outputCreated = false;
 try {
+  await mkdir(output, { recursive: false });
+  outputCreated = true;
+  await assertCreatedOutputDirectory();
   for (const artifact of receipt.artifacts) {
-    const envelope = await readFile(path.join(backup, artifact.name));
-    if (createHash('sha256').update(envelope).digest('hex') !== artifact.encryptedSha256) {
+    const initialEnvelopeLocation = encryptedArtifactPaths.get(artifact.name);
+    const envelopeLocation = await existingBackupFile(
+      artifact.name,
+      'Encrypted database artifact',
+      initialEnvelopeLocation.physicalPath,
+    );
+    const envelope = await readFile(envelopeLocation.absolutePath);
+    if (
+      envelope.byteLength !== artifact.encryptedBytes ||
+      createHash('sha256').update(envelope).digest('hex') !== artifact.encryptedSha256
+    ) {
       throw new Error(`Encrypted artifact checksum mismatch: ${artifact.name}`);
     }
     const magic = Buffer.from('SAFETYHUB-DB-BACKUP-V1\0');
@@ -115,16 +227,22 @@ try {
     ) {
       throw new Error(`Restored artifact checksum mismatch: ${artifact.name}`);
     }
-    await writeFile(path.join(output, artifact.name.replace(/[.]aes256gcm$/u, '')), plaintext, {
-      flag: 'wx',
-      mode: 0o600,
-    });
+    const outputLocation = await assertOutputFile(artifact.outputName, 'absent');
+    await writeFile(outputLocation.candidate.absolutePath, plaintext, { flag: 'wx', mode: 0o600 });
+    await assertOutputFile(artifact.outputName, 'file');
   }
   console.log(JSON.stringify({ ok: true, outputDirectory: output }));
 } catch (error) {
-  await rm(output, { recursive: true, force: true }).catch(() => undefined);
+  if (outputCreated) {
+    try {
+      await assertCreatedOutputDirectory();
+      await rm(output, { recursive: true, force: true });
+    } catch {
+      // Do not recursively remove a path whose physical identity changed during the restore.
+    }
+  }
   throw error;
 } finally {
-  key.fill(0);
+  key?.fill(0);
   recoveryKey?.fill(0);
 }

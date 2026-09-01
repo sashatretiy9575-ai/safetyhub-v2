@@ -25,7 +25,51 @@
 
 Удалённая статья должна отсутствовать в выдаче, sitemap и slug redirects. Удалённый
 курс не должен принимать новые попытки. Сохранённые сертификаты проверяются и
-скачиваются по-прежнему.
+скачиваются по-прежнему; PDF создаётся в браузере из авторизованных no-store
+metadata и неизменяемых assets, а не на сервере.
+
+## Locale shell и PWA
+
+- Проверяйте `/`, `/kk`, `/en`, `/zh` и один вложенный URL каждой локали. RU не
+  должен получать `/ru`, а `/zh/admin`, `/en/api/...` и locale-prefixed assets не
+  должны становиться alias существующего ресурса.
+- При проверке автоопределения очищайте только cookie `safetyhub-locale` и задавайте
+  конкретный `Accept-Language`. Явный префикс должен иметь приоритет, cookie —
+  приоритет над заголовком, неизвестный язык — возвращать RU.
+- После добавления ключа обновите все четыре `messages/*.json`. Тест каталогов
+  блокирует отсутствующий ключ, пустое значение или несовпадающий ICU parameter.
+- Если в `messages/zh.json` появились новые иероглифы, пересоберите UI subset из
+  официального Noto Sans SC variable TTF:
+  `python scripts/subset-cjk-ui-font.py C:/path/to/NotoSansSC-VF.ttf`.
+  Проверьте, что font остаётся self-hosted, меньше 500 KiB и preloaded только при
+  `data-locale="zh"`.
+- Проверяйте locale manifest `/manifest/{locale}` и offline shell
+  `/offline/{locale}`. После изменения их контракта увеличьте версию
+  `safetyhub-static-v*`, иначе установленная PWA может сохранить старый fallback.
+- При диагностике локализованного protected route сначала сравните внешний URL с
+  внутренним pathname после удаления locale prefix. Нельзя добавлять отдельный
+  browser Supabase client или обходить общий `updateSession` ради локали.
+
+## Клиентские сертификаты и export
+
+- Ошибка `CERTIFICATE_PDF_CLIENT_ONLY` на старом `/api/certificates/{id}` —
+  ожидаемый compatibility contract; актуальный интерфейс сначала запрашивает
+  `/metadata`, затем запускает browser worker.
+- Metadata endpoints обязаны оставаться `private, no-store`: 32 KiB для одного
+  сертификата и 2 MiB для административного export до 500 строк.
+- RU/KK/EN используют локальный Noto Sans Latin/Cyrillic/Kazakh asset. Полный ZH
+  font Noto Sans CJK SC `Sans2.004` входит в deployment bundle, проверяется по
+  размеру и SHA-256 и загружается только через один exact-query same-origin URL.
+  Route не обращается к внешнему upstream и не допускает query aliases. Immutable
+  content route дополнительно требует exact lowercase UUID pathname и отвергает
+  uppercase, mixed-case и percent-encoded aliases до DB/Storage; сбой
+  локального asset не должен приводить к server-side fallback-рендеру.
+- В Chromium с File System Access API большой ZIP записывается потоком. В других
+  браузерах export разбивается на части не более 100 сертификатов; это штатное
+  поведение, а не потеря данных.
+- При жалобе на скачивание сначала проверьте metadata JSON, template/font route,
+  CSP `worker-src/connect-src 'self'`, свободную память вкладки и отмену задачи.
+  Никогда не включайте обратно backend PDF/ZIP generation как оперативный обход.
 
 ## Storage reconciler
 
@@ -55,11 +99,80 @@ candidate, и повторно сверяет Storage. Ключ аватара �
 current и старый previous, разверните приложение и проверьте старые и новые QR.
 После переходного окна удалите previous отдельной выкладкой.
 
+`ZH_RECOVERY_PEPPER` хранится только в server runtime Vercel и должен содержать
+не менее 32 случайных байт. Его нельзя менять как обычный deploy: существующие
+initial recovery codes и admin re-enrollment codes после ротации перестанут
+проверяться. Плановая ротация требует сначала выдать новые codes через reasoned
+admin reset; аварийная ротация намеренно отзывает все ещё не использованные
+codes. Значение нельзя помещать в `NEXT_PUBLIC_*`, логи, analytics или Supabase
+таблицы.
+
+Для WebAuthn production trust root неизменяем: RP ID `safetyhub.kz`, origin
+`https://safetyhub.kz`. Preview deployment fail-closed; localhost разрешён
+только не-production процессу на `localhost:3000` или `127.0.0.1:3000`.
+`cleanup_required` и просроченный `cleanup_claimed` безопасно подхватываются
+следующей ZH auth-операцией; для гарантированного обслуживания также вызывайте
+service-only `claim_zh_registration_cleanup`/`finish_...` из планового bounded
+maintenance job. Строки операций, Auth users и avatar objects вручную не
+удаляйте.
+
 При утечке Storage bearer одновременно обновите Function secret и Vault value,
 затем проверьте, что старое значение получает отказ. Никогда не печатайте database
 URI, service-role key, backup passphrase или персональные payload.
 
+## OTP receipts и presentation leases
+
+Email OTP receipt обслуживается только service-role RPC
+`issue_email_otp_challenge`, `consume_email_otp_challenge_attempt`,
+`complete_email_otp_challenge` и `prune_email_otp_challenges`. Не выдавайте
+табличные grants на `private.email_otp_challenges` и не логируйте cookie, HMAC или
+email. Плановый maintenance может вызывать bounded prune; expired receipt в любом
+случае удаляется при следующем consume/issue. Шесть ошибок ограничивают только
+один конкретный challenge, а не все попытки жертвы по email.
+
+Защищённый relay презентации перед Storage download расходует actor/IP quota и
+вызывает `claim_course_presentation_download_lease` с обычным TTL 90 секунд.
+Контракт допускает максимум две активные передачи на actor и двенадцать глобально;
+lease удерживается до EOF, cancel, timeout или ошибки, затем освобождается точной
+парой `(leaseId, actorId)`. Не заменяйте его process-local semaphore. Crash
+восстанавливается expiry: следующий claim под advisory lock удаляет просроченные
+строки. Прямые grants на private lease table запрещены.
+
 ## Изменение схемы
+
+## Поэтапные runtime-флаги релиза
+
+Новые внешние поверхности имеют независимые server-only gates:
+
+- `SAFETYHUB_LOCALE_ROUTES_ENABLED` — префиксы `/kk`, `/en`, `/zh`, switcher,
+  localized sitemap/SEO/PWA;
+- `SAFETYHUB_ZH_PASSKEY_ENABLED` — ZH registration/login/recovery и admin reset;
+- `SAFETYHUB_ADMIN_INBOX_ENABLED` — UI и no-store API административного inbox.
+
+В production/preview отсутствие значения и любое значение кроме точного `true`
+оставляет поверхность закрытой. Включение выполняется отдельной reviewed
+конфигурацией deployment в указанном порядке; секреты в эти значения не входят.
+Перед включением локалей публикационный validator и parity обязаны быть зелёными.
+Перед ZH gate должны совпадать WebAuthn RP/origin и текущие legal versions. Перед
+inbox gate сначала разворачивается DB event contract, затем включается DB emission,
+а Telegram delivery активируется отдельным последующим шагом.
+
+DB-порядок задаётся service-only RPC `set_runtime_feature_flag` с обязательными
+reason и новым idempotency UUID для каждого логического изменения:
+
+1. `notification_events = true`;
+2. smoke административного inbox;
+3. `telegram_delivery = true`;
+4. smoke приватной группы.
+
+Отключение выполняется в обратном порядке. Прямые изменения private-таблицы,
+повторное использование UUID с другими параметрами и включение Telegram раньше
+event emission отклоняются контрактом БД.
+
+Операционная подготовка RU/KK/EN/ZH content выполняется по
+`docs/admin-localization-workflow.md`. Localized assessment bundle проверяется и
+импортируется только offline service-командой; browser upload для него отсутствует.
+Новые presentation objects всегда используют locale segment в immutable path.
 
 1. Добавьте новую migration; уже применённые файлы не переписываются.
 2. Выполните чистый local reset.

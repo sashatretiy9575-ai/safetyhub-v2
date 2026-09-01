@@ -6,6 +6,7 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { requestAdminNotificationRefresh } from '@/components/admin/admin-notification-inbox';
 import type { AdminAccountApprovalItem } from '@/features/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 
@@ -14,7 +15,8 @@ type DecisionResponse = { approvalState?: Decision; error?: string };
 
 const errorMessages: Record<string, string> = {
   ACCOUNT_APPROVAL_NOT_PENDING: 'Заявка уже была рассмотрена. Обновите очередь.',
-  ACCOUNT_APPROVAL_SELF_DECISION_FORBIDDEN: 'Администратор не может подтверждать собственную заявку.',
+  ACCOUNT_APPROVAL_SELF_DECISION_FORBIDDEN:
+    'Администратор не может подтверждать собственную заявку.',
   IDEMPOTENCY_KEY_REUSED: 'Эта операция уже была отправлена с другими данными. Обновите очередь.',
   RATE_LIMITED: 'Слишком много действий подряд. Подождите немного и повторите.',
 };
@@ -57,7 +59,11 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
       const result = await clientRequest(`/api/admin/account-approvals/${item.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idempotencyKey, decision, ...(decision === 'rejected' ? { reason } : {}) }),
+        body: JSON.stringify({
+          idempotencyKey,
+          decision,
+          ...(decision === 'rejected' ? { reason } : {}),
+        }),
       });
       const payload = await readClientResponseJson<DecisionResponse>(result.response);
       if (!result.ok) {
@@ -74,7 +80,12 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
       }
       operationKeys.current.delete(operationKey);
       setReasons((current) => ({ ...current, [item.id]: '' }));
-      setMessage(decision === 'approved' ? 'Доступ к обучению подтверждён.' : 'Заявка возвращена на уточнение.');
+      setMessage(
+        decision === 'approved'
+          ? 'Доступ к обучению подтверждён.'
+          : 'Заявка возвращена на уточнение.',
+      );
+      requestAdminNotificationRefresh();
       router.refresh();
     } catch (error) {
       setMessage(clientRequestMessage(error, 'Не удалось сохранить решение. Попробуйте ещё раз.'));
@@ -102,24 +113,32 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
                 />
               ) : (
                 <div className="grid size-20 shrink-0 place-items-center rounded-xl border border-dashed text-center text-xs text-[var(--color-text-muted)] sm:size-[5.25rem]">
-                  Фото<br />не загружено
+                  Фото
+                  <br />
+                  не загружено
                 </div>
               )}
               <div className="min-w-0 sm:hidden">
                 <h2 className="font-display text-lg font-bold break-words">{label}</h2>
-                <p className="break-all text-sm text-[var(--color-text-muted)]">{item.email}</p>
+                <p className="text-sm break-all text-[var(--color-text-muted)]">
+                  {item.email ?? 'Вход по ключу доступа'}
+                </p>
               </div>
             </div>
 
             <div className="min-w-0 space-y-4">
               <div className="hidden sm:block">
                 <h2 className="font-display text-lg font-bold break-words">{label}</h2>
-                <p className="break-all text-sm text-[var(--color-text-muted)]">{item.email}</p>
+                <p className="text-sm break-all text-[var(--color-text-muted)]">
+                  {item.email ?? 'Вход по ключу доступа'}
+                </p>
               </div>
 
               <dl className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
                 <div>
-                  <dt className="text-xs font-semibold text-[var(--color-text-muted)]">Должность</dt>
+                  <dt className="text-xs font-semibold text-[var(--color-text-muted)]">
+                    Должность
+                  </dt>
                   <dd className="break-words">{item.job || 'Не указана'}</dd>
                 </div>
                 <div>
@@ -128,24 +147,36 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
                 </div>
                 <div>
                   <dt className="text-xs font-semibold text-[var(--color-text-muted)]">Телефон</dt>
-                  <dd>{item.phoneE164 ?? 'Не указан'}{item.phoneCountryIso2 ? ` · ${item.phoneCountryIso2}` : ''}</dd>
+                  <dd>
+                    {item.phoneE164 ?? 'Не указан'}
+                    {item.phoneCountryIso2 ? ` · ${item.phoneCountryIso2}` : ''}
+                  </dd>
                 </div>
                 <div>
-                  <dt className="text-xs font-semibold text-[var(--color-text-muted)]">Контрольный срок</dt>
-                  <dd><time dateTime={item.dueAt}>{dateTime(item.dueAt)}</time></dd>
+                  <dt className="text-xs font-semibold text-[var(--color-text-muted)]">
+                    Контрольный срок
+                  </dt>
+                  <dd>
+                    <time dateTime={item.dueAt}>{dateTime(item.dueAt)}</time>
+                  </dd>
                 </div>
               </dl>
 
               <p className="text-xs text-[var(--color-text-muted)]">
-                Заявка отправлена: <time dateTime={item.requestedAt}>{dateTime(item.requestedAt)}</time>.
+                Заявка отправлена:{' '}
+                <time dateTime={item.requestedAt}>{dateTime(item.requestedAt)}</time>.
               </p>
 
               <div className="grid gap-2 border-t border-[var(--color-border)] pt-3 sm:grid-cols-[minmax(0,1fr)_auto]">
                 <label className="space-y-1">
-                  <span className="text-xs font-semibold text-[var(--color-text-muted)]">Комментарий при отказе</span>
+                  <span className="text-xs font-semibold text-[var(--color-text-muted)]">
+                    Комментарий при отказе
+                  </span>
                   <Textarea
                     value={reasons[item.id] ?? ''}
-                    onChange={(event) => setReasons((current) => ({ ...current, [item.id]: event.target.value }))}
+                    onChange={(event) =>
+                      setReasons((current) => ({ ...current, [item.id]: event.target.value }))
+                    }
                     maxLength={500}
                     rows={2}
                     placeholder="Например: уточните название компании."
@@ -153,7 +184,12 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
                   />
                 </label>
                 <div className="flex flex-wrap content-end gap-2">
-                  <Button type="button" size="sm" disabled={busy} onClick={() => void decide(item, 'approved')}>
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={busy}
+                    onClick={() => void decide(item, 'approved')}
+                  >
                     Подтвердить доступ
                   </Button>
                   <Button
@@ -171,7 +207,11 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
           </article>
         );
       })}
-      {message ? <p role="status" aria-live="polite" className="text-sm text-[var(--color-text-muted)]">{message}</p> : null}
+      {message ? (
+        <p role="status" aria-live="polite" className="text-sm text-[var(--color-text-muted)]">
+          {message}
+        </p>
+      ) : null}
     </div>
   );
 }

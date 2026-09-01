@@ -2,6 +2,7 @@ import type { AttemptPayload } from './types';
 
 export type AttemptPolicyCode =
   | 'ACCOUNT_APPROVAL_REQUIRED'
+  | 'LEGAL_ACCEPTANCE_REQUIRED'
   | 'PROFILE_ONBOARDING_REQUIRED'
   | 'AVATAR_REQUIRED'
   | 'ATTEMPT_DAILY_LIMIT'
@@ -64,6 +65,7 @@ export class AttemptExpiredError extends AttemptPolicyError {
 export function parseAttemptRpcError(error: { message: string; details?: string | null }) {
   const codes: AttemptPolicyCode[] = [
     'ACCOUNT_APPROVAL_REQUIRED',
+    'LEGAL_ACCEPTANCE_REQUIRED',
     'PROFILE_ONBOARDING_REQUIRED',
     'AVATAR_REQUIRED',
     'ATTEMPT_DAILY_LIMIT',
@@ -77,7 +79,7 @@ export function parseAttemptRpcError(error: { message: string; details?: string 
   if (!code) return new Error(error.message);
   return new AttemptPolicyError(
     code,
-    code === 'ACCOUNT_APPROVAL_REQUIRED'
+    code === 'ACCOUNT_APPROVAL_REQUIRED' || code === 'LEGAL_ACCEPTANCE_REQUIRED'
       ? 403
       : code === 'ATTEMPT_ROLLING_LIMIT' || code === 'ATTEMPT_DAILY_LIMIT'
       ? 429

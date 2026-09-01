@@ -27,21 +27,29 @@ test('public shell uses neutral glass chrome and the 1120px navigation breakpoin
 });
 
 test('theme, contact actions, and footer keep explicit accessible labels', async () => {
-  const [theme, header, footer] = await Promise.all([
+  const [theme, header, footer, ruMessages] = await Promise.all([
     read('components/shared/theme-toggle.tsx'),
     read('components/layout/header.tsx'),
     read('components/layout/footer.tsx'),
+    read('messages/ru.json'),
   ]);
+  const ru = JSON.parse(ruMessages);
 
   assert.match(theme, /role="switch"/);
   assert.match(theme, /aria-checked=\{isDark\}/);
-  assert.match(theme, />Светлая</);
-  assert.match(theme, />Тёмная</);
-  assert.match(header, /aria-label=\{`Позвонить: \$\{contacts\.phoneDisplay\}`\}/);
-  assert.match(header, /aria-label="Написать в WhatsApp"/);
+  assert.match(theme, /translations\('light'\)/);
+  assert.match(theme, /translations\('dark'\)/);
+  assert.equal(ru.Shell.theme.light, 'Светлая');
+  assert.equal(ru.Shell.theme.dark, 'Тёмная');
+  assert.match(header, /translations\('call', \{ phone: contacts\.phoneDisplay \}\)/);
+  assert.match(header, /translations\('whatsapp'\)/);
+  assert.equal(ru.Shell.call, 'Позвонить: {phone}');
+  assert.equal(ru.Shell.whatsapp, 'Написать в WhatsApp');
   assert.match(footer, /href="https:\/\/rc-web\.kz\/"/);
-  assert.match(footer, /aria-label="Навигация в подвале"/);
-  assert.match(footer, /aria-label="Юридическая информация"/);
+  assert.match(footer, /aria-label=\{translations\('footer\.navigation'\)\}/);
+  assert.match(footer, /aria-label=\{translations\('footer\.legalNavigation'\)\}/);
+  assert.equal(ru.Shell.footer.navigation, 'Навигация в подвале');
+  assert.equal(ru.Shell.footer.legalNavigation, 'Юридическая информация');
   assert.match(footer, /text-white\/45/);
   assert.match(footer, /min-h-11/);
   assert.match(footer, /text-\[#ff8a24\]/);

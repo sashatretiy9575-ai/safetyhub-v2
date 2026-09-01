@@ -25,7 +25,7 @@ test('registration asks for email only and defers explicit legal consent until a
     requestRoute,
     /prepareSignupLegalOperation|createAdminClient|auth\.admin\.createUser|email_confirm|raw_user_meta_data|\.identities\b|deleteUser\(/u,
   );
-  assert.match(verifyRoute, /return '\/auth\/legal'/u);
+  assert.match(verifyRoute, /localizedAccountPath\('\/auth\/legal', locale\)/u);
   assert.doesNotMatch(verifyRoute, /accept_current_legal_documents|legalAccepted|parsed\.data\.intent/u);
   assert.match(legalPage, /requireUser\(\{ enforceLegal: false \}\)/u);
   assert.match(legalPage, /<LegalAcceptanceGate/u);
@@ -38,14 +38,19 @@ test('registration asks for email only and defers explicit legal consent until a
 });
 
 test('registration start is neutral about whether the email already has an account', async () => {
-  const [flow, requestRoute] = await Promise.all([
+  const [flow, requestRoute, ruMessages] = await Promise.all([
     read('features/auth/email-otp-flow.tsx'),
     read('app/api/auth/email-otp/request/route.ts'),
+    read('messages/ru.json'),
   ]);
 
-  assert.match(flow, /Если этот адрес можно использовать, код отправлен/u);
-  assert.match(requestRoute, /return NextResponse\.json\(\{ sent: true \}, \{ status: 202 \}\)/u);
-  assert.doesNotMatch(flow, /reset-password|восстановите пароль|Пароль/u);
+  assert.match(flow, /setStatus\(t\('sentStatus'\)\)/u);
+  assert.match(JSON.parse(ruMessages).AuthOtp.sentStatus, /код отправлен/iu);
+  assert.match(
+    requestRoute,
+    /setEmailOtpChallengeCookie\([\s\S]*NextResponse\.json\(\{ sent: true \}, \{ status: 202 \}\)/u,
+  );
+  assert.doesNotMatch(flow, /reset-password|PasswordInput|type="password"/u);
 });
 
 test('email-code form exposes inline errors and focuses the first invalid field', async () => {

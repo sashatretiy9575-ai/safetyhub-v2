@@ -18,6 +18,7 @@ const PUBLIC_BUCKET = 'course-presentations';
 const paramsSchema = z.object({ courseId: z.string().uuid() });
 const bodySchema = z.object({
   presentationId: z.string().uuid(),
+  locale: z.enum(['ru', 'kk', 'en', 'zh']),
   sha256: z.string().regex(/^[0-9a-f]{64}$/u),
   pageCount: z.number().int().min(1).max(200),
 });
@@ -37,6 +38,7 @@ type FinalizedMetadata = {
   presentation: {
     id: string;
     courseId: string;
+    locale: 'ru' | 'kk' | 'en' | 'zh';
     storageBucket: 'course-presentations';
     storagePath: string;
     thumbnailPath: string;
@@ -48,6 +50,7 @@ type FinalizedMetadata = {
   };
   cleanup: {
     id: string;
+    locale: 'ru' | 'kk' | 'en' | 'zh';
     bucket: 'course-presentations-staging';
     path: string;
     thumbnailPath: string;
@@ -61,6 +64,7 @@ function finalizedMetadata(
   expected: {
     courseId: string;
     presentationId: string;
+    locale: 'ru' | 'kk' | 'en' | 'zh';
     sha256: string;
     pageCount: number;
     byteSize: number;
@@ -79,6 +83,7 @@ function finalizedMetadata(
     !presentation ||
     presentation.id !== expected.presentationId ||
     presentation.courseId !== expected.courseId ||
+    presentation.locale !== expected.locale ||
     presentation.storageBucket !== PUBLIC_BUCKET ||
     presentation.storagePath !== expected.publicPdfPath ||
     presentation.thumbnailPath !== expected.publicThumbnailPath ||
@@ -94,6 +99,7 @@ function finalizedMetadata(
     cleanup !== null &&
     (!cleanup ||
       !UUID_PATTERN.test(cleanup.id) ||
+      cleanup.locale !== expected.locale ||
       cleanup.bucket !== STAGING_BUCKET ||
       cleanup.path !== expected.stagingPdfPath ||
       cleanup.thumbnailPath !== expected.stagingThumbnailPath ||
@@ -172,6 +178,7 @@ async function cleanupFinalizedStaging(
 function readyPresentationResponse(result: FinalizedMetadata, replayed = result.replayed) {
   return NextResponse.json({
     id: result.presentation.id,
+    locale: result.presentation.locale,
     pageCount: result.presentation.pageCount,
     sha256: result.presentation.sha256,
     byteSize: result.presentation.byteSize,
@@ -267,6 +274,7 @@ export async function POST(request: Request, context: { params: Promise<{ course
     if (
       presentationRecord.status === 'ready' &&
       presentationRecord.course_id === expectedCourseId &&
+      presentationRecord.locale === body.data.locale &&
       presentationRecord.storage_bucket === PUBLIC_BUCKET &&
       presentationRecord.storage_path &&
       presentationRecord.thumbnail_path &&
@@ -277,6 +285,7 @@ export async function POST(request: Request, context: { params: Promise<{ course
       const replay = await commitPresentationMetadata(admin, actor.user.id, {
         courseId: expectedCourseId,
         presentationId: presentationRecord.id,
+        locale: body.data.locale,
         sha256: expectedSha256,
         pageCount: expectedPageCount,
         byteSize: expectedByteSize,
@@ -293,6 +302,7 @@ export async function POST(request: Request, context: { params: Promise<{ course
       // cannot be re-leased during this request, serving it is safe.
       return NextResponse.json({
         id: presentationRecord.id,
+        locale: presentationRecord.locale,
         pageCount: presentationRecord.page_count,
         sha256: presentationRecord.sha256,
         byteSize: presentationRecord.byte_size,
@@ -305,6 +315,7 @@ export async function POST(request: Request, context: { params: Promise<{ course
     }
     if (
       presentationRecord.course_id !== expectedCourseId ||
+      presentationRecord.locale !== body.data.locale ||
       presentationRecord.storage_bucket !== STAGING_BUCKET
     ) {
       return NextResponse.json({ error: 'PRESENTATION_VALIDATION_FAILED' }, { status: 409 });
@@ -410,7 +421,7 @@ export async function POST(request: Request, context: { params: Promise<{ course
       }
       await renderPdfBoundaryPages(pdfBytes, expectedPageCount);
       const courseSegment = expectedCourseId;
-      const publicPrefix = `${courseSegment}/${presentationRecord.id}`;
+      const publicPrefix = `${courseSegment}/${presentationRecord.locale}/${presentationRecord.id}`;
       publicPdfPath = `${publicPrefix}/${digest}.pdf`;
       publicThumbnailPath = `${publicPrefix}/${digest}-thumb.webp`;
       const [pdfUpload, thumbnailUpload] = await Promise.all([
@@ -443,6 +454,7 @@ export async function POST(request: Request, context: { params: Promise<{ course
       const metadata = await commitPresentationMetadata(admin, actor.user.id, {
         courseId: expectedCourseId,
         presentationId: presentationRecord.id,
+        locale: body.data.locale,
         sha256: digest,
         pageCount: expectedPageCount,
         byteSize: expectedByteSize,

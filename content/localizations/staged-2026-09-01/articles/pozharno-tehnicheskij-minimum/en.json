@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "pozharno-tehnicheskij-minimum",
+  "slug": "pozharno-tehnicheskij-minimum",
+  "title": "Fire alarm at work: what to do without panic",
+  "description": "A clear sequence of actions in the event of smoke, a burning smell or an alarm - from message to safe exit.",
+  "coverImage": "/images/generated/article-fire-safety.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "During a fire, the brain first tries to check whether “everything is serious.” This is a dangerous delay. Smoke, a burning smell, a flash or a signal from a warning system is a sufficient reason to immediately act according to the site plan."
+    },
+    {
+      "tone": "warning",
+      "type": "callout",
+      "title": "The priority is to get out and help others get out",
+      "content": "Report the fire by calling 101 or 112 and activate the established alarm procedure. Do not risk your life for belongings, documents or an attempt to fight the fire on your own."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Four steps when the alarm sounds"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Give the signal in the prescribed manner and call 101 or 112. State the address, location of the fire and your last name; do not end the call before the operator.",
+        "Stop working. If instructed to do so and does not pose a risk, stop the equipment safely.",
+        "Follow the signs to the nearest available emergency exit. Do not use the elevator and do not return to collect your belongings.",
+        "Arrive at the collection point, check in with the person in charge and remain there until further instructions."
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "If there is smoke on the route"
+    },
+    {
+      "type": "paragraph",
+      "content": "Do not walk into thick smoke or open a door where there is noticeable heat or smoke. Use another designated path. Move calmly, don't push people, help someone who is confused or has trouble finding their way, but don't create an extra hazard for yourself."
+    },
+    {
+      "rows": [
+        [
+          "Alarm sounded, but no smoke visible",
+          "Start evacuation anyway as planned"
+        ],
+        [
+          "Normal exit blocked",
+          "Proceed to another designated exit"
+        ],
+        [
+          "Colleague wants to go back for the phone",
+          "Stop him and continue towards the exit"
+        ],
+        [
+          "A person cannot evacuate without assistance",
+          "Inform the responsible and emergency services of the exact location"
+        ],
+        [
+          "You are already out",
+          "Do not re-enter without permission from emergency services"
+        ]
+      ],
+      "type": "table",
+      "caption": "Solutions in the first minutes",
+      "headers": [
+        "Situation",
+        "What to do"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "When fire extinguisher is acceptable"
+    },
+    {
+      "type": "paragraph",
+      "content": "The primary extinguishing agent is used only by trained people, if the fire is small, the agent is suitable for this type of fire, the room is not filled with smoke, and the path to the exit remains behind. If the fire grows, smoke appears, or the remedy does not work immediately, leave."
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "What to know in advance",
+      "content": "Locate the two closest exits, manual call point, muster point and local notification procedure. It’s too late to do this during anxiety."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "After evacuation"
+    },
+    {
+      "type": "paragraph",
+      "content": "At the assembly point, do not go home or leave the site until you have been accounted for; otherwise rescuers may search for you inside the building. Report any seat of fire, blocked passage or person you saw remaining inside. Do not spread assumptions—report only what you personally observed."
+    },
+    {
+      "type": "quote",
+      "content": "Good evacuation looks boring: early signal, familiar route, calm movement and accurate counting of people."
+    },
+    {
+      "url": "/topics/pozharnaya-bezopasnost",
+      "text": "Learn fire safety",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "Fire alarm at work: what to do without panic",
+    "ogImage": "/images/generated/article-fire-safety.webp",
+    "ogTitle": "Fire alarm at work: what to do without panic",
+    "indexable": true,
+    "description": "A clear sequence of actions in the event of smoke, a burning smell or an alarm - from message to safe exit.",
+    "ogDescription": "A clear sequence of actions in the event of smoke, a burning smell or an alarm - from message to safe exit."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-11",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/Z1400000188",
+      "title": "Law of the Republic of Kazakhstan “On Civil Protection”"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V2200026867",
+      "title": "Fire safety rules"
+    }
+  ],
+  "createdAt": "2026-08-09T00:00:00.000Z",
+  "updatedAt": "2026-08-25T20:15:07.807Z"
+}

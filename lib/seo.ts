@@ -1,8 +1,18 @@
 import type { Metadata } from 'next';
+import {
+  APP_LOCALES,
+  DEFAULT_LOCALE,
+  htmlLanguage,
+  localeAlternates,
+  localizePathname,
+  openGraphLocale,
+  type AppLocale,
+} from '@/i18n/config';
 import { absoluteUrl } from './utils';
 import { BRAND } from './constants';
 import { isPreviewDeployment } from './site-url';
 import type { SiteContactSettings } from './site-contacts-shared';
+import { rolloutFeatureEnabled } from './release/rollout-flags';
 
 type SeoOptions = {
   title?: string;
@@ -17,6 +27,7 @@ type SeoOptions = {
   modifiedTime?: string;
   authors?: string[];
   type?: 'website' | 'article';
+  locale?: AppLocale;
 };
 
 export const BASE_KEYWORDS = [
@@ -45,16 +56,26 @@ export function buildMetadata({
   modifiedTime,
   authors,
   type = 'website',
+  locale = DEFAULT_LOCALE,
 }: SeoOptions): Metadata {
   const fullTitle = title ? `${title} — ${BRAND.domain}` : `${BRAND.domain}`;
   const normalizedPath = path || '';
-  const url = absoluteUrl(normalizedPath);
+  const localizedPath = localizePathname(normalizedPath || '/', locale);
+  const url = absoluteUrl(localizedPath);
   const preventIndexing = noindex || isPreviewDeployment();
+  const localeRoutesEnabled = rolloutFeatureEnabled('localeRoutes');
+  const languageAlternates = Object.fromEntries(
+    Object.entries(localeAlternates(normalizedPath || '/'))
+      .filter(
+        ([language]) => localeRoutesEnabled || language === 'ru-KZ' || language === 'x-default',
+      )
+      .map(([language, pathname]) => [language, absoluteUrl(pathname)]),
+  );
   return {
     metadataBase: new URL(absoluteUrl('/')),
     title: fullTitle,
     description,
-    keywords: [...BASE_KEYWORDS, ...keywords].join(', '),
+    keywords: [...(locale === 'ru' ? BASE_KEYWORDS : []), ...keywords].join(', '),
     authors: authors?.map((name) => ({ name })) ?? [{ name: BRAND.domain }],
     creator: BRAND.domain,
     publisher: BRAND.domain,
@@ -73,14 +94,19 @@ export function buildMetadata({
             'max-video-preview': -1,
           },
         },
-    alternates: { canonical: url },
+    alternates: { canonical: url, languages: languageAlternates },
     openGraph: {
       type,
       url,
       siteName: BRAND.domain,
       title: ogTitle ?? fullTitle,
       description: ogDescription ?? description,
-      locale: 'ru_KZ',
+      locale: openGraphLocale(locale),
+      alternateLocale: localeRoutesEnabled
+        ? APP_LOCALES.filter((candidate) => candidate !== locale).map((candidate) =>
+            openGraphLocale(candidate),
+          )
+        : [],
       images: [{ url: ogImage, width: 1200, height: 630, alt: title ?? BRAND.domain }],
       ...(publishedTime ? { publishedTime } : {}),
       ...(modifiedTime ? { modifiedTime } : {}),
@@ -100,19 +126,22 @@ export function buildMetadata({
   };
 }
 
-export function organizationJsonLd(contacts: SiteContactSettings) {
+export function organizationJsonLd(
+  contacts: SiteContactSettings,
+  locale: AppLocale = DEFAULT_LOCALE,
+  localized?: { description?: string; city?: string },
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
     name: BRAND.domain,
     legalName: BRAND.domain,
-    url: absoluteUrl('/'),
+    url: absoluteUrl(localizePathname('/', locale)),
     logo: absoluteUrl('/icons/icon-512x512.png'),
-    description:
-      'Платформа онлайн-обучения и аттестации по промышленной безопасности, охране труда и пожарной безопасности в Казахстане.',
+    description: localized?.description,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: BRAND.city,
+      addressLocality: localized?.city ?? BRAND.city,
       addressCountry: 'KZ',
     },
     contactPoint: {
@@ -120,19 +149,20 @@ export function organizationJsonLd(contacts: SiteContactSettings) {
       telephone: contacts.phoneDisplay,
       contactType: 'customer service',
       areaServed: 'KZ',
-      availableLanguage: ['Russian'],
+      availableLanguage: ['Russian', 'Kazakh', 'English', 'Chinese'],
     },
     areaServed: { '@type': 'Country', name: 'Kazakhstan' },
   };
 }
 
-export function websiteJsonLd() {
+export function websiteJsonLd(locale: AppLocale = DEFAULT_LOCALE) {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: BRAND.domain,
-    url: absoluteUrl('/'),
-    inLanguage: ['ru-KZ'],
+    url: absoluteUrl(localizePathname('/', locale)),
+    inLanguage: htmlLanguage(locale),
+    availableLanguage: APP_LOCALES.map((candidate) => htmlLanguage(candidate)),
   };
 }
 
@@ -141,6 +171,9 @@ export function courseJsonLd(input: {
   description: string;
   url: string;
   provider?: string;
+  locale?: AppLocale;
+  credentialName?: string;
+  locationName?: string;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -150,13 +183,15 @@ export function courseJsonLd(input: {
     provider: {
       '@type': 'EducationalOrganization',
       name: input.provider ?? BRAND.domain,
-      sameAs: absoluteUrl('/'),
+      sameAs: absoluteUrl(localizePathname('/', input.locale ?? DEFAULT_LOCALE)),
     },
     url: input.url,
-    inLanguage: 'ru',
-    educationalCredentialAwarded: 'Сертификат SafetyHub.kz',
+    inLanguage: htmlLanguage(input.locale ?? DEFAULT_LOCALE),
+    educationalCredentialAwarded: input.credentialName,
     courseMode: 'online',
-    locationCreated: { '@type': 'Place', name: `${BRAND.city}, ${BRAND.country}` },
+    ...(input.locationName
+      ? { locationCreated: { '@type': 'Place', name: input.locationName } }
+      : {}),
   };
 }
 
@@ -193,6 +228,7 @@ export function articleJsonLd(input: {
   dateModified?: string;
   author: string;
   url: string;
+  locale?: AppLocale;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -209,23 +245,27 @@ export function articleJsonLd(input: {
       logo: { '@type': 'ImageObject', url: absoluteUrl('/icons/icon-512x512.png') },
     },
     mainEntityOfPage: { '@type': 'WebPage', '@id': input.url },
-    inLanguage: 'ru-KZ',
+    inLanguage: htmlLanguage(input.locale ?? DEFAULT_LOCALE),
   };
 }
 
-export function localBusinessJsonLd(contacts: SiteContactSettings) {
+export function localBusinessJsonLd(
+  contacts: SiteContactSettings,
+  locale: AppLocale = DEFAULT_LOCALE,
+  city: string = BRAND.city,
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    '@id': absoluteUrl('/#org'),
+    '@id': absoluteUrl(`${localizePathname('/', locale)}#org`),
     name: BRAND.domain,
     image: absoluteUrl('/opengraph-image'),
-    url: absoluteUrl('/'),
+    url: absoluteUrl(localizePathname('/', locale)),
     telephone: contacts.phoneDisplay,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: BRAND.city,
-      addressRegion: 'Алматы',
+      addressLocality: city,
+      addressRegion: city,
       addressCountry: 'KZ',
     },
     geo: { '@type': 'GeoCoordinates', latitude: 43.2389, longitude: 76.8897 },

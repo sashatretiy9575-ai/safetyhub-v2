@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
 type DataLoadFailureProps = {
@@ -10,6 +11,8 @@ type DataLoadFailureProps = {
 
 export function DataLoadFailure({ correlationId, message }: DataLoadFailureProps) {
   const router = useRouter();
+  const t = useTranslations('AppState');
+  const common = useTranslations('Common');
 
   return (
     <div
@@ -19,14 +22,14 @@ export function DataLoadFailure({ correlationId, message }: DataLoadFailureProps
       <div className="space-y-1">
         <p className="text-sm font-semibold text-[var(--color-danger)]">{message}</p>
         <p className="text-sm text-[var(--color-text-muted)]">
-          Часть данных не загрузилась. Повторите попытку или вернитесь позже.
+          {t('partialFailure')}
         </p>
         <p className="text-xs text-[var(--color-text-muted)]">
-          Код обращения: <span className="break-all font-mono">{correlationId}</span>
+          {common('correlationId', { id: correlationId })}
         </p>
       </div>
       <Button type="button" size="sm" variant="outline" onClick={() => router.refresh()}>
-        Повторить загрузку
+        {t('retryLoad')}
       </Button>
     </div>
   );

@@ -12,6 +12,8 @@ import { Container } from '@/components/ui/container';
 import { resolveCourseIcon } from '@/lib/course-icons';
 import type { Course } from '@/lib/content/topics';
 import { ROUTES } from '@/lib/constants';
+import { useLocale, useTranslations } from 'next-intl';
+import { localizePathname } from '@/i18n/config';
 
 export type CourseMaterialAccess =
   | 'anonymous'
@@ -26,45 +28,29 @@ function presentationDownloadUrl(url: string, slug: string) {
   return `${url}${separator}download=${encodeURIComponent(`${slug}.pdf`)}`;
 }
 
-function accessCta(access: CourseMaterialAccess, slug: string) {
+type AccessCopy = Record<
+  Exclude<CourseMaterialAccess, 'approved'>,
+  { title: string; description: string; label: string }
+>;
+
+function accessCta(access: CourseMaterialAccess, slug: string, locale: ReturnType<typeof useLocale>, copy: AccessCopy) {
   if (access === 'approved') return null;
   if (access === 'anonymous') {
+    const login = localizePathname('/auth/login', locale);
     return {
-      title: 'Войдите, чтобы открыть обучение',
-      description: 'После входа заполните профиль и отправьте заявку на проверку администратору.',
-      href: `/auth/login?return=${encodeURIComponent(`/topics/${slug}`)}`,
-      label: 'Войти по email-коду',
+      ...copy.anonymous,
+      href: `${login}?return=${encodeURIComponent(localizePathname(`/topics/${slug}`, locale))}`,
     };
   }
-  if (access === 'legal_required') {
-    return {
-      title: 'Нужно принять документы',
-      description: 'После принятия текущих документов можно завершить заявку на обучение.',
-      href: '/auth/legal',
-      label: 'Открыть документы',
-    };
-  }
-  if (access === 'profile_incomplete') {
-    return {
-      title: 'Сначала заполните профиль',
-      description: 'Добавьте контактный телефон и фотографию, затем отправьте заявку администратору.',
-      href: '/onboarding',
-      label: 'Заполнить профиль',
-    };
-  }
-  if (access === 'pending') {
-    return {
-      title: 'Заявка проверяется администратором',
-      description: 'До подтверждения презентация, вопросы и тест недоступны. Статус и обратный отсчёт есть в личном кабинете.',
-      href: '/profile',
-      label: 'Открыть статус заявки',
-    };
-  }
+  const destination =
+    access === 'legal_required'
+        ? '/auth/legal'
+        : access === 'profile_incomplete'
+          ? '/onboarding'
+          : '/profile';
   return {
-    title: 'Заявка требует уточнений',
-    description: 'Проверьте комментарий администратора и отправьте данные повторно.',
-    href: '/profile',
-    label: 'Уточнить данные',
+    ...copy[access],
+    href: localizePathname(destination, locale),
   };
 }
 
@@ -75,21 +61,29 @@ export function CourseMaterialActions({
   course: Course;
   access: CourseMaterialAccess;
 }) {
+  const locale = useLocale();
+  const t = useTranslations('Course');
   const courseIcon = resolveCourseIcon(course.icon);
   const CourseIcon = courseIcon.component;
   const filename = `${course.slug}.pdf`;
-  const cta = accessCta(access, course.slug);
+  const cta = accessCta(access, course.slug, locale, {
+    anonymous: { title: t('access.anonymousTitle'), description: t('access.anonymousDescription'), label: t('access.anonymousLabel') },
+    legal_required: { title: t('access.legalTitle'), description: t('access.legalDescription'), label: t('access.legalLabel') },
+    profile_incomplete: { title: t('access.profileTitle'), description: t('access.profileDescription'), label: t('access.profileLabel') },
+    pending: { title: t('access.pendingTitle'), description: t('access.pendingDescription'), label: t('access.pendingLabel') },
+    rejected: { title: t('access.rejectedTitle'), description: t('access.rejectedDescription'), label: t('access.rejectedLabel') },
+  });
 
   return (
     <section className="py-8 sm:py-12 lg:py-14">
       <Container size="content">
         <Link
-          href={ROUTES.topics}
+          href={localizePathname(ROUTES.topics, locale)}
           prefetch={false}
           className="mb-5 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-1 text-sm font-semibold text-[var(--color-text-muted)] transition hover:text-[var(--color-primary)]"
         >
           <ArrowLeft size={18} weight="bold" aria-hidden="true" />
-          Все курсы
+          {t('all')}
         </Link>
 
         <Card className="overflow-hidden">
@@ -100,7 +94,7 @@ export function CourseMaterialActions({
                   <CourseIcon size={30} weight="duotone" aria-hidden="true" />
                 </div>
                 <p className="text-xs font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">
-                  Онлайн-курс
+                  {t('online')}
                 </p>
                 <h1 className="mt-2 text-3xl leading-tight font-black tracking-[-0.035em] sm:text-4xl">
                   {course.title}
@@ -112,7 +106,7 @@ export function CourseMaterialActions({
                 <div className="mt-6 flex flex-wrap gap-2 text-xs font-semibold text-[var(--color-text-muted)] sm:text-sm">
                   <span className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[var(--color-surface-muted)] px-3.5">
                     <FilePdf size={18} weight="duotone" className="text-[var(--color-primary)]" />
-                    {course.presentation?.pageCount ?? 0} страниц
+                    {t('pages', { count: course.presentation?.pageCount ?? 0 })}
                   </span>
                   <span className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[var(--color-surface-muted)] px-3.5">
                     <ListChecks
@@ -120,11 +114,11 @@ export function CourseMaterialActions({
                       weight="duotone"
                       className="text-[var(--color-primary)]"
                     />
-                    {course.questionCount} вопросов
+                    {t('questions', { count: course.questionCount })}
                   </span>
                   <span className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[var(--color-surface-muted)] px-3.5">
                     <Timer size={18} weight="duotone" className="text-[var(--color-primary)]" />
-                    {course.durationMinutes} минут
+                    {t('minutes', { count: course.durationMinutes })}
                   </span>
                 </div>
               </div>
@@ -147,20 +141,20 @@ export function CourseMaterialActions({
                       download={filename}
                     >
                       <DownloadSimple size={20} weight="bold" aria-hidden="true" />
-                      Скачать презентацию
+                      {t('downloadPresentation')}
                     </a>
                   </Button>
                 ) : (
                   <Button type="button" variant="secondary" size="xl" className="w-full" disabled>
                     <DownloadSimple size={20} weight="bold" aria-hidden="true" />
-                    Презентация недоступна
+                    {t('presentationUnavailable')}
                   </Button>
                     )}
 
                     <Button asChild size="xl" className="w-full">
-                      <Link href={ROUTES.test(course.slug)} prefetch={false}>
+                      <Link href={localizePathname(ROUTES.test(course.slug), locale)} prefetch={false}>
                         <ListChecks size={20} weight="bold" aria-hidden="true" />
-                        Начать тест
+                        {t('startTest')}
                       </Link>
                     </Button>
                   </>

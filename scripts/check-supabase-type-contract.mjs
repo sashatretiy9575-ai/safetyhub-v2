@@ -46,11 +46,25 @@ const requiredColumns = [
 const forbiddenContractNames = [
   'review_course_draft',
   'review_article_draft',
-  'reviewed_content_hash',
   'next_review_at',
   'reviewed_at',
   'reviewer',
 ];
+
+function generatedRowContains(source, table, column) {
+  const tableStart = source.indexOf(`      ${table}: {\n`);
+  if (tableStart < 0) return false;
+  const rowStart = source.indexOf('        Row: {\n', tableStart);
+  const rowEnd = source.indexOf('        }\n', rowStart);
+  return rowStart >= 0 && rowEnd > rowStart && source.slice(rowStart, rowEnd).includes(column);
+}
+
+function committedTypeContains(source, typeName, column) {
+  const typeStart = source.indexOf(`export type ${typeName} = `);
+  if (typeStart < 0) return false;
+  const typeEnd = source.indexOf('\n};', typeStart);
+  return typeEnd > typeStart && source.slice(typeStart, typeEnd).includes(column);
+}
 
 const missingGenerated = [...requiredSchemaNames, ...requiredColumns].filter(
   (name) => !generated.stdout.includes(name),
@@ -70,6 +84,18 @@ if (missingGenerated.length > 0 || missingCommitted.length > 0) {
 
 const staleGenerated = forbiddenContractNames.filter((name) => generated.stdout.includes(name));
 const staleCommitted = forbiddenContractNames.filter((name) => committed.includes(name));
+if (
+  generatedRowContains(generated.stdout, 'course_drafts', 'reviewed_content_hash') ||
+  generatedRowContains(generated.stdout, 'article_drafts', 'reviewed_content_hash')
+) {
+  staleGenerated.push('legacy draft reviewed_content_hash');
+}
+if (
+  committedTypeContains(committed, 'CourseDraftRow', 'reviewed_content_hash') ||
+  committedTypeContains(committed, 'ArticleDraftRow', 'reviewed_content_hash')
+) {
+  staleCommitted.push('legacy draft reviewed_content_hash');
+}
 if (staleGenerated.length > 0 || staleCommitted.length > 0) {
   console.error(
     JSON.stringify({

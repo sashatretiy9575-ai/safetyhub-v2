@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "locale": "zh",
+  "sourceSlug": "pozharno-tehnicheskij-minimum",
+  "slug": "pozharno-tehnicheskij-minimum",
+  "title": "工作中发生火灾警报：如何做才不会惊慌",
+  "description": "在出现烟雾、燃烧气味或警报时有清晰的行动顺序 - 从消息到安全出口。",
+  "coverImage": "/images/generated/article-fire-safety.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "发生火灾时，大脑首先会尝试检查“一切是否都很严重”。这是一个危险的延误。烟雾、烧焦的气味、闪光或警告系统发出的信号都是立即根据现场计划采取行动的充分理由。"
+    },
+    {
+      "tone": "warning",
+      "type": "callout",
+      "title": "首要任务是出去并帮助别人出去",
+      "content": "拨打101或112报告火灾，并启动规定的报警程序。不要为了物品、文件或自行灭火而冒生命危险。"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "警报响起时的四个步骤"
+    },
+    {
+      "type": "list",
+      "items": [
+        "按规定方式发出信号并拨打 101 或 112。注明地址、起火地点和您的姓氏；不要在接线员之前结束通话。",
+        "停止工作。如果指示这样做并且不会造成风险，请安全停止设备。",
+        "按照标志前往最近的紧急出口。请勿使用电梯，也不要返回领取您的物品。",
+        "到达集合点，与负责人联系并留在原处，直到有进一步指示。"
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "如果路线上有烟雾"
+    },
+    {
+      "type": "paragraph",
+      "content": "不要走进浓烟或打开有明显热量或烟雾的门。使用另一个指定路径。冷静地行动，不要催促别人，帮助那些困惑或找不到路的人，但不要为自己创造一个额外的危险源。"
+    },
+    {
+      "rows": [
+        [
+          "警报响起，但看不到烟雾",
+          "无论如何都按计划开始疏散"
+        ],
+        [
+          "正常出口受阻",
+          "前往另一个指定出口"
+        ],
+        [
+          "同事要回去拿手机",
+          "阻止他并继续朝出口走去"
+        ],
+        [
+          "人员无法自行撤离",
+          "通知负责和紧急服务人员确切位置"
+        ],
+        [
+          "你已经出去了",
+          "未经紧急服务部门许可，请勿再次进入"
+        ]
+      ],
+      "type": "table",
+      "caption": "在第一分钟内找到解决方案",
+      "headers": [
+        "情况",
+        "该怎么办"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "当灭火器可接受时"
+    },
+    {
+      "type": "paragraph",
+      "content": "主要灭火剂只能由经过培训的人员使用，如果火势较小，该灭火剂适合此类火灾，房间内没有充满烟雾，并且通往出口的路径保留在后面。如果火势增大、冒烟或补救措施不能立即起效，请离开。"
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "提前了解什么",
+      "content": "找到两个最近的出口、手动呼叫点、集合点和本地通知程序。在焦虑期间这样做已经太晚了。"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "疏散后"
+    },
+    {
+      "type": "paragraph",
+      "content": "到达集合点后，在完成点名确认前不得回家或离开现场，否则救援人员可能会在建筑物内寻找你。如看到火源、通道受阻或有人仍留在室内，应立即报告。不要传播猜测，只报告自己亲眼观察到的事实。"
+    },
+    {
+      "type": "quote",
+      "content": "好疏散 看起来很无聊：信号早，路线熟悉，动作冷静，人数准确。"
+    },
+    {
+      "url": "/topics/pozharnaya-bezopasnost",
+      "text": "学习消防安全",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "工作中发生火灾警报：如何做才不会惊慌",
+    "ogImage": "/images/generated/article-fire-safety.webp",
+    "ogTitle": "工作中发生火灾警报：如何做才不会惊慌",
+    "indexable": true,
+    "description": "在出现烟雾、燃烧气味或警报时有清晰的行动顺序 - 从消息到安全出口。",
+    "ogDescription": "在出现烟雾、燃烧气味或警报时有清晰的行动顺序 - 从消息到安全出口。"
+  },
+  "jurisdiction": "哈萨克斯坦共和国",
+  "effectiveDate": "2026-08-11",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/Z1400000188",
+      "title": "哈萨克斯坦共和国“公民保护”法"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V2200026867",
+      "title": "消防安全规则"
+    }
+  ],
+  "createdAt": "2026-08-09T00:00:00.000Z",
+  "updatedAt": "2026-08-25T20:15:07.807Z"
+}

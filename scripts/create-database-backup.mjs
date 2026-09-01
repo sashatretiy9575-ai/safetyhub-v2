@@ -3,6 +3,11 @@ import { mkdir, readFile, rm, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { spawnSync } from 'node:child_process';
+import {
+  assertPhysicalPathRelationship,
+  databaseBackupArtifactName,
+  validateDatabaseBackupReceipt,
+} from './database-backup-security.mjs';
 
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 2) {
@@ -23,22 +28,80 @@ if (!schemaPath || !dataPath || !outputDirectory || !recoveryKeyOutput) {
 const resolvedOutput = path.resolve(outputDirectory);
 const resolvedRecoveryKeyOutput = path.resolve(recoveryKeyOutput);
 const sourcePaths = [path.resolve(schemaPath), path.resolve(dataPath)];
-if (sourcePaths.some((source) => source.startsWith(`${resolvedOutput}${path.sep}`))) {
-  console.error('Plaintext dump files must be outside the encrypted output directory.');
-  process.exit(1);
-}
-if (
-  resolvedRecoveryKeyOutput === resolvedOutput ||
-  resolvedRecoveryKeyOutput.startsWith(`${resolvedOutput}${path.sep}`)
-) {
-  console.error('The portable recovery key must be stored outside the encrypted backup directory.');
+if (process.platform !== 'win32') {
+  console.error('This backup wrapper currently requires Windows DPAPI.');
   process.exit(1);
 }
 
-await mkdir(resolvedOutput, { recursive: false });
+const artifactNames = sourcePaths.map(databaseBackupArtifactName);
+if (new Set(artifactNames.map((name) => name.normalize('NFC').toUpperCase())).size !== 2) {
+  throw new Error('Plaintext dump filenames would collide in the encrypted backup directory.');
+}
+
+const initialOutputBoundary = await assertPhysicalPathRelationship({
+  directoryPath: resolvedOutput,
+  candidatePath: resolvedRecoveryKeyOutput,
+  relationship: 'outside',
+  directoryExpectation: 'absent',
+  candidateExpectation: 'absent',
+  directoryLabel: 'Encrypted backup directory',
+  candidateLabel: 'Portable recovery key output',
+  relationshipError: 'The portable recovery key must be stored outside the encrypted backup directory.',
+});
+const expectedOutputPhysicalPath = initialOutputBoundary.directory.physicalPath;
+const expectedRecoveryKeyPhysicalPath = initialOutputBoundary.candidate.physicalPath;
+for (const sourcePath of sourcePaths) {
+  await assertPhysicalPathRelationship({
+    directoryPath: resolvedOutput,
+    candidatePath: sourcePath,
+    relationship: 'outside',
+    directoryExpectation: 'absent',
+    candidateExpectation: 'file',
+    directoryLabel: 'Encrypted backup directory',
+    candidateLabel: 'Plaintext dump file',
+    expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+    relationshipError: 'Plaintext dump files must be outside the encrypted output directory.',
+  });
+}
+
+async function assertCreatedOutputBoundary(candidatePath, candidateExpectation, candidateLabel) {
+  return assertPhysicalPathRelationship({
+    directoryPath: resolvedOutput,
+    candidatePath,
+    relationship: 'inside',
+    directoryExpectation: 'directory',
+    candidateExpectation,
+    directoryLabel: 'Encrypted backup directory',
+    candidateLabel,
+    expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+    relationshipError: `${candidateLabel} must stay inside the encrypted backup directory.`,
+  });
+}
+
+async function writeNewOutputFile(name, value) {
+  const target = path.join(resolvedOutput, name);
+  await assertCreatedOutputBoundary(target, 'absent', 'Encrypted backup file');
+  await writeFile(target, value, { flag: 'wx', mode: 0o600 });
+}
+
+async function assertCreatedOutputDirectory() {
+  return assertPhysicalPathRelationship({
+    directoryPath: resolvedOutput,
+    candidatePath: path.dirname(resolvedOutput),
+    relationship: 'outside',
+    directoryExpectation: 'directory',
+    candidateExpectation: 'directory',
+    directoryLabel: 'Encrypted backup directory',
+    candidateLabel: 'Encrypted backup parent directory',
+    expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+    relationshipError: 'The encrypted backup directory changed during the operation.',
+  });
+}
+
 const key = randomBytes(32);
 const recoveryKey = randomBytes(32);
 let recoveryKeyWritten = false;
+let outputCreated = false;
 const cleanPowerShellEnvironment = Object.fromEntries(
   Object.entries(process.env).filter(([name]) => name.toLowerCase() !== 'psmodulepath'),
 );
@@ -50,22 +113,57 @@ const receipt = {
   artifacts: [],
 };
 
-if (process.platform !== 'win32') {
-  console.error('This backup wrapper currently requires Windows DPAPI.');
-  process.exit(1);
-}
-
 try {
+  await mkdir(resolvedOutput, { recursive: false });
+  outputCreated = true;
+  await assertCreatedOutputDirectory();
+  await assertPhysicalPathRelationship({
+    directoryPath: resolvedOutput,
+    candidatePath: resolvedRecoveryKeyOutput,
+    relationship: 'outside',
+    directoryExpectation: 'directory',
+    candidateExpectation: 'absent',
+    directoryLabel: 'Encrypted backup directory',
+    candidateLabel: 'Portable recovery key output',
+    expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+    expectedCandidatePhysicalPath: expectedRecoveryKeyPhysicalPath,
+    relationshipError:
+      'The portable recovery key must be stored outside the encrypted backup directory.',
+  });
   for (const sourcePath of sourcePaths) {
+    await assertPhysicalPathRelationship({
+      directoryPath: resolvedOutput,
+      candidatePath: sourcePath,
+      relationship: 'outside',
+      directoryExpectation: 'directory',
+      candidateExpectation: 'file',
+      directoryLabel: 'Encrypted backup directory',
+      candidateLabel: 'Plaintext dump file',
+      expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+      relationshipError: 'Plaintext dump files must be outside the encrypted output directory.',
+    });
+  }
+  for (const [sourceIndex, sourcePath] of sourcePaths.entries()) {
+    await assertPhysicalPathRelationship({
+      directoryPath: resolvedOutput,
+      candidatePath: sourcePath,
+      relationship: 'outside',
+      directoryExpectation: 'directory',
+      candidateExpectation: 'file',
+      directoryLabel: 'Encrypted backup directory',
+      candidateLabel: 'Plaintext dump file',
+      expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+      relationshipError: 'Plaintext dump files must be outside the encrypted output directory.',
+    });
     const plaintext = await readFile(sourcePath);
     if (plaintext.byteLength < 128) throw new Error(`Dump is unexpectedly small: ${sourcePath}`);
     const iv = randomBytes(12);
     const cipher = createCipheriv('aes-256-gcm', key, iv);
     const encrypted = Buffer.concat([cipher.update(plaintext), cipher.final()]);
     const tag = cipher.getAuthTag();
-    const outputName = `${path.basename(sourcePath)}.aes256gcm`;
+    const outputName = artifactNames[sourceIndex];
     const envelope = Buffer.concat([Buffer.from('SAFETYHUB-DB-BACKUP-V1\0'), iv, tag, encrypted]);
-    await writeFile(path.join(resolvedOutput, outputName), envelope, { flag: 'wx', mode: 0o600 });
+    await writeNewOutputFile(outputName, envelope);
     receipt.artifacts.push({
       name: outputName,
       plaintextBytes: plaintext.byteLength,
@@ -94,14 +192,7 @@ try {
       `Windows DPAPI key protection failed: ${protectedKey.stderr.trim() || 'unknown error'}`,
     );
   }
-  await writeFile(
-    path.join(resolvedOutput, 'database-backup.key.dpapi'),
-    protectedKey.stdout.trim(),
-    {
-      flag: 'wx',
-      mode: 0o600,
-    },
-  );
+  await writeNewOutputFile('database-backup.key.dpapi', protectedKey.stdout.trim());
   const recoveryMagic = Buffer.from('SAFETYHUB-DB-KEY-V1\0');
   const recoveryIv = randomBytes(12);
   const recoveryCipher = createCipheriv('aes-256-gcm', recoveryKey, recoveryIv);
@@ -114,9 +205,18 @@ try {
     encryptedKey,
   ]);
   const recoveryEnvelopeName = 'database-backup.key.recovery.aes256gcm';
-  await writeFile(path.join(resolvedOutput, recoveryEnvelopeName), recoveryEnvelope, {
-    flag: 'wx',
-    mode: 0o600,
+  await writeNewOutputFile(recoveryEnvelopeName, recoveryEnvelope);
+  await assertPhysicalPathRelationship({
+    directoryPath: resolvedOutput,
+    candidatePath: resolvedRecoveryKeyOutput,
+    relationship: 'outside',
+    directoryExpectation: 'directory',
+    candidateExpectation: 'absent',
+    directoryLabel: 'Encrypted backup directory',
+    candidateLabel: 'Portable recovery key output',
+    expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+    expectedCandidatePhysicalPath: expectedRecoveryKeyPhysicalPath,
+    relationshipError: 'The portable recovery key must be stored outside the encrypted backup directory.',
   });
   await writeFile(
     resolvedRecoveryKeyOutput,
@@ -124,17 +224,27 @@ try {
     { flag: 'wx', mode: 0o600 },
   );
   recoveryKeyWritten = true;
+  await assertPhysicalPathRelationship({
+    directoryPath: resolvedOutput,
+    candidatePath: resolvedRecoveryKeyOutput,
+    relationship: 'outside',
+    directoryExpectation: 'directory',
+    candidateExpectation: 'file',
+    directoryLabel: 'Encrypted backup directory',
+    candidateLabel: 'Portable recovery key output',
+    expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+    expectedCandidatePhysicalPath: expectedRecoveryKeyPhysicalPath,
+    relationshipError:
+      'The portable recovery key must be stored outside the encrypted backup directory.',
+  });
   receipt.portableRecovery = {
     algorithm: 'aes-256-gcm',
     wrappedKeyFile: recoveryEnvelopeName,
     encryptedSha256: createHash('sha256').update(recoveryEnvelope).digest('hex'),
     recoveryKeyFormat: 'SAFETYHUB-RECOVERY-KEY-V1',
   };
-  await writeFile(
-    path.join(resolvedOutput, 'receipt.json'),
-    `${JSON.stringify(receipt, null, 2)}\n`,
-    { flag: 'wx', mode: 0o600 },
-  );
+  validateDatabaseBackupReceipt(receipt);
+  await writeNewOutputFile('receipt.json', `${JSON.stringify(receipt, null, 2)}\n`);
 
   for (const sourcePath of sourcePaths) await unlink(sourcePath);
   console.log(
@@ -146,8 +256,34 @@ try {
     }),
   );
 } catch (error) {
-  if (recoveryKeyWritten) await unlink(resolvedRecoveryKeyOutput).catch(() => undefined);
-  await rm(resolvedOutput, { recursive: true, force: true }).catch(() => undefined);
+  if (recoveryKeyWritten) {
+    try {
+      await assertPhysicalPathRelationship({
+        directoryPath: resolvedOutput,
+        candidatePath: resolvedRecoveryKeyOutput,
+        relationship: 'outside',
+        directoryExpectation: 'directory',
+        candidateExpectation: 'file',
+        directoryLabel: 'Encrypted backup directory',
+        candidateLabel: 'Portable recovery key output',
+        expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+        expectedCandidatePhysicalPath: expectedRecoveryKeyPhysicalPath,
+        relationshipError:
+          'The portable recovery key must be stored outside the encrypted backup directory.',
+      });
+      await unlink(resolvedRecoveryKeyOutput);
+    } catch {
+      // Do not unlink a recovery-key path whose physical identity changed during the backup.
+    }
+  }
+  if (outputCreated) {
+    try {
+      await assertCreatedOutputDirectory();
+      await rm(resolvedOutput, { recursive: true, force: true });
+    } catch {
+      // Do not recursively remove a path whose physical identity changed during the backup.
+    }
+  }
   console.error(error instanceof Error ? error.message : 'Database backup encryption failed.');
   process.exit(1);
 } finally {

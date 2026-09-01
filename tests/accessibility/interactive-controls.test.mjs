@@ -26,9 +26,14 @@ test('hero has one stable heading and no autoplay lifecycle', async () => {
   const hero = await read('components/marketing/hero.tsx');
 
   assert.match(hero, /<h1[\s\S]*id="hero-heading"/);
-  assert.match(hero, /href=\{ROUTES\.topics\}[\s\S]*Выбрать курс/);
-  assert.match(hero, /href=\{ROUTES\.contacts\}[\s\S]*Связаться/);
-  assert.doesNotMatch(hero, /Смотреть программы/);
+  assert.match(
+    hero,
+    /href=\{localizePathname\(ROUTES\.topics, locale\)\}[\s\S]*t\('courses'\)/,
+  );
+  assert.match(
+    hero,
+    /href=\{localizePathname\(ROUTES\.contacts, locale\)\}[\s\S]*t\('contact'\)/,
+  );
   assert.doesNotMatch(hero, /useState|setInterval|aria-live="polite"/);
 });
 

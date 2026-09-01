@@ -1,6 +1,7 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { useTranslations } from 'next-intl';
 import { applyDocumentTheme } from '@/lib/theme';
 
 const THEME_CHANGE_EVENT = 'safetyhub:theme-change';
@@ -38,17 +39,16 @@ function toggleTheme() {
 
 export function ThemeToggle() {
   const isDark = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, () => false);
+  const translations = useTranslations('Shell.theme');
 
   return (
     <button
       type="button"
       role="switch"
       aria-checked={isDark}
-      aria-label={
-        isDark ? 'Тёмная тема. Переключить на светлую' : 'Светлая тема. Переключить на тёмную'
-      }
+      aria-label={isDark ? translations('switchToLight') : translations('switchToDark')}
       onClick={toggleTheme}
-      className="glass group inline-flex h-11 min-w-[6.25rem] shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] px-2.5 whitespace-nowrap text-[var(--color-text)] transition-[color,background-color,border-color] duration-150 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-elevated)]"
+      className="glass group inline-flex size-11 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] px-0 whitespace-nowrap text-[var(--color-text)] transition-[color,background-color,border-color] duration-150 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-elevated)] min-[1120px]:h-11 min-[1120px]:w-auto min-[1120px]:min-w-[6.25rem] min-[1120px]:px-2.5"
     >
       <svg
         aria-hidden="true"
@@ -77,13 +77,16 @@ export function ThemeToggle() {
           strokeLinejoin="round"
         />
       </svg>
-      <span aria-hidden="true" className="text-xs leading-none font-semibold">
-        <span className="dark:hidden">Светлая</span>
-        <span className="hidden dark:inline">Тёмная</span>
+      <span
+        aria-hidden="true"
+        className="hidden text-xs leading-none font-semibold min-[1120px]:inline"
+      >
+        <span className="dark:hidden">{translations('light')}</span>
+        <span className="hidden dark:inline">{translations('dark')}</span>
       </span>
       <span
         aria-hidden="true"
-        className="size-1.5 shrink-0 rounded-full bg-[var(--color-primary)] opacity-75 transition-opacity group-hover:opacity-100"
+        className="hidden size-1.5 shrink-0 rounded-full bg-[var(--color-primary)] opacity-75 transition-opacity group-hover:opacity-100 min-[1120px]:block"
       />
     </button>
   );

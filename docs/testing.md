@@ -100,6 +100,9 @@ project-scoped Supabase auth cookie, перед запуском пересоб�
 - статьи на 1440/1536/1920 px: hero, TOC и body имеют одну рабочую ширину 1120 px;
 - карточки курсов на 320/390 px: фотография без встроенного текста читаема, а
   страница курса показывает полноширинные кнопки скачивания и начала теста;
+- presentation relay: GET расходует actor/network quota, держит не более двух
+  actor и двенадцати global leases, потоково проверяет exact PDF byte size и
+  освобождает lease при EOF/cancel/deadline; HEAD не вызывает Storage download;
 - 240–280 px: нет page-level horizontal overflow;
 - редакторы на 390 и 1440 px; sticky action bar не выше 64 px;
 - при открытии существующего курса в DevTools network/HTML не появляются
@@ -109,6 +112,15 @@ project-scoped Supabase auth cookie, перед запуском пересоб�
   продолжает pending action один раз;
 - light/dark `theme-color`, `html/body` и верхний/нижний safe area;
 - удаление статьи/курса, historical certificate download/revoke и запрет reissue;
+- certificate download: network содержит только bounded no-store JSON и font/template assets,
+  backend не отвечает `application/pdf` или `application/zip`, а старый PDF route возвращает
+  `CERTIFICATE_PDF_CLIENT_ONLY`;
+- certificate worker: RU/KK/EN/ZH glyphs, QR verification, progress/cancel, concurrency 2,
+  streaming export до 500 и fallback-части максимум по 100;
+- immutable font/content assets: принимаются только канонический raw query без
+  дополнительных, дублированных или переставленных параметров и exact lowercase
+  UUID pathname без case/percent-encoded aliases; полный ZH font
+  совпадает с закреплёнными byte length и SHA-256 и отсутствует в initial JS;
 - accessibility, keyboard/focus, hydration и console errors.
 
 Viewport/visual matrix включает как минимум 240, 280, 320, 390, 768, 1024,
@@ -121,8 +133,13 @@ Viewport/visual matrix включает как минимум 240, 280, 320, 390
 
 ## Release gate
 
-`npm run verify:release` объединяет application, clean database, SQL contracts,
-fixtures и authenticated Playwright. Production выкладывается только из точного
-SHA с зелёным CI. Если локальный Docker недоступен, это не считается успешным
-database gate: используйте CI или отдельный disposable Supabase и зафиксируйте
-результат до production migration.
+`npm run verify:release:local` последовательно выполняет clean database reset,
+DB lint, точную генерацию и сверку типов, SQL contracts, валидацию snapshot и
+initial import, release-проверку четырёхъязычного content batch, детерминированную
+проверку `supabase/seed.sql`, application verify, fixtures и authenticated
+Playwright. `npm run verify:release` дополнительно запускает нагрузочный профиль
+только против явно подтверждённого disposable Supabase и затем linked migration,
+type, Storage и content-parity checks. Production выкладывается только из точного
+SHA с зелёным CI и полным release receipt. Если локальный Docker недоступен, это
+не считается успешным database gate: используйте CI или отдельный disposable
+Supabase и зафиксируйте результат до production migration.

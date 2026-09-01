@@ -1,0 +1,716 @@
+{
+  "version": 1,
+  "courseId": "edfaf13a-6111-4940-bc06-28d655c3001d",
+  "locale": "en",
+  "expectedVersion": 1,
+  "questionVariants": [
+    {
+      "id": "2b72195c-a2cf-5a40-8ab1-2e3be956e8d6",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "d155e90a-824c-539b-b66e-3015c433bc12",
+          "text": "The size of the frame in the drawing does not match the prepared workpiece. What to do?",
+          "options": [
+            {
+              "id": "d03ed4ca-bc50-5546-8836-d897c1b5f566",
+              "text": "Bend the workpiece on site without approval."
+            },
+            {
+              "id": "c0bba186-cd46-50c0-94d2-270e3cd482ec",
+              "text": "Change the pitch of the rods by eye."
+            },
+            {
+              "id": "a0cb8a27-737c-56ed-a715-4cd2b10f4ff0",
+              "text": "Assemble the frame and hide the deviation during concreting."
+            },
+            {
+              "id": "edc66359-b1b7-5098-bf42-87fdee9b61c4",
+              "text": "Stop assembly and clarify the discrepancy with the person responsible for the design documentation."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "9155603a-7588-5157-85e1-a26cde8334be",
+          "text": "A pack of reinforcement lies without stops on a sloping platform. What to do?",
+          "options": [
+            {
+              "id": "dade6a0b-a286-5626-8f6c-3adfda4995b7",
+              "text": "Leave the pack until the crane starts moving it."
+            },
+            {
+              "id": "b3543270-8e55-5e57-9093-5341cdbc06ce",
+              "text": "Stop work and ensure stable storage on prepared supports with supports."
+            },
+            {
+              "id": "641fa84e-6b9f-59b5-98ff-8876d1409bf4",
+              "text": "Cut the bundle banding while standing downhill from it."
+            },
+            {
+              "id": "1d31f77a-a26b-5779-88b9-d4799d65de24",
+              "text": "Place one random scrap under the middle of the pack."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "8543a437-bc11-5547-83a6-19c2332ed3d5",
+          "text": "worker holds the short rod by hand near the cutting area of ​​the machine. How to organize the operation?",
+          "options": [
+            {
+              "id": "b97a5874-e939-5bd7-90d2-50d3d6f989ee",
+              "text": "Hold the rod with two people on both sides of the knife."
+            },
+            {
+              "id": "833c19d0-30d3-5556-90d2-1329660df0a8",
+              "text": "Put on thicker gloves and continue holding with your hand."
+            },
+            {
+              "id": "8182faf7-36db-59ec-83d5-04f57e72fc1e",
+              "text": "Use the provided feeding and holding device, keeping your hands out of the danger zone."
+            },
+            {
+              "id": "bac945e6-12e5-5060-b063-a978c7fc767b",
+              "text": "Increase cutting speed to finish faster."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "40a38c06-2fda-515f-93ec-876fbc091705",
+          "text": "The unprotected ends of the rods protrude from the frame into the passage. What measure is needed?",
+          "options": [
+            {
+              "id": "f8eb5d4f-42de-544d-a170-8cb4bf628ffc",
+              "text": "Fence off the danger area and install the provided protection for the protruding ends or change the organization of the passage."
+            },
+            {
+              "id": "947599ff-ea4b-5912-a2c9-d9705dba1a67",
+              "text": "Paint the ends with bright paint and leave the passage open."
+            },
+            {
+              "id": "528bef61-80e3-5e66-a3ed-d2922d033f83",
+              "text": "Cover the ends with thin paper."
+            },
+            {
+              "id": "cb265e29-4a20-5930-b1ad-7729d78127c0",
+              "text": "Warn workers verbally without physical protection."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "44684521-968f-5136-81e5-904715a5fe1e",
+          "text": "When is a welded connection of reinforcement allowed?",
+          "options": [
+            {
+              "id": "60d273c9-d7a4-5a48-914a-89871023e6ad",
+              "text": "When the rods have the same color."
+            },
+            {
+              "id": "bbbceaa4-4515-54d5-bc7a-8350aee488f3",
+              "text": "When there is any welding machine on site."
+            },
+            {
+              "id": "4a4aa856-bfd9-526c-b2d8-35d1b7e6a1bb",
+              "text": "When tying the reinforcement takes longer."
+            },
+            {
+              "id": "cb49e3b7-54ce-510a-b7fd-40971ffbc6cb",
+              "text": "When it is provided for by the design and technology, and the work is performed by an approved qualified worker."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "20932fb4-7f0f-5de3-94da-8547aabc12f6",
+          "text": "Frame displacement was detected before concreting. What is required?",
+          "options": [
+            {
+              "id": "d80e8304-17bd-5513-8b4e-8164635b134d",
+              "text": "Compensate for displacement by increasing the amount of concrete."
+            },
+            {
+              "id": "60395797-06be-559b-a5b1-02e516b671a5",
+              "text": "Leave offset if reinforcement steel does not touch the formwork."
+            },
+            {
+              "id": "a9116b69-cc5b-5a29-9092-569c3af5c8ad",
+              "text": "Stop preparations for concreting, restore the design position and perform inspection."
+            },
+            {
+              "id": "831a19cd-fd37-55de-95fc-de7233e523c3",
+              "text": "Cut interfering reinforcing bars without authorization."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "a55e5e2c-b460-5c16-91f7-426484f33b47",
+          "text": "A rebar worker is working at the edge of a floor slab. Which protective measure takes priority?",
+          "options": [
+            {
+              "id": "e50d1a14-c0b6-572d-aeaf-be42dda39a4e",
+              "text": "Only warning sign on the floor."
+            },
+            {
+              "id": "e7c4939f-2728-5b9f-b2e8-419283a449bf",
+              "text": "Serviceable collective fencing; if necessary, supplementary fall-arrest system according to the work plan."
+            },
+            {
+              "id": "103f7d0c-9117-570e-b052-f0b1b0378b5c",
+              "text": "One safety harness without checking the anchorage point."
+            },
+            {
+              "id": "3200cb35-65bf-5a92-a8e7-35c7a4dfa4b1",
+              "text": "The presence of a colleague nearby without a fence."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "150e1860-038e-5f8f-80b3-4fba5384a5a0",
+          "text": "What is the correct pre-shift inspection of a rebar cutting machine?",
+          "options": [
+            {
+              "id": "51622035-7fa8-5932-bd24-9a12403389cf",
+              "text": "Start with maximum load without inspection."
+            },
+            {
+              "id": "4f55e7b6-3f1f-5e4c-8cf5-c5b212d0eed0",
+              "text": "Check only for power supply."
+            },
+            {
+              "id": "f20790d2-748e-5853-8a0a-f62b1274cd62",
+              "text": "First remove the guard and check the knife by hand."
+            },
+            {
+              "id": "a5d6c512-25fb-5448-9e85-a2c79e3b688b",
+              "text": "Inspect guards, controls, work equipment and work area, then perform the prescribed test test."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "3b769351-ca84-58bd-96bf-84fa59fb2402",
+          "text": "The frame began to shift during installation. How to proceed?",
+          "options": [
+            {
+              "id": "2d392b20-757f-52fa-ac82-77828042cb65",
+              "text": "Stop the movement, exclude access to the danger zone, stabilize the frame and only then continue on command."
+            },
+            {
+              "id": "387e91d7-88c5-5e25-b75b-0ff1fbdb3fff",
+              "text": "Go under the frame and adjust the supports."
+            },
+            {
+              "id": "8741c24d-20be-5ac8-b1a6-b0666f8cc899",
+              "text": "Hold the frame with your body until the lift is completed."
+            },
+            {
+              "id": "3c846be4-e4c2-5eb4-a269-4e779aff5cee",
+              "text": "Speed ​​up the movement so that the frame falls into place faster."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "2c2504b5-5055-5925-b559-a7c19939a605",
+          "text": "What is called a protective layer of concrete?",
+          "options": [
+            {
+              "id": "03338867-3ff8-5770-9167-73671acdc033",
+              "text": "A layer of lubricant on the surface of the rod."
+            },
+            {
+              "id": "13820dce-fac0-5f04-955a-760e13e67412",
+              "text": "Temporary film over the formwork."
+            },
+            {
+              "id": "c9a362c6-e7bb-5632-877e-a5ce35e8fd91",
+              "text": "Design distance from the concrete surface to the reinforcement, ensured by its correct position."
+            },
+            {
+              "id": "35473d46-edc8-54ad-aee2-23941460e360",
+              "text": "Additional row of tying wire."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "753ce2bd-1961-56fe-b33a-85c044512257",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "272e7cec-f274-50f6-9753-32fc63416e9b",
+          "text": "There is no approved reinforcement drawing for the detail. What should the rebar worker do?",
+          "options": [
+            {
+              "id": "b8b4070e-aa31-5bb4-b1c4-5ee00a8edfa1",
+              "text": "Do not perform the unit until the approved design information and assignment have been received."
+            },
+            {
+              "id": "87b70dd4-1a62-58ae-8d8a-363428a10311",
+              "text": "Select the diameter and pitch according to the remaining material."
+            },
+            {
+              "id": "d577374a-7f8f-5be4-b15a-d45f0cb85cb4",
+              "text": "Replace missing reinforcement with tying wire."
+            },
+            {
+              "id": "25a371a6-15df-5240-b444-f77c9c59ed9d",
+              "text": "Repeat the circuit of the neighboring node regardless of the load."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f7b020f8-edd0-56ce-9934-ff0ca32b6f98",
+          "text": "While the frame is being moved by crane, a worker moves beneath the suspended load. What must the banksman or supervisor do?",
+          "options": [
+            {
+              "id": "8c321b04-3ab5-5cc0-9e3c-4fa78ef1fa47",
+              "text": "Ask the worker to hold the frame with his hands."
+            },
+            {
+              "id": "1bd703aa-6ccb-555b-9b2e-b44571a4f4da",
+              "text": "Immediately stop the movement and remove the person from the danger zone."
+            },
+            {
+              "id": "e0f10d78-9a20-5738-a7dc-0b9844ed51e4",
+              "text": "Continue ascent at lower speed."
+            },
+            {
+              "id": "8d3bc139-35e6-5ce9-8b9f-ca348685ac14",
+              "text": "Move the load higher without stopping the operation."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "b2f39577-6b65-5dfc-a0ae-4c14f6059719",
+          "text": "When bending reinforcement, a colleague is in the sector of possible movement of the rod. What should I do?",
+          "options": [
+            {
+              "id": "c21ba407-3fe3-58da-9a1f-310c5db511db",
+              "text": "Warn a colleague by shouting and start bending."
+            },
+            {
+              "id": "6a9f806e-acb3-5415-b206-b07bbb4d7e04",
+              "text": "Reduce the bending angle without changing the position of the colleague."
+            },
+            {
+              "id": "5ed159a4-732b-5b63-9506-6e0a567f4431",
+              "text": "Hold the free end of the rod with your foot."
+            },
+            {
+              "id": "53469778-4da0-5cd4-b0e7-a11fd14ceb1f",
+              "text": "Stop the operation and vacate the hazardous area before turning on the equipment."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "27b9178b-493f-5a3b-8fda-6399cc565059",
+          "text": "During reinforcement tying, the wire broke and its sharp end pointed toward the face. How should the risk be reduced?",
+          "options": [
+            {
+              "id": "3657b2c4-8df2-5b3d-89bd-47376edff0ca",
+              "text": "Extend the end of the wire and leave it out."
+            },
+            {
+              "id": "6b4265e4-076c-59a7-953c-d50e4c24eef8",
+              "text": "Twist the wire only by hand without tools."
+            },
+            {
+              "id": "dc186eef-3f31-5b9a-97aa-6ef776da0cad",
+              "text": "Use proper tools, control the direction of the wire ends and use eye and hand protection at risk."
+            },
+            {
+              "id": "be9a9387-c74b-58a5-8e4f-0c8a8f2eb31b",
+              "text": "Lean closer to see the reinforcement tying point better."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "b087ce96-3116-5b36-bd0c-8a99576d1e1a",
+          "text": "Is it possible to replace the design coupling by welding without approval?",
+          "options": [
+            {
+              "id": "12b1f311-1bd2-5fff-908b-780a18e1e3a8",
+              "text": "It is possible if the diameter of the rod is smaller than the neighboring one."
+            },
+            {
+              "id": "55a8e4b1-d2c5-59d1-9308-cadf4e45042d",
+              "text": "No: the connection method may be changed only through the established procedure and in accordance with the design decision."
+            },
+            {
+              "id": "1167b08f-28a5-578a-9b49-b1e3f21eb9c9",
+              "text": "It is possible if the welder considers the seam to be strong."
+            },
+            {
+              "id": "bc779bfe-4c00-5eff-8a28-ce1569e89909",
+              "text": "Possible for one joint without recording."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "32649218-e755-5c27-882b-d100344a29af",
+          "text": "How to install a protective layer of concrete for reinforcement?",
+          "options": [
+            {
+              "id": "56bef418-7531-5e90-8788-44a06c16210e",
+              "text": "According to the design documentation using the provided clamps and position control."
+            },
+            {
+              "id": "a6cb76ab-a511-5752-b89d-433e1bb44b6b",
+              "text": "One universal size for all designs."
+            },
+            {
+              "id": "bcbbe36d-cbc3-5886-a2a6-f2d249e83f8f",
+              "text": "According to a distance that is convenient to maintain manually."
+            },
+            {
+              "id": "5dffe213-e0ab-555f-b778-79aba1be9155",
+              "text": "Due to the free movement of the frame during concreting."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "814f0e02-2557-5ed6-b8b5-a95c4ca982be",
+          "text": "The frame is supplied by crane to the installation area. How to organize interaction?",
+          "options": [
+            {
+              "id": "a31530e7-ab9b-51ed-8e4b-aebf7bb5cc50",
+              "text": "Guide the load with your hands while underneath it."
+            },
+            {
+              "id": "45b77eb6-8cc7-563e-9eb1-820342bbd903",
+              "text": "Continue driving if the driver loses visibility."
+            },
+            {
+              "id": "bfdf05b0-5222-5b08-91e8-d0d8f9dd9460",
+              "text": "Allow any worker to issue different commands."
+            },
+            {
+              "id": "2474303c-d5ce-574c-a540-a877ed3d0ac2",
+              "text": "Assign a designated signalman, use consistent commands, and keep people away from the load."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "fb447427-81e0-5b82-bd63-45b9ac707a97",
+          "text": "What to check for a hand tying tool?",
+          "options": [
+            {
+              "id": "a7154d84-3ee1-52f6-8b1d-0286190631be",
+              "text": "Only the date of the last cleaning of the workplace."
+            },
+            {
+              "id": "e61c5c9b-dc09-5ea2-8a07-a3a1f9e12801",
+              "text": "Integrity of handles, working parts, fasteners and absence of dangerous burrs."
+            },
+            {
+              "id": "313e419c-6369-5dfd-963e-8a400c1a54ac",
+              "text": "Handle color only."
+            },
+            {
+              "id": "901cf25c-b040-586a-9a9a-9c1363c065cb",
+              "text": "Tool weight only."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "e9929882-9e71-534d-bd81-e67daec3f6a3",
+          "text": "During cutting, destruction of the machine's protective guard was discovered. What is the procedure?",
+          "options": [
+            {
+              "id": "75773664-d866-5745-84f7-03662c18f591",
+              "text": "Cover the area with cardboard and continue cutting."
+            },
+            {
+              "id": "bc23d580-07ec-50af-9dbb-afaec7e83e7a",
+              "text": "Work only on small diameters."
+            },
+            {
+              "id": "532b8549-9cff-5934-ad96-4df7aa23d0b7",
+              "text": "Stop the machine, turn off the power, indicate the malfunction and transfer the equipment for repair."
+            },
+            {
+              "id": "6bdb1dcb-6ac0-5a62-8cb3-a5d3fc3329eb",
+              "text": "Ask a colleague to hold a temporary shield."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "02d66848-659e-556d-9ccb-3f04c88db30d",
+          "text": "What is a mechanical coupler connection for reinforcing bars?",
+          "options": [
+            {
+              "id": "c950d66d-6ab5-51ce-a911-580f08d8b98f",
+              "text": "Random overlap of two rods without fixation."
+            },
+            {
+              "id": "ff8aa177-6284-525e-b235-8077b7cf708d",
+              "text": "Welding of any rods without a design solution."
+            },
+            {
+              "id": "eac465ad-c015-564f-b4cf-0ccdb91dea06",
+              "text": "Any manual reinforcement tying with wire."
+            },
+            {
+              "id": "7b0bdc99-99bd-53e9-8ff1-9b83854486f0",
+              "text": "A connection of reinforcing bars using a special device, made in accordance with the design and the technology of the specific system."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "9c9513cc-6c34-586b-bf3d-81feab93b8c2",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "5694d58e-0306-5e67-99c5-dfa2235d1b50",
+          "text": "At the site it is proposed to change the type of connection of the rods in order to speed up the work. Which decision is correct?",
+          "options": [
+            {
+              "id": "239fc8c8-f872-590c-b6ee-bc3df3cf53e0",
+              "text": "Mix different methods in one node without coordination."
+            },
+            {
+              "id": "dd9d148d-c61f-5bbc-852e-98965f92c2e0",
+              "text": "Replace connections at the discretion of the contractor."
+            },
+            {
+              "id": "8dd527d3-1e64-5e15-bb79-936077ce7b40",
+              "text": "Use only the connection provided by the design and approved technology."
+            },
+            {
+              "id": "a9b4f5a7-f3ad-55f2-8cb6-e9e3f706865b",
+              "text": "Use the cheapest method without control."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "c15c6945-d695-53f0-bf36-e7d0b832f488",
+          "text": "Before lifting the rod bundle, damage to the sling was detected. What to do?",
+          "options": [
+            {
+              "id": "7c486bfe-e8cc-5ed5-8a29-8485a6d371dc",
+              "text": "Do not perform the lift; replace the damaged sling with a serviceable sling inspected by the responsible person."
+            },
+            {
+              "id": "b6c6e09c-bc72-5d4f-a0b7-14ae7f0b2d43",
+              "text": "Reduce the load weight and use the damaged sling."
+            },
+            {
+              "id": "6fbae5b9-1d82-52c7-8c1e-ef2090ee92dc",
+              "text": "Reinforce the sling with reinforcement tying wire."
+            },
+            {
+              "id": "67f57e5f-5bb6-5bd7-817a-24ba607ffe38",
+              "text": "Lift the load with a jerk to reduce loading time."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "5089da5c-dcb6-55a5-8a8a-5999d003bfa3",
+          "text": "After cutting, sharp cuttings have accumulated near the machine. What to do?",
+          "options": [
+            {
+              "id": "72406deb-f88b-523e-9373-ec79d83a74fd",
+              "text": "Leave the trimmings until the end of the entire batch."
+            },
+            {
+              "id": "db9077d7-deb6-581a-b4b1-6c07a3bb7084",
+              "text": "Stop and safely remove trimmings into designated containers using suitable equipment."
+            },
+            {
+              "id": "74cb9861-b60f-591e-91c1-2d57fb03451f",
+              "text": "Throw cuttings into the aisle for later cleaning."
+            },
+            {
+              "id": "e382ea46-bc92-5c1b-b9a4-7163239a1c48",
+              "text": "Slide the scraps under the machine with your foot."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "db7790c4-b4ba-525c-b886-4322554ca29d",
+          "text": "When installing the frame, a pinch point occurred between the frame and the formwork. How to proceed?",
+          "options": [
+            {
+              "id": "b09bbae4-6f4c-5692-8480-9a9abb035e2e",
+              "text": "Stand between the frame and the formwork for precise alignment."
+            },
+            {
+              "id": "334d123e-a33d-582c-a63e-359382668e2e",
+              "text": "Hold the frame with your fingers until it is completely seated."
+            },
+            {
+              "id": "66f50813-5889-54e5-bccf-d149fed1bec9",
+              "text": "Do not place hands in the pinch zone and control the position of the frame using agreed means and commands."
+            },
+            {
+              "id": "51a5c96e-e511-5e18-ab42-52f95625273e",
+              "text": "Push the frame with your shoulder while lowering."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "1ac2d5fb-5bbf-5ccd-90ca-632a439a9723",
+          "text": "What determines the correct assembly of a mechanical connection?",
+          "options": [
+            {
+              "id": "16f7777f-a905-504a-82a6-f811917ddab3",
+              "text": "Only from the external shine of the coupling."
+            },
+            {
+              "id": "059b73ed-9789-532b-8bdd-76292b933de9",
+              "text": "Only from manual effort."
+            },
+            {
+              "id": "360799ef-c9b1-5699-a1a1-f3af343f8772",
+              "text": "Only from the air temperature at the beginning of the shift."
+            },
+            {
+              "id": "a2f5f61d-a4fb-57e8-9d67-1f9b2f4dc4d6",
+              "text": "From the design solution, system compatibility, manufacturer's instructions and installed controls."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "496e0f61-1e0b-5612-8f56-c886a93b90b3",
+          "text": "The frame retainer was destroyed before concreting. What should I do?",
+          "options": [
+            {
+              "id": "b7f10470-3c8d-541f-8fb0-5f99495773d0",
+              "text": "Replace it with a suitable, serviceable element and re-check the stability and position of the frame."
+            },
+            {
+              "id": "f08f9f25-f824-594f-bf1e-6aaefd883381",
+              "text": "Leave the frame without a lock if it is heavy."
+            },
+            {
+              "id": "610f07b2-acbf-5a2e-ab51-8d53fa39cf03",
+              "text": "Tie the frame to the formwork with random wire."
+            },
+            {
+              "id": "9f5e5fce-2e63-5e2f-b2a0-492331088996",
+              "text": "Place a random piece of wood."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f31fe743-cdad-5dee-84eb-b22186396855",
+          "text": "The power tool must be used in a wet area. What should I do?",
+          "options": [
+            {
+              "id": "0e9ad062-37ab-5345-800e-8de5b3482cbd",
+              "text": "Disable safety devices to avoid tripping."
+            },
+            {
+              "id": "41dc91ff-b6c7-542c-86ec-d3c4e2eca973",
+              "text": "Place the tool on a wet floor and plug it in via a regular extension cord."
+            },
+            {
+              "id": "33efc22a-3e4c-50b6-9486-983669161827",
+              "text": "Assess the conditions, apply the provided electrical protection and do not operate with faulty or unsuitable tools."
+            },
+            {
+              "id": "d54b469d-e17e-5051-b6e0-ad0df8210e3b",
+              "text": "Wrap the tool housing in cloth and continue working."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "48623af7-e32e-52ab-9fb3-390dab796c09",
+          "text": "In what sequence is the frame assembly site prepared?",
+          "options": [
+            {
+              "id": "690d59e1-4c09-5069-8da8-430a08b6a19d",
+              "text": "First, they lay out the rods in the passage, then look for the drawing."
+            },
+            {
+              "id": "0cf64ac9-28fc-58df-9ce1-f079d7d42462",
+              "text": "Study the task, fence and clear the area, place materials securely, check tools and protection."
+            },
+            {
+              "id": "4ca408d5-5380-5866-b728-b74e9f8a270f",
+              "text": "First, turn on the machines, then clear the work area."
+            },
+            {
+              "id": "08cbbd40-9181-50aa-9f98-d8917f15930a",
+              "text": "First remove the guards, then select PPE."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "e4c92932-37b2-521d-bcb4-01543cc84051",
+          "text": "The lifted load is suspended above the installation area. What should I do?",
+          "options": [
+            {
+              "id": "c4a9673d-d18d-5b36-accb-b15b9eada1f3",
+              "text": "Use the weight as a temporary support."
+            },
+            {
+              "id": "ae0d1c73-fdf1-5ce2-846c-591039b3d9de",
+              "text": "Push the load with your hands from below."
+            },
+            {
+              "id": "37865185-3b4e-504e-95c6-1954987a867b",
+              "text": "Continue tying under load while the crane is stationary."
+            },
+            {
+              "id": "9518ffac-9b52-55e6-883c-77903960f449",
+              "text": "Stop work under load, remove people and act according to the established commands of the responsible personnel."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "5422664f-ee24-55c2-b7d0-e6d33cd90ec7",
+          "text": "What are reinforcement clamps used for?",
+          "options": [
+            {
+              "id": "d3e2ed57-6284-590b-b722-b46b78797a2a",
+              "text": "To hold the frame in the design position and provide the specified protective layer."
+            },
+            {
+              "id": "17ec74e4-52ef-5fe4-8b89-e32527515517",
+              "text": "For temporary storage of cutting tools."
+            },
+            {
+              "id": "5702e229-f6af-5e44-8d5d-fa2d0c9f1c11",
+              "text": "To change the steel grade on site."
+            },
+            {
+              "id": "376a09d9-17ee-5447-83a5-555a0c200294",
+              "text": "For replacing all rod connections."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    }
+  ]
+}

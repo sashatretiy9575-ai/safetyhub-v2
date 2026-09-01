@@ -17,6 +17,18 @@ async function readYaml(path) {
   }
 }
 
+const exampleEnvironment = await readFile('.env.example', 'utf8');
+for (const flag of [
+  'SAFETYHUB_LOCALE_ROUTES_ENABLED',
+  'SAFETYHUB_ZH_PASSKEY_ENABLED',
+  'SAFETYHUB_ADMIN_INBOX_ENABLED',
+]) {
+  assert(
+    new RegExp(`^${flag}=false$`, 'mu').test(exampleEnvironment),
+    `${flag} must be documented with a fail-closed production example.`,
+  );
+}
+
 const dependabot = await readYaml('.github/dependabot.yml');
 assert(dependabot?.version === 2, 'Dependabot config must use version 2.');
 assert(Array.isArray(dependabot?.updates), 'Dependabot config must contain an updates array.');
@@ -47,11 +59,20 @@ const databaseCommands = databaseSteps
   .map((step) => step?.run)
   .filter(Boolean)
   .join('\n');
-assert(applicationCommands.includes('npm run verify') === false, 'CI application checks must stay inspectable.');
+assert(
+  applicationCommands.includes('npm run verify') === false,
+  'CI application checks must stay inspectable.',
+);
 assert(applicationCommands.includes('npm run lint'), 'CI application job must run lint.');
-assert(applicationCommands.includes('npm run type-check'), 'CI application job must run TypeScript.');
+assert(
+  applicationCommands.includes('npm run type-check'),
+  'CI application job must run TypeScript.',
+);
 assert(applicationCommands.includes('npm test'), 'CI application job must run Node tests.');
-assert(applicationCommands.includes('npm run build'), 'CI application job must build the application.');
+assert(
+  applicationCommands.includes('npm run build'),
+  'CI application job must build the application.',
+);
 assert(
   databaseCommands.includes('npm run seed:workspace'),
   'CI database job must seed authenticated workspaces.',
@@ -60,13 +81,22 @@ assert(
   databaseCommands.includes('supabase db reset'),
   'CI database job must rebuild Supabase from every migration.',
 );
-assert(databaseCommands.includes('npm run test:db'), 'CI database job must run SQL contract tests.');
+assert(
+  databaseCommands.includes('npm run test:db'),
+  'CI database job must run SQL contract tests.',
+);
 assert(
   databaseCommands.includes('npm run db:types:check:local'),
   'CI must reject stale exact generated database types from the clean local schema.',
 );
-assert(databaseCommands.includes('npm run check:db-types'), 'CI must check Supabase type contracts.');
-assert(databaseCommands.includes('npm run test:e2e:release'), 'CI must run strict authenticated E2E.');
+assert(
+  databaseCommands.includes('npm run check:db-types'),
+  'CI must check Supabase type contracts.',
+);
+assert(
+  databaseCommands.includes('npm run test:e2e:release'),
+  'CI must run strict authenticated E2E.',
+);
 assert(
   workflow?.jobs?.database?.env?.E2E_REQUIRE_AUTH === '1',
   'CI must require authenticated E2E credentials.',
@@ -76,9 +106,9 @@ for (const [jobName, steps] of [
   ['database', databaseSteps],
 ]) {
   assert(
-    String(steps.find((step) => step?.uses?.startsWith('actions/setup-node@'))?.with?.[
-      'node-version'
-    ]) === '24',
+    String(
+      steps.find((step) => step?.uses?.startsWith('actions/setup-node@'))?.with?.['node-version'],
+    ) === '24',
     `CI ${jobName} job must run the supported Node.js 24 toolchain.`,
   );
 }
@@ -129,8 +159,13 @@ assert(
     receiptCommands.includes('npm run test:db'),
   'Schema receipt must verify generated types and SQL contracts.',
 );
-assert(receiptWorkflowSource.includes('sha256sum'), 'Schema receipt must include a SHA-256 checksum.');
-const receiptArtifact = receiptSteps.find((step) => step?.name === 'Upload verified schema receipt');
+assert(
+  receiptWorkflowSource.includes('sha256sum'),
+  'Schema receipt must include a SHA-256 checksum.',
+);
+const receiptArtifact = receiptSteps.find(
+  (step) => step?.name === 'Upload verified schema receipt',
+);
 assert(
   receiptArtifact && !receiptArtifact.if,
   'Schema receipt artifact must upload only after all database checks pass.',

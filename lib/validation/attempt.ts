@@ -8,6 +8,7 @@ const isSupportedAttemptLength = (length: number) =>
 export const createAttemptSchema = z.object({
   testSlug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   startNew: z.boolean().optional().default(false),
+  locale: z.enum(['ru', 'kk', 'en', 'zh']).default('ru'),
 });
 export type CreateAttemptValues = z.infer<typeof createAttemptSchema>;
 

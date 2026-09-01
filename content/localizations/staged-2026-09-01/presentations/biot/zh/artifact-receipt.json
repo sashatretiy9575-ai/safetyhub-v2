@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "biot",
+  "locale": "zh",
+  "productionPublished": false,
+  "contentSummary": "BIOT: 基本职业安全健康要求：危害、风险评估、培训、批准、防护装备和应急程序。",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/biot/presentation.pptx",
+    "pptxSha256": "625d6bdc8fe58f207e5a670380f7106c3ae5917ca1e8a60eac2bbed60390c6f3",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/biot/zh/text-map.json",
+    "textMapSha256": "77f72665c018f85e71dc127ab9ee35541cc723406794850f88bf3e4b8dff042b"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/biot/zh/assets/pptx/84da5f207a17f06a27b735c395182a01f8aa22cd3775161129fa18a028f5e292/presentation.pptx",
+    "sha256": "84da5f207a17f06a27b735c395182a01f8aa22cd3775161129fa18a028f5e292",
+    "byteSize": 2371719,
+    "slideCount": 59
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/biot/zh/assets/pdf/5b8fe63d3ed41febf399695978a89fae44d7d1adf649ad37aa83f61c0774bfdf/presentation.pdf",
+    "sha256": "5b8fe63d3ed41febf399695978a89fae44d7d1adf649ad37aa83f61c0774bfdf",
+    "byteSize": 1566184,
+    "pageCount": 59,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "edits": {
+    "translatedElementCount": 373,
+    "translatedTableCellCount": 15,
+    "retainedElementCount": 120,
+    "sourceNotesAdded": 59,
+    "textTopologySha256": "04acf1dd9eb82c9015c2b1486bbf08b0d35748f1fdcd9b3c9ad8f85d17077939",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "status": "passed",
+    "automatedOnly": true,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 59
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 854,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "pptxRenderedSlideCount": 59,
+    "pdfRenderedPageCount": 59,
+    "pageTextLayerCount": 59,
+    "localizedTextUnitCount": 507,
+    "localizedTextMismatchCount": 0,
+    "missingGlyphSentinelCount": 0,
+    "templateTypographyRegressionCount": 0,
+    "templateTypographyReport": "content/localizations/staged-2026-09-01/qa/presentation-layout-audit.all.json",
+    "canvasOverflowCount": 0,
+    "canvasOverflowCheck": "Test passed. No overflow detected.",
+    "textFrameOverflowCount": 0,
+    "textFrameObservedOverflowCount": 0,
+    "sourceTextFrameObservedOverflowCount": 0,
+    "inheritedWithinToleranceTextFrameOverflowCount": 0,
+    "newlyIntroducedTextFrameOverflowCount": 0,
+    "inspectedTextFrameCount": 507,
+    "textFrameOverflowEngine": "Microsoft PowerPoint TextFrame2 bounds, source-relative regression comparison",
+    "nonblankPageChecks": 59,
+    "pdfUnsafeActionCount": 0,
+    "pdfEmbeddedFileCount": 0,
+    "visualMethod": "all-slide artifact-tool raster, all-page PDF.js 1600x900 raster/pixel inspection, contact sheets, localized text-layer comparison and padded-canvas overflow test",
+    "presentationTextMapSha256": "77f72665c018f85e71dc127ab9ee35541cc723406794850f88bf3e4b8dff042b"
+  },
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

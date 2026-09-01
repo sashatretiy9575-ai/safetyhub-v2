@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "slug": "biot",
+  "locale": "en",
+  "productionPublished": false,
+  "sourcePptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/biot/en/assets/pptx/64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3/presentation.pptx",
+    "sha256": "64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3"
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/biot/en/assets/pdf/cead2abf1efaf41c7cecd5f306161a3b4eb433ba19157aba0ba62af7a1866e80/presentation.pdf",
+    "sha256": "cead2abf1efaf41c7cecd5f306161a3b4eb433ba19157aba0ba62af7a1866e80",
+    "byteSize": 1146679,
+    "pageCount": 59,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "export": {
+    "engine": "Microsoft PowerPoint fixed-format PDF",
+    "onePagePerSlide": true,
+    "notesRendered": false
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "biot",
+  "locale": "en",
+  "productionPublished": false,
+  "contentSummary": "BIOT: Basic occupational safety and health requirements: hazards, risk assessment, training, approval, protective equipment and emergency procedures.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/biot/presentation.pptx",
+    "pptxSha256": "625d6bdc8fe58f207e5a670380f7106c3ae5917ca1e8a60eac2bbed60390c6f3",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/biot/en/text-map.json",
+    "textMapSha256": "27e8be2009aa9ecd08136c1c4ee80b7c53c18fc8592f4c94dd64a53d439d2231"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/biot/en/assets/pptx/64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3/presentation.pptx",
+    "sha256": "64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3",
+    "byteSize": 2365275,
+    "slideCount": 59
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/biot/en/assets/pdf/cead2abf1efaf41c7cecd5f306161a3b4eb433ba19157aba0ba62af7a1866e80/presentation.pdf",
+    "sha256": "cead2abf1efaf41c7cecd5f306161a3b4eb433ba19157aba0ba62af7a1866e80",
+    "byteSize": 1146679,
+    "pageCount": 59,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "edits": {
+    "translatedElementCount": 373,
+    "translatedTableCellCount": 15,
+    "retainedElementCount": 120,
+    "sourceNotesAdded": 59,
+    "textTopologySha256": "33bbe9ebb05f3bf271a10c640e09774839ead74783285fc32dcce925e0dcc8cb",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "status": "passed",
+    "automatedOnly": true,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 59
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 854,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "pptxRenderedSlideCount": 59,
+    "pdfRenderedPageCount": 59,
+    "pageTextLayerCount": 59,
+    "localizedTextUnitCount": 507,
+    "localizedTextMismatchCount": 0,
+    "missingGlyphSentinelCount": 0,
+    "templateTypographyRegressionCount": 0,
+    "templateTypographyReport": "content/localizations/staged-2026-09-01/qa/presentation-layout-audit.all.json",
+    "canvasOverflowCount": 0,
+    "canvasOverflowCheck": "Test passed. No overflow detected.",
+    "textFrameOverflowCount": 0,
+    "textFrameObservedOverflowCount": 0,
+    "sourceTextFrameObservedOverflowCount": 0,
+    "inheritedWithinToleranceTextFrameOverflowCount": 0,
+    "newlyIntroducedTextFrameOverflowCount": 0,
+    "inspectedTextFrameCount": 507,
+    "textFrameOverflowEngine": "Microsoft PowerPoint TextFrame2 bounds, source-relative regression comparison",
+    "nonblankPageChecks": 59,
+    "pdfUnsafeActionCount": 0,
+    "pdfEmbeddedFileCount": 0,
+    "visualMethod": "all-slide artifact-tool raster, all-page PDF.js 1600x900 raster/pixel inspection, contact sheets, localized text-layer comparison and padded-canvas overflow test",
+    "presentationTextMapSha256": "27e8be2009aa9ecd08136c1c4ee80b7c53c18fc8592f4c94dd64a53d439d2231"
+  },
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

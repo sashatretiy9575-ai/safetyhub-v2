@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-01T00:00:00.000Z",
+  "state": "INDEPENDENT_SEMANTIC_GATE_COMPLETE",
+  "reviewer": "independent-semantic-model-review",
+  "scope": "Bounded independent semantic and material-concision review of the sole pass5 KK scaffold slide-10 candidate; no translation was applied.",
+  "hashDefinition": "gateSha256 is SHA-256 of recursively key-sorted compact JSON for this object with gateSha256 omitted.",
+  "inputs": {
+    "sharedOverridePath": "content/localizations/translation-overrides.ru-kk-en-zh.json",
+    "sharedOverrideFileSha256": "e6fe80bf64edaf3df566d3992514e40a8a9185b17e4f707365e347e184ff0a86",
+    "expectedSharedOverrideFileSha256": "e6fe80bf64edaf3df566d3992514e40a8a9185b17e4f707365e347e184ff0a86",
+    "sharedOverrideHashMatched": true,
+    "layoutReportPath": "tmp/stage6/presentation-localization/qa/layout-regressions.kk-en.json",
+    "layoutReportFileSha256": "11f14b31acf176a89b5349bbfe0e8a06e26bca639c623b08c7936735d0aefdcd",
+    "expectedLayoutReportFileSha256": "11f14b31acf176a89b5349bbfe0e8a06e26bca639c623b08c7936735d0aefdcd",
+    "layoutReportHashMatched": true,
+    "sourceMapPath": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/kk/text-map.json",
+    "sourceMapFileSha256": "31fc866b695410c917181a5f41522b6b8c16d4f5c412e1d86435b3d66eb02b8f",
+    "candidateArtifactPath": "tmp/stage6/semantic-review/layout-concise-candidates-pass5.kk.json",
+    "candidateArtifactFileSha256": "07aca861019beef34909cae6c5451a74871da0d31486a821aa344c200ba40bf2",
+    "expectedCandidateArtifactFileSha256": "07aca861019beef34909cae6c5451a74871da0d31486a821aa344c200ba40bf2",
+    "candidateArtifactHashMatched": true,
+    "proposalPath": "tmp/stage6/semantic-review/proposed-overrides.layout-concise-pass5.json",
+    "proposalFileSha256": "2dc329dc42bcf47a88662e755846347908b47321dc56d6d916a5d228e826f978",
+    "expectedProposalFileSha256": "2dc329dc42bcf47a88662e755846347908b47321dc56d6d916a5d228e826f978",
+    "proposalFileHashMatched": true,
+    "expandedProposalPath": "tmp/stage6/semantic-review/proposed-overrides.layout-concise-pass5.expanded.json",
+    "expandedProposalFileSha256": "3f839d2a42c2c0ec4f72760dbe4b74fca1c455b5327fa23bad0b8afe2a44a68e",
+    "expectedExpandedProposalFileSha256": "3f839d2a42c2c0ec4f72760dbe4b74fca1c455b5327fa23bad0b8afe2a44a68e",
+    "expandedProposalFileHashMatched": true,
+    "proposalSha256": "5c2531c46c5c60297d84f9bcf6cf17e5e5cc95e6a59401cba3fb7c06c0d583f4",
+    "expectedProposalSha256": "5c2531c46c5c60297d84f9bcf6cf17e5e5cc95e6a59401cba3fb7c06c0d583f4",
+    "proposalHashMatched": true,
+    "proposedAgainstSharedOverrideSha256": "e6fe80bf64edaf3df566d3992514e40a8a9185b17e4f707365e347e184ff0a86"
+  },
+  "counts": {
+    "reviewedTargetCount": 1,
+    "acceptedTargetCount": 0,
+    "rejectedTargetCount": 1,
+    "acceptedSourceGroupCount": 0,
+    "rejectedSourceGroupCount": 1
+  },
+  "rejectionReasonCounts": {
+    "UNCONDITIONAL_STABILITY_CLAIM_INTRODUCED": 1
+  },
+  "validationFailures": [],
+  "applyInstructions": {
+    "requiredSharedOverrideFileSha256": "e6fe80bf64edaf3df566d3992514e40a8a9185b17e4f707365e347e184ff0a86",
+    "applyAcceptedTargetsOnly": true,
+    "acceptedTargetCount": 0,
+    "acceptedSourceGroupCount": 0,
+    "preserveRejectedCurrentTargets": true,
+    "doNotApplyRejectedIndexes": [
+      0
+    ],
+    "rerunBuilderValidatorAndRenderedLayoutAuditAfterAnyFutureAuthorizedApplication": true
+  },
+  "decisions": [
+    {
+      "index": 0,
+      "sourceSha256": "86951cb7ec4b48941d196e4799cce5dc094a9cdbbbf5130d3bae6ba5851d5ea9",
+      "source": "Система лесов и устойчивость",
+      "locale": "kk",
+      "current": "Құрылыс мінбесі: жүйе, орнықтылық",
+      "currentSha256": "3c1b1651699b7ad8c83dc200cb5a1a98c808e5522c4062369772f76d4e08555c",
+      "candidate": "Құрылыс мінбе жүйесі орнықты",
+      "candidateSha256": "443a564d7d2520aebe304246917c12e89292e1434d6bfa855d9805216c6e96e7",
+      "decision": "REJECT",
+      "reasonCode": "UNCONDITIONAL_STABILITY_CLAIM_INTRODUCED",
+      "rationale": "The candidate is materially narrower, and құрылыс plus мінбе жүйесі keeps construction scaffolding and system identifiable. However, the Russian source is a nominal section topic joining the scaffolding system with structural stability; орнықты turns that topic into the categorical assertion that the system is stable. That assurance is not supported by the adjacent requirement that dimensions, spacing, and ties be selected for the specific system from its design, passport, and scheme. The compressed Құрылыс мінбе жүйесі construction is also less natural and more ambiguous than the established Құрылыс мінбесі wording. Because the candidate changes the safety proposition and is awkward, it is not safe to approve.",
+      "semanticPreservation": false,
+      "numbersUnitsUrlsPreserved": true,
+      "materiallyMoreConcise": true,
+      "contractChecks": {
+        "constructionScaffoldingQualifierPreserved": true,
+        "systemQualifierPreserved": true,
+        "stabilityConceptPresent": true,
+        "sourceTopicRelationshipPreserved": false,
+        "unconditionalSafetyAssuranceAvoided": false,
+        "naturalUnambiguousKazakh": false,
+        "negationPreserved": true,
+        "actorsPreserved": true,
+        "authorizationPreserved": true
+      },
+      "layoutEvidence": {
+        "currentVisualUnits": 30.53,
+        "candidateVisualUnits": 26.43,
+        "visualUnitReduction": 4.1,
+        "visualReductionPercent": 13.43,
+        "currentLineCount": 2,
+        "requiredLineCount": 1
+      }
+    }
+  ],
+  "gateSha256": "41d38da02f6fcdfceb22a325f141b9d4860baa120bb0b9248f162aa70f288197"
+}

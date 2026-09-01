@@ -26,13 +26,14 @@ export type ArticleMutationResult = {
   draftVersion: number;
   contentHash: string;
   previousSlug?: string | null;
+  publicationError?: 'ARTICLE_LOCALIZATIONS_INCOMPLETE' | 'ARTICLE_LOCALIZATION_PUBLISH_FAILED';
 };
 
 type ArticleRpcClient = {
   rpc(
     name:
       | 'save_article_draft_v2'
-      | 'save_and_publish_article_v2'
+      | 'publish_article_revision_v3'
       | 'set_article_status_v2'
       | 'delete_article',
     args: Record<string, unknown>,
@@ -105,9 +106,9 @@ export async function saveArticleAction(input: unknown): Promise<ArticleMutation
 
 export async function publishArticleAction(input: unknown): Promise<ArticleMutationResult> {
   const article = articleDraftInputSchema.parse(input);
-  await requireCapability('content.manage');
+  const actor = await requireCapability('content.manage');
   const client = (await createClient()) as unknown as ArticleRpcClient;
-  const response = await client.rpc('save_and_publish_article_v2', {
+  const savedResponse = await client.rpc('save_article_draft_v2', {
     p_article_id: article.id ?? null,
     p_original_slug: article.originalSlug ?? null,
     p_slug: article.slug,
@@ -123,7 +124,21 @@ export async function publishArticleAction(input: unknown): Promise<ArticleMutat
       seo: article.seo ?? defaultContentSeo(article.title, article.description, article.coverImage),
     },
   });
-  const result = parseMutationResult(unwrapRpcMutationResponse(response));
+  const saved = parseMutationResult(unwrapRpcMutationResponse(savedResponse));
+  let result: ArticleMutationResult;
+  try {
+    const response = await client.rpc('publish_article_revision_v3', {
+      p_actor_id: actor.user.id,
+      p_article_id: saved.id,
+      p_expected_content_hash: saved.contentHash,
+    });
+    result = parseMutationResult(unwrapRpcMutationResponse(response));
+  } catch (error) {
+    if (error instanceof Error && error.message === 'ARTICLE_LOCALIZATIONS_INCOMPLETE') {
+      return { ...saved, publicationError: 'ARTICLE_LOCALIZATIONS_INCOMPLETE' };
+    }
+    return { ...saved, publicationError: 'ARTICLE_LOCALIZATION_PUBLISH_FAILED' };
+  }
   revalidateArticlePaths(result.slug, result.previousSlug);
   await getArticleBySlug(result.slug);
   return result;

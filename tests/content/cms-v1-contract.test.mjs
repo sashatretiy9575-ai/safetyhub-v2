@@ -39,7 +39,7 @@ test('course publication writes an immutable revision without a review operation
   assert.doesNotMatch(server, /review_course_draft|reviewedContentHash/);
 });
 
-test('articles publish the current draft directly with optimistic concurrency', async () => {
+test('articles save the current draft and atomically publish four localized copies', async () => {
   const [additive, action, editor] = await Promise.all([
     read('supabase/migrations/20260820000000_content_lifecycle_additive.sql'),
     read('lib/actions/articles.ts'),
@@ -60,8 +60,11 @@ test('articles publish the current draft directly with optimistic concurrency', 
   assert.match(additive, /p_expected_content_hash/);
   assert.match(additive, /insert into public\.article_revisions/);
   assert.match(action, /set_article_status_v2/);
-  assert.match(action, /save_and_publish_article_v2/);
-  assert.match(action, /p_expected_content_hash: expectedContentHash \?\? null/);
+  assert.match(action, /rpc\('save_article_draft_v2'/);
+  assert.match(action, /rpc\('publish_article_revision_v3'/);
+  assert.doesNotMatch(action, /rpc\('save_and_publish_article_v2'/);
+  assert.match(action, /p_expected_content_hash: saved\.contentHash/);
+  assert.match(action, /publicationError: 'ARTICLE_LOCALIZATIONS_INCOMPLETE'/);
   assert.doesNotMatch(action, /review_article_draft/);
   assert.match(editor, /draftVersion/);
   assert.match(editor, /publishArticleAction/);

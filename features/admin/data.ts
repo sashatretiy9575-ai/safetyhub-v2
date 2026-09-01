@@ -113,7 +113,7 @@ const adminCapabilitySchema = z.enum([
 const adminUserListItemSchema = z
   .object({
     id: z.string().uuid(),
-    email: z.string(),
+    email: z.string().nullable(),
     label: z.string().optional(),
     // Rolling-deploy compatibility: the previous RPC nested the display name in profile.
     // Zod strips every other legacy profile/identity/activity field before this result leaves
@@ -134,7 +134,7 @@ const adminUserListItemSchema = z
 
 const learningHistoryTargetSchema = z.object({
   id: z.string().uuid(),
-  email: z.string(),
+  email: z.string().nullable(),
   label: z.string(),
   role: z.literal('participant'),
   status: z.enum(['active', 'suspended']),
@@ -158,14 +158,14 @@ const auditEventSchema = z.object({
 
 const adminAccessUserSchema = z.object({
   id: z.string().uuid(),
-  email: z.string(),
+  email: z.string().nullable(),
   label: z.string(),
   capabilities: z.array(adminCapabilitySchema),
 });
 
 const adminAccountApprovalItemSchema = z.object({
   id: z.string().uuid(),
-  email: z.string().email(),
+  email: z.string().email().nullable(),
   name: z.string().max(80),
   surname: z.string().max(80),
   job: z.string().max(160),

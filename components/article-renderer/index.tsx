@@ -8,6 +8,7 @@ import type { ArticleBlock } from '@/lib/content/articles';
 import type { SiteContactSettings } from '@/lib/site-contacts-shared';
 import { ARTICLE_WHATSAPP_ACTION_URL, articleBlocksSchema } from '@/lib/validation/article';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 interface ArticleRendererProps {
   blocks: unknown;
@@ -25,7 +26,7 @@ function headingSlug(value: string) {
   return (
     value
       .normalize('NFKC')
-      .toLocaleLowerCase('ru-RU')
+      .toLocaleLowerCase()
       .replace(/[^\p{L}\p{N}]+/gu, '-')
       .replace(/^-+|-+$/g, '') || 'section'
   );
@@ -90,22 +91,20 @@ export function estimateArticleReadTime(blocks: unknown) {
 const calloutStyles = {
   info: {
     icon: Info,
-    label: 'Информация',
     className: 'border-[var(--color-primary)]/35 bg-[var(--color-primary-soft)]',
   },
   warning: {
     icon: Warning,
-    label: 'Важно',
     className: 'border-[var(--color-warning)]/40 bg-[var(--color-accent-amber-soft)]',
   },
   success: {
     icon: CheckCircle,
-    label: 'Рекомендация',
     className: 'border-[var(--color-success)]/35 bg-[var(--color-primary-soft)]',
   },
 } as const;
 
 export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
+  const t = useTranslations('Blog');
   const result = articleBlocksSchema.safeParse(blocks);
   if (!result.success) {
     return (
@@ -113,7 +112,7 @@ export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
         role="alert"
         className="rounded-[var(--radius-md)] border border-[var(--color-danger)]/35 bg-[var(--color-danger-soft)] p-4 text-sm text-[var(--color-danger)]"
       >
-        Содержимое материала временно недоступно из-за неверного формата статьи.
+        {t('articleUnavailable')}
       </div>
     );
   }
@@ -206,13 +205,13 @@ export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
             return (
               <Carousel
                 key={index}
-                label={block.label ?? `Галерея материала, блок ${index + 1}`}
+                label={block.label ?? t('gallery', { count: index + 1 })}
                 className="my-7"
                 gridClassName="md:grid-cols-2"
                 itemClassName="min-w-[92%] min-[420px]:min-w-[82%]"
-                itemLabel="Изображение"
-                previousLabel="Предыдущее изображение"
-                nextLabel="Следующее изображение"
+                itemLabel={t('image')}
+                previousLabel={t('previousImage')}
+                nextLabel={t('nextImage')}
               >
                 {block.images.map((galleryImage, imageIndex) => (
                   <figure key={`${galleryImage.src}-${imageIndex}`} className="min-w-0">
@@ -272,7 +271,7 @@ export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
               <div
                 key={index}
                 role="region"
-                aria-label={block.caption ?? `Таблица ${index + 1}`}
+                aria-label={block.caption ?? t('table', { count: index + 1 })}
                 tabIndex={0}
                 className="my-7 max-w-full overflow-x-auto rounded-[var(--radius-md)] focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
@@ -307,10 +306,16 @@ export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
           case 'callout': {
             const style = calloutStyles[block.tone];
             const Icon = style.icon;
+            const defaultLabel =
+              block.tone === 'info'
+                ? t('info')
+                : block.tone === 'warning'
+                  ? t('important')
+                  : t('recommendation');
             return (
               <aside
                 key={index}
-                aria-label={block.title ?? style.label}
+                aria-label={block.title ?? defaultLabel}
                 className={cn(
                   'my-7 flex gap-3 rounded-[var(--radius-md)] border p-4 sm:p-5',
                   style.className,
@@ -331,11 +336,11 @@ export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
             return (
               <aside
                 key={index}
-                aria-label="Источник"
+                aria-label={t('source')}
                 className="my-5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4"
               >
                 <p className="my-0 text-xs font-bold tracking-wider text-[var(--color-text-subtle)] uppercase">
-                  Источник
+                  {t('source')}
                 </p>
                 <a
                   href={block.url}

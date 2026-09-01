@@ -1,10 +1,8 @@
-import { promises as fs } from 'node:fs';
-import path from 'node:path';
-import fontkit from '@pdf-lib/fontkit';
-import { PDFDocument, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
-import { normalizePdfText } from '@/lib/pdf/certificate';
+import type { PDFFont, PDFPage, RGB } from 'pdf-lib';
+import type { CertificateRenderMetadata } from './certificate-client-contract.ts';
+import { normalizePdfText } from './certificate.ts';
 
-export type CertificateReportRow = {
+export type CertificateReportRow = Readonly<{
   fullName: string;
   position: string | null;
   organization: string | null;
@@ -14,30 +12,21 @@ export type CertificateReportRow = {
   completedAt: Date;
   issuedAt: Date;
   certificateNumber: string;
-};
+}>;
 
-const REPORT_FONT_BYTES = fs.readFile(
-  path.join(process.cwd(), 'lib', 'pdf', 'assets', 'noto-sans-latin-cyrillic.ttf'),
-);
 const A4_LANDSCAPE: [number, number] = [841.89, 595.28];
 const MARGIN = 32;
 const HEADER_HEIGHT = 48;
 const ROW_HEIGHT = 34;
 const FOOTER_HEIGHT = 24;
-const GREEN = rgb(0.07, 0.49, 0.16);
-const GREEN_DARK = rgb(0.03, 0.28, 0.1);
-const GREEN_PALE = rgb(0.93, 0.98, 0.94);
-const INK = rgb(0.06, 0.09, 0.16);
-const MUTED = rgb(0.37, 0.42, 0.47);
-const BORDER = rgb(0.82, 0.87, 0.83);
 
-type Column = {
+type Column = Readonly<{
   label: string;
   width: number;
   value: (row: CertificateReportRow) => string;
-};
+}>;
 
-const COLUMNS: Column[] = [
+const COLUMNS: readonly Column[] = [
   { label: 'ФИО', width: 123, value: (row) => row.fullName },
   { label: 'Должность', width: 93, value: (row) => row.position ?? '—' },
   { label: 'Компания', width: 98, value: (row) => row.organization ?? '—' },
@@ -46,9 +35,13 @@ const COLUMNS: Column[] = [
   {
     label: 'Прохождение',
     width: 82,
-    value: (row) => row.completedAt.toLocaleDateString('ru-RU'),
+    value: (row) => row.completedAt.toLocaleDateString('ru-KZ', { timeZone: 'Asia/Oral' }),
   },
-  { label: 'Выдача', width: 76, value: (row) => row.issuedAt.toLocaleDateString('ru-RU') },
+  {
+    label: 'Выдача',
+    width: 76,
+    value: (row) => row.issuedAt.toLocaleDateString('ru-KZ', { timeZone: 'Asia/Oral' }),
+  },
   // The generated number has a fixed `SH-YYYY-XXXXXXXXXXXX` shape. Keep the
   // entire value visible because it is the document's primary lookup key.
   { label: '№ сертификата', width: 117, value: (row) => row.certificateNumber },
@@ -77,92 +70,45 @@ function drawCell(
   x: number,
   y: number,
   width: number,
-  options: { size?: number; color?: ReturnType<typeof rgb> } = {},
+  ink: RGB,
 ) {
-  const size = options.size ?? 8;
+  const size = 8;
   page.drawText(fitText(font, value, size, width - 12), {
     x: x + 6,
     y: y + (ROW_HEIGHT - size) / 2 - 1,
     size,
     font,
-    color: options.color ?? INK,
+    color: ink,
   });
 }
 
-function drawReportHeader(page: PDFPage, font: PDFFont, createdAt: Date, rowCount: number) {
-  const { width, height } = page.getSize();
-  page.drawRectangle({ x: 0, y: height - 88, width, height: 88, color: GREEN_DARK });
-  page.drawText('SafetyHub.kz', {
-    x: MARGIN,
-    y: height - 36,
-    size: 21,
-    font,
-    color: rgb(1, 1, 1),
-  });
-  page.drawText('Отчёт по выданным сертификатам', {
-    x: MARGIN,
-    y: height - 64,
-    size: 13,
-    font,
-    color: rgb(0.85, 0.96, 0.87),
-  });
-  const metadata = `${createdAt.toLocaleDateString('ru-RU')} · участников: ${rowCount}`;
-  page.drawText(metadata, {
-    x: width - MARGIN - font.widthOfTextAtSize(metadata, 9),
-    y: height - 48,
-    size: 9,
-    font,
-    color: rgb(0.85, 0.96, 0.87),
-  });
+export function certificateReportRows(
+  items: readonly CertificateRenderMetadata[],
+): CertificateReportRow[] {
+  return items.map((item) => ({
+    fullName: item.fullName,
+    position: item.position,
+    organization: item.organization,
+    courseTitle: item.titleSnapshot,
+    score: item.score,
+    total: item.total,
+    completedAt: new Date(item.completedAt),
+    issuedAt: new Date(item.issuedAt),
+    certificateNumber: item.certificateNumber,
+  }));
 }
 
-function drawTableHeader(page: PDFPage, font: PDFFont, y: number) {
-  let x = MARGIN;
-  page.drawRectangle({
-    x: MARGIN,
-    y,
-    width: A4_LANDSCAPE[0] - MARGIN * 2,
-    height: HEADER_HEIGHT,
-    color: GREEN,
-  });
-  for (const column of COLUMNS) {
-    page.drawText(fitText(font, column.label, 8, column.width - 12), {
-      x: x + 6,
-      y: y + 19,
-      size: 8,
-      font,
-      color: rgb(1, 1, 1),
-    });
-    x += column.width;
-  }
-}
-
-function drawReportFooter(page: PDFPage, font: PDFFont, pageNumber: number, pageCount: number) {
-  const { width } = page.getSize();
-  const footer = `Страница ${pageNumber} из ${pageCount}`;
-  page.drawText(footer, {
-    x: width - MARGIN - font.widthOfTextAtSize(footer, 8),
-    y: 16,
-    size: 8,
-    font,
-    color: MUTED,
-  });
-  page.drawText('Сформировано SafetyHub.kz', {
-    x: MARGIN,
-    y: 16,
-    size: 8,
-    font,
-    color: MUTED,
-  });
-}
-
-export async function generateCertificateReport(
+export async function generateCertificateReportInBrowser(
   sourceRows: readonly CertificateReportRow[],
-  createdAt = new Date(),
+  createdAt: Date,
+  fontBytes: Uint8Array,
+  subsetFont = false,
 ): Promise<Uint8Array> {
-  if (sourceRows.length > 100) {
-    throw new Error('CERTIFICATE_REPORT_SIZE_INVALID');
-  }
+  if (sourceRows.length > 500) throw new Error('CERTIFICATE_REPORT_SIZE_INVALID');
+  const [{ PDFDocument, rgb }, fontkitModule] = await Promise.all([
+    import('pdf-lib'),
+    import('@pdf-lib/fontkit'),
+  ]);
   const rows = sourceRows.map((row) => ({
     ...row,
     fullName: normalizePdfText(row.fullName),
@@ -172,10 +118,8 @@ export async function generateCertificateReport(
     certificateNumber: normalizePdfText(row.certificateNumber),
   }));
   const pdf = await PDFDocument.create();
-  pdf.registerFontkit(fontkit);
-  // The prepared asset already contains only Latin/Cyrillic/Kazakh glyphs.
-  // Runtime subsetting stays off to preserve portable text extraction.
-  const font = await pdf.embedFont(await REPORT_FONT_BYTES, { subset: false });
+  pdf.registerFontkit(fontkitModule.default);
+  const font = await pdf.embedFont(fontBytes, { subset: subsetFont });
   pdf.setTitle('Отчёт по выданным сертификатам SafetyHub.kz');
   pdf.setSubject('Сводный отчёт об аттестации');
   pdf.setAuthor('SafetyHub.kz');
@@ -184,6 +128,12 @@ export async function generateCertificateReport(
   pdf.setCreationDate(createdAt);
   pdf.setModificationDate(createdAt);
 
+  const green = rgb(0.07, 0.49, 0.16);
+  const greenDark = rgb(0.03, 0.28, 0.1);
+  const greenPale = rgb(0.93, 0.98, 0.94);
+  const ink = rgb(0.06, 0.09, 0.16);
+  const muted = rgb(0.37, 0.42, 0.47);
+  const border = rgb(0.82, 0.87, 0.83);
   const tableTop = A4_LANDSCAPE[1] - 112;
   const tableBottom = FOOTER_HEIGHT + 12;
   const rowsPerPage = Math.max(
@@ -194,8 +144,51 @@ export async function generateCertificateReport(
 
   for (let pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
     const page = pdf.addPage(A4_LANDSCAPE);
-    drawReportHeader(page, font, createdAt, rows.length);
-    drawTableHeader(page, font, tableTop - HEADER_HEIGHT);
+    const { width, height } = page.getSize();
+    page.drawRectangle({ x: 0, y: height - 88, width, height: 88, color: greenDark });
+    page.drawText('SafetyHub.kz', {
+      x: MARGIN,
+      y: height - 36,
+      size: 21,
+      font,
+      color: rgb(1, 1, 1),
+    });
+    page.drawText('Отчёт по выданным сертификатам', {
+      x: MARGIN,
+      y: height - 64,
+      size: 13,
+      font,
+      color: rgb(0.85, 0.96, 0.87),
+    });
+    const metadata = `${createdAt.toLocaleDateString('ru-KZ', { timeZone: 'Asia/Oral' })} · участников: ${rows.length}`;
+    page.drawText(metadata, {
+      x: width - MARGIN - font.widthOfTextAtSize(metadata, 9),
+      y: height - 48,
+      size: 9,
+      font,
+      color: rgb(0.85, 0.96, 0.87),
+    });
+
+    let x = MARGIN;
+    const tableHeaderY = tableTop - HEADER_HEIGHT;
+    page.drawRectangle({
+      x: MARGIN,
+      y: tableHeaderY,
+      width: A4_LANDSCAPE[0] - MARGIN * 2,
+      height: HEADER_HEIGHT,
+      color: green,
+    });
+    for (const column of COLUMNS) {
+      page.drawText(fitText(font, column.label, 8, column.width - 12), {
+        x: x + 6,
+        y: tableHeaderY + 19,
+        size: 8,
+        font,
+        color: rgb(1, 1, 1),
+      });
+      x += column.width;
+    }
+
     const pageRows = rows.slice(pageIndex * rowsPerPage, (pageIndex + 1) * rowsPerPage);
     if (pageRows.length === 0) {
       page.drawText('Действующих сертификатов в выбранных строках нет.', {
@@ -203,7 +196,7 @@ export async function generateCertificateReport(
         y: tableTop - HEADER_HEIGHT - ROW_HEIGHT,
         size: 10,
         font,
-        color: MUTED,
+        color: muted,
       });
     }
     pageRows.forEach((row, index) => {
@@ -213,17 +206,32 @@ export async function generateCertificateReport(
         y,
         width: A4_LANDSCAPE[0] - MARGIN * 2,
         height: ROW_HEIGHT,
-        color: index % 2 === 0 ? rgb(1, 1, 1) : GREEN_PALE,
-        borderColor: BORDER,
+        color: index % 2 === 0 ? rgb(1, 1, 1) : greenPale,
+        borderColor: border,
         borderWidth: 0.35,
       });
-      let x = MARGIN;
+      let rowX = MARGIN;
       for (const column of COLUMNS) {
-        drawCell(page, font, column.value(row), x, y, column.width);
-        x += column.width;
+        drawCell(page, font, column.value(row), rowX, y, column.width, ink);
+        rowX += column.width;
       }
     });
-    drawReportFooter(page, font, pageIndex + 1, pageCount);
+
+    const footer = `Страница ${pageIndex + 1} из ${pageCount}`;
+    page.drawText(footer, {
+      x: width - MARGIN - font.widthOfTextAtSize(footer, 8),
+      y: 16,
+      size: 8,
+      font,
+      color: muted,
+    });
+    page.drawText('Сформировано SafetyHub.kz', {
+      x: MARGIN,
+      y: 16,
+      size: 8,
+      font,
+      color: muted,
+    });
   }
 
   return pdf.save({ useObjectStreams: true });

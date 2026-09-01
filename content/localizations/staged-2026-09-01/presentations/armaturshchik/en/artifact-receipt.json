@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "armaturshchik",
+  "locale": "en",
+  "productionPublished": false,
+  "contentSummary": "Rebar worker: Safe preparation, processing, handling and installation of reinforcement with control of the tool, frame and work area.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/armaturshchik/presentation.pptx",
+    "pptxSha256": "dca7ef29d82b24756a927831daaf566317e7de5653b7aab43d98492c385701f2",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/armaturshchik/en/text-map.json",
+    "textMapSha256": "f55fbdd741f58879f656afced42fcaba5dfd6e0e4366c2d35ce31d8a43e232b2"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/en/assets/pptx/db95211c418a56b31d09669d7687dde21b576a182dea7a458cf81fafb3c130b1/presentation.pptx",
+    "sha256": "db95211c418a56b31d09669d7687dde21b576a182dea7a458cf81fafb3c130b1",
+    "byteSize": 2799915,
+    "slideCount": 31
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/en/assets/pdf/dd7d9f44fd399a645bc0098f15502c3cbe8c4efd933471464feeb24b9009e275/presentation.pdf",
+    "sha256": "dd7d9f44fd399a645bc0098f15502c3cbe8c4efd933471464feeb24b9009e275",
+    "byteSize": 2171096,
+    "pageCount": 31,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "edits": {
+    "translatedElementCount": 183,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 56,
+    "sourceNotesAdded": 31,
+    "textTopologySha256": "c2c1a70ddcd7ef2dd21bde7db115810caa59707b363110b6b739b61741c96ff8",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "status": "passed",
+    "automatedOnly": true,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 31
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 405,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "pptxRenderedSlideCount": 31,
+    "pdfRenderedPageCount": 31,
+    "pageTextLayerCount": 31,
+    "localizedTextUnitCount": 239,
+    "localizedTextMismatchCount": 0,
+    "missingGlyphSentinelCount": 0,
+    "templateTypographyRegressionCount": 0,
+    "templateTypographyReport": "content/localizations/staged-2026-09-01/qa/presentation-layout-audit.all.json",
+    "canvasOverflowCount": 0,
+    "canvasOverflowCheck": "Test passed. No overflow detected.",
+    "textFrameOverflowCount": 0,
+    "textFrameObservedOverflowCount": 0,
+    "sourceTextFrameObservedOverflowCount": 0,
+    "inheritedWithinToleranceTextFrameOverflowCount": 0,
+    "newlyIntroducedTextFrameOverflowCount": 0,
+    "inspectedTextFrameCount": 239,
+    "textFrameOverflowEngine": "Microsoft PowerPoint TextFrame2 bounds, source-relative regression comparison",
+    "nonblankPageChecks": 31,
+    "pdfUnsafeActionCount": 0,
+    "pdfEmbeddedFileCount": 0,
+    "visualMethod": "all-slide artifact-tool raster, all-page PDF.js 1600x900 raster/pixel inspection, contact sheets, localized text-layer comparison and padded-canvas overflow test",
+    "presentationTextMapSha256": "f55fbdd741f58879f656afced42fcaba5dfd6e0e4366c2d35ce31d8a43e232b2"
+  },
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

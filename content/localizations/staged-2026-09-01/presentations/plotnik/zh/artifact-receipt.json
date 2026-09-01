@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "plotnik",
+  "locale": "zh",
+  "productionPublished": false,
+  "contentSummary": "木匠: 安全木匠工作实践：工作场所组织、手动和电动工具、PPE 和故障排除。",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/plotnik/presentation.pptx",
+    "pptxSha256": "8a0ab52560b8c424b8bd8f116a3338807d0c766eac02c9e58fb219bfb226b797",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/plotnik/zh/text-map.json",
+    "textMapSha256": "60ec2fa65e5489374626d691d309e4998b4f5f0b1cfaee6ab4efe80f4e36c6e5"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/plotnik/zh/assets/pptx/2c7ff0acf3bce75cc5ab9d7f90d32a045a990c59a47678801a232877d982a01f/presentation.pptx",
+    "sha256": "2c7ff0acf3bce75cc5ab9d7f90d32a045a990c59a47678801a232877d982a01f",
+    "byteSize": 1932535,
+    "slideCount": 25
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/plotnik/zh/assets/pdf/66ab1fafa568e2bad3ac8dd96170b402eade3c2dfa69f1176177e586f620b62f/presentation.pdf",
+    "sha256": "66ab1fafa568e2bad3ac8dd96170b402eade3c2dfa69f1176177e586f620b62f",
+    "byteSize": 1702550,
+    "pageCount": 25,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "edits": {
+    "translatedElementCount": 141,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 46,
+    "sourceNotesAdded": 25,
+    "textTopologySha256": "331297553ff87a5e012175a7162058bc6784868c2fe5ea9061bcd544a3f457e5",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "status": "passed",
+    "automatedOnly": true,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 25
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 320,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "pptxRenderedSlideCount": 25,
+    "pdfRenderedPageCount": 25,
+    "pageTextLayerCount": 25,
+    "localizedTextUnitCount": 187,
+    "localizedTextMismatchCount": 0,
+    "missingGlyphSentinelCount": 0,
+    "templateTypographyRegressionCount": 0,
+    "templateTypographyReport": "content/localizations/staged-2026-09-01/qa/presentation-layout-audit.all.json",
+    "canvasOverflowCount": 0,
+    "canvasOverflowCheck": "Test passed. No overflow detected.",
+    "textFrameOverflowCount": 0,
+    "textFrameObservedOverflowCount": 0,
+    "sourceTextFrameObservedOverflowCount": 0,
+    "inheritedWithinToleranceTextFrameOverflowCount": 0,
+    "newlyIntroducedTextFrameOverflowCount": 0,
+    "inspectedTextFrameCount": 187,
+    "textFrameOverflowEngine": "Microsoft PowerPoint TextFrame2 bounds, source-relative regression comparison",
+    "nonblankPageChecks": 25,
+    "pdfUnsafeActionCount": 0,
+    "pdfEmbeddedFileCount": 0,
+    "visualMethod": "all-slide artifact-tool raster, all-page PDF.js 1600x900 raster/pixel inspection, contact sheets, localized text-layer comparison and padded-canvas overflow test",
+    "presentationTextMapSha256": "60ec2fa65e5489374626d691d309e4998b4f5f0b1cfaee6ab4efe80f4e36c6e5"
+  },
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

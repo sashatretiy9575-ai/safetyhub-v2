@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "locale": "zh",
+  "sourceSlug": "elektrobezopasnost-na-rabochem-meste",
+  "slug": "elektrobezopasnost-na-rabochem-meste",
+  "title": "人人都应掌握的用电安全：禁止擅自处置的八种情况",
+  "description": "如果出现电缆损坏、冒火花、有烧焦味、插座潮湿或掉线等情况，普通用户应该怎么办？",
+  "coverImage": "/images/generated/article-electrical-safety.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "触电并不一定涉及大型配电柜或高压线路。损坏的延长线、潮湿的插座或存在故障的金属外壳看起来很普通，因此人们很容易下意识伸手触碰。"
+    },
+    {
+      "tone": "warning",
+      "type": "callout",
+      "title": "基本规则",
+      "content": "请勿触摸任何可能带电的人员、设备或电线。阻止其他人靠近并呼叫经过培训的电气人员或紧急服务人员。"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "八个“请勿触摸”信号"
+    },
+    {
+      "type": "list",
+      "items": [
+        "可见铜芯、绝缘层破裂或插头粘在电线上；",
+        "插座、电缆或外壳变得比平时更热；",
+        "有火花、噼啪声、有烧焦味或有烟灰痕迹；",
+        "设备触电或保护触发；",
+        "水已进入电气设备或位于连接附近；",
+        "电缆被门、电器、家具夹住或位于通道内；",
+        "防护罩打开、盖板被拆除或危险标志损坏；",
+        "电线掉落在地面、车辆、栅栏或树上。"
+      ],
+      "style": "unordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "普通用户的正确反应"
+    },
+    {
+      "rows": [
+        [
+          "延长线损坏",
+          "禁止使用；标明故障状态并移交更换"
+        ],
+        [
+          "有烧焦味",
+          "停止工作，走开，报告；关闭是以安全、既定的方式进行的"
+        ],
+        [
+          "插座湿式",
+          "请勿触摸插座或附近的水；限制访问并致电专家"
+        ],
+        [
+          "机器再次关闭",
+          "请勿重复开机；报告查找原因"
+        ],
+        [
+          "电线掉到地上",
+          "请勿接近或触摸附近的物体；警告人们并寻求帮助"
+        ]
+      ],
+      "type": "table",
+      "caption": "请勿修理任何您无权修理的东西",
+      "headers": [
+        "情况",
+        "安全行动"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "为什么“快速扭转”是危险的"
+    },
+    {
+      "type": "paragraph",
+      "content": "看似断开连接的设备可能会再次接收电压、保留电荷或连接到另一个电源。安全电气工作需要特定的关闭、测试、激活保护和批准顺序。未知损坏的管道胶带不是这个序列。"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "如果一个人受到电压"
+    },
+    {
+      "type": "paragraph",
+      "content": "请勿用手抓住。立即拨打 112 并通知调度人员可能发生触电。通过经过培训的人员以安全的方式实现源关闭。仅在确认不存在电气危险后，按照调度员的指示和您的培训，才接近并提供帮助。"
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "连接前",
+      "content": "检查外壳、电缆和插头；确保该区域干燥并且电线不会落在您的脚或车轮下。仅将设备用于其预期用途并在制造商指定的条件下使用。"
+    },
+    {
+      "type": "quote",
+      "content": "电不能原谅试探性的触摸。怀疑是离开并致电专家的充分理由。"
+    },
+    {
+      "url": "/topics",
+      "text": "选择培训项目",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "人人都应掌握的用电安全：禁止擅自处置的八种情况",
+    "ogImage": "/images/generated/article-electrical-safety.webp",
+    "ogTitle": "人人都应掌握的用电安全：禁止擅自处置的八种情况",
+    "indexable": true,
+    "description": "如果出现电缆损坏、冒火花、有烧焦味、插座潮湿或掉线等情况，普通用户应该怎么办？",
+    "ogDescription": "如果出现电缆损坏、冒火花、有烧焦味、插座潮湿或掉线等情况，普通用户应该怎么办？"
+  },
+  "jurisdiction": "哈萨克斯坦共和国",
+  "effectiveDate": "2026-08-12",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500010907",
+      "title": "操作电力装置的安全规则"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500010889",
+      "title": "消费电气装置操作安全规定"
+    }
+  ],
+  "createdAt": "2026-08-04T00:00:00.000Z",
+  "updatedAt": "2026-08-04T00:00:00.000Z"
+}

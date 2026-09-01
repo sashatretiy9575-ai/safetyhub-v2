@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "slug": "lesomontazhnye-raboty",
+  "locale": "zh",
+  "productionPublished": false,
+  "sourcePptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/zh/assets/pptx/efc292d495d415cf1d79f41672648ec95e27bfd1003fc1229244a8fdc6dd8bd3/presentation.pptx",
+    "sha256": "efc292d495d415cf1d79f41672648ec95e27bfd1003fc1229244a8fdc6dd8bd3"
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/zh/assets/pdf/9581df07a540fe856b636a5850fbdc7b5de8f0bf9eba93ade5568aa84d068d59/presentation.pdf",
+    "sha256": "9581df07a540fe856b636a5850fbdc7b5de8f0bf9eba93ade5568aa84d068d59",
+    "byteSize": 1994937,
+    "pageCount": 42,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "export": {
+    "engine": "Microsoft PowerPoint fixed-format PDF",
+    "onePagePerSlide": true,
+    "notesRendered": false
+  }
+}

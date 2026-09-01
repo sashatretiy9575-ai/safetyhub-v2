@@ -1,11 +1,21 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { entityIdSchema } from '@/lib/validation/admin';
 import { createApiResponse, createImmutableAssetResponse } from '@/lib/security/api-response';
+import {
+  hasExactCanonicalSearch,
+  hasExactCanonicalUuidPath,
+} from '@/lib/security/canonical-search';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: Request, context: { params: Promise<{ assetId: string }> }) {
+  if (!hasExactCanonicalSearch(request.url, '')) {
+    return createApiResponse(null, { status: 404 });
+  }
   const { assetId } = await context.params;
+  if (!hasExactCanonicalUuidPath(request.url, '/api/content-assets', assetId)) {
+    return createApiResponse(null, { status: 404 });
+  }
   const parsed = entityIdSchema.safeParse(assetId);
   if (!parsed.success) return createApiResponse(null, { status: 404 });
   const admin = createAdminClient();

@@ -17,18 +17,32 @@ type QuotaAction =
   | 'auth.otp.start.email'
   | 'auth.otp.verify'
   | 'auth.otp.verify.email'
+  | 'auth.zh.registration.options'
+  | 'auth.zh.registration.verify'
+  | 'auth.zh.authentication.options'
+  | 'auth.zh.authentication.verify'
+  | 'auth.zh.authentication.credential'
+  | 'auth.zh.recovery.options'
+  | 'auth.zh.recovery.verify'
+  | 'auth.zh.recovery.locator'
   | 'profile.update'
   | 'attempt.start'
   | 'attempt.complete'
+  | 'presentation.download'
   | 'certificate.pdf'
   | 'certificate.export'
   | 'admin.invite'
   | 'admin.suspend'
   | 'admin.delete'
   | 'admin.reconcile'
+  | 'admin.zh_credential.reset'
   | AdminMutationQuotaAction;
 
-type BusinessQuotaAction = 'avatar.upload' | 'certificate.pdf' | 'profile.update';
+type BusinessQuotaAction =
+  | 'avatar.upload'
+  | 'certificate.pdf'
+  | 'presentation.download'
+  | 'profile.update';
 
 type QuotaPayload = { allowed?: unknown; retryAfter?: unknown };
 type RpcClient = {

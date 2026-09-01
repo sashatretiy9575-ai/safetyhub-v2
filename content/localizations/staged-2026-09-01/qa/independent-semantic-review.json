@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-01T00:00:00.000Z",
+  "status": "passed",
+  "mode": "automated-only",
+  "automatedOnly": true,
+  "noHumanApproval": true,
+  "productionPublished": false,
+  "providerFamily": "OpenAI independent language-model review",
+  "corpusSha256": "051b74a0f13888c8f2374c2abfcf519267c8c985a7cb21e06c0c1d4a066c01c5",
+  "reviewedSourceUnitCount": 2193,
+  "reviewedLocalizedUnitCount": 6579,
+  "acceptedOverrideFileSha256": "1d6457c7ea098ecedb5619c40687e7ceb7afdbd4ee7cea541a0ed5133ce06219",
+  "acceptedOverrideCount": 656,
+  "deterministicHeuristicFindingCount": 721,
+  "deterministicHeuristicFindingsDisposition": "Triage signals were reviewed across bounded independent passes; they are not unresolved material findings.",
+  "evidence": [
+    {
+      "path": "content/localizations/staged-2026-09-01/qa/layout-concise-gate-pass5.kk.json",
+      "bytes": 5802,
+      "sha256": "55438c6e37dad34aa0f4b36388409c9869f0c6241baf0281043868a2c4c1f900"
+    },
+    {
+      "path": "content/localizations/staged-2026-09-01/qa/proposed-overrides.layout-concise-pass5.approved.json",
+      "bytes": 891,
+      "sha256": "c9f0f78b9b2967157118e1e13c6d4443420eeb5de49ba081b5c408a79af3c288"
+    }
+  ],
+  "pass5Rejection": {
+    "gateSha256": "41d38da02f6fcdfceb22a325f141b9d4860baa120bb0b9248f162aa70f288197",
+    "gateFileSha256": "55438c6e37dad34aa0f4b36388409c9869f0c6241baf0281043868a2c4c1f900",
+    "emptyApprovedFileSha256": "c9f0f78b9b2967157118e1e13c6d4443420eeb5de49ba081b5c408a79af3c288",
+    "rejectedTargetApplied": false
+  },
+  "validationFailures": [],
+  "unresolvedMaterialFindings": [],
+  "residualRisk": [
+    "All translation, semantic, terminology, legal and visual review was automated; no human linguistic, legal or design approval was performed.",
+    "Automated review reduces but cannot eliminate residual semantic, terminology, jurisdictional and layout risk.",
+    "Production publication and hosted parity checks remain deferred to the controlled release stage."
+  ]
+}

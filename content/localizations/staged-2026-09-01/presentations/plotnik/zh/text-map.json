@@ -1,0 +1,1892 @@
+{
+  "schemaVersion": 1,
+  "slug": "plotnik",
+  "locale": "zh",
+  "sourcePptx": "content/source-materials/derived/plotnik/presentation.pptx",
+  "slideCount": 25,
+  "slides": [
+    {
+      "slide": 1,
+      "slideId": "sl/y90nupkv",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/7qp4be9c",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "COURSE_KICKER",
+          "text": "УЧЕБНЫЙ КУРС",
+          "sourceTextSha256": "75cac1330e9d5668307c2a56beaadcfde7e96292c2b1cf30849e5d8cc270ded1",
+          "translatedText": "培训课程"
+        },
+        {
+          "id": "sh/65g3298r",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "DECK_TITLE",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/sryl4zqx",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "DECK_SUBTITLE",
+          "text": "Безопасная организация и выполнение плотницких работ",
+          "sourceTextSha256": "4f904fa35b17a34e8719f99a0e6286464cf47ba3a1e9893cde9dd7a130ed11c8",
+          "translatedText": "安全组织和执行木工工作"
+        },
+        {
+          "id": "sh/fu94fe98",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "DECK_AUDIENCE",
+          "text": "Учебный курс для рабочих и линейного персонала",
+          "sourceTextSha256": "f39f8059374d9aa573c6b106502b3275b17b1467ce37f81f9067fadfbf52df00",
+          "translatedText": "工人及一线人员培训课程"
+        },
+        {
+          "id": "sh/ul4vaxgb",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/vmdcj2xw",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        }
+      ]
+    },
+    {
+      "slide": 2,
+      "slideId": "sl/hwbqtkby",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/9072xkry",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "После курса работник сможет",
+          "sourceTextSha256": "4d0cf225b066ac4e94a63069ec59a5c5eccf08eaf1c1126690df72b4cac39d05",
+          "translatedText": "课程结束后作业人员将能够"
+        },
+        {
+          "id": "sh/ozy1ofad",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "LIST_NUMBER_1",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/a10jqpsj",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "LIST_ITEM_1",
+          "text": "Подготовить рабочее место, заготовку и инструмент до начала операции.",
+          "sourceTextSha256": "a1067fc3e4b0bbf4e6714cb0dc43d138c9641fff6dc749d0b93578134ff56102",
+          "translatedText": "开始操作前准备工作场所、工件和工具。"
+        },
+        {
+          "id": "sh/x4r21kru",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "LIST_NUMBER_2",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/r65knqtk",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "LIST_ITEM_2",
+          "text": "Выбрать безопасный приём ручной и механизированной обработки древесины.",
+          "sourceTextSha256": "60e7614bd3ba6504a349e36a8339d29a789cf09b4004e6c80d9f5900965a3f39",
+          "translatedText": "选择安全的手工和机械化木材加工方法。"
+        },
+        {
+          "id": "sh/q5wjelsz",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "LIST_NUMBER_3",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/9wnqhczy",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "LIST_ITEM_3",
+          "text": "Распознать неисправность, опасное действие и условие немедленной остановки.",
+          "sourceTextSha256": "0cf6f9de3078cf3ebee98adcda012b686605770390e40656a72651844a1dfcd5",
+          "translatedText": "识别故障、危险行为和立即停止情况。"
+        },
+        {
+          "id": "sh/mtwrmxg7",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "LIST_NUMBER_4",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/wjy9sry9",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "LIST_ITEM_4",
+          "text": "Применить защитные меры при пыли, шуме, стружке, электрическом и пожарном риске.",
+          "sourceTextSha256": "f1dd01db80d4dc5ea49e7e620b3666dedf6ed4c4c739e9dc6141db1829f797dd",
+          "translatedText": "针对灰尘、噪音、碎屑、电气和火灾风险采取防护措施。"
+        },
+        {
+          "id": "sh/bip8jmho",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Безопасная работа начинается до включения инструмента.",
+          "sourceTextSha256": "df71a8a7ff901e0bdda52363f47cba79c440e10df881297f77259fbc24ed82dd",
+          "translatedText": "安全操作在工具打开之前开始。"
+        },
+        {
+          "id": "sh/s72xofmh",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/76twva5c",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        }
+      ]
+    },
+    {
+      "slide": 3,
+      "slideId": "sl/ofy9wn61",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/cza94vmx",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Логика курса",
+          "sourceTextSha256": "9811ffd0b4bd51ed3b5d8cdebadc40ec24d961f5312280f37c2a3b31c3efff99",
+          "translatedText": "课程逻辑"
+        },
+        {
+          "id": "sh/d0jax03i",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "LIST_NUMBER_1",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/3ah8rqlg",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "LIST_ITEM_1",
+          "text": "Профессия и границы ответственности.",
+          "sourceTextSha256": "bab7504f06982c555cc1c2d756561cd4768b04a6b024c9f9075dfaa4282d3ae3",
+          "translatedText": "职业和责任界限。"
+        },
+        {
+          "id": "sh/obq90bml",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "LIST_NUMBER_2",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/m5cra54z",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "LIST_ITEM_2",
+          "text": "Подготовка рабочего места и заготовки.",
+          "sourceTextSha256": "57fc354d7c91aa3909cea2befc8f2babb62c230372219710eafdc6d6cb00e579",
+          "translatedText": "工作场所和工件的准备。"
+        },
+        {
+          "id": "sh/n6ls3alk",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "LIST_NUMBER_3",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/m1c3mlsn",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "LIST_ITEM_3",
+          "text": "Безопасные приёмы основных операций.",
+          "sourceTextSha256": "f77a0c34de3a598b4f153f2c6b41df46303760c5aada1d58c2175e64cea18d86",
+          "translatedText": "基本操作的安全技术。"
+        },
+        {
+          "id": "sh/943mhgre",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "LIST_NUMBER_4",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/v6l4jq94",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "LIST_ITEM_4",
+          "text": "Инструмент, СИЗ и контроль рисков.",
+          "sourceTextSha256": "48d940e03bd2ca2523d5aac4f521e4798d351d30747b0c6207d9d1907b3d377c",
+          "translatedText": "工具、PPE和风险控制。"
+        },
+        {
+          "id": "sh/a5c3ql8z",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "LIST_NUMBER_5",
+          "text": "05",
+          "sourceTextSha256": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+          "translatedText": "05"
+        },
+        {
+          "id": "sh/w7ulsvqp",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "LIST_ITEM_5",
+          "text": "Действия при неисправности и происшествии.",
+          "sourceTextSha256": "977ad2418d4545fdff7b43e73947058fd295eef0668916189b03c5abebe370b4",
+          "translatedText": "发生故障和事故时采取的措施。"
+        },
+        {
+          "id": "sh/i9w3u58v",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "Прямоугольник 18",
+          "text": "КУРС",
+          "sourceTextSha256": "0181e92ec27149039fb2f998972369363d8dbe9989444c5c3aec7e1ff0b98640",
+          "translatedText": "课程"
+        },
+        {
+          "id": "sh/f29gbyx0",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "Прямоугольник 20",
+          "text": "смысловых блоков",
+          "sourceTextSha256": "b9127e0dd9ea43a0023b523b097f92de1175fd6f49a2293dd77d08efefb9dbd0",
+          "translatedText": "语义块"
+        },
+        {
+          "id": "sh/re9g7yxo",
+          "shapeId": "25",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/sfix03y9",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/batgjixs",
+          "shapeId": "29",
+          "kind": "shape",
+          "name": "AGENDA_COUNT_CIRCLE",
+          "text": "5",
+          "sourceTextSha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+          "translatedText": "5"
+        }
+      ]
+    },
+    {
+      "slide": 4,
+      "slideId": "sl/jyx0ra1s",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/0ba143al",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/ql8jytsj",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Профессия и подготовка",
+          "sourceTextSha256": "74a9a94ec352cade9bef903ebbc6934b07bf96ac0f07f1b12372c831b3c2981c",
+          "translatedText": "专业与培训"
+        },
+        {
+          "id": "sh/doj29oba",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Сначала определить задачу, условия и безопасный способ выполнения.",
+          "sourceTextSha256": "58906735b3c29786ec84bf334ceef7714830aa572fdb045c9cca667caf2916db",
+          "translatedText": "首先定义任务、条件和执行任务的安全方法。"
+        },
+        {
+          "id": "sh/kbm987y5",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/5cva1cfq",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        }
+      ]
+    },
+    {
+      "slide": 5,
+      "slideId": "sl/i107q5of",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/dgbulwnm",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Плотник отвечает за точность и безопасность",
+          "sourceTextSha256": "a96f3a5ae1b49bbbffb29f050f4c365cdc476ab25a1065fcabc395800d01ac6a",
+          "translatedText": "木工负责精度和安全"
+        },
+        {
+          "id": "sh/cf2tcr61",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Работает с древесиной, листовыми материалами, конструкциями и крепежом в пределах задания. • Читает чертёж или схему, выбирает последовательность и проверяет исходный материал. • Не выполняет операции, для которых нет допуска, исправного оснащения или понятной технологии. • Согласует изменения конструкции и размеров с руководителем, а не исправляет проект самовольно.",
+          "sourceTextSha256": "b05947cd536692b366625eaa539a56443d1af0a3d77aa7925e7ba33bb76f47be",
+          "translatedText": "• 在工作范围内使用木材、板材、结构和紧固件。 • 阅读图纸或图表，选择顺序并检查源材料。 • 不执行未经批准、没有适当设备或可理解技术的操作。 • 与经理协调设计和尺寸的变更，未经许可不得修改项目。"
+        },
+        {
+          "id": "sh/l4bupwny",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Граница профессии определяется заданием, квалификацией и допуском.",
+          "sourceTextSha256": "d6e4d0119a78bf70548c6a74c6162b610dd75eeabf2881dd9d32363abed868ed",
+          "translatedText": "职业的界限是由任务、资格和许可决定的。"
+        },
+        {
+          "id": "sh/w32dkbuh",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/x4vedgvm",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "05",
+          "sourceTextSha256": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+          "translatedText": "05"
+        }
+      ]
+    },
+    {
+      "slide": 6,
+      "slideId": "sl/x8f69ofe",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/yhg7epsj",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Разряды отражают рост сложности работ",
+          "sourceTextSha256": "328df2cef02498087afbd4d19dc10c1c4e92698408e05ba7d4eebfe9e113dbaf",
+          "translatedText": "排名反映了工作日益复杂"
+        },
+        {
+          "id": "sh/zi98nu94",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• 2–3-й разряды: подготовительные, простые сборочные и вспомогательные операции. • 4–5-й разряды: изготовление и монтаж более сложных конструкций, точная подгонка. • 6–7-й разряды: особо сложные работы, восстановление, шаблоны и контроль качества. • Конкретную операцию поручают с учётом квалификации, обучения и локального допуска.",
+          "sourceTextSha256": "d2fe55f7eecf75067cec6590b514b752130105853674a70eacc2d0a6b79f14a7",
+          "translatedText": "• 第2-3 类：准备、简单组装和辅助操作。 • 第4-5类：较复杂结构的制造和安装、精密装配。 • 第6-7 类：特别复杂的工作、修复、模板和质量控制。 • 指定具体操作时会考虑资格、培训和当地许可。"
+        },
+        {
+          "id": "sh/ml07i9sv",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Высокий разряд не отменяет инструкцию и оценку риска.",
+          "sourceTextSha256": "96b33a8e7e65ffd4f09d1bae07b416602969696b0eafb5907cdb666f8b28453f",
+          "translatedText": "高级别不会凌驾于说明和风险评估之上。"
+        },
+        {
+          "id": "sh/h4bupgn6",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/w32twb6l",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "06",
+          "sourceTextSha256": "aacd834b5cdc64a329e27649143406dd068306542988dfc250d6184745894849",
+          "translatedText": "06"
+        }
+      ]
+    },
+    {
+      "slide": 7,
+      "slideId": "sl/gnmp4jqx",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/cb2tkvap",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Подготовка рабочего места снижает риск",
+          "sourceTextSha256": "9da6245fd4e5ec0e6cb66aeb97613ee1c862c5f3d24d6ae2a3a74aff6d989bd5",
+          "translatedText": "工作场所准备减少 风险"
+        },
+        {
+          "id": "sh/dcbud0ra",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Уберите отходы и предметы, мешающие устойчивой стойке и свободному движению. • Обеспечьте достаточное освещение, вентиляцию и доступ к аварийному отключению. • Разместите материал и инструмент так, чтобы не тянуться через режущую зону. • Проверьте, что проходы и эвакуационные пути свободны.",
+          "sourceTextSha256": "eb75d490e9b8b3b2803b5c2b0b29e32a501704fd9c39d973ad5555d0c42050ce",
+          "translatedText": "• 清除废物和妨碍稳定站立和自由活动的物体。 • 提供充足的照明、通风和紧急关闭通道。 • 放置材料和工具，使其不会拖过切割区域。 • 检查走道和逃生路线是否畅通。"
+        },
+        {
+          "id": "sh/zedcfa9g",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Чистое место — часть технологии, а не уборка после работы.",
+          "sourceTextSha256": "1b90577f06e9865aa64238c28c7abcb724c6bc3fb5cd6fea2685969f68fcfd4a",
+          "translatedText": "干净的地方是技术的一部分，而不是下班后的清洁。"
+        },
+        {
+          "id": "sh/fi9c369c",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/baxkjqlk",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "07",
+          "sourceTextSha256": "19b100ab7725c612f3d80ff203ca53cea5cadaafae3bf0f88f0fb4089fe08815",
+          "translatedText": "07"
+        }
+      ]
+    },
+    {
+      "slide": 8,
+      "slideId": "sl/fu1gfa1s",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/18byd4zy",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Заготовку нужно осмотреть и закрепить",
+          "sourceTextSha256": "ea9ada33e1de5d75522143fd5d692f246abde24e1016215a53e1c4c31943caad",
+          "translatedText": "必须检查并固定工件"
+        },
+        {
+          "id": "sh/g72x4zyd",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Удалите или обозначьте гвозди, скобы, камни, металлические включения и загрязнения. • Проверьте трещины, сучки, коробление и направление волокон. • Закрепите заготовку упорами, тисками или струбцинами без повреждения детали. • Линия реза и выход инструмента не должны проходить через руку, опору или кабель.",
+          "sourceTextSha256": "bf42bbd03b1818158cade314913e654b73141820b9568361caddb7816f6e41b7",
+          "translatedText": "• 去除或标记钉子、订书钉、石头、金属和碎片。 • 检查是否有裂纹、节疤、翘曲和纹理方向。 • 使用挡块、虎钳或夹具固定工件，而不损坏零件。 • 切割线和工具出口不得穿过手、支撑物或电缆。"
+        },
+        {
+          "id": "sh/6h0fypgb",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Рукой удерживают управление, а не неустойчивую заготовку.",
+          "sourceTextSha256": "040d59f53faa6b1bffdb7793233a77f0419810b9a24811a162e06e2854d1e81c",
+          "translatedText": "手握住控制装置，而不是不稳定的工件。"
+        },
+        {
+          "id": "sh/id0fu50z",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/o7ydoret",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "08",
+          "sourceTextSha256": "323783be9a53a31e158ec9600626a4703e99f4e183bc1acb8772cbdf5c3a1ece",
+          "translatedText": "08"
+        }
+      ]
+    },
+    {
+      "slide": 9,
+      "slideId": "sl/udsvah03",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/0b65obm9",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/mdonql4z",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Безопасная технология",
+          "sourceTextSha256": "3c05d3c8e1e70fbc1072af6554a213c9b4571423e4dc9708e6c553e4ca49bfe3",
+          "translatedText": "安全技术"
+        },
+        {
+          "id": "sh/9gzml0nq",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Каждая операция начинается с устойчивого положения и контролируемой траектории инструмента.",
+          "sourceTextSha256": "8c7592d7d54a7d5220ccd07ff4df31224878c6e5e3503a526ff9a9038bffb82b",
+          "translatedText": "每次操作都从稳定的位置和受控的刀具路径开始。"
+        },
+        {
+          "id": "sh/oza1gfyh",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/p0ji9kf2",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "09",
+          "sourceTextSha256": "3514acf61732f662da19625f7fe781c3e483f2dce8506012f3bb393f5003e105",
+          "translatedText": "09"
+        }
+      ]
+    },
+    {
+      "slide": 10,
+      "slideId": "sl/m90b6t0r",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xc3mho32",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Ручная распиловка по свободной линии",
+          "sourceTextSha256": "8d259c16af446bce2c45d84d06023848b13d9151742ef09612bdbc7d7b721557",
+          "translatedText": "沿自由线手动锯切"
+        },
+        {
+          "id": "sh/cbu58j2h",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Выберите пилу по материалу и виду реза; полотно должно быть исправным и натянутым. • Начинайте короткими направляющими движениями, удерживая пальцы вне линии полотна. • Поддерживайте отрезаемую часть, чтобы она не зажала полотно и не сорвалась. • Не направляйте пилу на себя и не очищайте зубья рукой во время движения.",
+          "sourceTextSha256": "0664a02dafaeec477e4db15d6e84dc3c06d4e95ee14390d27857e0235719e355",
+          "translatedText": "• 根据材料和切割类型选择合适的锯；锯条应完好并正确张紧。 • 先用短促的引导动作起锯，手指始终避开锯条运动线。 • 托住被切下的部分，防止其夹住锯条或突然断落。 • 不要朝自己身体方向推锯，也不要在锯条运动时用手清理锯齿。"
+        },
+        {
+          "id": "sh/ydcnatkn",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Линия реза должна быть свободна перед полотном и за ним.",
+          "sourceTextSha256": "57b73c047e5daec37218c083fddd2c705906fa73999f5a2d223b087eec28183d",
+          "translatedText": "刀片前后切割线必须清晰。"
+        },
+        {
+          "id": "sh/m1cnetkj",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/s7yt4b21",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "10",
+          "sourceTextSha256": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+          "translatedText": "10"
+        }
+      ]
+    },
+    {
+      "slide": 11,
+      "slideId": "sl/jetc3ut0",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xcryxg7y",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Тесание и строгание выполняют от тела",
+          "sourceTextSha256": "656903685f9e468eb57fd695d001c9dfbde648c5a4c28186c55cd6e6d3d76988",
+          "translatedText": "凿削和刨削应朝远离身体的方向进行"
+        },
+        {
+          "id": "sh/wbih4b6d",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Проверьте крепление рукоятки топора и состояние режущей кромки рубанка. • Заготовку закрепите так, чтобы она не смещалась при ударе или проходе инструмента. • Держите свободную руку вне траектории лезвия и зоны возможного соскальзывания. • Стружку удаляйте после остановки, щёткой или приспособлением.",
+          "sourceTextSha256": "edd47d4d48e59cf9678f34831c369b6f70851a1cfe3c419f14a74c56358fcfb8",
+          "translatedText": "• 检查斧柄的紧固情况以及刨刃的状况。 • 固定工件，使其在被工具撞击或经过时不会移动。 • 将空着的手放在刀片路径之外，并远离可能打滑的区域。 • 停止后，使用刷子或设备清除切屑。"
+        },
+        {
+          "id": "sh/250zy18b",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Рабочая траектория не пересекает тело работника.",
+          "sourceTextSha256": "9f2109b6e12dd328c8c72779d93fa2aabeef4120853db4032c518e60488512f0",
+          "translatedText": "工作路径不与工人的身体相交。"
+        },
+        {
+          "id": "sh/61kzalof",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/ofqtgnyt",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "11",
+          "sourceTextSha256": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+          "translatedText": "11"
+        }
+      ]
+    },
+    {
+      "slide": 12,
+      "slideId": "sl/8f2psfyx",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1gbm9s3a",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Стамеска и молоток: исправная опора",
+          "sourceTextSha256": "55acdf42e1f177b3a76926ff974f55ea5d50ef14490f465f656b1b6e79afe19f",
+          "translatedText": "凿子和锤子：良好的支撑"
+        },
+        {
+          "id": "sh/0f2lgnmp",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Стамеска должна иметь целую рукоятку и исправное кольцо; затупившуюся кромку затачивают безопасно. • Не направляйте режущую кромку на ладонь и не удерживайте деталь перед лезвием. • У молотка проверяйте насадку бойка, расклинивание и отсутствие трещин рукоятки. • Крепёж подавайте и удерживайте способом, исключающим удар по пальцам.",
+          "sourceTextSha256": "060736ff25ec8be80cc4f2aa35f255217d9150259096b4ff83851c177de63231",
+          "translatedText": "• 凿子必须有完整的手柄和工作环；钝边可以安全地磨利。 • 请勿将切削刃指向手掌或将工件放在刀片前面。 • 对于锤子，检查撞针附件、楔入情况以及手柄上是否有裂纹。 • 以不会碰到手指的方式送入和固定紧固件。"
+        },
+        {
+          "id": "sh/dcbm583y",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Исправная рукоятка и правильная опора предотвращают срыв.",
+          "sourceTextSha256": "71ceab47961c1bed72e29acb708c16247132d1ff8ba7dee73e72026a3c9abb0a",
+          "translatedText": "功能正常的手柄和适当的支撑可防止打滑。"
+        },
+        {
+          "id": "sh/wvupgz6t",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/xw3q94ne",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "12",
+          "sourceTextSha256": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+          "translatedText": "12"
+        }
+      ]
+    },
+    {
+      "slide": 13,
+      "slideId": "sl/hgzapcr6",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/q50nydsj",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Строительные работы выполняют по чертежу",
+          "sourceTextSha256": "9bd0f15fde568004e07e5425aaaf41b6e34cbc6e9db61ccbfb28ee7199ff9cf1",
+          "translatedText": "按图纸进行施工"
+        },
+        {
+          "id": "sh/bq9orito",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Разметку и узлы сверяйте с рабочей документацией до резки материала. • Временные опоры и крепления не снимают до достижения устойчивости конструкции. • При монтаже согласуйте порядок подачи деталей и исключите нахождение людей под грузом. • Отклонения размеров, влажности или качества материала сообщайте руководителю.",
+          "sourceTextSha256": "09f13aa4d90a1cfabb173ff3003f385a15c5ad52d900dca1a184b280694c9d6d",
+          "translatedText": "• 在切割材料之前，根据工作文件检查标记和部件。 • 在结构稳定之前，不得拆除临时支撑和紧固件。 • 安装时，应就零件的供应顺序达成一致，并确保负载下无人。 • 向您的主管报告尺寸、湿度或材料质量的偏差。"
+        },
+        {
+          "id": "sh/p4r6p8by",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Самовольная подгонка несущего элемента может изменить его работу.",
+          "sourceTextSha256": "d484c7fa8f8a3abda13838d0a7e1c6c4914f20c35f4828cfa30808314db4bca6",
+          "translatedText": "未经授权调整承载元件可能会改变其操作。"
+        },
+        {
+          "id": "sh/1076lobm",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/hcfy9k3u",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "13",
+          "sourceTextSha256": "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278",
+          "translatedText": "13"
+        }
+      ]
+    },
+    {
+      "slide": 14,
+      "slideId": "sl/6lsnupw7",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xc7eds76",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Безопасная подгонка полов и проёмов",
+          "sourceTextSha256": "df04d782fdfff56283d3a0bc673b93e1c447714ba377ad9a042f2e086dc4df4e",
+          "translatedText": "地板和开口的安全调整"
+        },
+        {
+          "id": "sh/wbydknq1",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Материал складируйте устойчиво, не перекрывая проходы и края проёмов. • Деталь подгоняйте на рабочем месте с надёжной фиксацией, а не на весу. • При работе у проёма применяйте предусмотренные ограждения и безопасный доступ. • Стекло, фурнитуру и тяжёлые элементы перемещайте согласованно и подходящими захватами.",
+          "sourceTextSha256": "c5fd3ee8e5728c7fb604c9d481d33925d761a3f869a16432c7e4502183e87a1c",
+          "translatedText": "• 稳定地储存材料，不要堵塞通道或开口边缘。 • 在固定可靠的工作场所调整部件，而不是依靠重量。 • 在开口附近工作时，请使用提供的防护装置和安全通道。 • 使用合适的夹具以协调的方式移动玻璃、配件和重型元件。"
+        },
+        {
+          "id": "sh/5grehs7i",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Подгонка у незакрытого проёма требует отдельной защиты от падения.",
+          "sourceTextSha256": "fc89ad72828680dc0fe8700e84ca0c77ab226948959dd271d5555300388367ac",
+          "translatedText": "安装未封闭的开口需要单独的防坠落保护。"
+        },
+        {
+          "id": "sh/c3e1gjyd",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/x4ni9ofy",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/a1wze9g7",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "14",
+          "sourceTextSha256": "8527a891e224136950ff32ca212b45bc93f69fbb801c3b1ebedac52775f99e61",
+          "translatedText": "14"
+        }
+      ]
+    },
+    {
+      "slide": 15,
+      "slideId": "sl/vaxsvy10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/547mhg3m",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Технология зависит от области работ",
+          "sourceTextSha256": "f6f5a2ae1511c7a69e274a5281ee315734ae41e3f8cee5fb263f27b2a52869ef",
+          "translatedText": "技术取决于工作领域"
+        },
+        {
+          "id": "sh/k3y5ov21",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Строительные работы: конструкции, опалубка, настилы, проёмы и временные элементы. • Отделка и мебель: более точная обработка, сборка, фурнитура и качество поверхности. • Реставрация: сохранение существующего материала и согласованная технология ремонта. • Лесозаготовительные операции относятся к отдельной организации работ и рискам.",
+          "sourceTextSha256": "b1cdbbf74119563e868228e90b133bb0a9f6e7f06d2992fbae43982acc50d1c5",
+          "translatedText": "• 建筑工程：结构、模板、盖板、开口和临时构件。 • 精加工和家具：更精确的精加工、组装、配件和表面质量。 • 修复：保存现有材料和协调修复技术。 • 记录操作涉及单独的工作和风险组织。"
+        },
+        {
+          "id": "sh/t87ml0ji",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Одинаковый инструмент не делает технологии взаимозаменяемыми.",
+          "sourceTextSha256": "a1197a5c2207ec6b33039a9c72d6842461134ecff6251c454f546c2571b261b9",
+          "translatedText": "相同的工具不能使技术互换。"
+        },
+        {
+          "id": "sh/wrm9kvep",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/hsvat0fa",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "15",
+          "sourceTextSha256": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+          "translatedText": "15"
+        }
+      ]
+    },
+    {
+      "slide": 16,
+      "slideId": "sl/gny5sjyp",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/9kby1g7m",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/zutgvm94",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Инструменты и риски",
+          "sourceTextSha256": "a1711c4ece8be995e27ad6f1d6de899911ed5570ee8b03afc66ac10a72538ff6",
+          "translatedText": "工具和风险"
+        },
+        {
+          "id": "sh/kv2h4rqp",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Исправность, подходящая оснастка и защитные устройства важнее скорости операции.",
+          "sourceTextSha256": "1920abf2e848360fd99c97ba7a06dfa0f0f4893d69fda5758ef605a52e1d4a1a",
+          "translatedText": "可维护性、合适的设备和安全装置比操作速度更重要。"
+        },
+        {
+          "id": "sh/fm1gzq5o",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/e1sf65o3",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "16",
+          "sourceTextSha256": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+          "translatedText": "16"
+        }
+      ]
+    },
+    {
+      "slide": 17,
+      "slideId": "sl/14bup87q",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1c7e50ni",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Ручной инструмент проверяют до работы",
+          "sourceTextSha256": "8a67f12187d5f9c01aff1d4a9413325cc99d6e80f69a07800b14b8dc0aabda1e",
+          "translatedText": "工作前检查手动工具"
+        },
+        {
+          "id": "sh/gbedwfmx",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Инструмент соответствует операции, размеру детали и материалу. • Рукоятки целые, сухие и надёжно закреплены; кромки и зубья без трещин и сколов. • Защитные чехлы и места хранения не повреждают режущие части. • Неисправный инструмент маркируют и выводят из применения.",
+          "sourceTextSha256": "4b0b7b0bfe5d32b5e961f43307ab160b3adf619807111d9529d24655ea6d7ead",
+          "translatedText": "• 工具与操作、零件尺寸和材料相匹配。 • 手柄完好、干燥且紧固；边缘和牙齿无裂纹或缺口。 • 防护罩和存储区域不会损坏切割部件。 • 有故障的工具被标记并停止使用。"
+        },
+        {
+          "id": "sh/6lwvql4v",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Подручная замена инструменту создаёт непредсказуемую нагрузку.",
+          "sourceTextSha256": "573998c9cb885fa25f0afef9fd6774711065fedc54a28746d213423b596cdd9b",
+          "translatedText": "方便地更换工具会产生不可预测的负载。"
+        },
+        {
+          "id": "sh/ihcvml4j",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Безопасность инструмента — приказ № 204",
+          "sourceTextSha256": "75c0a4424442a343082d8d449bdac30d8617554edf166ae933e7df73add661e6",
+          "translatedText": "规范：工具安全——第204号命令"
+        },
+        {
+          "id": "sh/4by9or6l",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/pc7qhwn6",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "17",
+          "sourceTextSha256": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+          "translatedText": "17"
+        }
+      ]
+    },
+    {
+      "slide": 18,
+      "slideId": "sl/y5wne50z",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/wrelszu9",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Электроинструмент применяют по назначению",
+          "sourceTextSha256": "ed642cf1cd5a5dbbb07af65e0ccfce53e56a7f162bdb8cc220ff0780261fe163",
+          "translatedText": "电动工具已用于其预期用途"
+        },
+        {
+          "id": "sh/hsn2l4bu",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Циркулярная пила: исправный кожух, подходящий диск, устойчивое ведение без бокового давления. • Лобзик и фрезер: закреплённая заготовка, исправная оснастка, полная остановка перед регулировкой. • Дрель: правильно зажатое сверло и исключение вращения детали. • Шлифмашина: круг или лента соответствуют инструменту, материалу и допустимой скорости.",
+          "sourceTextSha256": "5902faa3238dc7b3090db57792137403f9229e151fa1a0336038bb63c5f81664",
+          "translatedText": "• 圆锯：防护良好，锯片合适，导向稳定，无侧压。 • 竖锯和刳刨机：固定工件、适当的设备、调整前完全停止。 • 钻头：正确夹紧钻头并防止零件旋转。 • 砂光机：适合工具、材料和允许速度的砂轮或砂带。"
+        },
+        {
+          "id": "sh/je5knut0",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Перед сменой оснастки питание отключают и исключают случайный пуск.",
+          "sourceTextSha256": "448849bce1c612714873097b6152b62f09c3202cfa257b9fb50d3b9ac86ec87b",
+          "translatedText": "更换设备前，应先关闭电源，并排除意外启动。"
+        },
+        {
+          "id": "sh/rip4retw",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Безопасность инструмента — приказ № 204",
+          "sourceTextSha256": "75c0a4424442a343082d8d449bdac30d8617554edf166ae933e7df73add661e6",
+          "translatedText": "规范：工具安全——第204号命令"
+        },
+        {
+          "id": "sh/fapkr6pw",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/upg3i18r",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "18",
+          "sourceTextSha256": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a",
+          "translatedText": "18"
+        }
+      ]
+    },
+    {
+      "slide": 19,
+      "slideId": "sl/nid43ytk",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/9gb6xgbi",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Ограждения и оснастку нельзя обходить",
+          "sourceTextSha256": "a1095e9b2416f8c12540dabcb36055cccf954e3b63395bd44bcd8220df83a807",
+          "translatedText": "不得绕过护栏和设备"
+        },
+        {
+          "id": "sh/8v2pobax",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Кожухи и ограждения должны быть на месте, двигаться свободно и закрывать опасную часть. • Кабель, вилка, выключатель и ввод в корпус не имеют повреждений и следов перегрева. • Диск, полотно, фреза или сверло подходят по размеру и характеристикам изготовителя. • Самодельные переходники, блокировка выключателя и снятие защиты запрещены.",
+          "sourceTextSha256": "fcc183c8657df37cc76223c182255351fc46549a8443ab65885507cf13ce566c",
+          "translatedText": "• 盖子和防护装置必须就位、可自由移动并覆盖危险部分。 • 电缆、插头、开关和外壳入口未损坏或有任何过热迹象。 • 圆盘、刀片、刀具或钻头的尺寸和制造商规格正确。 • 禁止自制适配器、锁定 开关和拆除保护装置。"
+        },
+        {
+          "id": "sh/ahk7qls3",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Защита не мешает работе — она ограничивает доступ к опасной энергии.",
+          "sourceTextSha256": "263736ca75b0dc1ba091cf837fba40302493580db157bd1e506c5b88357f1466",
+          "translatedText": "保护不会干扰工作 - 它限制接触危险能量。"
+        },
+        {
+          "id": "sh/il47u5sz",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Безопасность инструмента — приказ № 204",
+          "sourceTextSha256": "75c0a4424442a343082d8d449bdac30d8617554edf166ae933e7df73add661e6",
+          "translatedText": "规范：工具安全——第204号命令"
+        },
+        {
+          "id": "sh/cri1gnql",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/dsri9sr6",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "19",
+          "sourceTextSha256": "9400f1b21cb527d7fa3d3eabba93557a18ebe7a2ca4e471cfe5e4c5b4ca7f767",
+          "translatedText": "19"
+        }
+      ]
+    },
+    {
+      "slide": 20,
+      "slideId": "sl/zyxsni5k",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/qpwjmh8n",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Неисправность означает остановку",
+          "sourceTextSha256": "dad039c5efb0391878117207bf1e41be029dd00b2fd75483ee0d1790c6e0fdaa",
+          "translatedText": "故障表示停止"
+        },
+        {
+          "id": "sh/3ml0rmpw",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "Прямоугольник 6",
+          "text": "• Искрение, запах перегрева, необычный шум или вибрация. • Заклинивание, биение, трещина диска, полотна или корпуса. • Самопроизвольный пуск, неработающий выключатель или защитный кожух. • Повреждённый кабель, вилка, заземление или следы влаги.",
+          "sourceTextSha256": "f696286fc9e36303783b5a39695b9ba46132680121db24da073caacc22f0ff83",
+          "translatedText": "• 火花、过热气味、异常噪音或振动。 • 盘、叶片或主体卡住、敲打、破裂。 • 自启动、开关或保护壳损坏。 • 电缆、插头、接地损坏或受潮。"
+        },
+        {
+          "id": "sh/gjuhg7ql",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "Прямоугольник 7",
+          "text": "Отключить — обозначить — сообщить. Не ремонтировать без полномочий.",
+          "sourceTextSha256": "c19323c8bc3595d3781defc7f522677724ff1d50018460ba69350f5f31f0c647",
+          "translatedText": "禁用-指定-报告。未经授权请勿修理。"
+        },
+        {
+          "id": "sh/rid4nuhs",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Безопасность инструмента — приказ № 204",
+          "sourceTextSha256": "75c0a4424442a343082d8d449bdac30d8617554edf166ae933e7df73add661e6",
+          "translatedText": "规范：工具安全——第204号命令"
+        },
+        {
+          "id": "sh/qh4nupg7",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/pwvmlkzm",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "20",
+          "sourceTextSha256": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+          "translatedText": "20"
+        },
+        {
+          "id": "sh/2t4nqpgb",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STOP_SIGN",
+          "text": "СТОП",
+          "sourceTextSha256": "b9e25ea0cee74abd54acfd57ccb3bd906be0673a755d04e4e976baa9b0e283b7",
+          "translatedText": "停止"
+        }
+      ]
+    },
+    {
+      "slide": 21,
+      "slideId": "sl/m1wvqtk3",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1gbmxs7a",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Пыль, шум и стружка требуют контроля",
+          "sourceTextSha256": "006343ec65e4c275c345b8bcd2774e10e31f379d79c855683ad67f175635b32e",
+          "translatedText": "灰尘、噪音和切屑需要控制"
+        },
+        {
+          "id": "sh/0f2lon6p",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "РИСК / ИСТОЧНИК",
+          "sourceTextSha256": "851ce8823ffad38155e037c57ecdf78a20c64bd1f2a0c5a2d45ea6e2edc50856",
+          "translatedText": "风险 / 来源"
+        },
+        {
+          "id": "sh/ra9kryp8",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "Прямоугольник 3",
+          "text": "ПОСЛЕДСТВИЕ",
+          "sourceTextSha256": "1da37746aeb7df559ec9874df174a32f36affa7af0d1ac18594d03355f832a05",
+          "translatedText": "结果"
+        },
+        {
+          "id": "sh/qp03yt8n",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "Прямоугольник 4",
+          "text": "МЕРА КОНТРОЛЯ",
+          "sourceTextSha256": "cf1c1f59a983a25c36423810031eef35d5f3f4404bf5c103b874132628f23721",
+          "translatedText": "控制措施"
+        },
+        {
+          "id": "sh/sb2lk36t",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "Прямоугольник 6",
+          "text": "Древесная пыль",
+          "sourceTextSha256": "2148813f638dc71d73c607afe122eb6ac3ff6cccc42a4b814812e58befdce70c",
+          "translatedText": "木粉"
+        },
+        {
+          "id": "sh/b6d432pc",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "Прямоугольник 7",
+          "text": "Раздражение, снижение видимости, пожарный риск",
+          "sourceTextSha256": "f557c89ef31b51df4f7f9a2764d06aca4b87b1ec7abc0460bd63f42664dfdf74",
+          "translatedText": "刺激，能见度降低，消防员 风险"
+        },
+        {
+          "id": "sh/al43uxor",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "Прямоугольник 8",
+          "text": "Местное удаление, уборка, подходящая защита дыхания",
+          "sourceTextSha256": "e86d0a883a3c80068ebefc6d82f2934d190d3a772865c9fd454ac0159623927b",
+          "translatedText": "局部清除、清洁、适当的呼吸防护"
+        },
+        {
+          "id": "sh/5kjydsri",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "Прямоугольник 10",
+          "text": "Шум",
+          "sourceTextSha256": "f35f73f2d167be0122f9239df4d150eecfc16305d91fad223c8ca080c16b0bc9",
+          "translatedText": "噪音"
+        },
+        {
+          "id": "sh/ixsf2d87",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "Прямоугольник 11",
+          "text": "Постепенное снижение слуха",
+          "sourceTextSha256": "71297557a25a2bb3ad4342cab36bf1c25d8665721414e7d970f4f6393b957be5",
+          "translatedText": "听力逐渐丧失"
+        },
+        {
+          "id": "sh/jy1gbi9s",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "Прямоугольник 12",
+          "text": "Исправный инструмент, ограничение воздействия, защита слуха",
+          "sourceTextSha256": "66c4b584b1b7d13b054d386794895b87f901814b89c175b748f49deaef21d140",
+          "translatedText": "功能性仪器、暴露限制、听力保护"
+        },
+        {
+          "id": "sh/hwjy98rm",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "Прямоугольник 14",
+          "text": "Стружка и осколки",
+          "sourceTextSha256": "c57b53a05d5c993b1399ed3005c6fc60b1cc7fb6b04fc1f377a4da873efdce1b",
+          "translatedText": "碎片和碎片"
+        },
+        {
+          "id": "sh/utsfyt8v",
+          "shapeId": "16",
+          "kind": "shape",
+          "name": "Прямоугольник 15",
+          "text": "Травма глаз и кожи",
+          "sourceTextSha256": "4fb1a570f7e96f425ef72ed1d60d8c0f6b37582d53576a2d1e228fd26173b1c4",
+          "translatedText": "眼睛和皮肤损伤"
+        },
+        {
+          "id": "sh/vu1w7y9g",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "Прямоугольник 16",
+          "text": "Ограждение, направление выброса, защита глаз",
+          "sourceTextSha256": "d6f25ab3c2ca142e219e258ad04d2fae9d21bd0ed8042e60c44bffb43432d4e2",
+          "translatedText": "防护罩，弹射方向，护眼"
+        },
+        {
+          "id": "sh/9sze58rq",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "Прямоугольник 18",
+          "text": "Отходы",
+          "sourceTextSha256": "bc2b8420407de69182b8990931cc89282e89c017c1646db006658b93cd9d7a6f",
+          "translatedText": "废物"
+        },
+        {
+          "id": "sh/porutkje",
+          "shapeId": "20",
+          "kind": "shape",
+          "name": "Прямоугольник 19",
+          "text": "Поскальзывание и распространение огня",
+          "sourceTextSha256": "fad6594ef4b62a5ac2b7a0f8dc9fed45fdb89f7085aa65741fe74ab07b54a303",
+          "translatedText": "滑倒和火灾蔓延"
+        },
+        {
+          "id": "sh/onid0f2t",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "Прямоугольник 20",
+          "text": "Регулярная уборка и безопасное накопление",
+          "sourceTextSha256": "21570c5373b8eca94b3fc7f4f4aafde8503527be59eeae8d89b6c689e156313d",
+          "translatedText": "定期清洁、安全堆积"
+        },
+        {
+          "id": "sh/nm9cru18",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "Прямоугольник 21",
+          "text": "Пыль удаляют у источника, а не сдувают в рабочую зону.",
+          "sourceTextSha256": "1746eb5c0346e743050a8acd5065f7ce2fb0c5286f5b53706c4980e9031a0bd6",
+          "translatedText": "灰尘从源头清除，而不是吹入工作区域。"
+        },
+        {
+          "id": "sh/fi9c3a1c",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "标准：消防安全规则"
+        },
+        {
+          "id": "sh/ehgvu5kr",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/lgbe14jm",
+          "shapeId": "28",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "21",
+          "sourceTextSha256": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+          "translatedText": "21"
+        }
+      ]
+    },
+    {
+      "slide": 22,
+      "slideId": "sl/5onypobq",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/6987itcr",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Очистка — только после полной остановки",
+          "sourceTextSha256": "f526f5812d0a48504fcd0e5c2e89c0893851182777856be93a7f1146831747f3",
+          "translatedText": "清洁 - 仅在完全停止后"
+        },
+        {
+          "id": "sh/7a18rydc",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Отключите питание, дождитесь полной остановки и исключите повторный пуск. • Удаляйте стружку щёткой, крючком или пылеудалением, не рукой возле режущей части. • Проверяйте крепёж, вентиляционные отверстия и состояние оснастки по инструкции. • Храните сухой инструмент и острые части в чехлах или предусмотренных местах.",
+          "sourceTextSha256": "2a86b44973370e9cfeb624294c810e46b44d774362d7ee7824f9b80d0e51d7e9",
+          "translatedText": "• 关闭电源，等待其完全停止并防止重新启动。 • 使用刷子、钩子或掸子清除切屑，而不是用手靠近切削部分。 • 根据说明检查紧固件、通风孔和设备状况。 • 将干燥工具和锋利部件存放在箱子或指定区域。"
+        },
+        {
+          "id": "sh/58zqpov6",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Обслуживание начинается только после снятия опасной энергии.",
+          "sourceTextSha256": "216298f019e1ea95a9d4d25e950aeeb35151edc853d544eb67e099be97730a7f",
+          "translatedText": "仅在危险能量被移除后才开始维护。"
+        },
+        {
+          "id": "sh/p43q1sva",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Безопасность инструмента — приказ № 204",
+          "sourceTextSha256": "75c0a4424442a343082d8d449bdac30d8617554edf166ae933e7df73add661e6",
+          "translatedText": "规范：工具安全——第204号命令"
+        },
+        {
+          "id": "sh/p4z6tcri",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/436507qx",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "22",
+          "sourceTextSha256": "785f3ec7eb32f30b90cd0fcf3657d388b5ff4297f2f9716ff66e9b69c05ddd09",
+          "translatedText": "22"
+        }
+      ]
+    },
+    {
+      "slide": 23,
+      "slideId": "sl/c7uhcr6t",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/90vqdczq",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "СИЗ выбирают по фактическому риску",
+          "sourceTextSha256": "fc1a9dff5f0bb42b39e33980bd3af000b087d433f5632d8fb7a34bcf14e3f7ed",
+          "translatedText": "PPE 根据实际风险选择"
+        },
+        {
+          "id": "sh/8zm9k7y5",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "• Защита глаз — при стружке, пыли и разрушении оснастки; защита слуха — при шуме. • Защита дыхания дополняет, но не заменяет пылеудаление и вентиляцию. • Обувь и одежда должны обеспечивать устойчивость и не иметь свободных частей. • Свободные перчатки не применяют там, где их может затянуть вращающаяся часть.",
+          "sourceTextSha256": "cb5d520718da955aadefd77b37e8c2b8db40ec27fb595a6b4efeddb4cfdc8eaf",
+          "translatedText": "• 眼睛保护 - 防止碎屑、灰尘和设备损坏；听力保护 - 防止噪音。 • 呼吸防护是对除尘和通风的补充，但不能替代。 • 鞋子和衣服应稳定且没有松动的部分。 • 请勿在可能被旋转部件夹住的地方使用宽松的手套。"
+        },
+        {
+          "id": "sh/a14rmhgb",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "СИЗ — последняя линия защиты после технических и организационных мер.",
+          "sourceTextSha256": "a9cde669055b0ae0e61a83056937d839c679aec33cf93b2bdea12d4581860127",
+          "translatedText": "PPE是技术和组织措施后的最后一道防线。"
+        },
+        {
+          "id": "sh/ip4rqhgn",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Трудовой кодекс РК",
+          "sourceTextSha256": "fb7bd048eaa66784bb1d2f82802ec90840e0da2847d5da587ffd3ac431406d02",
+          "translatedText": "规范：哈萨克斯坦共和国劳动法"
+        },
+        {
+          "id": "sh/sby90zm1",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/tc7at436",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "23",
+          "sourceTextSha256": "535fa30d7e25dd8a49f1536779734ec8286108d115da5045d77f3b4185d8f790",
+          "translatedText": "23"
+        }
+      ]
+    },
+    {
+      "slide": 24,
+      "slideId": "sl/7qto7e10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1sfqxsv6",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "При происшествии действуйте по приоритету",
+          "sourceTextSha256": "4caad08c2e0821644d56d6650802fbf2c15caa5fa822e1bc0f943787d62bdc8f",
+          "translatedText": "发生事件时，按照优先级采取行动"
+        },
+        {
+          "id": "sh/2to76dcr",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/9wzq1svi",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Остановить",
+          "sourceTextSha256": "3396400da0c46e24075f7e4791b362ce21ba4f8654e90370ac1515c01236fa8d",
+          "translatedText": "停止"
+        },
+        {
+          "id": "sh/ov6p8nux",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Отпустить пуск, отключить питание, не входить в опасную зону.",
+          "sourceTextSha256": "c19af46e4a0d5ea4af4707e31a46dcadd1d3ec44896022e2a538a56119beb602",
+          "translatedText": "释放启动，关闭电源，请勿进入危险区域。"
+        },
+        {
+          "id": "sh/ix47utcn",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/8veh8ril",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Защитить",
+          "sourceTextSha256": "b0d46e6ce7d12e6a1bf652168ec8b6d078b968dcfe0b3a40005aae189e7794b5",
+          "translatedText": "保护"
+        },
+        {
+          "id": "sh/9wni1wjq",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Предупредить людей, при необходимости вызвать 112 и первую помощь.",
+          "sourceTextSha256": "d3ee545baa9a6e44de33628b339c1a6d713ac64c3db94b00b0428b2235fcfe2c",
+          "translatedText": "警告人们，如有必要，拨打 112 和急救。"
+        },
+        {
+          "id": "sh/nu50zm10",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/wzyhcrih",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Сообщить",
+          "sourceTextSha256": "66d3e4d7b4eefde68b7113ff0bf5e445080364b21ef781ce57af4f3233b9c428",
+          "translatedText": "报告"
+        },
+        {
+          "id": "sh/x07i5wj2",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Уведомить руководителя, сохранить обстановку, если это безопасно.",
+          "sourceTextSha256": "01ff282aa994c5bd0b155eeb7d2db612af1944795db317db87cc143d21672227",
+          "translatedText": "通知主管，在安全的情况下维持现状。"
+        },
+        {
+          "id": "sh/vyp03m1w",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/c3uh07id",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Возобновить",
+          "sourceTextSha256": "07c7b8b8142d494fe76a69062c3f5194b7ad0eaa46d603cff431322c387c5676",
+          "translatedText": "简历"
+        },
+        {
+          "id": "sh/d43itcjy",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Только после устранения причины и разрешения ответственного лица.",
+          "sourceTextSha256": "01126b6c91318c568d22c19a5a5b1368dc0d07c43fa717daabf47b06ac15a4a4",
+          "translatedText": "排除原因并经负责人许可后。"
+        },
+        {
+          "id": "sh/rmtofup4",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Заклинивание, поражение током, разрушение оснастки и возгорание — повод немедленно остановиться.",
+          "sourceTextSha256": "d1f176977f8ef2274a6f1e93d29b4169335724685ec805fd2b7074533c963858",
+          "translatedText": "干扰、触电、设备损坏和火灾是立即停止的原因。"
+        },
+        {
+          "id": "sh/fadojepg",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Трудовой кодекс РК",
+          "sourceTextSha256": "fb7bd048eaa66784bb1d2f82802ec90840e0da2847d5da587ffd3ac431406d02",
+          "translatedText": "规范：哈萨克斯坦共和国劳动法"
+        },
+        {
+          "id": "sh/e947a9ov",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Плотник",
+          "sourceTextSha256": "adf0165533f927d149bdc9de26bd5f2ef4be893574bf54e1ae0cc373ea8bc2fe",
+          "translatedText": "木匠"
+        },
+        {
+          "id": "sh/pgf6po7i",
+          "shapeId": "28",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "24",
+          "sourceTextSha256": "c2356069e9d1e79ca924378153cfbbfb4d4416b1f99d41a2940bfdb66c5319db",
+          "translatedText": "24"
+        }
+      ]
+    },
+    {
+      "slide": 25,
+      "slideId": "sl/69wfm9o7",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/gbq1obep",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "CHECKLIST_TITLE",
+          "text": "Итоговый чек-лист плотника",
+          "sourceTextSha256": "452adf2c06ffc60bfc890d3e40a87b24bd35eae83d6f0949db76613e2a55b557",
+          "translatedText": "木匠的最终检查表"
+        },
+        {
+          "id": "sh/cfyt4beh",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "Прямоугольник 2",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/napsr6x0",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "Прямоугольник 3",
+          "text": "Задание и технология понятны; материал осмотрен.",
+          "sourceTextSha256": "e39064d13dc7f15663972edc167996c840896540d419aba0668a8667bf5bd706",
+          "translatedText": "任务和技术明确；材料已经过检验。"
+        },
+        {
+          "id": "sh/pc7atgf6",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "Прямоугольник 5",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/obyt0bel",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "Прямоугольник 6",
+          "text": "Рабочее место освещено, проходы свободны, заготовка закреплена.",
+          "sourceTextSha256": "c0cb5c71da9c0c613f1ff35ca5e4a89e6d4ecb8e1bb27c9c03520dd70a85ed47",
+          "translatedText": "工作场所照明，通道畅通，工件固定。"
+        },
+        {
+          "id": "sh/elwbu1wj",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "Прямоугольник 8",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/wza9cbqp",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "Прямоугольник 9",
+          "text": "Инструмент и оснастка исправны, ограждения установлены.",
+          "sourceTextSha256": "582f96bf541fab969bc14e0ba00463213b4221023c68d97584136a491db992e5",
+          "translatedText": "工具和设备运转良好，防护装置已安装。"
+        },
+        {
+          "id": "sh/uxsra18j",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "Прямоугольник 11",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/vy1sj694",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "Прямоугольник 12",
+          "text": "СИЗ выбраны по риску; пылеудаление и вентиляция работают.",
+          "sourceTextSha256": "990c401c94320966d620dc5460d028b7486f74360eed67efd3acc831e922ebdc",
+          "translatedText": "PPE；除尘、通风工作。"
+        },
+        {
+          "id": "sh/9cjahgry",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "Прямоугольник 14",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/m98r618n",
+          "shapeId": "16",
+          "kind": "shape",
+          "name": "Прямоугольник 15",
+          "text": "При неисправности, изменении условий или угрозе работа остановлена.",
+          "sourceTextSha256": "eeab0fda0154c79de410ec22233f3b343c57a1103c6ee50c7663860f75e70bf9",
+          "translatedText": "如果发生故障、条件变化或威胁，操作将停止。"
+        },
+        {
+          "id": "sh/7a1sf698",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "Прямоугольник 16",
+          "text": "Нажмите «Начать тест»",
+          "sourceTextSha256": "7def4d3ecea04d21659749684677aa095ef9e1b37b0d1abf8c22500ebc745c2e",
+          "translatedText": "点击“开始测试”"
+        },
+        {
+          "id": "sh/s7utkvqx",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "Прямоугольник 17",
+          "text": "Актуализировано: 21.08.2026",
+          "sourceTextSha256": "3612380a2a5a26e814543ff9385ccb697367c259e8ded06d6603b16d86cd2adf",
+          "translatedText": "更新日期：2026 年 8 月 21 日"
+        }
+      ]
+    }
+  ]
+}

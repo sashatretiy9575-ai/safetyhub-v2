@@ -7,7 +7,9 @@ import { invalidateCertificateVerificationCache } from '@/features/certificates/
 import { createAdminClient } from '@/lib/supabase/admin';
 import { readJsonBody } from '@/lib/security/request-body';
 
-const CONFIRMATION = 'УДАЛИТЬ';
+// Language-neutral protocol value. The localized phrase typed by the user is
+// validated in the UI and is never used as an API contract.
+const CONFIRMATION = 'DELETE_ACCOUNT';
 
 type PurgeAdminClient = ReturnType<typeof createAdminClient> & {
   rpc(

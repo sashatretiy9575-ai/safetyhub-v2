@@ -21,6 +21,8 @@ test('presentation upload uses a signed path-bound TUS grant and immutable priva
   assert.match(grant, /createSignedUploadUrl\(pdfPath/);
   assert.match(grant, /createSignedUploadUrl\(thumbnailPath/);
   assert.match(grant, /course-presentations-staging/);
+  assert.match(grant, /locale: z\.enum\(\['ru', 'kk', 'en', 'zh'\]\)/);
+  assert.match(grant, /locale: body\.data\.locale/);
   assert.match(grant, /const uploadId = presentationId/);
   assert.match(client, /new tus\.Upload/);
   assert.match(client, /'x-signature': destination\.token/);
@@ -49,7 +51,7 @@ test('presentation upload uses a signed path-bound TUS grant and immutable priva
   assert.match(finalize, /Math\.abs\(thumbnailRatio - 16 \/ 9\)/);
   assert.match(
     finalize,
-    /const publicPrefix = `\$\{courseSegment\}\/\$\{presentationRecord\.id\}`/,
+    /const publicPrefix = `\$\{courseSegment\}\/\$\{presentationRecord\.locale\}\/\$\{presentationRecord\.id\}`/,
   );
   assert.match(finalize, /cacheControl: '31536000'/);
   assert.match(finalize, /status: 'rejected'/);
@@ -88,7 +90,10 @@ test('presentation upload uses a signed path-bound TUS grant and immutable priva
   assert.match(retire, /'Referrer-Policy': 'no-referrer'/);
   assert.match(retire, /'X-Content-Type-Options': 'nosniff'/);
   assert.match(retire, /Content-Disposition/);
-  assert.doesNotMatch(retire, /createSignedUrl|storage\/v1\/object\/(?:public|sign)|NextResponse\.redirect/);
+  assert.doesNotMatch(
+    retire,
+    /createSignedUrl|storage\/v1\/object\/(?:public|sign)|NextResponse\.redirect/,
+  );
 });
 
 test('catalog cutover API is same-origin, capability-gated, bounded and RPC-envelope aware', async () => {
@@ -184,10 +189,13 @@ test('course material is approval-gated, private, and stays out of precache', as
     read('public/sw.js'),
     read('lib/security/content-security-policy.ts'),
   ]);
-  assert.ok(actions.indexOf('Скачать презентацию') < actions.indexOf('Начать тест'));
+  assert.ok(
+    actions.indexOf("t('downloadPresentation')") < actions.indexOf("t('startTest')"),
+    'presentation download must render before the test action',
+  );
   assert.match(actions, /download=\$\{encodeURIComponent/);
   assert.match(actions, /download=\{filename\}/);
-  assert.match(actions, /href=\{ROUTES\.test\(course\.slug\)\}/);
+  assert.match(actions, /localizePathname\(ROUTES\.test\(course\.slug\), locale\)/);
   assert.doesNotMatch(actions, /pdfjs-dist|canvas|iframe|dangerouslySetInnerHTML/);
   assert.match(topicPage, /<CourseMaterialActions course=\{topic\}/);
   assert.doesNotMatch(topicPage, /CoursePresentationViewer/);
@@ -203,7 +211,10 @@ test('course material is approval-gated, private, and stays out of precache', as
   assert.match(localAsset, /X-Content-Type-Options': 'nosniff'/);
   assert.doesNotMatch(localAsset, /createReadStream|readFile|storage\/v1\/object\/public/);
   assert.match(topicSource, /protectedPresentationUrl/);
-  assert.doesNotMatch(topicSource, /publicStorageUrl|storage\/v1\/object\/public|storage_path,thumbnail_path/);
+  assert.doesNotMatch(
+    topicSource,
+    /publicStorageUrl|storage\/v1\/object\/public|storage_path,thumbnail_path/,
+  );
   assert.match(bucketScript, /id: 'course-presentations',[\s\S]*?public: false/);
   assert.match(migration, /create or replace function private\.require_approved_learner\(\)/);
   assert.match(migration, /private\.require_active_user\(\)/);
@@ -219,15 +230,27 @@ test('course material is approval-gated, private, and stays out of precache', as
   assert.match(migration, /ACCOUNT_APPROVAL_REQUIRED/);
   assert.match(migration, /public = false/);
   assert.match(migration, /as restrictive[\s\S]*for all to anon, authenticated/);
-  assert.match(migration, /get_approved_course_presentation\([\s\S]*private\.require_approved_learner\(\)/);
+  assert.match(
+    migration,
+    /get_approved_course_presentation\([\s\S]*private\.require_approved_learner\(\)/,
+  );
   assert.match(migration, /revoke select on public\.course_presentations from anon, authenticated/);
-  assert.match(migration, /revoke select \([\s\S]*storage_path[\s\S]*\) on public\.course_presentations from anon, authenticated/);
-  assert.match(migration, /grant execute on function public\.get_approved_course_presentation\(text,text\)[\s\S]*to authenticated/);
+  assert.match(
+    migration,
+    /revoke select \([\s\S]*storage_path[\s\S]*\) on public\.course_presentations from anon, authenticated/,
+  );
+  assert.match(
+    migration,
+    /grant execute on function public\.get_approved_course_presentation\(text,text\)[\s\S]*to authenticated/,
+  );
   assert.match(adminInput, /function adminPresentationUrl/);
   assert.match(adminInput, /asset: 'presentation' \| 'thumbnail'/);
   assert.match(adminInput, /download', '1'/);
   assert.doesNotMatch(adminInput, /storage\/v1\/object\/(?:public|sign)/);
-  assert.match(contentSync, /downloadPublishedPresentationAsset\(storage, row\.storage_bucket, row\.storage_path\)/);
+  assert.match(
+    contentSync,
+    /downloadPublishedPresentationAsset\(storage, row\.storage_bucket, row\.storage_path\)/,
+  );
   assert.doesNotMatch(contentSync, /storage\/v1\/object\/public/);
   assert.doesNotMatch(serviceWorker, /presentation\.pdf|course-presentations/);
   assert.match(csp, /worker-src/);

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "slug": "pozharnaya-bezopasnost",
+  "locale": "en",
+  "productionPublished": false,
+  "sourcePptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/en/assets/pptx/dd65e1668cb4573f91822b7437e50e937b90e3dbed19fe4c11f417e4baa8d7a8/presentation.pptx",
+    "sha256": "dd65e1668cb4573f91822b7437e50e937b90e3dbed19fe4c11f417e4baa8d7a8"
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/en/assets/pdf/9c7ab00a693999bd693755b8315b3549515f5e2942079ed6eee52b4f4b64c180/presentation.pdf",
+    "sha256": "9c7ab00a693999bd693755b8315b3549515f5e2942079ed6eee52b4f4b64c180",
+    "byteSize": 624634,
+    "pageCount": 41,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "export": {
+    "engine": "Microsoft PowerPoint fixed-format PDF",
+    "onePagePerSlide": true,
+    "notesRendered": false
+  }
+}

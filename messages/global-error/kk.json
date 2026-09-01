@@ -1,0 +1,12 @@
+{
+  "AppState": {
+    "criticalTitle": "Күрделі қате орын алды",
+    "criticalDescription": "Қолданба толық ашылмады. Бетті жаңартыңыз немесе басты бетке оралыңыз.",
+    "digestId": "Қате ID"
+  },
+  "Common": {
+    "retry": "Қайталап көру",
+    "home": "Басты бетке",
+    "correlationIdPlain": "Өтініш коды"
+  }
+}

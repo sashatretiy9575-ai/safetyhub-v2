@@ -1,0 +1,134 @@
+{
+  "function": "save_legal_document_localization",
+  "args": {
+    "p_document_type": "terms",
+    "p_version": "2.3",
+    "p_locale": "en",
+    "p_title": "Terms of Use",
+    "p_body": {
+      "sections": [
+        {
+          "id": "terms-acceptance",
+          "heading": "Acceptance and subject to conditions",
+          "paragraphs": [
+            "These terms and conditions govern the use of the site and PWA SafetyHub.kz, four language versions, materials, account, tests, certificates and their verification functions. Upon successful authentication, the user separately accepts the current Terms and Conditions version 2.3 and the associated Privacy Policy version 1.3; only this explicit action records consent.",
+            "If the user does not agree, they should not register or continue to work with private features. The current implementation does not contain payment; When paid services appear, prices, returns and separate commercial terms must be published before payment."
+          ],
+          "items": [],
+          "links": [
+            {
+              "label": "Privacy Policy version 1.3",
+              "url": "/privacy?version=1.3"
+            }
+          ]
+        },
+        {
+          "id": "terms-account",
+          "heading": "Account, login, recovery and manual verification",
+          "paragraphs": [],
+          "items": [
+            "In RU, KK and EN, the user provides a valid email address and signs in with a one-time six-digit email OTP. In ZH, the user registers a discoverable passkey and signs in without email, SMS, a password or a username. The contact phone number is not an authentication factor in any locale.",
+            "Biometric verification or PIN verification is performed by the operating system or device authenticator and is not transmitted to SafetyHub. The email code, passkey session, recovery code, session and account must not be transferred to another person.",
+            "Synthetic Auth identifier of the Chinese account is an internal technical value, is not the user’s email and is not shown to him anywhere. The user should not attempt to use it as an address, username, or recovery method.",
+            "The recovery code is shown once and is intended only for one-time registration of a new passkey. It is invalidated after use. A reasoned administrator reset creates a new one-time re-enrollment code and is recorded in the audit log.",
+            "Before accessing the course materials, questions, test and certificate, your first name, last name, position, organization, your own current photograph and a contact number with the selected country code are required. The number is used only for communication, not for authentication or SMS.",
+            "The completed profile is sent to the administrator for manual verification. The usual benchmark for a decision is up to 24 hours from the date of dispatch; This is not automatic approval or a guaranteed period of access. While your application is pending, rejected, or your profile is incomplete, private learning features are not available.",
+            "If the application is rejected, the user can see the stated reason, correct the data and resubmit the profile. The displayed profile does not replace verified certificate data: the name, job title and organization used on the certificate are verified separately and stored as a versioned snapshot.",
+            "If compromise, abuse or violation of the terms is suspected, access may be temporarily limited while maintaining legal recourse."
+          ],
+          "links": []
+        },
+        {
+          "id": "terms-learning",
+          "heading": "Training, tests and attempts",
+          "paragraphs": [
+            "After the profile is approved, the user receives access to the localized course materials and test. Each published version contains three hidden variants; each variant contains 10 questions with four answer options and one correct answer. To pass, the user must answer at least 7 questions correctly, which is a score of 70%. Each attempt lasts 15 minutes. No more than 8 new attempts per course may be started in a calendar day in the Asia/Oral time zone. A resumed attempt remains in the locale selected when it was created.",
+            "It is prohibited to use bots, extract or distribute answer keys, interfere with the operation of the service, circumvent restrictions, or take the test for another person. Errors in the material should be submitted through the document contacts."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "terms-notifications",
+          "heading": "Administrative events and Telegram",
+          "paragraphs": [
+            "Application, course completion and system alert are displayed in the internal administrator inbox. A minimized information copy can be sent to a private Telegram group. Telegram unavailability does not cancel registration, course results or other confirmed actions.",
+            "Telegram does not make decisions, does not approve or reject applications, and does not change account status. The decision on the application can only be made by an authorized administrator in the web admin panel. The Telegram message does not contain email, phone number, position, organization, photograph, documents, answers, credentials, recovery data or synthetic Auth identifier."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "terms-certificates",
+          "heading": "Certificates and their verification",
+          "paragraphs": [
+            "An electronic certificate confirms the passing best result of a specific locale and version of the online test for verified user data. The first issue is performed explicitly by the administrator. If the result is strictly higher, the certificate is automatically replaced with a new one; correction of confirmed data may also cause a reissue. The administrator has the right to revoke the document indicating the reason. QR shows the status “Effective”, “Revoked” or “Document Not Found”.",
+            "The server returns only authorized limited metadata and a signed verification URL. The PDF-certificate, the administrative PDF-report and ZIP are collected only in the browser and are not permanently stored in the database or Storage. The user downloads only his own valid certificate; the administrator can transfer the general report and certificates of its participants to the authorized representative of the company.",
+            "The certificate itself is not declared to be a government license, hazardous work permit, or a substitute for mandatory training, instruction, medical examination, or employer certification. The applicability of the document to a specific industry and regulatory requirement must be separately confirmed by employer or a competent person."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "terms-content-localization",
+          "heading": "Materials, localizations and acceptable uses",
+          "paragraphs": [
+            "Materials are intended for informational training. They can be read and used for personal preparation; Bulk copying, resale, removal of attribution, malicious scanning and creation of false certificates are prohibited.",
+            "Regulatory information subject to change. The date of review and sources of material, when indicated, are helpful in assessing relevance but are not a substitute for official wording and professional advice for a specific work situation.",
+            "The Russian copy is the canonical source for localization. Copies of KK, EN and ZH are automatically translated, back-translated and automatically checked without human linguistic or legal approval. All four copies belong to the same version, have separate immutable hashes and the same structure; the user accepts the residual risk semantic or legal discrepancy of the automatic translation and may request clarification before acceptance."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "terms-availability",
+          "heading": "Availability and responsibility",
+          "paragraphs": [
+            "The service depends on Supabase, Vercel, the user's network, the Telegram Bot API for optional external notification delivery, and, when enabled, Cloudflare Turnstile. The operator strives to maintain functionality and security, but does not promise continuous availability or the absence of all errors. Planned changes and emergency protective restrictions are possible.",
+            "Nothing in the terms limits the user's rights or the operator's liability where such limitation is prohibited by law. The scope of liability and the claims procedure should be finally verified by a local lawyer after filling in the operator's details."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "terms-termination",
+          "heading": "Termination of Use and Data",
+          "paragraphs": [
+            "The user can stop using and permanently delete the account. This deletes the profile, photo, attempts, credentials, recovery digests, certificates, and associated audits within the implemented deletion cascade, and the QR check of the previous document is terminated. An external PDF that has already been downloaded cannot be physically recalled from the device. Categories, providers and removal procedures are described in Privacy Policy version 1.3."
+          ],
+          "items": [],
+          "links": [
+            {
+              "label": "Privacy Policy version 1.3",
+              "url": "/privacy?version=1.3"
+            }
+          ]
+        },
+        {
+          "id": "terms-changes",
+          "heading": "Changes and communication",
+          "paragraphs": [
+            "Significant changes receive a new number and date. The accepted version remains available via the versioned link in the profile, and for the new version the interface requests separate acceptance. Send questions and complaints through the contacts on the document."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "legal-contacts",
+          "heading": "Contacts according to the document",
+          "paragraphs": [
+            "Call or write to WhatsApp. For written requests, save the chat correspondence."
+          ],
+          "items": [
+            "Phone",
+            "WhatsApp",
+            "Write"
+          ],
+          "links": []
+        }
+      ]
+    },
+    "p_body_hash": null,
+    "p_complete": true
+  }
+}

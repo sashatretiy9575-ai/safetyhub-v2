@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "documentType": "privacy",
+  "title": "Privacy Policy",
+  "version": "1.2",
+  "bodyRevision": "privacy-1.2",
+  "effectiveDate": "2026-08-31",
+  "sourceComponent": "components/legal/privacy-policy-v1-2.tsx",
+  "sections": [
+    {
+      "id": "privacy-scope",
+      "heading": "Scope and grounds",
+      "paragraphs": [
+        "Policy applies to the PWA SafetyHub.kz site, account, courses, tests, certificates and administrative functions. Data is processed to provide access to training, conduct profile verification, perform testing, issue and verify certificates, respond to requests, protect the service and comply with applicable legal requirements.",
+        "Inferred grounds are user consent, compliance with accepted terms and conditions and legal requirements to the extent applicable. Their sufficiency for each scenario must be confirmed by the operator during a local legal review. The general regulatory starting point is the Law of the Republic of Kazakhstan “On Personal Data and Their Protection” on the official portal “Adilet”."
+      ],
+      "items": [],
+      "links": [
+        {
+          "label": "official portal “Adilet”",
+          "url": "https://adilet.zan.kz/rus/docs/Z1300000094"
+        }
+      ]
+    },
+    {
+      "id": "privacy-data",
+      "heading": "What data is processed",
+      "paragraphs": [
+        "The photo is stored as one private compressed WebP file in Supabase Storage. The original and intermediate frame are not saved, there is no public access to the avatar, facial recognition and automatic biometric identification are not performed. The camera stream does not leave the device: only the selected and processed frame is sent to the server.",
+        "Public verification of a certificate via an unpredictable link can show the owner's name, certificate number and status, test name, result and issue date. Do not post such a link if you do not want to share this information."
+      ],
+      "items": [
+        "Account and access: email, confirmation status, account and session service identifiers and auth/PKCE-cookie. Login and email confirmation are performed using a one-time code from the letter (email OTP). Password, SMS code and phone number are not used for authentication.",
+        "Profile and verification: first name, last name, position, organization, contact number with selected country code, square profile photo, status and time of manual verification by the administrator. The number is needed only as a contact for verification and support, is not used for login and is not transmitted to the SMS provider.",
+        "Training: Course and test version, answers completed, attempt time and status, best score, and issued, superseded, or revoked certificate metadata.",
+        "Consents: document type, version, date of acceptance and source of action (“profile”).",
+        "Security and administration: reasons and history of privileged actions, correlation/request ID, abbreviated user-agent, as well as HMAC hash of an enlarged network address for limits and investigation of abuse.",
+        "Contacts: address and content of the message, if the user writes to support."
+      ],
+      "links": []
+    },
+    {
+      "id": "privacy-approval",
+      "heading": "Manual profile check",
+      "paragraphs": [
+        "After explicitly accepting the current documents, the user fills out the profile and submits it for manual review. The usual benchmark for review is up to 24 hours from the date of submission; This is a waiting period and is not an automatic approval or guarantee of access to a course at any given time.",
+        "While the status is “under review” or “rejected,” the system does not open course materials and questions, does not allow you to start the test, and does not issue a certificate. The administrator sees the application in the back office and makes a decision; if rejected, the reason may be shown and the user can correct the profile and reapply."
+      ],
+      "items": [],
+      "links": []
+    },
+    {
+      "id": "privacy-storage",
+      "heading": "Cookie and local storage",
+      "paragraphs": [
+        "Necessary cookies are used to log in using an email code, update a session, PKCE-restore and protect closed routes. localStorage can store the theme, hide the installation prompt PWA, incomplete test answers and, for the administrator, the local editor draft. This data remains in the selected browser until the user or application deletes it. Advertising cookies and behavioral advertising are not used in the current version of the application.",
+        "If Cloudflare Turnstile is enabled, its technical data and storage are processed by Cloudflare for security checks according to policy Turnstile ."
+      ],
+      "items": [],
+      "links": [
+        {
+          "label": "policy Turnstile",
+          "url": "https://www.cloudflare.com/turnstile-privacy-policy/"
+        }
+      ]
+    },
+    {
+      "id": "privacy-processors",
+      "heading": "Suppliers and cross-border processing",
+      "paragraphs": [
+        "The storage region and access locations of providers depend on the selected regions, deployment settings and their current subprocessors; The code does not guarantee storage only in Kazakhstan. Before production launch, the operator must fix the actual regions, contracts and acceptable mechanism for cross-border transfer."
+      ],
+      "items": [
+        "Supabase - Auth, PostgreSQL, private Storage, short-lived signed links and delivery of email codes. See DPA and available regions.",
+        "Vercel - hosting, CDN, serverless execution and technical logs. See privacy notice and DPA.",
+        "Cloudflare - only optional anti-bot check Turnstile when it is enabled in the configuration."
+      ],
+      "links": [
+        {
+          "label": "DPA",
+          "url": "https://supabase.com/legal/customer-resources/data-processing-addendum"
+        },
+        {
+          "label": "available regions",
+          "url": "https://supabase.com/docs/guides/platform/regions"
+        },
+        {
+          "label": "privacy notice",
+          "url": "https://vercel.com/legal/privacy-notice"
+        },
+        {
+          "label": "DPA",
+          "url": "https://vercel.com/legal/dpa"
+        }
+      ]
+    },
+    {
+      "id": "privacy-retention",
+      "heading": "Storage periods and disposal",
+      "paragraphs": [
+        "Account details, profile, contact number, photo, completed attempts, best score, certificates, consents and associated administrative audit are stored for as long as the account exists. Raw attempts and audits do not have an automatic deletion period during this period.",
+        "When you permanently delete an account, the application deletes the Auth account, profile, photo, answers and attempts, top scores, verified data, certificates and associated audits. A public QR check of a remote certificate then returns “Document not found”. A copy of PDF that has already been downloaded to someone else’s device cannot be physically deleted. Vendor backups can be updated based on their technical cycle.",
+        "PDF-certificates and ZIP-archives are created upon request and are not permanently written to either PostgreSQL or Storage. The photograph is not included in the PDF, ZIP or QR check. A corporate report with certification data can be provided to an authorized representative of the user's company to confirm training."
+      ],
+      "items": [],
+      "links": []
+    },
+    {
+      "id": "privacy-rights",
+      "heading": "Rights and Appeals",
+      "paragraphs": [
+        "To the extent provided by applicable law, the user may request information about processing and a copy of the data, correction, restriction or termination of processing, withdrawal of consent and deletion of the account. Some records may be retained where a mandatory legal basis requires it; the operator must explain that decision.",
+        "To send a request or check the status of a manual review, use the document contacts. Identity verification may be required to secure your account. If the answer is not satisfactory, the user has the right to appeal to the competent authority or court in the manner prescribed by applicable law."
+      ],
+      "items": [],
+      "links": [
+        {
+          "label": "contacts according to the document",
+          "url": "#legal-contacts"
+        }
+      ]
+    },
+    {
+      "id": "privacy-security",
+      "heading": "Document Security and Changes",
+      "paragraphs": [
+        "The application uses one-time code login from email, differentiation of roles and powers, RLS, frequency limiting of operations, verification of the source of administrative requests, protective browser headers, audit of critical actions and encrypted transport. The code from the letter cannot be transferred to other persons; no measure eliminates risk completely.",
+        "A new significant version is published under a new number and date. The accepted version remains available via the versioned link in the profile; re-consent is requested if the current version has not yet been accepted."
+      ],
+      "items": [],
+      "links": []
+    },
+    {
+      "id": "legal-contacts",
+      "heading": "Contacts according to the document",
+      "paragraphs": [
+        "Call or write to WhatsApp. For written requests, save the chat correspondence."
+      ],
+      "items": [
+        "Phone",
+        "WhatsApp",
+        "Write"
+      ],
+      "links": []
+    }
+  ],
+  "locale": "en",
+  "bodyHash": "5a7fa7094dded3b92e4618f8a602f1104ddb7dcd26eff8b6c1c1c2d0e5386748"
+}

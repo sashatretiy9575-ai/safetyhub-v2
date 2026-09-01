@@ -3,6 +3,7 @@ import { contentMetadataSchema } from './content/content-metadata.ts';
 import { courseSeoSchema } from './validation/course.ts';
 import { defaultContentSeo, type ContentSeo } from './validation/content-seo.ts';
 import { isCourseIconId } from './course-icons.ts';
+import type { AppLocale } from './supabase/types.ts';
 
 export const TEST_EDITOR_LIMITS = Object.freeze({
   variantCount: 3,
@@ -47,6 +48,7 @@ export type TestEditorVariant = Readonly<{
 
 export type TestEditorPresentation = Readonly<{
   id: string;
+  locale: AppLocale;
   pageCount: number;
   sha256: string;
   byteSize: number;
@@ -128,6 +130,7 @@ function duplicateTexts(values: ReadonlyArray<string>) {
 function validPresentation(presentation: TestEditorPresentation | null) {
   return Boolean(
     presentation &&
+    presentation.locale === 'ru' &&
     UUID_PATTERN.test(presentation.id) &&
     presentation.status === 'ready' &&
     presentation.pageCount >= 1 &&

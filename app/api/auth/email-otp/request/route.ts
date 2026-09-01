@@ -4,9 +4,15 @@ import { isSameOriginRequest } from '@/features/auth/request-origin';
 import { createEphemeralAuthClient } from '@/lib/supabase/ephemeral-auth';
 import { emailOtpStartSchema } from '@/lib/validation/auth';
 import { readJsonBody } from '@/lib/security/request-body';
-import { requestSecurityMetadata, requestSubjectHash } from '@/lib/security/request-metadata';
+import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { consumeCoarseQuota } from '@/lib/security/rate-limit';
 import { authProviderRetryAfter } from '@/features/auth/otp-rate-limit';
+import { emailOtpRedirectUrl } from '@/features/auth/email-otp-locale';
+import { resolveSiteOrigin } from '@/lib/site-url';
+import {
+  issueEmailOtpChallenge,
+  setEmailOtpChallengeCookie,
+} from '@/lib/security/email-otp-challenge';
 
 type AuthProviderError = { code?: string; status?: number } | null;
 
@@ -26,9 +32,10 @@ function providerFailure(error: AuthProviderError) {
   }
 
   // For all other Auth provider errors, including a non-existent login email,
-  // deliberately return the same answer as a successful request. This avoids
-  // turning the passwordless endpoint into an account enumeration oracle.
-  return NextResponse.json({ sent: true }, { status: 202 });
+  // deliberately continue through the same challenge-receipt path as a
+  // successful request. This avoids turning either the response or cookie into
+  // an account enumeration oracle.
+  return null;
 }
 
 export async function POST(request: Request) {
@@ -46,22 +53,37 @@ export async function POST(request: Request) {
 
     const security = requestSecurityMetadata(request);
     await consumeCoarseQuota('auth.otp.start', security.ipHash);
-    await consumeCoarseQuota('auth.otp.start.email', requestSubjectHash(parsed.data.email));
+    const locale = parsed.data.locale ?? 'ru';
 
     // Both public entry pages are one passwordless email-code gateway. Let the
     // provider create an unknown address so a login attempt never turns into a
-    // silent no-email response. CAPTCHA and both quotas still run first, and
-    // the endpoint remains enumeration-neutral.
+    // silent no-email response. Supabase is the sole Turnstile verifier; only
+    // the network quota runs before that proof, so an attacker cannot spend a
+    // victim-wide email budget with invalid CAPTCHA tokens.
     const { error } = await createEphemeralAuthClient().auth.signInWithOtp({
       email: parsed.data.email,
       options: {
         shouldCreateUser: true,
         captchaToken: parsed.data.captchaToken,
+        emailRedirectTo: emailOtpRedirectUrl(resolveSiteOrigin(), locale),
       },
     });
-    if (error) return providerFailure(error);
+    if (error) {
+      const failure = providerFailure(error);
+      if (failure) return failure;
+    }
 
-    return NextResponse.json({ sent: true }, { status: 202 });
+    let challengeToken: string;
+    try {
+      challengeToken = await issueEmailOtpChallenge(parsed.data.email);
+    } catch {
+      return NextResponse.json({ error: 'OTP_UNAVAILABLE' }, { status: 503 });
+    }
+
+    return setEmailOtpChallengeCookie(
+      NextResponse.json({ sent: true }, { status: 202 }),
+      challengeToken,
+    );
   } catch (error) {
     return apiError(error);
   }

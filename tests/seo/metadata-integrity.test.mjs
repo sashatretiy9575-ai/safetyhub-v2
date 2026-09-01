@@ -24,7 +24,8 @@ test('JSON-LD describes only visible capabilities and is mounted on matching pag
   ]);
 
   assert.doesNotMatch(seo, /SearchAction|search_term_string/);
-  assert.match(home, /faqJsonLd\(FAQ_DATA\)/);
+  assert.match(home, /getFaqData\(\)/);
+  assert.match(home, /faqJsonLd\(faqData\)/);
   assert.match(courseGrid, /courseJsonLd/);
   assert.match(article, /articleJsonLd/);
   assert.match(article, /breadcrumbsJsonLd/);

@@ -325,8 +325,12 @@ begin
       pg_get_functiondef('public.complete_profile_onboarding(text,text,text,text)'::regprocedure)) = 0
     or position('private.update_profile_unmetered(' in
       pg_get_functiondef('public.complete_profile_onboarding(text,text,text,text)'::regprocedure)) = 0
-    or position('private.enforce_actor_quota(' in
-      pg_get_functiondef('public.start_test_attempt(text)'::regprocedure)) = 0
+    or position('private.enforce_actor_quota(' in (
+      pg_get_functiondef('public.start_test_attempt(text)'::regprocedure)
+      || pg_get_functiondef(
+        'public.start_test_attempt_locale(text,public.app_locale)'::regprocedure
+      )
+    )) = 0
     or position('private.enforce_actor_quota(' in
       pg_get_functiondef('public.complete_test_attempt(uuid,jsonb)'::regprocedure)) = 0
     or position('private.enforce_actor_quota(' in
@@ -357,8 +361,12 @@ begin
     raise exception 'persistent actor quota error envelope missing';
   end if;
 
-  if position('pg_exception_detail' in
-      pg_get_functiondef('public.start_test_attempt(text)'::regprocedure)) = 0
+  if position('pg_exception_detail' in (
+      pg_get_functiondef('public.start_test_attempt(text)'::regprocedure)
+      || pg_get_functiondef(
+        'public.start_test_attempt_locale(text,public.app_locale)'::regprocedure
+      )
+    )) = 0
     or position('ATTEMPT_DAILY_LIMIT' in
       pg_get_functiondef('private.rpc_error_envelope(text,text,text)'::regprocedure)) = 0
     or position('ATTEMPT_ROLLING_LIMIT' in

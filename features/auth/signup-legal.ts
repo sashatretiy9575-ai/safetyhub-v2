@@ -2,7 +2,7 @@ import 'server-only';
 
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { PRIVACY_POLICY, TERMS_POLICY } from '@/lib/legal';
+import { getCurrentLegalPolicies } from '@/lib/legal-current';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const SIGNUP_NONCE_PATTERN = /^[0-9a-f]{64}$/;
@@ -81,6 +81,7 @@ function parseFinalizedOperation(value: unknown): FinalizedSignupLegalOperation 
 export async function prepareSignupLegalOperation(
   email: string,
 ): Promise<PreparedSignupLegalOperation> {
+  const currentLegal = await getCurrentLegalPolicies();
   const operationId = randomUUID();
   const signupNonce = randomBytes(32).toString('hex');
   const nonceSha256 = createHash('sha256').update(signupNonce, 'utf8').digest('hex');
@@ -88,10 +89,10 @@ export async function prepareSignupLegalOperation(
     p_operation_id: operationId,
     p_nonce_sha256: nonceSha256,
     p_email: email,
-    p_privacy_version: PRIVACY_POLICY.version,
-    p_privacy_body_revision: PRIVACY_POLICY.bodyRevision,
-    p_terms_version: TERMS_POLICY.version,
-    p_terms_body_revision: TERMS_POLICY.bodyRevision,
+    p_privacy_version: currentLegal.privacy.version,
+    p_privacy_body_revision: currentLegal.privacy.bodyRevision,
+    p_terms_version: currentLegal.terms.version,
+    p_terms_body_revision: currentLegal.terms.bodyRevision,
   });
   if (error) throw new Error('SIGNUP_LEGAL_PREPARE_FAILED');
   return {

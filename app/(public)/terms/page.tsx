@@ -1,21 +1,29 @@
 import { notFound } from 'next/navigation';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { TermsPolicyV22 } from '@/components/legal/terms-policy-v2-2';
+import { TermsPolicyV23 } from '@/components/legal/terms-policy-v2-3';
 import { LegalContacts } from '@/components/legal/legal-contacts';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
-import {
-  formatLegalDate,
-  PRIVACY_POLICY_V1_1,
-  resolveLegalDocumentVersion,
-  TERMS_POLICY,
-} from '@/lib/legal';
+import { formatLegalDate, PRIVACY_POLICY_V1_1 } from '@/lib/legal';
+import { resolveActivatedLegalPolicy } from '@/lib/legal-current';
 import { buildMetadata } from '@/lib/seo';
+import { getLocalizedLegalDocument } from '@/lib/content/legal-documents';
+import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-document';
+import type { AppLocale } from '@/i18n/config';
 
-export const metadata = buildMetadata({
-  title: 'Условия использования',
-  description: 'Условия использования платформы и получения сертификатов SafetyHub.',
-  path: '/terms',
-});
+export async function generateMetadata() {
+  const [locale, t] = await Promise.all([
+    getLocale() as Promise<AppLocale>,
+    getTranslations('LegalFlow'),
+  ]);
+  return buildMetadata({
+    title: t('terms'),
+    description: t('termsMetadataDescription'),
+    path: '/terms',
+    locale,
+  });
+}
 
 type TermsPageProps = {
   searchParams: Promise<{ version?: string | string[] }>;
@@ -27,8 +35,15 @@ const linkClass =
 export default async function TermsPage({ searchParams }: TermsPageProps) {
   const requested = (await searchParams).version;
   const requestedVersion = Array.isArray(requested) ? requested[0] : requested;
-  const policy = resolveLegalDocumentVersion('terms', requestedVersion);
+  const locale = (await getLocale()) as AppLocale;
+  if (locale !== 'ru') {
+    const localized = await getLocalizedLegalDocument('terms', requestedVersion, locale);
+    if (!localized) notFound();
+    return <LocalizedLegalDocumentView document={localized} />;
+  }
+  const policy = await resolveActivatedLegalPolicy('terms', requestedVersion);
   if (!policy) notFound();
+  if (policy.bodyRevision === 'terms-2.3') return <TermsPolicyV23 policy={policy} />;
   if (policy.bodyRevision === 'terms-2.2') return <TermsPolicyV22 policy={policy} />;
   if (policy.bodyRevision !== 'terms-2.1') notFound();
 
@@ -60,7 +75,7 @@ export default async function TermsPage({ searchParams }: TermsPageProps) {
               Версия {policy.version}. Действует с {effectiveDate}
             </p>
             <p className="text-xs font-semibold tracking-wide text-[var(--color-text-subtle)] uppercase">
-              {policy.version === TERMS_POLICY.version ? 'Текущая редакция' : 'Архивная редакция'}
+              {requestedVersion ? 'Архивная редакция' : 'Текущая редакция'}
             </p>
           </header>
 

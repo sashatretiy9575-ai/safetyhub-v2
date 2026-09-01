@@ -1,0 +1,12 @@
+{
+  "AppState": {
+    "criticalTitle": "发生严重错误",
+    "criticalDescription": "应用未能完整打开。请刷新页面或返回首页。",
+    "digestId": "错误 ID"
+  },
+  "Common": {
+    "retry": "重试",
+    "home": "返回首页",
+    "correlationIdPlain": "查询编号"
+  }
+}

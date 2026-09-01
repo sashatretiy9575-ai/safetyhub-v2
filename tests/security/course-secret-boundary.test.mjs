@@ -5,8 +5,8 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const sourceRoots = ['app', 'components', 'features', 'lib'];
-const sourceExtensions = ['.ts', '.tsx', '.js', '.mjs'];
+const sourceRoots = ['app', 'components', 'features', 'i18n', 'lib', 'messages'];
+const sourceExtensions = ['.ts', '.tsx', '.js', '.mjs', '.json'];
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
 
 async function listFiles(directory) {
@@ -96,7 +96,11 @@ test('client import graph cannot reach reproducible seed or snapshot source file
     // Do not follow that boundary when checking the client import graph.
     if (/^['"]use server['"];?/u.test(source)) continue;
 
-    assert.doesNotMatch(source, /content[\\/]snapshots|supabase[\\/]seed\.sql/iu, file);
+    assert.doesNotMatch(
+      source,
+      /content[\\/](?:snapshots|localizations)|supabase[\\/]seed\.sql/iu,
+      file,
+    );
     assert.doesNotMatch(source, /['"](?:node:)?fs(?:[\\/][^'"]*)?['"]/u, file);
     assert.doesNotMatch(source, /import\s+['"]server-only['"]/u, file);
 

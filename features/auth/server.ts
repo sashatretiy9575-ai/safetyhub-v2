@@ -7,7 +7,7 @@ import {
   hasSupabaseSessionCookie,
   isSupabaseConfigured,
 } from '@/lib/supabase/server';
-import type { AccountStatus, AppRole } from '@/lib/supabase/types';
+import type { AccountStatus, AppLocale, AppRole } from '@/lib/supabase/types';
 import { ADMIN_CAPABILITIES, type AdminCapability } from '@/lib/security/capabilities';
 import { resolveSiteOrigin } from '@/lib/site-url';
 
@@ -19,6 +19,7 @@ export type AuthProfile = Readonly<{
   organization: string;
   phone_country_iso2: string | null;
   phone_e164: string | null;
+  preferred_locale: AppLocale;
   avatar_updated_at: string | null;
   onboarding_completed_at: string | null;
   created_at: string;
@@ -56,6 +57,7 @@ const authContextRowSchema = z.object({
   profile_organization: z.string(),
   profile_phone_country_iso2: z.string().nullable(),
   profile_phone_e164: z.string().nullable(),
+  profile_preferred_locale: z.enum(['ru', 'kk', 'en', 'zh']),
   profile_avatar_updated_at: z.string().nullable(),
   profile_onboarding_completed_at: z.string().nullable(),
   profile_identity_state: z.enum(['pending', 'verified', 'changed', 'revoked']),
@@ -138,6 +140,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
       organization: row.profile_organization,
       phone_country_iso2: row.profile_phone_country_iso2,
       phone_e164: row.profile_phone_e164,
+      preferred_locale: row.profile_preferred_locale,
       avatar_updated_at: row.profile_avatar_updated_at,
       onboarding_completed_at: row.profile_onboarding_completed_at,
       created_at: row.profile_created_at,

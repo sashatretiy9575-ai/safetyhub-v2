@@ -13,6 +13,9 @@ import { createPublicClient } from '@/lib/supabase/public';
 import { isContentSlug } from '@/lib/content/slug';
 import { coerceContentMetadata, type ContentMetadata } from '@/lib/content/content-metadata';
 import { contentSeoSchema, defaultContentSeo, type ContentSeo } from '@/lib/validation/content-seo';
+import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
+import { QUIZ_POLICY } from '@/lib/constants';
+import type { Json } from '@/lib/supabase/types';
 
 export interface CoursePresentation {
   id: string;
@@ -80,11 +83,19 @@ type PresentationRecord = {
   status?: unknown;
 };
 
-function protectedPresentationUrl(slug: string, asset: 'presentation' | 'thumbnail') {
-  return `/course-presentations/${encodeURIComponent(slug)}/${asset}`;
+function protectedPresentationUrl(
+  slug: string,
+  asset: 'presentation' | 'thumbnail',
+  locale: AppLocale = DEFAULT_LOCALE,
+) {
+  return `/course-presentations/${encodeURIComponent(slug)}/${asset}?locale=${locale}`;
 }
 
-function presentationFromRecord(value: PresentationRecord | null | undefined, slug: string) {
+function presentationFromRecord(
+  value: PresentationRecord | null | undefined,
+  slug: string,
+  locale: AppLocale = DEFAULT_LOCALE,
+) {
   if (!value || typeof value.id !== 'string' || !isContentSlug(slug)) return null;
   if (value.status !== undefined && value.status !== 'ready') return null;
   const pageCount = Number(value.pageCount ?? value.page_count);
@@ -94,8 +105,8 @@ function presentationFromRecord(value: PresentationRecord | null | undefined, sl
   // Its immutable Storage object path never reaches the rendered catalogue.
   return {
     id: value.id,
-    url: protectedPresentationUrl(slug, 'presentation'),
-    thumbnailUrl: protectedPresentationUrl(slug, 'thumbnail'),
+    url: protectedPresentationUrl(slug, 'presentation', locale),
+    thumbnailUrl: protectedPresentationUrl(slug, 'thumbnail', locale),
     pageCount,
     sha256: typeof value.sha256 === 'string' ? value.sha256 : '',
   } satisfies CoursePresentation;
@@ -265,7 +276,7 @@ const getCachedTopics = unstable_cache(getTopicsFromSource, ['content-topics-v4'
   tags: [CONTENT_CACHE_TAG, TOPICS_CACHE_TAG],
 });
 
-export const getTopics = cache(getCachedTopics);
+const getLegacyTopics = cache(getCachedTopics);
 
 async function getTopicBySlugFromSource(slug: string): Promise<Topic | null> {
   const localTopic = getLocalTopicBySlug(slug);
@@ -320,8 +331,202 @@ const getCachedTopicBySlug = unstable_cache(getTopicBySlugFromSource, ['content-
   tags: [CONTENT_CACHE_TAG, TOPICS_CACHE_TAG],
 });
 
-export const getTopicBySlug = cache((slug: string) =>
+const getLegacyTopicBySlug = cache((slug: string) =>
   isContentSlug(slug) ? getCachedTopicBySlug(slug) : Promise.resolve(null),
+);
+
+type LocalizedCourseListItem = {
+  slug: string;
+  locale: AppLocale;
+  title: string;
+  description: string;
+  icon: string;
+  displayOrder: number;
+  durationMinutes: number;
+  passScore: number;
+  publishedAt: string;
+};
+
+type LocalizedCourseRecord = LocalizedCourseListItem & {
+  id: string;
+  revisionId: string;
+  content: Json;
+  seo: unknown;
+  sources: unknown;
+  jurisdiction: string;
+  effectiveDate: string;
+  attemptsPerCalendarDay: number;
+  resetTimezone: string;
+  presentation: PresentationRecord;
+};
+
+type LocalizedCourseRpcClient = {
+  rpc(
+    name: 'list_published_courses_locale' | 'get_published_course_locale',
+    args: Record<string, unknown>,
+  ): PromiseLike<{
+    data: Json;
+    error: { code?: string; message?: string } | null;
+    status: number;
+  }>;
+};
+
+const lastKnownLocalizedTopics = new Map<AppLocale, Topic[]>();
+const lastKnownLocalizedTopicsBySlug = new Map<string, Topic | null>();
+
+function localizedTopicKey(locale: AppLocale, slug: string) {
+  return `${locale}:${slug}`;
+}
+
+function localizedTopicFromList(value: LocalizedCourseListItem): Topic {
+  return {
+    id: value.slug,
+    slug: value.slug,
+    title: value.title,
+    description: value.description,
+    icon: value.icon,
+    displayOrder: value.displayOrder,
+    durationMinutes: value.durationMinutes,
+    questionCount: QUIZ_POLICY.questionCount,
+    passScore: value.passScore,
+    attemptsPerDay: QUIZ_POLICY.attemptsPerCalendarDay,
+    attemptResetTimezone: QUIZ_POLICY.attemptResetTimezone,
+    presentation: null,
+    updatedAt: value.publishedAt,
+    seo: defaultContentSeo(value.title, value.description),
+    jurisdiction: '',
+    effectiveDate: '',
+    sources: [],
+  };
+}
+
+function localizedTopicFromRecord(value: LocalizedCourseRecord, locale: AppLocale): Topic {
+  return {
+    id: value.id,
+    slug: value.slug,
+    title: value.title,
+    description: value.description,
+    icon: value.icon,
+    displayOrder: value.displayOrder,
+    durationMinutes: value.durationMinutes,
+    questionCount: QUIZ_POLICY.questionCount,
+    passScore: value.passScore,
+    attemptsPerDay: value.attemptsPerCalendarDay,
+    attemptResetTimezone: value.resetTimezone,
+    presentation: presentationFromRecord(value.presentation, value.slug, locale),
+    updatedAt: value.publishedAt,
+    seo: topicSeo(value.seo, value.title, value.description),
+    ...metadataFields(value as unknown as Record<string, unknown>),
+  };
+}
+
+async function getLocalizedTopicsFromSource(locale: AppLocale): Promise<Topic[]> {
+  const supabase = createPublicClient();
+  if (!supabase) return getLegacyTopics();
+  try {
+    const { data, error, status } = await (supabase as unknown as LocalizedCourseRpcClient).rpc(
+      'list_published_courses_locale',
+      { p_locale: locale },
+    );
+    if (error) {
+      return fallbackAfterContentFailure({
+        configured: true,
+        error,
+        fallback: () => lastKnownLocalizedTopics.get(locale) ?? [],
+        operation: `list ${locale} topics`,
+        status,
+      });
+    }
+    const raw = data && typeof data === 'object' && !Array.isArray(data) ? data : null;
+    const items = raw && 'items' in raw && Array.isArray(raw.items) ? raw.items : [];
+    const topics = items
+      .filter((item): item is LocalizedCourseListItem => {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) return false;
+        const row = item as Partial<LocalizedCourseListItem>;
+        return (
+          typeof row.slug === 'string' &&
+          isContentSlug(row.slug) &&
+          row.locale === locale &&
+          typeof row.title === 'string' &&
+          typeof row.description === 'string' &&
+          typeof row.icon === 'string' &&
+          Number.isInteger(row.displayOrder) &&
+          Number.isInteger(row.durationMinutes) &&
+          Number.isInteger(row.passScore) &&
+          typeof row.publishedAt === 'string'
+        );
+      })
+      .map(localizedTopicFromList);
+    lastKnownLocalizedTopics.set(locale, topics);
+    return topics;
+  } catch (error) {
+    if (error instanceof ContentSourceError) throw error;
+    return fallbackAfterContentFailure({
+      configured: true,
+      error,
+      fallback: () => lastKnownLocalizedTopics.get(locale) ?? [],
+      operation: `list ${locale} topics`,
+    });
+  }
+}
+
+const getCachedLocalizedTopics = unstable_cache(
+  getLocalizedTopicsFromSource,
+  ['content-topics-localized-v1'],
+  {
+    revalidate: CONTENT_CACHE_REVALIDATE_SECONDS,
+    tags: [CONTENT_CACHE_TAG, TOPICS_CACHE_TAG],
+  },
+);
+
+export const getTopics = cache((locale: AppLocale = DEFAULT_LOCALE) =>
+  getCachedLocalizedTopics(locale),
+);
+
+async function getLocalizedTopicBySlugFromSource(slug: string, locale: AppLocale) {
+  const supabase = createPublicClient();
+  if (!supabase) return getLegacyTopicBySlug(slug);
+  const key = localizedTopicKey(locale, slug);
+  try {
+    const { data, error, status } = await (supabase as unknown as LocalizedCourseRpcClient).rpc(
+      'get_published_course_locale',
+      { p_slug: slug, p_locale: locale },
+    );
+    if (error) {
+      return fallbackAfterContentFailure({
+        configured: true,
+        error,
+        fallback: () => lastKnownLocalizedTopicsBySlug.get(key) ?? null,
+        operation: `read ${locale} topic ${slug}`,
+        status,
+      });
+    }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+    const topic = localizedTopicFromRecord(data as unknown as LocalizedCourseRecord, locale);
+    lastKnownLocalizedTopicsBySlug.set(key, topic);
+    return topic;
+  } catch (error) {
+    if (error instanceof ContentSourceError) throw error;
+    return fallbackAfterContentFailure({
+      configured: true,
+      error,
+      fallback: () => lastKnownLocalizedTopicsBySlug.get(key) ?? null,
+      operation: `read ${locale} topic ${slug}`,
+    });
+  }
+}
+
+const getCachedLocalizedTopicBySlug = unstable_cache(
+  getLocalizedTopicBySlugFromSource,
+  ['content-topic-localized-v1'],
+  {
+    revalidate: CONTENT_CACHE_REVALIDATE_SECONDS,
+    tags: [CONTENT_CACHE_TAG, TOPICS_CACHE_TAG],
+  },
+);
+
+export const getTopicBySlug = cache((slug: string, locale: AppLocale = DEFAULT_LOCALE) =>
+  isContentSlug(slug) ? getCachedLocalizedTopicBySlug(slug, locale) : Promise.resolve(null),
 );
 
 export async function getTopicSlugs(): Promise<string[]> {

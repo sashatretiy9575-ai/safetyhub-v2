@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "locale": "kk",
+  "slug": "plotnik",
+  "productionPublished": false,
+  "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+  "overrideCount": 1,
+  "allOtherElementGeometryUnchanged": true,
+  "neighborContentMoved": false,
+  "newlyIntersectedNeighborCount": 0,
+  "semanticsChanged": false,
+  "overrides": [
+    {
+      "locale": "kk",
+      "slug": "plotnik",
+      "slide": 25,
+      "shapeId": "16",
+      "name": "Прямоугольник 15",
+      "translatedText": "Ақаулық, жағдайлардың өзгеруі немесе қауіп төнген жағдайда жұмыс тоқтатылады.",
+      "sourceBbox": [
+        152,
+        502,
+        1000,
+        54
+      ],
+      "finalBbox": [
+        152,
+        502,
+        1000,
+        66
+      ],
+      "reason": "Height-only correction clears a 7 pt PowerPoint TextFrame2 vertical overflow; the next template element remains outside the expanded box.",
+      "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+      "sourceTextSha256": "eeab0fda0154c79de410ec22233f3b343c57a1103c6ee50c7663860f75e70bf9",
+      "translatedTextSha256": "0292f91142ea5c7fc117dee1900552ad292ae7f35df41f25ffd730cbdc777dfa",
+      "newlyIntersectedNeighborCount": 0
+    }
+  ]
+}

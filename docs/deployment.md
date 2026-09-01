@@ -1,5 +1,10 @@
 # Deployment и домен SafetyHub
 
+Пошаговый cutover для мультиязычности, ZH passkey, admin inbox, Telegram и
+client-only сертификатов зафиксирован отдельно в
+`docs/release-i18n-zh-telegram.md`; нижележащая историческая процедура каталога
+не заменяет новый fail-closed порядок включения.
+
 ## Текущее доменное состояние
 
 - canonical origin: `https://safetyhub.kz`;
@@ -21,6 +26,19 @@
   `email_sent = 30` явно задан в секции `[auth.rate_limit]` и оставляет запас
   относительно ограничения Plesk `50` писем в час; не возвращайте provider
   default `2` письма в час.
+- `[auth.captcha]` всегда включён с provider `turnstile`; Supabase Auth является
+  единственным verifier токена, переданного в `signInWithOtp`. Secret поступает
+  только через `SUPABASE_AUTH_CAPTCHA_SECRET`. Публичная пара Cloudflare
+  `1x000...AA` из `.env.example` и CI предназначена только для localhost и
+  disposable DB. Перед production `config push` задайте реальный secret:
+  подготовленная команда намеренно отказывается работать при пустом значении или
+  публичном always-pass test secret. Реальный secret не коммитится и не имеет
+  `NEXT_PUBLIC_`-копии.
+- После provider-accepted отправки приложение кладёт браузеру только 32 случайных
+  байта в `HttpOnly`, `SameSite=Lax`, production-`Secure` cookie. База хранит
+  только раздельные HMAC challenge/email, не более часа и шести попыток. Ошибка
+  CAPTCHA не создаёт receipt и не изменяет email-wide счётчик; verify без точного
+  receipt/email binding получает общий `OTP_CODE_INVALID`.
 - SMTP sender: `SafetyHub <no-reply@safetyhub.kz>` через
   `srv-plesk28.ps.kz:465`; не заменяйте provider-host на apex или `mail.safetyhub.kz`.
 - Перенесите из `supabase/config.toml` в целевой hosted Supabase лимит отправки,
@@ -144,6 +162,9 @@ type-contract и SQL regression проверок.
 - registration/login запускают один deferred Turnstile после submit, используют
   единый auto-create native OTP flow и отправляют только шестизначный email OTP;
   recovery/invite templates не содержат секрета;
+- invalid CAPTCHA и неверные коды с чужим email не расходуют victim-wide quota;
+  седьмая проверка одного challenge получает 429, успешная проверка удаляет
+  challenge и очищает opaque cookie;
 - native email OTP создаёт/подтверждает пользователя и получает сессию;
   внутренняя provider-запись password hash не считается пользовательским
   паролем; прямой password login, recovery и invite не получают SafetyHub JWT

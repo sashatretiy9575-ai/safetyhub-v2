@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "ohrana-truda-kazakhstan-2026",
+  "slug": "ohrana-truda-kazakhstan-2026",
+  "title": "Safe work day: what to check before starting your shift",
+  "description": "A simple route for the worker: understand the task, notice hazard, check the protection and do not start work if conditions are unsafe.",
+  "coverImage": "/images/generated/article-occupational-safety.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "Most safe shifts begin not with a long instruction, but with a short pause before work. In two minutes you can clarify the task, inspect the place and understand what has changed since yesterday. This skill is useful on the shop floor, in the warehouse, and in the office."
+    },
+    {
+      "tone": "success",
+      "type": "callout",
+      "title": "Main idea",
+      "content": "If you don't understand a task, don't see a safe way to complete it, or notice an immediate hazard, don't start the job silently. Stop, warn people nearby and contact your immediate supervisor."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Check in two minutes"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Challenge: Do I understand exactly what needs to be done and where does my work area end?",
+        "Location: Are aisles clear, adequate lighting, and floor free of spills, ice, cables, or debris?",
+        "Equipment: Any unusual noise, odor, heat, damage or removed guards?",
+        "Protection: Are the required PPE in place, fit and undamaged?",
+        "Communication: Do I know who to report an anomaly and how to call for help?"
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "What has changed today"
+    },
+    {
+      "type": "paragraph",
+      "content": "A familiar place can become dangerous after repairs, rearrangements, changes in materials, weather or work by another team. Don't rely on memory alone. Look at the actual situation: a new equipment route, an open hatch, a wet surface or a temporary cable is more important than yesterday’s picture in your head."
+    },
+    {
+      "rows": [
+        [
+          "Unusual odor, smoke or sparks",
+          "Do not turn on or touch the equipment; go away and report"
+        ],
+        [
+          "Guard removed or lockout",
+          "Do not start the mechanism and mark the danger zone"
+        ],
+        [
+          "PPE damaged or not suitable",
+          "Request a working replacement before starting work"
+        ],
+        [
+          "The task is different from the briefing",
+          "Specify the operating method and necessary protective measures"
+        ],
+        [
+          "People are in the danger zone",
+          "Stop the start of the operation and alert them"
+        ]
+      ],
+      "type": "table",
+      "caption": "Signals that cannot be ignored",
+      "headers": [
+        "Signal",
+        "Safe action"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "How to ask a question without unnecessary stress"
+    },
+    {
+      "type": "paragraph",
+      "content": "A good question describes a fact, risk and the desired solution. For example: “The insulation on the cable is damaged, it is dangerous to touch. Who can disconnect the line and replace the cable?” This formulation leads to action faster than the general “something is wrong here.”"
+    },
+    {
+      "type": "quote",
+      "content": "Safe method first, speed second. A lost two minutes is worth less than an incident."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "When work must be stopped"
+    },
+    {
+      "type": "paragraph",
+      "content": "The Labor Code of Kazakhstan provides guarantees for the employee in case of immediate danger to life and health. In practice, it is important not to leave silently: stop the dangerous action, if possible, warn others and immediately inform the manager in the prescribed manner. Do not attempt to repair the problem yourself unless you are trained and authorized to do so."
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "Remember three verbs",
+      "content": "Stop. Warn. Report. This sequence is suitable for most sudden hazards in the workplace."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "paragraph",
+      "content": "Make a two-minute check-in a habit at the beginning of your shift and after any break, task change, or move to a new location. It does not replace safety briefing, but helps apply it to a real-life situation."
+    },
+    {
+      "url": "/topics",
+      "text": "Select a safety course",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "Safe work day: what to check before starting your shift",
+    "ogImage": "/images/generated/article-occupational-safety.webp",
+    "ogTitle": "Safe work day: what to check before starting your shift",
+    "indexable": true,
+    "description": "A simple route for the worker: understand the task, notice hazard, check the protection and do not start work if conditions are unsafe.",
+    "ogDescription": "A simple route for the worker: understand the task, notice hazard, check the protection and do not start work if conditions are unsafe."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-12",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K1500000414",
+      "title": "Labor Code of the Republic of Kazakhstan"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500012665",
+      "title": "Rules for training, instructing and testing knowledge on safety and labor protection"
+    }
+  ],
+  "createdAt": "2026-08-10T00:00:00.000Z",
+  "updatedAt": "2026-08-10T00:00:00.000Z"
+}

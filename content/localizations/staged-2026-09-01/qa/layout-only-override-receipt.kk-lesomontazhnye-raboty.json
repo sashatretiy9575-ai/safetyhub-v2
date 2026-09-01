@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 1,
+  "locale": "kk",
+  "slug": "lesomontazhnye-raboty",
+  "productionPublished": false,
+  "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+  "overrideCount": 9,
+  "allOtherElementGeometryUnchanged": true,
+  "neighborContentMoved": false,
+  "newlyIntersectedNeighborCount": 0,
+  "semanticsChanged": false,
+  "overrides": [
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 1,
+      "shapeId": "5",
+      "name": "DECK_TITLE",
+      "translatedText": "Құрылыс мінбелерін монтаждау жұмыстары",
+      "sourceBbox": [
+        72,
+        212,
+        650,
+        190
+      ],
+      "finalBbox": [
+        72,
+        212,
+        650,
+        190
+      ],
+      "finalFontSizePx": 48,
+      "minimumReadableFontSizePx": 44,
+      "reason": "Bounded cover-title typography correction preserves the complete accepted title while fitting above the unchanged divider and subtitle; 48 px remains above the 44 px cover-title readability floor.",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+      "translatedTextSha256": "b30dd67bbd264cd6fd8b583fda01188e8dc482afc994457ebacf53d23a514fa3",
+      "newlyIntersectedNeighborCount": 0
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 2,
+      "shapeId": "8",
+      "name": "LIST_ITEM_2",
+      "translatedText": "Құрылыс мінбелерінің негізгі элементтерін және байланыстардың, төсемдердің әрі қоршаулардың мақсатын ажырату.",
+      "sourceBbox": [
+        210,
+        282,
+        620,
+        84
+      ],
+      "finalBbox": [
+        210,
+        282,
+        620,
+        84
+      ],
+      "finalFontSizePx": 22,
+      "minimumReadableFontSizePx": 20,
+      "reason": "Bounded 22 px list typography clears the PowerPoint vertical overflow without changing geometry or moving the next list row.",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceTextSha256": "106de87ac206b91898f8c7c332262cb10b03869a042f48c8ab229e383900bd0e",
+      "translatedTextSha256": "d970db95feace2b065e28984e031c2be1c11977ef51415f4bc0a5e6c6421eba4",
+      "newlyIntersectedNeighborCount": 0
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 2,
+      "shapeId": "11",
+      "name": "LIST_ITEM_3",
+      "translatedText": "Құрылыс мінбелерін қауіпсіз пайдалану және оларды пайдалануға рұқсат беру мәртебесін түсіну.",
+      "sourceBbox": [
+        210,
+        378,
+        620,
+        84
+      ],
+      "finalBbox": [
+        210,
+        378,
+        620,
+        84
+      ],
+      "finalFontSizePx": 22,
+      "minimumReadableFontSizePx": 20,
+      "reason": "Bounded 22 px list typography clears the PowerPoint vertical overflow without changing geometry or moving the next list row.",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceTextSha256": "1a9425bd2923d0cbda429270510c8291d04d25ba99345c6db81996faf98533a0",
+      "translatedTextSha256": "cb7dc441ea9fc284a34a4e95b1ae97230691248fa4fac52ca304882b5ed5cd28",
+      "newlyIntersectedNeighborCount": 0
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 8,
+      "shapeId": "7",
+      "name": "STEP_BODY_1",
+      "translatedText": "Жобаны, жүйенің техникалық паспортын, монтаждау сұлбасын, наряд-рұқсатты және шектеулерді.",
+      "sourceBbox": [
+        34,
+        422,
+        260,
+        110
+      ],
+      "finalBbox": [
+        34,
+        422,
+        260,
+        128
+      ],
+      "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceTextSha256": "070a3246cffa93674b4100bc5bab58662115a52e0b607e235f5f37716a3be202",
+      "translatedTextSha256": "542f80c8390ba464b8f3de6e666d9c9d42aece9f6e801e526b4c80f4a06b5bdb",
+      "newlyIntersectedNeighborCount": 0
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 10,
+      "shapeId": "4",
+      "name": "SECTION_TITLE",
+      "translatedText": "Құрылыс мінбесі: жүйе, орнықтылық",
+      "sourceBbox": [
+        72,
+        334,
+        1080,
+        152
+      ],
+      "finalBbox": [
+        72,
+        334,
+        1128,
+        152
+      ],
+      "reason": "Width-only correction keeps the independently accepted wording on one line at the unchanged 58 pt source typography. Left, top and height stay fixed; the title ends at x=1200 on a 1280 px slide and does not intersect neighboring content.",
+      "rejectedPass5Gate": {
+        "gateSha256": "41d38da02f6fcdfceb22a325f141b9d4860baa120bb0b9248f162aa70f288197",
+        "gateFileSha256": "55438c6e37dad34aa0f4b36388409c9869f0c6241baf0281043868a2c4c1f900",
+        "emptyApprovedFileSha256": "c9f0f78b9b2967157118e1e13c6d4443420eeb5de49ba081b5c408a79af3c288",
+        "rejectedCandidateApplied": false
+      },
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceTextSha256": "86951cb7ec4b48941d196e4799cce5dc094a9cdbbbf5130d3bae6ba5851d5ea9",
+      "translatedTextSha256": "3c1b1651699b7ad8c83dc200cb5a1a98c808e5522c4062369772f76d4e08555c",
+      "newlyIntersectedNeighborCount": 0
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 38,
+      "shapeId": "7",
+      "name": "STEP_BODY_1",
+      "translatedText": "Адамдарды, материалдарды, қоқыстарды және бөгде құрылғыларды алып тастаңыз.",
+      "sourceBbox": [
+        34,
+        422,
+        260,
+        110
+      ],
+      "finalBbox": [
+        34,
+        422,
+        260,
+        128
+      ],
+      "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceTextSha256": "4f323fe717993c08b40ec78f733630fb0226ffb99bfd7e61d033f5b5bc1e823e",
+      "translatedTextSha256": "03ddc553949c8cecbe0f5def2ca19564f2247fc75ed23710166be1f2717b3476",
+      "newlyIntersectedNeighborCount": 0
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 38,
+      "shapeId": "15",
+      "name": "STEP_BODY_3",
+      "translatedText": "Рұқсат етілген кезеңге дейін қосылымдар мен анкерлерді сақтай отырып, жоғарыдан төменге қарай алып тастаңыз.",
+      "sourceBbox": [
+        634,
+        422,
+        260,
+        110
+      ],
+      "finalBbox": [
+        634,
+        422,
+        260,
+        128
+      ],
+      "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceTextSha256": "57c584d548698fea361753e445e80665df973829e56d6191f9a9ddc0610fa6da",
+      "translatedTextSha256": "3a5cfa1ec6e74e2c4dff06cddacbd9a2064807c0fa7b9ddc01b02c4bfd506853",
+      "newlyIntersectedNeighborCount": 0
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 42,
+      "shapeId": "4",
+      "translatedText": "Жоба, жүйенің техникалық паспорты, тағайындалған рөлдер және қауіпсіз аймақ бар.",
+      "sourceBbox": [
+        152,
+        214,
+        1000,
+        54
+      ],
+      "finalBbox": [
+        152,
+        214,
+        1000,
+        66
+      ],
+      "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceTextSha256": "24670a774d9f339942a62f854bb1f98804ee8fe4d13b7c37b18e878b10b9d44a",
+      "translatedTextSha256": "709be53417aa3362bb344f03266d6c06c4747f6ae0aeff14ad485ec05ba739e8",
+      "newlyIntersectedNeighborCount": 0
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 42,
+      "shapeId": "7",
+      "translatedText": "Негіз, негіздер, геометрия, қосылыстар және бекітулер диаграммаға сәйкес келеді.",
+      "sourceBbox": [
+        152,
+        286,
+        1000,
+        54
+      ],
+      "finalBbox": [
+        152,
+        286,
+        1000,
+        66
+      ],
+      "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceTextSha256": "7094e5e533460f583d2871dcde86b101c0fe0e82e5312dcb20149ec9bdc22dd1",
+      "translatedTextSha256": "acb9c581aac6ddbbbf90f1ffee33a60c75d9e448441bf061c686dbe5de1058a4",
+      "newlyIntersectedNeighborCount": 0
+    }
+  ]
+}

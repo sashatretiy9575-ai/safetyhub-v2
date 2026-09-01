@@ -1,4 +1,6 @@
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
+import { LOCALE_PREFIXES, localizePathname } from './i18n/config';
 import { STATIC_CONTENT_SECURITY_POLICY } from './lib/security/content-security-policy';
 import { assertDeploymentSiteUrl } from './lib/site-url';
 
@@ -37,6 +39,17 @@ const profilePermissions = {
   value: 'camera=(self), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
 };
 
+const legacyTopicRedirects = [
+  { source: '/topics/fire-safety', destination: '/topics/pozharnaya-bezopasnost' },
+  { source: '/topics/occupational-health', destination: '/topics/biot' },
+  { source: '/topics/industrial-safety', destination: '/topics' },
+] as const;
+
+const localizedPrivateSource = (pathname: string) =>
+  `/:locale(${LOCALE_PREFIXES.join('|')})${pathname}`;
+
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['127.0.0.1'],
   reactStrictMode: true,
@@ -51,24 +64,21 @@ const nextConfig: NextConfig = {
       './node_modules/@img/sharp-linux-x64/**/*',
       './node_modules/@img/sharp-libvips-linux-x64/**/*',
     ],
+    '/certificate-assets/font': [
+      './lib/pdf/assets/noto-sans-latin-cyrillic.ttf',
+      './lib/pdf/assets/NotoSansCJKsc-Regular-Sans2.004.otf',
+    ],
   },
   async redirects() {
     return [
-      {
-        source: '/topics/fire-safety',
-        destination: '/topics/pozharnaya-bezopasnost',
-        permanent: true,
-      },
-      {
-        source: '/topics/occupational-health',
-        destination: '/topics/biot',
-        permanent: true,
-      },
-      {
-        source: '/topics/industrial-safety',
-        destination: '/topics',
-        permanent: true,
-      },
+      ...legacyTopicRedirects.map((redirect) => ({ ...redirect, permanent: true })),
+      ...LOCALE_PREFIXES.flatMap((locale) =>
+        legacyTopicRedirects.map((redirect) => ({
+          source: localizePathname(redirect.source, locale),
+          destination: localizePathname(redirect.destination, locale),
+          permanent: true,
+        })),
+      ),
     ];
   },
   async headers() {
@@ -81,6 +91,14 @@ const nextConfig: NextConfig = {
         headers: [...securityHeaders, restrictedPermissions],
       },
       {
+        source: localizedPrivateSource('/onboarding/:path*'),
+        headers: [...securityHeaders, profilePermissions],
+      },
+      {
+        source: localizedPrivateSource('/profile/:path*'),
+        headers: [...securityHeaders, profilePermissions],
+      },
+      {
         source: '/api/:path*',
         headers: privateNoStoreHeaders,
       },
@@ -89,7 +107,15 @@ const nextConfig: NextConfig = {
         headers: privateNoStoreHeaders,
       },
       {
+        source: localizedPrivateSource('/callback'),
+        headers: privateNoStoreHeaders,
+      },
+      {
         source: '/auth/:path*',
+        headers: privateNoStoreHeaders,
+      },
+      {
+        source: localizedPrivateSource('/auth/:path*'),
         headers: privateNoStoreHeaders,
       },
       {
@@ -97,7 +123,15 @@ const nextConfig: NextConfig = {
         headers: privateNoStoreHeaders,
       },
       {
+        source: localizedPrivateSource('/onboarding/:path*'),
+        headers: privateNoStoreHeaders,
+      },
+      {
         source: '/profile/:path*',
+        headers: privateNoStoreHeaders,
+      },
+      {
+        source: localizedPrivateSource('/profile/:path*'),
         headers: privateNoStoreHeaders,
       },
       {
@@ -109,10 +143,18 @@ const nextConfig: NextConfig = {
         headers: privateNoStoreHeaders,
       },
       {
+        source: localizedPrivateSource('/topics/:slug/test/:path*'),
+        headers: privateNoStoreHeaders,
+      },
+      {
         // Verification URLs contain an unguessable bearer token and render
         // participant data plus live revocation state. Never retain that HTML
         // in browser caches or at the CDN, and never forward the token.
         source: '/verify/:path*',
+        headers: privateNoStoreHeaders,
+      },
+      {
+        source: localizedPrivateSource('/verify/:path*'),
         headers: privateNoStoreHeaders,
       },
       {
@@ -135,4 +177,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

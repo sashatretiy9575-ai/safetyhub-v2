@@ -1,6 +1,7 @@
 'use client';
 
 import { AsYouType, type CountryCode } from 'libphonenumber-js/min';
+import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import {
   phoneCallingCode,
@@ -27,13 +28,14 @@ export function PhoneInput({
   disabled?: boolean;
   countryOptions: readonly PhoneCountryOption[];
 }) {
+  const t = useTranslations('Profile');
   const formatNationalNumber = (country: CountryCode, next: string) =>
     new AsYouType(country).input(next.replace(/[^\d+]/gu, ''));
 
   return (
     <div className="grid gap-2 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
       <label className="sr-only" htmlFor={`${id}-country`}>
-        Страна номера
+        {t('phoneCountry')}
       </label>
       <select
         id={`${id}-country`}
@@ -69,7 +71,7 @@ export function PhoneInput({
         invalid={invalid}
         aria-describedby={describedBy}
         disabled={disabled}
-        placeholder={`Номер после ${phoneCallingCode(value.countryIso2)}`}
+        placeholder={t('phonePlaceholder', { code: phoneCallingCode(value.countryIso2) })}
         required
       />
     </div>

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slug": "biot",
+  "locale": "en",
+  "productionPublished": false,
+  "contentSummary": "BIOT: Basic occupational safety and health requirements: hazards, risk assessment, training, approval, protective equipment and emergency procedures.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/biot/presentation.pptx",
+    "pptxSha256": "625d6bdc8fe58f207e5a670380f7106c3ae5917ca1e8a60eac2bbed60390c6f3",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/biot/en/text-map.json",
+    "textMapSha256": "27e8be2009aa9ecd08136c1c4ee80b7c53c18fc8592f4c94dd64a53d439d2231"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/biot/en/assets/pptx/64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3/presentation.pptx",
+    "sha256": "64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3",
+    "byteSize": 2365275,
+    "slideCount": 59
+  },
+  "edits": {
+    "translatedElementCount": 373,
+    "translatedTableCellCount": 15,
+    "retainedElementCount": 120,
+    "sourceNotesAdded": 59,
+    "textTopologySha256": "33bbe9ebb05f3bf271a10c640e09774839ead74783285fc32dcce925e0dcc8cb",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 59,
+    "layoutInspectionCount": 59,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 59
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 854,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

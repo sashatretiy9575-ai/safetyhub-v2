@@ -1,0 +1,716 @@
+{
+  "version": 1,
+  "courseId": "697acb0f-4761-4eef-bdd3-191939cf0afb",
+  "locale": "en",
+  "expectedVersion": 1,
+  "questionVariants": [
+    {
+      "id": "0ed3fd0d-07bb-53ee-8c0b-dda4bd89ba1e",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "7d6d72f1-1f4d-5a6c-be94-d6478feeb5d0",
+          "text": "The scaffold user removed the diagonal tie to carry material. How to proceed?",
+          "options": [
+            {
+              "id": "b2a38aee-d39c-54d9-ba98-d36287ef7c82",
+              "text": "Immediately cease use of the site and restore the structure by authorized project personnel."
+            },
+            {
+              "id": "fb43b758-cfa3-54a8-beda-832bd5f697c5",
+              "text": "Leave the connection disconnected until the end of the shift."
+            },
+            {
+              "id": "84365384-7574-5305-be87-5f52ccc118a1",
+              "text": "Replace the connection with a rope."
+            },
+            {
+              "id": "cc2f5921-89d1-5112-b37b-169f94ccda05",
+              "text": "Allow operation if there is only one person on the deck."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "6769c0ca-1f86-5959-910f-e160a39fefb4",
+          "text": "A scaffolding base plate has been set on loose ground without a sole board. What is required?",
+          "options": [
+            {
+              "id": "1f96b1f0-e729-5e0b-a7dc-fa4421bac739",
+              "text": "Place a random brick under one side of the slab."
+            },
+            {
+              "id": "59833fc2-168e-5ea3-a833-73b5279dacdb",
+              "text": "Increase the load on the stand to compact the soil."
+            },
+            {
+              "id": "1a29a980-87fa-5192-bb7f-8e642f7b37fa",
+              "text": "Compact the soil with your foot around the post."
+            },
+            {
+              "id": "f6fdebc8-0ac1-50d5-93bc-31dcfff2fe47",
+              "text": "Stop installation and prepare a stable foundation according to the design and system passport."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "125ee8c2-aef7-5702-a648-7bb0b2933bc9",
+          "text": "After strong winds there is no visible damage from the ground. Is it possible to resume work immediately?",
+          "options": [
+            {
+              "id": "2a89d0af-4b8a-502b-877c-cadbd559834e",
+              "text": "Yes, if you reduce the amount of materials on the flooring."
+            },
+            {
+              "id": "5cda491d-e173-59ca-830d-f4743255aae9",
+              "text": "Yes, if working platform is dry."
+            },
+            {
+              "id": "cb51c0bb-c96f-5ef0-bd02-319969219a72",
+              "text": "No; the scaffolding must undergo an extraordinary inspection by a competent person before it is authorized for use."
+            },
+            {
+              "id": "03e6539b-0d79-5bf1-88f7-8df08f169440",
+              "text": "Yes, if workers use hard hats."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "63665f9e-9350-57c8-8608-47145e4c7205",
+          "text": "At working platform materials are stored in excess of the specified permissible load. What to do?",
+          "options": [
+            {
+              "id": "861a440c-60ad-5017-b768-4fb4abdeff47",
+              "text": "Distribute the load at one edge of the deck."
+            },
+            {
+              "id": "db1297af-0b4e-5140-8504-828c70032638",
+              "text": "Stop loading immediately and adjust the load to the design and scaffolding status."
+            },
+            {
+              "id": "77324bd6-f300-5dc9-9b81-3054fa118d76",
+              "text": "Remove some of the ties to expand the space."
+            },
+            {
+              "id": "feb744da-75ef-5e26-a0ef-741949d0bcbc",
+              "text": "Allow overload for a short time."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "088d7595-6f55-579b-adfa-695b5e0f73f0",
+          "text": "Why is scaffolding attached to a structure?",
+          "options": [
+            {
+              "id": "226944f1-0e15-5225-bda3-9b76c98763ee",
+              "text": "To replace all diagonal braces."
+            },
+            {
+              "id": "cce74001-f22f-5a68-bb8d-d9bcd0125dcb",
+              "text": "To increase the width of the deck without calculation."
+            },
+            {
+              "id": "7e3b8568-f6b9-5657-ad1f-62697c4cdfdb",
+              "text": "For tier height indication only."
+            },
+            {
+              "id": "b42c12c1-1cab-5793-97f5-aca894172bf4",
+              "text": "To ensure the calculated spatial stability according to the design and installation diagram."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "0e6cf77a-3615-5ba9-ae0e-6bdee837ebfc",
+          "text": "What should the worker working platform be like?",
+          "options": [
+            {
+              "id": "b450e982-07b2-55dc-a0ff-10ea8400a86c",
+              "text": "Continuous within specified limits, stable, secured and without dangerous gaps or damage."
+            },
+            {
+              "id": "754cd847-3821-5af8-9f2a-6094cb1084d8",
+              "text": "Inclined to the outer edge for water drainage."
+            },
+            {
+              "id": "918b5257-b1c8-501c-86e0-8b255d4b6a27",
+              "text": "Loosely stowed for quick removal."
+            },
+            {
+              "id": "f2a66ca0-9e68-56ef-8a6f-cd3a27865c77",
+              "text": "Compiled from any scraps of different thicknesses."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "102f95b2-ba00-5633-ab4c-a61ecb8e9b4f",
+          "text": "Which fall protection measure has priority when installing scaffolding?",
+          "options": [
+            {
+              "id": "c2f82404-2cc7-592d-aefc-3567866e6833",
+              "text": "Installer's personal discretion only."
+            },
+            {
+              "id": "153ab31f-64ab-5fd0-a5f0-a497c30b6762",
+              "text": "Only a hard hat, with no guardrails or fall-arrest system."
+            },
+            {
+              "id": "ebe1ded0-9d23-5ad5-928e-5ad8ec3e1989",
+              "text": "Provided collective protection technology, complemented by a fall arrest system where required."
+            },
+            {
+              "id": "48976c8f-9a45-5bb8-9391-26b0e39eeffa",
+              "text": "Verbal height warning."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "5830f751-52f8-5dc5-a840-bceb70397b48",
+          "text": "What is the correct sequence for admitting scaffolding to operation?",
+          "options": [
+            {
+              "id": "f6c1cd59-53ed-5518-a865-d54dfdcc29ed",
+              "text": "Check only the bottom tier and open all levels."
+            },
+            {
+              "id": "3a2c6419-0bd4-51cd-b30b-3e215e7f23c9",
+              "text": "Install markings without inspecting the structure."
+            },
+            {
+              "id": "12f99518-f581-56c3-beeb-d9bbd6e203fe",
+              "text": "Allow operation, then check scaffolding at end of shift."
+            },
+            {
+              "id": "c692f7b0-5b06-5f2a-ae85-d6884920a2c4",
+              "text": "Complete installation according to the diagram, have it checked by a competent person, record the result and indicate the status."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "e3376089-fa59-5718-b389-8060e6a2e615",
+          "text": "What is a safe sequence for scaffold removal?",
+          "options": [
+            {
+              "id": "4bc987f8-5d1f-5202-bc47-fa2f717af096",
+              "text": "Disassemble unrelated areas at the same time without guidance."
+            },
+            {
+              "id": "c63ab398-96b4-5b61-a53f-d029eaf11be2",
+              "text": "According to the approved scheme in the reverse technological sequence while maintaining stability and fencing the area."
+            },
+            {
+              "id": "e30deb60-bb97-578e-a707-1b312903349b",
+              "text": "First remove all anchors, then dismantle the decking."
+            },
+            {
+              "id": "c41abc59-33f1-5167-ac20-cb32ceea4d31",
+              "text": "Throw elements down into a fenced area."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "2b1de486-d32a-5e2b-846d-463d53d4c922",
+          "text": "Who is a competent person when working with scaffolding?",
+          "options": [
+            {
+              "id": "79039d02-270e-5f8c-9b04-350c03b4f403",
+              "text": "Any user who reached working platform first."
+            },
+            {
+              "id": "3931d09f-3412-546c-872d-75dc58d26eea",
+              "text": "worker, which only transfers materials."
+            },
+            {
+              "id": "c670127b-013f-588f-abfa-31c18b24fb4d",
+              "text": "Assigned worker with the necessary knowledge and authority for the assigned reviews and decisions."
+            },
+            {
+              "id": "a51e2917-0fc9-501a-8811-5d65cd71707a",
+              "text": "Any visitor to a construction site."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "8cb0b85c-fab5-5e92-b733-6b0a969f201c",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "5692c857-f86e-5af4-a9f3-10bc7aa390ed",
+          "text": "A worker without the required authorization proposes changing the working-platform height. What should be done?",
+          "options": [
+            {
+              "id": "e3bf3016-7928-5642-ae21-b8085f4dc1be",
+              "text": "Allow if no tools are used."
+            },
+            {
+              "id": "97728e58-c94a-57b4-803f-cec8b36d05a3",
+              "text": "Remove the guard to speed up the transfer."
+            },
+            {
+              "id": "223449d7-d4b4-5bf4-a3f8-5ac42668e7c3",
+              "text": "Do not allow changes; Installation and relocation is carried out by designated trained personnel."
+            },
+            {
+              "id": "a52cc2f9-1919-5390-b965-498acbe8cefe",
+              "text": "Allow modification under verbal supervision of a colleague."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "b47dee41-0c82-5cc4-a039-350b4e6e0534",
+          "text": "After rain, the ground beneath the scaffolding base has subsided. What should be done?",
+          "options": [
+            {
+              "id": "bb9dc14b-a142-5620-b79e-521b7e55b167",
+              "text": "Continue working until the end of the shift."
+            },
+            {
+              "id": "d162894e-0fbe-5857-a43c-9678f14688f5",
+              "text": "Close access, unload the area using a safe procedure and carry out inspection and restoration of the base."
+            },
+            {
+              "id": "361169d2-ff9f-55a6-b299-5b7403b6005a",
+              "text": "Knock out wedges while people are on the deck."
+            },
+            {
+              "id": "79a96c3d-56c1-5d2f-88d3-4b1ef9e1ee16",
+              "text": "Add materials to the opposite side."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "d78550a6-f3bc-5ed4-a205-c0045e20c637",
+          "text": "Ice has formed on the decking. How to proceed?",
+          "options": [
+            {
+              "id": "3c3df9c7-38ad-514b-a997-518dc47d91ee",
+              "text": "Sprinkle sawdust on the ice as you continue working."
+            },
+            {
+              "id": "ba7f9851-6efe-5a3c-94f2-0011ae1d4120",
+              "text": "Move faster so as not to be delayed."
+            },
+            {
+              "id": "89fe62b1-96d7-5ff7-9e0c-57c662f5351c",
+              "text": "Remove the handrail for easy cleaning."
+            },
+            {
+              "id": "3bc6520e-d425-5cb5-8b42-744bc4852ccc",
+              "text": "Stop use of the area until the slip is safely corrected and conditions are reassessed."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "276bdb24-899e-59a9-a079-915e8a10ac45",
+          "text": "A loose board was found in the decking. What should I do?",
+          "options": [
+            {
+              "id": "69ba8e8c-97b6-54d8-ae0d-4dd4a2354e71",
+              "text": "Cover area and secure or replace working platform by authorized personnel prior to use."
+            },
+            {
+              "id": "63a52059-277f-549a-a2fa-c54e5e53ebc4",
+              "text": "Press the board with materials."
+            },
+            {
+              "id": "d16ba25c-c20f-5080-8ebd-daf1bf9a419f",
+              "text": "Warn workers to step over the dangerous area."
+            },
+            {
+              "id": "a26078f2-afd5-58bb-9c4b-cd0d6e416560",
+              "text": "Turn the board over and continue working."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "037aec4a-3506-52d6-8828-f206bdd1126b",
+          "text": "Is it possible to determine the pitch of anchors using one universal number?",
+          "options": [
+            {
+              "id": "0d718307-9bf4-5d45-adff-a1d3cc0e4439",
+              "text": "Yes, if the scaffolding is lower than the adjacent building."
+            },
+            {
+              "id": "08e43fa8-4283-54e7-9279-4226642e7693",
+              "text": "No; parameters are taken according to the project, the manufacturer’s passport and the diagram of a specific system."
+            },
+            {
+              "id": "4f8d5e48-fe99-595c-875d-3f58c133b1cf",
+              "text": "Yes, one number is suitable for all scaffolds."
+            },
+            {
+              "id": "88e01f70-2df5-5bdd-9345-f90b6d0e9793",
+              "text": "Yes, if the facade is made of concrete."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "80b90315-86eb-5bec-a434-decfe2472630",
+          "text": "How is safe access to the scaffolding tiers arranged?",
+          "options": [
+            {
+              "id": "36ba0b91-3604-53d8-85c3-1948ab40c06a",
+              "text": "On the outside of frames without special means."
+            },
+            {
+              "id": "a6b89ee5-d17c-5b43-b063-20038708fc63",
+              "text": "By diagonal connections."
+            },
+            {
+              "id": "c5ca6347-4f20-5fa8-8458-bd85b94a59cb",
+              "text": "By lifting on a loading platform not intended for people."
+            },
+            {
+              "id": "35972f2b-340f-5f09-88ea-27f001e4d79a",
+              "text": "Along the provided stairs or flight of stairs with proper fastening and a protected opening."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "1ad23bc6-8cd8-5542-b6cd-321a6b48f47e",
+          "text": "A fall-arrest anchor point has been selected on an arbitrary scaffolding member. What should be done?",
+          "options": [
+            {
+              "id": "5a018eef-1ea9-5bb0-bd65-c0a5ce0f950d",
+              "text": "Connect the harness to your colleague’s belt."
+            },
+            {
+              "id": "c214b37c-fd62-5be7-a454-a930aed00419",
+              "text": "Ignore possible free fall."
+            },
+            {
+              "id": "73e0e34f-a84a-5587-9fce-730b2c157d2e",
+              "text": "Use only the planned and calculated attachment point, taking into account the headroom."
+            },
+            {
+              "id": "66aa8c10-46cd-5746-964a-4a3ce2f48e2f",
+              "text": "Secure to the nearest handrail without checking."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "40af5b4c-0367-5887-acc8-a4345d2945b1",
+          "text": "What does the inspection after an alteration to the scaffolding include?",
+          "options": [
+            {
+              "id": "95e170ff-1018-5cbc-97c9-1ec860a4d5bd",
+              "text": "Check the top handrail only."
+            },
+            {
+              "id": "46eb5597-d542-5ecc-863f-d807e1adaab3",
+              "text": "Inspection of the base, elements, connections, fastenings, decking, fences and access with status recording."
+            },
+            {
+              "id": "0273376d-ad87-54f4-9e71-74878c15f9ef",
+              "text": "Checking the color of the marking only."
+            },
+            {
+              "id": "134c0c5f-1d18-5947-a4ff-b4f6cbde0720",
+              "text": "Checking only the number of employees."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "a5d5a75a-0515-59db-86eb-8c53cebe713a",
+          "text": "The scaffolding is marked “do not use”. What to do?",
+          "options": [
+            {
+              "id": "27a8292d-2ccc-59fb-baa5-951787848670",
+              "text": "Do not enter the scaffolding and wait for the reasons to be eliminated and a new permit by a competent person."
+            },
+            {
+              "id": "68fa6851-7873-550c-b2a7-3f7e22d91fe2",
+              "text": "Use only the lower tier."
+            },
+            {
+              "id": "be6d595e-9eb8-55d1-9f16-e50b64720e27",
+              "text": "Remove marking after verbal permission from colleague."
+            },
+            {
+              "id": "5c0bd61c-8592-541d-b04d-71d603f410fb",
+              "text": "Work without materials, maintaining markings."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "b7ac1bbd-f68a-5f06-a682-78b5f2d113d7",
+          "text": "What is the side fencing element needed for?",
+          "options": [
+            {
+              "id": "5be2d4f8-0e8b-5eab-ba3e-e04454c9b008",
+              "text": "To increase the permissible load of scaffolding."
+            },
+            {
+              "id": "13ff7656-cd4d-5076-9135-175a9d6b48e1",
+              "text": "To replace the middle handrail in all cases."
+            },
+            {
+              "id": "4f499786-d72c-59f8-8dd4-9879f4fc8fe3",
+              "text": "For securing electrical cables."
+            },
+            {
+              "id": "cdfe1ece-13e5-5824-8d78-0156421ef934",
+              "text": "To reduce the risk of objects and worker feet slipping over the edge of the deck."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "ba490446-8f39-5277-ab62-d2124035492c",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "278ccf96-38a9-5f5e-bb81-8841dbe3e1dd",
+          "text": "After the scaffolding was put into operation, the user noticed a missing element. Which action is correct?",
+          "options": [
+            {
+              "id": "eae7ccae-e37b-56f8-a5e2-99dc742d3f2c",
+              "text": "Move to the next span without reporting the defect."
+            },
+            {
+              "id": "4a9dfb8d-bc92-5a4e-ab29-f539d39e3192",
+              "text": "Stop use, secure the area and report to a competent person for inspection."
+            },
+            {
+              "id": "4b024e9d-7331-5571-beee-9a65b6c1f5f6",
+              "text": "Replace the element yourself with any suitable profile."
+            },
+            {
+              "id": "62042341-4ad5-51d9-ab48-18837fe6ea37",
+              "text": "Continue work without posting materials."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "7885e909-7fe7-5287-a6d1-6fc6e14347bf",
+          "text": "Stand mounted on a set of loose scraps. Which decision is correct?",
+          "options": [
+            {
+              "id": "f3739f24-20be-51ba-8030-4bdfcd453d5d",
+              "text": "Secure the scraps with wire and leave."
+            },
+            {
+              "id": "b7eeeec5-2d0f-5578-b5f4-73322a3dedb2",
+              "text": "Add sand on one side only."
+            },
+            {
+              "id": "72742e8b-2b1a-5633-a098-6e74b5eb655b",
+              "text": "Rebuild the support using the provided base elements on the prepared base."
+            },
+            {
+              "id": "4e920141-f958-56ce-bfa7-6fd31172eb12",
+              "text": "Consider the support acceptable in the absence of wind."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "a6868dc3-cd8a-5a49-b60c-d0148c73d692",
+          "text": "During work, visibility deteriorated and the wind increased. What should a leader do?",
+          "options": [
+            {
+              "id": "cbac7473-0343-5941-85f0-a40d7b2c585a",
+              "text": "Assess conditions and stop work if safe operation and stability are not ensured."
+            },
+            {
+              "id": "23b3d84c-ff04-5ca2-8596-309c278c713f",
+              "text": "Remove signal barriers to prevent them from being torn down."
+            },
+            {
+              "id": "1506c3b7-f181-5063-bec9-c0dbafcb9acc",
+              "text": "Allow work without moving materials."
+            },
+            {
+              "id": "41ae0574-866e-5eb3-b99b-238955e8c927",
+              "text": "Continue working on the upper tier only."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "57be894a-ea0f-5209-94dc-9c54523c4fce",
+          "text": "There is no side element on the tier, and people are working below. Which action is correct?",
+          "options": [
+            {
+              "id": "86c20103-061a-5c2a-822e-d924776e393f",
+              "text": "Move materials closer to the edge to clear the passage."
+            },
+            {
+              "id": "40c3dd22-d271-5044-b005-560e84df97a0",
+              "text": "Continue if the tool is in your pockets."
+            },
+            {
+              "id": "cd147d86-0666-52f0-b247-f44f9088c127",
+              "text": "Give a verbal warning without fencing the area."
+            },
+            {
+              "id": "2613b877-b504-519c-a0e4-b096271a9763",
+              "text": "Stop work, eliminate people below and restore protection against falling objects."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "53ac272c-f246-5208-8198-9dfa6af90216",
+          "text": "What should you do with a loose clamp or connection?",
+          "options": [
+            {
+              "id": "b67b973b-d47a-532e-89fc-66a6d394af23",
+              "text": "Pull it up while people are on the deck."
+            },
+            {
+              "id": "ed0cc646-2b91-53bf-a073-e4633c656de0",
+              "text": "Replace the clamp with wire."
+            },
+            {
+              "id": "e18d9924-f2ff-52fc-a17c-84b98d50b46f",
+              "text": "Stop use of the affected area and restore connection through the system, followed by testing."
+            },
+            {
+              "id": "5c241580-1d25-5908-9f10-3161cf1b5aeb",
+              "text": "Leave until scheduled dismantling."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "a8580d1d-b97b-5ab4-8e8a-10f209c2a08e",
+          "text": "What must be taken into account when constructing a deck fencing?",
+          "options": [
+            {
+              "id": "e1aa8a8c-99a0-5f9f-9e73-0a479f1c03cf",
+              "text": "Continuity of handrails, intermediate protection and side elements according to the design and scaffolding system."
+            },
+            {
+              "id": "a6cceb3a-9be1-5a33-9f71-e89180e439b2",
+              "text": "Only having one rope on the outside."
+            },
+            {
+              "id": "9625466b-a240-563a-93d9-7f0af4c17db3",
+              "text": "Only the height of the nearest wall."
+            },
+            {
+              "id": "80e52545-3d7d-5b3f-aceb-38d8eb15ca0c",
+              "text": "Top rail color only."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "5bdc6210-5957-59dd-89df-fc0c5b4dc433",
+          "text": "Scaffolding is located next to the electrical installation. How to proceed?",
+          "options": [
+            {
+              "id": "0f4a651f-96f2-5f12-84b0-2108675cc668",
+              "text": "Move long elements over wires manually."
+            },
+            {
+              "id": "77c1063e-7d0d-544c-9094-9d9fcf6ab68e",
+              "text": "Observe the established safe distances and protective measures according to the plan, excluding the approach of elements and people."
+            },
+            {
+              "id": "51c582b6-3756-58a6-8dcf-aaa32064f23a",
+              "text": "Consider metal scaffolding as protective ground without testing."
+            },
+            {
+              "id": "23093c95-d691-5861-ae3a-d721792954f2",
+              "text": "Continue working with the lighting turned off."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "3da37fc5-bb04-57c5-8ca8-a7cb0fc3fd67",
+          "text": "When is an extraordinary inspection required?",
+          "options": [
+            {
+              "id": "77962d55-ba31-5785-83f5-823f25e80598",
+              "text": "Only after complete dismantling."
+            },
+            {
+              "id": "8dfdefbe-dbcb-535f-8527-c4a65bdfa228",
+              "text": "Only before holidays."
+            },
+            {
+              "id": "c4a3b9fe-0cd8-586b-8603-a362ac22287e",
+              "text": "Following change, damage, subsidence, adverse weather or other event likely to affect safety."
+            },
+            {
+              "id": "d41bec89-6674-5aca-995b-1a1dcf1c5b24",
+              "text": "Only when changing the color of the facade."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "45427f1d-f108-5aa0-88e2-f23a404cb6be",
+          "text": "During dismantling, a deformed element was found. What should I do?",
+          "options": [
+            {
+              "id": "f0ea4f18-3bbb-51a6-a522-9d9247e707a7",
+              "text": "Hide the element in the general pack."
+            },
+            {
+              "id": "ae367e9f-72df-5213-810b-0a0ecf40d6e5",
+              "text": "Use it as a temporary support pad."
+            },
+            {
+              "id": "875a4d99-124f-5b7e-a674-82ca8a554229",
+              "text": "Straighten with a blow and immediately install in another area."
+            },
+            {
+              "id": "94c2c398-66e0-569c-a227-c05ed69b1223",
+              "text": "Separate it from serviceable elements, label it and send it for designated rejection or evaluation."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "0b63f5e5-62ed-5a5a-b439-cbcf4a93d2c4",
+          "text": "What does scaffold anchoring mean?",
+          "options": [
+            {
+              "id": "a2e7a74f-b504-5cab-b646-ad5490dd683e",
+              "text": "The connection of the scaffolding with the structure provided for in the project, ensuring their stability."
+            },
+            {
+              "id": "f4f3e019-a8c9-54dd-affe-502d48a7146c",
+              "text": "Permissible load marking on the decking."
+            },
+            {
+              "id": "d1e46088-3658-579c-928b-534e5b29d638",
+              "text": "Any rope between two posts."
+            },
+            {
+              "id": "81113a66-6c91-50b7-bf5a-8b56b98f034b",
+              "text": "Underlay for base plate."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    }
+  ]
+}

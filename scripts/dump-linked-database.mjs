@@ -2,6 +2,11 @@ import { spawnSync } from 'node:child_process';
 import { mkdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import {
+  clearLinkedPostgresConnection,
+  linkedPostgresEnvironment,
+  parseLinkedPostgresConnection,
+} from './database-backup-security.mjs';
 
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 2) {
@@ -19,45 +24,6 @@ const resolvedPgDump = path.resolve(pgDumpPath);
 const resolvedOutput = path.resolve(outputDirectory);
 const schemaPath = path.join(resolvedOutput, 'schema.sql');
 const dataPath = path.join(resolvedOutput, 'data.sql');
-
-function decodeShellValue(rawValue) {
-  const value = rawValue.trim().replace(/[;]$/u, '');
-  if (
-    (value.startsWith("'") && value.endsWith("'")) ||
-    (value.startsWith('"') && value.endsWith('"'))
-  ) {
-    return value.slice(1, -1);
-  }
-  return value;
-}
-
-function readConnectionEnvironment(output) {
-  const connection = {};
-  for (const line of output.split(/\r?\n/u)) {
-    const match = line.match(
-      /^(?:export\s+|set\s+)?(PGHOST|PGPORT|PGUSER|PGPASSWORD|PGDATABASE)=(.+)$/iu,
-    );
-    if (match) connection[match[1].toUpperCase()] = decodeShellValue(match[2]);
-  }
-
-  if (connection.PGHOST && connection.PGUSER && connection.PGPASSWORD) {
-    connection.PGPORT ||= '5432';
-    connection.PGDATABASE ||= 'postgres';
-    return connection;
-  }
-
-  const uriMatch = output.match(
-    /postgres(?:ql)?:\/\/([^:\s/'";]+):([^@\s/'";]+)@([^:\s/'";]+):(\d+)\/([^?\s'";]+)/iu,
-  );
-  if (!uriMatch) return null;
-  return {
-    PGUSER: decodeURIComponent(uriMatch[1]),
-    PGPASSWORD: decodeURIComponent(uriMatch[2]),
-    PGHOST: uriMatch[3],
-    PGPORT: uriMatch[4],
-    PGDATABASE: decodeURIComponent(uriMatch[5]),
-  };
-}
 
 function classifyPgDumpFailure(stderr) {
   const version = stderr.match(/server version:\s*([0-9.]+).*pg_dump version:\s*([0-9.]+)/isu);
@@ -82,11 +48,7 @@ function runPgDump(connection, dumpArgs) {
     encoding: 'utf8',
     windowsHide: true,
     timeout: 15 * 60 * 1000,
-    env: {
-      ...process.env,
-      ...connection,
-      PGSSLMODE: 'require',
-    },
+    env: linkedPostgresEnvironment(connection),
   });
   if (result.error) throw new Error(`pg_dump could not start: ${result.error.message}`);
   if (result.status !== 0) {
@@ -110,14 +72,10 @@ if (dryRun.error || dryRun.status !== 0) {
   throw new Error('Supabase CLI could not create a temporary database login.');
 }
 
-const connection = readConnectionEnvironment(`${dryRun.stdout}\n${dryRun.stderr}`);
+const connection = parseLinkedPostgresConnection(`${dryRun.stdout}\n${dryRun.stderr}`, {
+  allowUri: true,
+});
 if (!connection) throw new Error('Temporary database login was not present in CLI output.');
-if (!/^[-.a-z0-9]+[.]supabase[.](?:com|co)$/iu.test(connection.PGHOST)) {
-  throw new Error('Refusing an unexpected database host.');
-}
-if (!/^cli_login_/u.test(connection.PGUSER)) {
-  throw new Error('Refusing a non-ephemeral database user.');
-}
 await mkdir(resolvedOutput, { recursive: false });
 
 const commonArgs = [
@@ -170,5 +128,5 @@ try {
     }),
   );
 } finally {
-  for (const name of Object.keys(connection)) connection[name] = '';
+  clearLinkedPostgresConnection(connection);
 }

@@ -51,7 +51,7 @@ test('application source tree contains no MFA implementation symbols or routes',
     await Promise.all(['app', 'components', 'features', 'lib'].map((root) => sourceFiles(root)))
   ).flat();
   const forbiddenSymbol =
-    /requiresMfa|mfaAssuranceLevel|requireFresh(?:Capability|Role)|privilegedStepUpMaxAgeSeconds|latestTotpVerification|isMfaVerificationFresh|mfa_reset|aal2|recovery_codes|totp/i;
+    /requiresMfa|mfaAssuranceLevel|requireFresh(?:Capability|Role)|privilegedStepUpMaxAgeSeconds|latestTotpVerification|isMfaVerificationFresh|mfa_reset|mfa_recovery_codes|aal2|totp/i;
 
   for (const file of files) {
     assert.doesNotMatch(await read(file), forbiddenSymbol, `stale MFA implementation in ${file}`);

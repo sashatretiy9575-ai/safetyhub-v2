@@ -27,7 +27,7 @@ file_size_limit = "50MiB"
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://localhost:3000/**"]
+additional_redirect_urls = ["http://localhost:3000/auth/login?email_locale=ru", "http://localhost:3000/kk/auth/login?email_locale=kk", "http://localhost:3000/en/auth/login?email_locale=en"]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
@@ -39,6 +39,11 @@ password_requirements = "lower_upper_letters_digits"
 # Keep Supabase below the Plesk mailbox ceiling of 50 messages/hour.
 email_sent = 30
 
+[auth.captcha]
+enabled = true
+provider = "turnstile"
+secret = "env(SUPABASE_AUTH_CAPTCHA_SECRET)"
+
 [auth.email]
 enable_signup = true
 double_confirm_changes = true
@@ -49,11 +54,11 @@ otp_length = 6
 otp_expiry = 3600
 
 [auth.email.template.magic_link]
-subject = "Код для входа в SafetyHub"
+subject = "SafetyHub"
 content_path = "./supabase/templates/magic-link.html"
 
 [auth.email.template.confirmation]
-subject = "Код для создания аккаунта SafetyHub"
+subject = "SafetyHub"
 content_path = "./supabase/templates/confirmation.html"
 
 [auth.email.template.recovery]
@@ -74,4 +79,9 @@ uri = "pg-functions://postgres/public/enforce_email_otp_access_token"
 # A scheduler has no user JWT. The function verifies its own high-entropy
 # STORAGE_RECONCILER_SECRET bearer before it creates a service-role client.
 [functions.storage-reconciler]
+verify_jwt = false
+
+# Database webhooks and the minute sweep authenticate with an independent,
+# high-entropy TELEGRAM_DISPATCHER_SECRET. User JWTs are never accepted here.
+[functions.telegram-dispatcher]
 verify_jwt = false

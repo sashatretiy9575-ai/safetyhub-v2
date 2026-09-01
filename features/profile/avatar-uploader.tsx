@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   ArrowCounterClockwise,
   Camera,
@@ -21,47 +22,26 @@ import {
   validateAvatarSource,
   type AvatarCrop,
 } from '@/lib/avatar-image';
-import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
+import { clientRequest, readClientResponseJson } from '@/lib/client-request';
+import { localizedClientRequestMessage } from '@/i18n/client-errors';
 
 type AvatarFeedback = Readonly<{
   kind: 'status' | 'error';
   message: string;
 }>;
 
-function avatarErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    if (error.message === 'AVATAR_SOURCE_TOO_LARGE') {
-      return 'Исходный файл слишком большой. Выберите фотографию до 8 МБ и 24 мегапикселей.';
-    }
-    if (error.message === 'AVATAR_IMAGE_REQUIRED') {
-      return 'Выберите фотографию в формате JPEG, PNG или WebP.';
-    }
-    if (error.message === 'AVATAR_IMAGE_INVALID') {
-      return 'Не удалось прочитать фотографию. Выберите другой файл.';
-    }
-    if (error.message === 'AVATAR_TOO_COMPLEX') {
-      return 'Не удалось уменьшить фотографию до 100 КБ. Выберите другое изображение.';
-    }
-    if (error.message === 'AVATAR_DIMENSIONS_INVALID') {
-      return 'Браузер создал неподдерживаемый файл. Обновите страницу и повторите.';
-    }
-    if (error.message === 'AVATAR_UPLOAD_IN_PROGRESS') {
-      return 'Предыдущее сохранение ещё завершается. Подождите несколько секунд и повторите.';
-    }
-  }
-  return clientRequestMessage(error, 'Не удалось сохранить фотографию.');
-}
-
 function CropPreview({
   file,
   crop,
+  previewLabel,
   onCropChange,
   onError,
 }: {
   file: File;
   crop: AvatarCrop;
+  previewLabel: string;
   onCropChange: (crop: AvatarCrop) => void;
-  onError: (message: string) => void;
+  onError: (error: unknown) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointersRef = useRef(new Map<number, { x: number; y: number }>());
@@ -76,7 +56,7 @@ function CropPreview({
         if (active) setImage(loaded);
       },
       (error) => {
-        if (active) onError(avatarErrorMessage(error));
+        if (active) onError(error);
       },
     );
     return () => {
@@ -145,7 +125,7 @@ function CropPreview({
       width={360}
       height={360}
       className="aspect-square h-auto w-full touch-none rounded-2xl bg-[var(--color-surface-muted)] object-cover"
-      aria-label="Предпросмотр кадрирования фотографии"
+      aria-label={previewLabel}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
@@ -196,6 +176,8 @@ export function AvatarUploader({
   compact?: boolean;
   onUploaded?: (signedUrl: string) => void;
 }) {
+  const t = useTranslations('Avatar');
+  const tErrors = useTranslations('Common.errors');
   const photoActionsId = useId();
   const cropTitleId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -215,6 +197,21 @@ export function AvatarUploader({
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<AvatarFeedback | null>(null);
   const [photoActionsOpen, setPhotoActionsOpen] = useState(!compact);
+
+  const avatarErrorMessage = useCallback(
+    (error: unknown) => {
+      if (error instanceof Error) {
+        if (error.message === 'AVATAR_SOURCE_TOO_LARGE') return t('errors.sourceTooLarge');
+        if (error.message === 'AVATAR_IMAGE_REQUIRED') return t('errors.imageRequired');
+        if (error.message === 'AVATAR_IMAGE_INVALID') return t('errors.imageInvalid');
+        if (error.message === 'AVATAR_TOO_COMPLEX') return t('errors.tooComplex');
+        if (error.message === 'AVATAR_DIMENSIONS_INVALID') return t('errors.dimensionsInvalid');
+        if (error.message === 'AVATAR_UPLOAD_IN_PROGRESS') return t('errors.uploadInProgress');
+      }
+      return localizedClientRequestMessage(error, t('errors.uploadFailed'), tErrors);
+    },
+    [t, tErrors],
+  );
 
   const stopCamera = useCallback(() => {
     cameraRequestRef.current += 1;
@@ -266,13 +263,13 @@ export function AvatarUploader({
       setCrop(DEFAULT_AVATAR_CROP);
       setFeedback({
         kind: 'status',
-        message: 'Фото выбрано. Настройте кадрирование и нажмите «Использовать фото».',
+        message: t('selected'),
       });
     } catch (error) {
       setCandidate(null);
       setFeedback({ kind: 'error', message: avatarErrorMessage(error) });
     }
-  }, []);
+  }, [avatarErrorMessage, t]);
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -297,7 +294,7 @@ export function AvatarUploader({
       setCameraOpen(false);
       setFeedback({
         kind: 'status',
-        message: 'Прямая камера недоступна. Используйте системную камеру устройства.',
+        message: t('cameraUnavailable'),
       });
       captureInputRef.current?.click();
       return;
@@ -332,8 +329,8 @@ export function AvatarUploader({
         (error.name === 'NotAllowedError' || error.name === 'SecurityError');
       setCameraError(
         denied
-          ? 'Доступ к камере запрещён. Разрешите камеру в настройках браузера или используйте системную камеру.'
-          : 'Не удалось открыть камеру. Используйте системную камеру или выберите готовую фотографию.',
+          ? t('cameraDenied')
+          : t('cameraFailed'),
       );
     } finally {
       if (mountedRef.current && requestId === cameraRequestRef.current) setCameraStarting(false);
@@ -355,7 +352,7 @@ export function AvatarUploader({
       setCameraOpen(false);
       chooseCandidate(file);
     } catch {
-      setCameraError('Камера ещё не готова. Подождите секунду и повторите снимок.');
+      setCameraError(t('cameraNotReady'));
     } finally {
       setBusy(false);
     }
@@ -364,7 +361,7 @@ export function AvatarUploader({
   const upload = async () => {
     if (!candidate || busy) return;
     setBusy(true);
-    setFeedback({ kind: 'status', message: 'Обрабатываем и сохраняем фотографию…' });
+    setFeedback({ kind: 'status', message: t('processing') });
     try {
       const avatar = await compressAvatar(candidate, crop);
       const body = new FormData();
@@ -392,7 +389,7 @@ export function AvatarUploader({
       const bytes = typeof payload.bytes === 'number' ? payload.bytes : avatar.size;
       setFeedback({
         kind: 'status',
-        message: `Фотография сохранена · ${Math.ceil(bytes / 1024)} КБ`,
+        message: t('saved', { kilobytes: Math.ceil(bytes / 1024) }),
       });
       onUploaded?.(payload.avatarUrl);
     } catch (error) {
@@ -406,10 +403,10 @@ export function AvatarUploader({
     setCrop((current) => ({ ...current, [field]: Number(event.target.value) }));
   };
 
-  const previewError = useCallback((value: string) => {
+  const previewError = useCallback((value: unknown) => {
     setCandidate(null);
-    setFeedback({ kind: 'error', message: value });
-  }, []);
+    setFeedback({ kind: 'error', message: avatarErrorMessage(value) });
+  }, [avatarErrorMessage]);
 
   return (
     <div className={compact ? 'space-y-2 text-center' : 'space-y-4 text-center'}>
@@ -419,7 +416,7 @@ export function AvatarUploader({
         {avatarUrl ? (
           <AvatarImage
             src={avatarUrl}
-            alt="Фотография профиля"
+            alt={t('profilePhoto')}
             className="aspect-square size-full rounded-2xl object-cover"
           />
         ) : null}
@@ -432,7 +429,7 @@ export function AvatarUploader({
         accept="image/jpeg,image/png,image/webp"
         className="sr-only"
         onChange={onFileChange}
-        aria-label="Выбрать готовую фотографию профиля"
+        aria-label={t('chooseAria')}
       />
       <input
         ref={captureInputRef}
@@ -441,7 +438,7 @@ export function AvatarUploader({
         capture="user"
         className="sr-only"
         onChange={onFileChange}
-        aria-label="Сделать фотографию системной камерой"
+        aria-label={t('systemCameraAria')}
       />
 
       {compact && !photoActionsOpen ? (
@@ -454,12 +451,12 @@ export function AvatarUploader({
           aria-controls={photoActionsId}
           onClick={() => setPhotoActionsOpen(true)}
         >
-          <Camera size={17} /> Изменить фото
+          <Camera size={17} /> {t('change')}
         </Button>
       ) : (
         <div id={photoActionsId} className="flex flex-wrap justify-center gap-2">
           <Button type="button" size="sm" variant="outline" disabled={busy} onClick={startCamera}>
-            <Camera size={17} /> Сделать фото
+            <Camera size={17} /> {t('take')}
           </Button>
           <Button
             type="button"
@@ -468,7 +465,7 @@ export function AvatarUploader({
             disabled={busy}
             onClick={() => fileInputRef.current?.click()}
           >
-            <ImageSquare size={17} /> Выбрать из устройства
+            <ImageSquare size={17} /> {t('choose')}
           </Button>
           {compact ? (
             <Button
@@ -482,7 +479,7 @@ export function AvatarUploader({
                 setFeedback(null);
               }}
             >
-              Закрыть
+              {t('close')}
             </Button>
           ) : null}
         </div>
@@ -498,16 +495,22 @@ export function AvatarUploader({
         >
           <div className="space-y-1">
             <h3 id={cropTitleId} className="font-display text-base font-bold">
-              Настройте фотографию
+              {t('cropTitle')}
             </h3>
             <p className="text-xs text-[var(--color-text-muted)]">
-              Переместите изображение при необходимости, затем сохраните его.
+              {t('cropDescription')}
             </p>
           </div>
-          <CropPreview file={candidate} crop={crop} onCropChange={setCrop} onError={previewError} />
+          <CropPreview
+            file={candidate}
+            crop={crop}
+            previewLabel={t('cropPreview')}
+            onCropChange={setCrop}
+            onError={previewError}
+          />
           <div className="space-y-3">
             <label className="block text-xs font-semibold">
-              Масштаб
+              {t('zoom')}
               <input
                 type="range"
                 min={AVATAR_MIN_ZOOM}
@@ -519,7 +522,7 @@ export function AvatarUploader({
               />
             </label>
             <label className="block text-xs font-semibold">
-              По горизонтали
+              {t('horizontal')}
               <input
                 type="range"
                 min="-1"
@@ -531,7 +534,7 @@ export function AvatarUploader({
               />
             </label>
             <label className="block text-xs font-semibold">
-              По вертикали
+              {t('vertical')}
               <input
                 type="range"
                 min="-1"
@@ -552,10 +555,10 @@ export function AvatarUploader({
               className="col-span-2 w-full sm:order-3 sm:w-auto"
             >
               {busy ? <SpinnerGap size={17} className="animate-spin" /> : <Check size={17} />}
-              Использовать фото
+              {t('usePhoto')}
             </Button>
             <Button type="button" size="sm" variant="outline" disabled={busy} onClick={startCamera}>
-              <ArrowCounterClockwise size={17} /> Переснять
+              <ArrowCounterClockwise size={17} /> {t('retake')}
             </Button>
             <Button
               type="button"
@@ -567,7 +570,7 @@ export function AvatarUploader({
                 setFeedback(null);
               }}
             >
-              Отмена
+              {t('cancel')}
             </Button>
           </div>
         </div>
@@ -575,8 +578,8 @@ export function AvatarUploader({
 
       {!compact || photoActionsOpen ? (
         <p className="text-xs text-[var(--color-text-muted)]">
-          {required ? 'Фотография обязательна. ' : ''}Квадрат 360 × 360 · не более 100 КБ.
-          Формат оптимизируется автоматически.
+          {required ? t('requiredPrefix') : ''}
+          {t('requirements')}
         </p>
       ) : null}
       {feedback ? (
@@ -599,10 +602,10 @@ export function AvatarUploader({
           <div className="w-full max-w-lg space-y-4 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 text-left shadow-[var(--shadow-pop)] sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <h2 id="camera-title" className="font-display text-xl font-bold">
-                Сделать фотографию
+                {t('cameraTitle')}
               </h2>
               <Button type="button" variant="ghost" size="icon" onClick={closeCamera}>
-                <X size={20} /> <span className="sr-only">Закрыть камеру</span>
+                <X size={20} /> <span className="sr-only">{t('closeCamera')}</span>
               </Button>
             </div>
             <div className="mx-auto aspect-square max-h-[62vh] overflow-hidden rounded-2xl bg-black">
@@ -612,12 +615,12 @@ export function AvatarUploader({
                 playsInline
                 autoPlay
                 className="size-full -scale-x-100 object-cover"
-                aria-label="Предпросмотр фронтальной камеры"
+                aria-label={t('cameraPreview')}
               />
             </div>
             {cameraStarting ? (
               <p role="status" className="flex items-center gap-2 text-sm">
-                <SpinnerGap size={18} className="animate-spin" /> Открываем камеру…
+                <SpinnerGap size={18} className="animate-spin" /> {t('openingCamera')}
               </p>
             ) : null}
             {cameraError ? (
@@ -633,7 +636,7 @@ export function AvatarUploader({
                   variant="outline"
                   onClick={() => captureInputRef.current?.click()}
                 >
-                  <Camera size={17} /> Системная камера
+                  <Camera size={17} /> {t('systemCamera')}
                 </Button>
               ) : (
                 <Button
@@ -643,7 +646,7 @@ export function AvatarUploader({
                   disabled={cameraStarting || busy}
                   onClick={startCamera}
                 >
-                  <ArrowCounterClockwise size={17} /> Перезапустить
+                  <ArrowCounterClockwise size={17} /> {t('restart')}
                 </Button>
               )}
               <Button
@@ -652,7 +655,7 @@ export function AvatarUploader({
                 disabled={cameraStarting || busy || !cameraReady}
                 onClick={takePhoto}
               >
-                <Camera size={17} /> Сфотографировать
+                <Camera size={17} /> {t('capture')}
               </Button>
             </div>
           </div>

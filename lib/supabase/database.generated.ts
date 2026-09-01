@@ -93,6 +93,32 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notification_reads: {
+        Row: {
+          admin_user_id: string
+          event_id: string
+          read_at: string
+        }
+        Insert: {
+          admin_user_id: string
+          event_id: string
+          read_at?: string
+        }
+        Update: {
+          admin_user_id?: string
+          event_id?: string
+          read_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notification_reads_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "notification_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_operation_receipts: {
         Row: {
           action: string
@@ -336,6 +362,54 @@ export type Database = {
         }
         Relationships: []
       }
+      course_presentation_download_leases: {
+        Row: {
+          actor_id: string
+          claimed_at: string
+          expires_at: string
+          id: string
+        }
+        Insert: {
+          actor_id: string
+          claimed_at?: string
+          expires_at: string
+          id?: string
+        }
+        Update: {
+          actor_id?: string
+          claimed_at?: string
+          expires_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      email_otp_challenges: {
+        Row: {
+          attempt_count: number
+          challenge_hash: string
+          email_hash: string
+          expires_at: string
+          issued_at: string
+          max_attempts: number
+        }
+        Insert: {
+          attempt_count?: number
+          challenge_hash: string
+          email_hash: string
+          expires_at: string
+          issued_at?: string
+          max_attempts?: number
+        }
+        Update: {
+          attempt_count?: number
+          challenge_hash?: string
+          email_hash?: string
+          expires_at?: string
+          issued_at?: string
+          max_attempts?: number
+        }
+        Relationships: []
+      }
       initial_course_import_operations: {
         Row: {
           batch_id: string | null
@@ -408,6 +482,98 @@ export type Database = {
           request_hash?: string
           result?: Json
           target_user_id?: string
+        }
+        Relationships: []
+      }
+      notification_deliveries: {
+        Row: {
+          attempts: number
+          channel: string
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          id: string
+          last_error_category: string | null
+          lease_expires_at: string | null
+          lease_token: string | null
+          next_attempt_at: string
+          remote_message_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          channel?: string
+          created_at?: string
+          delivered_at?: string | null
+          event_id: string
+          id?: string
+          last_error_category?: string | null
+          lease_expires_at?: string | null
+          lease_token?: string | null
+          next_attempt_at?: string
+          remote_message_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          created_at?: string
+          delivered_at?: string | null
+          event_id?: string
+          id?: string
+          last_error_category?: string | null
+          lease_expires_at?: string | null
+          lease_token?: string | null
+          next_attempt_at?: string
+          remote_message_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_deliveries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "notification_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_events: {
+        Row: {
+          aggregate_id: string | null
+          aggregate_type: string
+          correlation_id: string
+          created_at: string
+          dedupe_key: string
+          event_type: string
+          id: string
+          occurred_at: string
+          payload: Json
+        }
+        Insert: {
+          aggregate_id?: string | null
+          aggregate_type: string
+          correlation_id?: string
+          created_at?: string
+          dedupe_key: string
+          event_type: string
+          id?: string
+          occurred_at?: string
+          payload: Json
+        }
+        Update: {
+          aggregate_id?: string | null
+          aggregate_type?: string
+          correlation_id?: string
+          created_at?: string
+          dedupe_key?: string
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          payload?: Json
         }
         Relationships: []
       }
@@ -528,6 +694,316 @@ export type Database = {
         }
         Relationships: []
       }
+      zh_authorized_sessions: {
+        Row: {
+          auth_epoch: number
+          authorized_at: string
+          last_seen_at: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          auth_epoch: number
+          authorized_at?: string
+          last_seen_at?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          auth_epoch?: number
+          authorized_at?: string
+          last_seen_at?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zh_authorized_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "zh_webauthn_accounts"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      zh_credential_reset_receipts: {
+        Row: {
+          actor_user_id: string
+          created_at: string
+          expires_at: string
+          idempotency_key: string
+          request_hash: string
+          result: Json
+        }
+        Insert: {
+          actor_user_id: string
+          created_at?: string
+          expires_at?: string
+          idempotency_key: string
+          request_hash: string
+          result: Json
+        }
+        Update: {
+          actor_user_id?: string
+          created_at?: string
+          expires_at?: string
+          idempotency_key?: string
+          request_hash?: string
+          result?: Json
+        }
+        Relationships: []
+      }
+      zh_recovery_codes: {
+        Row: {
+          consumed_at: string | null
+          created_at: string
+          digest: string
+          expires_at: string | null
+          kind: string
+          locator: string
+          salt: string
+          user_id: string
+        }
+        Insert: {
+          consumed_at?: string | null
+          created_at?: string
+          digest: string
+          expires_at?: string | null
+          kind: string
+          locator: string
+          salt: string
+          user_id: string
+        }
+        Update: {
+          consumed_at?: string | null
+          created_at?: string
+          digest?: string
+          expires_at?: string | null
+          kind?: string
+          locator?: string
+          salt?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zh_recovery_codes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "zh_webauthn_accounts"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      zh_registration_operations: {
+        Row: {
+          auth_user_id: string | null
+          avatar_bytes: number | null
+          avatar_object_key: string | null
+          avatar_sha256: string | null
+          cleanup_attempts: number
+          cleanup_last_error: string | null
+          cleanup_lease_until: string | null
+          completed_at: string | null
+          operation_id: string
+          request_hash: string
+          state: string
+          synthetic_email: string
+          updated_at: string
+          user_handle: string
+        }
+        Insert: {
+          auth_user_id?: string | null
+          avatar_bytes?: number | null
+          avatar_object_key?: string | null
+          avatar_sha256?: string | null
+          cleanup_attempts?: number
+          cleanup_last_error?: string | null
+          cleanup_lease_until?: string | null
+          completed_at?: string | null
+          operation_id: string
+          request_hash: string
+          state?: string
+          synthetic_email: string
+          updated_at?: string
+          user_handle: string
+        }
+        Update: {
+          auth_user_id?: string | null
+          avatar_bytes?: number | null
+          avatar_object_key?: string | null
+          avatar_sha256?: string | null
+          cleanup_attempts?: number
+          cleanup_last_error?: string | null
+          cleanup_lease_until?: string | null
+          completed_at?: string | null
+          operation_id?: string
+          request_hash?: string
+          state?: string
+          synthetic_email?: string
+          updated_at?: string
+          user_handle?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zh_registration_operations_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: true
+            referencedRelation: "zh_webauthn_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      zh_session_grants: {
+        Row: {
+          auth_epoch: number
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          auth_epoch: number
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          auth_epoch?: number
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zh_session_grants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "zh_webauthn_accounts"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      zh_webauthn_accounts: {
+        Row: {
+          auth_epoch: number
+          created_at: string
+          updated_at: string
+          user_handle: string
+          user_id: string
+        }
+        Insert: {
+          auth_epoch?: number
+          created_at?: string
+          updated_at?: string
+          user_handle: string
+          user_id: string
+        }
+        Update: {
+          auth_epoch?: number
+          created_at?: string
+          updated_at?: string
+          user_handle?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      zh_webauthn_challenges: {
+        Row: {
+          challenge_sha256: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          purpose: string
+          recovery_locator: string | null
+          request_hash: string | null
+          user_handle: string | null
+          user_id: string | null
+        }
+        Insert: {
+          challenge_sha256: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          id: string
+          purpose: string
+          recovery_locator?: string | null
+          request_hash?: string | null
+          user_handle?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          challenge_sha256?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          purpose?: string
+          recovery_locator?: string | null
+          request_hash?: string | null
+          user_handle?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      zh_webauthn_credentials: {
+        Row: {
+          backed_up: boolean
+          created_at: string
+          credential_id: string
+          device_type: string
+          last_used_at: string | null
+          public_key: string
+          revoked_at: string | null
+          revoked_reason: string | null
+          signature_counter: number
+          state: string
+          transports: string[]
+          user_id: string
+        }
+        Insert: {
+          backed_up: boolean
+          created_at?: string
+          credential_id: string
+          device_type: string
+          last_used_at?: string | null
+          public_key: string
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          signature_counter?: number
+          state?: string
+          transports?: string[]
+          user_id: string
+        }
+        Update: {
+          backed_up?: boolean
+          created_at?: string
+          credential_id?: string
+          device_type?: string
+          last_used_at?: string | null
+          public_key?: string
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          signature_counter?: number
+          state?: string
+          transports?: string[]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zh_webauthn_credentials_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "zh_webauthn_accounts"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       admin_attestation_rows: {
@@ -633,7 +1109,36 @@ export type Database = {
         Returns: string
       }
       assert_active_superadmin_invariant: { Args: never; Returns: undefined }
+      assert_article_draft_localizations_complete: {
+        Args: { p_article_id: string }
+        Returns: undefined
+      }
+      assert_course_draft_localizations_complete: {
+        Args: { p_test_id: string }
+        Returns: undefined
+      }
+      assert_course_revision_localizations_complete: {
+        Args: { p_revision_id: string }
+        Returns: undefined
+      }
       assert_legacy_course_mutation_allowed: { Args: never; Returns: undefined }
+      assessment_structure: { Args: { p_questions: Json }; Returns: Json }
+      assessment_structure_hash: {
+        Args: { p_questions: Json }
+        Returns: string
+      }
+      attach_article_revision_localizations: {
+        Args: {
+          p_actor_id: string
+          p_article_id: string
+          p_revision_id: string
+        }
+        Returns: undefined
+      }
+      attach_course_revision_localizations: {
+        Args: { p_actor_id: string; p_revision_id: string; p_test_id: string }
+        Returns: undefined
+      }
       attempt_payload: {
         Args: { p_attempt_id: string; p_retry_at?: string }
         Returns: Json
@@ -679,6 +1184,10 @@ export type Database = {
       consume_business_quota_for_actor: {
         Args: { p_action: string; p_actor_id: string }
         Returns: Json
+      }
+      consume_zh_session_grant: {
+        Args: { p_session_id: string; p_user_id: string }
+        Returns: number
       }
       correct_option_ids_from_draft: {
         Args: { p_questions: Json }
@@ -760,6 +1269,10 @@ export type Database = {
       }
       ensure_rpc_payload: { Args: { p_payload: Json }; Returns: Json }
       explanations_from_draft: { Args: { p_questions: Json }; Returns: Json }
+      get_admin_learning_history_provider_internal: {
+        Args: { p_actor_id: string; p_target_user_id: string }
+        Returns: Json
+      }
       has_current_legal_acceptance: {
         Args: { p_user_id: string }
         Returns: boolean
@@ -784,6 +1297,7 @@ export type Database = {
           title: string
         }[]
       }
+      is_zh_synthetic_user: { Args: { p_user_id: string }; Returns: boolean }
       issue_certificate_for_attestation: {
         Args: {
           p_actor_id: string
@@ -799,6 +1313,88 @@ export type Database = {
         Returns: Json
       }
       jsonb_canonical_text: { Args: { p_value: Json }; Returns: string }
+      list_admin_access_users_page_provider_internal: {
+        Args: {
+          p_cursor_created_at?: string
+          p_cursor_id?: string
+          p_limit?: number
+          p_query?: string
+        }
+        Returns: Json
+      }
+      list_admin_users_page_provider_internal: {
+        Args: {
+          p_cursor_created_at?: string
+          p_cursor_id?: string
+          p_limit?: number
+          p_query?: string
+          p_role?: Database["public"]["Enums"]["app_role"]
+          p_status?: Database["public"]["Enums"]["account_status"]
+        }
+        Returns: Json
+      }
+      list_learning_history_targets_page_provider_internal: {
+        Args: {
+          p_actor_id: string
+          p_cursor_created_at?: string
+          p_cursor_id?: string
+          p_limit?: number
+          p_query?: string
+        }
+        Returns: Json
+      }
+      list_pending_account_approval_page_provider_internal: {
+        Args: {
+          p_cursor_due_at?: string
+          p_cursor_user_id?: string
+          p_limit?: number
+        }
+        Returns: Json
+      }
+      localized_article_content_hash: {
+        Args: {
+          p_blocks: Json
+          p_cover_image: string
+          p_description: string
+          p_effective_date: string
+          p_jurisdiction: string
+          p_seo: Json
+          p_slug: string
+          p_sources: Json
+          p_title: string
+        }
+        Returns: string
+      }
+      localized_assessment_structure: {
+        Args: { p_variants: Json }
+        Returns: Json
+      }
+      localized_course_content_hash: {
+        Args: {
+          p_content: Json
+          p_description: string
+          p_presentation_sha256: string
+          p_seo: Json
+          p_sources: Json
+          p_title: string
+          p_variants: Json
+        }
+        Returns: string
+      }
+      localized_course_variants_valid: {
+        Args: { p_variants: Json }
+        Returns: boolean
+      }
+      localized_explanations: { Args: { p_questions: Json }; Returns: Json }
+      localized_public_questions: { Args: { p_questions: Json }; Returns: Json }
+      localized_questions_valid: {
+        Args: { p_questions: Json }
+        Returns: boolean
+      }
+      localized_variants_from_source: {
+        Args: { p_variants: Json }
+        Returns: Json
+      }
       lock_active_superadmin_invariant: { Args: never; Returns: undefined }
       lock_auth_admin_outbox: { Args: never; Returns: undefined }
       lock_signup_legal_operations: { Args: never; Returns: undefined }
@@ -878,6 +1474,11 @@ export type Database = {
         Args: { p_revision_id: string }
         Returns: Json
       }
+      redact_zh_email_items: { Args: { p_payload: Json }; Returns: Json }
+      refresh_zh_authorized_session: {
+        Args: { p_session_id: string; p_user_id: string }
+        Returns: number
+      }
       request_account_suspension_confirmed_unmetered: {
         Args: {
           p_correlation_id: string
@@ -889,6 +1490,10 @@ export type Database = {
           p_user_agent?: string
         }
         Returns: Json
+      }
+      request_notification_dispatch: {
+        Args: { p_delivery_id?: string; p_reason: string }
+        Returns: number
       }
       require_active_user: { Args: never; Returns: string }
       require_any_capability: {
@@ -1201,6 +1806,68 @@ export type Database = {
         }
         Relationships: []
       }
+      article_draft_localizations: {
+        Row: {
+          article_id: string
+          blocks: Json
+          content_hash: string
+          created_at: string
+          description: string
+          draft_version: number
+          locale: Database["public"]["Enums"]["app_locale"]
+          reviewed_content_hash: string | null
+          seo: Json
+          sources: Json
+          status: string
+          title: string
+          translation_qa: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          article_id: string
+          blocks?: Json
+          content_hash: string
+          created_at?: string
+          description?: string
+          draft_version?: number
+          locale: Database["public"]["Enums"]["app_locale"]
+          reviewed_content_hash?: string | null
+          seo?: Json
+          sources?: Json
+          status?: string
+          title: string
+          translation_qa?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          article_id?: string
+          blocks?: Json
+          content_hash?: string
+          created_at?: string
+          description?: string
+          draft_version?: number
+          locale?: Database["public"]["Enums"]["app_locale"]
+          reviewed_content_hash?: string | null
+          seo?: Json
+          sources?: Json
+          status?: string
+          title?: string
+          translation_qa?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_draft_localizations_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "article_drafts"
+            referencedColumns: ["article_id"]
+          },
+        ]
+      }
       article_drafts: {
         Row: {
           article_id: string
@@ -1259,6 +1926,56 @@ export type Database = {
             columns: ["article_id"]
             isOneToOne: true
             referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      article_revision_localizations: {
+        Row: {
+          blocks: Json
+          content_hash: string
+          description: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          published_at: string
+          published_by: string | null
+          revision_id: string
+          seo: Json
+          sources: Json
+          title: string
+          translation_qa: Json
+        }
+        Insert: {
+          blocks: Json
+          content_hash: string
+          description?: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          published_at?: string
+          published_by?: string | null
+          revision_id: string
+          seo?: Json
+          sources?: Json
+          title: string
+          translation_qa?: Json
+        }
+        Update: {
+          blocks?: Json
+          content_hash?: string
+          description?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
+          published_at?: string
+          published_by?: string | null
+          revision_id?: string
+          seo?: Json
+          sources?: Json
+          title?: string
+          translation_qa?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_revision_localizations_revision_id_fkey"
+            columns: ["revision_id"]
+            isOneToOne: false
+            referencedRelation: "article_revisions"
             referencedColumns: ["id"]
           },
         ]
@@ -1487,6 +2204,8 @@ export type Database = {
           issued_at: string
           issued_by: string | null
           job: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          localized_test_title: string
           organization: string
           pass_score: number
           revision_id: string | null
@@ -1514,6 +2233,8 @@ export type Database = {
           issued_at?: string
           issued_by?: string | null
           job: string
+          locale?: Database["public"]["Enums"]["app_locale"]
+          localized_test_title: string
           organization: string
           pass_score: number
           revision_id?: string | null
@@ -1541,6 +2262,8 @@ export type Database = {
           issued_at?: string
           issued_by?: string | null
           job?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
+          localized_test_title?: string
           organization?: string
           pass_score?: number
           revision_id?: string | null
@@ -1725,6 +2448,104 @@ export type Database = {
         }
         Relationships: []
       }
+      course_draft_localizations: {
+        Row: {
+          content: Json
+          content_hash: string
+          created_at: string
+          description: string
+          draft_version: number
+          locale: Database["public"]["Enums"]["app_locale"]
+          question_variants: Json
+          reviewed_content_hash: string | null
+          seo: Json
+          sources: Json
+          status: string
+          test_id: string
+          title: string
+          translation_qa: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          content?: Json
+          content_hash: string
+          created_at?: string
+          description?: string
+          draft_version?: number
+          locale: Database["public"]["Enums"]["app_locale"]
+          question_variants?: Json
+          reviewed_content_hash?: string | null
+          seo?: Json
+          sources?: Json
+          status?: string
+          test_id: string
+          title: string
+          translation_qa?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          content?: Json
+          content_hash?: string
+          created_at?: string
+          description?: string
+          draft_version?: number
+          locale?: Database["public"]["Enums"]["app_locale"]
+          question_variants?: Json
+          reviewed_content_hash?: string | null
+          seo?: Json
+          sources?: Json
+          status?: string
+          test_id?: string
+          title?: string
+          translation_qa?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_draft_localizations_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "course_drafts"
+            referencedColumns: ["test_id"]
+          },
+        ]
+      }
+      course_draft_presentations: {
+        Row: {
+          locale: Database["public"]["Enums"]["app_locale"]
+          presentation_id: string
+          test_id: string
+        }
+        Insert: {
+          locale: Database["public"]["Enums"]["app_locale"]
+          presentation_id: string
+          test_id: string
+        }
+        Update: {
+          locale?: Database["public"]["Enums"]["app_locale"]
+          presentation_id?: string
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_draft_presentations_presentation_id_fkey"
+            columns: ["presentation_id"]
+            isOneToOne: true
+            referencedRelation: "course_presentations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_draft_presentations_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "course_drafts"
+            referencedColumns: ["test_id"]
+          },
+        ]
+      }
       course_drafts: {
         Row: {
           attempt_reset_timezone: string
@@ -1827,6 +2648,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          locale: Database["public"]["Enums"]["app_locale"]
           mime_type: string
           page_count: number
           retired_at: string | null
@@ -1847,6 +2669,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
           mime_type?: string
           page_count: number
           retired_at?: string | null
@@ -1867,6 +2690,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
           mime_type?: string
           page_count?: number
           retired_at?: string | null
@@ -1940,6 +2764,56 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "legal_acceptances_document_type_version_fkey"
+            columns: ["document_type", "version"]
+            isOneToOne: false
+            referencedRelation: "legal_document_versions"
+            referencedColumns: ["document_type", "version"]
+          },
+        ]
+      }
+      legal_document_localizations: {
+        Row: {
+          body: Json
+          body_hash: string
+          created_at: string
+          document_type: Database["public"]["Enums"]["legal_document_type"]
+          locale: Database["public"]["Enums"]["app_locale"]
+          published_at: string | null
+          published_by: string | null
+          status: string
+          title: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          body: Json
+          body_hash: string
+          created_at?: string
+          document_type: Database["public"]["Enums"]["legal_document_type"]
+          locale: Database["public"]["Enums"]["app_locale"]
+          published_at?: string | null
+          published_by?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          body?: Json
+          body_hash?: string
+          created_at?: string
+          document_type?: Database["public"]["Enums"]["legal_document_type"]
+          locale?: Database["public"]["Enums"]["app_locale"]
+          published_at?: string | null
+          published_by?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_document_localizations_document_type_version_fkey"
             columns: ["document_type", "version"]
             isOneToOne: false
             referencedRelation: "legal_document_versions"
@@ -2045,6 +2919,7 @@ export type Database = {
           organization_id: string | null
           phone_country_iso2: string | null
           phone_e164: string | null
+          preferred_locale: Database["public"]["Enums"]["app_locale"]
           surname: string
           updated_at: string
         }
@@ -2059,6 +2934,7 @@ export type Database = {
           organization_id?: string | null
           phone_country_iso2?: string | null
           phone_e164?: string | null
+          preferred_locale?: Database["public"]["Enums"]["app_locale"]
           surname?: string
           updated_at?: string
         }
@@ -2073,6 +2949,7 @@ export type Database = {
           organization_id?: string | null
           phone_country_iso2?: string | null
           phone_e164?: string | null
+          preferred_locale?: Database["public"]["Enums"]["app_locale"]
           surname?: string
           updated_at?: string
         }
@@ -2127,6 +3004,7 @@ export type Database = {
           duration_minutes: number
           expires_at: string
           id: string
+          locale: Database["public"]["Enums"]["app_locale"]
           pass_score: number
           reset_timezone: string
           revision_id: string
@@ -2144,6 +3022,7 @@ export type Database = {
           duration_minutes: number
           expires_at: string
           id?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
           pass_score: number
           reset_timezone?: string
           revision_id: string
@@ -2161,6 +3040,7 @@ export type Database = {
           duration_minutes?: number
           expires_at?: string
           id?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
           pass_score?: number
           reset_timezone?: string
           revision_id?: string
@@ -2192,6 +3072,136 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "test_revisions"
             referencedColumns: ["test_id", "id"]
+          },
+        ]
+      }
+      test_revision_localizations: {
+        Row: {
+          content: Json
+          content_hash: string
+          description: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          published_at: string
+          published_by: string | null
+          revision_id: string
+          seo: Json
+          sources: Json
+          title: string
+          translation_qa: Json
+        }
+        Insert: {
+          content?: Json
+          content_hash: string
+          description?: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          published_at?: string
+          published_by?: string | null
+          revision_id: string
+          seo?: Json
+          sources?: Json
+          title: string
+          translation_qa?: Json
+        }
+        Update: {
+          content?: Json
+          content_hash?: string
+          description?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
+          published_at?: string
+          published_by?: string | null
+          revision_id?: string
+          seo?: Json
+          sources?: Json
+          title?: string
+          translation_qa?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_revision_localizations_revision_id_fkey"
+            columns: ["revision_id"]
+            isOneToOne: false
+            referencedRelation: "test_revisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_revision_presentations: {
+        Row: {
+          created_at: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          presentation_id: string
+          revision_id: string
+        }
+        Insert: {
+          created_at?: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          presentation_id: string
+          revision_id: string
+        }
+        Update: {
+          created_at?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
+          presentation_id?: string
+          revision_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_revision_presentations_presentation_id_fkey"
+            columns: ["presentation_id"]
+            isOneToOne: false
+            referencedRelation: "course_presentations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "test_revision_presentations_revision_id_fkey"
+            columns: ["revision_id"]
+            isOneToOne: false
+            referencedRelation: "test_revisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_revision_variant_localizations: {
+        Row: {
+          content_hash: string
+          created_at: string
+          explanations: Json
+          locale: Database["public"]["Enums"]["app_locale"]
+          question_count: number
+          questions: Json
+          revision_id: string
+          structure_hash: string
+          variant_id: string
+        }
+        Insert: {
+          content_hash: string
+          created_at?: string
+          explanations?: Json
+          locale: Database["public"]["Enums"]["app_locale"]
+          question_count: number
+          questions: Json
+          revision_id: string
+          structure_hash: string
+          variant_id: string
+        }
+        Update: {
+          content_hash?: string
+          created_at?: string
+          explanations?: Json
+          locale?: Database["public"]["Enums"]["app_locale"]
+          question_count?: number
+          questions?: Json
+          revision_id?: string
+          structure_hash?: string
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_revision_variant_localizations_revision_id_variant_id_fkey"
+            columns: ["revision_id", "variant_id"]
+            isOneToOne: false
+            referencedRelation: "test_revision_variants"
+            referencedColumns: ["revision_id", "id"]
           },
         ]
       }
@@ -2570,6 +3580,10 @@ export type Database = {
         }
         Returns: Json
       }
+      attach_zh_registration_auth_user: {
+        Args: { p_operation_id: string; p_user_id: string }
+        Returns: Json
+      }
       begin_initial_course_import: {
         Args: {
           p_actor_id: string
@@ -2621,6 +3635,18 @@ export type Database = {
         }
         Returns: Json
       }
+      claim_course_presentation_download_lease: {
+        Args: { p_actor_id: string; p_lease_seconds?: number }
+        Returns: Json
+      }
+      claim_notification_deliveries: {
+        Args: {
+          p_lease_seconds?: number
+          p_limit?: number
+          p_worker_id: string
+        }
+        Returns: Json
+      }
       claim_profile_avatar_reconciliation: {
         Args: { p_limit?: number; p_worker_id: string }
         Returns: Json
@@ -2633,13 +3659,26 @@ export type Database = {
         }
         Returns: Json
       }
+      claim_zh_registration_cleanup: { Args: never; Returns: Json }
       complete_course_presentation_cleanup: {
         Args: { p_presentation_ids: string[] }
         Returns: Json
       }
+      complete_email_otp_challenge: {
+        Args: { p_challenge_hash: string; p_email_hash: string }
+        Returns: boolean
+      }
       complete_initial_course_import: {
         Args: { p_catalog_hash: string; p_operation_id: string }
         Returns: Json
+      }
+      complete_notification_delivery: {
+        Args: {
+          p_delivery_id: string
+          p_lease_token: string
+          p_remote_message_id: string
+        }
+        Returns: boolean
       }
       complete_profile_avatar_reconciliation: {
         Args: {
@@ -2663,6 +3702,32 @@ export type Database = {
         Args: { p_answers: Json; p_attempt_id: string }
         Returns: Json
       }
+      complete_zh_authentication: {
+        Args: {
+          p_backed_up: boolean
+          p_credential_id: string
+          p_expected_counter: number
+          p_new_counter: number
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      complete_zh_recovery: {
+        Args: {
+          p_backed_up: boolean
+          p_credential_id: string
+          p_device_type: string
+          p_locator: string
+          p_next_digest: string
+          p_next_locator: string
+          p_next_salt: string
+          p_public_key_base64: string
+          p_request_id: string
+          p_signature_counter: number
+          p_transports: string[]
+        }
+        Returns: Json
+      }
       confirm_admin_identities: {
         Args: { p_user_ids: string[] }
         Returns: Json
@@ -2674,6 +3739,10 @@ export type Database = {
       }
       consume_coarse_ip_quota: {
         Args: { p_action: string; p_ip_hash: string }
+        Returns: Json
+      }
+      consume_email_otp_challenge_attempt: {
+        Args: { p_challenge_hash: string; p_email_hash: string }
         Returns: Json
       }
       create_certificate_export_job: {
@@ -2714,6 +3783,14 @@ export type Database = {
         Args: { p_actor_id: string; p_asset_id: string }
         Returns: Json
       }
+      emit_system_notification_alert: {
+        Args: {
+          p_admin_path?: string
+          p_correlation_id: string
+          p_machine_code: string
+        }
+        Returns: string
+      }
       enforce_email_otp_access_token: { Args: { event: Json }; Returns: Json }
       execute_admin_attestation_action: {
         Args: {
@@ -2723,6 +3800,15 @@ export type Database = {
           p_reason?: string
           p_target_ids: string[]
           p_value?: string
+        }
+        Returns: Json
+      }
+      fail_notification_delivery: {
+        Args: {
+          p_delivery_id: string
+          p_error_category: string
+          p_lease_token: string
+          p_retry_after_seconds?: number
         }
         Returns: Json
       }
@@ -2751,6 +3837,32 @@ export type Database = {
         }
         Returns: Json
       }
+      finalize_zh_registration: {
+        Args: {
+          p_backed_up: boolean
+          p_credential_id: string
+          p_device_type: string
+          p_job: string
+          p_name: string
+          p_operation_id: string
+          p_organization: string
+          p_phone_country_iso2: string
+          p_phone_e164: string
+          p_privacy_body_revision: string
+          p_privacy_version: string
+          p_public_key_base64: string
+          p_recovery_digest: string
+          p_recovery_locator: string
+          p_recovery_salt: string
+          p_request_hash: string
+          p_signature_counter: number
+          p_surname: string
+          p_terms_body_revision: string
+          p_terms_version: string
+          p_transports: string[]
+        }
+        Returns: Json
+      }
       finish_profile_avatar_storage_write: {
         Args: {
           p_error_code?: string
@@ -2758,6 +3870,14 @@ export type Database = {
           p_user_id: string
         }
         Returns: Json
+      }
+      finish_zh_registration_cleanup: {
+        Args: {
+          p_error_code?: string
+          p_operation_id: string
+          p_success: boolean
+        }
+        Returns: undefined
       }
       get_admin_attestation_by_certificate_number: {
         Args: { p_query: string }
@@ -2777,6 +3897,22 @@ export type Database = {
           content_type: string
           presentation_id: string
         }[]
+      }
+      get_approved_course_presentation_locale: {
+        Args: {
+          p_asset: string
+          p_course_slug: string
+          p_locale: Database["public"]["Enums"]["app_locale"]
+        }
+        Returns: {
+          byte_size: number
+          content_type: string
+          presentation_id: string
+        }[]
+      }
+      get_article_editor_localizations: {
+        Args: { p_actor_id: string; p_article_id: string }
+        Returns: Json
       }
       get_auth_context: {
         Args: never
@@ -2800,6 +3936,7 @@ export type Database = {
           profile_organization: string
           profile_phone_country_iso2: string
           profile_phone_e164: string
+          profile_preferred_locale: Database["public"]["Enums"]["app_locale"]
           profile_surname: string
           profile_updated_at: string
           role: Database["public"]["Enums"]["product_role"]
@@ -2817,8 +3954,20 @@ export type Database = {
         Args: { p_actor_id: string }
         Returns: Json
       }
+      get_course_editor_localizations: {
+        Args: { p_actor_id: string; p_test_id: string }
+        Returns: Json
+      }
       get_course_editor_payload_v3: {
         Args: { p_actor_id: string; p_test_id: string }
+        Returns: Json
+      }
+      get_legal_document_localization: {
+        Args: {
+          p_document_type: Database["public"]["Enums"]["legal_document_type"]
+          p_locale: Database["public"]["Enums"]["app_locale"]
+          p_version: string
+        }
         Returns: Json
       }
       get_my_capabilities: { Args: never; Returns: string[] }
@@ -2833,14 +3982,33 @@ export type Database = {
         Returns: Json
       }
       get_profile_dashboard: { Args: never; Returns: Json }
+      get_profile_dashboard_locale: {
+        Args: { p_locale: Database["public"]["Enums"]["app_locale"] }
+        Returns: Json
+      }
       get_public_certificate: {
         Args: { p_certificate_id: string }
+        Returns: Json
+      }
+      get_published_article_locale: {
+        Args: {
+          p_locale: Database["public"]["Enums"]["app_locale"]
+          p_slug: string
+        }
+        Returns: Json
+      }
+      get_published_course_locale: {
+        Args: {
+          p_locale: Database["public"]["Enums"]["app_locale"]
+          p_slug: string
+        }
         Returns: Json
       }
       get_published_course_snapshot_v3: {
         Args: { p_test_id: string }
         Returns: Json
       }
+      get_safe_user_email: { Args: { p_user_id: string }; Returns: string }
       get_site_settings: { Args: never; Returns: Json }
       get_test_attempt: { Args: { p_attempt_id: string }; Returns: Json }
       get_test_editor_payload: {
@@ -2852,8 +4020,39 @@ export type Database = {
         Returns: Json
       }
       get_user_identity: { Args: { p_target_id?: string }; Returns: Json }
+      get_zh_authentication_context: {
+        Args: { p_credential_id: string; p_request_id: string }
+        Returns: Json
+      }
+      get_zh_recovery_context: { Args: { p_locator: string }; Returns: Json }
+      get_zh_recovery_verification_context: {
+        Args: { p_locator: string; p_request_id: string }
+        Returns: Json
+      }
+      get_zh_registration_operation: {
+        Args: { p_operation_id: string }
+        Returns: Json
+      }
+      import_course_assessment_localization: {
+        Args: {
+          p_actor_id: string
+          p_expected_version: number
+          p_locale: Database["public"]["Enums"]["app_locale"]
+          p_question_variants: Json
+          p_test_id: string
+        }
+        Returns: Json
+      }
       issue_certificates: {
         Args: { p_attestation_ids: string[] }
+        Returns: Json
+      }
+      issue_email_otp_challenge: {
+        Args: {
+          p_challenge_hash: string
+          p_email_hash: string
+          p_expires_in_seconds?: number
+        }
         Returns: Json
       }
       list_admin_access_outbox_page: {
@@ -2903,6 +4102,14 @@ export type Database = {
         }
         Returns: Json
       }
+      list_admin_notification_inbox: {
+        Args: {
+          p_before_id?: string
+          p_before_occurred_at?: string
+          p_limit?: number
+        }
+        Returns: Json
+      }
       list_admin_users_page: {
         Args: {
           p_cursor_created_at?: string
@@ -2936,6 +4143,19 @@ export type Database = {
         }
         Returns: Json
       }
+      list_published_articles_locale: {
+        Args: {
+          p_before_id?: string
+          p_before_published_at?: string
+          p_limit?: number
+          p_locale: Database["public"]["Enums"]["app_locale"]
+        }
+        Returns: Json
+      }
+      list_published_courses_locale: {
+        Args: { p_locale: Database["public"]["Enums"]["app_locale"] }
+        Returns: Json
+      }
       manage_user_role_confirmed: {
         Args: {
           p_correlation_id: string
@@ -2948,6 +4168,10 @@ export type Database = {
         }
         Returns: Json
       }
+      mark_admin_notifications_read: {
+        Args: { p_event_ids: string[] }
+        Returns: Json
+      }
       mark_content_asset_orphan: {
         Args: { p_actor_id: string; p_asset_id: string }
         Returns: Json
@@ -2957,6 +4181,20 @@ export type Database = {
           p_observed_bytes: number
           p_observed_sha256: string
           p_operation_token: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      mark_zh_registration_cleanup_required: {
+        Args: { p_error_code: string; p_operation_id: string }
+        Returns: undefined
+      }
+      mark_zh_registration_storage_written: {
+        Args: {
+          p_bytes: number
+          p_object_key: string
+          p_operation_id: string
+          p_sha256: string
           p_user_id: string
         }
         Returns: Json
@@ -3007,6 +4245,28 @@ export type Database = {
         }
         Returns: Json
       }
+      prepare_zh_authentication_challenge: {
+        Args: { p_challenge_sha256: string; p_request_id: string }
+        Returns: Json
+      }
+      prepare_zh_recovery_challenge: {
+        Args: {
+          p_challenge_sha256: string
+          p_locator: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      prepare_zh_registration_operation: {
+        Args: {
+          p_challenge_sha256: string
+          p_operation_id: string
+          p_request_hash: string
+          p_synthetic_email: string
+          p_user_handle: string
+        }
+        Returns: Json
+      }
       preview_organization_merge: {
         Args: { p_source_ids: string[]; p_target_id: string }
         Returns: Json
@@ -3037,10 +4297,12 @@ export type Database = {
         Returns: number
       }
       prune_coarse_ip_rate_limits: { Args: { p_limit?: number }; Returns: Json }
+      prune_email_otp_challenges: { Args: { p_limit?: number }; Returns: Json }
       prune_learning_history_delete_receipts: {
         Args: { p_limit?: number }
         Returns: number
       }
+      prune_notification_data: { Args: { p_limit?: number }; Returns: Json }
       prune_signup_legal_operations: {
         Args: { p_limit?: number }
         Returns: Json
@@ -3051,6 +4313,15 @@ export type Database = {
       }
       prune_terminal_avatar_upload_operations: {
         Args: { p_limit?: number }
+        Returns: Json
+      }
+      prune_zh_webauthn_ephemera: { Args: { p_limit?: number }; Returns: Json }
+      publish_article_revision_v3: {
+        Args: {
+          p_actor_id: string
+          p_article_id: string
+          p_expected_content_hash: string
+        }
         Returns: Json
       }
       publish_course_revision: {
@@ -3077,6 +4348,21 @@ export type Database = {
         }
         Returns: Json
       }
+      publish_course_revision_v4: {
+        Args: {
+          p_actor_id: string
+          p_expected_content_hash: string
+          p_test_id: string
+        }
+        Returns: Json
+      }
+      publish_legal_document_localizations: {
+        Args: {
+          p_document_type: Database["public"]["Enums"]["legal_document_type"]
+          p_version: string
+        }
+        Returns: Json
+      }
       publish_legal_document_version: {
         Args: {
           p_body_revision: string
@@ -3087,6 +4373,10 @@ export type Database = {
         Returns: Json
       }
       purge_user_account: { Args: { p_target_id: string }; Returns: Json }
+      release_course_presentation_download_lease: {
+        Args: { p_actor_id: string; p_lease_id: string }
+        Returns: boolean
+      }
       request_account_suspension_confirmed: {
         Args: {
           p_correlation_id: string
@@ -3096,6 +4386,17 @@ export type Database = {
           p_suspended: boolean
           p_target_id: string
           p_user_agent?: string
+        }
+        Returns: Json
+      }
+      reset_zh_credential: {
+        Args: {
+          p_digest: string
+          p_idempotency_key: string
+          p_locator: string
+          p_reason: string
+          p_salt: string
+          p_target_user_id: string
         }
         Returns: Json
       }
@@ -3130,6 +4431,10 @@ export type Database = {
           p_course_id: string
           p_presentation_id: string
         }
+        Returns: Json
+      }
+      retry_admin_notification_delivery: {
+        Args: { p_event_id: string }
         Returns: Json
       }
       revoke_certificate: {
@@ -3221,6 +4526,22 @@ export type Database = {
         }
         Returns: Json
       }
+      save_article_localization_draft: {
+        Args: {
+          p_actor_id: string
+          p_article_id: string
+          p_blocks: Json
+          p_description: string
+          p_expected_version: number
+          p_locale: Database["public"]["Enums"]["app_locale"]
+          p_reviewed_content_hash: string
+          p_seo: Json
+          p_sources: Json
+          p_title: string
+          p_translation_qa: Json
+        }
+        Returns: Json
+      }
       save_course_draft: {
         Args: {
           p_actor_id: string
@@ -3276,6 +4597,36 @@ export type Database = {
         }
         Returns: Json
       }
+      save_course_localization_draft: {
+        Args: {
+          p_actor_id: string
+          p_content: Json
+          p_description: string
+          p_expected_version: number
+          p_locale: Database["public"]["Enums"]["app_locale"]
+          p_presentation_id: string
+          p_question_variants: Json
+          p_reviewed_content_hash: string
+          p_seo: Json
+          p_sources: Json
+          p_test_id: string
+          p_title: string
+          p_translation_qa: Json
+        }
+        Returns: Json
+      }
+      save_legal_document_localization: {
+        Args: {
+          p_body: Json
+          p_body_hash: string
+          p_complete?: boolean
+          p_document_type: Database["public"]["Enums"]["legal_document_type"]
+          p_locale: Database["public"]["Enums"]["app_locale"]
+          p_title: string
+          p_version: string
+        }
+        Returns: Json
+      }
       search_profile_organizations: {
         Args: { p_limit?: number; p_query: string }
         Returns: string[]
@@ -3298,6 +4649,10 @@ export type Database = {
       }
       set_course_catalog_maintenance: {
         Args: { p_actor_id: string; p_enabled: boolean }
+        Returns: Json
+      }
+      set_preferred_locale: {
+        Args: { p_locale: Database["public"]["Enums"]["app_locale"] }
         Returns: Json
       }
       set_test_status: {
@@ -3328,7 +4683,23 @@ export type Database = {
         }
         Returns: Json
       }
+      stage_legal_document_version: {
+        Args: {
+          p_body_revision: string
+          p_document_type: Database["public"]["Enums"]["legal_document_type"]
+          p_effective_at: string
+          p_version: string
+        }
+        Returns: Json
+      }
       start_test_attempt: { Args: { p_test_slug: string }; Returns: Json }
+      start_test_attempt_locale: {
+        Args: {
+          p_locale: Database["public"]["Enums"]["app_locale"]
+          p_test_slug: string
+        }
+        Returns: Json
+      }
       submit_profile_for_approval_from_trusted_server: {
         Args: {
           p_job: string
@@ -3378,6 +4749,7 @@ export type Database = {
         | "approved"
         | "rejected"
       account_status: "active" | "suspended"
+      app_locale: "ru" | "kk" | "en" | "zh"
       app_role: "user" | "admin" | "superadmin"
       article_status: "draft" | "published"
       attempt_status: "started" | "passed" | "failed" | "expired"
@@ -3533,6 +4905,7 @@ export const Constants = {
         "rejected",
       ],
       account_status: ["active", "suspended"],
+      app_locale: ["ru", "kk", "en", "zh"],
       app_role: ["user", "admin", "superadmin"],
       article_status: ["draft", "published"],
       attempt_status: ["started", "passed", "failed", "expired"],

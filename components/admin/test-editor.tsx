@@ -130,7 +130,13 @@ function FieldWarning({ id, message }: { id: string; message?: string }) {
   ) : null;
 }
 
-export function TestEditor({ initial }: { initial?: TestEditorSeed }) {
+export function TestEditor({
+  initial,
+  initialPublicationNotice = null,
+}: {
+  initial?: TestEditorSeed;
+  initialPublicationNotice?: 'incomplete' | 'failed' | null;
+}) {
   const router = useRouter();
   const normalizedInitial = useMemo(() => freshTestFromSeed(initial), [initial]);
   const [course, setCourse] = useState<TestEditorPayload>(normalizedInitial);
@@ -141,7 +147,13 @@ export function TestEditor({ initial }: { initial?: TestEditorSeed }) {
   const [activeQuestion, setActiveQuestion] = useState(0);
   const [preview, setPreview] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(
+    initialPublicationNotice === 'incomplete'
+      ? 'Черновик сохранён, но публикация заблокирована: подготовьте RU, KK, EN и ZH.'
+      : initialPublicationNotice === 'failed'
+        ? 'Черновик сохранён, но четыре локализации опубликовать не удалось.'
+        : '',
+  );
   const [validationAttempted, setValidationAttempted] = useState(false);
 
   const snapshot = useMemo(() => serializeTestEditorPayload(course), [course]);
@@ -257,7 +269,9 @@ export function TestEditor({ initial }: { initial?: TestEditorSeed }) {
       const result = await clientRequest('/api/admin/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...editableCourse, id: course.id ?? null, publish }),
+        // Canonical RU authoring is saved first. The four-locale publisher is
+        // a separate atomic RPC and refuses any incomplete locale matrix.
+        body: JSON.stringify({ ...editableCourse, id: course.id ?? null, publish: false }),
       });
       const payload = await readClientResponseJson<{
         id?: string;
@@ -266,14 +280,49 @@ export function TestEditor({ initial }: { initial?: TestEditorSeed }) {
         publicationState?: PublicationState;
         error?: string;
       }>(result.response);
-      if (!result.ok || !payload?.id) throw new Error(payload?.error ?? 'COURSE_SAVE_FAILED');
-      const next = {
+      if (!result.ok || !payload?.id || !payload.contentHash || !payload.draftVersion) {
+        throw new Error(payload?.error ?? 'COURSE_SAVE_FAILED');
+      }
+      let next: TestEditorPayload = {
         ...course,
         id: payload.id,
         draftVersion: payload.draftVersion ?? course.draftVersion,
         contentHash: payload.contentHash ?? course.contentHash,
-        publicationState: payload.publicationState ?? (publish ? 'published' : 'draft'),
-      } satisfies TestEditorPayload;
+        publicationState: 'draft' as const,
+      };
+      setCourse(next);
+      setSavedSnapshot(serializeTestEditorPayload(next));
+      if (publish) {
+        const publication = await clientRequest(
+          `/api/admin/courses/${encodeURIComponent(payload.id)}/localizations/publish`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ expectedContentHash: payload.contentHash }),
+          },
+        );
+        const publicationPayload = await readClientResponseJson<{ error?: string }>(
+          publication.response,
+        );
+        if (!publication.ok) {
+          setError(
+            publicationPayload?.error === 'COURSE_LOCALIZATIONS_INCOMPLETE'
+              ? 'Публикация заблокирована: подготовьте RU, KK, EN и ZH, включая PDF и защищённый импорт вопросов.'
+              : clientRequestMessage(
+                  publication.error,
+                  'Черновик сохранён, но четыре локализации опубликовать не удалось.',
+                ),
+          );
+          if (!course.id) {
+            approveNavigation();
+            router.replace(
+              `/admin/courses/${payload.id}?publication=${publicationPayload?.error === 'COURSE_LOCALIZATIONS_INCOMPLETE' ? 'incomplete' : 'failed'}`,
+            );
+          } else router.refresh();
+          return;
+        }
+        next = { ...next, publicationState: 'published' };
+      }
       setCourse(next);
       setSavedSnapshot(serializeTestEditorPayload(next));
       if (!course.id) {

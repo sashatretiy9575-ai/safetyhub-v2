@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slug": "lesomontazhnye-raboty",
+  "locale": "zh",
+  "productionPublished": false,
+  "contentSummary": "脚手架搭设作业: 脚手架的安全安装和操作：设计、基础、连接、作业平台、围栏、通道、许可和条件控制。",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/lesomontazhnye-raboty/presentation.pptx",
+    "pptxSha256": "582338c561283acc27a932f586eaccc31e14adaee0d6a4c4648a70355d738c27",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/zh/text-map.json",
+    "textMapSha256": "3f62b1ce6909c19a589795fbef177152dea78148f78a63a4dc2f8d33a19ea144"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/zh/assets/pptx/efc292d495d415cf1d79f41672648ec95e27bfd1003fc1229244a8fdc6dd8bd3/presentation.pptx",
+    "sha256": "efc292d495d415cf1d79f41672648ec95e27bfd1003fc1229244a8fdc6dd8bd3",
+    "byteSize": 2493104,
+    "slideCount": 42
+  },
+  "edits": {
+    "translatedElementCount": 211,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 72,
+    "sourceNotesAdded": 42,
+    "textTopologySha256": "77fc7e01b13e21bb52bd7c3384654a63c456b59046b49bc2af774b1e14118e78",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 42,
+    "layoutInspectionCount": 42,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 42
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 510,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

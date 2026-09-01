@@ -1,20 +1,18 @@
 import Link from 'next/link';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { NextResponse } from '@/lib/security/api-response';
 import { getSiteUrl } from '@/features/auth/server';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 
 export const PASSWORD_AUTH_RETIRED_ERROR = 'PASSWORD_AUTH_RETIRED';
-
-const RETIRED_MESSAGE =
-  'Пароли, восстановление пароля и приглашения больше не используются. Войдите или зарегистрируйтесь по одноразовому коду из письма.';
 
 export function passwordAuthRetiredResponse() {
   return NextResponse.json(
     {
       error: PASSWORD_AUTH_RETIRED_ERROR,
-      message: 'Password authentication has been retired. Use the email OTP flow instead.',
     },
     {
       status: 410,
@@ -39,18 +37,24 @@ export function redirectFromRetiredPasswordLink() {
   return response;
 }
 
-export function PasswordAuthRetiredPage() {
+export async function PasswordAuthRetiredPage() {
+  const [locale, t] = await Promise.all([
+    getLocale() as Promise<AppLocale>,
+    getTranslations('AuthOtp'),
+  ]);
   return (
     <section className="py-10 md:py-20">
       <Container size="narrow">
         <Card className="mx-auto max-w-md">
           <CardContent className="space-y-5 p-4 min-[320px]:p-6 md:p-8">
             <div className="space-y-2">
-              <h1 className="font-display text-2xl font-bold">Вход только по коду</h1>
-              <p className="text-sm text-[var(--color-text-muted)]">{RETIRED_MESSAGE}</p>
+              <h1 className="font-display text-2xl font-bold">{t('retiredTitle')}</h1>
+              <p className="text-sm text-[var(--color-text-muted)]">
+                {t('retiredDescription')}
+              </p>
             </div>
             <Button asChild className="w-full">
-              <Link href="/auth/login">Получить код на email</Link>
+              <Link href={localizePathname('/auth/login', locale)}>{t('retiredAction')}</Link>
             </Button>
           </CardContent>
         </Card>

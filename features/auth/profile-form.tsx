@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import { PencilSimple, X } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
-import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
+import { useTranslations } from 'next-intl';
+import { clientRequest, readClientResponseJson } from '@/lib/client-request';
+import { localizedClientRequestMessage } from '@/i18n/client-errors';
 import {
   normalizeProfileSubmissionValues,
   PROFILE_FIELD_LIMITS,
@@ -11,6 +13,7 @@ import {
   type ProfileField,
   type ProfileSubmissionField,
   type ProfileSubmissionValues,
+  type ProfileValidationError,
 } from '@/features/profile/fields';
 import { PhoneInput } from '@/features/profile/phone-input';
 import { Button } from '@/components/ui/button';
@@ -31,9 +34,13 @@ export function ProfileForm({
   countryOptions: readonly PhoneCountryOption[];
 }) {
   const router = useRouter();
+  const t = useTranslations('Profile');
+  const tErrors = useTranslations('Common.errors');
   const [form, setForm] = useState(initial);
   const [savedProfile, setSavedProfile] = useState(initial);
-  const [errors, setErrors] = useState<Partial<Record<ProfileSubmissionField, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<ProfileSubmissionField, ProfileValidationError>>
+  >({});
   const [organizations, setOrganizations] = useState<string[]>([]);
   const [editing, setEditing] = useState(false);
   const [message, setMessage] = useState('');
@@ -71,7 +78,7 @@ export function ProfileForm({
     const validation = validateProfileSubmissionValues(form);
     if (Object.keys(validation).length > 0) {
       setErrors(validation);
-      setMessage('Проверьте обязательные поля.');
+      setMessage(t('required'));
       return;
     }
 
@@ -86,7 +93,7 @@ export function ProfileForm({
       });
       const payload = await readClientResponseJson<UpdateResponse>(result.response);
       if (!result.ok) {
-        setMessage(clientRequestMessage(result.error, 'Не удалось сохранить профиль.'));
+        setMessage(localizedClientRequestMessage(result.error, t('saveFailed'), tErrors));
         return;
       }
       setForm(normalized);
@@ -94,12 +101,12 @@ export function ProfileForm({
       setEditing(false);
       setMessage(
         payload?.approvalState === 'pending'
-          ? 'Данные сохранены и направлены администратору на проверку.'
-          : 'Данные профиля сохранены.',
+          ? t('savedForReview')
+          : t('saved'),
       );
       router.refresh();
     } catch (requestError) {
-      setMessage(clientRequestMessage(requestError, 'Не удалось сохранить профиль.'));
+      setMessage(localizedClientRequestMessage(requestError, t('saveFailed'), tErrors));
     } finally {
       setBusy(false);
     }
@@ -112,12 +119,21 @@ export function ProfileForm({
     setMessage('');
   };
 
+  const validationMessage = (error: ProfileValidationError | undefined) => {
+    if (!error) return '';
+    if (error.code === 'REQUIRED') return t('validation.required');
+    if (error.code === 'CONTROL_CHARACTERS') return t('validation.controlCharacters');
+    if (error.code === 'TOO_LONG') return t('validation.tooLong', { max: error.maxLength });
+    if (error.code === 'PHONE_COUNTRY_REQUIRED') return t('validation.phoneCountry');
+    return t('validation.phoneInvalid');
+  };
+
   return (
     <div className="space-y-3">
       {!editing ? (
         <div className="flex flex-wrap items-center gap-3">
           <Button type="button" size="sm" variant="outline" onClick={() => setEditing(true)}>
-            <PencilSimple size={17} /> Изменить данные
+            <PencilSimple size={17} /> {t('edit')}
           </Button>
           {message ? (
             <p role="status" className="text-sm text-[var(--color-text-muted)]">
@@ -128,7 +144,7 @@ export function ProfileForm({
       ) : (
         <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2" noValidate>
           <div className="space-y-1">
-            <Label htmlFor="profile-name">Имя</Label>
+            <Label htmlFor="profile-name">{t('name')}</Label>
             <Input
               id="profile-name"
               autoComplete="given-name"
@@ -139,11 +155,13 @@ export function ProfileForm({
               required
             />
             {errors.name ? (
-              <p className="text-xs text-[var(--color-danger)]">{errors.name}</p>
+              <p className="text-xs text-[var(--color-danger)]">
+                {validationMessage(errors.name)}
+              </p>
             ) : null}
           </div>
           <div className="space-y-1">
-            <Label htmlFor="profile-surname">Фамилия</Label>
+            <Label htmlFor="profile-surname">{t('surname')}</Label>
             <Input
               id="profile-surname"
               autoComplete="family-name"
@@ -154,11 +172,13 @@ export function ProfileForm({
               required
             />
             {errors.surname ? (
-              <p className="text-xs text-[var(--color-danger)]">{errors.surname}</p>
+              <p className="text-xs text-[var(--color-danger)]">
+                {validationMessage(errors.surname)}
+              </p>
             ) : null}
           </div>
           <div className="space-y-1 sm:col-span-2">
-            <Label htmlFor="profile-job">Должность</Label>
+            <Label htmlFor="profile-job">{t('job')}</Label>
             <Input
               id="profile-job"
               autoComplete="organization-title"
@@ -168,10 +188,12 @@ export function ProfileForm({
               invalid={Boolean(errors.job)}
               required
             />
-            {errors.job ? <p className="text-xs text-[var(--color-danger)]">{errors.job}</p> : null}
+            {errors.job ? (
+              <p className="text-xs text-[var(--color-danger)]">{validationMessage(errors.job)}</p>
+            ) : null}
           </div>
           <div className="space-y-1 sm:col-span-2">
-            <Label htmlFor="profile-organization">Компания</Label>
+            <Label htmlFor="profile-organization">{t('organizationShort')}</Label>
             <Input
               id="profile-organization"
               list="profile-organizations"
@@ -188,11 +210,13 @@ export function ProfileForm({
               ))}
             </datalist>
             {errors.organization ? (
-              <p className="text-xs text-[var(--color-danger)]">{errors.organization}</p>
+              <p className="text-xs text-[var(--color-danger)]">
+                {validationMessage(errors.organization)}
+              </p>
             ) : null}
           </div>
           <div className="space-y-1 sm:col-span-2">
-            <Label htmlFor="profile-phone">Номер телефона</Label>
+            <Label htmlFor="profile-phone">{t('phone')}</Label>
             <PhoneInput
               id="profile-phone"
               countryOptions={countryOptions}
@@ -206,20 +230,20 @@ export function ProfileForm({
               disabled={busy}
             />
             <p id="profile-phone-help" className="text-xs text-[var(--color-text-muted)]">
-              Номер используется только для связи по заявке. SMS-коды не отправляются.
+              {t('phoneHint')}
             </p>
             {errors.phone ? (
               <p id="profile-phone-error" className="text-xs text-[var(--color-danger)]">
-                {errors.phone}
+                {validationMessage(errors.phone)}
               </p>
             ) : null}
           </div>
           <div className="flex flex-wrap gap-2 sm:col-span-2">
             <Button type="submit" size="sm" disabled={busy}>
-              {busy ? 'Сохраняем…' : 'Сохранить'}
+              {busy ? t('submitting') : t('save')}
             </Button>
             <Button type="button" size="sm" variant="ghost" disabled={busy} onClick={cancelEditing}>
-              <X size={16} /> Отмена
+              <X size={16} /> {t('cancel')}
             </Button>
           </div>
           {message ? (

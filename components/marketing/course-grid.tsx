@@ -10,9 +10,17 @@ import { getTopics } from '@/lib/content/topics';
 import { getCourseCoverImage } from '@/lib/course-cover-images';
 import { courseJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { localizePathname } from '@/i18n/config';
 
 export async function CourseGrid() {
-  const topics = await getTopics();
+  const [locale, t, courseT, footerT] = await Promise.all([
+    getLocale(),
+    getTranslations('Home.courses'),
+    getTranslations('Course'),
+    getTranslations('Shell.footer'),
+  ]);
+  const topics = await getTopics(locale);
 
   return (
     <>
@@ -23,7 +31,10 @@ export async function CourseGrid() {
             name: topic.title,
             description: topic.description,
             provider: 'SafetyHub',
-            url: absoluteUrl(ROUTES.topic(topic.slug)),
+            url: absoluteUrl(localizePathname(ROUTES.topic(topic.slug), locale)),
+            locale,
+            credentialName: courseT('credentialAwarded'),
+            locationName: footerT('city'),
           })}
         />
       ))}
@@ -36,23 +47,23 @@ export async function CourseGrid() {
         <Container size="wide">
           <SectionHeading
             id="courses-heading"
-            eyebrow="Программы обучения"
-            title="Курсы по безопасности для специалистов и команд"
-            description="Выберите направление и проходите обучение в удобном темпе."
+            eyebrow={t('eyebrow')}
+            title={t('title')}
+            description={t('description')}
             action={
               <Link
-                href={ROUTES.topics}
+                href={localizePathname(ROUTES.topics, locale)}
                 prefetch={false}
                 className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 px-4 text-sm font-semibold text-[var(--color-text)] backdrop-blur-xl transition hover:border-[var(--color-primary)]/45 hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-on-primary-soft)]"
               >
-                Все курсы
+                {t('all')}
                 <ArrowUpRight size={17} weight="bold" aria-hidden="true" />
               </Link>
             }
           />
 
           {topics.length > 0 ? (
-            <MarketingSlider label="Программы обучения" itemLabel="Курс" className="mt-7 sm:mt-10">
+            <MarketingSlider label={t('slider')} itemLabel={t('item')} className="mt-7 sm:mt-10">
               {topics.map((topic, index) => (
                 <CourseCard
                   key={topic.slug}
@@ -69,7 +80,7 @@ export async function CourseGrid() {
             </MarketingSlider>
           ) : (
             <p className="mt-6 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 p-6 text-sm text-[var(--color-text-muted)] backdrop-blur-xl">
-              Опубликованные курсы скоро появятся.
+              {t('empty')}
             </p>
           )}
         </Container>

@@ -80,10 +80,11 @@ test('current and previous verification secrets both require at least 32 charact
 });
 
 test('certificate verification stores no token or document bytes in Postgres or Storage', async () => {
-  const [baseline, server, pdfRoute, exportRoute] = await Promise.all([
+  const [baseline, server, pdfRoute, metadataRoute, exportRoute] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
     read('features/certificates/server.ts'),
     read('app/api/certificates/[certificateId]/route.ts'),
+    read('app/api/certificates/[certificateId]/metadata/route.ts'),
     read('app/api/admin/attestations/export/route.ts'),
   ]);
 
@@ -93,8 +94,13 @@ test('certificate verification stores no token or document bytes in Postgres or 
   assert.doesNotMatch(baseline, /pdf_base64|pdf_bytes|bytea[^;]*certificate/i);
   assert.match(server, /verifyCertificateVerificationToken\(token\)/);
   assert.match(server, /rpc\('get_public_certificate'/);
-  assert.match(pdfRoute, /Content-Disposition/);
-  assert.doesNotMatch(`${pdfRoute}\n${exportRoute}`, /\.storage\.|pdf_projection|pdf_base64/);
+  assert.match(pdfRoute, /CERTIFICATE_PDF_CLIENT_ONLY/);
+  assert.match(metadataRoute, /createCertificateRenderMetadata/);
+  assert.match(server, /certificateVerificationUrl\(siteUrl, verificationToken\)/);
+  assert.doesNotMatch(
+    `${pdfRoute}\n${metadataRoute}\n${exportRoute}`,
+    /\.storage\.|pdf_projection|pdf_base64|application\/pdf|application\/zip/,
+  );
 });
 
 test('course deletion metadata never enters certificate download or public verification payloads', async () => {

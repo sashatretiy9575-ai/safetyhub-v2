@@ -10,6 +10,7 @@ import type {
   ProfileIdentityState,
   ProfileValues,
 } from '@/features/profile/fields';
+import type { AppLocale } from '@/i18n/config';
 
 export type ProfileAttestation = {
   attestationId: string;
@@ -50,8 +51,11 @@ type SectionResult<T> = { state: 'ready'; data: T } | { state: 'failed'; correla
 
 type UntypedRpcClient = {
   rpc(
-    name: 'get_profile_dashboard' | 'get_my_profile_avatar_manifest',
-    args?: Record<string, never>,
+    name:
+      | 'get_profile_dashboard'
+      | 'get_profile_dashboard_locale'
+      | 'get_my_profile_avatar_manifest',
+    args?: Record<string, never> | { p_locale: AppLocale },
   ): PromiseLike<{
     data: Json;
     error: { message: string; code?: string | null } | null;
@@ -151,10 +155,13 @@ function loadFailure(section: string, error: unknown): SectionResult<never> {
   return { state: 'failed', correlationId };
 }
 
-export const getProfileDashboard = cache(async (): Promise<SectionResult<ProfileDashboard>> => {
+export const getProfileDashboard = cache(
+  async (locale: AppLocale): Promise<SectionResult<ProfileDashboard>> => {
   try {
     const supabase = (await createClient()) as unknown as UntypedRpcClient;
-    const { data, error } = await supabase.rpc('get_profile_dashboard');
+    const { data, error } = await supabase.rpc('get_profile_dashboard_locale', {
+      p_locale: locale,
+    });
     if (error) return loadFailure('dashboard', error);
     const parsed = dashboardSchema.safeParse(data);
     if (!parsed.success) return loadFailure('dashboard', parsed.error);
@@ -162,7 +169,8 @@ export const getProfileDashboard = cache(async (): Promise<SectionResult<Profile
   } catch (error) {
     return loadFailure('dashboard', error);
   }
-});
+  },
+);
 
 export const getProfileAvatarUrl = cache(async (userId: string) => {
   try {

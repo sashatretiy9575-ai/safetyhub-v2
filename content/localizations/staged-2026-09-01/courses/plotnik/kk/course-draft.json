@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "courseId": "f1d89c10-ca34-4223-8c04-de97790a3292",
+  "slug": "plotnik",
+  "locale": "kk",
+  "title": "Ағаш шебері",
+  "description": "Ағаш ұстасының қауіпсіз жұмыс тәжірибесі: жұмыс орнын ұйымдастыру, қол және электр құралдары, ЖҚҚ және ақауларды жою.",
+  "content": {
+    "modules": []
+  },
+  "seo": {},
+  "jurisdiction": "Қазақстан Республикасы",
+  "effectiveDate": "2026-08-21",
+  "sources": [],
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "importSequence": {
+    "firstAdminSaveExpectedVersion": null,
+    "serviceAssessmentImportExpectedVersion": 1,
+    "completionAdminSaveExpectedVersion": 2,
+    "presentationId": "${PRESENTATION_ID_FROM_IMMUTABLE_UPLOAD}"
+  },
+  "sourceTopologySha256": "f211174f6ec40a6cb7730d71247cd2d743e49dd5d306f5a6d32f72bb553af1b4",
+  "sourceAnswerMappingSha256": "d8c8736d08a4cd352b7c042096e7629b00147b303e058a5b9c14ad0e310b68cf",
+  "answerKeysIncluded": false
+}

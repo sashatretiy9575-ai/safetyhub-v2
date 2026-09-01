@@ -11,7 +11,10 @@ test('blog streams its data grid behind a route-specific skeleton', async () => 
   ]);
 
   assert.match(source, /<PageHeader/);
-  assert.match(source, /<Suspense fallback=\{<ArticleGridSkeleton \/>\}>/);
+  assert.match(
+    source,
+    /<Suspense fallback=\{<ArticleGridSkeleton label=\{t\('loading'\)\} \/>\}>/,
+  );
   assert.match(source, /async function ArticlesGrid\(\)/);
   assert.match(source, /priority=\{false\}/);
   assert.match(articleCard, /placeholder="blur"/);

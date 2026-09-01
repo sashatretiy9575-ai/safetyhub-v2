@@ -45,18 +45,20 @@ test('profile uses one dashboard contract and keeps attempt analytics hidden', a
     read('features/profile/server.ts'),
     read('features/auth/profile-form.tsx'),
   ]);
-  assert.match(profile, /Личный кабинет/);
-  assert.match(profile, /Следующий шаг/);
-  assert.match(profile, /Мои курсы/);
-  assert.match(profile, /Сдано \{passed\} из \{current\.length\} · Сертификатов \{issued\}/);
-  assert.match(profile, /Скачать/);
+  assert.match(profile, /getTranslations\('Profile'\)/);
+  assert.match(profile, /t\('dashboardTitle'\)/);
+  assert.match(profile, /t\('nextStep'\)/);
+  assert.match(profile, /t\('coursesTitle'\)/);
+  assert.match(profile, /t\('coursesSummary', \{/);
+  assert.match(profile, /t\('download'\)/);
   assert.match(profile, /compact/);
-  assert.match(profile, /Мои данные/);
+  assert.match(profile, /t\('myData'\)/);
   assert.match(profile, /data-learning-dashboard data-state="ready"/);
   assert.match(profile, /data-learning-dashboard data-state="failed"/);
   assert.doesNotMatch(profile, /Лучшие результаты|Ваше обучение|Данные для сертификата/);
   assert.match(server, /getProfileDashboard/);
-  assert.match(server, /rpc\('get_profile_dashboard'\)/);
+  assert.match(server, /rpc\('get_profile_dashboard_locale', \{/);
+  assert.match(server, /p_locale: locale/);
   assert.doesNotMatch(profile, /PassRateChart|ActivityChart|ResultDistribution|RecentAttempts/);
   assert.doesNotMatch(profile, /количество попыток|Осталось попыток|Последние попытки/i);
   assert.doesNotMatch(form, /\/api\/identity|supabase\/client/);
@@ -68,8 +70,10 @@ test('account deletion is explicit, irreversible, and hands off to durable clean
     read('app/api/profile/account/route.ts'),
     read('features/auth/server.ts'),
   ]);
-  assert.match(control, /confirmation !== CONFIRMATION/);
-  assert.match(control, /PDF\s+физически удалить невозможно/);
+  assert.match(control, /confirmation !== confirmationPhrase/);
+  assert.match(control, /body: JSON\.stringify\(\{ confirmation: API_CONFIRMATION \}\)/);
+  assert.match(control, /useTranslations\('AccountDeletion'\)/);
+  assert.match(control, /t\('description'\)/);
   assert.match(route, /rpc\('begin_user_account_purge'/);
   assert.match(route, /requireAccountDeletionUser\(\)/);
   assert.doesNotMatch(route, /p_target_id:\s*(?:body|request|params|searchParams)/);

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { ArticleCard } from '@/components/marketing/article-card';
 import { Container } from '@/components/ui/container';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -6,19 +7,22 @@ import { PageHeader } from '@/components/ui/page-header';
 import { getArticles } from '@/lib/content/articles';
 import { buildMetadata } from '@/lib/seo';
 
-export const metadata = buildMetadata({
-  title: 'Статьи по охране труда и безопасности в Казахстане',
-  description:
-    'Практические статьи по охране труда, промышленной и пожарной безопасности в Казахстане.',
-  path: '/blog',
-  keywords: ['блог по охране труда', 'промышленная безопасность статьи'],
-});
+export async function generateMetadata() {
+  const t = await getTranslations('Blog');
+  return buildMetadata({
+    title: t('metadataTitle'),
+    description: t('metadataDescription'),
+    path: '/blog',
+    keywords: [t('metadataKeyword1'), t('metadataKeyword2')],
+    locale: await getLocale(),
+  });
+}
 
-function ArticleGridSkeleton() {
+function ArticleGridSkeleton({ label }: { label: string }) {
   return (
     <div
       className="grid gap-5 min-[1100px]:grid-cols-3 sm:grid-cols-2 lg:gap-6"
-      aria-label="Загружаем статьи"
+      aria-label={label}
     >
       {Array.from({ length: 3 }, (_, index) => (
         <div
@@ -39,13 +43,14 @@ function ArticleGridSkeleton() {
 }
 
 async function ArticlesGrid() {
-  const articles = await getArticles();
+  const [locale, t] = await Promise.all([getLocale(), getTranslations('Blog')]);
+  const articles = await getArticles(locale);
 
   if (articles.length === 0) {
     return (
       <EmptyState
-        title="Статей пока нет"
-        description="Скоро здесь появятся практические статьи по безопасности."
+        title={t('emptyTitle')}
+        description={t('emptyDescription')}
       />
     );
   }
@@ -53,7 +58,7 @@ async function ArticlesGrid() {
   return (
     <div
       className="grid items-stretch gap-5 min-[1100px]:grid-cols-3 sm:grid-cols-2 lg:gap-6"
-      aria-label="Статьи по безопасности"
+      aria-label={t('listAria')}
     >
       {articles.map((article, index) => (
         <ArticleCard
@@ -70,20 +75,21 @@ async function ArticlesGrid() {
   );
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const t = await getTranslations('Blog');
   return (
     <>
       <PageHeader
-        title="Блог, который помогает действовать безопасно"
-        description="Разбираем реальные рабочие ситуации простыми словами: от первой смены и СИЗ до пожарной тревоги, первой помощи и подготовки к тесту."
-        eyebrow="10 практических материалов SafetyHub"
+        title={t('title')}
+        description={t('description')}
+        eyebrow={t('eyebrow')}
         variant="compact"
       />
 
       <section className="py-9 sm:py-12 lg:py-16">
         <Container size="wide">
-          <h2 className="sr-only">Список статей</h2>
-          <Suspense fallback={<ArticleGridSkeleton />}>
+          <h2 className="sr-only">{t('listTitle')}</h2>
+          <Suspense fallback={<ArticleGridSkeleton label={t('loading')} />}>
             <ArticlesGrid />
           </Suspense>
         </Container>

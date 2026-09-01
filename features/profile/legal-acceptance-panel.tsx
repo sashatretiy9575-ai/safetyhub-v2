@@ -1,27 +1,26 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { CheckCircle, FileText, WarningCircle } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
-import {
-  legalDocumentHref,
-  PRIVACY_POLICY,
-  TERMS_POLICY,
-  type LegalDocumentType,
-} from '@/lib/legal';
+import { legalDocumentHref, type LegalDocumentVersion, type LegalDocumentType } from '@/lib/legal';
 import type { Json, LegalAcceptanceRow } from '@/lib/supabase/types';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 
 type Acceptance = Omit<LegalAcceptanceRow, 'user_id'>;
 
 type LegalAcceptancePanelProps = {
   initialAcceptances: Acceptance[];
   initiallyUnavailable: boolean;
+  currentPolicies: Readonly<{
+    privacy: LegalDocumentVersion;
+    terms: LegalDocumentVersion;
+  }>;
   onAccepted?: () => void;
 };
-
-const currentDocuments = [PRIVACY_POLICY, TERMS_POLICY] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -66,30 +65,31 @@ function mergeAcceptances(current: Acceptance[], incoming: Acceptance[]) {
   );
 }
 
-function documentLabel(type: LegalDocumentType) {
-  return type === 'privacy' ? 'Политика конфиденциальности' : 'Условия использования';
-}
-
-function acceptedAtLabel(value: string) {
-  const timestamp = new Date(value);
-  if (Number.isNaN(timestamp.getTime())) return 'дата недоступна';
-  return `${new Intl.DateTimeFormat('ru-RU', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'Asia/Almaty',
-  }).format(timestamp)} (Алматы)`;
+function localizedDocumentHref(type: LegalDocumentType, version: string, locale: AppLocale) {
+  const href = legalDocumentHref(type, version);
+  const [pathname, query] = href.split('?');
+  const localized = localizePathname(pathname ?? '/', locale);
+  return query ? `${localized}?${query}` : localized;
 }
 
 export function LegalAcceptancePanel({
   initialAcceptances,
   initiallyUnavailable,
+  currentPolicies,
   onAccepted,
 }: LegalAcceptancePanelProps) {
+  const locale = useLocale() as AppLocale;
+  const t = useTranslations('LegalFlow');
+  const format = useFormatter();
   const [acceptances, setAcceptances] = useState(initialAcceptances);
   const [historyUnavailable, setHistoryUnavailable] = useState(initiallyUnavailable);
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const currentDocuments = useMemo(
+    () => [currentPolicies.privacy, currentPolicies.terms] as const,
+    [currentPolicies],
+  );
 
   const acceptedKeys = useMemo(
     () => new Set(acceptances.map((acceptance) => acceptanceKey(acceptance))),
@@ -110,7 +110,7 @@ export function LegalAcceptancePanel({
       });
       const data = await readClientResponseJson<Json>(result.response);
       if (!result.ok) {
-        setMessage('Не удалось записать согласие. Обновите страницу и попробуйте ещё раз.');
+        setMessage(t('saveFailed'));
         return;
       }
       const recorded = parseAcceptancePayload(data);
@@ -121,16 +121,16 @@ export function LegalAcceptancePanel({
           recordedKeys.has(`${document.type}:${document.version}`),
         )
       ) {
-        setMessage('Сервер не вернул подтверждение записи. Обновите страницу перед повтором.');
+        setMessage(t('receiptMissing'));
         return;
       }
       setAcceptances((current) => mergeAcceptances(current, recorded));
       setHistoryUnavailable(false);
       setConfirmed(false);
-      setMessage('Текущие версии приняты. Запись добавлена в историю.');
+      setMessage(t('saved'));
       onAccepted?.();
     } catch {
-      setMessage('Не удалось записать согласие. Проверьте соединение и попробуйте ещё раз.');
+      setMessage(t('networkFailed'));
     } finally {
       setBusy(false);
     }
@@ -141,10 +141,8 @@ export function LegalAcceptancePanel({
       <div className="flex items-start gap-3">
         <FileText className="mt-0.5 shrink-0 text-[var(--color-primary)]" size={22} />
         <div className="space-y-1">
-          <h2 className="font-display text-xl font-bold">Документы и согласия</h2>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Здесь хранится версия, которую вы приняли. Ссылка открывает именно эту редакцию.
-          </p>
+          <h2 className="font-display text-xl font-bold">{t('title')}</h2>
+          <p className="text-sm text-[var(--color-text-muted)]">{t('description')}</p>
         </div>
       </div>
 
@@ -156,17 +154,17 @@ export function LegalAcceptancePanel({
               key={document.type}
               className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3"
             >
-              <p className="text-sm font-semibold text-[var(--color-text)]">{document.title}</p>
+              <p className="text-sm font-semibold text-[var(--color-text)]">{t(document.type)}</p>
               <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-                Текущая версия {document.version}
+                {t('currentVersion', { version: document.version })}
               </p>
               <Link
-                href={legalDocumentHref(document.type, document.version)}
+                href={localizedDocumentHref(document.type, document.version, locale)}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-2 inline-flex min-h-11 items-center font-semibold text-[var(--color-primary)] underline underline-offset-2"
               >
-                Открыть документ
+                {t('open')}
               </Link>
               <p className="flex items-center gap-1 text-xs">
                 {accepted ? (
@@ -176,10 +174,10 @@ export function LegalAcceptancePanel({
                       size={16}
                       className="text-[var(--color-primary)]"
                     />
-                    Принята
+                    {t('accepted')}
                   </>
                 ) : (
-                  'Ещё не принята'
+                  t('notAccepted')
                 )}
               </p>
             </div>
@@ -193,8 +191,7 @@ export function LegalAcceptancePanel({
           className="flex gap-2 rounded-xl border border-dashed border-[var(--color-warning)] p-3 text-sm text-[var(--color-text-muted)]"
         >
           <WarningCircle aria-hidden="true" className="mt-0.5 shrink-0" size={18} />
-          История согласий временно недоступна. Документы можно открыть, но перед повторным
-          принятием лучше обновить страницу.
+          {t('historyUnavailable')}
         </p>
       ) : null}
 
@@ -209,18 +206,20 @@ export function LegalAcceptancePanel({
               required
             />
             <span>
-              Я прочитал(а) и принимаю Политику конфиденциальности версии {PRIVACY_POLICY.version} и
-              Условия использования версии {TERMS_POLICY.version}.
+              {t('confirmation', {
+                privacyVersion: currentPolicies.privacy.version,
+                termsVersion: currentPolicies.terms.version,
+              })}
             </span>
           </label>
           <Button type="submit" size="sm" disabled={!confirmed || busy}>
-            {busy ? 'Сохраняем…' : 'Принять текущие версии'}
+            {busy ? t('saving') : t('accept')}
           </Button>
         </form>
       ) : (
         <p className="flex items-center gap-2 rounded-xl bg-[var(--color-primary-soft)] p-3 text-sm font-semibold text-[var(--color-primary)]">
           <CheckCircle aria-hidden="true" size={18} weight="fill" />
-          Текущие версии приняты.
+          {t('acceptedCurrent')}
         </p>
       )}
 
@@ -232,7 +231,7 @@ export function LegalAcceptancePanel({
 
       {acceptances.length > 0 ? (
         <div className="space-y-2">
-          <h3 className="text-sm font-bold">История принятия</h3>
+          <h3 className="text-sm font-bold">{t('history')}</h3>
           <ul className="divide-y divide-[var(--color-border)] rounded-xl border border-[var(--color-border)] px-3">
             {acceptances.map((acceptance) => (
               <li
@@ -241,20 +240,28 @@ export function LegalAcceptancePanel({
               >
                 <span>
                   <strong className="text-[var(--color-text)]">
-                    {documentLabel(acceptance.document_type)} {acceptance.version}
+                    {t(acceptance.document_type)} {acceptance.version}
                   </strong>
                   <span className="block text-xs text-[var(--color-text-muted)]">
-                    {acceptedAtLabel(acceptance.accepted_at)} ·{' '}
-                    {acceptance.source === 'registration' ? 'при регистрации' : 'в профиле'}
+                    {Number.isNaN(Date.parse(acceptance.accepted_at))
+                      ? t('dateUnavailable')
+                      : `${format.dateTime(new Date(acceptance.accepted_at), {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        })} (${t('timezone')})`}{' '}
+                    ·{' '}
+                    {acceptance.source === 'registration'
+                      ? t('sourceRegistration')
+                      : t('sourceProfile')}
                   </span>
                 </span>
                 <Link
-                  href={legalDocumentHref(acceptance.document_type, acceptance.version)}
+                  href={localizedDocumentHref(acceptance.document_type, acceptance.version, locale)}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex min-h-11 shrink-0 items-center font-semibold text-[var(--color-primary)] underline underline-offset-2"
                 >
-                  Открыть принятую версию
+                  {t('openAccepted')}
                 </Link>
               </li>
             ))}

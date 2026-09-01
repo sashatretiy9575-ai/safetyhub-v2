@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "soobshit-ob-opasnosti-i-incidentah",
+  "slug": "soobshit-ob-opasnosti-i-incidentah",
+  "title": "A near miss: why hazardous situations must be reported",
+  "description": "What to write down after a near-incident, how to separate facts from guesswork and turn the signal into real improvement.",
+  "coverImage": "/images/generated/article-near-miss.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "The load swayed next to the man, the box fell into an empty passage, the tool fell off, but did not hit anyone. It's easy to exhale and forget. However, this situation freely reveals a weak point before injury occurs."
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "A dangerous situation is data, not denunciation",
+      "content": "The purpose of the message is to remove a condition that may recur. A good entry describes the event and setting rather than looking for someone to blame."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Secure the area first"
+    },
+    {
+      "type": "paragraph",
+      "content": "If risk persists, stop the action, alert people, and notify the person in charge. Do not leave a dropped object, spill, or damage “until convenient.” In case of injury or deterioration of health, they first call for help and act according to emergency procedures, and make a recording later."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Five facts for a useful message"
+    },
+    {
+      "type": "list",
+      "items": [
+        "When and where it happened - time, area, landmark.",
+        "What was performed immediately before the event.",
+        "What did you see or hear: movement, sound, position of objects.",
+        "Who or what might have been hurt and how close it was.",
+        "What temporary measures have already been taken: stopping, fencing, shutdown by a specialist."
+      ],
+      "style": "ordered"
+    },
+    {
+      "rows": [
+        [
+          "The driver is inattentive again",
+          "The forklift entered a turn while a pedestrian was in a marked crossing"
+        ],
+        [
+          "The rack is bad",
+          "Deformation is visible on the second rack, the lower beam is displaced"
+        ],
+        [
+          "Everyone violates",
+          "At 15:20 three people passed through the closed signal tape"
+        ],
+        [
+          "Lucky, everything is fine",
+          "A box weighing about 10 kg fell a meter from the workplace"
+        ]
+      ],
+      "type": "table",
+      "caption": "Fact and guess sound different",
+      "headers": [
+        "Bad wording",
+        "Useful wording"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Photos are not always useful"
+    },
+    {
+      "type": "paragraph",
+      "content": "Take photographs only when permitted, safe and not disruptive to assistance. Do not enter a hazard zone merely to take a photograph. Do not photograph the injured person or documents containing personal data. An accurate sketch, time and description of object locations may be more useful than an attractive photograph."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "How to understand that the message worked"
+    },
+    {
+      "type": "list",
+      "items": [
+        "hazard temporarily isolated or eliminated;",
+        "the message has been assigned a clear status or has been received by a specific person;",
+        "the cause is determined, and not just the consequences are removed;",
+        "the change is communicated to those facing the same risk;",
+        "After fixing, it is verified that the problem does not recur."
+      ],
+      "style": "unordered"
+    },
+    {
+      "type": "quote",
+      "content": "“No one was hurt” is a good outcome, but a bad reason to not change anything."
+    },
+    {
+      "type": "paragraph",
+      "content": "If an event does result in an injury, do not try to decide for yourself whether it is considered work-related. Report it in a timely manner in the prescribed manner and retain the factual information for official review."
+    },
+    {
+      "url": "/topics",
+      "text": "Brush up on safety knowledge",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "A near miss: why hazardous situations must be reported",
+    "ogImage": "/images/generated/article-near-miss.webp",
+    "ogTitle": "A near miss: why hazardous situations must be reported",
+    "indexable": true,
+    "description": "What to write down after a near-incident, how to separate facts from guesswork and turn the signal into real improvement.",
+    "ogDescription": "What to write down after a near-incident, how to separate facts from guesswork and turn the signal into real improvement."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-12",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K1500000414",
+      "title": "Labor Code of the Republic of Kazakhstan"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500012655",
+      "title": "Forms for investigation of work-related accidents"
+    }
+  ],
+  "createdAt": "2026-08-05T00:00:00.000Z",
+  "updatedAt": "2026-08-05T00:00:00.000Z"
+}

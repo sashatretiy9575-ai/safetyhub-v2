@@ -10,6 +10,13 @@ const paramsSchema = z.object({
   testVersion: z.coerce.number().int().positive(),
 });
 
+type SafeEmailRpcClient = {
+  rpc(
+    name: 'get_safe_user_email',
+    args: { p_user_id: string },
+  ): PromiseLike<{ data: unknown; error: { message: string } | null }>;
+};
+
 export async function GET(
   request: Request,
   context: { params: Promise<{ userId: string }> },
@@ -27,7 +34,7 @@ export async function GET(
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
     const admin = createAdminClient();
-    const [{ data: revision, error: revisionError }, authResult] = await Promise.all([
+    const [{ data: revision, error: revisionError }, authResult, safeEmailResult] = await Promise.all([
       admin
         .from('test_revisions')
         .select('id')
@@ -35,10 +42,14 @@ export async function GET(
         .eq('version', parsed.data.testVersion)
         .maybeSingle(),
       admin.auth.admin.getUserById(parsed.data.userId),
+      (admin as unknown as SafeEmailRpcClient).rpc('get_safe_user_email', {
+        p_user_id: parsed.data.userId,
+      }),
     ]);
     if (revisionError) throw revisionError;
     if (authResult.error) throw authResult.error;
-    const email = authResult.data.user?.email ?? null;
+    if (safeEmailResult.error) throw safeEmailResult.error;
+    const email = typeof safeEmailResult.data === 'string' ? safeEmailResult.data : null;
     if (!revision) return NextResponse.json({ email, items: [] });
 
     const { data, error } = await admin

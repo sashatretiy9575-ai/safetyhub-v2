@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "courseId": "5641b254-4aa5-4a8c-a7cf-4364a1de6db0",
+  "slug": "pozharnaya-bezopasnost",
+  "locale": "en",
+  "title": "fire safety",
+  "description": "Fire prevention, warning, evacuation, use of primary extinguishing agents and safe actions in case of fire.",
+  "content": {
+    "modules": []
+  },
+  "seo": {},
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-21",
+  "sources": [],
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "importSequence": {
+    "firstAdminSaveExpectedVersion": null,
+    "serviceAssessmentImportExpectedVersion": 1,
+    "completionAdminSaveExpectedVersion": 2,
+    "presentationId": "${PRESENTATION_ID_FROM_IMMUTABLE_UPLOAD}"
+  },
+  "sourceTopologySha256": "a3acfe341d3b971748721db095a4cce3a27be0f09e88a3f5db9708e3448366eb",
+  "sourceAnswerMappingSha256": "28fab5c5b71a3968b52727441d970e865582ce074996e0a793b2390c47a0366e",
+  "answerKeysIncluded": false
+}

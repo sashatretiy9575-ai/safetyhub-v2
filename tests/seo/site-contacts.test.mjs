@@ -42,8 +42,10 @@ test('public contacts are server cached and rendered into contact and SEO compon
   assert.match(contacts, /unstable_cache/);
   assert.match(contacts, /SITE_CONTACTS_REVALIDATE_SECONDS = 60 \* 60/);
   assert.match(contacts, /get_site_settings/);
-  assert.match(layout, /organizationJsonLd\(contacts\)/);
-  assert.match(layout, /localBusinessJsonLd\(contacts\)/);
+  assert.match(layout, /organizationJsonLd\(contacts, locale, \{/);
+  assert.match(layout, /description: metadata\('description'\)/);
+  assert.match(layout, /city: footer\('city'\)/);
+  assert.match(layout, /localBusinessJsonLd\(contacts, locale, footer\('city'\)\)/);
   assert.match(seo, /telephone: contacts\.phoneDisplay/);
   assert.match(shell, /getSiteContacts/);
   assert.match(adminRoute, /invalidOriginResponse/);

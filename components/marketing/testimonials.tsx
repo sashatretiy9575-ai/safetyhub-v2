@@ -1,28 +1,14 @@
 import { ArrowRight, CheckCircle, Quotes } from '@phosphor-icons/react/dist/ssr';
 import { Carousel } from '@/components/ui/carousel';
-
-const CASES = [
-  {
-    context: 'Новый сотрудник',
-    problem: 'Нужно быстро освежить правила перед первым рабочим днём.',
-    action: 'Материал проходит с телефона небольшими смысловыми блоками.',
-    outcome: 'Результат теста сразу остаётся в аккаунте.',
-  },
-  {
-    context: 'Специалист по охране труда',
-    problem: 'Важно видеть, какие темы уже пройдены участниками.',
-    action: 'Лучший результат по каждому курсу собран в одном профиле без бумажных записей.',
-    outcome: 'К аттестациям и сертификатам можно вернуться в любой момент.',
-  },
-  {
-    context: 'Руководитель команды',
-    problem: 'Сотрудникам неудобно проходить длинные проверки на телефоне.',
-    action: 'Каждый тест ограничен десятью понятными вопросами.',
-    outcome: 'Проверка не превращается в длинную мобильную анкету.',
-  },
-] as const;
+import { useTranslations } from 'next-intl';
 
 export function Testimonials() {
+  const t = useTranslations('Home.cases');
+  const cases = [
+    { context: t('employee'), problem: t('employeeProblem'), action: t('employeeAction'), outcome: t('employeeOutcome') },
+    { context: t('specialist'), problem: t('specialistProblem'), action: t('specialistAction'), outcome: t('specialistOutcome') },
+    { context: t('manager'), problem: t('managerProblem'), action: t('managerAction'), outcome: t('managerOutcome') },
+  ] as const;
   return (
     <section
       aria-labelledby="cases-heading"
@@ -32,33 +18,33 @@ export function Testimonials() {
         <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(20rem,0.6fr)] lg:items-end lg:gap-14">
           <div>
             <p className="text-[11px] font-bold tracking-[0.14em] text-[var(--color-text-subtle)] uppercase sm:text-xs">
-              Сценарии использования
+              {t('eyebrow')}
             </p>
             <h2
               id="cases-heading"
               className="mt-2.5 text-[24px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[30px] lg:text-[38px]"
             >
-              Как используют SafetyHub
+              {t('title')}
             </h2>
           </div>
           <p className="max-w-xl border-l-2 border-[var(--color-primary)]/45 pl-4 text-[14px] leading-[1.6] text-[var(--color-text-muted)] sm:text-[15px] sm:leading-6 lg:justify-self-end">
-            Обезличенные типовые сценарии без названий компаний, лиц и рекламных цифр.
+            {t('description')}
           </p>
         </div>
 
         <Carousel
-          label="Сценарии использования"
+          label={t('slider')}
           className="mt-7 md:mt-11"
           gridClassName="md:grid-cols-3"
         >
-          {CASES.map((item) => (
+          {cases.map((item) => (
             <article
               key={item.context}
               className="flex h-full flex-col rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/72 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl md:p-6"
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-1.5 text-[10px] font-bold tracking-wider text-[var(--color-text-muted)] uppercase">
-                  Типовой сценарий
+                  {t('type')}
                 </span>
                 <Quotes
                   size={26}
@@ -72,7 +58,7 @@ export function Testimonials() {
               <div className="mt-4 space-y-3 text-sm">
                 <dl>
                   <dt className="text-[10px] font-black tracking-widest text-[var(--color-text-subtle)] uppercase">
-                    Задача
+                    {t('task')}
                   </dt>
                   <dd className="mt-1 leading-relaxed text-[var(--color-text-muted)]">
                     {item.problem}
@@ -87,7 +73,7 @@ export function Testimonials() {
                   />
                   <dl>
                     <dt className="text-[10px] font-black tracking-widest text-[var(--color-text-subtle)] uppercase">
-                      Действие
+                      {t('action')}
                     </dt>
                     <dd className="mt-1 leading-relaxed text-[var(--color-text-muted)]">
                       {item.action}
@@ -103,7 +89,7 @@ export function Testimonials() {
                   />
                   <dl>
                     <dt className="text-[10px] font-black tracking-widest text-[var(--color-text-subtle)] uppercase">
-                      Результат
+                      {t('result')}
                     </dt>
                     <dd className="mt-1 leading-relaxed text-[var(--color-text-muted)]">
                       {item.outcome}

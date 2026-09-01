@@ -51,6 +51,7 @@ const secretPatterns = [
   /\bnpm_[A-Za-z0-9]{36}\b/gu,
   /\bsk_(?:live|test)_[A-Za-z0-9]{16,}\b/gu,
   /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/gu,
+  /\b[0-9]{6,12}:[A-Za-z0-9_-]{30,}\b/gu,
   /\bAIza[0-9A-Za-z_-]{35}\b/gu,
   /\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/gu,
   /-----BEGIN (?:RSA |OPENSSH |EC |DSA )?PRIVATE KEY-----/gu,
@@ -106,7 +107,10 @@ const packageManifest = JSON.parse(readFileSync(path.join(repositoryRoot, 'packa
 const approvedInstallScripts = packageManifest.allowScripts ?? {};
 for (const [packagePath, metadata] of Object.entries(lock.packages ?? {})) {
   if (!metadata.hasInstallScript) continue;
-  const packageName = packagePath.replace(/^node_modules\//u, '');
+  // npm lockfiles can nest a second copy below
+  // `node_modules/<parent>/node_modules/<package>`. `allowScripts` is keyed by
+  // the actual package name/version, not by its installation location.
+  const packageName = packagePath.split('node_modules/').at(-1) ?? packagePath;
   const approval = `${packageName}@${metadata.version}`;
   if (approvedInstallScripts[approval] !== true) {
     fail(`${approval} has install scripts but is not explicitly version-pinned in allowScripts`);

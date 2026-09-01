@@ -1,11 +1,12 @@
 import { Suspense } from 'react';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { Hero } from '@/components/marketing/hero';
 import { PartnersStrip } from '@/components/marketing/partners-strip';
 import { CourseGrid } from '@/components/marketing/course-grid';
 import { ProcessTimeline } from '@/components/marketing/process-timeline';
 import { Testimonials } from '@/components/marketing/testimonials';
 import { Resources } from '@/components/marketing/resources';
-import { FAQ_DATA, FaqAccordion } from '@/components/marketing/faq-accordion';
+import { FaqAccordion, getFaqData } from '@/components/marketing/faq-accordion';
 import { ContactCta } from '@/components/marketing/contact-cta';
 import { JsonLd } from '@/components/shared/json-ld';
 import { buildMetadata, faqJsonLd } from '@/lib/seo';
@@ -30,24 +31,28 @@ function HomeSectionFallback({ label }: { label: string }) {
   );
 }
 
-export const metadata = buildMetadata({
-  title: 'Обучение по охране труда',
-  description:
-    'Онлайн-обучение по промышленной безопасности, охране труда и пожарной безопасности.',
-  path: '/',
-});
+export async function generateMetadata() {
+  const t = await getTranslations('Home');
+  return buildMetadata({
+    title: t('metadataTitle'),
+    description: t('metadataDescription'),
+    path: '/',
+    locale: await getLocale(),
+  });
+}
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [t, faqData] = await Promise.all([getTranslations('Home'), getFaqData()]);
   return (
     <>
-      <JsonLd data={faqJsonLd(FAQ_DATA)} />
+      <JsonLd data={faqJsonLd(faqData)} />
       <Hero />
-      <Suspense fallback={<HomeSectionFallback label="Загружаем курсы" />}>
+      <Suspense fallback={<HomeSectionFallback label={t('loadingCourses')} />}>
         <CourseGrid />
       </Suspense>
       <PartnersStrip />
       <ProcessTimeline />
-      <Suspense fallback={<HomeSectionFallback label="Загружаем материалы" />}>
+      <Suspense fallback={<HomeSectionFallback label={t('loadingResources')} />}>
         <Resources />
       </Suspense>
       <Testimonials />

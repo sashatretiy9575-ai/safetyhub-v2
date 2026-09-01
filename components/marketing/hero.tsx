@@ -4,17 +4,17 @@ import { preload } from 'react-dom';
 import { ArrowRight, ChatCircleDots, MapPin } from '@phosphor-icons/react/dist/ssr';
 import { Container } from '@/components/ui/container';
 import { ROUTES } from '@/lib/constants';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { localizePathname } from '@/i18n/config';
 
 const HERO_IMAGES = {
   desktop: '/images/generated/hero-safetyhub-desktop-v2.webp',
   mobile: '/images/generated/hero-safetyhub-mobile-v2.webp',
 } as const;
 
-const HERO_ALT = 'Специалисты по безопасности проверяют данные на производстве';
-
-function HeroPicture() {
+function HeroPicture({ alt }: { alt: string }) {
   const common = {
-    alt: HERO_ALT,
+    alt,
     fill: true,
     priority: true,
     quality: 82,
@@ -49,7 +49,7 @@ function HeroPicture() {
       <source media="(min-width: 1024px)" srcSet={desktopImageProps.srcSet} />
       <img
         {...mobileImageProps}
-        alt={HERO_ALT}
+        alt={alt}
         fetchPriority="high"
         className="object-cover object-center"
       />
@@ -57,13 +57,14 @@ function HeroPicture() {
   );
 }
 
-export function Hero() {
+export async function Hero() {
+  const [t, locale] = await Promise.all([getTranslations('Home.hero'), getLocale()]);
   return (
     <section aria-labelledby="hero-heading" className="py-4 sm:py-7 lg:py-10">
       <Container size="wide">
         <div className="relative isolate grid overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)]/78 shadow-[0_24px_64px_-42px_rgba(15,23,18,0.38)] backdrop-blur-xl lg:min-h-[33rem] lg:grid-cols-[0.86fr_1.14fr] lg:rounded-[32px]">
           <div className="relative aspect-[16/9] min-h-0 overflow-hidden lg:order-2 lg:aspect-auto">
-            <HeroPicture />
+            <HeroPicture alt={t('imageAlt')} />
             <div
               aria-hidden="true"
               className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent lg:bg-gradient-to-r lg:from-[var(--color-surface)]/15 lg:to-transparent"
@@ -78,7 +79,7 @@ export function Hero() {
                 className="text-[var(--color-primary)]"
                 aria-hidden="true"
               />
-              Алматы · онлайн по Казахстану
+              {t('eyebrow')}
             </span>
             <span
               aria-hidden="true"
@@ -88,22 +89,22 @@ export function Hero() {
               id="hero-heading"
               className="mt-3.5 max-w-xl text-[28px] leading-[1.14] font-bold tracking-[-0.04em] text-balance sm:text-[40px] sm:leading-[1.1] lg:text-[46px] lg:leading-[1.07] xl:text-[50px]"
             >
-              Обучение по безопасности без лишней сложности
+              {t('title')}
             </h1>
             <p className="mt-4 max-w-xl text-[14px] leading-[1.6] text-[var(--color-text-muted)] sm:text-base sm:leading-7">
-              Презентации, 10 вопросов и результат в аккаунте.
+              {t('description')}
             </p>
 
             <div className="mt-6 grid grid-cols-1 gap-2.5 min-[340px]:grid-cols-2 sm:mt-7 sm:flex sm:flex-wrap sm:gap-3">
               <Link
-                href={ROUTES.topics}
+                href={localizePathname(ROUTES.topics, locale)}
                 className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-2.5 text-[13px] font-semibold text-[var(--color-primary-foreground)] transition hover:bg-[var(--color-primary-hover)] sm:min-h-[52px] sm:gap-2 sm:px-6 sm:text-sm"
               >
-                Выбрать курс
+                {t('courses')}
                 <ArrowRight size={17} weight="regular" aria-hidden="true" />
               </Link>
               <Link
-                href={ROUTES.contacts}
+                href={localizePathname(ROUTES.contacts, locale)}
                 className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 px-2.5 text-[13px] font-semibold text-[var(--color-text)] backdrop-blur-xl transition hover:bg-[var(--color-surface)] sm:min-h-[52px] sm:gap-2 sm:px-6 sm:text-sm"
               >
                 <ChatCircleDots
@@ -112,7 +113,7 @@ export function Hero() {
                   className="text-[var(--color-primary)]"
                   aria-hidden="true"
                 />
-                Связаться
+                {t('contact')}
               </Link>
             </div>
           </div>

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "pozharnaya-bezopasnost",
+  "locale": "kk",
+  "productionPublished": false,
+  "contentSummary": "өрт қауіпсіздігі: Өрттің алдын алу, ескерту, эвакуация, бастапқы сөндіргіштерді қолдану және өрт кезіндегі қауіпсіз әрекеттер.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/pozharnaya-bezopasnost/presentation.pptx",
+    "pptxSha256": "4e75a28d8b2a55fd272a34e9674babc09709b4d35b837c111ff73cfeb6f0e9b8",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/kk/text-map.json",
+    "textMapSha256": "d12a1e65edc83511678354c8943234d4e6da3ff6de89d261311e09d60101103d"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/kk/assets/pptx/37374afd69bd03eb9408a68b08d3709d0ddc3eabc43c489865fb6115dfea2c22/presentation.pptx",
+    "sha256": "37374afd69bd03eb9408a68b08d3709d0ddc3eabc43c489865fb6115dfea2c22",
+    "byteSize": 1441499,
+    "slideCount": 41
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/kk/assets/pdf/87d105fc0c0a40cd04d4028178ea58fe75e3fe60aa0e025a7b68cda5c2ad8815/presentation.pdf",
+    "sha256": "87d105fc0c0a40cd04d4028178ea58fe75e3fe60aa0e025a7b68cda5c2ad8815",
+    "byteSize": 638461,
+    "pageCount": 41,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "edits": {
+    "translatedElementCount": 271,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 89,
+    "sourceNotesAdded": 41,
+    "textTopologySha256": "fb93e8932c446197cba8a0e9b61764373ad3de2b6a0b51c6f56217c06f7b7888",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "status": "passed",
+    "automatedOnly": true,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 41
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 616,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "pptxRenderedSlideCount": 41,
+    "pdfRenderedPageCount": 41,
+    "pageTextLayerCount": 41,
+    "localizedTextUnitCount": 360,
+    "localizedTextMismatchCount": 0,
+    "missingGlyphSentinelCount": 0,
+    "templateTypographyRegressionCount": 0,
+    "templateTypographyReport": "content/localizations/staged-2026-09-01/qa/presentation-layout-audit.all.json",
+    "canvasOverflowCount": 0,
+    "canvasOverflowCheck": "Test passed. No overflow detected.",
+    "textFrameOverflowCount": 0,
+    "textFrameObservedOverflowCount": 0,
+    "sourceTextFrameObservedOverflowCount": 0,
+    "inheritedWithinToleranceTextFrameOverflowCount": 0,
+    "newlyIntroducedTextFrameOverflowCount": 0,
+    "inspectedTextFrameCount": 360,
+    "textFrameOverflowEngine": "Microsoft PowerPoint TextFrame2 bounds, source-relative regression comparison",
+    "nonblankPageChecks": 41,
+    "pdfUnsafeActionCount": 0,
+    "pdfEmbeddedFileCount": 0,
+    "visualMethod": "all-slide artifact-tool raster, all-page PDF.js 1600x900 raster/pixel inspection, contact sheets, localized text-layer comparison and padded-canvas overflow test",
+    "presentationTextMapSha256": "d12a1e65edc83511678354c8943234d4e6da3ff6de89d261311e09d60101103d"
+  },
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

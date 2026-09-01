@@ -1,16 +1,29 @@
 import { notFound } from 'next/navigation';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { PrivacyPolicyV12 } from '@/components/legal/privacy-policy-v1-2';
+import { PrivacyPolicyV13 } from '@/components/legal/privacy-policy-v1-3';
 import { LegalContacts } from '@/components/legal/legal-contacts';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
-import { formatLegalDate, LEGAL_REFERENCE_LINKS, resolveLegalDocumentVersion } from '@/lib/legal';
+import { formatLegalDate, LEGAL_REFERENCE_LINKS } from '@/lib/legal';
+import { resolveActivatedLegalPolicy } from '@/lib/legal-current';
 import { buildMetadata } from '@/lib/seo';
+import { getLocalizedLegalDocument } from '@/lib/content/legal-documents';
+import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-document';
+import type { AppLocale } from '@/i18n/config';
 
-export const metadata = buildMetadata({
-  title: 'Политика конфиденциальности',
-  description: 'Как SafetyHub обрабатывает и защищает персональные данные.',
-  path: '/privacy',
-});
+export async function generateMetadata() {
+  const [locale, t] = await Promise.all([
+    getLocale() as Promise<AppLocale>,
+    getTranslations('LegalFlow'),
+  ]);
+  return buildMetadata({
+    title: t('privacy'),
+    description: t('privacyMetadataDescription'),
+    path: '/privacy',
+    locale,
+  });
+}
 
 type PrivacyPageProps = {
   searchParams: Promise<{ version?: string | string[] }>;
@@ -22,8 +35,15 @@ const externalLinkClass =
 export default async function PrivacyPage({ searchParams }: PrivacyPageProps) {
   const requested = (await searchParams).version;
   const requestedVersion = Array.isArray(requested) ? requested[0] : requested;
-  const policy = resolveLegalDocumentVersion('privacy', requestedVersion);
+  const locale = (await getLocale()) as AppLocale;
+  if (locale !== 'ru') {
+    const localized = await getLocalizedLegalDocument('privacy', requestedVersion, locale);
+    if (!localized) notFound();
+    return <LocalizedLegalDocumentView document={localized} />;
+  }
+  const policy = await resolveActivatedLegalPolicy('privacy', requestedVersion);
   if (!policy) notFound();
+  if (policy.bodyRevision === 'privacy-1.3') return <PrivacyPolicyV13 policy={policy} />;
   if (policy.bodyRevision === 'privacy-1.2') return <PrivacyPolicyV12 policy={policy} />;
   if (policy.bodyRevision !== 'privacy-1.1') notFound();
 

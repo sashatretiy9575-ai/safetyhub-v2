@@ -14,7 +14,7 @@ export function MarketingSlider({
   children,
   className,
   itemClassName,
-  itemLabel = 'Карточка',
+  itemLabel,
 }: MarketingSliderProps) {
   return (
     <Carousel
@@ -23,8 +23,6 @@ export function MarketingSlider({
       itemClassName={itemClassName}
       className={className}
       variant="marketing"
-      previousLabel={`Предыдущая ${itemLabel.toLocaleLowerCase('ru-RU')}`}
-      nextLabel={`Следующая ${itemLabel.toLocaleLowerCase('ru-RU')}`}
     >
       {children}
     </Carousel>

@@ -1,0 +1,2341 @@
+{
+  "schemaVersion": 1,
+  "slug": "armaturshchik",
+  "locale": "kk",
+  "sourcePptx": "content/source-materials/derived/armaturshchik/presentation.pptx",
+  "slideCount": 31,
+  "slides": [
+    {
+      "slide": 1,
+      "slideId": "sl/y90nupkv",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/7qp4be9c",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "COURSE_KICKER",
+          "text": "УЧЕБНЫЙ КУРС",
+          "sourceTextSha256": "75cac1330e9d5668307c2a56beaadcfde7e96292c2b1cf30849e5d8cc270ded1",
+          "translatedText": "ОҚУ КУРСЫ"
+        },
+        {
+          "id": "sh/65g3298r",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "DECK_TITLE",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/sryl4zqx",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "DECK_SUBTITLE",
+          "text": "Технология, качество и безопасное выполнение арматурных работ",
+          "sourceTextSha256": "c7394ebc2f44f141a41a4a07f063c87e69746c72b714c4e98e36e21ad69780bf",
+          "translatedText": "Арматура жұмыстарының технологиясы, сапасы және қауіпсіз орындалуы"
+        },
+        {
+          "id": "sh/fu94fe98",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "DECK_AUDIENCE",
+          "text": "Учебный курс для рабочих и линейного персонала",
+          "sourceTextSha256": "f39f8059374d9aa573c6b106502b3275b17b1467ce37f81f9067fadfbf52df00",
+          "translatedText": "Жұмысшылар мен желілік қызметкерлерді оқыту курсы"
+        },
+        {
+          "id": "sh/ul4vaxgb",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/vmdcj2xw",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        }
+      ]
+    },
+    {
+      "slide": 2,
+      "slideId": "sl/hwbqtkby",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/9072xkry",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "После курса работник сможет",
+          "sourceTextSha256": "4d0cf225b066ac4e94a63069ec59a5c5eccf08eaf1c1126690df72b4cac39d05",
+          "translatedText": "Курстан кейін жұмыскер мүмкін болады"
+        },
+        {
+          "id": "sh/ozy1ofad",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "LIST_NUMBER_1",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/a10jqpsj",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "LIST_ITEM_1",
+          "text": "Подготовить материал, инструмент и рабочую зону по проекту и заданию.",
+          "sourceTextSha256": "c2b39856fd8112f3b8b7fd011a41f42945436b598f236d0819de37f9633f2743",
+          "translatedText": "Материалды, құралдарды және жұмыс аймағын жобаға және тапсырмаға сәйкес дайындаңыз."
+        },
+        {
+          "id": "sh/x4r21kru",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "LIST_NUMBER_2",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/r65knqtk",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "LIST_ITEM_2",
+          "text": "Безопасно выполнить правку, резку, гибку, вязку и сборку каркаса.",
+          "sourceTextSha256": "f752767ca1c505de7a8a94550413697f0a16e788d5e113c299db0b68969f5ba7",
+          "translatedText": "Арматураны қауіпсіз түзету, кесу, ию және байлау, сондай-ақ қаңқаны құрастыру."
+        },
+        {
+          "id": "sh/q5wjelsz",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "LIST_NUMBER_3",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/9wnqhczy",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "LIST_ITEM_3",
+          "text": "Различать способы соединения и не подменять проектное решение.",
+          "sourceTextSha256": "34112a6bb23ffee19181265c5c62d1e8cd545d89edc092b48301f00dd2a6aa20",
+          "translatedText": "Қосылу әдістерін ажыратыңыз және жобалық шешімді ауыстырмаңыз."
+        },
+        {
+          "id": "sh/mtwrmxg7",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "LIST_NUMBER_4",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/wjy9sry9",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "LIST_ITEM_4",
+          "text": "Проверить качество, распознать опасное условие и остановить работу.",
+          "sourceTextSha256": "9d02f806dc2879641a79281296e66f53b7a1a3a3aaf643a513c3c7c13c19c8f5",
+          "translatedText": "Сапаны тексеріңіз, қауіпті жағдайды танып, жұмысты тоқтатыңыз."
+        },
+        {
+          "id": "sh/bip8jmho",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Арматура работает в конструкции только при точном положении и надёжном соединении.",
+          "sourceTextSha256": "827940735728969ecb2075780a2337af8b3da07363fcb8fb63341af53b5a5089",
+          "translatedText": "арматура құрылымда дәл позиция және сенімді қосылыммен ғана жұмыс істейді."
+        },
+        {
+          "id": "sh/s72xofmh",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/76twva5c",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        }
+      ]
+    },
+    {
+      "slide": 3,
+      "slideId": "sl/ofy9wn61",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/cza94vmx",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Логика курса",
+          "sourceTextSha256": "9811ffd0b4bd51ed3b5d8cdebadc40ec24d961f5312280f37c2a3b31c3efff99",
+          "translatedText": "Курс логикасы"
+        },
+        {
+          "id": "sh/d0jax03i",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "LIST_NUMBER_1",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/3ah8rqlg",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "LIST_ITEM_1",
+          "text": "Материалы, проект и подготовка.",
+          "sourceTextSha256": "2572d87ec3f7b992e7e05bbfc0c91c99c9dd698c3ca1a9f6f588073376c3444a",
+          "translatedText": "Материалдар, дизайн және дайындық."
+        },
+        {
+          "id": "sh/obq90bml",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "LIST_NUMBER_2",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/m5cra54z",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "LIST_ITEM_2",
+          "text": "Технологическая последовательность.",
+          "sourceTextSha256": "10ab8269f83adf83225423cb7238f05e7e394a0298a381dc8586ab74ff13271b",
+          "translatedText": "Технологиялық реттілік."
+        },
+        {
+          "id": "sh/n6ls3alk",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "LIST_NUMBER_3",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/m1c3mlsn",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "LIST_ITEM_3",
+          "text": "Соединения и установка каркаса.",
+          "sourceTextSha256": "0692dec5ba28b11b099c63b2499f2d51ce01a6260a884dabe02058caa66b55eb",
+          "translatedText": "Жақтауды қосу және орнату."
+        },
+        {
+          "id": "sh/943mhgre",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "LIST_NUMBER_4",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/v6l4jq94",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "LIST_ITEM_4",
+          "text": "Контроль качества и типовые дефекты.",
+          "sourceTextSha256": "7533c533e04ffd58146fddb36623d9ffd9b2dcf99d96456ade4060f93e6b2e2d",
+          "translatedText": "Сапаны бақылау және типтік ақаулар."
+        },
+        {
+          "id": "sh/a5c3ql8z",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "LIST_NUMBER_5",
+          "text": "05",
+          "sourceTextSha256": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+          "translatedText": "05"
+        },
+        {
+          "id": "sh/w7ulsvqp",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "LIST_ITEM_5",
+          "text": "Риски, СИЗ и условия остановки.",
+          "sourceTextSha256": "615d3a3a5082fac7902260eb972a9d7dcc87d3efae3a8309e193779ed78e6b9f",
+          "translatedText": "Тәуекелдер, ЖҚҚ және тоқтату шарттары."
+        },
+        {
+          "id": "sh/i9w3u58v",
+          "shapeId": "19",
+          "kind": "shape",
+          "text": "КУРС",
+          "sourceTextSha256": "0181e92ec27149039fb2f998972369363d8dbe9989444c5c3aec7e1ff0b98640",
+          "translatedText": "КУРС"
+        },
+        {
+          "id": "sh/f29gbyx0",
+          "shapeId": "21",
+          "kind": "shape",
+          "text": "смысловых блоков",
+          "sourceTextSha256": "b9127e0dd9ea43a0023b523b097f92de1175fd6f49a2293dd77d08efefb9dbd0",
+          "translatedText": "семантикалық блоктар"
+        },
+        {
+          "id": "sh/re9g7yxo",
+          "shapeId": "25",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/sfix03y9",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/batgjixs",
+          "shapeId": "29",
+          "kind": "shape",
+          "name": "AGENDA_COUNT_CIRCLE",
+          "text": "5",
+          "sourceTextSha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+          "translatedText": "5"
+        }
+      ]
+    },
+    {
+      "slide": 4,
+      "slideId": "sl/jyx0ra1s",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/0ba143al",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/ql8jytsj",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Задание, материал и подготовка",
+          "sourceTextSha256": "45601900118a023beecdbde8f7c5eed4df8635d7534703cc310fd0c398cdeea6",
+          "translatedText": "Тапсырма, материал және дайындық"
+        },
+        {
+          "id": "sh/doj29oba",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "До обработки нужно понять проект, организовать перемещение и исключить самовольные замены.",
+          "sourceTextSha256": "913bec22d57c54066807829b4025b88ff179304b618728423959759aa84f865e",
+          "translatedText": "Өңдеу алдында жобаны түсіну, қозғалысты ұйымдастыру және рұқсат етілмеген ауыстыруларды болдырмау керек."
+        },
+        {
+          "id": "sh/kbm987y5",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/5cva1cfq",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        }
+      ]
+    },
+    {
+      "slide": 5,
+      "slideId": "sl/i107q5of",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/dgbulwnm",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Арматура формирует силовую схему",
+          "sourceTextSha256": "a72c762aa5c6f211e9588d101caa3de254269e375c58e6c2ff226a5b9407aca7",
+          "translatedText": "Арматура құрылымның күш сұлбасын құрайды"
+        },
+        {
+          "id": "sh/cf2tcr61",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Арматурщик заготавливает, собирает и устанавливает элементы усиления железобетонных конструкций. • Работа связана с проектными размерами, положением стержней, соединениями и защитным слоем. • Изменение диаметра, шага, формы или способа соединения выполняют только по согласованному решению. • Готовность каркаса подтверждается контролем до бетонирования.",
+          "sourceTextSha256": "d21982f10844b1b9c5aafe8df18ed655a1bd6b5df6c8da64fe345e9ae9028f39",
+          "translatedText": "• Арматуршы темірбетон конструкцияларының арматура элементтерін дайындайды, құрастырады және орнатады. • Жұмыс жобалық өлшемдерге, арматура өзектерінің орналасуына, қосылыстарға және бетонның қорғаныш қабатына байланысты. • Диаметрді, қадамды, пішінді немесе қосу тәсілін тек келісілген жобалық шешім бойынша өзгертеді. • Қаңқаның дайындығы бетондау алдында жүргізілген бақылаумен расталады."
+        },
+        {
+          "id": "sh/l4bupwny",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Скрытая после бетонирования ошибка должна быть выявлена заранее.",
+          "sourceTextSha256": "a6215772c9f20a8f8f99cb7386c6b769724718a65a338480074829f16d851cd3",
+          "translatedText": "Бетондаудан кейін жасырылған қате алдын ала анықталуы керек."
+        },
+        {
+          "id": "sh/w32dkbuh",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/x4vedgvm",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "05",
+          "sourceTextSha256": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+          "translatedText": "05"
+        }
+      ]
+    },
+    {
+      "slide": 6,
+      "slideId": "sl/x8f69ofe",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/yhg7epsj",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Сложность работ растёт вместе с разрядом",
+          "sourceTextSha256": "df42d27aee816b7e7db39310bada2b018a3e2f45d09bcdc77e940777eb39d142",
+          "translatedText": "Жұмыстың күрделілігі дәрежеге қарай артады"
+        },
+        {
+          "id": "sh/zi98nu94",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• 2–3-й разряды: простая подготовка, правка, резка, вязка и помощь при сборке. • 4–5-й разряды: сложные каркасы, установка, соединения и чтение рабочих схем. • 6–7-й разряды: особо сложные пространственные каркасы и ответственные конструкции. • Фактическое поручение зависит от квалификации, допуска и технологии на объекте.",
+          "sourceTextSha256": "7027ec5bf1065a9fc3ff045670ced1cdf8f1315aaf12341dd498f42a8289593f",
+          "translatedText": "• 2–3-разрядтар: қарапайым дайындау, түзету, кесу, арматураны байлау және құрастыруға көмектесу. • 4–5-разрядтар: күрделі қаңқалар, орнату, қосылыстар және жұмыс сызбаларын оқу. • 6–7-разрядтар: аса күрделі кеңістіктік қаңқалар мен жауапты конструкциялар. • Нақты тапсырма объектідегі біліктілікке, жұмысқа жіберілуге және технологияға байланысты."
+        },
+        {
+          "id": "sh/ml07i9sv",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Разряд подтверждает компетенцию, но не заменяет проект и инструктаж.",
+          "sourceTextSha256": "685c98ab9dd5e864e8a3203fb1752ceca4392cc3d5e74e63c6ef648b0e2b892d",
+          "translatedText": "Дәреже құзыреттілігін растайды, бірақ жобаны және нұсқама алмастырмайды."
+        },
+        {
+          "id": "sh/h4bupgn6",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/w32twb6l",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "06",
+          "sourceTextSha256": "aacd834b5cdc64a329e27649143406dd068306542988dfc250d6184745894849",
+          "translatedText": "06"
+        }
+      ]
+    },
+    {
+      "slide": 7,
+      "slideId": "sl/gnmp4jqx",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/cb2tkvap",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Материал идентифицируют до обработки",
+          "sourceTextSha256": "067a9e39bd8a133870004249a438b20b3d8f5d527d706f6b986316037b775565",
+          "translatedText": "Материал өңдеу алдында анықталады"
+        },
+        {
+          "id": "sh/dcbud0ra",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Проверяют маркировку партии, диаметр, профиль, состояние поверхности и документы поставки. • Стержни, сетки, проволоку, фиксаторы и соединительные элементы хранят раздельно и устойчиво. • Сильную коррозию, загрязнение, деформацию и несоответствие проекту фиксируют до работы. • Неподтверждённую замену материала не используют.",
+          "sourceTextSha256": "7bbbcd13775dcc5f37c50c4a1587c2aca2329b141e132c138e2254a653db3451",
+          "translatedText": "• Партия таңбасын, диаметрді, профильді, бет күйін және жеткізу құжаттарын тексереді. • Арматура өзектерін, торларды, байлау сымын, бекіткіштер мен қосу элементтерін бөлек әрі орнықты сақтайды. • Күшті коррозияны, ластануды, деформацияны және жобаға сәйкессіздікті жұмыс басталғанға дейін тіркейді. • Расталмаған материал алмастыруын қолданбайды."
+        },
+        {
+          "id": "sh/zedcfa9g",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Марка и диаметр определяются проектом, а не наличием на складе.",
+          "sourceTextSha256": "c3ccbbc25213d90957dcfeddbfef87dae9edd9b7b93839cd322de2735d734111",
+          "translatedText": "Арматура маркасы мен диаметрін қоймадағы бар-жоғы емес, жоба белгілейді."
+        },
+        {
+          "id": "sh/fi9c369c",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/baxkjqlk",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "07",
+          "sourceTextSha256": "19b100ab7725c612f3d80ff203ca53cea5cadaafae3bf0f88f0fb4089fe08815",
+          "translatedText": "07"
+        }
+      ]
+    },
+    {
+      "slide": 8,
+      "slideId": "sl/fu1gfa1s",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/18byd4zy",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Проект задаёт форму и положение каркаса",
+          "sourceTextSha256": "c897111ab9c2ebe9573f4515258126ea33b430576c51c1ec2727da4e3bc524ad",
+          "translatedText": "Жоба жақтаудың пішіні мен орнын анықтайды"
+        },
+        {
+          "id": "sh/g72x4zyd",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• До начала уточняют чертёж, спецификацию, монтажную схему, последовательность и контрольные точки. • Разметку выполняют от установленной базы, проверяя единицы измерения и привязки. • Неясный узел, конфликт размеров или отсутствующий элемент передают руководителю. • Рабочее место готовят под конкретные операции и безопасное перемещение заготовок.",
+          "sourceTextSha256": "64c81810b92f6a0c9edb75b8ebc593beb22bde064374c311837ca063f5570993",
+          "translatedText": "• Жұмысты бастамас бұрын сызбаны, спецификацияны, монтаждау сұлбасын, реттілік пен бақылау нүктелерін нақтылайды. • Белгілеуді белгіленген базадан бастап, өлшем бірліктері мен байланыстырмаларды тексеріп орындайды. • Түсініксіз түйін, өлшемдердің сәйкессіздігі немесе жетіспейтін элемент туралы жетекшіге хабарлайды. • Жұмыс орнын нақты операцияларға және дайындамаларды қауіпсіз жылжытуға дайындайды."
+        },
+        {
+          "id": "sh/6h0fypgb",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Сомнение в чертеже решают до резки и гибки.",
+          "sourceTextSha256": "98b231445d95de02cb57f9f2233bc1ddc703083337ff1b184263c5c2f79a6116",
+          "translatedText": "Сызбадағы күмәндар кесу және майыстыру алдында шешіледі."
+        },
+        {
+          "id": "sh/id0fu50z",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/o7ydoret",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "08",
+          "sourceTextSha256": "323783be9a53a31e158ec9600626a4703e99f4e183bc1acb8772cbdf5c3a1ece",
+          "translatedText": "08"
+        }
+      ]
+    },
+    {
+      "slide": 9,
+      "slideId": "sl/udsvah03",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1cfmhgne",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Складирование исключает скатывание",
+          "sourceTextSha256": "0ae460c252ac0e33f536e09f0bae2c8d2c6c892877b19378bb0185aac8143880",
+          "translatedText": "Сақтау айналдыруды болдырмайды"
+        },
+        {
+          "id": "sh/0b65obm9",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Пакеты размещают на устойчивых подкладках с упорами и сохраняют маркировку. • Проходы, подъезд, места строповки и зоны работы механизмов оставляют свободными. • Ручное перемещение планируют по массе, длине и числу работников; длинный стержень несут согласованно. • Под поднятым пакетом и между грузом и неподвижным предметом не находятся.",
+          "sourceTextSha256": "f69adc1027c249a987911e67b61bad12a3d107ff6fc66aa40a5ae7bd85246458",
+          "translatedText": "• Арматура бумаларын тіректері бар орнықты төсемдерге орналастырып, таңбалануын сақтайды. • Өту және көлік жолдарын, строптау орындарын және механизмдер жұмыс істейтін аймақтарды бос қалдырады. • Қолмен тасымалдауды массаға, ұзындыққа және жұмыскерлер санына қарай жоспарлайды; ұзын арматура өзегін келісіп тасымалдайды. • Көтерілген буманың астында және жүк пен қозғалмайтын заттың арасында тұрмайды."
+        },
+        {
+          "id": "sh/mdonql4z",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "До подъёма определите маршрут, команду и безопасное место укладки.",
+          "sourceTextSha256": "0d0813c17aba404f12f35ef5917b058ccd168886ea35d144e715ae7df667579d",
+          "translatedText": "Көтеру алдында жолды, экипажды және қауіпсіз орналастыру аймағын анықтаңыз."
+        },
+        {
+          "id": "sh/ah8nu54b",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/oza1gfyh",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "09",
+          "sourceTextSha256": "3514acf61732f662da19625f7fe781c3e483f2dce8506012f3bb393f5003e105",
+          "translatedText": "09"
+        }
+      ]
+    },
+    {
+      "slide": 10,
+      "slideId": "sl/m90b6t0r",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/cbu58j2h",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/ydcnatkn",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Заготовка и сборка",
+          "sourceTextSha256": "93273e59b9ce8b96a7bb5ba8fa01395f5877d1af7f7710c8c649af159e175b65",
+          "translatedText": "Дайындау, құрау"
+        },
+        {
+          "id": "sh/l036l83y",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Технологическая последовательность сохраняет размеры, качество и контроль опасной энергии.",
+          "sourceTextSha256": "d97c00486128ffe0640160b52061224a7a66c1ee9bad46a0bb6c02bcd8571a09",
+          "translatedText": "Технологиялық реттілік өлшемдерді, сапаны және қауіпті энергияны бақылауды сақтайды."
+        },
+        {
+          "id": "sh/s7yt4b21",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/d87uxg3m",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "10",
+          "sourceTextSha256": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+          "translatedText": "10"
+        }
+      ]
+    },
+    {
+      "slide": 11,
+      "slideId": "sl/jetc3ut0",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xcryxg7y",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Правка и очистка предшествуют разметке",
+          "sourceTextSha256": "183123aae7e31615cb7fb8578c00f2347ee51a2dc0934f3a818b61f36a41e670",
+          "translatedText": "Түзету мен тазалау — белгілеуге дейін"
+        },
+        {
+          "id": "sh/250zy18b",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/98rytw72",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Осмотреть",
+          "sourceTextSha256": "d0d892022cc10e810d3cea37509c81df85f4cb6e96dcd8ca4d2d22761e45b213",
+          "translatedText": "Тексеру"
+        },
+        {
+          "id": "sh/o7ih0r6h",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Определить деформацию, загрязнение и состояние поверхности.",
+          "sourceTextSha256": "1d441378e84ab2b4902d6b152aea9dcaee10c538a0dc30d329e77fd2fa94319e",
+          "translatedText": "Деформацияны, ластануды және беттің күйін анықтаңыз."
+        },
+        {
+          "id": "sh/61kzalof",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/ofqtgnyt",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Закрепить",
+          "sourceTextSha256": "340e3c751299c9104583c935bb7fc3b18ff137b2747caaf4052b7b9d2e631b45",
+          "translatedText": "Бекіту"
+        },
+        {
+          "id": "sh/9gza9sze",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Установить материал и защитные устройства оборудования.",
+          "sourceTextSha256": "e1d87753080b9787047bf4a0ba2284e2576d58796606201706a8eaa2ef7e4a53",
+          "translatedText": "Материалды және жабдықты қорғау құрылғыларын орнатыңыз."
+        },
+        {
+          "id": "sh/nehs7iho",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/0b6tc3yx",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Выправить",
+          "sourceTextSha256": "3a403b08cda3284dd1aec5ae5d038630e2f03a91449bbe76414d9118f47fc36f",
+          "translatedText": "Түзетіңіз"
+        },
+        {
+          "id": "sh/1cfa58zi",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Работать штатным способом без рывков и нахождения в линии натяжения.",
+          "sourceTextSha256": "c16a434049d8e1dc74cfa4e34764b7dcf654096fcbd1503bbbda297b040c1b71",
+          "translatedText": "Жұлқымай, тартылу сызығында тұрмай, белгіленген тәсілмен жұмыс істеу."
+        },
+        {
+          "id": "sh/zaxs3yhc",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/cn6t83y1",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Проверить",
+          "sourceTextSha256": "e4424a6df6f657f88cc1d6e4d4cab64773fdddd9ca0d257115f055cae396ceb1",
+          "translatedText": "Тексеріңіз"
+        },
+        {
+          "id": "sh/dofa18z6",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Сверить прямолинейность и пригодность к дальнейшей операции.",
+          "sourceTextSha256": "e590e412597689d00853b0da10193e89e3323e379471e998cf5db07a3ab9a814",
+          "translatedText": "Түзулікті және әрі қарай жұмыс істеуге жарамдылығын тексеріңіз."
+        },
+        {
+          "id": "sh/7650nq5s",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Ручная правка длинного стержня без устойчивой опоры опасна.",
+          "sourceTextSha256": "e98acb24045193ea9916f3fd9a9a23881c1ce3be3291389c8af1d102e3e9a6ad",
+          "translatedText": "Тұрақты тіреусіз ұзын шыбықты қолмен түзету қауіпті."
+        },
+        {
+          "id": "sh/j2lgjq5w",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/y1czalob",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "11",
+          "sourceTextSha256": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+          "translatedText": "11"
+        }
+      ]
+    },
+    {
+      "slide": 12,
+      "slideId": "sl/8f2psfyx",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1gbm9s3a",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Измерение и резка идут от одной базы",
+          "sourceTextSha256": "283daa5f63e4515f5b83e347124f5f30d4d639037e4571e4b59d87a8cc2c772e",
+          "translatedText": "Өлшеу мен кесу бір базадан жүргізіледі"
+        },
+        {
+          "id": "sh/0f2lgnmp",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Разметку сверяют со спецификацией и учитывают форму детали после гибки. • Заготовку фиксируют; зона отлёта отрезка и искр освобождается от людей и горючих материалов. • Оснастка соответствует диаметру, материалу и допустимым параметрам оборудования. • Измеренный элемент после резки идентифицируют, чтобы исключить смешение.",
+          "sourceTextSha256": "0d405a84a617a0e78d8baf6d2e1e7528076c5cad2fde089747f2efa9c3cc2cc8",
+          "translatedText": "• Белгілеуді спецификациямен салыстырып, иілгеннен кейінгі бөлшек пішінін ескереді. • Дайындаманы бекітеді; кесінді мен ұшқын ұшуы мүмкін аймақты адамдар мен жанғыш материалдардан босатады. • Жарақ арматура диаметріне, материалға және жабдықтың рұқсат етілген параметрлеріне сәйкес болуы тиіс. • Араласып кетпеуі үшін өлшенген элементті кескеннен кейін сәйкестендіреді."
+        },
+        {
+          "id": "sh/q903ad4n",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Повторная проверка размера дешевле и безопаснее переделки каркаса.",
+          "sourceTextSha256": "ec386ea67f22c0508ce0872693754b73a270c5dd9868a2d90ac60bf770d97dd6",
+          "translatedText": "Өлшемді қайта тексеру жақтауды қайта жасаудан гөрі арзанырақ және қауіпсіз."
+        },
+        {
+          "id": "sh/a543mx4r",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Безопасность инструмента — приказ № 204",
+          "sourceTextSha256": "75c0a4424442a343082d8d449bdac30d8617554edf166ae933e7df73add661e6",
+          "translatedText": "Норма: Құрал қауіпсіздігі — № 204 бұйрық"
+        },
+        {
+          "id": "sh/wvupgz6t",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/xw3q94ne",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "12",
+          "sourceTextSha256": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+          "translatedText": "12"
+        }
+      ]
+    },
+    {
+      "slide": 13,
+      "slideId": "sl/hgzapcr6",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/q50nydsj",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Гибка выполняется штатным оборудованием",
+          "sourceTextSha256": "24edf3a0556086b36a0ccfb482ca0ce8142a6bcb58a3e4385d8dcb3f4eae1db6",
+          "translatedText": "Иілу штаттық жабдықпен орындалады"
+        },
+        {
+          "id": "sh/bq9orito",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Проверьте упоры, привод, ограждения и рабочую зону гибочного оборудования. • Стержень укладывают по схеме, не удерживая рукой рядом с подвижным органом. • Радиус, угол и направление гибки задаются проектом и технологией. • Исправление готовой детали повторной гибкой допускается только по согласованной технологии.",
+          "sourceTextSha256": "e2d8db2ca96cefac62e61d3a0fd4e481e6fa5001d15d286f8f863e3749e63c78",
+          "translatedText": "• Ию жабдығының тіректерін, жетегін, қоршауларын және жұмыс аймағын тексеріңіз. • Арматура өзегін сұлба бойынша орналастырып, қозғалатын машина бөлігіне жақын жерден қолмен ұстамаңыз. • Ию радиусы, бұрышы мен бағыты жоба және технологиямен белгіленеді. • Дайын бөлшекті қайта ию арқылы түзетуге тек келісілген технология бойынша рұқсат етіледі."
+        },
+        {
+          "id": "sh/p4r6p8by",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Находиться в плоскости возможного выброса стержня нельзя.",
+          "sourceTextSha256": "a9bcb627475b9f8207a8681edcfb9f5a56d9e0f8c40330e3f0ef35c2d94d5a43",
+          "translatedText": "Сіз өзекшенің шығуы мүмкін жазықтықта бола алмайсыз."
+        },
+        {
+          "id": "sh/1076lobm",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/hcfy9k3u",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "13",
+          "sourceTextSha256": "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278",
+          "translatedText": "13"
+        }
+      ]
+    },
+    {
+      "slide": 14,
+      "slideId": "sl/6lsnupw7",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xc7eds76",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Каркас собирают от устойчивой основы",
+          "sourceTextSha256": "3d1040a8a0c236b6bfb7a0943c975335b9f793dd0abcab820b9a7c2905f9aeed",
+          "translatedText": "Рамка тұрақты негізден жиналған"
+        },
+        {
+          "id": "sh/idgvmx8r",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/5grehs7i",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Разложить",
+          "sourceTextSha256": "f2748239b07d51c5d8db6d4a149f3cc7df6798f549a3f6a0976c933e4a901ac4",
+          "translatedText": "Жайып қою"
+        },
+        {
+          "id": "sh/kfidonqx",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Подготовить элементы по маркировке и порядку сборки.",
+          "sourceTextSha256": "9b1f4c3f943deaf4f68091d6ba33b84eb6c8aade20aab667a5fd897bd3142cce",
+          "translatedText": "Элементтерді белгілерге және құрастыру тәртібіне сәйкес дайындаңыз."
+        },
+        {
+          "id": "sh/ehwvat8n",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/c3e1gjyd",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Зафиксировать",
+          "sourceTextSha256": "5ee3a32c6b5c46e3db5e1ed341593311434f34b960bdde72d2d4cc305d32a486",
+          "translatedText": "Бекіту"
+        },
+        {
+          "id": "sh/x4ni9ofy",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Установить шаблоны, упоры и временные связи.",
+          "sourceTextSha256": "53f6bc181d70b317d5c66a8ad73bcb916e046a5cef2abaa21de5ca2efd4e16df",
+          "translatedText": "Үлгілерді, аялдамалар мен уақытша қосылымдарды орнатыңыз."
+        },
+        {
+          "id": "sh/b2507exs",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/kre1k3y9",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Соединить",
+          "sourceTextSha256": "b128408e3c5da9ff7e6594e9063cb00ee8cd367b02af9eab693230ceb07b0f63",
+          "translatedText": "Қосылу"
+        },
+        {
+          "id": "sh/ls7idofu",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Выполнить предусмотренную вязку или другое проектное соединение.",
+          "sourceTextSha256": "bf953789e7e2c91e6639f60dd2e52cfdf0dc6354e7b442038cacb69ea915a216",
+          "translatedText": "Көзделген арматура байлауын немесе жобадағы басқа қосылысты орындау."
+        },
+        {
+          "id": "sh/z650byxo",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/0buh8zy5",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Проверить",
+          "sourceTextSha256": "e4424a6df6f657f88cc1d6e4d4cab64773fdddd9ca0d257115f055cae396ceb1",
+          "translatedText": "Тексеріңіз"
+        },
+        {
+          "id": "sh/1w3i14fq",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Сверить геометрию, устойчивость и готовность к перемещению.",
+          "sourceTextSha256": "767a2159abfa0fca6f1f0a1c6a24f803f6f3c6c1325e21cea29f8ac84c37f286",
+          "translatedText": "Геометрияны, тұрақтылықты және қозғалуға дайындығын тексеріңіз."
+        },
+        {
+          "id": "sh/fqdg3q98",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Пространственный каркас не отпускают до временной фиксации.",
+          "sourceTextSha256": "f3eb8dd7995cbb773a99a4b2da8a7d962e5f7ef8392894a361e07617811b4633",
+          "translatedText": "Кеңістіктік кадр уақытша бекітілгенше босатылмайды."
+        },
+        {
+          "id": "sh/3udg7q9k",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/2t4fyl8z",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "14",
+          "sourceTextSha256": "8527a891e224136950ff32ca212b45bc93f69fbb801c3b1ebedac52775f99e61",
+          "translatedText": "14"
+        }
+      ]
+    },
+    {
+      "slide": 15,
+      "slideId": "sl/vaxsvy10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/547mhg3m",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Вязка сохраняет проектное положение",
+          "sourceTextSha256": "e83f02633795cdecb743d30d4cc4abfde7675bdc4ee2749943351184a221ee66",
+          "translatedText": "Арматураны байлау жобалық қалпын сақтайды"
+        },
+        {
+          "id": "sh/k3y5ov21",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Проволоку и способ узла выбирают по технологической карте и назначению соединения. • Стержни фиксируют до затяжки, чтобы исключить защемление пальцев и смещение. • Концы проволоки загибают внутрь и не оставляют в зоне прохода или контакта. • Качество оценивают по устойчивости узла и сохранению проектной геометрии.",
+          "sourceTextSha256": "d3f3c9d4d4161a06419a10bd354f3180ca2e8939979deba29d2d73b20d569916",
+          "translatedText": "• Байлау сымы мен түйін тәсілін технологиялық картаға және қосылыстың мақсатына сәйкес таңдайды. • Саусақтардың қысылуы мен арматура өзектерінің ығысуын болдырмау үшін өзектерді тартуға дейін бекітеді. • Сым ұштарын ішке қарай иіп, өту немесе жанасу аймағында қалдырмайды. • Сапаны түйіннің орнықтылығы және жобалық геометрияның сақталуы бойынша бағалайды."
+        },
+        {
+          "id": "sh/65gnqlk7",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Лишняя затяжка не компенсирует неправильное положение стержня.",
+          "sourceTextSha256": "57af30a0c1a06845de7742237c201f5ce3dedab0cc32249686854ec5d70ababe",
+          "translatedText": "Шамадан тыс қатайту штанганың дұрыс емес орналасуының орнын толтырмайды."
+        },
+        {
+          "id": "sh/m9c3e1kn",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/wrm9kvep",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "15",
+          "sourceTextSha256": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+          "translatedText": "15"
+        }
+      ]
+    },
+    {
+      "slide": 16,
+      "slideId": "sl/gny5sjyp",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/8z2h8bq1",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Проволока и инструмент: острые риски",
+          "sourceTextSha256": "5199d184bec969a6b392aca765e4dd08babf01750d657f127180be46a1a860ca",
+          "translatedText": "Байлау сымы мен құрал: кесу, шаншу"
+        },
+        {
+          "id": "sh/9kby1g7m",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Отрезанные концы сразу убирают в тару, не оставляют на настиле или в каркасе. • Крюк, клещи или механизированный инструмент проверяют до работы. • Кисть держат вне линии возможного срыва; не тянут проволоку на себя рывком. • Защита рук применяется там, где она не создаёт риск захвата движущимися частями.",
+          "sourceTextSha256": "638eb0381c4b4615992adefc139470e221bcf54c866665d78263f30696d4891f",
+          "translatedText": "• Кесілген сым ұштарын дереу ыдысқа жинап, төсемде немесе қаңқада қалдырмайды. • Ілмек, тістеуік немесе механикаландырылған құрал жұмыс басталғанға дейін тексеріледі. • Қол білезігін сымның ықтимал серпілу сызығынан тыс ұстайды; сымды өзіне қарай жұлқып тартпайды. • Қолды қорғау құралдары қозғалатын бөліктерге ілініп қалу қаупін тудырмайтын жағдайда қолданылады."
+        },
+        {
+          "id": "sh/kv2h4rqp",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Острый конец проволоки должен быть контролируем от резки до утилизации.",
+          "sourceTextSha256": "8e8cf495c0d0bda81c2c9856fa7ed4f3bd3f500613f8682176073f0c054b291f",
+          "translatedText": "Сымның үшкір ұшын кесуден қоқысқа тастауға дейін бақылау керек."
+        },
+        {
+          "id": "sh/fm1gzq5o",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/e1sf65o3",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "16",
+          "sourceTextSha256": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+          "translatedText": "16"
+        }
+      ]
+    },
+    {
+      "slide": 17,
+      "slideId": "sl/14bup87q",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1c7e50ni",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Сварка требует проекта и допуска",
+          "sourceTextSha256": "5b711915db745aa0591e7fb41f199e6d56aa9c9830334401cffaf647f27e9bb5",
+          "translatedText": "Дәнекерлеуге жоба талабы, тиісті рұқсат қажет"
+        },
+        {
+          "id": "sh/gbedwfmx",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Свариваемость материала, тип шва и подготовка определяются проектом и технологией. • Работу выполняет допущенный сварщик с исправным оборудованием и защитой зоны. • Огневые риски контролируют нарядом-допуском там, где он требуется. • Качество соединения проверяют установленным методом, а дефект не маскируют дополнительным металлом.",
+          "sourceTextSha256": "7b01c72501f102ffdd9d091ff63553e691f7065e1c6a3634fecc1b2dd1c0c34c",
+          "translatedText": "• Материалдың дәнекерлеу қабілеті, тігіс түрі және дайындық конструкциясы мен технологиясымен анықталады. • Жұмысты тиісті жабдықпен және аумақты қорғаумен бекітілген дәнекерлеуші ​​орындайды. • Өрт қаупі қажет болған жағдайда рұқсатпен бақыланады. • Қосылу сапасы белгіленген әдіспен тексеріледі, ақау қосымша металмен бүркеленбейді."
+        },
+        {
+          "id": "sh/6lwvql4v",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Вязка и сварка не являются свободно взаимозаменяемыми.",
+          "sourceTextSha256": "cd14b3c703ea333fdfc9379fce115450e518435362a57b87a99dd3a646174154",
+          "translatedText": "Арматураны байлау мен дәнекерлеу өзара еркін алмастырылмайды."
+        },
+        {
+          "id": "sh/ihcvml4j",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/4by9or6l",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/pc7qhwn6",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "17",
+          "sourceTextSha256": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+          "translatedText": "17"
+        }
+      ]
+    },
+    {
+      "slide": 18,
+      "slideId": "sl/y5wne50z",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/wrelszu9",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Муфты применяют как проектную систему",
+          "sourceTextSha256": "0aaef25344db43849d56384a36b1e8899c3556c0900552815c42deede56e3c4b",
+          "translatedText": "Жобалық арматура муфта жүйесі қолданылады"
+        },
+        {
+          "id": "sh/hsn2l4bu",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Тип муфты, подготовка концов и допуски определяются проектом и инструкцией изготовителя. • Резьбовые, обжимные и иные механические решения не подменяют друг друга. • Перед соединением проверяют чистоту, геометрию и маркировку компонентов. • Затяжку, обжатие и контроль выполняют предусмотренным инструментом и методом.",
+          "sourceTextSha256": "5d4811829638312f8e3e3dd94cceca14d6c56dfb5bddd2a4534bb457331f9b46",
+          "translatedText": "• Арматура муфтасының түрі, өзек ұштарын дайындау және рұқсат етілетін ауытқулар жоба мен дайындаушы нұсқаулығымен белгіленеді. • Бұрандалы, сығымдалатын және басқа механикалық шешімдер бірін-бірі алмастырмайды. • Қосудың алдында компоненттердің тазалығын, геометриясын және таңбалануын тексереді. • Тарту, сығымдау және бақылауды көзделген құралмен және тәсілмен орындайды."
+        },
+        {
+          "id": "sh/je5knut0",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Соединение считается готовым после контроля, а не после визуального совпадения деталей.",
+          "sourceTextSha256": "b01086c73c2d6dd2a5ff19730058491d4e61a8d90b124485c25f672164c53cf8",
+          "translatedText": "Қосылым бөлшектерді көзбен салыстырудан емес, бақылаудан соң дайын саналады."
+        },
+        {
+          "id": "sh/rip4retw",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/fapkr6pw",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "18",
+          "sourceTextSha256": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a",
+          "translatedText": "18"
+        }
+      ]
+    },
+    {
+      "slide": 19,
+      "slideId": "sl/nid43ytk",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/9gb6xgbi",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Каркас фиксируют до бетонирования",
+          "sourceTextSha256": "06f59172908127ea4c2ebac5bedd216ae9607e4a708db2228415562dd840d0fa",
+          "translatedText": "Рама бетондау алдында бекітіледі"
+        },
+        {
+          "id": "sh/8v2pobax",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Согласуйте строповку, точки подъёма, команды и безопасное положение работников. • После установки закрепите каркас, фиксаторы и временные связи от смещения и опрокидывания. • Не допускайте нахождения людей под грузом и в зоне защемления. • Перед бетонированием подтвердите геометрию, устойчивость и доступность проектных элементов.",
+          "sourceTextSha256": "c7a0317a18569ffd6532bf2a1fb56024f3c9fa781ff4a0d21f54543a5476f593",
+          "translatedText": "• Строптауды, көтеру нүктелерін, командаларды және жұмыскерлердің қауіпсіз орналасуын келісіңіз. • Орнатқаннан кейін қаңқаны, бекіткіштерді және уақытша байланыстарды ығысудан және аударылудан бекітіңіз. • Жүктің астында және қысылу аймағында адамдардың болуына жол бермеңіз. • Бетондау алдында геометрияны, орнықтылықты және жобалық элементтердің қолжетімділігін растаңыз."
+        },
+        {
+          "id": "sh/ahk7qls3",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Освобождать грузозахватные средства можно только после устойчивой фиксации.",
+          "sourceTextSha256": "35212a72f98030029a820e9d96301e71d472dbc4ae4313ae8947f5522d5f24c1",
+          "translatedText": "Жүк қармайтын құрылғыларды қаңқа орнықты бекітілгеннен кейін ғана босатуға болады."
+        },
+        {
+          "id": "sh/il47u5sz",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/cri1gnql",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "19",
+          "sourceTextSha256": "9400f1b21cb527d7fa3d3eabba93557a18ebe7a2ca4e471cfe5e4c5b4ca7f767",
+          "translatedText": "19"
+        }
+      ]
+    },
+    {
+      "slide": 20,
+      "slideId": "sl/zyxsni5k",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/qpwjmh8n",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Защитный слой задаётся проектом",
+          "sourceTextSha256": "cd34c32608b088ebdd246d7779dd02826040149acbf2cada839ae5073b1a3e33",
+          "translatedText": "Қорғаныс қабаты жобамен көрсетілген"
+        },
+        {
+          "id": "sh/rq50vmp8",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Положение арматуры обеспечивают предусмотренными фиксаторами и опорами. • Универсальное значение защитного слоя не применяют ко всем конструкциям. • Перед бетонированием проверяют расстояния, устойчивость и отсутствие смещения фиксаторов. • Самодельные случайные подкладки используют только если они предусмотрены технологией.",
+          "sourceTextSha256": "77f596bc1f966637c8e629b3be1d0fcacb29276fe9d158f7fc46a1647360dbea",
+          "translatedText": "• Арматураның орнын көзделген дистанциялық бекіткіштер мен тіректер қамтамасыз етеді. • Қорғаныш қабатының бір әмбебап мәнін барлық конструкцияға қолдануға болмайды. • Бетондау алдында арақашықтықтарды, орнықтылықты және бекіткіштердің ығыспағанын тексереді. • Қолдан жасалған кездейсоқ төсемдерді технологияда көзделген жағдайда ғана қолданады."
+        },
+        {
+          "id": "sh/2lczih8r",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Размеры защитного слоя и шага берут из конкретного проекта.",
+          "sourceTextSha256": "b9a3a7648f88e4e5d34c74d4ab6bb21eee34d60f3a1af4725b250f3ddcc06f54",
+          "translatedText": "Қорғаныс қабаты мен қадамның өлшемдері нақты жобадан алынған."
+        },
+        {
+          "id": "sh/dkfmp4zy",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/cj65wzyd",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "20",
+          "sourceTextSha256": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+          "translatedText": "20"
+        }
+      ]
+    },
+    {
+      "slide": 21,
+      "slideId": "sl/m1wvqtk3",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/0f2lon6p",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/qp03yt8n",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Качество и безопасность",
+          "sourceTextSha256": "9327a90b9dd85fd1f38b67e37000e7ccd31d94ab73cb31092a078564fdb93ec2",
+          "translatedText": "Сапа және қауіпсіздік"
+        },
+        {
+          "id": "sh/dcb2t87y",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Контроль качества одновременно предотвращает конструктивные дефекты и опасные переделки.",
+          "sourceTextSha256": "f67ba45436032c592d9b73cb9a6d60c707af85d63ac31af503c542b40d25afd1",
+          "translatedText": "Сапаны бақылау бір уақытта дизайн ақаулары мен қауіпті өзгерістердің алдын алады."
+        },
+        {
+          "id": "sh/4jax4nqd",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/5kjydsri",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "21",
+          "sourceTextSha256": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+          "translatedText": "21"
+        }
+      ]
+    },
+    {
+      "slide": 22,
+      "slideId": "sl/5onypobq",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/6987itcr",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Контроль выполняют до скрытия работ",
+          "sourceTextSha256": "30e15ef3d0aefcb67fc01fcf00afe7c466fc7600ba8a9fccf436dbba34df6ba8",
+          "translatedText": "Жұмысты жаппас бұрын тексереді"
+        },
+        {
+          "id": "sh/7a18rydc",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Сверяют тип, количество, положение и маркировку элементов с проектом. • Проверяют размеры, геометрию, соединения, фиксаторы и временные связи. • Контролируют чистоту арматуры и готовность к бетонированию. • Несоответствия фиксируют и устраняют по согласованному решению.",
+          "sourceTextSha256": "298f9db8cb0a9cce6067fc0c12bd31bf976ac62caef3bf7ec4a689b7f848a4c7",
+          "translatedText": "• Жобамен элементтердің түрін, санын, орнын және таңбалауын тексеріңіз. • Өлшемдерді, геометрияны, қосылымдарды, бекіткіштерді және уақытша қосылымдарды тексеріңіз. • Арматураның тазалығын және бетондауға дайындығын қадағалау. • Келісілген шешімге сәйкес сәйкессіздіктер тіркеледі және жойылады."
+        },
+        {
+          "id": "sh/58zqpov6",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Фото или запись контроля не заменяет фактическую проверку каркаса.",
+          "sourceTextSha256": "4ce5da2ad2993a063e27594bdf5ca5d5dd30e8db42e62dd5960fef70feaa56f8",
+          "translatedText": "Фотосурет немесе тексеру жазбасы нақты кадрды тексеруді алмастырмайды."
+        },
+        {
+          "id": "sh/p43q1sva",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/p4z6tcri",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "22",
+          "sourceTextSha256": "785f3ec7eb32f30b90cd0fcf3657d388b5ff4297f2f9716ff66e9b69c05ddd09",
+          "translatedText": "22"
+        }
+      ]
+    },
+    {
+      "slide": 23,
+      "slideId": "sl/c7uhcr6t",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/90vqdczq",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Типовые дефекты имеют конкретные причины",
+          "sourceTextSha256": "ff4b5a1ffa723b6fb33b9c000df7c9fb9ff5f2d501e8a327817b11762471ed96",
+          "translatedText": "Типтік ақаулардың нақты себептері болады"
+        },
+        {
+          "id": "sh/8zm9k7y5",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "РИСК / ИСТОЧНИК",
+          "sourceTextSha256": "851ce8823ffad38155e037c57ecdf78a20c64bd1f2a0c5a2d45ea6e2edc50856",
+          "translatedText": "тәуекел / КӨЗ"
+        },
+        {
+          "id": "sh/v2d8fmhw",
+          "shapeId": "4",
+          "kind": "shape",
+          "text": "ПОСЛЕДСТВИЕ",
+          "sourceTextSha256": "1da37746aeb7df559ec9874df174a32f36affa7af0d1ac18594d03355f832a05",
+          "translatedText": "НӘТИЖЕЛЕР"
+        },
+        {
+          "id": "sh/a14rmhgb",
+          "shapeId": "5",
+          "kind": "shape",
+          "text": "МЕРА КОНТРОЛЯ",
+          "sourceTextSha256": "cf1c1f59a983a25c36423810031eef35d5f3f4404bf5c103b874132628f23721",
+          "translatedText": "БАҚЫЛАУ ШАРАСЫ"
+        },
+        {
+          "id": "sh/w3m9o7yh",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "Смещение стержней",
+          "sourceTextSha256": "9cbbf93a0c96eb57c68ce66c33ba7c1c926c3e435b3795f03670931a40e4a902",
+          "translatedText": "Арматура өзектерінің ығысуы"
+        },
+        {
+          "id": "sh/jqd8jmhs",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Слабая фиксация или удар при монтаже",
+          "sourceTextSha256": "bbfac0dbf86e62afd0506ce0db8d0059e989a5dca2c64f17aede2835960cb341",
+          "translatedText": "Орнату кезінде нашар бекіту немесе соққы"
+        },
+        {
+          "id": "sh/ip4rqhgn",
+          "shapeId": "9",
+          "kind": "shape",
+          "text": "Восстановить положение по проекту и усилить фиксацию",
+          "sourceTextSha256": "5a7af48b23586c6f93ac22d93eb7f6b5680505c31e06e2589d649bce2349a16a",
+          "translatedText": "Дизайнға сәйкес позицияны қалпына келтіріңіз және бекітуді күшейтіңіз"
+        },
+        {
+          "id": "sh/tc7at436",
+          "shapeId": "11",
+          "kind": "shape",
+          "text": "Неполное соединение",
+          "sourceTextSha256": "341e3e4c4b8f9e0955f092d568ba45b40cbaa87661911441b5ab00ea11bae285",
+          "translatedText": "Қосылым аяқталмады"
+        },
+        {
+          "id": "sh/69gry94v",
+          "shapeId": "12",
+          "kind": "shape",
+          "text": "Нарушена технология вязки, сварки или муфты",
+          "sourceTextSha256": "9e442635ec5f2a00624bda3cac47e3177892abee449b93dcdc433e6c5b307a37",
+          "translatedText": "Арматураны байлау, дәнекерлеу немесе муфталы қосылыс технологиясы бұзылған"
+        },
+        {
+          "id": "sh/rapsrelg",
+          "shapeId": "13",
+          "kind": "shape",
+          "text": "Остановить приёмку и выполнить утверждённое исправление",
+          "sourceTextSha256": "bd15f57cce7b049a080cb349f3af6769a8ff48162a4f93baa5df86262807cdca",
+          "translatedText": "Қабылдауды тоқтатыңыз және бекітілген түзетуді орындаңыз"
+        },
+        {
+          "id": "sh/1graxo3i",
+          "shapeId": "15",
+          "kind": "shape",
+          "text": "Недостаточная устойчивость",
+          "sourceTextSha256": "42b4eeb08961f3db9c065f463d89857ba37862ab556772beb70934ed48efaf3a",
+          "translatedText": "Тұрақтылық жеткіліксіз"
+        },
+        {
+          "id": "sh/edgr294r",
+          "shapeId": "16",
+          "kind": "shape",
+          "text": "Нет связей или опор",
+          "sourceTextSha256": "89b1acfdc8fee3ef964f4a31011d5ece01bb13ee7989f137c9c2c2b3957d260d",
+          "translatedText": "Байланыстырғыштар немесе тіректер жоқ"
+        },
+        {
+          "id": "sh/fepsvelc",
+          "shapeId": "17",
+          "kind": "shape",
+          "text": "Не поднимать и не бетонировать до закрепления",
+          "sourceTextSha256": "4aadcfcef70ad94d62a13258e3008e9d900a8cbbc8ffd46b94f1648f4a37fddb",
+          "translatedText": "Қаңқа бекітілгенге дейін оны көтермеңіз және бетондау жұмысын бастамаңыз"
+        },
+        {
+          "id": "sh/p4ra1o3e",
+          "shapeId": "19",
+          "kind": "shape",
+          "text": "Острые выступы",
+          "sourceTextSha256": "8e2537b90871238bcb4b74153e4336bd8e44b1aa2e330c7d54d4a06987a245c4",
+          "translatedText": "Өткір шығыңқы жерлер"
+        },
+        {
+          "id": "sh/x0nalovi",
+          "shapeId": "20",
+          "kind": "shape",
+          "text": "Не защищены концы и проволока",
+          "sourceTextSha256": "9062518393ff7a703d9c4dc881163d420d214cfe22465bafa1ae3933ee93ec13",
+          "translatedText": "Арматура ұштары мен байлау сымы қорғалмаған"
+        },
+        {
+          "id": "sh/wze9cjud",
+          "shapeId": "21",
+          "kind": "shape",
+          "text": "Оградить, обозначить и установить защиту",
+          "sourceTextSha256": "e3e4c19688f7e054a7022b019f6e2971475a2a85903878093a3666edb292898c",
+          "translatedText": "Қоршау, белгілеу және қорғау"
+        },
+        {
+          "id": "sh/by58jeds",
+          "shapeId": "22",
+          "kind": "shape",
+          "text": "Дефект не исправляют способом, который сам не предусмотрен проектом.",
+          "sourceTextSha256": "75fc2621cf3ef4f6229d13559507c57eb8bba711460f6b8d04180782c14bcb86",
+          "translatedText": "Ақауды жобада көзделмеген тәсілмен түзетуге болмайды."
+        },
+        {
+          "id": "sh/j2psnydo",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/y1gretc3",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "23",
+          "sourceTextSha256": "535fa30d7e25dd8a49f1536779734ec8286108d115da5045d77f3b4185d8f790",
+          "translatedText": "23"
+        }
+      ]
+    },
+    {
+      "slide": 24,
+      "slideId": "sl/7qto7e10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1sfqxsv6",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Сложные работы планируют отдельно",
+          "sourceTextSha256": "d30709c902b124b6cdb4a069864a1752e193a612d1388fb7fe0bc74a1699c7e4",
+          "translatedText": "Күрделі жұмыстар бөлек жоспарланған"
+        },
+        {
+          "id": "sh/0r6p4nul",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Крупные пространственные каркасы, стеснённые зоны и нестандартные узлы оценивают заранее. • Назначают последовательность сборки, временную устойчивость и безопасный доступ. • Подъём, сварку, работу на высоте и взаимодействие бригад увязывают в общем плане. • Изменение условий приводит к повторной оценке риска.",
+          "sourceTextSha256": "43872797fbea4a7f1d86fc51a751bc4a02f3b268fe7332fcf92983dcfa503c22",
+          "translatedText": "• Ірі кеңістіктік қаңқаларды, тар аймақтарды және стандартты емес түйіндерді алдын ала бағалайды. • Құрастыру ретін, уақытша орнықтылықты және қауіпсіз қолжетімділікті белгілейді. • Көтеру, дәнекерлеу, биіктіктегі жұмыс және бригадалардың өзара іс-қимылын ортақ жоспарда үйлестіреді. • Жағдай өзгерсе, тәуекелді қайта бағалайды."
+        },
+        {
+          "id": "sh/9wzq1svi",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Чем сложнее каркас, тем важнее временная устойчивость на каждом этапе.",
+          "sourceTextSha256": "819be9e9c1fcb7ce3cf83897c04d501c507193a67b1a2b22e1494cd1639070f9",
+          "translatedText": "Жақтау неғұрлым күрделі болса, соғұрлым әр кезеңдегі уақытша тұрақтылық маңыздырақ."
+        },
+        {
+          "id": "sh/8veh8ril",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/9wni1wjq",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "24",
+          "sourceTextSha256": "c2356069e9d1e79ca924378153cfbbfb4d4416b1f99d41a2940bfdb66c5319db",
+          "translatedText": "24"
+        }
+      ]
+    },
+    {
+      "slide": 25,
+      "slideId": "sl/69wfm9o7",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xg7axgf2",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Основные риски меняются по операции",
+          "sourceTextSha256": "7fd3732102ffa126935aa56f5ba4c46c964f3bb550e8bd527c65386b70cb22fa",
+          "translatedText": "Негізгі тәуекелдер операцияға қарай өзгереді"
+        },
+        {
+          "id": "sh/cfyt4beh",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "РИСК / ИСТОЧНИК",
+          "sourceTextSha256": "851ce8823ffad38155e037c57ecdf78a20c64bd1f2a0c5a2d45ea6e2edc50856",
+          "translatedText": "тәуекел / КӨЗ"
+        },
+        {
+          "id": "sh/napsr6x0",
+          "shapeId": "4",
+          "kind": "shape",
+          "text": "ПОСЛЕДСТВИЕ",
+          "sourceTextSha256": "1da37746aeb7df559ec9874df174a32f36affa7af0d1ac18594d03355f832a05",
+          "translatedText": "НӘТИЖЕЛЕР"
+        },
+        {
+          "id": "sh/29wby1wf",
+          "shapeId": "5",
+          "kind": "shape",
+          "text": "МЕРА КОНТРОЛЯ",
+          "sourceTextSha256": "cf1c1f59a983a25c36423810031eef35d5f3f4404bf5c103b874132628f23721",
+          "translatedText": "БАҚЫЛАУ ШАРАСЫ"
+        },
+        {
+          "id": "sh/obyt0bel",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "Резка и гибка",
+          "sourceTextSha256": "2d459fe82c32d76d518608040eba7a882be0df6ac263deaef92d4d6d0fec4fa6",
+          "translatedText": "Кесу және майыстыру"
+        },
+        {
+          "id": "sh/fm5snmx4",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Отлёт, захват, выброс стержня",
+          "sourceTextSha256": "7f9352814f53c2629bd1d809ebc5d13731c4296109cf11c351172796eba72e4c",
+          "translatedText": "Арматура өзегінің ұшып кетуі, ілініп қалуы немесе лақтырылуы"
+        },
+        {
+          "id": "sh/elwbu1wj",
+          "shapeId": "9",
+          "kind": "shape",
+          "text": "Ограждение, фиксация, безопасная зона",
+          "sourceTextSha256": "df22f40200c33c3c42166f59494a737a9ac8ac982b350d6a42348b8ee6ea5bad",
+          "translatedText": "Қоршау, бекіту, қауіпсіз аймақ"
+        },
+        {
+          "id": "sh/h0jalgra",
+          "shapeId": "11",
+          "kind": "shape",
+          "text": "Сварка",
+          "sourceTextSha256": "9c5f91ab9992b06fb9f0392d8956e30d289e61d34e3a3e4c7391b055066d12ec",
+          "translatedText": "Дәнекерлеу"
+        },
+        {
+          "id": "sh/uxsra18j",
+          "shapeId": "12",
+          "kind": "shape",
+          "text": "Ожог, дым, пожар, поражение током",
+          "sourceTextSha256": "10905dcf2ff0b1cceefbe98ca7448450c74ecd24d1c563380ff55dfe13c8678b",
+          "translatedText": "Күйік, түтін, өрт, электр тогының соғуы"
+        },
+        {
+          "id": "sh/vy1sj694",
+          "shapeId": "13",
+          "kind": "shape",
+          "text": "Допуск, вентиляция, защита, контроль огневых работ",
+          "sourceTextSha256": "f3d5c655a92204f6b229a21c3b19db1c8abf28cd864c23b6c7c1d4a790e9cc51",
+          "translatedText": "Мақұлдау, желдету, қорғау, ыстық жұмысты бақылау"
+        },
+        {
+          "id": "sh/9cjahgry",
+          "shapeId": "15",
+          "kind": "shape",
+          "text": "Подъём",
+          "sourceTextSha256": "0a76d610959b3a16f25463144b52a2db62dc601db7960012f2a5c7d4f3497c20",
+          "translatedText": "Көтеру"
+        },
+        {
+          "id": "sh/m98r618n",
+          "shapeId": "16",
+          "kind": "shape",
+          "text": "Падение груза и защемление",
+          "sourceTextSha256": "33baf8c0e49b87f79c1ad3e4cc7c577b0b9cf3c12606ce3f59c31230656502d3",
+          "translatedText": "Жүктің түсуі және шымшу"
+        },
+        {
+          "id": "sh/7a1sf698",
+          "shapeId": "17",
+          "kind": "shape",
+          "text": "План строповки, сигнальщик, запрет зоны",
+          "sourceTextSha256": "61d69cacda638719bb061a7584c50770bdff7c86373f0c5013601cd5f7794ce1",
+          "translatedText": "Көтеру жоспары, белгі беруші, аймаққа тыйым салу"
+        },
+        {
+          "id": "sh/t83at0ri",
+          "shapeId": "19",
+          "kind": "shape",
+          "text": "Установка",
+          "sourceTextSha256": "a95642d636d1afeac5de33c3f2cef84a03b80fc29d00c478711ac5b3c69f9ca9",
+          "translatedText": "Орнату"
+        },
+        {
+          "id": "sh/1czihwva",
+          "shapeId": "20",
+          "kind": "shape",
+          "text": "Падение с высоты, потеря устойчивости",
+          "sourceTextSha256": "286560a337ebe708ae86692974f6dc02b1ca73126b01b8cdcf6739df3ed4fa93",
+          "translatedText": "Биіктіктен құлау, тұрақтылықты жоғалту"
+        },
+        {
+          "id": "sh/gbq1obep",
+          "shapeId": "21",
+          "kind": "shape",
+          "text": "Коллективная защита, связи, безопасный доступ",
+          "sourceTextSha256": "bde4473290de047695bf106bd8747f10e561acc199c411f0d12cc8f1cb3fa4a1",
+          "translatedText": "Ұжымдық қорғаныс, байланыстырғыштар, қауіпсіз қолжетімділік"
+        },
+        {
+          "id": "sh/fax0f6d4",
+          "shapeId": "22",
+          "kind": "shape",
+          "text": "Один комплект мер не покрывает все этапы арматурных работ.",
+          "sourceTextSha256": "7cd94e29647b98ba7a19c0e8184628731a1962a94ce0022c6290fa5615fe1033",
+          "translatedText": "Бір ғана шаралар жиынтығы арматура жұмыстарының барлық кезеңін қамтымайды."
+        },
+        {
+          "id": "sh/r6x0bmx8",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/6lojihwn",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "25",
+          "sourceTextSha256": "b7a56873cd771f2c446d369b649430b65a756ba278ff97ec81bb6f55b2e73569",
+          "translatedText": "25"
+        }
+      ]
+    },
+    {
+      "slide": 26,
+      "slideId": "sl/l0bepsfm",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/uhk36lk7",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Инструмент проверяют перед каждой сменой",
+          "sourceTextSha256": "5beb4e930d679280378b6167586b24fa2f8867963b771c83c292b172649e1df8",
+          "translatedText": "Құралдар әр ауысым алдында тексеріледі"
+        },
+        {
+          "id": "sh/vitkzqlc",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• У ручного инструмента проверяют рукоятки, режущие кромки и соответствие операции. • У электроинструмента — корпус, кабель, выключатель, ограждение и оснастку. • Регулировку, очистку и смену оснастки выполняют после отключения энергии. • Неисправный инструмент выводят из применения и сообщают ответственному лицу.",
+          "sourceTextSha256": "7a22f829bc6a912029144bc89141932021d2b006d624834a206d7c84828775b8",
+          "translatedText": "• Қол құралдарының тұтқалары, кескіш жиектері және жұмысқа жарамдылығы тексеріледі. • Электр құралының корпусы, кабелі, ажыратқышы, қорғанысы және керек-жарақтары бар. • Жабдықтарды реттеу, тазалау және ауыстыру электр қуаты үзілгеннен кейін жүзеге асырылады. • Ақаулы құрал қолданыстан шығарылып, жауапты тұлғаға хабарланады."
+        },
+        {
+          "id": "sh/tgr2xg3m",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Исправность подтверждают осмотром и предусмотренной проверкой, а не пробным риском.",
+          "sourceTextSha256": "2722fde2d93e1506835f42c2c12a2c66e1bb5f2a73a36d87c12910217c8e49c4",
+          "translatedText": "Пайдалануға жарамдылық сынақ тәуекелімен емес, тексеру және белгіленген тексеру арқылы расталады."
+        },
+        {
+          "id": "sh/lcr2tw3a",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Безопасность инструмента — приказ № 204",
+          "sourceTextSha256": "75c0a4424442a343082d8d449bdac30d8617554edf166ae933e7df73add661e6",
+          "translatedText": "Норма: Құрал қауіпсіздігі — № 204 бұйрық"
+        },
+        {
+          "id": "sh/lsja143i",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/krat8z2x",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "26",
+          "sourceTextSha256": "5f9c4ab08cac7457e9111a30e4664920607ea2c115a1433d7be98e97e64244ca",
+          "translatedText": "26"
+        }
+      ]
+    },
+    {
+      "slide": 27,
+      "slideId": "sl/4vyxknqp",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/kn694nmx",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Высота и подъём требуют общей координации",
+          "sourceTextSha256": "75da6fb4fd1119d8cf3f44030ca693dfa44e71d12a904c5d35efe2506fe17782",
+          "translatedText": "Биіктік пен көтеруді үйлестіру қажет"
+        },
+        {
+          "id": "sh/lofadsni",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Безопасный доступ и коллективная защита организуются до подъёма работника. • Рабочий не находится под грузом и не направляет подвешенный каркас руками из опасной зоны. • Команды подаёт назначенное лицо; связь и сигналы согласуются до операции. • Инструмент и мелкие детали закрепляют от падения.",
+          "sourceTextSha256": "1ce58375b5f91735786e72b4c6faa43285fcc3f54b8b818939f14b6ee2d2e641",
+          "translatedText": "• Жұмыскер биіктікке көтерілмей тұрып қауіпсіз кіру жолы мен ұжымдық қорғаныс ұйымдастырылады. • Жұмыскер жүктің астында тұрмайды және қауіпті аймақта тұрып ілулі қаңқаны қолымен бағыттамайды. • Командаларды тағайындалған тұлға береді; байланыс пен сигналдар операция басталғанға дейін келісіледі. • Құралдар мен ұсақ бөлшектер құлап кетуден бекітіледі."
+        },
+        {
+          "id": "sh/7qxsfi5o",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Монтажник и машинист должны понимать одну последовательность и одни сигналы.",
+          "sourceTextSha256": "5b6f91d9d869cf585c9f75cea274d4a464b150cca0ec49b07d864d227ce0518e",
+          "translatedText": "Орнатушы мен оператор бірдей реттілік пен бірдей сигналдарды түсінуі керек."
+        },
+        {
+          "id": "sh/vuxsj250",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "Норма: Биіктіктегі жұмыстар — № 109 бұйрық"
+        },
+        {
+          "id": "sh/ju5gv294",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/ytwfmx8j",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "27",
+          "sourceTextSha256": "670671cd97404156226e507973f2ab8330d3022ca96e0c93bdbdb320c41adcaf",
+          "translatedText": "27"
+        }
+      ]
+    },
+    {
+      "slide": 28,
+      "slideId": "sl/3mdove10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/q9cz6xkv",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Выступающие концы защищают немедленно",
+          "sourceTextSha256": "9997280d7a0aefdc534abdc20394b8ed43d0dc3c3b5b48b77f9fa25dddd966d3",
+          "translatedText": "Шығыңқы ұштары дереу қорғалған"
+        },
+        {
+          "id": "sh/ralgf21g",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Опасные концы ограждают, обозначают или закрывают предусмотренной защитой. • Проходы не прокладывают через зоны торчащей арматуры и остатков проволоки. • Руки защищают от порезов, а положение тела — от защемления между элементами. • При перемещении длинных стержней сохраняют дистанцию и согласованные команды.",
+          "sourceTextSha256": "a49b2a335ecccb5352ef24cd86e4e4c91a043fd19f1eec20fc8e764eaaf74037",
+          "translatedText": "• Қауіпті ұштарды қоршайды, белгілейді немесе көзделген қорғанышпен жабады. • Өту жолдарын шығып тұрған арматура мен сым қалдықтары бар аймақ арқылы жүргізбейді. • Қолды кесілуден, ал дене қалпын элементтер арасындағы қысылудан қорғайды. • Ұзын арматура өзектерін жылжытқанда арақашықтықты сақтап, келісілген командаларды қолданады."
+        },
+        {
+          "id": "sh/10nylwji",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Защитный колпачок не заменяет ограждение там, где возможно падение на арматуру.",
+          "sourceTextSha256": "2caa9e73fa5980ee2b857e251db4eca8b091d7afb5354ad7f03ffae0aaded791",
+          "translatedText": "Қорғаныс қалпақ арматураға құлап қалуы мүмкін қорғанысты ауыстырмайды."
+        },
+        {
+          "id": "sh/947ipwje",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/lg3690fq",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "28",
+          "sourceTextSha256": "59e19706d51d39f66711c2653cd7eb1291c94d9b55eb14bda74ce4dc636d015a",
+          "translatedText": "28"
+        }
+      ]
+    },
+    {
+      "slide": 29,
+      "slideId": "sl/i5o3q10v",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/tk36hwby",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "СИЗ дополняют технические меры",
+          "sourceTextSha256": "ee0311adcae3af017957a418c1eff3c7c81773348796df86a5c453c7edcf9bd4",
+          "translatedText": "ЖҚҚ техникалық шараларды толықтырады"
+        },
+        {
+          "id": "sh/8jup8rad",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Каска, защитная обувь и одежда соответствуют условиям площадки. • Защита глаз и лица нужна при резке, шлифовании, натяжении и сварке. • Перчатки выбирают под проволоку, острые кромки и работу с инструментом. • Для высоты и сварки применяют специализированные системы и СИЗ по оценке риска.",
+          "sourceTextSha256": "f8a72fac36f212eb8218314b78f326c3e8ee57bc2a584a597a194a78350c15a0",
+          "translatedText": "• Каска, қорғаныш аяқ киім мен киім алаң жағдайына сәйкес болуы тиіс. • Кесу, тегістеу, керу және дәнекерлеу кезінде көз бен бетті қорғау қажет. • Қолғапты байлау сымына, өткір жиектерге және қолданылатын құралға сәйкес таңдайды. • Биіктіктегі және дәнекерлеу жұмыстарына тәуекелді бағалау негізінде мамандандырылған жүйелер мен ЖҚҚ қолданады."
+        },
+        {
+          "id": "sh/ulc7a1s3",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "СИЗ не делают безопасной работу без ограждения, фиксации и допуска.",
+          "sourceTextSha256": "65db152d5e9d529c878d99ad40223e8a1b0f353345312854736014fdf2f3298a",
+          "translatedText": "Қоршау, бекіту және тиісті рұқсат болмаған жұмысты ЖҚҚ қауіпсіз етпейді."
+        },
+        {
+          "id": "sh/apsnyxcz",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Трудовой кодекс РК",
+          "sourceTextSha256": "fb7bd048eaa66784bb1d2f82802ec90840e0da2847d5da587ffd3ac431406d02",
+          "translatedText": "Норма: Қазақстан Республикасының Еңбек кодексі"
+        },
+        {
+          "id": "sh/kf2tw7a1",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/5gbupcrm",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "29",
+          "sourceTextSha256": "35135aaa6cc23891b40cb3f378c53a17a1127210ce60e125ccf03efcfdaec458",
+          "translatedText": "29"
+        }
+      ]
+    },
+    {
+      "slide": 30,
+      "slideId": "sl/wnqh07ex",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/po72d8nm",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Работу останавливают при изменении условий",
+          "sourceTextSha256": "e1649537f1083bd674f092389821d6afc17858c15b53a15cc14b854eba480036",
+          "translatedText": "Шарттар өзгерген кезде жұмыс тоқтатылады"
+        },
+        {
+          "id": "sh/cril836d",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "• Проект или узел непонятен, материал не идентифицирован либо обнаружено несоответствие. • Нет ограждения, устойчивой опоры, временных связей или безопасного доступа. • Инструмент, оснастка, сварочное или подъёмное оборудование неисправны. • Люди находятся в опасной зоне, связь потеряна или погода мешает безопасной работе.",
+          "sourceTextSha256": "72de7c0af28b1ba7777af3668a02ce2d0d8bc7ac8cfd6629e11c1104eda78e6b",
+          "translatedText": "• Дизайн немесе құрастыру түсініксіз, материал анықталмаған немесе сәйкессіздік табылған. • Ешқандай қоршау, тұрақты тірек, уақытша қосылымдар немесе қауіпсіз қол жеткізу. • Құралдар, арматуралар, дәнекерлеу немесе көтеру жабдықтары ақаулы. • Адамдар қауіпті аймақта, байланыс үзілген немесе ауа-райы қауіпсіз жұмыс істеуге кедергі келтіреді."
+        },
+        {
+          "id": "sh/ru5k3ep8",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Остановить — оградить — сообщить — возобновить после разрешения.",
+          "sourceTextSha256": "7ed7571bd76887125e9c7830fb5cec00e0d8852705341bbe0cddbdfd03f5a944",
+          "translatedText": "Тоқтау - қоршау - есеп - рұқсаттан кейін жалғастыру."
+        },
+        {
+          "id": "sh/2l8f6p0r",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Трудовой кодекс РК",
+          "sourceTextSha256": "fb7bd048eaa66784bb1d2f82802ec90840e0da2847d5da587ffd3ac431406d02",
+          "translatedText": "Норма: Қазақстан Республикасының Еңбек кодексі"
+        },
+        {
+          "id": "sh/3mhwzu1c",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Арматурщик",
+          "sourceTextSha256": "4e7c71aaa2bc82d56102429894ebe9890d5dea9df64370c6aa122ece328df98a",
+          "translatedText": "Арматуршы"
+        },
+        {
+          "id": "sh/cbaxczit",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "30",
+          "sourceTextSha256": "624b60c58c9d8bfb6ff1886c2fd605d2adeb6ea4da576068201b6c6958ce93f4",
+          "translatedText": "30"
+        },
+        {
+          "id": "sh/ba1w3uh8",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STOP_SIGN",
+          "text": "СТОП",
+          "sourceTextSha256": "b9e25ea0cee74abd54acfd57ccb3bd906be0673a755d04e4e976baa9b0e283b7",
+          "translatedText": "ТОҚТАТУ"
+        }
+      ]
+    },
+    {
+      "slide": 31,
+      "slideId": "sl/lcn6tkb6",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/8zu1cj21",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "CHECKLIST_TITLE",
+          "text": "Итоговый чек-лист арматурщика",
+          "sourceTextSha256": "e67bd76843f629e4511dc820a8ebff0e2001d40f40bdfda67017bf24dee62776",
+          "translatedText": "Арматуршының соңғы чек-парағы"
+        },
+        {
+          "id": "sh/cfa903yt",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/zilsbyx4",
+          "shapeId": "4",
+          "kind": "shape",
+          "text": "Проект, материал и последовательность понятны.",
+          "sourceTextSha256": "3aecc6f828f7df482ea87cb85a8fd95439d17e1cf870a7260bbf9535993a753b",
+          "translatedText": "Дизайн, материал және реттілік анық."
+        },
+        {
+          "id": "sh/1k3ad8fa",
+          "shapeId": "6",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/0jut43yp",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "Зона работ, складирование и маршрут перемещения безопасны.",
+          "sourceTextSha256": "e8f6728269ce69a59d2ae5f263b550cab87568596198f9ae27481bdb1f0fa2d4",
+          "translatedText": "Жұмыс аймағы, сақтау және қозғалыс жолы қауіпсіз."
+        },
+        {
+          "id": "sh/ul8rq9gf",
+          "shapeId": "9",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/4vm5g7al",
+          "shapeId": "10",
+          "kind": "shape",
+          "text": "Инструмент, оборудование и оснастка исправны.",
+          "sourceTextSha256": "2f32e52fedfc56570272548e9d9cafdbac3724397baeb5921b33a5a9d04fd7d4",
+          "translatedText": "Құрал-саймандар, құрал-жабдықтар және арматура жақсы жұмыс жағдайында."
+        },
+        {
+          "id": "sh/it4nexsf",
+          "shapeId": "12",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/3ud4n290",
+          "shapeId": "13",
+          "kind": "shape",
+          "text": "Каркас устойчив, соединения и положение проверены до бетонирования.",
+          "sourceTextSha256": "ae3aa9b6ca4c83eb96fbeff4e86d69e6058d2ecf546a1d48ab9a271685abb3b5",
+          "translatedText": "Рама тұрақты, бетондау алдында қосылымдар мен позиция тексеріледі."
+        },
+        {
+          "id": "sh/d0fmtcr2",
+          "shapeId": "15",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/qx4nihsb",
+          "shapeId": "16",
+          "kind": "shape",
+          "text": "При угрозе, неисправности или несоответствии работа остановлена.",
+          "sourceTextSha256": "81c6ff66ed72bcfedc8bf7d210c412e38659a016d0c62fb5b04ea48b2e20ddde",
+          "translatedText": "Қауіп, ақаулық немесе сәйкессіздік туындаған жағдайда жұмыс тоқтатылады."
+        },
+        {
+          "id": "sh/ryd4rm9w",
+          "shapeId": "17",
+          "kind": "shape",
+          "text": "Нажмите «Начать тест»",
+          "sourceTextSha256": "7def4d3ecea04d21659749684677aa095ef9e1b37b0d1abf8c22500ebc745c2e",
+          "translatedText": "«Сынақты бастау» түймесін басыңыз"
+        },
+        {
+          "id": "sh/832l8nad",
+          "shapeId": "18",
+          "kind": "shape",
+          "text": "Актуализировано: 21.08.2026",
+          "sourceTextSha256": "3612380a2a5a26e814543ff9385ccb697367c259e8ded06d6603b16d86cd2adf",
+          "translatedText": "Жаңартылған: 21/08/2026"
+        }
+      ]
+    }
+  ]
+}

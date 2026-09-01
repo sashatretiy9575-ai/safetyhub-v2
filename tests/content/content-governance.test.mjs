@@ -15,15 +15,17 @@ const slugs = [
 ];
 
 test('public learning copy consistently describes ten-question tests', async () => {
-  const [hero, testimonials, partners] = await Promise.all([
+  const [hero, testimonials, partners, ru] = await Promise.all([
     read('components/marketing/hero.tsx'),
     read('components/marketing/testimonials.tsx'),
     read('components/marketing/partners-strip.tsx'),
+    read('messages/ru.json').then(JSON.parse),
   ]);
   const publicCopy = `${hero}\n${testimonials}\n${partners}`;
   assert.doesNotMatch(publicCopy, /пятью понятными вопросами/iu);
-  assert.match(testimonials, /десятью понятными вопросами/iu);
-  assert.match(publicCopy, /10 вопросов/iu);
+  assert.match(testimonials, /t\('managerAction'\)/u);
+  assert.match(ru.Home.cases.managerAction, /десятью понятными вопросами/iu);
+  assert.match(ru.Home.hero.description, /10 вопросов/iu);
 });
 
 test('the local course snapshot contains only the five canonical presentation courses', async () => {
@@ -97,10 +99,12 @@ test('public course page offers presentation download before the test and preser
     nextConfig,
     /source: '\/topics\/industrial-safety'.+destination: '\/topics'.+permanent: true/su,
   );
-  assert.ok(actions.indexOf('Скачать презентацию') < actions.indexOf('Начать тест'));
+  assert.ok(
+    actions.indexOf("t('downloadPresentation')") < actions.indexOf("t('startTest')"),
+  );
   assert.match(actions, /download=\$\{encodeURIComponent/);
   assert.match(actions, /download=\{filename\}/);
-  assert.match(actions, /href=\{ROUTES\.test\(course\.slug\)\}/);
+  assert.match(actions, /localizePathname\(ROUTES\.test\(course\.slug\), locale\)/);
   assert.doesNotMatch(actions, /pdfjs-dist|canvas|iframe|PageUp|PageDown/);
   assert.match(topicSource, /course-presentations/);
   assert.doesNotMatch(topicPage, /TopicViewer/);

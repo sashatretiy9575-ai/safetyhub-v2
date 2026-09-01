@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "slug": "lesomontazhnye-raboty",
+  "productionPublished": false,
+  "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+  "overrideCount": 1,
+  "allOtherElementGeometryUnchanged": true,
+  "neighborContentMoved": false,
+  "newlyIntersectedNeighborCount": 0,
+  "semanticsChanged": false,
+  "overrides": [
+    {
+      "locale": "en",
+      "slug": "lesomontazhnye-raboty",
+      "slide": 42,
+      "shapeId": "4",
+      "translatedText": "Design documentation, the system technical manual, assigned roles and a safe zone are in place.",
+      "sourceBbox": [
+        152,
+        214,
+        1000,
+        54
+      ],
+      "finalBbox": [
+        152,
+        214,
+        1000,
+        66
+      ],
+      "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+      "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+      "sourceTextSha256": "24670a774d9f339942a62f854bb1f98804ee8fe4d13b7c37b18e878b10b9d44a",
+      "translatedTextSha256": "225c318f1c21718a0fbd92f9a811599a274f4364f80d0dcb0ab1949f5c9f67ed",
+      "newlyIntersectedNeighborCount": 0
+    }
+  ]
+}

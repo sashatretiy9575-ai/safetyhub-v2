@@ -1,0 +1,2844 @@
+{
+  "schemaVersion": 1,
+  "slug": "lesomontazhnye-raboty",
+  "locale": "zh",
+  "sourcePptx": "content/source-materials/derived/lesomontazhnye-raboty/presentation.pptx",
+  "slideCount": 42,
+  "slides": [
+    {
+      "slide": 1,
+      "slideId": "sl/y90nupkv",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/7qp4be9c",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "COURSE_KICKER",
+          "text": "УЧЕБНЫЙ КУРС",
+          "sourceTextSha256": "75cac1330e9d5668307c2a56beaadcfde7e96292c2b1cf30849e5d8cc270ded1",
+          "translatedText": "培训课程"
+        },
+        {
+          "id": "sh/65g3298r",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "DECK_TITLE",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/sryl4zqx",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "DECK_SUBTITLE",
+          "text": "Безопасный монтаж, эксплуатация и демонтаж строительных лесов",
+          "sourceTextSha256": "2d12bbc3d8395256e16399e3b4c76853e6a284a28776b24c0f51b7b456bef7fe",
+          "translatedText": "脚手架的安全安装、操作和拆除"
+        },
+        {
+          "id": "sh/fu94fe98",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "DECK_AUDIENCE",
+          "text": "Учебный курс для рабочих и линейного персонала",
+          "sourceTextSha256": "f39f8059374d9aa573c6b106502b3275b17b1467ce37f81f9067fadfbf52df00",
+          "translatedText": "工人及一线人员培训课程"
+        },
+        {
+          "id": "sh/ul4vaxgb",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/vmdcj2xw",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        }
+      ]
+    },
+    {
+      "slide": 2,
+      "slideId": "sl/hwbqtkby",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/9072xkry",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "После курса работник сможет",
+          "sourceTextSha256": "4d0cf225b066ac4e94a63069ec59a5c5eccf08eaf1c1126690df72b4cac39d05",
+          "translatedText": "课程结束后作业人员将能够"
+        },
+        {
+          "id": "sh/ozy1ofad",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "LIST_NUMBER_1",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/a10jqpsj",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "LIST_ITEM_1",
+          "text": "Проверить допуск, проект, основание и опасную зону до монтажа.",
+          "sourceTextSha256": "2ad9ea1607328bcca4d76966c561f9ae47c0b543c2e1f7a736408c4161dc66b9",
+          "translatedText": "搭设前检查作业许可、设计、基础和危险区域。"
+        },
+        {
+          "id": "sh/x4r21kru",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "LIST_NUMBER_2",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/r65knqtk",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "LIST_ITEM_2",
+          "text": "Распознать основные элементы лесов и назначение связей, настилов и ограждений.",
+          "sourceTextSha256": "106de87ac206b91898f8c7c332262cb10b03869a042f48c8ab229e383900bd0e",
+          "translatedText": "识别脚手架的主要构件，并了解拉结件、脚手板和防护栏的用途。"
+        },
+        {
+          "id": "sh/q5wjelsz",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "LIST_NUMBER_3",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/9wnqhczy",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "LIST_ITEM_3",
+          "text": "Безопасно пользоваться лесами и понимать статус их допуска к эксплуатации.",
+          "sourceTextSha256": "1a9425bd2923d0cbda429270510c8291d04d25ba99345c6db81996faf98533a0",
+          "translatedText": "安全使用脚手架并了解其审批状态。"
+        },
+        {
+          "id": "sh/mtwrmxg7",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "LIST_NUMBER_4",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/wjy9sry9",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "LIST_ITEM_4",
+          "text": "Остановить работу при деформации, просадке, перегрузке или опасной погоде.",
+          "sourceTextSha256": "c4eb55226a95081109b3b8f5c343fd31dec9e2e932d55f7df7f104d1bd26aa72",
+          "translatedText": "出现变形、下沉、超载或恶劣天气时应停止运行。"
+        },
+        {
+          "id": "sh/bip8jmho",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Безопасность лесов определяется системой целиком, а не одним прочным элементом.",
+          "sourceTextSha256": "0df8151431a6ebbd2e4aa4f2b261575269b100a05c27d43d773bae375aa033f4",
+          "translatedText": "脚手架的安全性是由整个系统决定的，而不是由某个强大的元素决定的。"
+        },
+        {
+          "id": "sh/s72xofmh",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/76twva5c",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        }
+      ]
+    },
+    {
+      "slide": 3,
+      "slideId": "sl/ofy9wn61",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/cza94vmx",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Логика курса",
+          "sourceTextSha256": "9811ffd0b4bd51ed3b5d8cdebadc40ec24d961f5312280f37c2a3b31c3efff99",
+          "translatedText": "课程逻辑"
+        },
+        {
+          "id": "sh/d0jax03i",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "LIST_NUMBER_1",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/3ah8rqlg",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "LIST_ITEM_1",
+          "text": "Допуск, роли и планирование.",
+          "sourceTextSha256": "065aeeaa8eaf5d132662a3bb53ed15b0d244a630eb5db06757b642a5d412f282",
+          "translatedText": "入场、角色和规划。"
+        },
+        {
+          "id": "sh/obq90bml",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "LIST_NUMBER_2",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/m5cra54z",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "LIST_ITEM_2",
+          "text": "Элементы, основание и устойчивость.",
+          "sourceTextSha256": "7794eb4de486188d92605ab89299e2cdd00244fad4fc09fffaa4ccfe760403a3",
+          "translatedText": "元素、基础和稳定性。"
+        },
+        {
+          "id": "sh/n6ls3alk",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "LIST_NUMBER_3",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/m1c3mlsn",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "LIST_ITEM_3",
+          "text": "Настилы, доступ и защита от падения.",
+          "sourceTextSha256": "54261ce07912fbf6503664d0e11d095c1c58c95b4dcbe4223f42edcc29bec0ec",
+          "translatedText": "地板、通道和坠落保护。"
+        },
+        {
+          "id": "sh/943mhgre",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "LIST_NUMBER_4",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/v6l4jq94",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "LIST_ITEM_4",
+          "text": "Проверка, использование и демонтаж.",
+          "sourceTextSha256": "e9ba5d916dc6418c38715fde335d70dce01231d978643f696b8acb56980f0f3d",
+          "translatedText": "检查、使用和拆卸。"
+        },
+        {
+          "id": "sh/a5c3ql8z",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "LIST_NUMBER_5",
+          "text": "05",
+          "sourceTextSha256": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+          "translatedText": "05"
+        },
+        {
+          "id": "sh/w7ulsvqp",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "LIST_ITEM_5",
+          "text": "Остановка работ и аварийные действия.",
+          "sourceTextSha256": "273c138d093d5c7477f61e5f63bfdcadfa066d7eb2c2936f2f4326fe87e03345",
+          "translatedText": "停工和紧急行动。"
+        },
+        {
+          "id": "sh/i9w3u58v",
+          "shapeId": "19",
+          "kind": "shape",
+          "text": "КУРС",
+          "sourceTextSha256": "0181e92ec27149039fb2f998972369363d8dbe9989444c5c3aec7e1ff0b98640",
+          "translatedText": "课程"
+        },
+        {
+          "id": "sh/f29gbyx0",
+          "shapeId": "21",
+          "kind": "shape",
+          "text": "смысловых блоков",
+          "sourceTextSha256": "b9127e0dd9ea43a0023b523b097f92de1175fd6f49a2293dd77d08efefb9dbd0",
+          "translatedText": "语义块"
+        },
+        {
+          "id": "sh/re9g7yxo",
+          "shapeId": "25",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/sfix03y9",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/batgjixs",
+          "shapeId": "29",
+          "kind": "shape",
+          "name": "AGENDA_COUNT_CIRCLE",
+          "text": "5",
+          "sourceTextSha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+          "translatedText": "5"
+        }
+      ]
+    },
+    {
+      "slide": 4,
+      "slideId": "sl/jyx0ra1s",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/0ba143al",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/ql8jytsj",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Допуск и планирование",
+          "sourceTextSha256": "96b25045ca3424179d79b17bbabbed7a0049c6ab62bae034a5ddce127fc6a212",
+          "translatedText": "入学及规划"
+        },
+        {
+          "id": "sh/doj29oba",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Монтаж начинается с назначения ответственных лиц, проекта и оценки условий площадки.",
+          "sourceTextSha256": "b1ae6e95d9b13a557e96ed1675b3ee03f997452aabdf7b5776f9ae2ed6715b13",
+          "translatedText": "安装从任命负责人、设计和评估现场条件开始。"
+        },
+        {
+          "id": "sh/kbm987y5",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/5cva1cfq",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        }
+      ]
+    },
+    {
+      "slide": 5,
+      "slideId": "sl/i107q5of",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/dgbulwnm",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Монтаж выполняет подготовленная бригада",
+          "sourceTextSha256": "b09f1939fd3fd97ab935282b5184fc7076db43ea7fb8e4f93330de7b712b48a8",
+          "translatedText": "安装由经过培训的团队进行"
+        },
+        {
+          "id": "sh/cf2tcr61",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Монтаж, изменение и демонтаж поручают обученным работникам под назначенным руководством. • Проверку и допуск выполняет лицо, которому поручена эта функция и которое знает систему лесов. • Пользователь не меняет настил, связи, крепления или ограждения самовольно. • Допуски к высоте, электроопасным зонам и подъёмным операциям проверяют отдельно.",
+          "sourceTextSha256": "9cca25a194f27e64c9bdffa3659ef268f052642e357b34c5384949153ffafa2d",
+          "translatedText": "• 脚手架的搭设、改动和拆除应由经过培训的作业人员在指定负责人监督下进行。 • 检查和使用许可应由承担该职责且熟悉脚手架系统的人员实施。 • 使用者不得擅自改动作业平台、拉结、紧固件或防护栏。 • 高处作业、电气危险区域作业和起重作业的许可应分别核查。"
+        },
+        {
+          "id": "sh/l4bupwny",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Право пользоваться лесами не означает право их перестраивать.",
+          "sourceTextSha256": "53289ffdf0b1d6f9367dd3491a7e87b4af5a26fce33bd2b34efba611cf2f0d6f",
+          "translatedText": "获准使用脚手架并不意味着有权擅自改动脚手架。"
+        },
+        {
+          "id": "sh/w32dkbuh",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/x4vedgvm",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/ahkvi1cb",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "05",
+          "sourceTextSha256": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+          "translatedText": "05"
+        }
+      ]
+    },
+    {
+      "slide": 6,
+      "slideId": "sl/x8f69ofe",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/yhg7epsj",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Роли разделяют ответственность",
+          "sourceTextSha256": "79e889f65b58f3aa141c8727966fe0fad3fd41ed39a52d32f8058c26fb4e79d1",
+          "translatedText": "角色分担责任"
+        },
+        {
+          "id": "sh/zi98nu94",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Руководитель работ планирует последовательность, ресурсы и безопасные условия. • Монтажник выполняет схему, проверяет элемент перед установкой и сообщает об отклонении. • Назначенное компетентное лицо осматривает систему и фиксирует статус допуска. • Пользователь проводит визуальную проверку перед работой и соблюдает ограничения.",
+          "sourceTextSha256": "92c107b11e8ff5cebfeef23fe0afc6d92382f0ba942dcf5f6ddd252ed3f3d9ef",
+          "translatedText": "• 作业负责人负责规划顺序、资源和安全条件。 • 搭设人员按搭设方案作业，安装前检查构件并报告偏差。 • 指定的胜任人员检查脚手架系统并记录使用许可状态。 • 使用者在作业前进行目视检查并遵守限制。"
+        },
+        {
+          "id": "sh/ml07i9sv",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Каждый отвечает за свою проверку, но изменения разрешает только уполномоченное лицо.",
+          "sourceTextSha256": "77d2174a2728327b7c9a408af76f3c6398cda6a3ef9726e741076d06bbc83d2d",
+          "translatedText": "每个人都有责任自行验证，但只有授权人员才允许更改。"
+        },
+        {
+          "id": "sh/h4bupgn6",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/w32twb6l",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "06",
+          "sourceTextSha256": "aacd834b5cdc64a329e27649143406dd068306542988dfc250d6184745894849",
+          "translatedText": "06"
+        }
+      ]
+    },
+    {
+      "slide": 7,
+      "slideId": "sl/gnmp4jqx",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/cb2tkvap",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Работа на высоте начинается от 1,3 метра",
+          "sourceTextSha256": "0d59ef69423417dcde146228bed859ad6116c1a38babf5b6e866f0fa4d805c5e",
+          "translatedText": "高空作业1.3米起"
+        },
+        {
+          "id": "sh/dcbud0ra",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• К работе на высоте относится работа на высоте или глубине 1,3 м и более. • Также учитывается расстояние менее 2 м от неограждённой границы перепада. • Безопасность обеспечивают коллективной защитой, доступом и при необходимости страховочной системой. • Конкретные меры фиксируют в проекте производства работ и наряде-допуске.",
+          "sourceTextSha256": "01ee8e2dbc3e46bfd00d050580cb4ea688530543428a94a31ad9e85ca7d029e5",
+          "translatedText": "• 高空作业包括在高度或深度为1.3 m 或以上的作业。 • 距无围栏的跌落边界小于2 m 的距离也被考虑在内。 • 通过集体保护、准入以及必要时的安全网来确保安全。 • 具体措施记录在工作项目和工作许可证中。"
+        },
+        {
+          "id": "sh/kzmdova1",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Высота оценивается вместе с краем перепада и фактическим доступом.",
+          "sourceTextSha256": "c71a166895a18ce72c1bb6bd373dcd31bce46e3b0aa02857f6c962d4c9cfb307",
+          "translatedText": "高度是根据下降边缘和实际通道进行评估的。"
+        },
+        {
+          "id": "sh/baxkjqlk",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/a9ojq5kz",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/xcz2l03q",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "07",
+          "sourceTextSha256": "19b100ab7725c612f3d80ff203ca53cea5cadaafae3bf0f88f0fb4089fe08815",
+          "translatedText": "07"
+        }
+      ]
+    },
+    {
+      "slide": 8,
+      "slideId": "sl/fu1gfa1s",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/18byd4zy",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Планирование предшествует монтажу",
+          "sourceTextSha256": "175cd7cad8bf0f35454f4bd136abf6beca6cb4f983c113038ac461f9a0fcd56a",
+          "translatedText": "安装前规划"
+        },
+        {
+          "id": "sh/6h0fypgb",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/tkby9kzm",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Изучить",
+          "sourceTextSha256": "d129aea9e1223b0bdf6a8399b56026c83b68ec155deec58cb76d9d0c02176401",
+          "translatedText": "探索"
+        },
+        {
+          "id": "sh/sjix0zy1",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Проект, паспорт системы, схему монтажа, наряд-допуск и ограничения.",
+          "sourceTextSha256": "070a3246cffa93674b4100bc5bab58662115a52e0b607e235f5f37716a3be202",
+          "translatedText": "设计文件、系统技术说明书、搭设方案、作业许可证和限制条件。"
+        },
+        {
+          "id": "sh/id0fu50z",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/o7ydoret",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Осмотреть",
+          "sourceTextSha256": "d0d892022cc10e810d3cea37509c81df85f4cb6e96dcd8ca4d2d22761e45b213",
+          "translatedText": "检查"
+        },
+        {
+          "id": "sh/98rehwve",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Основание, фасад, проёмы, коммуникации, движение транспорта и погоду.",
+          "sourceTextSha256": "088ebbbfe3d080ab178487156084988db18682f21fc029659f9c207f0285c2d5",
+          "translatedText": "基地、立面、开口、通讯、交通和天气。"
+        },
+        {
+          "id": "sh/n6pwfmd8",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/0jydkreh",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Организовать",
+          "sourceTextSha256": "50e95de265ac5cad0232e55e07dc6a807c894847e52ca3d4cf7e34a126d24db6",
+          "translatedText": "整理"
+        },
+        {
+          "id": "sh/1k7edwv2",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Опасную зону, складирование, подъём, доступ и спасательные действия.",
+          "sourceTextSha256": "5a4cf0b00137d26cde5145d6885e504bb91e858868e1554a0a07fd51efc76882",
+          "translatedText": "危险区域、储存、起重、出入和救援操作。"
+        },
+        {
+          "id": "sh/zipwbmdc",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/kfixwbe1",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Проинструктировать",
+          "sourceTextSha256": "388288f5c5f5efa94d70b255f44e307cbff18ba78b467b0b54e636b9cb3b5c24",
+          "translatedText": "指导"
+        },
+        {
+          "id": "sh/lgbepgvm",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Распределить роли, сигналы, порядок монтажа и условия остановки.",
+          "sourceTextSha256": "a265966e8d4c680cc7e2a56adc30ae5b777e45ff30fd007d855e83a8aa4299fc",
+          "translatedText": "分配角色、信号、安装顺序和停止条件。"
+        },
+        {
+          "id": "sh/7u5w765k",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Неизвестный тип лесов или отсутствующая схема — основание не начинать монтаж.",
+          "sourceTextSha256": "a82fa1f2ddbf82eb821fdc69d4631f0dbb0e74c169da1f9b262c29b191933036",
+          "translatedText": "未知类型的脚手架或缺少图表是不开始安装的原因。"
+        },
+        {
+          "id": "sh/jq5w365o",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/i5wva1o3",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/x4ne1wni",
+          "shapeId": "28",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "08",
+          "sourceTextSha256": "323783be9a53a31e158ec9600626a4703e99f4e183bc1acb8772cbdf5c3a1ece",
+          "translatedText": "08"
+        }
+      ]
+    },
+    {
+      "slide": 9,
+      "slideId": "sl/udsvah03",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1cfmhgne",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Опасную зону ограждают до начала работ",
+          "sourceTextSha256": "f50719d621763c365083b0b370205cd1f6af937bee27c2709cf342277c60e902",
+          "translatedText": "工作开始前，危险区域已被围起"
+        },
+        {
+          "id": "sh/0b65obm9",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Границу определяют по высоте, характеру работ и возможной траектории падения предметов. • Ограждение и знаки должны быть заметны, устойчивы и не создавать новый риск. • Проход людей и движение техники через зону согласуют или прекращают. • Материалы не размещают за границей так, чтобы они перекрывали пути эвакуации.",
+          "sourceTextSha256": "fecc382ca7148743cf31d7642044f1451d57b9625ee6ddd244318d734251d3b4",
+          "translatedText": "• 根据作业高度、作业性质和物体可能的坠落轨迹划定区域边界。 • 围挡和标志必须醒目、稳固，且不得产生新的风险。 • 人员和车辆穿越该区域时，应进行协调或停止通行。 • 不得将材料放在区域边界之外并阻塞疏散通道。"
+        },
+        {
+          "id": "sh/mdonql4z",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Ограждение защищает людей внизу ещё до появления первого элемента наверху.",
+          "sourceTextSha256": "e3f5e581aa4893fa53f06f95bfce47b508bf8494a620158487bcabb12aa9618c",
+          "translatedText": "甚至在第一个元素出现在上面之前，栅栏就可以保护下面的人。"
+        },
+        {
+          "id": "sh/ah8nu54b",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/oza1gfyh",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/p0ji9kf2",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "09",
+          "sourceTextSha256": "3514acf61732f662da19625f7fe781c3e483f2dce8506012f3bb393f5003e105",
+          "translatedText": "09"
+        }
+      ]
+    },
+    {
+      "slide": 10,
+      "slideId": "sl/m90b6t0r",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xc3mho32",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/zelojyl8",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Система лесов и устойчивость",
+          "sourceTextSha256": "86951cb7ec4b48941d196e4799cce5dc094a9cdbbbf5130d3bae6ba5851d5ea9",
+          "translatedText": "脚手架系统与稳定性"
+        },
+        {
+          "id": "sh/ydcnatkn",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Размеры, шаги и крепления принимаются только по проекту, паспорту и схеме конкретной системы.",
+          "sourceTextSha256": "714ebfa1f8b6cbab1048436487b39fd1a3526d8f14245c6be5437292e4faf89b",
+          "translatedText": "尺寸、间距和紧固方式只能依据具体系统的设计文件、技术说明书和方案确定。"
+        },
+        {
+          "id": "sh/m1cnetkj",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/s7yt4b21",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "10",
+          "sourceTextSha256": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+          "translatedText": "10"
+        }
+      ]
+    },
+    {
+      "slide": 11,
+      "slideId": "sl/jetc3ut0",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xcryxg7y",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Тип лесов определяет способ сборки",
+          "sourceTextSha256": "aad3eac910d24f8e81f2cae1a9b100d61c7ebebf62d9d737c94a28b213d476c2",
+          "translatedText": "脚手架的类型决定了组装方法"
+        },
+        {
+          "id": "sh/wbih4b6d",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Рамные, хомутовые, клиновые и другие системы имеют разные узлы и ограничения. • Элементы разных систем не смешивают без подтверждённой совместимости. • Схема задаёт последовательность, высоту ярусов, связи, крепления и доступ. • Повреждённый или неизвестный элемент не используют как универсальную замену.",
+          "sourceTextSha256": "d0f84f7d5719cc6cc2d5fe5d514069c16bdd19495998c9032d7115fde5567878",
+          "translatedText": "• 框架、夹具、楔块和其他系统具有不同的组件和限制。 • 在未确认兼容性的情况下，不得混合不同系统的元件。 • 该图指定了顺序、层高、连接、紧固件和通道。 • 损坏或未知的物品不能用作通用替换品。"
+        },
+        {
+          "id": "sh/98rytw72",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Универсальной схемы монтажа для всех лесов не существует.",
+          "sourceTextSha256": "88a4295c6c1826fac34f15f3d086894473c9e5114028f86af37710899fdff1e7",
+          "translatedText": "所有脚手架没有通用的安装方案。"
+        },
+        {
+          "id": "sh/ofqtgnyt",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/9gza9sze",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "11",
+          "sourceTextSha256": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+          "translatedText": "11"
+        }
+      ]
+    },
+    {
+      "slide": 12,
+      "slideId": "sl/8f2psfyx",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1gbm9s3a",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Каждый элемент выполняет свою функцию",
+          "sourceTextSha256": "249adaa65d65666798547fdde09cab71a4bf9513514406136002b3645e3d55dc",
+          "translatedText": "每个元素执行自己的功能"
+        },
+        {
+          "id": "sh/0f2lgnmp",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Стойки передают вертикальную нагрузку на основание. • Ригели и поперечины формируют ярусы и поддерживают настил. • Связи и раскосы обеспечивают пространственную жёсткость. • Хомуты, клинья, замки и крепления соединяют систему по схеме изготовителя.",
+          "sourceTextSha256": "faeb43818f9b8b39a45b68818fed0313736521eca11a56c26f530a318fab45ee",
+          "translatedText": "• 立杆把竖向荷载传递至基础。 • 纵向水平杆和横向水平杆组成各作业层并支撑脚手板。 • 拉结件和斜撑提供空间刚度。 • 扣件、楔件、锁扣和紧固件按制造商图纸连接整个系统。"
+        },
+        {
+          "id": "sh/q903ad4n",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Удаление одного элемента может изменить устойчивость всей секции.",
+          "sourceTextSha256": "7806666df4dce63eea071bb04f800c11b97b5643bf2ac7868ea8f8b61884d293",
+          "translatedText": "移除一个元件可以改变整个部分的稳定性。"
+        },
+        {
+          "id": "sh/a543mx4r",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/wvupgz6t",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "12",
+          "sourceTextSha256": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+          "translatedText": "12"
+        }
+      ]
+    },
+    {
+      "slide": 13,
+      "slideId": "sl/hgzapcr6",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/q50nydsj",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Основание безопасно передаёт нагрузку",
+          "sourceTextSha256": "86f2c2e6362d89bb017a27071809fe1056a21d95ed751b96aa2247e460137611",
+          "translatedText": "底座安全转移负载"
+        },
+        {
+          "id": "sh/bq9orito",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Оценивают несущую способность, ровность, дренаж, пустоты, траншеи и возможную просадку. • Лёд, рыхлый грунт, мусор и случайные подкладки не являются надёжным основанием. • Нагрузку распределяют предусмотренными опорными элементами. • Состояние основания контролируют в течение эксплуатации, особенно после осадков и земляных работ.",
+          "sourceTextSha256": "96ab892112743357f2ac98de813e36d6a1fab5025973be8379a2d56e6ab19653",
+          "translatedText": "• 评估承载能力、水平度、排水、空隙、沟渠和可能的沉降。 • 冰、松散的土壤、碎片和随意的垫子不是可靠的基础。 • 负载由所提供的支撑元件分配。 • 在运行过程中，特别是在降水和挖掘工作之后，对地基状况进行监测。"
+        },
+        {
+          "id": "sh/p4r6p8by",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Вертикальные леса не компенсируют слабое основание.",
+          "sourceTextSha256": "b648029ee22a11f3562ce1fb6d9f9bdc7cf911493665f7aa77922af929e3b06e",
+          "translatedText": "垂直脚手架不能弥补薄弱的地基。"
+        },
+        {
+          "id": "sh/1076lobm",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/hcfy9k3u",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "13",
+          "sourceTextSha256": "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278",
+          "translatedText": "13"
+        }
+      ]
+    },
+    {
+      "slide": 14,
+      "slideId": "sl/6lsnupw7",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xc7eds76",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Опорные доски и базы работают совместно",
+          "sourceTextSha256": "11b2840c724f5fa28b63eb289124c11a6a6c66ff0cf24096f198c1548a856fbf",
+          "translatedText": "支撑板和底座协同工作"
+        },
+        {
+          "id": "sh/wbydknq1",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Размер и материал опорной доски принимают по проекту и расчёту нагрузки. • Базовая пластина полностью опирается на подкладку и не висит на краю. • Винтовой домкрат используют только в допустимом диапазоне изготовителя. • Кирпич, обрезки и незафиксированные пакеты материала как подкладки не применяют.",
+          "sourceTextSha256": "9232c0535ebe1596b5feefd7c7760ecd24c9c6323a4cb8948f5afbff8116bf2e",
+          "translatedText": "• 支撑板的尺寸和材料是根据设计和荷载计算而取的。 • 底板完全放在垫子上，并且不会悬挂在边缘上。 • 螺旋千斤顶只能在制造商允许的范围内使用。 • 砖块、废料和散装材料不用作衬里。"
+        },
+        {
+          "id": "sh/idgvmx8r",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Сомнительные старые размеры не переносятся: действует проект конкретных лесов.",
+          "sourceTextSha256": "8f8ef60ac0009763b9169ab5b6df80b6013cd587d7f86ad62195b5cf96ede010",
+          "translatedText": "不得沿用存疑的旧尺寸：应以该具体脚手架的设计为准。"
+        },
+        {
+          "id": "sh/ehwvat8n",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/c3e1gjyd",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "14",
+          "sourceTextSha256": "8527a891e224136950ff32ca212b45bc93f69fbb801c3b1ebedac52775f99e61",
+          "translatedText": "14"
+        }
+      ]
+    },
+    {
+      "slide": 15,
+      "slideId": "sl/vaxsvy10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/547mhg3m",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Геометрию проверяют по мере монтажа",
+          "sourceTextSha256": "1d8b59c544c5913a6b52bc577323c2136e4ed83beb6efb4de9b09365967b6653",
+          "translatedText": "安装过程中检查几何形状"
+        },
+        {
+          "id": "sh/k3y5ov21",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Вертикальность, горизонтальность и расстояния контролируют после каждого участка. • Шаг стоек, ярусов и креплений принимают по проекту и паспорту системы. • Отклонение не исправляют принудительным изгибом или случайной распоркой. • До продолжения монтажа устраняют причину перекоса или просадки.",
+          "sourceTextSha256": "4c872b10c998a07f94ba13f8d78b02358f54a5346a1c85fb6617828cffeafdc5",
+          "translatedText": "• 每完成一个区段后检查垂直度、水平度和间距。 • 立杆、作业层和紧固件的间距应按设计文件和系统技术说明书确定。 • 不得通过强行弯曲或随意增设撑杆纠正偏差。 • 继续搭设前必须消除倾斜或沉降的原因。"
+        },
+        {
+          "id": "sh/t87ml0ji",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Накопленная небольшая ошибка превращается в опасный перекос на высоте.",
+          "sourceTextSha256": "2ce94ddeb50bbc28a17fcdccf7994c530f0301e3485a7a42a8987cda369eea82",
+          "translatedText": "累积的小误差会变成危险的高度不对中。"
+        },
+        {
+          "id": "sh/wrm9kvep",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/hsvat0fa",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "15",
+          "sourceTextSha256": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+          "translatedText": "15"
+        }
+      ]
+    },
+    {
+      "slide": 16,
+      "slideId": "sl/gny5sjyp",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/8z2h8bq1",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Связи обеспечивают жёсткость системы",
+          "sourceTextSha256": "5ec07e4f6c708144fd7e32d5ac15e7d7c5d07854c287a46422007086ac10371b",
+          "translatedText": "连接确保系统刚性"
+        },
+        {
+          "id": "sh/9kby1g7m",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Продольные и поперечные связи устанавливают в местах и последовательности, заданных схемой. • Связь должна быть исправно закреплена на предусмотренных узлах. • Временное снятие допускается только по разрешённой процедуре с заменяющей мерой. • После удара, перемещения или изменения конфигурации связи проверяют повторно.",
+          "sourceTextSha256": "07c023d690f12a506a590cc835b0b723be67416bfbb2b27198beec3ec606b3eb",
+          "translatedText": "• 纵向和横向连接件按图中规定的位置和顺序安装。 • 必须正确保护指定节点的连接。 • 只有通过授权程序并采取替代措施才允许临时撤回。 • 撞击、移动或重新配置后，将重新检查连接。"
+        },
+        {
+          "id": "sh/zutgvm94",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Связь нельзя считать «лишней», даже если настил пока не нагружен.",
+          "sourceTextSha256": "a6f45b237f7ef92cdece0bf360233a36c058cfd73d01898269667fcaff49d023",
+          "translatedText": "连接不能被视为“多余”，即使作业平台 尚未加载。"
+        },
+        {
+          "id": "sh/3qdg7qpo",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/fm1gzq5o",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "16",
+          "sourceTextSha256": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+          "translatedText": "16"
+        }
+      ]
+    },
+    {
+      "slide": 17,
+      "slideId": "sl/14bup87q",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1c7e50ni",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Раскосы стабилизируют плоскость",
+          "sourceTextSha256": "507d3c9361559ca53e52067bd6a191122914092af1606da4457d095f08b9bbd6",
+          "translatedText": "斜撑用于稳定架体平面"
+        },
+        {
+          "id": "sh/gbedwfmx",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Раскосы устанавливают с начала монтажа, а не после достижения полной высоты. • Направление, количество и узлы крепления задаются схемой конкретной системы. • Погнутый, треснувший или незафиксированный раскос выводят из работы. • Самовольное снятие для прохода или подачи материала запрещено.",
+          "sourceTextSha256": "0d7c95f5cfc20a10c84ed4a5a3b04e2bd511945f7d76094fe64463623f650b4c",
+          "translatedText": "• 斜撑应从脚手架搭设开始即安装，不得等到达到全部高度后再安装。 • 斜撑方向、数量和连接节点由具体系统方案规定。 • 弯曲、开裂或未固定的斜撑必须停用。 • 禁止为通行或传递材料而擅自拆除斜撑。"
+        },
+        {
+          "id": "sh/t8ne10n6",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Отсутствующий раскос может привести к складыванию секции.",
+          "sourceTextSha256": "5f1356c475d7a6f0e43891eed1e2761a17a224d91b920a47206ff70526164a38",
+          "translatedText": "缺少斜撑可能导致架体节段失稳折叠。"
+        },
+        {
+          "id": "sh/4by9or6l",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/pc7qhwn6",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "17",
+          "sourceTextSha256": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+          "translatedText": "17"
+        }
+      ]
+    },
+    {
+      "slide": 18,
+      "slideId": "sl/y5wne50z",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/wrelszu9",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Крепление к сооружению выполняют по схеме",
+          "sourceTextSha256": "50a9b13e7572129102f095c81a6f2ed28820720ca00ccfe8daed0e21ad6c3be2",
+          "translatedText": "根据图表进行结构紧固"
+        },
+        {
+          "id": "sh/hsn2l4bu",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Тип анкера, основание, узел и расположение определяются проектом и расчётом. • Крепление не устанавливают в слабый или неизвестный материал без подтверждения. • Анкеры монтируют последовательно, сохраняя устойчивость свободного участка. • Снятие креплений при демонтаже ведут в обратном порядке и только после освобождения ярусов.",
+          "sourceTextSha256": "8dc533f56888d9e625cd8909d56a983468fe9f13881b6c69c9b7944fa01f07fe",
+          "translatedText": "• 锚栓类型、底座、装配和位置由设计和计算确定。 • 未经确认，不得将紧固件安装在脆弱或未知的材料上。 • 锚杆按顺序安装，保持自由区域的稳定性。 • 拆除过程中紧固件的拆除应按相反顺序进行，并且仅在各层被释放后进行。"
+        },
+        {
+          "id": "sh/je5knut0",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Прочность анкера подтверждается проектом и основанием, а не внешним видом.",
+          "sourceTextSha256": "0fd2ff045c0b3b23f7212d3c82c4443e2def33521dcd61b19f19a560719d2f52",
+          "translatedText": "锚的强度是通过设计和基础来体现的，而不是通过其外观来体现。"
+        },
+        {
+          "id": "sh/rip4retw",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/fapkr6pw",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "18",
+          "sourceTextSha256": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a",
+          "translatedText": "18"
+        }
+      ]
+    },
+    {
+      "slide": 19,
+      "slideId": "sl/nid43ytk",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/9gb6xgbi",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Нагрузка ограничивается классом лесов",
+          "sourceTextSha256": "dbe0d04726a9c692226d07f5ece1f28d7fc121aa9aeacd1302d9b5925da8f241",
+          "translatedText": "负载受脚手架等级限制"
+        },
+        {
+          "id": "sh/8v2pobax",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Допустимая нагрузка указывается в проекте, паспорте или маркировке системы. • Учитывают людей, материалы, инструмент, поддоны, временные устройства и динамику подачи. • Материал распределяют равномерно и не складируют у незащищённого края. • Неизвестная или превышенная нагрузка требует разгрузки и проверки.",
+          "sourceTextSha256": "a2606da728615511365aee7ed948fc320206ae6ebbc73e9f4638e7788fd7644d",
+          "translatedText": "• 允许荷载应在设计文件、系统技术说明书或系统标识中注明。 • 应计入人员、材料、工具、托盘、临时装置以及送料时的动态影响。 • 材料应均匀分布，不得堆放在无防护的边缘附近。 • 荷载不明或超载时，必须卸载并检查。"
+        },
+        {
+          "id": "sh/xkbq10be",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Старые значения нагрузки не применяются без подтверждения для данной системы.",
+          "sourceTextSha256": "fd30c9b13c46ada6bc25f278e29dcf8ce420f6ec3f37229ad7d6b8b913105066",
+          "translatedText": "未经确认，旧负载值不会应用于此系统。"
+        },
+        {
+          "id": "sh/cri1gnql",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/dsri9sr6",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "19",
+          "sourceTextSha256": "9400f1b21cb527d7fa3d3eabba93557a18ebe7a2ca4e471cfe5e4c5b4ca7f767",
+          "translatedText": "19"
+        }
+      ]
+    },
+    {
+      "slide": 20,
+      "slideId": "sl/zyxsni5k",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/rq50vmp8",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/po3itc72",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Настил, доступ и защита",
+          "sourceTextSha256": "95b32881a252c0879f5e0e225f3d569b114bb72261abba6e18f54aa539cb0351",
+          "translatedText": "作业平台，访问和安全"
+        },
+        {
+          "id": "sh/2lczih8r",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Рабочая площадка должна быть непрерывной, ограждённой и доступной без подъёма по конструкции.",
+          "sourceTextSha256": "35084ce47b15cb3273a0175211fa68080295732e3d38997e5e66772642e11c1e",
+          "translatedText": "工作区域必须连续、有围栏且无需攀爬结构即可进入。"
+        },
+        {
+          "id": "sh/dkfmp4zy",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/cj65wzyd",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "20",
+          "sourceTextSha256": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+          "translatedText": "20"
+        }
+      ]
+    },
+    {
+      "slide": 21,
+      "slideId": "sl/m1wvqtk3",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1gbmxs7a",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Настил выбирают как элемент системы",
+          "sourceTextSha256": "fa3eb72d20e2e765ab781c7312425d22cd3454a829d7029cc7074464dada1701",
+          "translatedText": "作业平台 被选为系统元素"
+        },
+        {
+          "id": "sh/0f2lon6p",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Дощатые и металлические настилы должны соответствовать системе, пролёту и нагрузке. • Повреждённые доски, деформированные панели и элементы с ослабленными замками бракуют. • Настил укладывают в предусмотренном направлении и на штатные опоры. • Случайные щиты и материалы не используют вместо рабочего настила.",
+          "sourceTextSha256": "240c1fc21c0f1ea25a64323e3625ac8594003f6bda52452ea46d4add443f851f",
+          "translatedText": "• 木板和金属甲板必须适合系统、跨度和负载。 • 损坏的板、变形的面板和锁松动的元件将被拒绝。 • 作业平台 按规定方向铺设在标准支架上。 • 不使用随机板和材料代替工作地板。"
+        },
+        {
+          "id": "sh/dcb2t87y",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Настил — несущий элемент, а не просто поверхность для ходьбы.",
+          "sourceTextSha256": "4e87240f425ed7bc9612a4be9c1dc7f36d87a5337dea9706c23a603330264b6b",
+          "translatedText": "作业平台 是一个承重元件，而不仅仅是一个行走的表面。"
+        },
+        {
+          "id": "sh/4jax4nqd",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/5kjydsri",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "21",
+          "sourceTextSha256": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+          "translatedText": "21"
+        }
+      ]
+    },
+    {
+      "slide": 22,
+      "slideId": "sl/5onypobq",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/6987itcr",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Настил закрепляют от смещения",
+          "sourceTextSha256": "f388b66fb130cfb01ddf5f851fcf2e8472d41d6c66ec6900d8cf1bce0d56222c",
+          "translatedText": "作业平台 防止移位"
+        },
+        {
+          "id": "sh/7a18rydc",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Панели и доски фиксируют штатными замками, упорами или предусмотренным способом. • Зазоры и перекрытия принимают по паспорту и схеме монтажа. • Отверстия и временно снятые участки немедленно ограждают. • После перемещения материала проверяют, не сдвинут ли настил и ограждения.",
+          "sourceTextSha256": "6bd5b484aa5e5ce44e748ca96266be347b62fe74ff25e93a232ad1bf9d093ec1",
+          "translatedText": "• 面板和脚手板应使用规定的锁扣、止挡或指定方式固定。 • 间隙和搭接应按技术说明书和搭设方案确定。 • 洞口和临时拆除的区域必须立即设置防护。 • 移动材料后检查脚手板和防护栏是否发生移位。"
+        },
+        {
+          "id": "sh/il87etcv",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Неподвижность настила проверяют до допуска людей.",
+          "sourceTextSha256": "071e45d58e7e9d6edce966a0cd3180a51bcdad5f4f1b8297ece4a5b57b37157f",
+          "translatedText": "在人们进入之前检查地板的固定性。"
+        },
+        {
+          "id": "sh/p4z6tcri",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/436507qx",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "22",
+          "sourceTextSha256": "785f3ec7eb32f30b90cd0fcf3657d388b5ff4297f2f9716ff66e9b69c05ddd09",
+          "translatedText": "22"
+        }
+      ]
+    },
+    {
+      "slide": 23,
+      "slideId": "sl/c7uhcr6t",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/90vqdczq",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Ограждение защищает от падения с края",
+          "sourceTextSha256": "9d4ad7bf70c33f7e6ca2db85a4225722f506ba8751c80e8287224e1a62e1c623",
+          "translatedText": "护栏防止从边缘掉落"
+        },
+        {
+          "id": "sh/8zm9k7y5",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Поручни, промежуточные элементы и бортовая защита устанавливаются по системе и проекту. • Ограждение должно быть непрерывным на рабочем ярусе и у торцов. • Снятый элемент ограждения немедленно заменяют эквивалентной мерой и восстанавливают. • Запрещено вставать на поручень или использовать его как опору для подъёма.",
+          "sourceTextSha256": "b1651798d881b68f63d4085df8617600eb413afe308083dd5e4baa7a50184cb6",
+          "translatedText": "• 根据系统和设计安装扶手、中间元件和侧面防护装置。 • 工作平面和末端的围栏必须是连续的。 • 拆除的围栏元件立即用等效措施替换并恢复。 • 禁止站在扶手上或利用扶手攀爬。"
+        },
+        {
+          "id": "sh/a14rmhgb",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Коллективная защита действует для всех работников одновременно.",
+          "sourceTextSha256": "82ac614c29239a91c2939caefe6cad33237588468437296dbf624e900e4faa0e",
+          "translatedText": "集体保护同时适用于所有工人。"
+        },
+        {
+          "id": "sh/ip4rqhgn",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/sby90zm1",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/tc7at436",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "23",
+          "sourceTextSha256": "535fa30d7e25dd8a49f1536779734ec8286108d115da5045d77f3b4185d8f790",
+          "translatedText": "23"
+        }
+      ]
+    },
+    {
+      "slide": 24,
+      "slideId": "sl/7qto7e10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1sfqxsv6",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Доступ организуют отдельно от конструкции",
+          "sourceTextSha256": "76a8b03e5d5866b4e77a1bf1b41d3105102fddc4854dd0de0bc1c1967f839a74",
+          "translatedText": "访问与结构分开组织"
+        },
+        {
+          "id": "sh/0r6p4nul",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• На ярусы поднимаются по предусмотренным лестницам, лестничным маршам или башням. • Не поднимаются по раскосам, стойкам, наружной стороне или незафиксированным элементам. • Вход и выход не должны требовать перелезания через ограждение без защищённого проёма. • Люки и площадки сохраняют свободными от материалов.",
+          "sourceTextSha256": "fe7dcbc3db93bdaa35aa65094c73283b1da3ed8f65573731987fe5868abeea85",
+          "translatedText": "• 使用提供的楼梯、楼梯或塔楼攀登各层。 • 请勿攀爬支架、柱子、外部或松动的元件。 • 进入和退出不应需要翻越没有受保护开口的栅栏。 • 舱口和平台上不得有任何材料。"
+        },
+        {
+          "id": "sh/2to76dcr",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Безопасный настил бесполезен, если к нему ведёт опасный подъём.",
+          "sourceTextSha256": "f49c2ce5e84ebe9ec95d140cc135cd63f50bed048e027fdc3c8970733e1d653c",
+          "translatedText": "安全作业平台就没用了。"
+        },
+        {
+          "id": "sh/ix47utcn",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/8veh8ril",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "24",
+          "sourceTextSha256": "c2356069e9d1e79ca924378153cfbbfb4d4416b1f99d41a2940bfdb66c5319db",
+          "translatedText": "24"
+        }
+      ]
+    },
+    {
+      "slide": 25,
+      "slideId": "sl/69wfm9o7",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xg7axgf2",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Лестница должна быть частью решения",
+          "sourceTextSha256": "a3143b57cf52cb71f1cff21cbccdc5b1b360c3659e7b39e8579bc98dc035835d",
+          "translatedText": "楼梯必须是解决方案的一部分"
+        },
+        {
+          "id": "sh/cfyt4beh",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Тип, угол, крепление и выход лестницы определяются проектом и паспортом лесов. • Ступени, тетивы, площадки и запирающие элементы проверяют до использования. • Лестницу не загромождают и не используют для одновременной подачи длинного груза. • Неисправный доступ закрывают до восстановления.",
+          "sourceTextSha256": "c9d8173a5a9a5233ab749f1c95bbad2b1ce5d00b73a0b0110fc2f7cf16df8f50",
+          "translatedText": "• 梯子的类型、角度、固定方式和出口位置由设计及脚手架技术文件确定。 • 使用前应检查踏步、梯梁、平台和锁定部件。 • 梯子不得被堵塞，也不得在同一通道内同时运送长件。 • 有缺陷的通道在修复前必须封闭。"
+        },
+        {
+          "id": "sh/pc7atgf6",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Противоречивые старые интервалы ступеней не переносятся как универсальная норма.",
+          "sourceTextSha256": "88d3b93024b53f35ff5acf51963a84db804ef5ec5a8f986e162d79d2da3b834e",
+          "translatedText": "相互冲突的旧步数间隔不会作为通用规范继续使用。"
+        },
+        {
+          "id": "sh/wza9cbqp",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/h0jalgra",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "25",
+          "sourceTextSha256": "b7a56873cd771f2c446d369b649430b65a756ba278ff97ec81bb6f55b2e73569",
+          "translatedText": "25"
+        }
+      ]
+    },
+    {
+      "slide": 26,
+      "slideId": "sl/l0bepsfm",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/uhk36lk7",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Материалы поднимают отдельно от людей",
+          "sourceTextSha256": "fd06ffeec95f68c57393069390a8e9eefba0fdfc18c05fb53a0e6933bc684e5a",
+          "translatedText": "物料与人员分开提升"
+        },
+        {
+          "id": "sh/vitkzqlc",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Используют предусмотренные подъёмные средства, тару и места приёма груза. • Маршрут груза и зона внизу освобождаются; команда подачи согласуется. • Инструмент и мелкие детали закрепляют от падения. • Перенос груза по лестнице допускается только если сохраняются безопасный хват и опора.",
+          "sourceTextSha256": "94db1aebd723cf875acd5dd178ee990a9e6400d80236278c0bc8fc1765e467de",
+          "translatedText": "• 使用规定的起吊辅助装置、盛装容器和接料位置。 • 清空载荷移动路线及下方区域，并事先统一传递载荷的指令。 • 工具和小零件应固定，防止坠落。 • 只有能够保持安全抓握和可靠支撑时，才允许在梯子上搬运载荷。"
+        },
+        {
+          "id": "sh/md0321kv",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Руки работника на лестнице предназначены прежде всего для безопасного подъёма.",
+          "sourceTextSha256": "72860455bd9e19352f8ad408fd3afe0ae9eda5d71dea6baae3ef33dd251b37ac",
+          "translatedText": "工人的手放在梯子上主要是为了安全上升。"
+        },
+        {
+          "id": "sh/lsja143i",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/krat8z2x",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "26",
+          "sourceTextSha256": "5f9c4ab08cac7457e9111a30e4664920607ea2c115a1433d7be98e97e64244ca",
+          "translatedText": "26"
+        }
+      ]
+    },
+    {
+      "slide": 27,
+      "slideId": "sl/4vyxknqp",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/kn694nmx",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Сначала применяют коллективную защиту",
+          "sourceTextSha256": "42b966332797badfe2b06efde7e071a476b8685f73f7e410c07b9f3faf4015fc",
+          "translatedText": "先行集体保护"
+        },
+        {
+          "id": "sh/lofadsni",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Монтаж планируют так, чтобы ограждения и защищённые площадки появлялись как можно раньше. • Страховочная система применяется там, где риск нельзя устранить коллективной мерой. • Метод монтажа должен защищать работника при установке следующего яруса. • Снятие защиты допускается только при контролируемой альтернативе.",
+          "sourceTextSha256": "b11a67938624999933bcd12e94e8b9e566d62a4dcd8224b6579f993f6fa8ed22",
+          "translatedText": "• 规划安装，以便尽早出现围栏和保护区。 • 防坠落系统 用于无法通过集体行动消除风险 的情况。 • 安装下一层时，安装方法必须保护工人。 • 只有通过受控替代方案才允许取消保护。"
+        },
+        {
+          "id": "sh/8r698nm9",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Приоритет — не допустить падение, а не только остановить его.",
+          "sourceTextSha256": "826782cd1d967c5abd91de94414898c31053a58cf4e308e7ee067549bf24bdf7",
+          "translatedText": "首要任务是防止跌倒，而不仅仅是阻止跌倒。"
+        },
+        {
+          "id": "sh/ju5gv294",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/ytwfmx8j",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/lw7yxcra",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "27",
+          "sourceTextSha256": "670671cd97404156226e507973f2ab8330d3022ca96e0c93bdbdb320c41adcaf",
+          "translatedText": "27"
+        }
+      ]
+    },
+    {
+      "slide": 28,
+      "slideId": "sl/3mdove10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/q9cz6xkv",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Страховка требует запаса высоты",
+          "sourceTextSha256": "60d77910b4c6db10e7f0bfae319e17d4667f6691fbb517cf424fb54a876d05f7",
+          "translatedText": "防坠落系统需要足够的坠落净空"
+        },
+        {
+          "id": "sh/ralgf21g",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Применяют совместимую систему, подходящую к задаче и условиям рабочего места. • Анкерную точку выбирает ответственное лицо с подтверждением пригодности. • Учитывают длину соединительной подсистемы, раскрытие амортизатора и запас высоты. • Компоненты осматривают до применения; повреждённые выводят из эксплуатации.",
+          "sourceTextSha256": "49f3f6b389c0bc7ec86d87d9d2758b352fa425d5ad8befd18a2af1c3c6939f7f",
+          "translatedText": "• 使用适合任务和工作场所条件的兼容系统。 • 锚点由负责人选择并确认其适用性。 • 考虑连接子系统的长度、减震器开口和净空高度。 • 使用前对部件进行检查；损坏的将停止使用。"
+        },
+        {
+          "id": "sh/10nylwji",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Зацепиться за ближайший элемент — не значит обеспечить безопасную страховку.",
+          "sourceTextSha256": "c0e839bd7aab391f60e54d21e75539137f3ad2b04dbab5cb3737aee3996802f1",
+          "translatedText": "随意挂接在最近的构件上并不能提供可靠的防坠落保护。"
+        },
+        {
+          "id": "sh/947ipwje",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/lg3690fq",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/kfu5gfe5",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "28",
+          "sourceTextSha256": "59e19706d51d39f66711c2653cd7eb1291c94d9b55eb14bda74ce4dc636d015a",
+          "translatedText": "28"
+        }
+      ]
+    },
+    {
+      "slide": 29,
+      "slideId": "sl/i5o3q10v",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/tk36hwby",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Предметы защищают от падения",
+          "sourceTextSha256": "a05813eaf9f3e1c7f48b1b93643c916130e3d5ed340bab42c7d2111b11fb9dc1",
+          "translatedText": "防止物体坠落"
+        },
+        {
+          "id": "sh/8jup8rad",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Устанавливают бортовые элементы, защитные сетки или другие предусмотренные меры. • Инструмент закрепляют, мелкие детали хранят в закрываемой таре. • Материал не складывают у края и не бросают вниз. • Опасную зону внизу сохраняют до полного окончания работ и уборки.",
+          "sourceTextSha256": "c16c5b89d8da6383f5acb4bab202f81067ebe57e3ec6d5ca6f4006c01bc1468f",
+          "translatedText": "• 安装侧面元件、防护网或其他规定措施。 • 工具已固定，小部件存放在密闭容器中。 • 材料边缘未折叠或掉落。 • 维护下方的危险区域直至工作和清洁完成。"
+        },
+        {
+          "id": "sh/h8n6lwbu",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Каска снижает тяжесть травмы, но не заменяет предотвращение падения предмета.",
+          "sourceTextSha256": "60c80d5c0102b2c6b1ec3a5d65a6ae0c3f86d98bde9fc58dae0be9f98eb7d054",
+          "translatedText": "安全帽可以减轻伤害的严重程度，但不能代替防止物体坠落。"
+        },
+        {
+          "id": "sh/kf2tw7a1",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/5gbupcrm",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "29",
+          "sourceTextSha256": "35135aaa6cc23891b40cb3f378c53a17a1127210ce60e125ccf03efcfdaec458",
+          "translatedText": "29"
+        }
+      ]
+    },
+    {
+      "slide": 30,
+      "slideId": "sl/wnqh07ex",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/po72d8nm",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Электроустановки меняют условия монтажа",
+          "sourceTextSha256": "50fdac4fa88c2b92ee149f887dde079438d862969a53d6f54566927c83126233",
+          "translatedText": "电气装置改变安装条件"
+        },
+        {
+          "id": "sh/o3yl4361",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• До работы выявляют линии, кабели, токоведущие части и возможное наведённое напряжение. • Опасные расстояния и защитные меры определяются нарядом-допуском и ответственными лицами. • Металлические элементы не перемещают в сторону проводов без контролируемой схемы. • При изменении положения линии или лесов оценку выполняют повторно.",
+          "sourceTextSha256": "13894d8324a0fa8db4ae71f04f423a42d8c93c383636b14dc06cb1fbc6a3473a",
+          "translatedText": "• 工作前，识别线路、电缆、带电部件和可能的感应电压。 • 危险距离和防护措施由许可证和负责人确定。 • 如果没有受控模式，金属元件不会移向电线。 • 如果线路或脚手架的位置发生变化，则需重复评估。"
+        },
+        {
+          "id": "sh/xsr2h8ni",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Нельзя определять безопасное расстояние до напряжения на глаз.",
+          "sourceTextSha256": "4671684a457346ed3afdb6b874c9a583a4590446820805409698105c2ce6401a",
+          "translatedText": "无法确定眼睛疲劳的安全距离。"
+        },
+        {
+          "id": "sh/onqx8zix",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/p8ze14zi",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/2l8f6p0r",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "30",
+          "sourceTextSha256": "624b60c58c9d8bfb6ff1886c2fd605d2adeb6ea4da576068201b6c6958ce93f4",
+          "translatedText": "30"
+        }
+      ]
+    },
+    {
+      "slide": 31,
+      "slideId": "sl/lcn6tkb6",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/dgja98fe",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Погода может потребовать остановки",
+          "sourceTextSha256": "645d36be2b26e86ae2588d46e96cfeafe47f9f2b55e363fd862da73f522ef727",
+          "translatedText": "天气可能需要停止"
+        },
+        {
+          "id": "sh/0jut43yp",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "• Ветер, гроза, осадки, лёд, жара и плохая видимость влияют на устойчивость и действия человека. • Предельные условия принимают по проекту, паспорту системы и локальной инструкции. • После неблагоприятной погоды проверяют основание, крепления, настил и защитные элементы. • Работа не возобновляется только потому, что осадки закончились.",
+          "sourceTextSha256": "e86753c216aca8c4647c6dc1fdfe9568a2565a5093435da21d7df035f6886799",
+          "translatedText": "• 风、雷暴、降水、结冰、高温和能见度差会影响人体的稳定性和表现。 • 根据项目、系统通行证和当地指令接受限制条件。 • 恶劣天气过后，检查底座、紧固件、作业平台 和保护元件。 • 工作不会仅仅因为降雨结束而恢复。"
+        },
+        {
+          "id": "sh/fmhszex0",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Неподтверждённая универсальная скорость ветра не заменяет требования конкретной системы.",
+          "sourceTextSha256": "1c488b1f8e0ad22a998948a78fa502392cc92bc990b78c0bbe9ccb1c5c241e1f",
+          "translatedText": "未经验证的通用风速不能替代特定系统的要求。"
+        },
+        {
+          "id": "sh/it4nexsf",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/3ud4n290",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "31",
+          "sourceTextSha256": "eb1e33e8a81b697b75855af6bfcdbcbf7cbbde9f94962ceaec1ed8af21f5a50f",
+          "translatedText": "31"
+        },
+        {
+          "id": "sh/qx4nihsb",
+          "shapeId": "16",
+          "kind": "shape",
+          "name": "STOP_SIGN",
+          "text": "СТОП",
+          "sourceTextSha256": "b9e25ea0cee74abd54acfd57ccb3bd906be0673a755d04e4e976baa9b0e283b7",
+          "translatedText": "停止"
+        }
+      ]
+    },
+    {
+      "slide": 32,
+      "slideId": "sl/6l0j294r",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/kr61sfy1",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/6t8jupg7",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Проверка и эксплуатация",
+          "sourceTextSha256": "b3b41658e5ea089fa5107aa2f2ec483774040c472bd1e04067cd510347ee69ef",
+          "translatedText": "检查与操作"
+        },
+        {
+          "id": "sh/7uh0nuxs",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Леса допускаются к работе только после проверки, а изменения требуют нового осмотра.",
+          "sourceTextSha256": "1163be8bdefeedcfa9f23fe2f569cd5fc4370b5e5bc9938ef5dd273016c0ce75",
+          "translatedText": "脚手架经检查后方可使用，如有变更需重新检查。"
+        },
+        {
+          "id": "sh/nyd0bqxo",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/ry94z29w",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "32",
+          "sourceTextSha256": "e29c9c180c6279b0b02abd6a1801c7c04082cf486ec027aa13515e4f3884bb6b",
+          "translatedText": "32"
+        }
+      ]
+    },
+    {
+      "slide": 33,
+      "slideId": "sl/nax4b2dk",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/lk3m50nq",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Проверка охватывает всю систему",
+          "sourceTextSha256": "c69a97e3822ac95a6c815f1ae375a884544c080458a74a8be2d3fa85ad8c5996",
+          "translatedText": "测试覆盖整个系统"
+        },
+        {
+          "id": "sh/mlc3y54b",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/9o3m9knm",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Основание",
+          "sourceTextSha256": "0369683b41e6de45c6aa131ce2d8bfd85917d38f2db2a8b711736a3e20418b0e",
+          "translatedText": "底座"
+        },
+        {
+          "id": "sh/8nul0fmh",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Просадка, подкладки, базы, вода и состояние грунта.",
+          "sourceTextSha256": "d0ab3fa40e1702828ff14098cb69c6209ac6158d4458d3f2023366985325e4c5",
+          "translatedText": "沉降、垫层、基础、水和土壤状况。"
+        },
+        {
+          "id": "sh/apc32p47",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/grad8zah",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Конструкция",
+          "sourceTextSha256": "0bcaab7dd7ec0f87b534bf53cff8fe44073c4c76aef7309398193826e0882bc3",
+          "translatedText": "设计"
+        },
+        {
+          "id": "sh/hsjuhkb2",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Стойки, ригели, связи, раскосы, замки и анкеры.",
+          "sourceTextSha256": "cbc909e8797e6be11866712363d6f0c76e3338eadc40af1a61469c7ed59a4a94",
+          "translatedText": "立杆、纵向水平杆、拉结件、斜撑、锁扣和锚固件。"
+        },
+        {
+          "id": "sh/vq1cfutw",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/4vadczad",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Рабочий ярус",
+          "sourceTextSha256": "1fbc10f08c1c2b5e9c0d94c75beb2945e4d1b494d9ab7362806045f5e26aba53",
+          "translatedText": "工作层"
+        },
+        {
+          "id": "sh/5w3ul4by",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Настил, ограждения, доступ, люки и защита от предметов.",
+          "sourceTextSha256": "a6a38513f6cca0464f6a7fd142dd916a50e7b5ef232dc4a24042210151b1560a",
+          "translatedText": "作业平台，障碍物、通道、舱口和物体保护。"
+        },
+        {
+          "id": "sh/3u1cjut8",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/czudgjap",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Статус",
+          "sourceTextSha256": "225077c6d4791e693ff47d24e846cfc3198da287d2b8e77fd2bba435183f0d54",
+          "translatedText": "状态"
+        },
+        {
+          "id": "sh/dk3ep4ba",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Нагрузка, ограничения, маркировка и запись результата осмотра.",
+          "sourceTextSha256": "fd8378aba0de5d7925cb57781ec7280b040e7a0be8d6974a546c284867865e71",
+          "translatedText": "检验结果的装载、限制、标记和记录。"
+        },
+        {
+          "id": "sh/zehc7u18",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Проверка одного яруса не подтверждает безопасность всей системы.",
+          "sourceTextSha256": "c1841b0e5f657b5dc71cde4bc5af81a32db5c5e8f9cc21283bff4cb18b35aba6",
+          "translatedText": "测试一层并不能确认整个系统的安全性。"
+        },
+        {
+          "id": "sh/nihcbe1k",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/mh8v29kz",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "33",
+          "sourceTextSha256": "c6f3ac57944a531490cd39902d0f777715fd005efac9a30622d5f5205e7f6894",
+          "translatedText": "33"
+        }
+      ]
+    },
+    {
+      "slide": 34,
+      "slideId": "sl/ofu103u5",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/pwzm1kbm",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Повторный осмотр нужен после изменения",
+          "sourceTextSha256": "98447e8c167f070b4cb8aad7beb54889ebc1d82fe79979a08835d09d3b515166",
+          "translatedText": "变更后需重新检验"
+        },
+        {
+          "id": "sh/ovq58fu1",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Проверяют после монтажа и перед первым допуском к эксплуатации. • Повторная проверка нужна после изменения конфигурации, повреждения или удара. • Неблагоприятная погода, просадка грунта и длительный перерыв также требуют осмотра. • До подтверждения безопасности доступ ограничивают.",
+          "sourceTextSha256": "eefde6c564d5aaa7cd7d1f505ee31075ba66d4ed9ca672d8bfbd0594e5f451dc",
+          "translatedText": "• 安装后和首次允许操作前进行检查。 • 配置更改、损坏或冲击后需要重新检查。 • 不利的天气、沉降和长时间的休息也需要检查。 • 在确认安全之前，访问受到限制。"
+        },
+        {
+          "id": "sh/d0zm54bi",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Старый статус допуска не действует после существенного изменения условий.",
+          "sourceTextSha256": "4212a217b67aaa29d4c7272e41703425764560e1a3959fc3dcb0abae68b1e382",
+          "translatedText": "条件发生重大变化后，原使用许可状态即失效。"
+        },
+        {
+          "id": "sh/0vidkfu5",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/1wredkbq",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "34",
+          "sourceTextSha256": "86e50149658661312a9e0b35558d84f6c6d3da797f552a9657fe0558ca40cdef",
+          "translatedText": "34"
+        }
+      ]
+    },
+    {
+      "slide": 35,
+      "slideId": "sl/1obmtofm",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/idonexon",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Маркировка показывает текущий статус",
+          "sourceTextSha256": "e325d124d84736ad9c8c91e5fd75a69fbbc006779878422b51c393d1e6a0eba0",
+          "translatedText": "标记显示当前状态"
+        },
+        {
+          "id": "sh/3ex47ip8",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• У входа размещают понятный статус: допущено, ограничено или запрещено к использованию. • Указывают ответственного, дату проверки и существенные ограничения, если это предусмотрено процедурой. • Отсутствующая или просроченная маркировка означает необходимость уточнить статус. • Пользователь не изменяет маркировку самостоятельно.",
+          "sourceTextSha256": "7d0f92e2b0097b8736bafe96b88f900b3c54565d51926dbd0e0fc5391fbfb476",
+          "translatedText": "• 入口处有明确的指示：允许、限制或禁止使用。 • 如果程序有规定，请注明负责人、检查日期和重要限制。 • 标签丢失或过期意味着需要澄清其状态。 • 用户不能独立更改标记。"
+        },
+        {
+          "id": "sh/u943ador",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Цвет ярлыка без локальной легенды не является достаточной инструкцией.",
+          "sourceTextSha256": "59d83345b325b86e252778f88a6c37a7ba8ff278e1cf169b3213a13e790d8fc5",
+          "translatedText": "没有本地图例的标签颜色不足以说明。"
+        },
+        {
+          "id": "sh/5of6xcbi",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/4n65o7ax",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "35",
+          "sourceTextSha256": "9f14025af0065b30e47e23ebb3b491d39ae8ed17d33739e5ff3827ffb3634953",
+          "translatedText": "35"
+        }
+      ]
+    },
+    {
+      "slide": 36,
+      "slideId": "sl/m9s3ehgf",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/5s3atkbq",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Пользователь проверяет леса перед работой",
+          "sourceTextSha256": "0afbf477fc05dbae4d96a6c636feab464c2e036c6d968533e43864ee98cfe3f8",
+          "translatedText": "用户上班前检查脚手架"
+        },
+        {
+          "id": "sh/4rut0fa5",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Убедитесь, что статус допуска действителен и относится к нужному участку. • Осмотрите доступ, настил, ограждение, чистоту и видимые повреждения. • Соблюдайте ограничения нагрузки и назначение яруса. • Немедленно сообщайте о снятом элементе, просадке, раскачивании или постороннем вмешательстве.",
+          "sourceTextSha256": "a7ff72e7c1b3d28ef4d17c3487222596f049338c9c742fd3fb2c98e95dca4293",
+          "translatedText": "• 确保清关状态有效并适用于正确的区域。 • 检查通道、作业平台、围栏、清洁度和可见损坏。 • 遵守负载限制和层用途。 • 立即报告任何被移除的物品、下沉、晃动或篡改。"
+        },
+        {
+          "id": "sh/dwnax4bm",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Ежедневный взгляд пользователя дополняет, но не заменяет формальную проверку.",
+          "sourceTextSha256": "b94d4b865ca9edf25efdb760b79f8375ae3aa1d95c21c3b0fe96a5b1f22a484b",
+          "translatedText": "每日用户审查是对正式审查的补充，但不能取代。"
+        },
+        {
+          "id": "sh/kfi54n2l",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/lgr6xs36",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "36",
+          "sourceTextSha256": "76a50887d8f1c2e9301755428990ad81479ee21c25b43215cf524541e0503269",
+          "translatedText": "36"
+        }
+      ]
+    },
+    {
+      "slide": 37,
+      "slideId": "sl/jyhsreh4",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/61c7md0r",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Самовольные изменения запрещены",
+          "sourceTextSha256": "236cc381f640bbb234506e45bb5287d05bb3c199f056834e26745ae2911e68cf",
+          "translatedText": "未经授权禁止更改"
+        },
+        {
+          "id": "sh/jyl8ryh0",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "• Не снимайте связи, раскосы, анкеры, настилы или ограждения для удобства работы. • Не перегружайте ярус и не ставьте подмости или лестницы на настил без проектного решения. • Не крепите тали, рукава, баннеры или оборудование к лесам без подтверждения. • Не используйте леса при неизвестном статусе или видимом повреждении.",
+          "sourceTextSha256": "bb05a76d41bf8f0db24178c0be11e06b241130c4282ad3225fd3af161d626d06",
+          "translatedText": "• 不得为图方便而拆除拉结件、斜撑、锚固件、脚手板或防护栏。 • 不得使作业层超载，也不得在没有设计方案的情况下在脚手板上放置小型作业架或梯子。 • 未经确认，不得将起重葫芦、软管、横幅或设备固定在脚手架上。 • 状态不明或存在明显损坏的脚手架不得使用。"
+        },
+        {
+          "id": "sh/4vy9wnyp",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Любое изменение нагрузки или конфигурации требует согласования и проверки.",
+          "sourceTextSha256": "464cbf50933dd4ef9f6b128ca6aa0d51af69cc5b65c40c74106fcf6d953b5679",
+          "translatedText": "任何负载或配置更改都需要批准和验证。"
+        },
+        {
+          "id": "sh/naxs7q9s",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/m94rel87",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "37",
+          "sourceTextSha256": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
+          "translatedText": "37"
+        },
+        {
+          "id": "sh/z6ds369w",
+          "shapeId": "16",
+          "kind": "shape",
+          "name": "STOP_SIGN",
+          "text": "СТОП",
+          "sourceTextSha256": "b9e25ea0cee74abd54acfd57ccb3bd906be0673a755d04e4e976baa9b0e283b7",
+          "translatedText": "停止"
+        }
+      ]
+    },
+    {
+      "slide": 38,
+      "slideId": "sl/ofahkri5",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/kvy1kbep",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Демонтаж ведут сверху вниз",
+          "sourceTextSha256": "838886076ff752897513a6599d0d26192ae8741ad0aa64df94f0190f0c4d0b52",
+          "translatedText": "拆解是从上到下进行的"
+        },
+        {
+          "id": "sh/7yp0f6dg",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/8zi1obe1",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Освободить",
+          "sourceTextSha256": "0444e74d7ca893bcec6052b44ba43842e269a873bed33db62544cefb1f6432db",
+          "translatedText": "发布"
+        },
+        {
+          "id": "sh/90rihgv6",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Убрать людей, материалы, мусор и посторонние крепления.",
+          "sourceTextSha256": "4f323fe717993c08b40ec78f733630fb0226ffb99bfd7e61d033f5b5bc1e823e",
+          "translatedText": "清除人员、材料、碎片和异物。"
+        },
+        {
+          "id": "sh/v290jqdc",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/3it0j25o",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Оградить",
+          "sourceTextSha256": "413de2e9ea423ac54574d6097fb72be5a63a991bf8da00e5fa07786327222283",
+          "translatedText": "栅栏"
+        },
+        {
+          "id": "sh/ih0zqxoj",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Восстановить опасную зону, сигналы и порядок передачи элементов.",
+          "sourceTextSha256": "e5a87843a1c084ea80cc49d21b6197c84c6fba05d42694fde872f94b48aef525",
+          "translatedText": "恢复危险区域、信号和元素传输顺序。"
+        },
+        {
+          "id": "sh/4j2hs7m9",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/ve90f25s",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Разобрать",
+          "sourceTextSha256": "89a79917098e737ea1c064a3111ee74fce439bae21e875bca14af71edcc63cc8",
+          "translatedText": "拆机"
+        },
+        {
+          "id": "sh/ud0zmxo7",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Снимать сверху вниз, сохраняя связи и анкеры до разрешённого этапа.",
+          "sourceTextSha256": "57c584d548698fea361753e445e80665df973829e56d6191f9a9ddc0610fa6da",
+          "translatedText": "从上到下拆卸，保持连接和锚固，直到达到允许的阶段。"
+        },
+        {
+          "id": "sh/gfihon6d",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/fad0rm5w",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Передать",
+          "sourceTextSha256": "1dc58eaa3a661d16988379a8a48758528d3ade082a6597a55068193d1d88c243",
+          "translatedText": "发送"
+        },
+        {
+          "id": "sh/e94jyh4b",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Не бросать элементы; осматривать, сортировать и складировать устойчиво.",
+          "sourceTextSha256": "c897ebd870cf6b9da6750176e1b9b3b3520f70ec94ebd592fb913af63a912951",
+          "translatedText": "请勿投掷物品；可持续地检查、分类和存储。"
+        },
+        {
+          "id": "sh/w76lsv6p",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Преждевременное снятие связи или анкера может вызвать обрушение оставшейся части.",
+          "sourceTextSha256": "f83c650e1620eb073b17c58cb66725eec785f17f8ff5287657316700ac6037de",
+          "translatedText": "过早拆除系带或锚栓可能会导致剩余部分倒塌。"
+        },
+        {
+          "id": "sh/kbqlwv61",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/lczmp07m",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "38",
+          "sourceTextSha256": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+          "translatedText": "38"
+        }
+      ]
+    },
+    {
+      "slide": 39,
+      "slideId": "sl/twb2lg7e",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/50769kvu",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "После демонтажа элементы сортируют",
+          "sourceTextSha256": "9cb9c7c993bed5e603690d0d1a41fc9fc6723e7a52823e6d4d45dd92088d9a41",
+          "translatedText": "拆解后，元素已排序"
+        },
+        {
+          "id": "sh/4ze50fu9",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Очищают элементы способом, не повреждающим замки, покрытие и геометрию. • Проверяют деформацию, трещины, коррозию, сварные швы и комплектность. • Годные элементы складируют по типам на устойчивой площадке. • Брак маркируют и физически отделяют от пригодного материала.",
+          "sourceTextSha256": "b514445a29a56c4e9f269c9df6c0ebc6c84d11ada30f822f906d73a0e993b9a8",
+          "translatedText": "• 以不损坏锁、涂层和几何形状的方式清洁元件。 • 检查变形、裂纹、腐蚀、焊缝和完整性。 • 合适的元素按类型存储在稳定的站点上。 • 废品被标记并与可用材料物理分离。"
+        },
+        {
+          "id": "sh/do76d4vq",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Повреждённый элемент не возвращают в оборот «до следующего ремонта».",
+          "sourceTextSha256": "721f828a7638bfa020b0ce12263f110b58e33561449ff70c68b63b9db94fef89",
+          "translatedText": "损坏的物品不会返回流通“直到下次维修”。"
+        },
+        {
+          "id": "sh/sjmpon2x",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/dkvqxsji",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "39",
+          "sourceTextSha256": "0b918943df0962bc7a1824c0555a389347b4febdc7cf9d1254406d80ce44e3f9",
+          "translatedText": "39"
+        }
+      ]
+    },
+    {
+      "slide": 40,
+      "slideId": "sl/5ojatgfe",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/y9gzu50n",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Деревянные элементы: пожарный риск",
+          "sourceTextSha256": "52e637e6982f212027faf4e9aab562bd3d1868d683bc16bb7f300165e6164119",
+          "translatedText": "木质元素：火风险"
+        },
+        {
+          "id": "sh/zapg3qh8",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Удаляйте горючие отходы и не допускайте накопления сухой древесины и упаковки. • Огневые работы рядом выполняют только с предусмотренными мерами и контролем. • Эвакуационные пути и доступ к средствам пожаротушения сохраняют свободными. • Пропитка или покрытие учитываются только при подтверждённом состоянии и назначении.",
+          "sourceTextSha256": "76b7976305d4c47df0deb326265fe8c0b76e04145686171ffe219e7f158a740f",
+          "translatedText": "• 清除易燃废物并避免堆积干木材和包装。 • 动火作业 附近仅执行所提供的措施和控制。 • 疏散路线和灭火设备通道保持畅通。 • 只有在条件和目的得到确认的情况下才考虑浸渍或涂层。"
+        },
+        {
+          "id": "sh/alwfql0r",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Деревянный настил не становится негорючим из-за одного старого покрытия.",
+          "sourceTextSha256": "fac6c9f96b5f20e0171e4a2b0720b2ab1240faf7eed589f10bb919dbc9fa2a22",
+          "translatedText": "木质作业平台 仅因旧涂层而不会变得不易燃。"
+        },
+        {
+          "id": "sh/1wnmx4vq",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "标准：消防安全规则"
+        },
+        {
+          "id": "sh/gvel4ze5",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/fu54vudk",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "40",
+          "sourceTextSha256": "d59eced1ded07f84c145592f65bdf854358e009c5cd705f5215bf18697fed103",
+          "translatedText": "40"
+        }
+      ]
+    },
+    {
+      "slide": 41,
+      "slideId": "sl/cnmpwjmp",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/t0rqhkju",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Деформация или просадка требуют эвакуации",
+          "sourceTextSha256": "50b40868be5696eac043f3ddd4739632cf073ed2b33967be7c75e616d5e175a8",
+          "translatedText": "变形或下沉需要疏散"
+        },
+        {
+          "id": "sh/g3i9czil",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "• Прекратите работу, предупредите людей и организованно покиньте опасный участок. • Оградите доступ и не пытайтесь выправлять нагруженную конструкцию самостоятельно. • Сообщите руководителю и назначенному лицу, опишите место и признаки изменения. • Возобновляйте работу только после обследования, устранения причины и нового допуска.",
+          "sourceTextSha256": "efba975c40c453f1341b4a503c2d6d7fb5df2a8e0efbdbe73497cd067868960b",
+          "translatedText": "• 停止工作，警告人员，有序离开危险区域。 • 保护通道，不要尝试自行拉直负载结构。 • 通知主管和指定人员，描述变化的位置和迹象。 • 经检查、消除原因并重新批准后方可恢复工作。"
+        },
+        {
+          "id": "sh/36t8nu1w",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Раскачивание, ослабление замка, треск или просадка — не нормальная «усадка» лесов.",
+          "sourceTextSha256": "85736805f266d38e7b0c304f273d4ab84e637b8cd61f4762b1551b53db676e83",
+          "translatedText": "摇晃、锁松动、开裂或下沉并非脚手架的正常“收缩”。"
+        },
+        {
+          "id": "sh/qt872t8b",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Работы на высоте — приказ № 109",
+          "sourceTextSha256": "22fb5b4d50bad1a3ad535bf32b72091b3141b8221fa163eaa10d5fd0171d1587",
+          "translatedText": "规范：高处作业——第109号命令"
+        },
+        {
+          "id": "sh/ruh8by9w",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Лесомонтажные работы",
+          "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+          "translatedText": "脚手架搭设作业"
+        },
+        {
+          "id": "sh/0za983qd",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "41",
+          "sourceTextSha256": "3d914f9348c9cc0ff8a79716700b9fcd4d2f3e711608004eb8f138bcba7f14d9",
+          "translatedText": "41"
+        },
+        {
+          "id": "sh/zy18fy9s",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STOP_SIGN",
+          "text": "СТОП",
+          "sourceTextSha256": "b9e25ea0cee74abd54acfd57ccb3bd906be0673a755d04e4e976baa9b0e283b7",
+          "translatedText": "停止"
+        }
+      ]
+    },
+    {
+      "slide": 42,
+      "slideId": "sl/7mdw7yh8",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/l8nad0rq",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "CHECKLIST_TITLE",
+          "text": "Итоговый чек-лист лесомонтажника",
+          "sourceTextSha256": "6fc6fbe66cc3cf8fa58d4ad44b99b00600b93d1e2172787838dab113a4bb4d60",
+          "translatedText": "脚手架搭设人员最终检查表"
+        },
+        {
+          "id": "sh/nmxwfetc",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/0j6dkjul",
+          "shapeId": "4",
+          "kind": "shape",
+          "text": "Есть проект, паспорт, назначенные роли и безопасная зона.",
+          "sourceTextSha256": "24670a774d9f339942a62f854bb1f98804ee8fe4d13b7c37b18e878b10b9d44a",
+          "translatedText": "已具备设计文件、系统技术说明书、指定职责和安全区域。"
+        },
+        {
+          "id": "sh/yh4vi9cv",
+          "shapeId": "6",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/zixcbedg",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "Основание, базы, геометрия, связи и крепления соответствуют схеме.",
+          "sourceTextSha256": "7094e5e533460f583d2871dcde86b101c0fe0e82e5312dcb20149ec9bdc22dd1",
+          "translatedText": "底座、底座、几何形状、连接和紧固件与图表相对应。"
+        },
+        {
+          "id": "sh/dgvu94va",
+          "shapeId": "9",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/5w3qp0z2",
+          "shapeId": "10",
+          "kind": "shape",
+          "text": "Настил, ограждение, доступ и защита от предметов завершены.",
+          "sourceTextSha256": "24cf3db6b8b7bc7e1d10830452d15d55432a845f36f452b2207669cff258b148",
+          "translatedText": "作业平台，围栏、访问和对象保护完成。"
+        },
+        {
+          "id": "sh/jul8nahw",
+          "shapeId": "12",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/itsru50b",
+          "shapeId": "13",
+          "kind": "shape",
+          "text": "Статус допуска действителен; нагрузка и погода контролируются.",
+          "sourceTextSha256": "f68f494754c48200a1fd1c87c640ca7dcfdd4783e2e31730f27ecfb02b70616c",
+          "translatedText": "使用许可状态有效，并持续监控荷载和天气。"
+        },
+        {
+          "id": "sh/wra9svi5",
+          "shapeId": "15",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/vq18zqhk",
+          "shapeId": "16",
+          "kind": "shape",
+          "text": "При изменении, повреждении или сомнении работа остановлена.",
+          "sourceTextSha256": "1778ffa15dd2fc9580e9bd4ca820643607c9361c098d8be12e4c50c279563a4f",
+          "translatedText": "如果发生改变、损坏或有疑问，工作将停止。"
+        },
+        {
+          "id": "sh/upsrql0f",
+          "shapeId": "17",
+          "kind": "shape",
+          "text": "Нажмите «Начать тест»",
+          "sourceTextSha256": "7def4d3ecea04d21659749684677aa095ef9e1b37b0d1abf8c22500ebc745c2e",
+          "translatedText": "点击“开始测试”"
+        },
+        {
+          "id": "sh/94jqxgzu",
+          "shapeId": "18",
+          "kind": "shape",
+          "text": "Актуализировано: 21.08.2026",
+          "sourceTextSha256": "3612380a2a5a26e814543ff9385ccb697367c259e8ded06d6603b16d86cd2adf",
+          "translatedText": "更新日期：2026 年 8 月 21 日"
+        }
+      ]
+    }
+  ]
+}

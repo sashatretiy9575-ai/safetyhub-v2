@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slug": "pozharnaya-bezopasnost",
+  "locale": "kk",
+  "productionPublished": false,
+  "contentSummary": "өрт қауіпсіздігі: Өрттің алдын алу, ескерту, эвакуация, бастапқы сөндіргіштерді қолдану және өрт кезіндегі қауіпсіз әрекеттер.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/pozharnaya-bezopasnost/presentation.pptx",
+    "pptxSha256": "4e75a28d8b2a55fd272a34e9674babc09709b4d35b837c111ff73cfeb6f0e9b8",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/kk/text-map.json",
+    "textMapSha256": "d12a1e65edc83511678354c8943234d4e6da3ff6de89d261311e09d60101103d"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/kk/assets/pptx/37374afd69bd03eb9408a68b08d3709d0ddc3eabc43c489865fb6115dfea2c22/presentation.pptx",
+    "sha256": "37374afd69bd03eb9408a68b08d3709d0ddc3eabc43c489865fb6115dfea2c22",
+    "byteSize": 1441499,
+    "slideCount": 41
+  },
+  "edits": {
+    "translatedElementCount": 271,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 89,
+    "sourceNotesAdded": 41,
+    "textTopologySha256": "fb93e8932c446197cba8a0e9b61764373ad3de2b6a0b51c6f56217c06f7b7888",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 41,
+    "layoutInspectionCount": 41,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 41
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 616,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

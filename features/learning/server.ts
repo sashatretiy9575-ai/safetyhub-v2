@@ -10,6 +10,7 @@ import type { Json } from '@/lib/supabase/types';
 import type { AttemptPayload } from './types';
 import { AttemptExpiredError, parseAttemptRpcError } from './policy-error';
 import { QUIZ_POLICY } from '@/lib/constants';
+import type { AppLocale } from '@/i18n/config';
 
 type UntypedRpcClient = {
   rpc(
@@ -45,6 +46,7 @@ const attemptPayloadSchema = z
     revisionId: z.string().uuid(),
     testSlug: z.string(),
     title: z.string(),
+    locale: z.enum(['ru', 'kk', 'en', 'zh']),
     status: z.enum(['started', 'completed', 'passed', 'failed', 'expired']),
     score: z.number().int().nonnegative().nullable(),
     total: z
@@ -103,15 +105,13 @@ function parseAttemptMutationPayload(value: Json): AttemptPayload {
   return parseRpcPayload(value);
 }
 
-export async function startAttempt(testSlug: string, startNew = false) {
+export async function startAttempt(testSlug: string, _startNew = false, locale: AppLocale) {
   await requireUser({ enforceLegal: true });
   const client = (await createClient()) as unknown as UntypedRpcClient;
-  const { data, error } = await client.rpc(
-    startNew ? 'start_test_attempt' : 'resume_test_attempt',
-    {
-      p_test_slug: testSlug,
-    },
-  );
+  const { data, error } = await client.rpc('start_test_attempt_locale', {
+    p_test_slug: testSlug,
+    p_locale: locale,
+  });
   if (error) {
     if (error.message.includes('RATE_LIMITED:')) normalizeRateLimitError(error);
     throw parseAttemptRpcError(error);

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "state": "INDEPENDENTLY_APPROVED_TARGETS_ONLY",
+  "scope": "Approved-only subset of the sole pass5 KK scaffold slide-10 proposal; no translation was applied.",
+  "sharedOverridesModified": false,
+  "proposedAgainstSharedOverrideSha256": "e6fe80bf64edaf3df566d3992514e40a8a9185b17e4f707365e347e184ff0a86",
+  "sourceCandidateArtifactFileSha256": "07aca861019beef34909cae6c5451a74871da0d31486a821aa344c200ba40bf2",
+  "sourceProposalFileSha256": "2dc329dc42bcf47a88662e755846347908b47321dc56d6d916a5d228e826f978",
+  "sourceExpandedProposalFileSha256": "3f839d2a42c2c0ec4f72760dbe4b74fca1c455b5327fa23bad0b8afe2a44a68e",
+  "semanticGateSha256": "41d38da02f6fcdfceb22a325f141b9d4860baa120bb0b9248f162aa70f288197",
+  "itemCount": 0,
+  "targetCount": 0,
+  "approvedDecisionIndexes": [],
+  "rejectedDecisionIndexes": [
+    0
+  ],
+  "validationFailures": [],
+  "items": []
+}

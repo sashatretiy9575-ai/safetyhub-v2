@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "slug": "armaturshchik",
+  "locale": "zh",
+  "productionPublished": false,
+  "sourcePptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/zh/assets/pptx/31716dd37660917b47292b0e3357f33d2abb896dc7150227dc9f936b9d20c985/presentation.pptx",
+    "sha256": "31716dd37660917b47292b0e3357f33d2abb896dc7150227dc9f936b9d20c985"
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/zh/assets/pdf/4ac1daf98395fd21079f7cacd1229c990f2243b1c06ff8371c7eb06ccacb851d/presentation.pdf",
+    "sha256": "4ac1daf98395fd21079f7cacd1229c990f2243b1c06ff8371c7eb06ccacb851d",
+    "byteSize": 2460867,
+    "pageCount": 31,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "export": {
+    "engine": "Microsoft PowerPoint fixed-format PDF",
+    "onePagePerSlide": true,
+    "notesRendered": false
+  }
+}

@@ -36,6 +36,8 @@ import {
   type ContentSource,
 } from '@/lib/content/content-metadata';
 import { clearEditorDraft, readEditorDraft, writeEditorDraft } from '@/lib/editor-drafts';
+import { ArticleLocalizationsEditor } from '@/components/admin/article-localizations-editor';
+import type { ArticleLocalizationEditorItem } from '@/features/admin/localization-contract';
 
 type ArticleLocalDraft = {
   id: string | null;
@@ -90,7 +92,15 @@ function normalizeSlug(value: string) {
     .replace(/^-|-$/g, '');
 }
 
-export function AdminEditor({ initialData }: { initialData?: Article }) {
+export function AdminEditor({
+  initialData,
+  initialLocalizations,
+  initialPublicationNotice = null,
+}: {
+  initialData?: Article;
+  initialLocalizations?: ArticleLocalizationEditorItem[];
+  initialPublicationNotice?: 'incomplete' | 'failed' | null;
+}) {
   const router = useRouter();
   const editorIdRef = useRef(initialData?.id ?? 'new');
   const initialBlocks = articleBlocksSchema.safeParse(initialData?.blocks ?? []);
@@ -126,7 +136,13 @@ export function AdminEditor({ initialData }: { initialData?: Article }) {
   );
   const [preview, setPreview] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(
+    initialPublicationNotice === 'incomplete'
+      ? 'Черновик сохранён, но публикация заблокирована: подготовьте RU, KK, EN и ZH.'
+      : initialPublicationNotice === 'failed'
+        ? 'Черновик сохранён, но четыре локализации опубликовать не удалось.'
+        : '',
+  );
   const [saveState, setSaveState] = useState<'saved' | 'unsaved' | 'saving'>('saved');
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [draftReady, setDraftReady] = useState(false);
@@ -372,13 +388,34 @@ export function AdminEditor({ initialData }: { initialData?: Article }) {
         setDraftVersion(result.draftVersion);
         setOriginalSlug(result.slug);
         setSlug(result.slug);
-        setStatus('published');
-        setPublishedContentHash(result.contentHash);
-        setPublicationState('published');
         setSavedFingerprint(documentFingerprint);
         setSavedAt(new Date());
         setSaveState('saved');
         clearEditorDraft(window.localStorage, 'article', editorIdRef.current);
+        if (result.publicationError) {
+          setStatus(result.status);
+          setPublicationState(
+            result.status === 'published'
+              ? 'published_with_draft_changes'
+              : publishedContentHash
+                ? 'draft'
+                : 'never_published',
+          );
+          setError(
+            result.publicationError === 'ARTICLE_LOCALIZATIONS_INCOMPLETE'
+              ? 'Черновик сохранён, но публикация заблокирована: подготовьте RU, KK, EN и ZH.'
+              : 'Черновик сохранён, но четыре локализации опубликовать не удалось.',
+          );
+          approveNavigation();
+          router.replace(
+            `/admin/articles/${result.slug}/edit?publication=${result.publicationError === 'ARTICLE_LOCALIZATIONS_INCOMPLETE' ? 'incomplete' : 'failed'}`,
+          );
+          router.refresh();
+          return;
+        }
+        setStatus('published');
+        setPublishedContentHash(result.contentHash);
+        setPublicationState('published');
         finishNavigation(result.slug);
         return;
       }
@@ -397,8 +434,12 @@ export function AdminEditor({ initialData }: { initialData?: Article }) {
         setPublicationState('draft');
       }
       finishNavigation(result.slug);
-    } catch {
-      setError('Не удалось изменить статус статьи. Повторите действие после проверки полей.');
+    } catch (statusError) {
+      setError(
+        statusError instanceof Error && statusError.message === 'ARTICLE_LOCALIZATIONS_INCOMPLETE'
+          ? 'Публикация заблокирована: подготовьте RU, KK, EN и ZH.'
+          : 'Не удалось изменить статус статьи. Повторите действие после проверки полей.',
+      );
     } finally {
       setBusy(false);
     }
@@ -727,6 +768,16 @@ export function AdminEditor({ initialData }: { initialData?: Article }) {
           </div>
         </div>
       )}
+
+      {articleId && initialLocalizations ? (
+        <ArticleLocalizationsEditor articleId={articleId} initial={initialLocalizations} />
+      ) : articleId ? (
+        <Card>
+          <CardContent className="p-4 text-sm text-[var(--color-text-muted)]">
+            Обновите страницу после первого сохранения, чтобы открыть вкладки RU, KK, EN и ZH.
+          </CardContent>
+        </Card>
+      ) : null}
 
       <DestructiveDialog
         open={deleteOpen}

@@ -125,6 +125,8 @@ test('workspace seed provides at least one hundred participants and authenticate
     assert.match(seed, new RegExp(`${frozenAttemptField}:`));
   }
   assert.match(seed, /revision\.duration_minutes \* 60_000/);
+  assert.match(seed, /locale: 'ru'/);
+  assert.match(seed, /localized_test_title: revision\.title/);
   assert.match(seed, /ignoreDuplicates: true/);
   assert.match(seed, /onConflict: 'id'/);
   for (const [width, height] of [

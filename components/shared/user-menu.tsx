@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { DownloadSimple, Gauge, SignOut, User } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,9 +13,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
-import { clientRequest, clientRequestMessage } from '@/lib/client-request';
+import { clientRequest } from '@/lib/client-request';
+import { localizedClientRequestMessage } from '@/i18n/client-errors';
 import { ROUTES } from '@/lib/constants';
 import { usePwaInstall } from '@/components/shared/use-pwa-install';
+import { localizePathname } from '@/i18n/config';
 
 export type UserMenuProps = {
   email: string;
@@ -25,6 +28,9 @@ export type UserMenuProps = {
 
 export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps) {
   const router = useRouter();
+  const locale = useLocale();
+  const translations = useTranslations('Shell.userMenu');
+  const errorTranslations = useTranslations('Common.errors');
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState('');
   const { install, isInstallable, isStandalone } = usePwaInstall();
@@ -45,10 +51,12 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
       body: JSON.stringify({ scope: 'local' }),
     });
     if (result.ok) {
-      window.location.replace('/auth/login?signedOut=1');
+      window.location.replace(`${localizePathname('/auth/login', locale)}?signedOut=1`);
       return;
     }
-    setSignOutError(clientRequestMessage(result.error, 'Не удалось выйти. Повторите попытку.'));
+    setSignOutError(
+      localizedClientRequestMessage(result.error, translations('signOutError'), errorTranslations),
+    );
     setSigningOut(false);
   };
 
@@ -57,7 +65,7 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
       const outcome = await install();
       if (outcome === 'accepted') return;
     }
-    const accountRoute = isAdmin ? ROUTES.adminAccount : ROUTES.profile;
+    const accountRoute = isAdmin ? ROUTES.adminAccount : localizePathname(ROUTES.profile, locale);
     router.push(`${accountRoute}#install-app`);
   };
 
@@ -67,7 +75,7 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
         <Button
           variant="ghost"
           size="icon"
-          aria-label={`Меню пользователя${fullName ? `, ${fullName}` : ''}`}
+          aria-label={translations('label', { suffix: fullName ? `, ${fullName}` : '' })}
           aria-haspopup="menu"
           className="glass overflow-hidden rounded-full shadow-none"
         >
@@ -87,7 +95,9 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
       >
         <DropdownMenuItem
           className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
-          onSelect={() => router.push(isAdmin ? ROUTES.admin : ROUTES.profile)}
+          onSelect={() =>
+            router.push(isAdmin ? ROUTES.admin : localizePathname(ROUTES.profile, locale))
+          }
         >
           <div className="flex items-center gap-3">
             {isAdmin ? (
@@ -96,7 +106,7 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
               <User size={18} weight="regular" className="text-[var(--color-text-muted)]" />
             )}
             <span className="text-sm font-medium">
-              {isAdmin ? 'Админ-панель' : 'Профиль'}
+              {isAdmin ? translations('admin') : translations('profile')}
             </span>
           </div>
         </DropdownMenuItem>
@@ -108,7 +118,7 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
           >
             <div className="flex items-center gap-3">
               <User size={18} weight="regular" className="text-[var(--color-text-muted)]" />
-              <span className="text-sm font-medium">Мой аккаунт</span>
+              <span className="text-sm font-medium">{translations('account')}</span>
             </div>
           </DropdownMenuItem>
         ) : null}
@@ -124,7 +134,7 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
                 weight="regular"
                 className="text-[var(--color-text-muted)]"
               />
-              <span className="text-sm font-medium">Установить приложение</span>
+              <span className="text-sm font-medium">{translations('install')}</span>
             </div>
           </DropdownMenuItem>
         ) : null}
@@ -145,7 +155,9 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
               weight="regular"
               className="transition-transform group-hover:translate-x-0.5"
             />
-            <span className="text-sm font-medium">{signingOut ? 'Выходим…' : 'Выйти'}</span>
+            <span className="text-sm font-medium">
+              {signingOut ? translations('signingOut') : translations('signOut')}
+            </span>
           </div>
         </DropdownMenuItem>
         {signOutError ? (

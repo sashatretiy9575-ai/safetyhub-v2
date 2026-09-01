@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "pervaya-pomoshch-na-rabote",
+  "slug": "pervaya-pomoshch-na-rabote",
+  "title": "First aid at work: staying composed in the first minutes",
+  "description": "Safe algorithm for an eyewitness: assess the situation, call for help, support the victim and not cause harm by unnecessary actions.",
+  "coverImage": "/images/generated/article-first-aid.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "first aid starts not with a first aid kit, but with a hazard assessment. If you rush to the victim under voltage, into smoke or under a moving mechanism, there will be more victims. A calm sequence of actions is more important than trying to remember everything at once."
+    },
+    {
+      "tone": "warning",
+      "type": "callout",
+      "title": "If there is a threat to your life, call immediately",
+      "content": "Call an ambulance at 103 or the single emergency service 112. Follow the dispatcher's instructions. This article helps you remember the procedure, but does not replace face-to-face training and practical first aid practice."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Eyewitness algorithm"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Stop and assess the location: electricity, fire, gas, movement of equipment, falling objects and other threats.",
+        "Call a specific person: “You are wearing a blue jacket, call 112 and bring a first aid kit.” This way the request will not disappear into the crowd.",
+        "Tell the dispatcher the exact address, entrance or workshop, number of victims, visible hazard and your phone number.",
+        "If the approach is safe, check the person's response and follow the controller's instructions to the best of your training.",
+        "Stay nearby, monitor the condition and convey only known facts to the arriving specialists."
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "What to say to emergency services"
+    },
+    {
+      "rows": [
+        [
+          "Where",
+          "Warehouse on Abay Street, entry through the second entrance, sector B"
+        ],
+        [
+          "What happened",
+          "worker fell down the stairs, is conscious"
+        ],
+        [
+          "How many victims",
+          "One person"
+        ],
+        [
+          "Is there hazard",
+          "The movement of forklifts is stopped, the area is fenced"
+        ],
+        [
+          "Who will meet",
+          "A colleague is waiting for a team at the entrance"
+        ]
+      ],
+      "type": "table",
+      "caption": "A short message saves time",
+      "headers": [
+        "Need to report",
+        "Example"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Helping does not mean doing everything"
+    },
+    {
+      "type": "paragraph",
+      "content": "Do not give medicine, food or drink unless directed by a healthcare professional. Do not move a person after a fall or impact unless there is an immediate threat at the scene. Don't try to \"fix\" the damage. In the event of bleeding, burns, impairment of consciousness or breathing, follow the dispatcher’s prompts and the techniques that you have been trained in."
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "If an automatic defibrillator is nearby",
+      "content": "Ask for the device and turn it on. Voice prompts guide the user through the steps. Do not touch the victim during rhythm and shock analysis and continue to follow device and dispatcher instructions."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "After transfer to doctors"
+    },
+    {
+      "type": "paragraph",
+      "content": "Report the incident to your supervisor in the prescribed manner and write down the facts while they are fresh: time, location, what you saw and what actions you took. Do not post photos of the victim or medical details in general chats. It's normal to feel confused after a difficult event - seek support if you need it."
+    },
+    {
+      "type": "quote",
+      "content": "Site safety, early call for help and accurate information are already significant assistance to the victim."
+    },
+    {
+      "url": "/topics",
+      "text": "Select a safety course",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "First aid at work: staying composed in the first minutes",
+    "ogImage": "/images/generated/article-first-aid.webp",
+    "ogTitle": "First aid at work: staying composed in the first minutes",
+    "indexable": true,
+    "description": "Safe algorithm for an eyewitness: assess the situation, call for help, support the victim and not cause harm by unnecessary actions.",
+    "ogDescription": "Safe algorithm for an eyewitness: assess the situation, call for help, support the victim and not cause harm by unnecessary actions."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-12",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V2000021814",
+      "title": "Rules and standards for the provision of first aid by persons without medical education"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K2000000360",
+      "title": "Code of the Republic of Kazakhstan “On the health of the people and the healthcare system”"
+    }
+  ],
+  "createdAt": "2026-08-07T00:00:00.000Z",
+  "updatedAt": "2026-08-07T00:00:00.000Z"
+}

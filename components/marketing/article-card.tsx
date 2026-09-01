@@ -2,6 +2,8 @@ import Image from 'next/image';
 import { ArrowRight, BookOpenText } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useLocale, useTranslations } from 'next-intl';
+import { localizePathname } from '@/i18n/config';
 
 const CARD_BLUR_PLACEHOLDER =
   'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2225%22 viewBox=%220 0 40 25%22%3E%3Crect width=%2240%22 height=%2225%22 fill=%22%23eef1ef%22/%3E%3C/svg%3E';
@@ -23,9 +25,11 @@ export function ArticleCard({
   priority = false,
   featured = false,
 }: ArticleCardProps) {
+  const locale = useLocale();
+  const t = useTranslations('Blog');
   return (
     <Link
-      href={`/blog/${slug}`}
+      href={localizePathname(`/blog/${slug}`, locale)}
       className={cn(
         'group flex h-full min-w-0 flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_16px_40px_-30px_rgba(15,23,18,0.34)] transition duration-300 hover:border-[var(--color-primary)]/45 hover:shadow-[var(--shadow-card)] focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)] motion-safe:hover:-translate-y-1',
         featured &&
@@ -71,7 +75,7 @@ export function ArticleCard({
       >
         <p className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.13em] text-[var(--color-primary)] uppercase sm:text-xs">
           <BookOpenText size={16} weight="bold" aria-hidden="true" />
-          Практическое руководство
+          {t('cardEyebrow')}
         </p>
         <h3
           className={cn(
@@ -90,7 +94,7 @@ export function ArticleCard({
           {description}
         </p>
         <span className="mt-6 inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-[var(--color-primary-soft)] px-4 text-sm font-bold text-[var(--color-primary-hover)] transition-colors group-hover:bg-[var(--color-primary)] group-hover:text-[var(--color-primary-foreground)]">
-          Читать статью
+          {t('read')}
           <ArrowRight
             size={17}
             weight="bold"

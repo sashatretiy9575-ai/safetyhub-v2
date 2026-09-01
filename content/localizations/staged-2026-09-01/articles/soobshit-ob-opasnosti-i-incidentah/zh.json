@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "locale": "zh",
+  "sourceSlug": "soobshit-ob-opasnosti-i-incidentah",
+  "slug": "soobshit-ob-opasnosti-i-incidentah",
+  "title": "险些发生事故：为什么要报告危险情况",
+  "description": "险些发生事故后要写下什么，如何将事实与猜测分开，并将信号转化为真正的改进。",
+  "coverImage": "/images/generated/article-near-miss.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "货物在男子旁边晃动，箱子掉进空荡荡的通道，工具掉落，但没有砸到人。很容易呼气而忘记。然而，这种情况在受伤之前就暴露了弱点。"
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "危险的情况是数据，而不是谴责",
+      "content": "该消息的目的是消除可能再次出现的情况。一个好的条目描述了事件和背景，而不是寻找责任人。"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "首先确保区域安全"
+    },
+    {
+      "type": "paragraph",
+      "content": "如果风险持续存在，停止行动，提醒人们，并通知负责人。请勿将掉落的物体、溢出或损坏的物品留在“方便的时候”。如果发生受伤或健康状况恶化，他们首先寻求帮助并按照紧急程序采取行动，然后进行记录。"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "有用信息的五个事实"
+    },
+    {
+      "type": "list",
+      "items": [
+        "发生的时间和地点 - 时间、区域、地标。",
+        "活动开始前进行的表演。",
+        "你看到或听到了什么：运动、声音、物体的位置。",
+        "谁或什么可能受到伤害以及伤害有多近。",
+        "已采取哪些临时措施：停止、围栏、由专家关闭。"
+      ],
+      "style": "ordered"
+    },
+    {
+      "rows": [
+        [
+          "司机又不专心了",
+          "当行人在有标记的十字路口时，叉车进入转弯"
+        ],
+        [
+          "架子坏了",
+          "第二个机架上可见变形，下梁发生移位"
+        ],
+        [
+          "人人违规",
+          "15时20分，三人通过封闭的信号带"
+        ],
+        [
+          "幸运的是，一切都很好",
+          "重约10公斤的箱子从工作场所一米处坠落"
+        ]
+      ],
+      "type": "table",
+      "caption": "事实和猜测听起来不同",
+      "headers": [
+        "措辞不当",
+        "有用的措辞"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "照片并不总是有用"
+    },
+    {
+      "type": "paragraph",
+      "content": "只有在获准、安全且不妨碍救助时才可拍照。不要为了拍照进入危险区域。不要拍摄伤者或含有个人数据的文件。有时，准确的示意图、时间和物品位置说明比漂亮的照片更有用。"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "如何理解该消息有效"
+    },
+    {
+      "type": "list",
+      "items": [
+        "危险源 暂时隔离或消除；",
+        "消息已被分配明确的状态或已被特定人员接收；",
+        "原因已确定，而不仅仅是消除后果；",
+        "将变更传达给面临相同风险的人员；",
+        "修复后，验证问题不再出现。"
+      ],
+      "style": "unordered"
+    },
+    {
+      "type": "quote",
+      "content": "“没有人受伤”是一个好的结果，但却是一个不改变任何事情的糟糕理由。"
+    },
+    {
+      "type": "paragraph",
+      "content": "如果某个事件确实导致受伤，请勿尝试自行决定该事件是否被视为与工作相关。按规定方式及时报告，并保留事实信息供官方审核。"
+    },
+    {
+      "url": "/topics",
+      "text": "温习安全知识",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "险些发生事故：为什么要报告危险情况",
+    "ogImage": "/images/generated/article-near-miss.webp",
+    "ogTitle": "险些发生事故：为什么要报告危险情况",
+    "indexable": true,
+    "description": "险些发生事故后要写下什么，如何将事实与猜测分开，并将信号转化为真正的改进。",
+    "ogDescription": "险些发生事故后要写下什么，如何将事实与猜测分开，并将信号转化为真正的改进。"
+  },
+  "jurisdiction": "哈萨克斯坦共和国",
+  "effectiveDate": "2026-08-12",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K1500000414",
+      "title": "哈萨克斯坦共和国劳动法"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500012655",
+      "title": "工伤事故调查表"
+    }
+  ],
+  "createdAt": "2026-08-05T00:00:00.000Z",
+  "updatedAt": "2026-08-05T00:00:00.000Z"
+}

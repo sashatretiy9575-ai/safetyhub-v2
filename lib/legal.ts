@@ -32,7 +32,7 @@ export const TERMS_POLICY_V2_1 = {
   bodyRevision: 'terms-2.1',
 } as const satisfies LegalDocumentVersion;
 
-export const PRIVACY_POLICY = {
+export const PRIVACY_POLICY_V1_2 = {
   type: 'privacy',
   title: 'Политика конфиденциальности',
   version: '1.2',
@@ -41,7 +41,7 @@ export const PRIVACY_POLICY = {
   bodyRevision: 'privacy-1.2',
 } as const satisfies LegalDocumentVersion;
 
-export const TERMS_POLICY = {
+export const TERMS_POLICY_V2_2 = {
   type: 'terms',
   title: 'Условия использования',
   version: '2.2',
@@ -50,11 +50,29 @@ export const TERMS_POLICY = {
   bodyRevision: 'terms-2.2',
 } as const satisfies LegalDocumentVersion;
 
+export const PRIVACY_POLICY = {
+  type: 'privacy',
+  title: 'Политика конфиденциальности',
+  version: '1.3',
+  effectiveDate: '2026-09-01',
+  path: '/privacy',
+  bodyRevision: 'privacy-1.3',
+} as const satisfies LegalDocumentVersion;
+
+export const TERMS_POLICY = {
+  type: 'terms',
+  title: 'Условия использования',
+  version: '2.3',
+  effectiveDate: '2026-09-01',
+  path: '/terms',
+  bodyRevision: 'terms-2.3',
+} as const satisfies LegalDocumentVersion;
+
 // Accepted versions must remain addressable after a new version becomes current.
 // When adding a version, preserve the corresponding rendered copy on its page.
 export const LEGAL_DOCUMENT_VERSIONS = {
-  privacy: [PRIVACY_POLICY_V1_1, PRIVACY_POLICY],
-  terms: [TERMS_POLICY_V2_1, TERMS_POLICY],
+  privacy: [PRIVACY_POLICY_V1_1, PRIVACY_POLICY_V1_2, PRIVACY_POLICY],
+  terms: [TERMS_POLICY_V2_1, TERMS_POLICY_V2_2, TERMS_POLICY],
 } as const satisfies Record<LegalDocumentType, readonly LegalDocumentVersion[]>;
 
 export function resolveLegalDocumentVersion(
@@ -86,4 +104,5 @@ export const LEGAL_REFERENCE_LINKS = {
   vercelPrivacy: 'https://vercel.com/legal/privacy-notice',
   vercelDpa: 'https://vercel.com/legal/dpa',
   cloudflareTurnstile: 'https://www.cloudflare.com/turnstile-privacy-policy/',
+  telegramPrivacy: 'https://telegram.org/privacy',
 } as const;

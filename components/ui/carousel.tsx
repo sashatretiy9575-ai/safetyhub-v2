@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -31,11 +32,15 @@ export function Carousel({
   className,
   gridClassName = 'md:grid-cols-3',
   itemClassName,
-  itemLabel = 'Карточка',
-  previousLabel = 'Предыдущая карточка',
-  nextLabel = 'Следующая карточка',
+  itemLabel,
+  previousLabel,
+  nextLabel,
   variant = 'standard',
 }: CarouselProps) {
+  const t = useTranslations('Common.carousel');
+  const resolvedItemLabel = itemLabel ?? t('item');
+  const resolvedPreviousLabel = previousLabel ?? t('previous', { item: resolvedItemLabel });
+  const resolvedNextLabel = nextLabel ?? t('next', { item: resolvedItemLabel });
   const items = Children.toArray(children);
   const trackRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | null>(null);
@@ -105,20 +110,28 @@ export function Carousel({
     >
       {variant === 'marketing' ? (
         <p className="sr-only" aria-live="polite">
-          {itemLabel} {active + 1} из {items.length}
+          {t('position', {
+            item: resolvedItemLabel,
+            current: active + 1,
+            total: items.length,
+          })}
         </p>
       ) : null}
       {variant === 'standard' && items.length > 1 ? (
         <div className="mb-3 flex items-center justify-between gap-3 md:hidden">
           <p className="text-sm font-medium text-[var(--color-text-muted)]" aria-live="polite">
-            {itemLabel} {active + 1} из {items.length}
+            {t('position', {
+              item: resolvedItemLabel,
+              current: active + 1,
+              total: items.length,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
               type="button"
               variant="outline"
               size="icon"
-              aria-label={previousLabel}
+              aria-label={resolvedPreviousLabel}
               disabled={active === 0}
               onClick={() => goTo(active - 1)}
             >
@@ -128,7 +141,7 @@ export function Carousel({
               type="button"
               variant="outline"
               size="icon"
-              aria-label={nextLabel}
+              aria-label={resolvedNextLabel}
               disabled={active === items.length - 1}
               onClick={() => goTo(active + 1)}
             >
@@ -155,7 +168,11 @@ export function Carousel({
             key={index}
             role="listitem"
             aria-roledescription="slide"
-            aria-label={`${itemLabel} ${index + 1} из ${items.length}`}
+            aria-label={t('position', {
+              item: resolvedItemLabel,
+              current: index + 1,
+              total: items.length,
+            })}
             className={cn(
               variant === 'marketing'
                 ? 'h-auto min-w-[min(82vw,19.5rem)] snap-start sm:min-w-[calc((100%_-_1rem)/2.15)] min-[1200px]:min-w-0'
@@ -188,7 +205,7 @@ export function Carousel({
               type="button"
               onClick={() => goTo(active - 1)}
               disabled={active === 0}
-              aria-label={previousLabel}
+              aria-label={resolvedPreviousLabel}
               className="grid size-11 place-items-center rounded-full border border-[var(--color-border-strong)] bg-[var(--color-surface)]/90 text-[var(--color-text)] shadow-sm backdrop-blur-xl transition hover:bg-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-40"
             >
               <CaretLeft size={20} weight="regular" aria-hidden="true" />
@@ -197,7 +214,7 @@ export function Carousel({
               type="button"
               onClick={() => goTo(active + 1)}
               disabled={active === items.length - 1}
-              aria-label={nextLabel}
+              aria-label={resolvedNextLabel}
               className="grid size-11 place-items-center rounded-full border border-[var(--color-border-strong)] bg-[var(--color-surface)]/90 text-[var(--color-text)] shadow-sm backdrop-blur-xl transition hover:bg-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-40"
             >
               <CaretRight size={20} weight="regular" aria-hidden="true" />

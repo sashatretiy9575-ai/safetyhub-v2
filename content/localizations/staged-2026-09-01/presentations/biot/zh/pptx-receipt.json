@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slug": "biot",
+  "locale": "zh",
+  "productionPublished": false,
+  "contentSummary": "BIOT: 基本职业安全健康要求：危害、风险评估、培训、批准、防护装备和应急程序。",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/biot/presentation.pptx",
+    "pptxSha256": "625d6bdc8fe58f207e5a670380f7106c3ae5917ca1e8a60eac2bbed60390c6f3",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/biot/zh/text-map.json",
+    "textMapSha256": "77f72665c018f85e71dc127ab9ee35541cc723406794850f88bf3e4b8dff042b"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/biot/zh/assets/pptx/84da5f207a17f06a27b735c395182a01f8aa22cd3775161129fa18a028f5e292/presentation.pptx",
+    "sha256": "84da5f207a17f06a27b735c395182a01f8aa22cd3775161129fa18a028f5e292",
+    "byteSize": 2371719,
+    "slideCount": 59
+  },
+  "edits": {
+    "translatedElementCount": 373,
+    "translatedTableCellCount": 15,
+    "retainedElementCount": 120,
+    "sourceNotesAdded": 59,
+    "textTopologySha256": "04acf1dd9eb82c9015c2b1486bbf08b0d35748f1fdcd9b3c9ad8f85d17077939",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 59,
+    "layoutInspectionCount": 59,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 59
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 854,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

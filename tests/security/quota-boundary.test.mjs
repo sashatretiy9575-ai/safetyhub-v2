@@ -55,7 +55,14 @@ test('actor quota is consumed exactly once at the trusted mutation boundary', as
   // in SQL; app code keeps only the independent network budget.
   assert.match(exportRoute, /consumeCoarseQuota\('certificate\.export'/);
   assert.doesNotMatch(exportRoute, /consumeBusinessQuota/);
-  assert.match(rateLimit, /type BusinessQuotaAction = 'avatar\.upload' \| 'certificate\.pdf' \| 'profile\.update'/);
+  for (const action of [
+    'avatar.upload',
+    'certificate.pdf',
+    'presentation.download',
+    'profile.update',
+  ]) {
+    assert.match(rateLimit, new RegExp(`\\| '${action.replace('.', '\\.')}'`, 'u'));
+  }
   assert.match(rateLimit, /rpc\('consume_business_quota_for_actor'/);
   assert.doesNotMatch(rateLimit, /rpc\('consume_business_quota',/);
 
@@ -89,7 +96,7 @@ test('arbitrary actor quota actions are not exposed to browser roles', async () 
     persistent,
     /grant execute on function public\.consume_business_quota(?:_for_actor)?\([^)]*\)\s+to (?:anon|authenticated)/,
   );
-  assert.match(rateLimit, /type BusinessQuotaAction = 'avatar\.upload' \| 'certificate\.pdf' \| 'profile\.update'/);
+  assert.match(rateLimit, /type BusinessQuotaAction[\s\S]*?'presentation\.download'/u);
   assert.doesNotMatch(databaseTypes, /\bconsume_business_quota:\s*\{/);
 });
 

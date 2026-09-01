@@ -1,0 +1,175 @@
+{
+  "function": "save_legal_document_localization",
+  "args": {
+    "p_document_type": "privacy",
+    "p_version": "1.3",
+    "p_locale": "en",
+    "p_title": "Privacy Policy",
+    "p_body": {
+      "sections": [
+        {
+          "id": "privacy-scope",
+          "heading": "Scope and grounds",
+          "paragraphs": [
+            "The policy applies to the site and PWA SafetyHub.kz, four language versions, account, courses, tests, certificates and administrative functions. Data is processed to provide access to training, conduct manual profile verification, perform testing, issue and verify certificates, respond to requests, protect the service and comply with applicable legal requirements.",
+            "Inferred grounds are user consent, compliance with accepted terms and conditions and legal requirements to the extent applicable. Their sufficiency for each scenario must be confirmed by the operator during a local legal review. The general regulatory starting point is the Law of the Republic of Kazakhstan “On Personal Data and Their Protection”."
+          ],
+          "items": [],
+          "links": [
+            {
+              "label": "Law of the Republic of Kazakhstan “On Personal Data and Their Protection” on the “Adilet” portal",
+              "url": "https://adilet.zan.kz/rus/docs/Z1300000094"
+            }
+          ]
+        },
+        {
+          "id": "privacy-authentication",
+          "heading": "Account, login and recovery",
+          "paragraphs": [
+            "For Russian, Kazakh and English versions, login and email confirmation are performed using a one-time six-digit code from the letter. Password, SMS code and contact phone number are not used as a login factor.",
+            "For the Chinese version, email, SMS, a password and a username are not required. Sign-in uses a discoverable WebAuthn passkey with mandatory user verification on the device. Biometric data and the device PIN are not transmitted to SafetyHub and are not stored by SafetyHub: verification is performed by the operating system or the user's authenticator.",
+            "For technical compatibility, the Chinese account is assigned an internal opaque synthetic Auth identifier. It is not the user's address, is not used for mail, and is never shown to the user or administrator, nor included in a public or administrative response, Telegram message, analytics, or application log.",
+            "For a passkey, the credential ID, public key, signature counter, declared transports and credential state are processed. A one-time challenge receipt remains valid for no more than 5 minutes. The recovery code is shown once; only its salted and peppered digest is stored. After use, the recovery code is invalidated immediately. An administrator may perform a reasoned, auditable reset and issue a one-time passkey re-enrollment code."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-profile-learning",
+          "heading": "Profile, verification and training",
+          "paragraphs": [
+            "The profile contains first name, last name, position, organization, contact number with selected country code, square photo, preferred locale, status and time of manual verification by the administrator. The contact number is needed only for verification and support; it is not an authentication factor and is not transmitted to the SMS provider.",
+            "The photo is stored as one private compressed WebP file in Supabase Storage. The original and intermediate frame are not saved, there is no public access to the avatar, facial recognition and automatic biometric identification are not performed. The camera stream does not leave the device: only the selected and processed frame is sent to the server.",
+            "After explicitly accepting the current documents, the profile is sent for manual review. While the status is “under review”, “rejected” or the profile is not completed, the system does not open course materials and questions, does not allow you to create, resume or complete an attempt, and does not issue a certificate. The decision is made by the administrator only in the web admin panel; Telegram does not make decisions and does not change the status of the application.",
+            "For training, the locale and version of the course and test, completed answers, time and status of attempt, best result, and metadata of the issued, replaced or revoked certificate are saved. For consents, the document type and version, copy locale, acceptance date, and source of action are stored."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-notifications",
+          "heading": "Administrative notifications and Telegram",
+          "paragraphs": [
+            "Events about a new application, course completion and system error are atomically recorded in the internal administrator inbox. An additional information copy can be sent by a bot to a private Telegram group. Telegram unavailability does not cancel the business transaction and does not hide the event in the internal inbox.",
+            "An application message contains only the first name, last name, locale, time and a link to the application queue. A course-completion message contains only the first name, last name, course title, passed or failed result, score and time. A system alert contains a stable machine code, time, correlation ID and a link to the admin panel.",
+            "In Telegram it is prohibited to transmit email, phone number, position, organization, photo, documents, answers, credential metadata, challenge, recovery data and synthetic Auth identifier. Telegram messages do not contain approve or reject buttons and cannot change account status."
+          ],
+          "items": [],
+          "links": [
+            {
+              "label": "Telegram Privacy Policy",
+              "url": "https://telegram.org/privacy"
+            }
+          ]
+        },
+        {
+          "id": "privacy-storage",
+          "heading": "Cookie and local storage",
+          "paragraphs": [
+            "Necessary cookies are used for logging in, updating HttpOnly session, PKCE-recovering email OTP, protecting closed routes and saving the selected locale. localStorage can store the theme, hide the installation prompt PWA, incomplete test answers and, for the administrator, the local editor draft. This data remains in the selected browser until the user or application deletes it. Advertising cookies and behavioral advertising are not used.",
+            "If Cloudflare Turnstile is enabled, its technical data and storage are processed by Cloudflare for security checks."
+          ],
+          "items": [],
+          "links": [
+            {
+              "label": "Privacy Policy Cloudflare Turnstile",
+              "url": "https://www.cloudflare.com/turnstile-privacy-policy/"
+            }
+          ]
+        },
+        {
+          "id": "privacy-processors",
+          "heading": "Suppliers and cross-border processing",
+          "paragraphs": [
+            "The storage region and access locations of providers depend on the selected regions, deployment settings and their current subprocessors; The code does not guarantee storage only in Kazakhstan. Before production publication, the operator must record the actual regions, contracts and acceptable cross-border transfer mechanism."
+          ],
+          "items": [
+            "Supabase - Auth, PostgreSQL, private Storage, short-lived signed links, email code delivery, Edge Functions and notification delivery queue.",
+            "Vercel - hosting, CDN, serverless execution and technical logs.",
+            "Cloudflare - optional anti-bot check Turnstile, when it is enabled in the configuration.",
+            "Telegram Bot API - delivery of strictly minimized information messages to a private administrative group."
+          ],
+          "links": [
+            {
+              "label": "Supabase DPA",
+              "url": "https://supabase.com/legal/customer-resources/data-processing-addendum"
+            },
+            {
+              "label": "Regions Supabase",
+              "url": "https://supabase.com/docs/guides/platform/regions"
+            },
+            {
+              "label": "Vercel Privacy Notice",
+              "url": "https://vercel.com/legal/privacy-notice"
+            },
+            {
+              "label": "Vercel DPA",
+              "url": "https://vercel.com/legal/dpa"
+            },
+            {
+              "label": "Telegram Privacy Policy",
+              "url": "https://telegram.org/privacy"
+            }
+          ]
+        },
+        {
+          "id": "privacy-retention",
+          "heading": "Storage periods and disposal",
+          "paragraphs": [
+            "Account and profile data, credential passkey, contact number, photo, completed attempts, best score, certificates, consents and associated administrative audit are stored as long as the account exists or until the individual credential is reset. The used recovery digest is immediately invalidated; A short-lived challenge receipt expires in no later than 5 minutes.",
+            "Successful Telegram delivery lines are stored for 30 days, administrative inbox events - 90 days; history audit is not reduced by these deadlines. Delivery errors contain only a limited category and technical identifiers, rather than a full external response.",
+            "When an account is permanently deleted, the application deletes the Auth account, profile, photograph, answers and attempts, best results, verified data, credentials and recovery digests, certificates and associated audit records within the implemented deletion cascade. Public QR verification of a deleted certificate then returns “Document not found”. A PDF copy already downloaded to another device cannot be physically deleted from that device. Provider backups may be updated according to their technical cycle."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-certificates",
+          "heading": "Certificates, reports and public inspection",
+          "paragraphs": [
+            "The server returns only the authorized limited metadata, template version, and already signed verification URL. PDF-certificate, administrative PDF-report and ZIP are collected only in the user’s or administrator’s browser; their bytes are not created by the backend route and are not stored in PostgreSQL or Storage. The photograph is not included in the PDF, ZIP or QR check.",
+            "Public verification of a certificate using an unpredictable signed link can reveal the owner's name, certificate number and status, localized test name, result, and issue date. Do not post such a link if you do not want to share this information. A corporate report with certification data can be provided to an authorized representative of the user's company to confirm training."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-rights",
+          "heading": "Rights and Appeals",
+          "paragraphs": [
+            "To the extent provided by applicable law, the user may request information about processing and a copy of the data, correction, restriction or termination of processing, withdrawal of consent and deletion of the account. Some records may be retained where a mandatory legal basis requires it; the operator must explain that decision.",
+            "To send a request or check the status of a manual review, use the contacts on the document. Identity verification may be required to secure your account. If the answer is not satisfactory, the user has the right to appeal to the competent authority or court in the manner prescribed by applicable law."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-security-localization",
+          "heading": "Security, localization and document changes",
+          "paragraphs": [
+            "The application verifies the WebAuthn origin, challenge and signature, requires user verification, uses one-time email codes, separates roles and capabilities, applies RLS and operation rate limits, sends protective browser headers, audits critical actions and uses encrypted transport. The email code, passkey session and recovery code must not be shared with anyone else; no measure eliminates risk completely.",
+            "The Russian copy is the canonical source for localization. Copies of KK, EN and ZH are automatically translated, back-translated and automatically checked without human linguistic or legal approval. All four copies are published as one version, have separate immutable hashes and the same structure; residual risk semantic or legal discrepancies in automatic translation remain.",
+            "A new significant edition is published under a new number and date. The accepted version remains available via the versioned link in the profile; separate consent is requested if the current version has not yet been accepted."
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "legal-contacts",
+          "heading": "Contacts according to the document",
+          "paragraphs": [
+            "Call or write to WhatsApp. For written requests, save the chat correspondence."
+          ],
+          "items": [
+            "Phone",
+            "WhatsApp",
+            "Write"
+          ],
+          "links": []
+        }
+      ]
+    },
+    "p_body_hash": null,
+    "p_complete": true
+  }
+}

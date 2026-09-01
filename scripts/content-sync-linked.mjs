@@ -14,6 +14,12 @@ import process from 'node:process';
 import { createClient } from '@supabase/supabase-js';
 import pg from 'pg';
 import { validateAndRenderPresentation } from './course-content/presentation-pdf-qa.mjs';
+import {
+  clearLinkedPostgresConnection,
+  linkedPostgresClientOptions,
+  parseLinkedPostgresConnection,
+  redactLinkedPostgresError,
+} from './database-backup-security.mjs';
 
 const { Client } = pg;
 const ROOT = process.cwd();
@@ -176,17 +182,6 @@ async function readJsonIfPresent(filePath) {
   }
 }
 
-function decodeShellValue(rawValue) {
-  const value = rawValue.trim().replace(/[;]$/u, '');
-  if (
-    (value.startsWith("'") && value.endsWith("'")) ||
-    (value.startsWith('"') && value.endsWith('"'))
-  ) {
-    return value.slice(1, -1);
-  }
-  return value;
-}
-
 function linkedConnection() {
   const cli = path.resolve('node_modules', 'supabase', 'dist', 'supabase.js');
   const result = spawnSync(process.execPath, [cli, 'db', 'dump', '--linked', '--dry-run'], {
@@ -199,29 +194,11 @@ function linkedConnection() {
   if (result.error || result.status !== 0) {
     throw new Error('Supabase CLI could not create a temporary linked database login.');
   }
-  const values = {};
-  for (const line of `${result.stdout}\n${result.stderr}`.split(/\r?\n/u)) {
-    const match = line.match(
-      /^(?:export\s+|set\s+)?(PGHOST|PGPORT|PGUSER|PGPASSWORD|PGDATABASE)=(.+)$/iu,
-    );
-    if (match) values[match[1].toUpperCase()] = decodeShellValue(match[2]);
-  }
-  if (!values.PGHOST || !values.PGUSER || !values.PGPASSWORD) {
+  const connection = parseLinkedPostgresConnection(`${result.stdout}\n${result.stderr}`);
+  if (!connection) {
     throw new Error('Temporary linked database credentials were not available.');
   }
-  if (!/^[-.a-z0-9]+[.]supabase[.](?:com|co)$/iu.test(values.PGHOST)) {
-    throw new Error('Refusing an unexpected database host.');
-  }
-  if (!/^cli_login_/u.test(values.PGUSER)) {
-    throw new Error('Refusing a non-ephemeral database user.');
-  }
-  return {
-    host: values.PGHOST,
-    port: Number(values.PGPORT || 5432),
-    user: values.PGUSER,
-    password: values.PGPASSWORD,
-    database: values.PGDATABASE || 'postgres',
-  };
+  return connection;
 }
 
 function asDate(value) {
@@ -272,13 +249,11 @@ async function downloadPublishedPresentationAsset(storage, bucket, storagePath) 
 }
 
 const connection = linkedConnection();
-const client = new Client({
-  ...connection,
-  ssl: { rejectUnauthorized: false },
+const client = new Client(linkedPostgresClientOptions(connection, {
   application_name: 'safetyhub-content-parity',
   statement_timeout: 2 * 60 * 1000,
   query_timeout: 2 * 60 * 1000,
-});
+}));
 const storage = linkedStorageAdmin();
 
 let courseRows;
@@ -403,12 +378,9 @@ try {
   await client.query('commit');
 } catch (error) {
   await client.query('rollback').catch(() => undefined);
-  const message = error instanceof Error ? error.message : 'Unknown linked database error';
-  throw new Error(
-    `Linked content export failed: ${message.replaceAll(connection.password, '[redacted]')}`,
-  );
+  throw new Error(`Linked content export failed: ${redactLinkedPostgresError(error, connection)}`);
 } finally {
-  connection.password = '';
+  clearLinkedPostgresConnection(connection);
   await client.end().catch(() => undefined);
 }
 

@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import { ContactLink } from '@/components/shared/contact-link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import type { SiteContactSettings } from '@/lib/site-contacts-shared';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 
 type ApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
 
@@ -18,6 +20,7 @@ function formatRemaining(milliseconds: number) {
 }
 
 function ReviewContacts({ contacts }: { contacts: SiteContactSettings }) {
+  const t = useTranslations('Approval');
   return (
     <div className="grid gap-2 sm:grid-cols-2">
       <ContactLink
@@ -25,14 +28,14 @@ function ReviewContacts({ contacts }: { contacts: SiteContactSettings }) {
         contacts={contacts}
         className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border-strong)] px-3 text-sm font-semibold transition hover:border-[var(--color-primary)] focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
       >
-        Позвонить: {contacts.phoneDisplay}
+        {t('callWithNumber', { phone: contacts.phoneDisplay })}
       </ContactLink>
       <ContactLink
         kind="whatsapp"
         contacts={contacts}
         className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[#128c4a]/45 px-3 text-sm font-semibold text-[#128c4a] transition hover:bg-[#128c4a]/10 focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)] dark:text-[#39dc7a]"
       >
-        Написать в WhatsApp
+        {t('whatsapp')}
       </ContactLink>
     </div>
   );
@@ -49,6 +52,8 @@ export function AccountApprovalStatus({
   rejectionReason: string | null;
   contacts: SiteContactSettings;
 }) {
+  const locale = useLocale() as AppLocale;
+  const t = useTranslations('Approval');
   const dueTimestamp = useMemo(() => {
     if (!dueAt) return null;
     const parsed = Date.parse(dueAt);
@@ -69,13 +74,17 @@ export function AccountApprovalStatus({
       <Card className="border-[var(--color-warning)]">
         <CardContent className="space-y-3 p-4 sm:p-5">
           <div>
-            <p className="text-xs font-bold tracking-wide text-[var(--color-warning)] uppercase">Доступ к обучению</p>
-            <h2 className="font-display mt-1 text-xl font-bold">Сначала заполните профиль</h2>
+            <p className="text-xs font-bold tracking-wide text-[var(--color-warning)] uppercase">
+              {t('accessEyebrow')}
+            </p>
+            <h2 className="font-display mt-1 text-xl font-bold">{t('profileTitle')}</h2>
             <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
-              Добавьте свои данные, номер телефона и фотографию. После отправки заявку проверит администратор.
+              {t('profileDescription')}
             </p>
           </div>
-          <Button asChild size="sm"><Link href="/onboarding">Заполнить профиль</Link></Button>
+          <Button asChild size="sm">
+            <Link href={localizePathname('/onboarding', locale)}>{t('profileAction')}</Link>
+          </Button>
         </CardContent>
       </Card>
     );
@@ -86,15 +95,17 @@ export function AccountApprovalStatus({
       <Card className="border-[var(--color-danger)]">
         <CardContent className="space-y-3 p-4 sm:p-5">
           <div>
-            <p className="text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase">Нужны уточнения</p>
-            <h2 className="font-display mt-1 text-xl font-bold">Заявка пока не подтверждена</h2>
+            <p className="text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase">
+              {t('rejectedEyebrow')}
+            </p>
+            <h2 className="font-display mt-1 text-xl font-bold">{t('rejectedTitle')}</h2>
             <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
-              Проверьте данные в профиле и отправьте их повторно. До подтверждения курсы и тесты недоступны.
+              {t('rejectedDescription')}
             </p>
           </div>
           {rejectionReason ? (
             <p className="rounded-xl bg-[var(--color-danger)]/10 p-3 text-sm leading-6">
-              <strong>Комментарий администратора:</strong> {rejectionReason}
+              <strong>{t('adminComment')}</strong> {rejectionReason}
             </p>
           ) : null}
           <ReviewContacts contacts={contacts} />
@@ -110,27 +121,33 @@ export function AccountApprovalStatus({
     <Card className="border-[var(--color-primary)]">
       <CardContent className="space-y-4 p-4 sm:p-5">
         <div>
-          <p className="text-xs font-bold tracking-wide text-[var(--color-primary)] uppercase">Заявка на проверке</p>
-          <h2 className="font-display mt-1 text-xl font-bold">Администратор проверяет ваши данные</h2>
+          <p className="text-xs font-bold tracking-wide text-[var(--color-primary)] uppercase">
+            {t('pendingEyebrow')}
+          </p>
+          <h2 className="font-display mt-1 text-xl font-bold">{t('pendingTitle')}</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
-            До подтверждения нельзя открыть вопросы курса, презентацию или начать тест.
+            {t('pendingDescription')}
           </p>
         </div>
         {remaining === null ? (
           <p className="rounded-xl bg-[var(--color-surface-muted)] p-3 text-sm">
-            Мы сообщим в личном кабинете, когда заявка будет рассмотрена.
+            {t('pendingNoDue')}
           </p>
         ) : expired ? (
           <p className="rounded-xl bg-[var(--color-accent-amber-soft)] p-3 text-sm leading-6">
-            Срок проверки в 24 часа уже прошёл. Позвоните администратору или напишите в WhatsApp — он проверит статус вручную.
+            {t('overdue')}
           </p>
         ) : (
           <div className="rounded-xl bg-[var(--color-primary-soft)] p-3">
-            <p className="text-xs font-semibold text-[var(--color-text-muted)]">Осталось до контрольного срока</p>
+            <p className="text-xs font-semibold text-[var(--color-text-muted)]">
+              {t('remaining')}
+            </p>
             <p aria-live="polite" className="mt-1 font-mono text-2xl font-bold tracking-wide text-[var(--color-primary)]">
               {formatRemaining(remaining)}
             </p>
-            <p className="mt-1 text-xs text-[var(--color-text-muted)]">Не нужно обновлять страницу: счётчик идёт сам.</p>
+            <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+              {t('countdownHint')}
+            </p>
           </div>
         )}
         <ReviewContacts contacts={contacts} />

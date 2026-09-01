@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "documentType": "privacy",
+  "version": "1.3",
+  "bodyRevision": "privacy-1.3",
+  "effectiveAt": "2026-09-01T00:00:00Z",
+  "productionPublished": false,
+  "currentPointerActivation": "deferred-to-controlled-release",
+  "requiredOrder": [
+    "deploy-compatible-read-path",
+    "stage-legal-version",
+    "save-four-complete-localizations",
+    "verify-four-body-hashes-and-topology",
+    "publish-localizations-and-rotate-current-in-one-database-transaction",
+    "activate-application-current-pointer"
+  ],
+  "stageRpc": {
+    "path": "legal/privacy/1.3/stage-rpc.json",
+    "sha256": "b20150ce15f31a5e8cdfac3463f98c6d5b85b418c0ce47850921f779820af5b4",
+    "bytes": 207
+  },
+  "localizationReceipts": [
+    {
+      "locale": "ru",
+      "localizedBodySha256": "e53914fc75327fafc9ba0077d93112536fff6ca31bd6da1dfd63cbe311074a5e",
+      "topologySha256": "0e7ee6209413c84f828739d7b47e236bbd0a4dcdb111cb6a3d268d9a7ec83888",
+      "saveRpc": {
+        "path": "legal/privacy/1.3/ru/save-rpc.json",
+        "sha256": "663d39dc459cfdcdd0a06dc3451728b74d86ca978a5b0fbf8f347bde169a6bb2",
+        "bytes": 20692
+      }
+    },
+    {
+      "locale": "kk",
+      "localizedBodySha256": "a6e1b1727e4e3852f4a0913659914798b66ffc6d038c389e9e774a59ebdefa33",
+      "topologySha256": "0e7ee6209413c84f828739d7b47e236bbd0a4dcdb111cb6a3d268d9a7ec83888",
+      "saveRpc": {
+        "path": "legal/privacy/1.3/kk/save-rpc.json",
+        "sha256": "907b292d30cba338f97c1fba76d538f34f5c08b196b09bb60b3a828ce3ceab1a",
+        "bytes": 21843
+      }
+    },
+    {
+      "locale": "en",
+      "localizedBodySha256": "97c7ad660b3b7af4235d0add8086702cefa50b3011332b48e3cf7956b121194f",
+      "topologySha256": "0e7ee6209413c84f828739d7b47e236bbd0a4dcdb111cb6a3d268d9a7ec83888",
+      "saveRpc": {
+        "path": "legal/privacy/1.3/en/save-rpc.json",
+        "sha256": "7a4b68e46750f7ec9989d9d67e9fc7969d665186e210b75386ef2e5e284ad293",
+        "bytes": 13671
+      }
+    },
+    {
+      "locale": "zh",
+      "localizedBodySha256": "36711ef0b56663ee5479a4074e03a12f20518c5c99aec6d34659c6365d7b9a02",
+      "topologySha256": "0e7ee6209413c84f828739d7b47e236bbd0a4dcdb111cb6a3d268d9a7ec83888",
+      "saveRpc": {
+        "path": "legal/privacy/1.3/zh/save-rpc.json",
+        "sha256": "f8e52c2b32ef831ccb059e5d4b7bd4779673434f926ef7bc4d47c5d127521e52",
+        "bytes": 12105
+      }
+    }
+  ],
+  "publishRpc": {
+    "path": "legal/privacy/1.3/publish-rpc.json",
+    "sha256": "6796a7292e6bcc13a39999fdc1630eeb6aecefb43f924c41c1f3702ce466e512",
+    "bytes": 177,
+    "executed": false
+  },
+  "review": {
+    "mode": "automated-only",
+    "humanLinguisticApproval": false,
+    "humanLegalApproval": false,
+    "residualRisk": "Semantic or legal divergence can remain after automated translation and review."
+  }
+}

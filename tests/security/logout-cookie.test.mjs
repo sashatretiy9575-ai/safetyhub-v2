@@ -27,6 +27,7 @@ test('local logout is idempotent while global revocation reports Auth failure', 
   assert.match(route, /safetyhub-password-context/u);
   assert.doesNotMatch(route, /password-change/u);
   assert.match(route, /Clear-Site-Data/u);
-  assert.match(menu, /window\.location\.replace\('\/auth\/login\?signedOut=1'\)/u);
+  assert.match(menu, /localizePathname\('\/auth\/login', locale\)/u);
+  assert.match(menu, /\?signedOut=1/u);
   assert.match(menu, /role="alert"/u);
 });

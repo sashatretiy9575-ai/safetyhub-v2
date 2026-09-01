@@ -6,6 +6,14 @@ import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import pg from 'pg';
+import {
+  assertPhysicalPathRelationship,
+  clearLinkedPostgresConnection,
+  linkedPostgresClientOptions,
+  linkedPostgresEnvironment,
+  parseLinkedPostgresConnection,
+  redactLinkedPostgresError,
+} from './database-backup-security.mjs';
 
 const { Client } = pg;
 const INCLUDED_SCHEMAS = ['public', 'private', 'auth', 'storage'];
@@ -29,12 +37,16 @@ if (!outputArgument || !postgresBinArgument || !recoveryKeyOutputArgument) {
 const outputDirectory = path.resolve(outputArgument);
 const recoveryKeyOutput = path.resolve(recoveryKeyOutputArgument);
 const postgresBin = path.resolve(postgresBinArgument);
-if (
-  recoveryKeyOutput === outputDirectory ||
-  recoveryKeyOutput.startsWith(`${outputDirectory}${path.sep}`)
-) {
-  throw new Error('The portable recovery key must be outside the encrypted backup directory.');
-}
+await assertPhysicalPathRelationship({
+  directoryPath: outputDirectory,
+  candidatePath: recoveryKeyOutput,
+  relationship: 'outside',
+  directoryExpectation: 'absent',
+  candidateExpectation: 'absent',
+  directoryLabel: 'Encrypted backup directory',
+  candidateLabel: 'Portable recovery key output',
+  relationshipError: 'The portable recovery key must be outside the encrypted backup directory.',
+});
 const executableSuffix = process.platform === 'win32' ? '.exe' : '';
 const postgresTools = Object.fromEntries(
   ['pg_dump', 'pg_restore', 'psql', 'initdb', 'pg_ctl'].map((name) => [
@@ -52,31 +64,6 @@ const dataPath = path.join(workDirectory, 'data.dump');
 function isInsideTemporaryRoot(target) {
   const relative = path.relative(temporaryRoot, target);
   return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative);
-}
-
-function decodeShellValue(rawValue) {
-  const value = rawValue.trim().replace(/[;]$/u, '');
-  if (
-    (value.startsWith("'") && value.endsWith("'")) ||
-    (value.startsWith('"') && value.endsWith('"'))
-  ) {
-    return value.slice(1, -1);
-  }
-  return value;
-}
-
-function readConnectionEnvironment(output) {
-  const connection = {};
-  for (const line of output.split(/\r?\n/u)) {
-    const match = line.match(
-      /^(?:export\s+|set\s+)?(PGHOST|PGPORT|PGUSER|PGPASSWORD|PGDATABASE)=(.+)$/iu,
-    );
-    if (match) connection[match[1].toUpperCase()] = decodeShellValue(match[2]);
-  }
-  if (!connection.PGHOST || !connection.PGUSER || !connection.PGPASSWORD) return null;
-  connection.PGPORT ||= '5432';
-  connection.PGDATABASE ||= 'postgres';
-  return connection;
 }
 
 function quoteIdentifier(value) {
@@ -117,18 +104,6 @@ function runNodeScript(script, args) {
     {},
     path.basename(script),
   ).trim();
-}
-
-function postgresEnvironment(connection) {
-  return {
-    ...process.env,
-    PGHOST: connection.PGHOST,
-    PGPORT: connection.PGPORT,
-    PGUSER: connection.PGUSER,
-    PGPASSWORD: connection.PGPASSWORD,
-    PGDATABASE: connection.PGDATABASE,
-    PGSSLMODE: 'require',
-  };
 }
 
 function archiveList(archivePath) {
@@ -370,26 +345,14 @@ if (dryRun.error || dryRun.status !== 0) {
   throw new Error('Supabase CLI could not create a temporary linked database login.');
 }
 
-const connection = readConnectionEnvironment(`${dryRun.stdout}\n${dryRun.stderr}`);
+const connection = parseLinkedPostgresConnection(`${dryRun.stdout}\n${dryRun.stderr}`);
 if (!connection) throw new Error('Temporary linked database credentials were not available.');
-if (!/^[-.a-z0-9]+[.]supabase[.](?:com|co)$/iu.test(connection.PGHOST)) {
-  throw new Error('Refusing an unexpected database host.');
-}
-if (!/^cli_login_/u.test(connection.PGUSER)) {
-  throw new Error('Refusing a non-ephemeral database user.');
-}
 
-const client = new Client({
-  host: connection.PGHOST,
-  port: Number(connection.PGPORT),
-  user: connection.PGUSER,
-  password: connection.PGPASSWORD,
-  database: connection.PGDATABASE,
-  ssl: { rejectUnauthorized: false },
+const client = new Client(linkedPostgresClientOptions(connection, {
   application_name: 'safetyhub-pgdump-backup',
   statement_timeout: 5 * 60 * 1000,
   query_timeout: 5 * 60 * 1000,
-});
+}));
 
 try {
   await client.connect();
@@ -442,7 +405,7 @@ try {
     '--encoding=UTF8',
     ...INCLUDED_SCHEMAS.flatMap((schema) => ['--schema', schema]),
   ];
-  const dumpEnvironment = postgresEnvironment(connection);
+  const dumpEnvironment = linkedPostgresEnvironment(connection);
   runProcess(
     postgresTools.pg_dump,
     [...commonDumpArguments, '--schema-only', '--file', schemaPath],
@@ -562,11 +525,11 @@ try {
   }
   throw new Error(
     error instanceof Error
-      ? `Linked pg_dump backup failed: ${error.message.replaceAll(connection.PGPASSWORD, '[redacted]')}`
+      ? `Linked pg_dump backup failed: ${redactLinkedPostgresError(error, connection)}`
       : 'Linked pg_dump backup failed.',
   );
 } finally {
-  connection.PGPASSWORD = '';
+  clearLinkedPostgresConnection(connection);
   await client.end().catch(() => undefined);
   for (const target of [workDirectory, verificationDirectory, rehearsalDirectory]) {
     if (isInsideTemporaryRoot(target)) {

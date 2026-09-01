@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slug": "pozharnaya-bezopasnost",
+  "locale": "zh",
+  "productionPublished": false,
+  "contentSummary": "消防安全: 防火、警告、疏散、初级灭火剂的使用以及火灾时的安全行动。",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/pozharnaya-bezopasnost/presentation.pptx",
+    "pptxSha256": "4e75a28d8b2a55fd272a34e9674babc09709b4d35b837c111ff73cfeb6f0e9b8",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/zh/text-map.json",
+    "textMapSha256": "6f3df1c021389290a48355df508d783f22227b0c56ae707aa0f381a5d8683578"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/zh/assets/pptx/e5f27d6a194ca2e561edb5ee733ef1c1ebc293ff7bbfa953ee1aaba9fcbabcab/presentation.pptx",
+    "sha256": "e5f27d6a194ca2e561edb5ee733ef1c1ebc293ff7bbfa953ee1aaba9fcbabcab",
+    "byteSize": 1435552,
+    "slideCount": 41
+  },
+  "edits": {
+    "translatedElementCount": 272,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 88,
+    "sourceNotesAdded": 41,
+    "textTopologySha256": "db1d18a028358e1e432fa85524d76ed20d9154ad30f6b5ec8353867dd6876d14",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 41,
+    "layoutInspectionCount": 41,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 41
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 616,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

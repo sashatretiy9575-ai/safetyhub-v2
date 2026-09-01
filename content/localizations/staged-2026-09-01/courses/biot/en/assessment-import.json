@@ -1,0 +1,716 @@
+{
+  "version": 1,
+  "courseId": "56c7fac7-7181-47e9-91cc-aa88e3c59191",
+  "locale": "en",
+  "expectedVersion": 1,
+  "questionVariants": [
+    {
+      "id": "cb8dfec8-21a6-59a3-8725-931cfc14bf5a",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "b96a656b-41f1-5470-9591-e672694a80d4",
+          "text": "worker sees an immediate threat of collapse in its area. How to proceed?",
+          "options": [
+            {
+              "id": "3d80e1fd-a064-535a-9183-a93a48845297",
+              "text": "Continue work until written instructions are received."
+            },
+            {
+              "id": "8df94b5f-9e02-5504-8c25-0f547a62ccf5",
+              "text": "Stop work, leave the danger zone and immediately inform the supervisor in the prescribed manner."
+            },
+            {
+              "id": "059d1b90-1bfb-54df-802d-6c77012563ac",
+              "text": "Independently eliminate the threat without assessing or fencing."
+            },
+            {
+              "id": "a8cb0294-a61a-54a6-973e-4c7dc740898e",
+              "text": "Ask a colleague to observe while work continues."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "132a9aa0-21b1-5407-b38c-e95fbe579410",
+          "text": "An employee injury has occurred. What is the correct first action by an eyewitness?",
+          "options": [
+            {
+              "id": "c1434394-5882-5284-beba-a5964dfdbe2a",
+              "text": "Immediately change the scene without requiring rescue."
+            },
+            {
+              "id": "a4558963-d046-5259-b923-c824a8b1890a",
+              "text": "Send the victim alone to fill out the documents."
+            },
+            {
+              "id": "4420fbed-ac73-5fc0-9b3d-4ab5977d2e1b",
+              "text": "Stop exposure to the hazard, call for help, provide all possible first aid and report the incident."
+            },
+            {
+              "id": "a37e5c5c-ee12-5466-8410-2af18436cc45",
+              "text": "Finish the production operation first."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "ea421348-3b63-536c-a8a4-c2f46a9945cb",
+          "text": "Equipment safety guard is damaged. What must worker do?",
+          "options": [
+            {
+              "id": "c5dac3c2-a0ba-596b-806e-56fde4ffb915",
+              "text": "Work only in the presence of a colleague."
+            },
+            {
+              "id": "0ec46c0a-cfd5-5b82-b142-c71d3a7c3234",
+              "text": "Remove the remaining part of the guard and continue working."
+            },
+            {
+              "id": "ad8ff1a5-9fc7-5e68-a3c5-6726a002a6cf",
+              "text": "Cover damage with cardboard without reporting."
+            },
+            {
+              "id": "786a4aef-5056-5516-af08-0c5f811ec2df",
+              "text": "Stop using the equipment and report the malfunction to the responsible person."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "08644b64-94d3-5f58-8960-85740a7ecc08",
+          "text": "Which measure should be considered before issuing additional PPE?",
+          "options": [
+            {
+              "id": "6d5c920f-21ba-5060-a463-958d7f2b4bfa",
+              "text": "Removal of hazard or technical containment and isolation of source, if possible."
+            },
+            {
+              "id": "61e8d935-44a9-51c2-9695-a2fade0b8e1b",
+              "text": "Increased shift duration."
+            },
+            {
+              "id": "d004ce74-5eea-5486-ab29-948fcd85f71e",
+              "text": "Postponement of training to the end of work."
+            },
+            {
+              "id": "7b5a032c-5437-57cb-b8ef-9cfe96d6a1d9",
+              "text": "Replacement of the warning sign with a larger one without other measures."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "7ccde0d5-2976-5bcb-9fcf-9ef4066781ec",
+          "text": "When is an employee allowed to work independently?",
+          "options": [
+            {
+              "id": "ab91f431-2c74-586f-bc00-2dff483ad4d4",
+              "text": "After a verbal introduction to a colleague."
+            },
+            {
+              "id": "7dd5801a-415a-5943-be6b-42b258f3c339",
+              "text": "After the first independent operation."
+            },
+            {
+              "id": "1ab378d4-f1cd-5dc2-875c-25a48bde5dc5",
+              "text": "After the required training, instruction, knowledge testing and other established tolerances for his work."
+            },
+            {
+              "id": "dd60a02e-ad61-5eb1-8881-02676192d39d",
+              "text": "Immediately after signing the report card."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "8e8eb823-6b0f-549d-8a53-816782664d0a",
+          "text": "Who ensures that the required PPE is issued to the employee?",
+          "options": [
+            {
+              "id": "adfe99f9-16be-5438-96c5-941bf9e0708a",
+              "text": "Any visitor to the work site."
+            },
+            {
+              "id": "8ec13757-df81-5d97-a9cf-579683a6a7c1",
+              "text": "The worker personally, by being required to buy it from any store."
+            },
+            {
+              "id": "35cc8555-dcee-5e46-afef-19f0c992eaba",
+              "text": "OEM only."
+            },
+            {
+              "id": "15290c7d-0df8-5bcc-922a-5fc807f79e4b",
+              "text": "employer in accordance with risks, regulations and established procedures."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "c8171b54-c12c-599c-97e8-7b74abc3ddc0",
+          "text": "Gas hazardous work is planned at a hazardous production facility. What is needed before you start?",
+          "options": [
+            {
+              "id": "4ad0b8d9-3b0f-5427-87d4-897ad5eab21e",
+              "text": "Start work after verbal consent from your closest colleague."
+            },
+            {
+              "id": "3a34d569-cb02-5209-b142-5e283df618b9",
+              "text": "Organize the work under the established procedure and permit-to-work, with atmosphere analysis, protective measures and emergency readiness."
+            },
+            {
+              "id": "8d4f8e13-3643-5922-993c-57f5c878f0b0",
+              "text": "Check the atmosphere by smell."
+            },
+            {
+              "id": "da642e1a-3b43-5f2d-b4d3-6afa00b11eee",
+              "text": "Turn off the alarm so that it does not interfere."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f5b6ee1d-f2fe-5960-9d9d-3241f09fd06e",
+          "text": "How should worker act upon an emergency signal at a hazardous production facility?",
+          "options": [
+            {
+              "id": "182a0b0c-485f-506b-980b-130e8bb3b919",
+              "text": "Stop work, carry out the actions provided for in the plan, leave or take a safe place and report via established communication."
+            },
+            {
+              "id": "a086cbd6-f0ae-52ff-a847-e5ea12b58316",
+              "text": "Continue work until instructed by a colleague."
+            },
+            {
+              "id": "a6f45a7d-f1fa-55ba-a523-0e78e5071595",
+              "text": "Return for personal items after leaving."
+            },
+            {
+              "id": "a73bffca-153f-54fc-bc55-4d62bcc483b5",
+              "text": "Change the evacuation route independently without reason."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "25b5b16f-ca43-531b-b0c0-04bd7dabe4db",
+          "text": "There is no permit marking before working with pressure equipment and the status is unclear. What to do?",
+          "options": [
+            {
+              "id": "2d9df961-1c83-56a4-8504-cdbe8ec05d96",
+              "text": "Open the fitting with blows of the tool."
+            },
+            {
+              "id": "e53d34ff-2416-5677-9017-96c3d05c6101",
+              "text": "Turn on minimum pressure for testing."
+            },
+            {
+              "id": "af9fcfa3-53c1-52d3-bc55-6855e457a511",
+              "text": "Apply the date yourself with a marker."
+            },
+            {
+              "id": "5af83904-4aa9-5a4b-91da-b0cc2451cd0c",
+              "text": "Do not turn on the equipment and request confirmation of approval and technical condition from the responsible person."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "b1e7342a-f694-5346-b959-2d404a37151d",
+          "text": "What is a hazardous production facility?",
+          "options": [
+            {
+              "id": "776067b3-105c-54b5-a1dc-bda99e77d0fe",
+              "text": "Any room where more than two people work."
+            },
+            {
+              "id": "a4ea85ad-20d3-50b8-877d-001c340dccd4",
+              "text": "Fire station building only."
+            },
+            {
+              "id": "bc864dde-7007-58fa-b0cf-2702d12e7ff2",
+              "text": "An object identified by legally established signs of the presence of hazardous substances, processes or technical devices."
+            },
+            {
+              "id": "967b9c84-6269-5d8a-b812-0f90c2ea2975",
+              "text": "Any territory with access control."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "adf6ab88-5108-5cad-b44a-162073d7632a",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "8cdf7782-a80c-5cbd-aa0e-cdd3aeb26e2c",
+          "text": "The employee was assigned to perform an operation for which he was not trained to perform safely. What should I do?",
+          "options": [
+            {
+              "id": "ff6b9194-9692-5785-b826-0ac9b4bf4aec",
+              "text": "Sign the journal after completing the work."
+            },
+            {
+              "id": "d46128ad-7556-5024-a2bd-f4cea6d2e5f7",
+              "text": "Transfer the operation to another untrained employee."
+            },
+            {
+              "id": "eb88cbd9-057e-5ae7-a261-a4dd5c5b9f5e",
+              "text": "Perform the operation following the example of a colleague without instructions."
+            },
+            {
+              "id": "39c59ddb-183b-5b70-9efa-7abaabae9f3c",
+              "text": "Do not start the operation and inform the supervisor about the need for training and clearance."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "ae4258bd-6a0e-551e-9f29-2a7b7f15632b",
+          "text": "Occurred incident without injury, but there could have been a serious consequence. What should I do?",
+          "options": [
+            {
+              "id": "e5019704-1db4-579d-be85-c6fffa4c9896",
+              "text": "Report the incident, retain available information and participate in the analysis of causes and preventive measures."
+            },
+            {
+              "id": "10d667d4-7886-5847-98f3-350776baf457",
+              "text": "Discuss the case only informally after the shift."
+            },
+            {
+              "id": "834af64f-8d47-5f8c-994b-17fa06e76301",
+              "text": "Do not report because no one was injured."
+            },
+            {
+              "id": "dd766577-d309-5753-85d1-3b0f61579230",
+              "text": "Delete entries so you don't have to stop working."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "83c5fdf0-9a52-5731-a87e-6e6af48a995f",
+          "text": "worker observed a spill of an unknown substance. How to proceed?",
+          "options": [
+            {
+              "id": "4e425888-6735-5815-849a-29051d13121c",
+              "text": "Check the substance for smell at close range."
+            },
+            {
+              "id": "27d537ad-b069-5625-9583-6dd6a6538506",
+              "text": "Fence off or leave the danger zone as appropriate and report, without proceeding with liquidation without preparation and means."
+            },
+            {
+              "id": "f675830d-c6ed-577c-ab0b-18dec82aaa0f",
+              "text": "Flush spill down drain."
+            },
+            {
+              "id": "60205898-3f4a-5b80-854c-cf4453d7345d",
+              "text": "Collect the substance with bare hands in an ordinary container."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f0210db0-654c-5ef6-bcbe-5a713da95894",
+          "text": "Dangerous dust constantly appears in the area. Which approach corresponds to the hierarchy of control?",
+          "options": [
+            {
+              "id": "865f4b1c-e43d-5316-a343-243640e7810d",
+              "text": "Remove dust with a dry broom while working."
+            },
+            {
+              "id": "3aa16ec1-10ee-5b11-82a7-9c705067dea9",
+              "text": "Consider the warning label as sufficient protection."
+            },
+            {
+              "id": "9b87bfaf-e101-5410-a258-89f425ee17c1",
+              "text": "Limit the issuance of disposable masks without evaluation."
+            },
+            {
+              "id": "b55c58f1-decf-53b4-b9b3-23bd67d3d631",
+              "text": "Consider process elimination or replacement and dust removal engineering first, then organizational measures and PPE."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "cb6a97f2-e65c-5b41-9b69-645a9b1abc98",
+          "text": "Is training automatically transferred whenever an employee transfers?",
+          "options": [
+            {
+              "id": "fa99446a-9511-55ac-b7f0-25f34f07102d",
+              "text": "The decision is made by worker himself without the employer’s documents."
+            },
+            {
+              "id": "3fd23602-4571-5fc5-a7b9-fdbba2b6dfe9",
+              "text": "Yes, retraining is prohibited for any transfer."
+            },
+            {
+              "id": "c3ab6856-ea49-57aa-96a0-a445df5d3e8d",
+              "text": "The procedure is determined by employer according to the current rules, taking into account the profession, work and conditions; non-repetition is possible only in the intended case."
+            },
+            {
+              "id": "c6d9b034-6c4e-5f56-b2ac-a47e2404e1d7",
+              "text": "No, learning always repeats regardless of conditions."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "3d8486fb-7cd3-5949-806d-7747dcb475b4",
+          "text": "What must worker do with the issued PPE?",
+          "options": [
+            {
+              "id": "53f2c7d6-1c1f-5732-9f87-61397db0a677",
+              "text": "Change the design for convenience without approval."
+            },
+            {
+              "id": "3daf22fb-28f1-5559-94fa-dbee37afa396",
+              "text": "Use correctly, check before use, take care of it and report any defects."
+            },
+            {
+              "id": "17e12411-832d-56c2-adb1-af2ce2452017",
+              "text": "Transfer them to any person without regard to size or purpose."
+            },
+            {
+              "id": "26e7f553-1183-59b8-adfb-23b26e8d1812",
+              "text": "Use faulty PPE until new ones are received."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "54d4fbe1-0235-565d-9c0a-bf8d24c5fe59",
+          "text": "An odor resembling hydrogen sulfide was detected and the gas detector alarm activated. What should be done?",
+          "options": [
+            {
+              "id": "a455be56-91db-5a2d-8adc-87d92f6472d6",
+              "text": "Immediately leave the danger zone along the route, warn others and report in an emergency."
+            },
+            {
+              "id": "4923c962-6c1c-53a7-9b12-77594d7072e5",
+              "text": "Continue working with the door open."
+            },
+            {
+              "id": "6cfeef59-1c12-58a6-88d3-108efbd9e873",
+              "text": "Look for leaks alone without breathing protection."
+            },
+            {
+              "id": "5423b12d-ff59-5e1a-8cd1-5babb5f71d8e",
+              "text": "Remove the protection to more accurately determine the smell."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "84f7ead1-6adb-5123-9371-fe3fc20f698f",
+          "text": "What is the purpose of an emergency response plan?",
+          "options": [
+            {
+              "id": "f52fb4ba-c6b3-5c2d-b1f0-6acae7fa8070",
+              "text": "Determine the wages of the emergency group."
+            },
+            {
+              "id": "5e99f603-9438-53f5-9cae-7a2644668f40",
+              "text": "Replace equipment maintenance."
+            },
+            {
+              "id": "4f4b332f-3c84-5ce5-b93c-7c1af83997aa",
+              "text": "Establish a routine cleaning schedule."
+            },
+            {
+              "id": "5bbdf605-5d5e-57b1-ba4d-7de9e84d757e",
+              "text": "Determine in advance the notification, personnel actions, management and resources to contain the accident and protect people."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "498d012e-7466-5ccc-92a8-6d416e82c366",
+          "text": "Gas analysis was not performed before entering the tank. What should I do?",
+          "options": [
+            {
+              "id": "d5ad42c0-bafe-5243-8689-d8f379435099",
+              "text": "Enter briefly while holding your breath."
+            },
+            {
+              "id": "c219e516-cbce-55b2-9a3a-ceb92a2d2443",
+              "text": "Check the air with a burning match."
+            },
+            {
+              "id": "ca167b24-fccd-5c7c-bee8-41f9d790da8a",
+              "text": "Do not enter until procedure is completed, environmental analysis, ventilation, observation and readiness for rescue are complete."
+            },
+            {
+              "id": "21fae48e-6545-585b-934e-aaba228cf9a0",
+              "text": "Allow one employee to enter without an observer."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "3ab428ba-4222-56c8-92c0-410eb3ab6aab",
+          "text": "What does incident mean in industrial safety?",
+          "options": [
+            {
+              "id": "bba1e961-564f-535a-93af-57f22bb82e5c",
+              "text": "Any written remark to the employee."
+            },
+            {
+              "id": "cb0a277f-ae39-5303-b1a4-b1679b14fb30",
+              "text": "Failure, damage or deviation at a hazardous production facility that violated the safe operation of the process, but did not reach signs of an accident."
+            },
+            {
+              "id": "e87e147e-5bcf-5ca3-b61d-8b28d4eacd1c",
+              "text": "Only occupational accident out of production."
+            },
+            {
+              "id": "c65b1393-396d-5817-9eca-a1a97d675cc0",
+              "text": "Any planned stop for lunch."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "1c6f90ed-50d9-5f92-a14f-380caec6523a",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "added656-a55c-52cb-a44d-8d359edb6183",
+          "text": "A life-threatening hazard suddenly arises in the work area. How is the right to safe work exercised?",
+          "options": [
+            {
+              "id": "ba57aaa7-97dd-51a0-9165-f995b32fca56",
+              "text": "worker stops operation and notifies the identified responsible person of the imminent threat."
+            },
+            {
+              "id": "7d25423c-a3b7-56a5-865a-c43650c8467c",
+              "text": "worker hides hazard until the scheduled meeting."
+            },
+            {
+              "id": "34157b98-457c-5c49-9dfb-9693b6bddee8",
+              "text": "worker leaves the organization without notice."
+            },
+            {
+              "id": "93ad51ba-196a-5739-a59d-c3b2ed4f536d",
+              "text": "worker continues to work if the shift is almost over."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "6f1b3155-2144-5411-8e9b-a262f99d2868",
+          "text": "After the incident, you need to maintain the situation. When is it permissible to change it?",
+          "options": [
+            {
+              "id": "bdcfd472-7a2a-540f-ab10-4e613fee6bef",
+              "text": "Always immediately after an incident for quick cleanup."
+            },
+            {
+              "id": "325d742f-c69d-5fff-8b27-57009aa45a35",
+              "text": "Only for the sake of continuing the production plan."
+            },
+            {
+              "id": "1e2dbb5b-f0b6-52c4-a678-8008f5aed8b8",
+              "text": "At the request of any witness without documentation."
+            },
+            {
+              "id": "2d210e33-3859-5cb1-892c-2d8101e1bb80",
+              "text": "When necessary to save people, prevent further danger or as directed by responsible services with recording of changes."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "746f572b-5f22-5f6a-9ff2-e8b9ab877fb8",
+          "text": "The tool began producing an unusual noise and vibration. What is required?",
+          "options": [
+            {
+              "id": "f5d880bf-6145-535c-8b75-6850c760a60d",
+              "text": "Continue until scheduled break."
+            },
+            {
+              "id": "a03c44b0-fbe0-5569-9d59-eb9c43c73301",
+              "text": "Transfer a working tool to a colleague without explanation."
+            },
+            {
+              "id": "2365b0aa-18b4-5dcc-b88d-9ed30bfe8e37",
+              "text": "Stop operation, unplug tool safely and report fault."
+            },
+            {
+              "id": "bf6d63c7-c2d4-5eca-8310-a39ab67acb2e",
+              "text": "Increase load to check power."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "83fef26f-148d-5958-85cf-f950a39d6506",
+          "text": "Dangerous movement of the mechanism can be physically isolated. Which control is preferable?",
+          "options": [
+            {
+              "id": "8f0d8b89-151c-5420-88c7-159e82cd65f1",
+              "text": "Only issue gloves regardless of risk of entrapment."
+            },
+            {
+              "id": "8d63e01e-d1e4-55d1-be37-0a58385dccdc",
+              "text": "Install serviceable technical fencing with the provided interlocks."
+            },
+            {
+              "id": "a2274050-9490-5f24-a221-4878dc006792",
+              "text": "Just remind employees to be more careful."
+            },
+            {
+              "id": "786cc205-fd27-5fc4-a8c3-0010bd0b966a",
+              "text": "Just reduce the time you spend nearby."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "12e7e21a-bc88-5bad-937f-fd65dbc6bc74",
+          "text": "Why is target safety briefing carried out?",
+          "options": [
+            {
+              "id": "cd7d6c90-cbf3-54dd-9a93-a995715081ba",
+              "text": "For specific one-time or dangerous work and the conditions for its safe performance in specified cases."
+            },
+            {
+              "id": "13b40efb-1886-5a2f-a0d7-48eb55067cb7",
+              "text": "To replace all types of vocational training."
+            },
+            {
+              "id": "1d2b66e4-da71-5221-ac44-f16b7071c093",
+              "text": "For vacation schedule information only."
+            },
+            {
+              "id": "dbf57436-2565-51ae-adef-dc342a70845e",
+              "text": "For permission to operate faulty equipment."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "6de1f664-6418-5957-9aa8-e454ff09f413",
+          "text": "Why is collective protection usually considered before individual protection?",
+          "options": [
+            {
+              "id": "a3034cb0-7e15-5eac-a944-828d791f7730",
+              "text": "It is always cheaper than any other solution."
+            },
+            {
+              "id": "b8baba1a-c824-5d6d-93ef-6ad5bc29f187",
+              "text": "It is only used after an accident."
+            },
+            {
+              "id": "63bbabd9-0a2e-5cf2-9443-d02e5f4fb9cf",
+              "text": "It reduces the impact of a hazard on a group of people at once and is less dependent on the behavior of each individual."
+            },
+            {
+              "id": "e47b32a7-e669-5a86-be18-9ceb2dbf7f4c",
+              "text": "It allows you to cancel staff training."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "ce9886c6-8c21-5c39-9fd1-040e4427f54c",
+          "text": "Before hot work at the hazardous production facility, flammable materials were not removed. Which decision is correct?",
+          "options": [
+            {
+              "id": "8b9e4f31-fec9-5696-8488-7616dec7875b",
+              "text": "Ask one worker to observe without extinguishing equipment."
+            },
+            {
+              "id": "a63b517c-a158-5ede-a3c1-dcd5802d0d0d",
+              "text": "Start work by placing a bucket of water nearby."
+            },
+            {
+              "id": "4a6b1461-2c5b-50a2-ae00-4c5f96b381f3",
+              "text": "Cover the materials with paper."
+            },
+            {
+              "id": "6a50ff26-407b-56fe-8c01-c09dd9898e26",
+              "text": "Do not start work until the work permit measures have been completed and the fireproof area has been prepared."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "6aca454f-67e5-5312-a73e-09fb9a658dd0",
+          "text": "What is checked during emergency training?",
+          "options": [
+            {
+              "id": "e17a2dc3-720d-5e92-bc5b-eaa42ce92efe",
+              "text": "Understand signals, routes, roles, communications and practical actions without creating actual danger."
+            },
+            {
+              "id": "97e15ff2-765b-5657-8532-009a54969f2c",
+              "text": "Timesheet filling speed only."
+            },
+            {
+              "id": "7bafe744-8b4c-5d96-a7b3-e76998f11ec8",
+              "text": "Only knowledge of the manager’s office number."
+            },
+            {
+              "id": "b297dd4b-e690-56da-a813-039b2486d223",
+              "text": "Casual clothing only."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f3197da2-ce96-5838-b4a9-69c41e655b1e",
+          "text": "The gas analyzer showed a value above the established safe limit. How to proceed?",
+          "options": [
+            {
+              "id": "3d41feae-7908-507f-9826-deddafde180f",
+              "text": "Turn off the device and focus on how you feel."
+            },
+            {
+              "id": "87236056-4c73-5b62-9a0c-6500b6b9ee0a",
+              "text": "Do not start or stop work, exit the area and carry out emergency and control measures according to the procedure."
+            },
+            {
+              "id": "dbb2d46b-c81b-52d4-81f6-02f744e30001",
+              "text": "Pass the device to another worker and remain in the area."
+            },
+            {
+              "id": "f6f758f3-7d5d-514e-b95e-cc4fafd4a9a9",
+              "text": "Continue working at a faster pace."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "2e65f150-d64e-5858-94bd-d4d1b7d5e6b6",
+          "text": "What does the abbreviation PLA stand for?",
+          "options": [
+            {
+              "id": "0abc679d-55fd-5f77-997b-83e2df519252",
+              "text": "Planned sheet reinforcement."
+            },
+            {
+              "id": "66dd3741-3e45-5366-b651-29d0d77eb357",
+              "text": "List of personal leaves of administration."
+            },
+            {
+              "id": "3e4fee19-0def-5b28-9bae-3eecd7872509",
+              "text": "Emergency response plan defining organized actions in case of an emergency."
+            },
+            {
+              "id": "32d895a7-31cf-5732-ab5c-4e71fe5ad043",
+              "text": "Laboratory analysis passport."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    }
+  ]
+}

@@ -127,8 +127,8 @@ test('public article composition is wide, single-column, readable, and related',
     read('app/(public)/blog/[slug]/page.tsx'),
     read('components/article-renderer/index.tsx'),
   ]);
-  assert.match(page, /getArticleBySlug\(slug\)/);
-  assert.match(page, /getArticles\(\)/);
+  assert.match(page, /getArticleBySlug\(slug, locale\)/);
+  assert.match(page, /getArticles\(locale\)/);
   assert.match(page, /getSiteContacts\(\)/);
   assert.match(page, /<Container size="wide">/);
   assert.match(page, /article\.coverImage \? \(/);
@@ -143,9 +143,9 @@ test('public article composition is wide, single-column, readable, and related',
   assert.doesNotMatch(page, /aria-label="О материале"/);
   assert.doesNotMatch(page, /modifiedTime: article\.reviewedAt/);
   assert.doesNotMatch(page, /dateModified: article\.reviewedAt/);
-  assert.match(page, /<ArticleSources article=\{article\} \/>/);
-  assert.match(page, /Нормативные источники \(\{sourceCount\}\)/);
-  assert.match(page, /<RelatedArticles articles=\{relatedArticles\} \/>/);
+  assert.match(page, /<ArticleSources[\s\S]+label=\{t\('sources'/);
+  assert.match(page, /t\('sources', \{ count: article\.sources\?\.length \?\? 0 \}\)/);
+  assert.match(page, /<RelatedArticles[\s\S]+articles=\{relatedArticles\}[\s\S]+locale=\{locale\}/);
   assert.match(renderer, /data-article-cta/);
   assert.match(renderer, /ARTICLE_WHATSAPP_ACTION_URL/);
   assert.match(renderer, /<ContactLink kind="whatsapp" contacts=\{contacts\}/);
@@ -164,10 +164,10 @@ test('article cards keep copy visible and expose a clear reading action', async 
 
   assert.doesNotMatch(card, /line-clamp/);
   assert.doesNotMatch(card, /(?:^|\s)h-\[[^\]]+\]/);
-  assert.match(card, /Читать статью/);
+  assert.match(card, /t\('read'\)/);
   assert.match(card, /bg-\[var\(--color-primary-soft\)\]/);
   assert.match(blog, /featured=\{index === 0\}/);
-  assert.match(resources, /Открыть весь блог/);
+  assert.match(resources, /t\('all'\)/);
 });
 
 test('stored content and admin editing use the same runtime block contract', async () => {
@@ -210,7 +210,7 @@ test('stored content and admin editing use the same runtime block contract', asy
   assert.match(blockEditor, /Примечание к источнику/);
   assert.match(blockEditor, /note: event\.target\.value \|\| undefined/);
   assert.match(renderer, /alt=\{block\.decorative \? '' : block\.alt\}/);
-  assert.match(renderer, /itemLabel="Изображение"/);
+  assert.match(renderer, /itemLabel=\{t\('image'\)\}/);
   assert.match(renderer, /getArticleToc\(blocks: unknown\)/);
   assert.match(renderer, /articleBlocksSchema\.safeParse\(blocks\)/);
   assert.match(carousel, /aria-roledescription="carousel"/);

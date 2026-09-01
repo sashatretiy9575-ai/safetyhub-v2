@@ -1,12 +1,17 @@
 import { FaqAccordion } from '@/components/marketing/faq-accordion';
 import { ContactCta } from '@/components/marketing/contact-cta';
 import { buildMetadata } from '@/lib/seo';
+import { getLocale, getTranslations } from 'next-intl/server';
 
-export const metadata = buildMetadata({
-  title: 'Ответы перед началом обучения',
-  description: 'Ответы на частые вопросы о курсах, тестах и аккаунте SafetyHub.',
-  path: '/faq',
-});
+export async function generateMetadata() {
+  const t = await getTranslations('Faq');
+  return buildMetadata({
+    title: t('metadataTitle'),
+    description: t('metadataDescription'),
+    path: '/faq',
+    locale: await getLocale(),
+  });
+}
 
 export default function FaqPage() {
   return (

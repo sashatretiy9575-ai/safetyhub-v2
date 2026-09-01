@@ -93,8 +93,8 @@ test('learner-facing course and profile UI block material until approval', async
 
   assert.match(topicPage, /getAuthContext/);
   assert.match(topicPage, /auth\.approval\.state/);
-  assert.match(actions, /access === 'pending'/);
-  assert.match(actions, /До подтверждения презентация, вопросы и тест недоступны/);
+  assert.match(actions, /pending: \{ title: t\('access\.pendingTitle'\)/);
+  assert.match(actions, /description: t\('access\.pendingDescription'\)/);
   assert.match(actions, /access === 'approved'/);
   assert.match(status, /window\.setInterval/);
   assert.match(status, /<ContactLink\s+kind="phone"\s+contacts=\{contacts\}/);

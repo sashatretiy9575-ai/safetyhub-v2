@@ -1,23 +1,29 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { AuthenticationError, requireUser } from '@/features/auth/server';
 import { OnboardingForm } from '@/features/profile/onboarding-form';
 import { getProfileAvatarUrl } from '@/features/profile/server';
 import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 
 export default async function OnboardingPage() {
+  const locale = (await getLocale()) as AppLocale;
+  const t = await getTranslations('Profile');
   let context: Awaited<ReturnType<typeof requireUser>>;
   try {
     context = await requireUser();
   } catch (error) {
     if (error instanceof AuthenticationError && error.status === 401) {
-      redirect('/auth/login?return=/onboarding');
+      redirect(
+        `${localizePathname('/auth/login', locale)}?return=${encodeURIComponent(localizePathname('/onboarding', locale))}`,
+      );
     }
     if (error instanceof AuthenticationError && error.code === 'LEGAL_ACCEPTANCE_REQUIRED') {
-      redirect('/auth/legal');
+      redirect(localizePathname('/auth/legal', locale));
     }
     throw error;
   }
@@ -28,7 +34,9 @@ export default async function OnboardingPage() {
   };
   const avatarUrl = profile.avatar_updated_at ? await getProfileAvatarUrl(context.user.id) : null;
   if (profile.onboarding_completed_at && avatarUrl) {
-    redirect(context.approval.state === 'approved' ? '/topics' : '/profile');
+    redirect(
+      localizePathname(context.approval.state === 'approved' ? '/topics' : '/profile', locale),
+    );
   }
 
   return (
@@ -36,11 +44,14 @@ export default async function OnboardingPage() {
       <Container size="narrow">
         <div className="mx-auto max-w-2xl space-y-5">
           <div className="text-center">
-            <p className="text-sm font-semibold text-[var(--color-primary)]">Первый шаг</p>
-            <h1 className="font-display mt-1 text-3xl font-black md:text-4xl">Заполните профиль</h1>
+            <p className="text-sm font-semibold text-[var(--color-primary)]">
+              {t('onboardingEyebrow')}
+            </p>
+            <h1 className="font-display mt-1 text-3xl font-black md:text-4xl">
+              {t('onboardingTitle')}
+            </h1>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[var(--color-text-muted)]">
-              После отправки заявки администратор проверит данные в течение 24 часов. До подтверждения
-              вопросы курсов и тесты недоступны.
+              {t('onboardingDescription')}
             </p>
           </div>
           <Card>

@@ -2,11 +2,13 @@ import { z } from 'zod';
 import { apiError } from '@/features/auth/api-error';
 import { getSiteUrl, requireCapability } from '@/features/auth/server';
 import {
-  certificateExportFilename,
   certificateExportResultSchema,
-  createCertificateExportStream,
+  createCertificateExportMetadata,
 } from '@/features/admin/certificate-export-archive';
-import { attachmentContentDisposition } from '@/lib/pdf/certificate';
+import {
+  CERTIFICATE_EXPORT_METADATA_MAX_BYTES,
+  createBoundedCertificateMetadataResponse,
+} from '@/features/certificates/metadata-response';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { createApiResponse } from '@/lib/security/api-response';
@@ -33,16 +35,15 @@ export async function GET(_request: Request, context: { params: Promise<{ jobId:
     const response = await client.rpc('resolve_certificate_export_job', { p_job_id: jobId });
     const resolved = certificateExportResultSchema.parse(unwrapRpcMutationResponse(response));
     const now = new Date();
-    return createApiResponse(createCertificateExportStream(resolved, now, getSiteUrl()), {
-      headers: {
-        'Content-Type': 'application/zip',
-        'Content-Disposition': attachmentContentDisposition(certificateExportFilename(now)),
-        'Cache-Control': 'private, no-store',
-        'X-Content-Type-Options': 'nosniff',
+    const metadata = await createCertificateExportMetadata(resolved, now, getSiteUrl());
+    return createBoundedCertificateMetadataResponse(
+      metadata,
+      CERTIFICATE_EXPORT_METADATA_MAX_BYTES,
+      {
         'X-SafetyHub-Exported-Count': String(resolved.items.length),
         'X-SafetyHub-Excluded-Count': String(resolved.skipped.length),
       },
-    });
+    );
   } catch (error) {
     return apiError(error);
   }

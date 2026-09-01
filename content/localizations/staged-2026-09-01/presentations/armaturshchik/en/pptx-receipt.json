@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slug": "armaturshchik",
+  "locale": "en",
+  "productionPublished": false,
+  "contentSummary": "Rebar worker: Safe preparation, processing, handling and installation of reinforcement with control of the tool, frame and work area.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/armaturshchik/presentation.pptx",
+    "pptxSha256": "dca7ef29d82b24756a927831daaf566317e7de5653b7aab43d98492c385701f2",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/armaturshchik/en/text-map.json",
+    "textMapSha256": "f55fbdd741f58879f656afced42fcaba5dfd6e0e4366c2d35ce31d8a43e232b2"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/en/assets/pptx/db95211c418a56b31d09669d7687dde21b576a182dea7a458cf81fafb3c130b1/presentation.pptx",
+    "sha256": "db95211c418a56b31d09669d7687dde21b576a182dea7a458cf81fafb3c130b1",
+    "byteSize": 2799915,
+    "slideCount": 31
+  },
+  "edits": {
+    "translatedElementCount": 183,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 56,
+    "sourceNotesAdded": 31,
+    "textTopologySha256": "c2c1a70ddcd7ef2dd21bde7db115810caa59707b363110b6b739b61741c96ff8",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 31,
+    "layoutInspectionCount": 31,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 31
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 405,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

@@ -2,37 +2,44 @@
 
 import { useState } from 'react';
 import { Trash } from '@phosphor-icons/react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { clientRequest, clientRequestMessage } from '@/lib/client-request';
+import { clientRequest } from '@/lib/client-request';
+import { localizedClientRequestMessage } from '@/i18n/client-errors';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 
-const CONFIRMATION = 'УДАЛИТЬ';
+const API_CONFIRMATION = 'DELETE_ACCOUNT';
 
 export function AccountDeletion() {
+  const locale = useLocale() as AppLocale;
+  const t = useTranslations('AccountDeletion');
+  const tErrors = useTranslations('Common.errors');
+  const confirmationPhrase = t('confirmation');
   const [open, setOpen] = useState(false);
   const [confirmation, setConfirmation] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
 
   const removeAccount = async () => {
-    if (busy || confirmation !== CONFIRMATION) return;
+    if (busy || confirmation !== confirmationPhrase) return;
     setBusy(true);
-    setMessage('Удаляем аккаунт и связанные данные…');
+    setMessage(t('deleting'));
     try {
       const result = await clientRequest('/api/profile/account', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ confirmation }),
+        body: JSON.stringify({ confirmation: API_CONFIRMATION }),
         cache: 'no-store',
       });
       if (!result.ok) {
-        setMessage(clientRequestMessage(result.error, 'Не удалось удалить аккаунт.'));
+        setMessage(localizedClientRequestMessage(result.error, t('failed'), tErrors));
         return;
       }
-      window.location.assign('/auth/login?deleted=1');
+      window.location.assign(`${localizePathname('/auth/login', locale)}?deleted=1`);
     } catch (error) {
-      setMessage(clientRequestMessage(error, 'Не удалось удалить аккаунт.'));
+      setMessage(localizedClientRequestMessage(error, t('failed'), tErrors));
     } finally {
       setBusy(false);
     }
@@ -41,7 +48,7 @@ export function AccountDeletion() {
   if (!open) {
     return (
       <Button type="button" size="sm" variant="danger" onClick={() => setOpen(true)}>
-        <Trash size={17} /> Удалить аккаунт
+        <Trash size={17} /> {t('action')}
       </Button>
     );
   }
@@ -49,16 +56,14 @@ export function AccountDeletion() {
   return (
     <div className="space-y-4 rounded-2xl border border-[var(--color-danger)] p-4">
       <div>
-        <h2 className="font-display text-lg font-bold">Необратимое удаление</h2>
+        <h2 className="font-display text-lg font-bold">{t('title')}</h2>
         <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-          Будут удалены профиль, фотография, все попытки, результаты, сертификаты и связанный аудит.
-          Проверка сертификатов по QR перестанет работать. Уже скачанные на другие устройства PDF
-          физически удалить невозможно.
+          {t('description')}
         </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="account-deletion-confirmation">
-          Для подтверждения введите {CONFIRMATION}
+          {t('prompt', { confirmation: confirmationPhrase })}
         </Label>
         <Input
           id="account-deletion-confirmation"
@@ -73,10 +78,10 @@ export function AccountDeletion() {
           type="button"
           size="sm"
           variant="danger"
-          disabled={busy || confirmation !== CONFIRMATION}
+          disabled={busy || confirmation !== confirmationPhrase}
           onClick={removeAccount}
         >
-          <Trash size={17} /> {busy ? 'Удаляем…' : 'Удалить навсегда'}
+          <Trash size={17} /> {busy ? t('deletingShort') : t('deleteForever')}
         </Button>
         <Button
           type="button"
@@ -89,7 +94,7 @@ export function AccountDeletion() {
             setMessage('');
           }}
         >
-          Отмена
+          {t('cancel')}
         </Button>
       </div>
       {message ? (

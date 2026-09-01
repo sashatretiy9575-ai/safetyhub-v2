@@ -19,6 +19,7 @@ const scriptFile = fileURLToPath(import.meta.url);
 export const repositoryRoot = path.resolve(path.dirname(scriptFile), '..');
 export const productionSiteUrl = 'https://safetyhub.kz';
 export const temporaryDirectoryPrefix = 'safetyhub-production-auth-config-';
+export const cloudflareAlwaysPassTestSecret = '1x0000000000000000000000000000000AA';
 export const localSupabaseCliPath = path.join(
   repositoryRoot,
   'node_modules',
@@ -41,22 +42,23 @@ const expectedConfigurationLineChanges = Object.freeze([
     production: `site_url = "${productionSiteUrl}"`,
   }),
   Object.freeze({
-    source: 'additional_redirect_urls = ["http://localhost:3000/**"]',
-    production: `additional_redirect_urls = ["${productionSiteUrl}/**"]`,
+    source:
+      'additional_redirect_urls = ["http://localhost:3000/auth/login?email_locale=ru", "http://localhost:3000/kk/auth/login?email_locale=kk", "http://localhost:3000/en/auth/login?email_locale=en"]',
+    production: `additional_redirect_urls = ["${productionSiteUrl}/auth/login?email_locale=ru", "${productionSiteUrl}/kk/auth/login?email_locale=kk", "${productionSiteUrl}/en/auth/login?email_locale=en"]`,
   }),
 ]);
 
 // Updating either value is an intentional release-review step. These hashes pin
 // exactly the committed localhost source and the only permitted production copy.
 export const expectedSourceConfigurationSha256 =
-  '2e17fa5984321d1713caec61a7b0c54276b96e757d604adf0dee08a2168f4962';
+  'd451dea0d3c96f675bbe5ad92606f553a2559ed0a999cffed8277894a25d7d19';
 export const expectedProductionConfigurationSha256 =
-  '4a99a15e864ae823b715466e7025a59761b0c0769046370c22657ccbf62769d5';
+  'ca81bcd6bb4c6e6a999f1d02672b87de775f002c3d6daaa129ec35dea145b618';
 export const expectedTemplateSha256 = Object.freeze({
   'supabase/templates/magic-link.html':
-    'efcea98cd3cc116a6e4d1bd68d1a36d13618ab0583427df0994014b1d4598c89',
+    '0294e0748cab0fff26f1ffb75ae29cd59b1e6090734bacf4ef77aef91e293189',
   'supabase/templates/confirmation.html':
-    '2acfa9e9e97cd449e6dbc0f58475f5a7104c87f34ac45e3b9675ee7433844c36',
+    '2c855b3974874f391cec53eb4ba9a194ffe4d08fc07fe1dc8707119501e6c081',
   'supabase/templates/recovery.html':
     'e9879969f6f2f1fecc5c3f20708d180733760523e08cbe4726b384603f841317',
   'supabase/templates/invite.html':
@@ -127,6 +129,13 @@ function lineChanges(source, production) {
 
 export function createProductionConfiguration(sourceConfiguration) {
   if (typeof sourceConfiguration !== 'string') fail('CONFIGURATION_SOURCE_INVALID');
+  if (
+    !sourceConfiguration.includes('[auth.captcha]') ||
+    !sourceConfiguration.includes('provider = "turnstile"') ||
+    !sourceConfiguration.includes('secret = "env(SUPABASE_AUTH_CAPTCHA_SECRET)"')
+  ) {
+    fail('CONFIGURATION_TURNSTILE_BOUNDARY_MISSING');
+  }
 
   let productionConfiguration = sourceConfiguration;
   for (const change of expectedConfigurationLineChanges) {
@@ -167,6 +176,7 @@ function quotePowerShell(value) {
 export function safeConfigPushCommand(temporaryRoot) {
   if (!path.isAbsolute(temporaryRoot)) fail('TEMPORARY_DIRECTORY_MUST_BE_ABSOLUTE');
   return [
+    `if ([string]::IsNullOrWhiteSpace($env:SUPABASE_AUTH_CAPTCHA_SECRET) -or $env:SUPABASE_AUTH_CAPTCHA_SECRET -eq ${quotePowerShell(cloudflareAlwaysPassTestSecret)}) { throw 'A real production SUPABASE_AUTH_CAPTCHA_SECRET is required' };`,
     `Push-Location ${quotePowerShell(temporaryRoot)};`,
     'try {',
     `& ${quotePowerShell(process.execPath)} ${quotePowerShell(localSupabaseCliPath)}`,

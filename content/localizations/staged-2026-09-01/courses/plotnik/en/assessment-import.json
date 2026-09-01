@@ -1,0 +1,716 @@
+{
+  "version": 1,
+  "courseId": "f1d89c10-ca34-4223-8c04-de97790a3292",
+  "locale": "en",
+  "expectedVersion": 1,
+  "questionVariants": [
+    {
+      "id": "d3930e8d-40f7-5d9f-98fb-bdb08b119083",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "d6c4a8d9-1581-540a-b124-a09262885bad",
+          "text": "Before sawing, the board is unstable and rocks on the workbench. What should be done?",
+          "options": [
+            {
+              "id": "afe70682-5b3b-5b17-8f87-ff322b92e682",
+              "text": "Hold the board with your knee and saw with your free hand."
+            },
+            {
+              "id": "a6ea4733-8f83-54ba-8f8c-a8a529d49ac3",
+              "text": "Have a colleague hold the board close to the cutting line."
+            },
+            {
+              "id": "f90b68b6-b411-51f9-a468-4c10747519dc",
+              "text": "Securely secure the workpiece with stops or clamps and only then begin sawing."
+            },
+            {
+              "id": "705e600b-bb35-5e75-8d23-8cf0dc95811e",
+              "text": "Start with short, quick movements so that the board itself takes a stable position."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "eed054b7-721a-5d22-ac3b-153c31b82da1",
+          "text": "When sawing by hand, the cutting line runs close to the supporting hand. How to change work?",
+          "options": [
+            {
+              "id": "55555403-9a84-5874-80d8-9e0b43684ba2",
+              "text": "Rearrange and secure the workpiece so that the hand is outside the line of movement of the saw."
+            },
+            {
+              "id": "70f15c6c-3a30-5ff0-aa75-a8eeb5b7b235",
+              "text": "Increase the cutting speed to get through the dangerous area faster."
+            },
+            {
+              "id": "43628d7c-f27d-568c-a98b-30d7b9b218db",
+              "text": "Turn the blade with the teeth in the opposite direction."
+            },
+            {
+              "id": "030527f9-df31-5784-b770-6ce81a5e8f84",
+              "text": "Continue, pressing the workpiece harder with your palm."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f2b4c912-0614-50a4-bf3c-b1e2b909764d",
+          "text": "A carpenter is planing a board and directing the plane toward the body. How should the technique be corrected?",
+          "options": [
+            {
+              "id": "ff437581-3f73-5809-9433-6eb61bc51a1c",
+              "text": "Work with one hand and hold the blade with the other."
+            },
+            {
+              "id": "6dfcc247-af22-5abc-afc3-f63875d8fc04",
+              "text": "Continue moving towards yourself, but reduce the pressure."
+            },
+            {
+              "id": "5d78f4ab-8718-56f3-ae79-764a66156a57",
+              "text": "Remove the stop from the workbench to allow the board to move."
+            },
+            {
+              "id": "620d6a71-013b-584f-bed4-873494b70f89",
+              "text": "Secure the board and guide the tool in a controlled manner away from the body along a stable path."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "ec122b32-0e93-5af5-9958-709bb78d2d6a",
+          "text": "The jigsaw blade is stuck in the workpiece. What is the first safe action?",
+          "options": [
+            {
+              "id": "30f21bbf-9106-50f3-8f4d-050229a15584",
+              "text": "Pull the tool towards you while the engine is running."
+            },
+            {
+              "id": "ae9f9fe2-2f60-5b5d-a267-84d6c8f41fa9",
+              "text": "Release the switch, turn off the power and wait until the equipment stops completely."
+            },
+            {
+              "id": "e59b9056-c44a-56e1-ad62-12e2fec43ae9",
+              "text": "Press the workpiece with your foot and increase the speed."
+            },
+            {
+              "id": "30426909-056c-50b6-86bf-5af960a4fbf3",
+              "text": "Try to release the blade with a screwdriver without turning off the power."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "e5ec4652-9008-56f2-8bec-708f12c7610d",
+          "text": "How to check the suitability of the blade before installing it on the saw?",
+          "options": [
+            {
+              "id": "32edc437-1d5e-553c-bf38-30d21ede0c87",
+              "text": "Install any disk with a suitable mounting hole."
+            },
+            {
+              "id": "3c04b389-ef6c-5711-8d7f-739e8369e1c1",
+              "text": "Test the disc by hitting it on a metal workbench."
+            },
+            {
+              "id": "8a0e1e91-21fd-5665-833f-e1df6e3bf7fc",
+              "text": "Check the type, size and permissible speed with the tool and make sure there is no damage."
+            },
+            {
+              "id": "e9a3d3a0-cf3a-5854-8710-b4981024a756",
+              "text": "Select a disc only by the color of the packaging."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "6840d392-9cec-579f-bf3c-c29d7c274594",
+          "text": "Sanding produces a lot of fine wood dust. Which measure is most effective?",
+          "options": [
+            {
+              "id": "e8d828e1-f16d-5806-93b2-623ba6af2475",
+              "text": "Close the ventilation openings to prevent dust from flying around."
+            },
+            {
+              "id": "402602f8-ebf0-5abd-9a03-d339ada10eee",
+              "text": "Use only cotton gloves."
+            },
+            {
+              "id": "6229b33f-af34-5b31-abc8-10390cb63cd8",
+              "text": "Use a fan to move the dust into the common passage."
+            },
+            {
+              "id": "8b41e655-555c-5902-a624-ec6a15be3159",
+              "text": "Apply dust removal at source, ventilation and risk-matched PPE."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "55f72b98-a3b9-5d12-ac79-085d87b81c9b",
+          "text": "When is it permissible to change the saw blade or blade?",
+          "options": [
+            {
+              "id": "995b5ac1-0ba7-5619-8680-29f3e3d1b7d7",
+              "text": "After disconnecting the tool from the power source and stopping all moving parts completely."
+            },
+            {
+              "id": "72afca1e-ba27-54cb-807f-82d7b921a26b",
+              "text": "Idling at minimum speed."
+            },
+            {
+              "id": "d1f960c6-410b-581e-ba62-97b66044ca79",
+              "text": "Immediately after the switch is released, while the disk is rotating by inertia."
+            },
+            {
+              "id": "d526ba2d-9252-54ae-9187-9bd66ec68e7e",
+              "text": "When the tool is turned on, if you use thick gloves."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "bab7074c-e136-5ba1-8b2c-63073ec855a8",
+          "text": "What is the correct sequence for pre-shift checking of power tools?",
+          "options": [
+            {
+              "id": "9e728bfa-d3ce-5d43-a7d4-b6239cb223c7",
+              "text": "Check only the switch, without inspecting the equipment."
+            },
+            {
+              "id": "c9743526-1db8-5ca2-9cf0-8472a6fd3788",
+              "text": "Remove the guard, turn on the tool and then check the disc by hand."
+            },
+            {
+              "id": "2735118e-c220-54f7-a687-308e3f341b03",
+              "text": "Inspect the housing and cable, check guards and accessories, then perform the specified no-load test."
+            },
+            {
+              "id": "3c2a36e3-a583-5740-a257-022fef4f6476",
+              "text": "First make a working cut, then inspect the cable and casing."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "2324e993-e7cf-5e80-922e-36b09379c4c0",
+          "text": "How to shut down a power tool?",
+          "options": [
+            {
+              "id": "ff9efcdd-5612-53e2-b8a0-8fcd9a38f95b",
+              "text": "Leave the tool connected for the next shift."
+            },
+            {
+              "id": "389cfaec-0729-52b2-ad7f-d41aebfcfbb5",
+              "text": "Turn off, wait until it stops completely, turn off the power, clean and put away the tool."
+            },
+            {
+              "id": "d50527ea-199e-5735-9f9f-c046b6f2adbf",
+              "text": "Place the rotary tool on the workbench and turn it off later."
+            },
+            {
+              "id": "4850fe67-795c-5253-a8e1-0dc187d700d3",
+              "text": "Stop the equipment by hand using a rag."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "9c91c699-13aa-5507-b288-09c1f5d8e94e",
+          "text": "What does kickback mean when using a saw?",
+          "options": [
+            {
+              "id": "0ea1082d-9f22-5d69-a1bf-3683d5b2eb91",
+              "text": "Planned engine stop after the switch is released."
+            },
+            {
+              "id": "bef4cefe-dd30-5b8a-be2e-400de0f63c47",
+              "text": "Gradual dulling of the cutting edge."
+            },
+            {
+              "id": "ec8bd640-bede-553c-92b7-1066b0ff8df4",
+              "text": "Normal removal of sawdust from a cut."
+            },
+            {
+              "id": "8799388c-795d-5e28-abd2-64418865647c",
+              "text": "Sudden uncontrolled movement of the tool or workpiece due to jamming or catching of the disk."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "8abfd5d2-320b-51f0-9c7a-1aa87f9bdef0",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "bf4e9d91-04e0-584f-a631-4612503457a3",
+          "text": "In the aisle near the workplace there are scraps and a power tool cable. What to do before starting work?",
+          "options": [
+            {
+              "id": "41f3e5a3-960d-5c6b-ad53-a1a0f72b8e65",
+              "text": "Cover the scraps with a sheet of plywood and begin work."
+            },
+            {
+              "id": "f96b5414-5949-5e47-b1bd-8da003807275",
+              "text": "Remove any cuttings, route the cable safely and ensure clear passage."
+            },
+            {
+              "id": "c48a73d4-6416-5c8e-9700-5a4d48f2c3f5",
+              "text": "Move the cable closer to the cutting line so that it is more visible."
+            },
+            {
+              "id": "6eeabe3e-8ae2-5f96-a44f-543fc603e5cf",
+              "text": "Leave everything in place if the job takes less than an hour."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "7a130cb7-121b-5651-9b1c-a23cb0bcb1ee",
+          "text": "On a circular saw, the protective guard does not return completely. What should a carpenter do?",
+          "options": [
+            {
+              "id": "89e9c0fa-332b-53dc-ad05-a1c6deba6fe0",
+              "text": "Use the saw only for shallow cuts."
+            },
+            {
+              "id": "9d2e5e18-e61d-58b8-b2aa-38f13a785972",
+              "text": "Lock the cover in the open position for convenience."
+            },
+            {
+              "id": "fcafaff9-b7f5-5c91-9a0c-4e82b6f7397d",
+              "text": "Lubricate the housing while rotating the disc and continue working."
+            },
+            {
+              "id": "4bdc5a18-1772-5e0c-842f-ac07663b5e0f",
+              "text": "Turn off the saw, take it out of service and report the malfunction."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "c28ca391-3c7a-5328-a846-e01309430bde",
+          "text": "The handle of the chisel is split. What should I do?",
+          "options": [
+            {
+              "id": "096c0a1e-22a8-52ba-bebf-e921164f5b10",
+              "text": "Remove the tool from use until the handle is replaced or properly repaired."
+            },
+            {
+              "id": "f2c2a39b-f653-59b7-9180-3b21bcb53a74",
+              "text": "Wrap the split with electrical tape and use for light work."
+            },
+            {
+              "id": "f77e465a-f0d5-5e3e-bee7-ccb2d41dd3d5",
+              "text": "Hold the chisel by the metal part."
+            },
+            {
+              "id": "2360b422-85f3-5cee-b809-b5c777c125d2",
+              "text": "Use only a soft mallet without changing the handle."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "38fe63cc-a0d7-5b8b-bb04-685d75051407",
+          "text": "worker received an electric shock from a tool. What should an eyewitness do?",
+          "options": [
+            {
+              "id": "6e71c69f-0812-5470-9181-acb96ea4bbd7",
+              "text": "Pour water over the instrument to stop sparking."
+            },
+            {
+              "id": "ed6abfd5-10b0-51a1-b6b0-612a8f3760b3",
+              "text": "First, put the tool in the cabinet, then inform the manager."
+            },
+            {
+              "id": "89304837-9a36-5b0e-9fbc-2ef73f8b170e",
+              "text": "Safely turn off power, call for help and administer first aid without direct contact with live parts."
+            },
+            {
+              "id": "ceee4738-6549-5468-8baa-0e26457ba042",
+              "text": "Grab the victim by the arms and pull him away."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "6197587a-8159-5f7a-b57d-060ca8760bef",
+          "text": "The insulation on the power tool cable is damaged. Which solution meets security requirements?",
+          "options": [
+            {
+              "id": "8759c0c7-1d70-5420-a7b2-3af1ece5bab6",
+              "text": "Connect the tool via a longer extension cord without repair."
+            },
+            {
+              "id": "aacc1e16-86e9-5228-bc12-8db26d0b1a27",
+              "text": "Do not use the tool until the fault has been repaired in an authorized manner."
+            },
+            {
+              "id": "bab54152-90cd-55d8-bc96-6630251efea7",
+              "text": "Cover the damage with paper and work in a dry room."
+            },
+            {
+              "id": "c63c37f6-589d-577d-b91b-6e6ccd6b1059",
+              "text": "Hold the cable with your foot so that the damaged area does not move."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "d28794af-3bbb-5ded-b718-3b38291f849d",
+          "text": "Why are loose gloves dangerous around rotating equipment?",
+          "options": [
+            {
+              "id": "4c7fdf42-817b-5878-86f3-d9e83fa9cbd7",
+              "text": "Gloves are sure to increase engine temperature."
+            },
+            {
+              "id": "f1fb97b2-fd40-5fd3-bbbe-caa1c1b9a87b",
+              "text": "Gloves change the direction of rotation of the tool."
+            },
+            {
+              "id": "e1d48829-ca52-5c26-a45b-1b245defb419",
+              "text": "Gloves interfere with work only at low temperatures."
+            },
+            {
+              "id": "a14d8ba5-f4b2-5787-91dd-a76d46325ee5",
+              "text": "The glove material may be caught by the rotating part and tighten the hand."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "535250e4-ff60-5c6c-b1de-fb7d6e7f63a5",
+          "text": "How to properly store hand-held cutting tools after cleaning?",
+          "options": [
+            {
+              "id": "4f24f6a9-be50-579c-a567-a31ee7d59f52",
+              "text": "In a general pile with fasteners and scraps."
+            },
+            {
+              "id": "0011c056-c08f-556b-bef2-b99aee9cda12",
+              "text": "In a damp rag so that the metal does not heat up."
+            },
+            {
+              "id": "7c3c2b29-563a-52b0-be93-39aedeaa4246",
+              "text": "In a dry place, with the cutting part protected and without the risk of falling."
+            },
+            {
+              "id": "c6735c4d-818c-5316-8a6f-52c4ffddb0a9",
+              "text": "On the edge of the workbench with the cutting part facing out."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "a27ef516-349c-5595-81ce-60becd4cb45c",
+          "text": "What is the most efficient procedure for checking hand tools?",
+          "options": [
+            {
+              "id": "8f1797ab-c7f8-5916-a1a2-e871e0dd662e",
+              "text": "Check the tool’s intended use, the integrity of its handle, the condition of the working part and whether it is securely fastened."
+            },
+            {
+              "id": "32d03942-b080-50be-a1aa-38ac98600288",
+              "text": "Sharpen any tool, regardless of its purpose."
+            },
+            {
+              "id": "bd9576d3-ffec-5335-8415-70401a795169",
+              "text": "First test the tool with a maximum blow to the metal."
+            },
+            {
+              "id": "7364813d-0323-55d7-8d72-f4e8736a6880",
+              "text": "Only check that the handle is clean."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "b2096a33-d277-58bf-a4c4-783c1f793a77",
+          "text": "The tool began vibrating strongly and produced an overheating smell. What is the correct sequence of actions?",
+          "options": [
+            {
+              "id": "67d15d9c-5ace-5fa3-96d8-7dd786fc598a",
+              "text": "Increase the load to reduce vibration."
+            },
+            {
+              "id": "020e68b1-268b-5154-9e89-f5a7c4e8eb53",
+              "text": "Cool the instrument with water without switching off."
+            },
+            {
+              "id": "998ada4c-6831-56e0-9c28-49f82365aeeb",
+              "text": "Continue until complete failure, then replace the equipment."
+            },
+            {
+              "id": "ec62b09f-c1a1-5b3f-a4fc-a8b752452adf",
+              "text": "Immediately stop, disconnect, indicate fault and submit for inspection."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "55548083-4a49-5b46-a1bb-df857482f431",
+          "text": "What is the purpose of a tool guard?",
+          "options": [
+            {
+              "id": "fa91def9-a442-5171-97d5-cd6de4abe981",
+              "text": "Replace training and other protective measures."
+            },
+            {
+              "id": "26cc1286-64cf-5c42-b542-1fff1a56848e",
+              "text": "Restrict access to hazardous moving parts and keep particle release within specified limits."
+            },
+            {
+              "id": "27389fc5-4478-55bf-90d7-64a97c934021",
+              "text": "Hold the workpiece instead of the clamping device."
+            },
+            {
+              "id": "01730d90-71f8-594f-aece-40ffdb822be1",
+              "text": "Increase the rotation speed of the equipment."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "91f10066-0447-5e23-87da-032ae5ca37b1",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "a4676234-b37a-53b4-99a5-567be5236cbf",
+          "text": "Upon inspection of a piece of wood, a protruding nail was discovered. Which action is correct?",
+          "options": [
+            {
+              "id": "1e15e599-f256-5345-bb71-314ac1eff289",
+              "text": "Do not start processing until the metal inclusion has been removed or the workpiece has been replaced."
+            },
+            {
+              "id": "1ca0f285-f5ca-550f-bc18-8eca2ae667d7",
+              "text": "Wear thicker gloves and process the workpiece in the usual way."
+            },
+            {
+              "id": "039787b3-c0ec-56c3-9399-e164d6c8cd1d",
+              "text": "Process the area at minimum speed without changing the equipment."
+            },
+            {
+              "id": "d6e1698e-290a-56e1-a1bb-0ba5b193704e",
+              "text": "Mark the nail with chalk and continue sawing next to it."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "d5b8618e-480c-543f-95a0-13abd8e6b23e",
+          "text": "A small part is difficult to hold when processing with a power tool. Which method is safer?",
+          "options": [
+            {
+              "id": "e4945645-2413-51e2-abf7-0f6fac26c101",
+              "text": "Hold the part with your fingers as close to the processing area as possible."
+            },
+            {
+              "id": "a770aa55-7d37-58fb-b6f2-2b57409ae3ce",
+              "text": "Press the part to the floor with shoes."
+            },
+            {
+              "id": "4c3dda87-094b-5ad3-b703-bc8883b1a129",
+              "text": "Secure the part with a suitable device and keep your hands out of the danger zone."
+            },
+            {
+              "id": "5f815f2c-c512-5855-af9c-519a253df24a",
+              "text": "Ask a colleague to hold the part with his hand from the side of the tool exit."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "34eea8cc-16aa-54d5-90d2-a0360c233f33",
+          "text": "After planing, there were shavings left on the workbench near the cutting tool. How to remove it?",
+          "options": [
+            {
+              "id": "71332ca9-b123-5eea-8724-7124491411ca",
+              "text": "Blow the chips onto a colleague with compressed air."
+            },
+            {
+              "id": "7f9d0faf-a32c-5ef8-b0d8-39f7a670ff9d",
+              "text": "After stopping and safely placing the tool, remove the chips with a brush or other tool."
+            },
+            {
+              "id": "27f71c0c-57d2-52d3-bb3b-d04228dffe2f",
+              "text": "Remove chips only after the end of the shift, without stopping work."
+            },
+            {
+              "id": "4f79c45a-ff94-5a08-b64c-afe073d66273",
+              "text": "Brush the shavings with your palm towards the passage."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "58b9e341-d705-526f-960a-0c7af961235a",
+          "text": "Smoke and a burning smell appeared in the wood processing area. How to proceed?",
+          "options": [
+            {
+              "id": "2b88c665-5d74-52ba-8c14-d47adb5416bb",
+              "text": "Open all containers with flammable materials for inspection."
+            },
+            {
+              "id": "cce1a900-6db1-5cc6-8cc0-d038cda8980c",
+              "text": "Close the room and continue work in the adjacent area."
+            },
+            {
+              "id": "08dbd77b-7161-5178-8bff-c97683c4b5cd",
+              "text": "Wait for visible flames without reporting signs of fire."
+            },
+            {
+              "id": "03b8e1bf-83ad-52b7-86c6-4418f263c616",
+              "text": "Stop work, turn off power when safe, sound the alarm, notify 101/112 and evacuate as appropriate."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "29f5db9d-1996-5974-a7e7-2e6fce8c01a2",
+          "text": "The worker is obstructed by the standard guard of the cutting part. What is acceptable?",
+          "options": [
+            {
+              "id": "a867e1d2-e839-5932-b829-c802f6fa5d4c",
+              "text": "Remove the guard for one cut and install it after work."
+            },
+            {
+              "id": "3b2b4f3c-9902-5367-9a9a-aabb87dbf1ed",
+              "text": "Secure the fence with wire in the open position."
+            },
+            {
+              "id": "86292da2-cb4e-5405-8657-4ad08f33d5c2",
+              "text": "Keep the guard in good condition and select a safe way to perform the operation according to the manufacturer's instructions."
+            },
+            {
+              "id": "403bdee0-cdb2-5ede-b86b-7b25adce5d7a",
+              "text": "Ask a colleague to hold the guardrail with his hand."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "d946b86f-f721-52ff-8e48-a84845b3b7c5",
+          "text": "High noise and flying chips are present at the same time. How to choose protection?",
+          "options": [
+            {
+              "id": "4c20c937-858f-5e4b-9afd-94f76c3fb94c",
+              "text": "Wear proper eye and hearing protection appropriate to the risk assessment and the operation being performed."
+            },
+            {
+              "id": "7c8d285d-586b-5571-a285-919564e45038",
+              "text": "Close your eyes when passing chips and do not use PPE."
+            },
+            {
+              "id": "d74f9bca-b0d7-5039-9f62-c61b7c1dc66c",
+              "text": "Put on regular glasses and turn off the standard guard."
+            },
+            {
+              "id": "c8682863-fdee-5de2-b9a2-d4d65152df7c",
+              "text": "Select hearing protection only, as noise is more dangerous than wood chips."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "890c6cc1-4db1-5623-995e-cec8dab489a3",
+          "text": "How to safely remove dust from tools after use?",
+          "options": [
+            {
+              "id": "bf405947-aeb9-56e1-923a-6f80f3d5f3c7",
+              "text": "Clean the ventilation holes with a metal wire while the power is on."
+            },
+            {
+              "id": "e3c6ae2b-5ce4-5328-b5c6-02acc6351a73",
+              "text": "Blow the working tool with compressed air towards colleagues."
+            },
+            {
+              "id": "18afcd14-4532-586b-ba3e-0f5c6e670b7f",
+              "text": "Immerse power tools in water."
+            },
+            {
+              "id": "4c964e58-4e4e-51cd-b560-0bcc912f8744",
+              "text": "Disconnect the tool and clean it in the manner specified in the instructions, without directing the contamination towards people."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "d95244c7-64ed-594a-afce-7695c2fa8cfd",
+          "text": "What should you check before starting to process a workpiece?",
+          "options": [
+            {
+              "id": "a56b6911-7bb2-5f99-bd2a-c925164dfe6c",
+              "text": "Only the availability of an unused socket."
+            },
+            {
+              "id": "abeaa3ac-016c-5daa-8383-8230454b480b",
+              "text": "Workplace, material and its fastening, serviceability of the tool and required protective measures."
+            },
+            {
+              "id": "56c58aab-3d60-5b9a-adc2-aa0a805be97f",
+              "text": "Only the appearance of the finished product."
+            },
+            {
+              "id": "07863388-bc02-54b3-b727-79c636d00809",
+              "text": "Only the execution speed of the previous operation."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "28d7415c-20bd-5f43-bada-3785e1c1f1e9",
+          "text": "How to safely replace accessories?",
+          "options": [
+            {
+              "id": "1836c106-3353-528a-92f1-c9dec9d8161a",
+              "text": "Turn off the power, check the compatibility and condition of the equipment, install it according to the instructions and restore the fences."
+            },
+            {
+              "id": "b59600a0-0b49-52bd-8bc2-bfb866501760",
+              "text": "Use any equipment of the same color."
+            },
+            {
+              "id": "c140e6cd-6151-593a-af2b-739b45a7e1d7",
+              "text": "After installation, immediately operate at full load without testing."
+            },
+            {
+              "id": "625a7d46-5f8e-550e-8477-3f17b1fa5dba",
+              "text": "Remove the guard with the engine running and quickly replace the equipment."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f245a326-8260-5616-bbc2-865f09ff4436",
+          "text": "What is local dust removal?",
+          "options": [
+            {
+              "id": "712dc75c-ab11-5a85-a719-4045a68b32a3",
+              "text": "Closing all air inlets during operation."
+            },
+            {
+              "id": "4e2bae48-fd58-58c6-afc5-4f5ad8961c4a",
+              "text": "Cleaning the floor at the end of the shift with a dry broom."
+            },
+            {
+              "id": "6b61fdc7-ec45-5a9e-a3e0-1aecb03bc8fb",
+              "text": "Capture contamination directly at the point of its formation before spreading throughout the work area."
+            },
+            {
+              "id": "aaca6744-f139-5839-85c1-09fc427175b0",
+              "text": "Dust is moved by a fan into an adjacent room."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    }
+  ]
+}

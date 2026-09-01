@@ -17,20 +17,19 @@ test('profile distinguishes read failures from honest empty states and offers re
   assert.match(pageSource, /dashboardResult\.state === 'ready'/);
   assert.match(pageSource, /dashboardResult\.state === 'failed'/);
   assert.match(pageSource, /DataLoadFailure/);
-  assert.match(pageSource, /Результаты обучения временно не загрузились/);
-  assert.match(failureSource, /Код обращения:/);
+  assert.match(pageSource, /t\('dashboardFailure'\)/);
+  assert.match(failureSource, /common\('correlationId', \{ id: correlationId \}\)/);
   assert.match(failureSource, /router\.refresh\(\)/);
-  assert.match(failureSource, /Повторить загрузку/);
+  assert.match(failureSource, /t\('retryLoad'\)/);
 });
 
 test('profile keeps approved identity in the server model without duplicating it in the editor', async () => {
   const formSource = await readFile('features/auth/profile-form.tsx', 'utf8');
-  assert.match(serverSource, /rpc\('get_profile_dashboard'\)/);
+  assert.match(serverSource, /rpc\('get_profile_dashboard_locale'/);
+  assert.match(serverSource, /p_locale: locale/);
   assert.match(serverSource, /approvedIdentity/);
-  assert.match(formSource, /Изменить данные/);
+  assert.match(formSource, /t\('edit'\)/);
   assert.doesNotMatch(formSource, /CurrentProfile|IdentityPanel/);
-  assert.doesNotMatch(formSource, /Сейчас в действующих сертификатах/);
-  assert.doesNotMatch(pageSource, /Данные для сертификата/);
   assert.doesNotMatch(formSource, /\/api\/identity/);
   assert.doesNotMatch(formSource, /supabase\/client/);
 });

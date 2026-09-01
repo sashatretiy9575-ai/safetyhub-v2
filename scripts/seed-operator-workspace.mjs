@@ -354,6 +354,8 @@ if (!revisions.length) {
       organization: user.organization,
       test_slug: revision.slug,
       test_title: revision.title,
+      locale: 'ru',
+      localized_test_title: revision.title,
       score,
       total: variant.question_count,
       pass_score: revision.pass_score,

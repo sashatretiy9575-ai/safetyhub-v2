@@ -22,7 +22,7 @@ test('Turnstile uses one deferred native Cloudflare widget', async () => {
   assert.match(source, /id=\{TURNSTILE_SCRIPT_ID\}/u);
   assert.match(source, /execution: 'execute'/u);
   assert.match(source, /appearance: 'always'/u);
-  assert.match(source, /language: 'ru'/u);
+  assert.match(source, /language: locale === 'zh' \? 'zh-CN' : locale/u);
   assert.match(source, /retry: 'never'/u);
   assert.match(source, /'refresh-expired': 'manual'/u);
   assert.match(source, /'refresh-timeout': 'manual'/u);

@@ -12,7 +12,7 @@ test('homepage topics and resources use the shared published content APIs', asyn
     read('lib/course-cover-images.ts'),
   ]);
 
-  assert.match(courses, /await getTopics\(\)/);
+  assert.match(courses, /await getTopics\(locale\)/);
   assert.doesNotMatch(courses, /const TOPICS =/);
   assert.match(courses, /getCourseCoverImage\(topic\.slug\)/);
   assert.match(catalog, /getCourseCoverImage\(topic\.slug\)/);
@@ -26,7 +26,7 @@ test('homepage topics and resources use the shared published content APIs', asyn
   ]) {
     assert.match(covers, new RegExp(`['\"]?${slug}['\"]?:`));
   }
-  assert.match(resources, /await getArticles\(\)/);
+  assert.match(resources, /await getArticles\(locale\)/);
   assert.doesNotMatch(resources, /const POSTS =/);
   assert.match(resources, /coverImage=\{post\.coverImage\}/);
 });
@@ -37,20 +37,20 @@ test('homepage streams its useful choices first and removes duplicate promise se
   const coursePosition = page.indexOf('<CourseGrid />');
   const trustPosition = page.indexOf('<PartnersStrip />');
   assert.ok(coursePosition > 0 && coursePosition < trustPosition);
-  assert.match(page, /Suspense fallback=\{<HomeSectionFallback label="Загружаем курсы"/);
+  assert.match(page, /Suspense fallback=\{<HomeSectionFallback label=\{t\('loadingCourses'\)\}/);
   assert.doesNotMatch(page, /<ResultsNumbers \/>/);
   assert.doesNotMatch(page, /<BenefitGrid \/>/);
 });
 
 test('onboarding presents the approved three-step course journey', async () => {
   const source = await read('components/marketing/process-timeline.tsx');
-  const choose = source.indexOf("title: 'Выберите курс'");
-  const learn = source.indexOf("title: 'Изучите материал'");
-  const result = source.indexOf("title: 'Сохраните результат'");
+  const choose = source.indexOf("title: t('chooseTitle')");
+  const learn = source.indexOf("title: t('learnTitle')");
+  const result = source.indexOf("title: t('resultTitle')");
 
   assert.ok(choose >= 0 && choose < learn && learn < result);
   assert.match(source, /QUIZ_POLICY\.questionCount/);
-  assert.doesNotMatch(source, /Войдите для теста/);
+  assert.doesNotMatch(source, /[\u0400-\u04ff]/u);
 });
 
 test('public learning choices stay concise and action-first while FAQ starts collapsed', async () => {
@@ -62,8 +62,8 @@ test('public learning choices stay concise and action-first while FAQ starts col
   ]);
 
   const imagePosition = courseCard.indexOf('<Image');
-  const questionCountPosition = courseCard.indexOf('${questionCount} вопросов');
-  const actionPosition = courseCard.lastIndexOf('Открыть курс');
+  const questionCountPosition = courseCard.indexOf("t('questions'");
+  const actionPosition = courseCard.lastIndexOf("t('open')");
 
   assert.ok(imagePosition >= 0 && imagePosition < questionCountPosition);
   assert.ok(questionCountPosition < actionPosition);
@@ -71,7 +71,7 @@ test('public learning choices stay concise and action-first while FAQ starts col
   assert.match(courseCard, /data-course-card-cta/);
   assert.match(courseCard, /grid-cols-2/);
   assert.match(courseCard, /col-span-2/);
-  assert.doesNotMatch(courseCard, /Открыть\s*<\/span>/);
+  assert.doesNotMatch(courseCard, /[\u0400-\u04ff]/u);
   assert.doesNotMatch(courseCard, /description:\s*string|\{description\}|line-clamp-3/);
   assert.doesNotMatch(courseGrid, /description=\{topic\.description\}/);
   assert.doesNotMatch(courseCatalog, /description=\{topic\.description\}/);

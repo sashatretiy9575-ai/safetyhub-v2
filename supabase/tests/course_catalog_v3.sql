@@ -516,6 +516,8 @@ begin
   end if;
   v_history_preview_definition := lower(pg_get_functiondef(
     'public.get_admin_learning_history(uuid,uuid)'::regprocedure
+  )) || lower(pg_get_functiondef(
+    'private.get_admin_learning_history_provider_internal(uuid,uuid)'::regprocedure
   ));
   if position('require_capability(''results.delete'')'
       in v_history_preview_definition) = 0
@@ -527,6 +529,8 @@ begin
   end if;
   v_history_targets_definition := lower(pg_get_functiondef(
     'public.list_learning_history_targets_page(uuid,integer,text,timestamp with time zone,uuid)'::regprocedure
+  )) || lower(pg_get_functiondef(
+    'private.list_learning_history_targets_page_provider_internal(uuid,integer,text,timestamp with time zone,uuid)'::regprocedure
   ));
   if position('require_capability(''results.delete'')'
       in v_history_targets_definition) = 0

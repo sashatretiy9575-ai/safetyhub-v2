@@ -21,12 +21,7 @@ export function apiError(error: unknown) {
     );
   }
   if (error instanceof RpcMutationError) {
-    if (
-      [
-        'ACCOUNT_APPROVAL_NOT_PENDING',
-        'IDEMPOTENCY_KEY_REUSED',
-      ].includes(error.message)
-    ) {
+    if (['ACCOUNT_APPROVAL_NOT_PENDING', 'IDEMPOTENCY_KEY_REUSED'].includes(error.message)) {
       return NextResponse.json({ error: error.message }, { status: 409 });
     }
     if (error.message === 'ACCOUNT_APPROVAL_SELF_DECISION_FORBIDDEN') {
@@ -95,6 +90,9 @@ export function apiError(error: unknown) {
   }
   if (message.includes('CATALOG_MAINTENANCE_REQUIRED')) {
     return NextResponse.json({ error: 'CATALOG_MAINTENANCE_REQUIRED' }, { status: 409 });
+  }
+  if (message.includes('NOTIFICATION_DELIVERY_NOT_RETRYABLE')) {
+    return NextResponse.json({ error: 'NOTIFICATION_DELIVERY_NOT_RETRYABLE' }, { status: 409 });
   }
   if (
     message.includes('ACCOUNT_HAS_PENDING_AUTH_OPERATIONS') ||

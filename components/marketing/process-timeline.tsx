@@ -3,26 +3,15 @@ import { SectionHeading } from '@/components/marketing/_shared/section-heading';
 import { Container } from '@/components/ui/container';
 import { MarketingSlider } from '@/components/ui/marketing-slider';
 import { QUIZ_POLICY } from '@/lib/constants';
-
-const STEPS = [
-  {
-    icon: BookOpenText,
-    title: 'Выберите курс',
-    text: 'Откройте подходящую программу.',
-  },
-  {
-    icon: ListChecks,
-    title: 'Изучите материал',
-    text: `Пройдите тему и ответьте на ${QUIZ_POLICY.questionCount} вопросов.`,
-  },
-  {
-    icon: CheckCircle,
-    title: 'Сохраните результат',
-    text: 'Итог появится в аккаунте.',
-  },
-] as const;
+import { useTranslations } from 'next-intl';
 
 export function ProcessTimeline() {
+  const t = useTranslations('Home.process');
+  const steps = [
+    { icon: BookOpenText, title: t('chooseTitle'), text: t('chooseText') },
+    { icon: ListChecks, title: t('learnTitle'), text: t('learnText', { count: QUIZ_POLICY.questionCount }) },
+    { icon: CheckCircle, title: t('resultTitle'), text: t('resultText') },
+  ] as const;
   return (
     <section
       id="process"
@@ -41,13 +30,13 @@ export function ProcessTimeline() {
       <Container size="wide">
         <SectionHeading
           id="process-heading"
-          eyebrow="Как проходит обучение"
-          title="От выбора курса до результата"
-          description="Три понятных шага. Доступно онлайн в Алматы и по всему Казахстану."
+          eyebrow={t('eyebrow')}
+          title={t('title')}
+          description={t('description')}
         />
 
-        <MarketingSlider label="Этапы обучения" itemLabel="Шаг" className="mt-7 sm:mt-10">
-          {STEPS.map(({ icon: Icon, title, text }, index) => (
+        <MarketingSlider label={t('slider')} itemLabel={t('item')} className="mt-7 sm:mt-10">
+          {steps.map(({ icon: Icon, title, text }, index) => (
             <article
               key={title}
               className="relative flex h-[12.5rem] flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/72 p-5 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl min-[1200px]:h-[12rem] min-[1200px]:p-6"

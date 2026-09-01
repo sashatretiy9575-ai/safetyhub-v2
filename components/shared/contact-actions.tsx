@@ -2,6 +2,7 @@ import { PhoneCall, WhatsappLogo } from '@phosphor-icons/react/dist/ssr';
 import { ContactLink } from '@/components/shared/contact-link';
 import type { SiteContactSettings } from '@/lib/site-contacts-shared';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export function ContactActions({
   contacts,
@@ -10,6 +11,7 @@ export function ContactActions({
   contacts: SiteContactSettings;
   compact?: boolean;
 }) {
+  const t = useTranslations('Contacts');
   return (
     <div className={cn('grid min-w-0 grid-cols-1 gap-2.5 sm:grid-cols-2', compact ? '' : 'w-full')}>
       <ContactLink
@@ -21,7 +23,7 @@ export function ContactActions({
           <PhoneCall size={20} weight="regular" aria-hidden="true" />
         </span>
         <span className="min-w-0">
-          <span className="block text-[13px] leading-4 font-bold">Позвонить</span>
+          <span className="block text-[13px] leading-4 font-bold">{t('call')}</span>
           <span className="mt-0.5 block truncate text-[15px] leading-5 font-semibold text-[var(--color-text-subtle)]">
             {contacts.phoneDisplay}
           </span>
@@ -39,7 +41,7 @@ export function ContactActions({
         <span className="min-w-0">
           <span className="block text-[15px] leading-5 font-bold">WhatsApp</span>
           <span className="mt-0.5 block truncate text-[15px] leading-5 font-medium text-[var(--color-text-subtle)]">
-            Ответим в чате
+            {t('chat')}
           </span>
         </span>
       </ContactLink>

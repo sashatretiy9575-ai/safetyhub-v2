@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "slug": "plotnik",
+  "locale": "kk",
+  "productionPublished": false,
+  "contentSummary": "Ағаш шебері: Ағаш ұстасының қауіпсіз жұмыс тәжірибесі: жұмыс орнын ұйымдастыру, қол және электр құралдары, ЖҚҚ және ақауларды жою.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved. Reviewed locale text and hidden provenance notes change; one independently authorized width-only title correction is recorded and bounded without moving neighboring content.",
+  "source": {
+    "pptx": "content/source-materials/derived/plotnik/presentation.pptx",
+    "pptxSha256": "8a0ab52560b8c424b8bd8f116a3338807d0c766eac02c9e58fb219bfb226b797",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/text-map.json",
+    "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/assets/pptx/a9c05a91e1fa2759382c68d32787591fb6077e634872c1b0b2ea59e60defe2f9/presentation.pptx",
+    "sha256": "a9c05a91e1fa2759382c68d32787591fb6077e634872c1b0b2ea59e60defe2f9",
+    "byteSize": 1935632,
+    "slideCount": 25
+  },
+  "edits": {
+    "translatedElementCount": 140,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 47,
+    "sourceNotesAdded": 25,
+    "textTopologySha256": "6833d9d35b8969ce7198d3bc0cf9fa1d7e2ccc0122ca26dba1f52bb2fce66b65",
+    "approvedLayoutOverrideCount": 1
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 25,
+    "layoutInspectionCount": 25,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 25
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 320,
+    "approvedLayoutOverrideCount": 1,
+    "approvedLayoutOverrides": [
+      {
+        "locale": "kk",
+        "slug": "plotnik",
+        "slide": 25,
+        "shapeId": "16",
+        "name": "Прямоугольник 15",
+        "translatedText": "Ақаулық, жағдайлардың өзгеруі немесе қауіп төнген жағдайда жұмыс тоқтатылады.",
+        "sourceBbox": [
+          152,
+          502,
+          1000,
+          54
+        ],
+        "finalBbox": [
+          152,
+          502,
+          1000,
+          66
+        ],
+        "reason": "Height-only correction clears a 7 pt PowerPoint TextFrame2 vertical overflow; the next template element remains outside the expanded box.",
+        "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+        "sourceTextSha256": "eeab0fda0154c79de410ec22233f3b343c57a1103c6ee50c7663860f75e70bf9",
+        "translatedTextSha256": "0292f91142ea5c7fc117dee1900552ad292ae7f35df41f25ffd730cbdc777dfa",
+        "newlyIntersectedNeighborCount": 0
+      }
+    ],
+    "layoutOverrideReceipt": {
+      "path": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/qa/layout-only-override-receipt.json",
+      "sha256": "5c48e14b350b32e444164f56ed2c99275e6c0ce087e218e7f4941c530c8f12ec",
+      "byteSize": 1335,
+      "schemaVersion": 1,
+      "locale": "kk",
+      "slug": "plotnik",
+      "productionPublished": false,
+      "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+      "overrideCount": 1,
+      "allOtherElementGeometryUnchanged": true,
+      "neighborContentMoved": false,
+      "newlyIntersectedNeighborCount": 0,
+      "semanticsChanged": false,
+      "overrides": [
+        {
+          "locale": "kk",
+          "slug": "plotnik",
+          "slide": 25,
+          "shapeId": "16",
+          "name": "Прямоугольник 15",
+          "translatedText": "Ақаулық, жағдайлардың өзгеруі немесе қауіп төнген жағдайда жұмыс тоқтатылады.",
+          "sourceBbox": [
+            152,
+            502,
+            1000,
+            54
+          ],
+          "finalBbox": [
+            152,
+            502,
+            1000,
+            66
+          ],
+          "reason": "Height-only correction clears a 7 pt PowerPoint TextFrame2 vertical overflow; the next template element remains outside the expanded box.",
+          "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+          "sourceTextSha256": "eeab0fda0154c79de410ec22233f3b343c57a1103c6ee50c7663860f75e70bf9",
+          "translatedTextSha256": "0292f91142ea5c7fc117dee1900552ad292ae7f35df41f25ffd730cbdc777dfa",
+          "newlyIntersectedNeighborCount": 0
+        }
+      ]
+    },
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

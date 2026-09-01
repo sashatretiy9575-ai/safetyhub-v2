@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "plotnik",
+  "locale": "en",
+  "productionPublished": false,
+  "contentSummary": "Carpenter: Safe carpenter work practices: workplace organization, hand and power tools, PPE and troubleshooting.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/plotnik/presentation.pptx",
+    "pptxSha256": "8a0ab52560b8c424b8bd8f116a3338807d0c766eac02c9e58fb219bfb226b797",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/plotnik/en/text-map.json",
+    "textMapSha256": "4ec763727f9db624572dc75a3599439dee89422925363c28b926ca4882c4f583"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/plotnik/en/assets/pptx/c5aa6f8bd04300c57e92e200eba3ec7fa56b30c6fb68d67cf0fece77b9decc4d/presentation.pptx",
+    "sha256": "c5aa6f8bd04300c57e92e200eba3ec7fa56b30c6fb68d67cf0fece77b9decc4d",
+    "byteSize": 1930441,
+    "slideCount": 25
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/plotnik/en/assets/pdf/b1b2f47b2b226afac72f7648a702e5ecfe1baf26340261e63709d25d9303ea31/presentation.pdf",
+    "sha256": "b1b2f47b2b226afac72f7648a702e5ecfe1baf26340261e63709d25d9303ea31",
+    "byteSize": 1426775,
+    "pageCount": 25,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "edits": {
+    "translatedElementCount": 141,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 46,
+    "sourceNotesAdded": 25,
+    "textTopologySha256": "8e5499e878c01778eb1e052c625d8f1c24b5d27970847ef7095c4d95aa82586a",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "status": "passed",
+    "automatedOnly": true,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 25
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 320,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "pptxRenderedSlideCount": 25,
+    "pdfRenderedPageCount": 25,
+    "pageTextLayerCount": 25,
+    "localizedTextUnitCount": 187,
+    "localizedTextMismatchCount": 0,
+    "missingGlyphSentinelCount": 0,
+    "templateTypographyRegressionCount": 0,
+    "templateTypographyReport": "content/localizations/staged-2026-09-01/qa/presentation-layout-audit.all.json",
+    "canvasOverflowCount": 0,
+    "canvasOverflowCheck": "Test passed. No overflow detected.",
+    "textFrameOverflowCount": 0,
+    "textFrameObservedOverflowCount": 0,
+    "sourceTextFrameObservedOverflowCount": 0,
+    "inheritedWithinToleranceTextFrameOverflowCount": 0,
+    "newlyIntroducedTextFrameOverflowCount": 0,
+    "inspectedTextFrameCount": 187,
+    "textFrameOverflowEngine": "Microsoft PowerPoint TextFrame2 bounds, source-relative regression comparison",
+    "nonblankPageChecks": 25,
+    "pdfUnsafeActionCount": 0,
+    "pdfEmbeddedFileCount": 0,
+    "visualMethod": "all-slide artifact-tool raster, all-page PDF.js 1600x900 raster/pixel inspection, contact sheets, localized text-layer comparison and padded-canvas overflow test",
+    "presentationTextMapSha256": "4ec763727f9db624572dc75a3599439dee89422925363c28b926ca4882c4f583"
+  },
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

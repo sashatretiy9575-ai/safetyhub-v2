@@ -2,7 +2,7 @@ import { NextResponse } from '@/lib/security/api-response';
 import { apiError } from '@/features/auth/api-error';
 import { isSameOriginRequest } from '@/features/auth/request-origin';
 import { requireUser } from '@/features/auth/server';
-import { PRIVACY_POLICY, TERMS_POLICY } from '@/lib/legal';
+import { getCurrentLegalPolicies } from '@/lib/legal-current';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 
@@ -24,12 +24,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'FORBIDDEN' }, { status: 403 });
     }
     await requireUser({ enforceLegal: false });
+    const currentLegal = await getCurrentLegalPolicies();
     const client = (await createClient()) as unknown as LegalRpcClient;
     const response = await client.rpc('accept_current_legal_documents', {
-      p_privacy_version: PRIVACY_POLICY.version,
-      p_privacy_body_revision: PRIVACY_POLICY.bodyRevision,
-      p_terms_version: TERMS_POLICY.version,
-      p_terms_body_revision: TERMS_POLICY.bodyRevision,
+      p_privacy_version: currentLegal.privacy.version,
+      p_privacy_body_revision: currentLegal.privacy.bodyRevision,
+      p_terms_version: currentLegal.terms.version,
+      p_terms_body_revision: currentLegal.terms.bodyRevision,
     });
     const acceptances = unwrapRpcMutationResponse(response);
     return NextResponse.json({ acceptances });

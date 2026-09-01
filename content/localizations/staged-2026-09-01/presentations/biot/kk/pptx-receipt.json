@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "slug": "biot",
+  "locale": "kk",
+  "productionPublished": false,
+  "contentSummary": "BIOT: Еңбек қауіпсіздігі және еңбекті қорғаудың негізгі талаптары: қауіптер, тәуекелдерді бағалау, оқыту, бекіту, қорғаныс құралдары және төтенше жағдайлар кезіндегі процедуралар.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved. Reviewed locale text and hidden provenance notes change; one independently authorized width-only title correction is recorded and bounded without moving neighboring content.",
+  "source": {
+    "pptx": "content/source-materials/derived/biot/presentation.pptx",
+    "pptxSha256": "625d6bdc8fe58f207e5a670380f7106c3ae5917ca1e8a60eac2bbed60390c6f3",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/biot/kk/text-map.json",
+    "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/biot/kk/assets/pptx/5d72761df15221f20c202d49c38927aa4b034d299ba47400a6112b8277066947/presentation.pptx",
+    "sha256": "5d72761df15221f20c202d49c38927aa4b034d299ba47400a6112b8277066947",
+    "byteSize": 2381056,
+    "slideCount": 59
+  },
+  "edits": {
+    "translatedElementCount": 372,
+    "translatedTableCellCount": 15,
+    "retainedElementCount": 121,
+    "sourceNotesAdded": 59,
+    "textTopologySha256": "43365afcf638f67cadb0e4dd664f4346c875e3b49be06936bc91de32e6c36aaa",
+    "approvedLayoutOverrideCount": 3
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 59,
+    "layoutInspectionCount": 59,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 59
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 854,
+    "approvedLayoutOverrideCount": 3,
+    "approvedLayoutOverrides": [
+      {
+        "locale": "kk",
+        "slug": "biot",
+        "slide": 22,
+        "shapeId": "19",
+        "name": "STEP_BODY_4",
+        "translatedText": "Өлшемдерді таңдап, басқару элементтерін тағайындаңыз және өзгерістер орын алса, қайта тексеріңіз.",
+        "sourceBbox": [
+          934,
+          422,
+          260,
+          110
+        ],
+        "finalBbox": [
+          934,
+          422,
+          260,
+          128
+        ],
+        "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+        "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+        "sourceTextSha256": "f82f5605f144e6b57f1bc68a2dfebaf3f4afdae9bedc1e7c75f49d3354767373",
+        "translatedTextSha256": "5a90d211105635c0322b2e234cdfa1fb7bb327b45f8c6f144052cec81acb8197",
+        "newlyIntersectedNeighborCount": 0
+      },
+      {
+        "locale": "kk",
+        "slug": "biot",
+        "slide": 36,
+        "shapeId": "19",
+        "name": "STEP_BODY_4",
+        "translatedText": "Адамдарды құтқарудан және оқиғалардың дамуына жол бермеуден басқа жағдайды өзгертпеңіз.",
+        "sourceBbox": [
+          934,
+          422,
+          260,
+          110
+        ],
+        "finalBbox": [
+          934,
+          422,
+          260,
+          128
+        ],
+        "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+        "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+        "sourceTextSha256": "83f6dc2345e6ea3ca7870e0d7037c63a80eecafbc8dee2230ed3aa2f4ac18a71",
+        "translatedTextSha256": "ccc7f53bcbbb279de2e3c6f6dae7cd67ec5b9688a2633b4554f5388eed1c5187",
+        "newlyIntersectedNeighborCount": 0
+      },
+      {
+        "locale": "kk",
+        "slug": "biot",
+        "slide": 59,
+        "shapeId": "7",
+        "translatedText": "жұмыскер оқытылған, тазартылған және миссия мен төтенше жағдай процедураларын түсінеді.",
+        "sourceBbox": [
+          152,
+          286,
+          1000,
+          54
+        ],
+        "finalBbox": [
+          152,
+          286,
+          1000,
+          66
+        ],
+        "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+        "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+        "sourceTextSha256": "e26c2d2a31c19fe63b6c12e63df4fc2f0e11cebfaa6b8bb43ab8b3690fbab576",
+        "translatedTextSha256": "1088ac0415ac0223dcf7dcb9c1e41ddb7849c6d78fbf12bffa357f9eba1f28a0",
+        "newlyIntersectedNeighborCount": 0
+      }
+    ],
+    "layoutOverrideReceipt": {
+      "path": "content/localizations/staged-2026-09-01/presentations/biot/kk/qa/layout-only-override-receipt.json",
+      "sha256": "b38bb90a57d325c09562dfdcaa68faff2ecc670fdf2baf98765c355ebde34584",
+      "byteSize": 3236,
+      "schemaVersion": 1,
+      "locale": "kk",
+      "slug": "biot",
+      "productionPublished": false,
+      "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+      "overrideCount": 3,
+      "allOtherElementGeometryUnchanged": true,
+      "neighborContentMoved": false,
+      "newlyIntersectedNeighborCount": 0,
+      "semanticsChanged": false,
+      "overrides": [
+        {
+          "locale": "kk",
+          "slug": "biot",
+          "slide": 22,
+          "shapeId": "19",
+          "name": "STEP_BODY_4",
+          "translatedText": "Өлшемдерді таңдап, басқару элементтерін тағайындаңыз және өзгерістер орын алса, қайта тексеріңіз.",
+          "sourceBbox": [
+            934,
+            422,
+            260,
+            110
+          ],
+          "finalBbox": [
+            934,
+            422,
+            260,
+            128
+          ],
+          "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+          "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+          "sourceTextSha256": "f82f5605f144e6b57f1bc68a2dfebaf3f4afdae9bedc1e7c75f49d3354767373",
+          "translatedTextSha256": "5a90d211105635c0322b2e234cdfa1fb7bb327b45f8c6f144052cec81acb8197",
+          "newlyIntersectedNeighborCount": 0
+        },
+        {
+          "locale": "kk",
+          "slug": "biot",
+          "slide": 36,
+          "shapeId": "19",
+          "name": "STEP_BODY_4",
+          "translatedText": "Адамдарды құтқарудан және оқиғалардың дамуына жол бермеуден басқа жағдайды өзгертпеңіз.",
+          "sourceBbox": [
+            934,
+            422,
+            260,
+            110
+          ],
+          "finalBbox": [
+            934,
+            422,
+            260,
+            128
+          ],
+          "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+          "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+          "sourceTextSha256": "83f6dc2345e6ea3ca7870e0d7037c63a80eecafbc8dee2230ed3aa2f4ac18a71",
+          "translatedTextSha256": "ccc7f53bcbbb279de2e3c6f6dae7cd67ec5b9688a2633b4554f5388eed1c5187",
+          "newlyIntersectedNeighborCount": 0
+        },
+        {
+          "locale": "kk",
+          "slug": "biot",
+          "slide": 59,
+          "shapeId": "7",
+          "translatedText": "жұмыскер оқытылған, тазартылған және миссия мен төтенше жағдай процедураларын түсінеді.",
+          "sourceBbox": [
+            152,
+            286,
+            1000,
+            54
+          ],
+          "finalBbox": [
+            152,
+            286,
+            1000,
+            66
+          ],
+          "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+          "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+          "sourceTextSha256": "e26c2d2a31c19fe63b6c12e63df4fc2f0e11cebfaa6b8bb43ab8b3690fbab576",
+          "translatedTextSha256": "1088ac0415ac0223dcf7dcb9c1e41ddb7849c6d78fbf12bffa357f9eba1f28a0",
+          "newlyIntersectedNeighborCount": 0
+        }
+      ]
+    },
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

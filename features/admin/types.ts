@@ -1,4 +1,4 @@
-import type { AccountStatus, AppRole } from '@/lib/supabase/types';
+import type { AccountStatus, AppLocale, AppRole } from '@/lib/supabase/types';
 import type { AdminCapability } from '@/lib/security/capabilities';
 import type { ContentSource } from '@/lib/content/content-metadata';
 import type { ContentSeo } from '@/lib/validation/content-seo';
@@ -10,7 +10,7 @@ import type { IconId } from '@/lib/course-icons';
  */
 export type AdminUserListItem = {
   id: string;
-  email: string;
+  email: string | null;
   label: string;
   role: AppRole;
   capabilities: AdminCapability[];
@@ -20,7 +20,7 @@ export type AdminUserListItem = {
 /** Minimal PII read model for the capability-gated manual learner-approval queue. */
 export type AdminAccountApprovalItem = {
   id: string;
-  email: string;
+  email: string | null;
   name: string;
   surname: string;
   job: string;
@@ -35,7 +35,7 @@ export type AdminAccountApprovalItem = {
 /** Deletion-specific directory entry; deliberately excludes capabilities and history detail. */
 export type LearningHistoryTarget = {
   id: string;
-  email: string;
+  email: string | null;
   label: string;
   role: 'participant';
   status: AccountStatus;
@@ -53,7 +53,7 @@ export type AdminPage<T> = {
 
 export type AdminAccessUser = {
   id: string;
-  email: string;
+  email: string | null;
   label: string;
   capabilities: AdminCapability[];
 };
@@ -196,6 +196,7 @@ export type AdminAuditEvent = {
 
 export type AdminPresentation = {
   id: string;
+  locale: AppLocale;
   pageCount: number;
   sha256: string;
   byteSize: number;
@@ -223,7 +224,7 @@ export type AdminLearningHistory = {
     id: string;
     name: string;
     surname: string;
-    email: string;
+    email: string | null;
     role: string;
   };
   counts: AdminLearningHistoryCounts;

@@ -10,13 +10,14 @@ test('learner dashboard exposes one best-result model without attempt analytics'
     read('features/profile/server.ts'),
   ]);
 
-  assert.match(loader, /rpc\('get_profile_dashboard'\)/);
+  assert.match(loader, /rpc\('get_profile_dashboard_locale', \{/);
+  assert.match(loader, /p_locale: locale/);
   assert.match(profile, /const canAccessLearning = context\.approval\.state === 'approved'/);
   assert.match(profile, /\{canAccessLearning \? \(/);
-  assert.match(profile, /Следующий шаг/);
-  assert.match(profile, /Мои курсы/);
-  assert.match(profile, /Результат/);
-  assert.match(profile, /Скачать/);
+  assert.match(profile, /t\('nextStep'\)/);
+  assert.match(profile, /t\('coursesTitle'\)/);
+  assert.match(profile, /t\('result'\)/);
+  assert.match(profile, /t\('download'\)/);
   assert.doesNotMatch(profile, /Доступные курсы|Лучший результат/);
   assert.doesNotMatch(profile, /RecentAttempts|ActivityChart|ResultDistribution|PassRateChart/);
   assert.doesNotMatch(profile, /количество попыток|Осталось попыток|Последние попытки/i);
@@ -29,14 +30,15 @@ test('quiz reveals a failed score and explains the calendar-day limit without us
   ]);
 
   assert.match(client, /ATTEMPT_DAILY_LIMIT/);
-  assert.match(client, /Лимит новых попыток исчерпан/);
+  assert.match(client, /t\('errors\.dailyLimitAt', \{ availableAt \}\)/);
+  assert.match(client, /t\('errors\.dailyLimitUnknown', \{ count: 8 \}\)/);
   assert.match(client, /COURSE_CATALOG_MAINTENANCE/);
-  assert.match(client, /Каталог курсов временно обновляется/);
+  assert.match(client, /t\('errors\.catalogMaintenance'\)/);
   assert.match(client, /ATTEMPT_ROLLING_LIMIT/);
   assert.match(client, /payload\.error === 'ATTEMPT_NOT_FOUND'[\s\S]*clearQuizDraft/);
   assert.match(client, /errorCode === 'ATTEMPT_NOT_FOUND'[\s\S]*loadAttempt\(true\)/);
   assert.match(client, /\{attempt\.score \?\? 0\}\/\{attempt\.total\}/);
-  assert.match(client, /Улучшить результат/);
+  assert.match(client, /t\('improveResult'\)/);
   assert.doesNotMatch(client, /3 попытки|24 часа|Осталось попыток|attemptsRemaining/);
   assert.doesNotMatch(payload, /attemptsRemaining|limitWindowEndsAt/);
 });
@@ -53,11 +55,13 @@ test('profile editing includes organization and renders the account-approval sta
 
   assert.match(schema, /organization: profileField\(PROFILE_FIELD_LIMITS\.organization\)/);
   assert.match(fields, /organization: 160/);
-  assert.match(form, /Данные профиля сохранены/);
-  assert.match(form, /Изменить данные/);
+  assert.match(form, /useTranslations\('Profile'\)/);
+  assert.match(form, /t\('saved'\)/);
+  assert.match(form, /t\('edit'\)/);
   assert.match(profile, /AccountApprovalStatus/);
-  assert.match(approvalStatus, /Заявка на проверке/);
-  assert.match(approvalStatus, /Осталось до контрольного срока/);
+  assert.match(approvalStatus, /useTranslations\('Approval'\)/);
+  assert.match(approvalStatus, /t\('pendingTitle'\)/);
+  assert.match(approvalStatus, /t\('remaining'\)/);
   assert.doesNotMatch(form, /Сейчас в действующих сертификатах/);
   assert.doesNotMatch(profile, /Данные для сертификата/);
   assert.match(form, /api\/profile\/organizations/);

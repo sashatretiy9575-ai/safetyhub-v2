@@ -3,17 +3,19 @@ import { apiError } from '@/features/auth/api-error';
 import { invalidOriginResponse } from '@/features/auth/request-origin';
 import { getSiteUrl, requireCapability } from '@/features/auth/server';
 import {
-  certificateExportFilename,
   certificateExportResultSchema,
-  createCertificateExportStream,
+  createCertificateExportMetadata,
 } from '@/features/admin/certificate-export-archive';
-import { attachmentContentDisposition } from '@/lib/pdf/certificate';
+import {
+  CERTIFICATE_EXPORT_METADATA_MAX_BYTES,
+  createBoundedCertificateMetadataResponse,
+} from '@/features/certificates/metadata-response';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { readJsonBody } from '@/lib/security/request-body';
 import { consumeCoarseQuota } from '@/lib/security/rate-limit';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { createApiResponse, NextResponse } from '@/lib/security/api-response';
+import { NextResponse } from '@/lib/security/api-response';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -51,16 +53,15 @@ export async function POST(request: Request) {
     });
     const resolved = certificateExportResultSchema.parse(unwrapRpcMutationResponse(response));
     const now = new Date();
-    return createApiResponse(createCertificateExportStream(resolved, now, getSiteUrl()), {
-      headers: {
-        'Content-Type': 'application/zip',
-        'Content-Disposition': attachmentContentDisposition(certificateExportFilename(now)),
-        'Cache-Control': 'private, no-store',
-        'X-Content-Type-Options': 'nosniff',
+    const metadata = await createCertificateExportMetadata(resolved, now, getSiteUrl());
+    return createBoundedCertificateMetadataResponse(
+      metadata,
+      CERTIFICATE_EXPORT_METADATA_MAX_BYTES,
+      {
         'X-SafetyHub-Exported-Count': String(resolved.items.length),
         'X-SafetyHub-Excluded-Count': String(resolved.skipped.length),
       },
-    });
+    );
   } catch (error) {
     return apiError(error);
   }

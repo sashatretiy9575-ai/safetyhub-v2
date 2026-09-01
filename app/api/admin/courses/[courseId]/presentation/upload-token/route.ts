@@ -13,6 +13,7 @@ import { TEST_EDITOR_LIMITS } from '@/lib/admin-test-editor';
 const STAGING_BUCKET = 'course-presentations-staging';
 const paramsSchema = z.object({ courseId: z.string().uuid() });
 const bodySchema = z.object({
+  locale: z.enum(['ru', 'kk', 'en', 'zh']),
   filename: z.string().trim().min(1).max(240),
   mimeType: z.literal('application/pdf'),
   byteSize: z.number().int().positive().max(TEST_EDITOR_LIMITS.presentationMaxBytes),
@@ -55,6 +56,7 @@ export async function POST(request: Request, context: { params: Promise<{ course
     const inserted = await admin.from('course_presentations').insert({
       id: presentationId,
       course_id: params.data.courseId,
+      locale: body.data.locale,
       storage_bucket: STAGING_BUCKET,
       storage_path: pdfPath,
       thumbnail_path: thumbnailPath,

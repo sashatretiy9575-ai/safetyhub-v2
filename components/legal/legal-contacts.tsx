@@ -1,4 +1,5 @@
 import { Phone, WhatsappLogo } from '@phosphor-icons/react/dist/ssr';
+import { getTranslations } from 'next-intl/server';
 import { ContactLink } from '@/components/shared/contact-link';
 import { getSiteContacts } from '@/lib/site-contacts';
 
@@ -6,7 +7,10 @@ const contactClass =
   'flex min-h-14 items-center gap-3 px-1 py-3 transition-colors hover:text-[var(--color-primary)] focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]';
 
 export async function LegalContacts() {
-  const contacts = await getSiteContacts();
+  const [contacts, t] = await Promise.all([
+    getSiteContacts(),
+    getTranslations('LegalFlow'),
+  ]);
   return (
     <section
       id="legal-contacts"
@@ -15,10 +19,10 @@ export async function LegalContacts() {
     >
       <div>
         <h2 id="legal-contacts-title" className="text-xl font-semibold text-[var(--color-text)]">
-          Контакты по документу
+          {t('contactsTitle')}
         </h2>
         <p className="mt-2 text-sm">
-          Позвоните или напишите в WhatsApp. Для письменного обращения сохраните переписку в чате.
+          {t('contactsDescription')}
         </p>
       </div>
       <div className="divide-y divide-[var(--color-border)] border-y border-[var(--color-border)] sm:grid sm:grid-cols-2 sm:divide-x sm:divide-y-0">
@@ -30,7 +34,9 @@ export async function LegalContacts() {
             aria-hidden="true"
           />
           <span className="min-w-0">
-            <span className="block text-xs font-bold text-[var(--color-text-subtle)]">Телефон</span>
+            <span className="block text-xs font-bold text-[var(--color-text-subtle)]">
+              {t('phone')}
+            </span>
             <span className="mt-1 block text-[15px] font-semibold text-[var(--color-text)]">
               {contacts.phoneDisplay}
             </span>
@@ -48,7 +54,7 @@ export async function LegalContacts() {
               WhatsApp
             </span>
             <span className="mt-1 block text-[15px] font-semibold text-[var(--color-text)]">
-              Написать
+              {t('write')}
             </span>
           </span>
         </ContactLink>

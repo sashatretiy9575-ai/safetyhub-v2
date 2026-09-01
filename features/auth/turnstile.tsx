@@ -2,6 +2,7 @@
 
 import Script from 'next/script';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCspNonce } from '@/features/auth/csp-nonce';
 
 type TurnstileSize = 'compact' | 'flexible';
@@ -12,12 +13,6 @@ export type TurnstileHandle = {
 };
 
 const TURNSTILE_SCRIPT_ID = 'cloudflare-turnstile-api';
-
-const FAILURE_MESSAGES: Record<TurnstileFailure, string> = {
-  error: 'Не удалось выполнить проверку Cloudflare.',
-  expired: 'Проверка Cloudflare истекла.',
-  unsupported: 'Этот браузер не поддерживает проверку Cloudflare.',
-};
 
 declare global {
   interface Window {
@@ -32,6 +27,8 @@ declare global {
 
 export const Turnstile = forwardRef<TurnstileHandle, { onToken: (token: string | null) => void }>(
   function Turnstile({ onToken }, ref) {
+    const locale = useLocale();
+    const t = useTranslations('AuthOtp');
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
     const nonce = useCspNonce();
     const containerRef = useRef<HTMLDivElement>(null);
@@ -86,7 +83,7 @@ export const Turnstile = forwardRef<TurnstileHandle, { onToken: (token: string |
         const widgetId = window.turnstile.render(container, {
           sitekey: siteKey,
           theme: 'auto',
-          language: 'ru',
+          language: locale === 'zh' ? 'zh-CN' : locale,
           size,
           execution: 'execute',
           appearance: 'always',
@@ -112,7 +109,7 @@ export const Turnstile = forwardRef<TurnstileHandle, { onToken: (token: string |
       } catch {
         failVerification('error');
       }
-    }, [activated, executeNativeWidget, failVerification, siteKey]);
+    }, [activated, executeNativeWidget, failVerification, locale, siteKey]);
 
     const execute = useCallback(() => {
       if (!siteKey || pendingExecutionRef.current || completedRef.current) return;
@@ -178,20 +175,20 @@ export const Turnstile = forwardRef<TurnstileHandle, { onToken: (token: string |
           tabIndex={-1}
           className="flex min-h-[65px] w-full min-w-0 justify-center rounded-[var(--radius-md)] focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           role="group"
-          aria-label="Проверка безопасности Cloudflare"
+          aria-label={t('captchaAria')}
         />
         {failure ? (
           <p
             role="alert"
             className="flex items-center justify-between gap-3 text-sm text-[var(--color-danger)]"
           >
-            <span>{FAILURE_MESSAGES[failure]}</span>
+            <span>{t(`turnstile.${failure}`)}</span>
             <button
               type="button"
               onClick={execute}
               className="min-h-10 shrink-0 rounded-lg px-2 font-bold underline underline-offset-4 focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
             >
-              Повторить
+              {t('turnstile.retry')}
             </button>
           </p>
         ) : null}

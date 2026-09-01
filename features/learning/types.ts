@@ -4,6 +4,7 @@ export type AttemptPayload = {
   revisionId: string;
   testSlug: string;
   title: string;
+  locale: 'ru' | 'kk' | 'en' | 'zh';
   status: 'started' | 'completed' | 'passed' | 'failed' | 'expired';
   score: number | null;
   total: number;

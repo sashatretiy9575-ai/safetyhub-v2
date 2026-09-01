@@ -6,10 +6,17 @@ import type { Article } from '@/lib/content/articles';
 import { coerceContentMetadata } from '@/lib/content/content-metadata';
 import { articleBlocksSchema, type ArticleLifecycleStatus } from '@/lib/validation/article';
 import { contentSeoSchema, defaultContentSeo } from '@/lib/validation/content-seo';
+import { getArticleEditorLocalizations } from '@/features/admin/localizations-server';
 
-export default async function EditArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function EditArticlePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ publication?: string }>;
+}) {
   await requireCapability('content.manage');
-  const { slug } = await params;
+  const [{ slug }, query] = await Promise.all([params, searchParams]);
   const admin = createAdminClient();
   const { data, error } = await admin
     .from('article_drafts')
@@ -59,5 +66,16 @@ export default async function EditArticlePage({ params }: { params: Promise<{ sl
     }),
     blocks: blocks.data,
   };
-  return <AdminEditor initialData={article} />;
+  const localizations = await getArticleEditorLocalizations(data.article_id);
+  return (
+    <AdminEditor
+      initialData={article}
+      initialLocalizations={localizations}
+      initialPublicationNotice={
+        query.publication === 'incomplete' || query.publication === 'failed'
+          ? query.publication
+          : null
+      }
+    />
+  );
 }

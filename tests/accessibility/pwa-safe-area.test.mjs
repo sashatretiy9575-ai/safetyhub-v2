@@ -35,7 +35,8 @@ test('install banner stays compact above the mobile bar and reserves temporary s
   assert.match(overlay, /--pwa-banner-space/);
   assert.match(overlay, /PROMPT_DELAY_MS = 15_000/);
   assert.match(overlay, /30 \* 24 \* 60 \* 60/);
-  assert.match(overlay, /pathname\.startsWith\('\/admin'\)/);
+  assert.match(overlay, /splitLocalePathname\(pathname\)\.pathname/);
+  assert.match(overlay, /routePathname\.startsWith\('\/admin'\)/);
   assert.match(overlay, /pointer: coarse/);
   assert.match(overlay, /var\(--safe-area-right\)/);
   assert.match(overlay, /var\(--safe-area-left\)/);

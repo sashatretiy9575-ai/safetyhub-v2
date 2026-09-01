@@ -41,6 +41,8 @@ begin
 
   v_queue_definition := lower(pg_get_functiondef(
     'public.list_pending_account_approval_page(integer,timestamp with time zone,uuid)'::regprocedure
+  )) || lower(pg_get_functiondef(
+    'private.list_pending_account_approval_page_provider_internal(integer,timestamp with time zone,uuid)'::regprocedure
   ));
   if position('private.require_capability(''identity.manage'')' in v_queue_definition) = 0
     or position('control.approval_state = ''pending''' in v_queue_definition) = 0

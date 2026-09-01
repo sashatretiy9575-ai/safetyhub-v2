@@ -39,6 +39,7 @@ export type SignUpValues = z.infer<typeof signUpSchema>;
 
 const normalizedEmailSchema = z.string().trim().toLowerCase().email().max(254);
 const captchaTokenSchema = z.string().min(1).max(4096).optional();
+const emailOtpLocaleSchema = z.enum(['ru', 'kk', 'en']).optional();
 
 /**
  * Passwordless email entry point. `register` intentionally accepts the same
@@ -50,6 +51,7 @@ export const emailOtpStartSchema = z
     email: normalizedEmailSchema,
     intent: z.enum(['login', 'register']),
     captchaToken: captchaTokenSchema,
+    locale: emailOtpLocaleSchema,
   });
 export type EmailOtpStartValues = z.infer<typeof emailOtpStartSchema>;
 
@@ -59,6 +61,7 @@ export type EmailOtpStartValues = z.infer<typeof emailOtpStartSchema>;
 export const emailOtpVerifySchema = z.object({
   email: normalizedEmailSchema,
   code: z.string().regex(/^\d{6}$/),
+  locale: emailOtpLocaleSchema,
 });
 export type EmailOtpVerifyValues = z.infer<typeof emailOtpVerifySchema>;
 

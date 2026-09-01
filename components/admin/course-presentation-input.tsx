@@ -6,6 +6,7 @@ import type { AdminPresentation } from '@/features/admin/types';
 import { Button } from '@/components/ui/button';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { TEST_EDITOR_LIMITS } from '@/lib/admin-test-editor';
+import type { AppLocale } from '@/lib/supabase/types';
 
 type UploadGrant = {
   presentationId: string;
@@ -17,6 +18,7 @@ type UploadGrant = {
 
 type PendingFinalize = {
   presentationId: string;
+  locale: AppLocale;
   sha256: string;
   pageCount: number;
 };
@@ -170,10 +172,12 @@ function adminPresentationUrl(
 
 export function CoursePresentationInput({
   courseId,
+  locale = 'ru',
   value,
   onChange,
 }: {
   courseId: string | null;
+  locale?: AppLocale;
   value: AdminPresentation | null;
   onChange: (value: AdminPresentation | null) => void;
 }) {
@@ -252,6 +256,7 @@ export function CoursePresentationInput({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            locale,
             filename: file.name,
             mimeType: file.type,
             byteSize: file.size,
@@ -292,6 +297,7 @@ export function CoursePresentationInput({
       finalizeStarted = true;
       const finalizeRequest = {
         presentationId: grant.presentationId,
+        locale,
         sha256: inspected.sha256,
         pageCount: inspected.pageCount,
       };

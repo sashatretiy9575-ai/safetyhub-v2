@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "scope": "SafetyHub Stage 6 localized presentation artifacts (ZH)",
+  "productionPublished": false,
+  "automatedReviewOnly": true,
+  "locales": [
+    "zh"
+  ],
+  "localeCount": 1,
+  "sourceDeckCount": 5,
+  "presentationCount": 5,
+  "sourceSlideCount": 198,
+  "pptxRenderedSlideCount": 198,
+  "pdfRenderedPageCount": 198,
+  "canonicalArtifactContract": {
+    "pptxPerDeckLocale": 1,
+    "pdfPerDeckLocale": 1,
+    "contentAddressedParentsVerified": true,
+    "hashesAndByteSizesVerified": true,
+    "sourceRenderPageCountsEqual": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "approvedLayoutOverrideCount": 0
+  },
+  "presentations": [
+    {
+      "locale": "zh",
+      "slug": "plotnik",
+      "textMapSha256": "60ec2fa65e5489374626d691d309e4998b4f5f0b1cfaee6ab4efe80f4e36c6e5",
+      "sourceSlideCount": 25,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/plotnik/zh/assets/pptx/2c7ff0acf3bce75cc5ab9d7f90d32a045a990c59a47678801a232877d982a01f/presentation.pptx",
+        "sha256": "2c7ff0acf3bce75cc5ab9d7f90d32a045a990c59a47678801a232877d982a01f",
+        "byteSize": 1932535,
+        "slideCount": 25
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/plotnik/zh/assets/pdf/66ab1fafa568e2bad3ac8dd96170b402eade3c2dfa69f1176177e586f620b62f/presentation.pdf",
+        "sha256": "66ab1fafa568e2bad3ac8dd96170b402eade3c2dfa69f1176177e586f620b62f",
+        "byteSize": 1702550,
+        "pageCount": 25,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 25,
+      "renderedPageCount": 25,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/plotnik/zh/artifact-receipt.json",
+      "artifactReceiptSha256": "1854b5e69ab1f7920ede139fe8a04f46c6f7048a0e11c378cc936d1b0b05fed4"
+    },
+    {
+      "locale": "zh",
+      "slug": "armaturshchik",
+      "textMapSha256": "90b45c2b5889ec523149f5f92972ea7cd739db647d6b8e17481e479b8953e24c",
+      "sourceSlideCount": 31,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/zh/assets/pptx/31716dd37660917b47292b0e3357f33d2abb896dc7150227dc9f936b9d20c985/presentation.pptx",
+        "sha256": "31716dd37660917b47292b0e3357f33d2abb896dc7150227dc9f936b9d20c985",
+        "byteSize": 2803329,
+        "slideCount": 31
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/zh/assets/pdf/4ac1daf98395fd21079f7cacd1229c990f2243b1c06ff8371c7eb06ccacb851d/presentation.pdf",
+        "sha256": "4ac1daf98395fd21079f7cacd1229c990f2243b1c06ff8371c7eb06ccacb851d",
+        "byteSize": 2460867,
+        "pageCount": 31,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 31,
+      "renderedPageCount": 31,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/armaturshchik/zh/artifact-receipt.json",
+      "artifactReceiptSha256": "0ec9136cb008429d11de99ba69ca8e25da5a6d7ebdac1e2359d1112e8ca949e1"
+    },
+    {
+      "locale": "zh",
+      "slug": "lesomontazhnye-raboty",
+      "textMapSha256": "3f62b1ce6909c19a589795fbef177152dea78148f78a63a4dc2f8d33a19ea144",
+      "sourceSlideCount": 42,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/zh/assets/pptx/efc292d495d415cf1d79f41672648ec95e27bfd1003fc1229244a8fdc6dd8bd3/presentation.pptx",
+        "sha256": "efc292d495d415cf1d79f41672648ec95e27bfd1003fc1229244a8fdc6dd8bd3",
+        "byteSize": 2493104,
+        "slideCount": 42
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/zh/assets/pdf/9581df07a540fe856b636a5850fbdc7b5de8f0bf9eba93ade5568aa84d068d59/presentation.pdf",
+        "sha256": "9581df07a540fe856b636a5850fbdc7b5de8f0bf9eba93ade5568aa84d068d59",
+        "byteSize": 1994937,
+        "pageCount": 42,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 42,
+      "renderedPageCount": 42,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/zh/artifact-receipt.json",
+      "artifactReceiptSha256": "6030752e66242864a246347c40c2ae2a78866074ab39f0913b55a692e76fdcf9"
+    },
+    {
+      "locale": "zh",
+      "slug": "biot",
+      "textMapSha256": "77f72665c018f85e71dc127ab9ee35541cc723406794850f88bf3e4b8dff042b",
+      "sourceSlideCount": 59,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/biot/zh/assets/pptx/84da5f207a17f06a27b735c395182a01f8aa22cd3775161129fa18a028f5e292/presentation.pptx",
+        "sha256": "84da5f207a17f06a27b735c395182a01f8aa22cd3775161129fa18a028f5e292",
+        "byteSize": 2371719,
+        "slideCount": 59
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/biot/zh/assets/pdf/5b8fe63d3ed41febf399695978a89fae44d7d1adf649ad37aa83f61c0774bfdf/presentation.pdf",
+        "sha256": "5b8fe63d3ed41febf399695978a89fae44d7d1adf649ad37aa83f61c0774bfdf",
+        "byteSize": 1566184,
+        "pageCount": 59,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 59,
+      "renderedPageCount": 59,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/biot/zh/artifact-receipt.json",
+      "artifactReceiptSha256": "150f1eadcd42567766f07effcd3744c939e6b37260094da32e6c4d048d2ac56f"
+    },
+    {
+      "locale": "zh",
+      "slug": "pozharnaya-bezopasnost",
+      "textMapSha256": "6f3df1c021389290a48355df508d783f22227b0c56ae707aa0f381a5d8683578",
+      "sourceSlideCount": 41,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/zh/assets/pptx/e5f27d6a194ca2e561edb5ee733ef1c1ebc293ff7bbfa953ee1aaba9fcbabcab/presentation.pptx",
+        "sha256": "e5f27d6a194ca2e561edb5ee733ef1c1ebc293ff7bbfa953ee1aaba9fcbabcab",
+        "byteSize": 1435552,
+        "slideCount": 41
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/zh/assets/pdf/708603a25126dd211662a770f283112ebc525f97fde1682afa4562b60e02ed84/presentation.pdf",
+        "sha256": "708603a25126dd211662a770f283112ebc525f97fde1682afa4562b60e02ed84",
+        "byteSize": 1014601,
+        "pageCount": 41,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 41,
+      "renderedPageCount": 41,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/zh/artifact-receipt.json",
+      "artifactReceiptSha256": "5dbb3af06a8fe6aa078027f95e0d3c62341b94c7cb7d4d7686686521d3435d41"
+    }
+  ],
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

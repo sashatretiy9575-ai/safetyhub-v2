@@ -96,8 +96,8 @@ test('article editor keeps sources optional and publishes directly', async () =>
   assert.match(action, /set_article_status_v2/);
   assert.match(action, /delete_article/);
   assert.doesNotMatch(content, /reviewer|reviewed_at|next_review_at/);
-  assert.match(page, /Нормативные источники/);
-  assert.doesNotMatch(page, /повторной редакционной проверки/iu);
+  assert.match(page, /label=\{t\('sources'/u);
+  assert.doesNotMatch(page, /[\u0400-\u04ff]/u);
   assert.match(
     contract,
     /create type public\.article_status_two_state as enum \('draft', 'published'\)/,

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "documentType": "terms",
+  "version": "2.3",
+  "bodyRevision": "terms-2.3",
+  "effectiveAt": "2026-09-01T00:00:00Z",
+  "locale": "ru",
+  "productionPublished": false,
+  "automatedOnly": false,
+  "canonicalSourceLocale": "ru",
+  "canonicalSourceBodySha256": "355730dda398cdfcab45368d016f1e77f8656870953bcaf241afc2cbeb4536f1",
+  "localizedBodySha256": "355730dda398cdfcab45368d016f1e77f8656870953bcaf241afc2cbeb4536f1",
+  "topologySha256": "d1a7fa9378d484aaec8dfc2d306c1731aa6968f449740d2379199d6ad609a373",
+  "saveRpc": {
+    "path": "legal/terms/2.3/ru/save-rpc.json",
+    "sha256": "ad7d133d1d91a1a276cd8c5a8bee01b31fafa1532e46757ffa1f8b17da900487",
+    "bytes": 16676
+  },
+  "residualRisk": []
+}

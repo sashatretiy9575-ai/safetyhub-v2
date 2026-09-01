@@ -41,6 +41,7 @@ jobs:
       - run: npm test
       - run: npm run content:snapshot:validate
       - run: npm run content:initial-import:validate
+      - run: npm run content:localizations:validate:release
       - run: npm run content:seed:generate
       - run: git diff --exit-code -- supabase/seed.sql
       - run: npm run build
@@ -56,6 +57,9 @@ jobs:
       E2E_ADMIN_EMAIL: admin@safetyhub.local
       E2E_PARTICIPANT_EMAIL: participant@safetyhub.local
       E2E_REQUIRE_AUTH: '1'
+      # Cloudflare's public always-pass Turnstile secret is valid only for this
+      # disposable local Supabase instance; production uses its own secret.
+      SUPABASE_AUTH_CAPTCHA_SECRET: 1x0000000000000000000000000000000AA
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -73,7 +77,13 @@ jobs:
         shell: bash
         run: |
           npx --no-install supabase start
-          npx --no-install supabase db reset
+          # A freshly provisioned GitHub runner can briefly lose the reset
+          # container immediately after the initial image pulls. Retry once
+          # with diagnostics; SQL failures remain fatal on both attempts.
+          if ! npx --no-install supabase db reset; then
+            echo "Initial database reset failed; retrying once with debug output." >&2
+            npx --no-install supabase db reset --debug
+          fi
           npx --no-install supabase status -o env > "$RUNNER_TEMP/supabase.env"
           source "$RUNNER_TEMP/supabase.env"
           if [[ -z "${API_URL:-}" || -z "${ANON_KEY:-}" || -z "${SERVICE_ROLE_KEY:-}" ]]; then
@@ -121,5 +131,84 @@ jobs:
           retention-days: 14
 
       - name: Stop local Supabase
+        if: always()
+        run: npx --no-install supabase stop --no-backup
+
+  local-capacity-load:
+    name: local capacity load (25/50/100)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SAFETYHUB_LOAD_TARGET: local-ci
+      SAFETYHUB_LOCAL_LOAD_MARKER: LOCAL DISPOSABLE SUPABASE ONLY
+      SAFETYHUB_LOAD_USERS: '100'
+      SAFETYHUB_LOAD_SESSIONS: '100'
+      # Cloudflare documents this as the public always-pass test secret. It is
+      # scoped to the disposable local GoTrue container, never production.
+      SUPABASE_AUTH_CAPTCHA_SECRET: 1x0000000000000000000000000000000AA
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Start isolated local Supabase
+        shell: bash
+        run: |
+          npx --no-install supabase start
+          if ! npx --no-install supabase db reset; then
+            echo "Initial database reset failed; retrying once with debug output." >&2
+            npx --no-install supabase db reset --debug
+          fi
+          npx --no-install supabase status -o env > "$RUNNER_TEMP/supabase-load.env"
+          source "$RUNNER_TEMP/supabase-load.env"
+          if [[ "$API_URL" != "http://127.0.0.1:54321" ]]; then
+            echo "Load test target is not the exact local Supabase endpoint." >&2
+            exit 1
+          fi
+          if [[ "$DB_URL" != "postgresql://postgres:postgres@127.0.0.1:54322/postgres" ]]; then
+            echo "Load test database is not the exact local Supabase database." >&2
+            exit 1
+          fi
+          if [[ -z "${ANON_KEY:-}" || -z "${SERVICE_ROLE_KEY:-}" ]]; then
+            echo "Local Supabase did not expose the expected CI credentials." >&2
+            exit 1
+          fi
+          printf '%s\n' "::add-mask::$SERVICE_ROLE_KEY"
+          printf '%s\n' "::add-mask::$DB_URL"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY"
+            echo "SUPABASE_SECRET_KEY=$SERVICE_ROLE_KEY"
+            echo "SAFETYHUB_LOCAL_DATABASE_URL=$DB_URL"
+          } >> "$GITHUB_ENV"
+
+      - run: npm run storage:buckets:ensure:local
+      - run: npm run content:assets:seed:local
+
+      - name: Run isolated 25/50/100 capacity profile
+        shell: bash
+        run: |
+          mkdir -p test-results
+          env -u SUPABASE_ACCESS_TOKEN npm run test:load \
+            | tee test-results/local-capacity-load.log
+
+      - name: Upload sanitized capacity report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: local-capacity-load-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test-results/local-capacity-load.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Stop isolated local Supabase
         if: always()
         run: npx --no-install supabase stop --no-backup

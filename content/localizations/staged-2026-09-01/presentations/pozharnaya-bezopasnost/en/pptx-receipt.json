@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slug": "pozharnaya-bezopasnost",
+  "locale": "en",
+  "productionPublished": false,
+  "contentSummary": "fire safety: Fire prevention, warning, evacuation, use of primary extinguishing agents and safe actions in case of fire.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/pozharnaya-bezopasnost/presentation.pptx",
+    "pptxSha256": "4e75a28d8b2a55fd272a34e9674babc09709b4d35b837c111ff73cfeb6f0e9b8",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/en/text-map.json",
+    "textMapSha256": "6bac3a78a49622ca90609901e8677e5fe2805e2fc77ed1d15b82c4cde8148e05"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/en/assets/pptx/dd65e1668cb4573f91822b7437e50e937b90e3dbed19fe4c11f417e4baa8d7a8/presentation.pptx",
+    "sha256": "dd65e1668cb4573f91822b7437e50e937b90e3dbed19fe4c11f417e4baa8d7a8",
+    "byteSize": 1431083,
+    "slideCount": 41
+  },
+  "edits": {
+    "translatedElementCount": 272,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 88,
+    "sourceNotesAdded": 41,
+    "textTopologySha256": "da0d6e5faaf192b817e048d5cdfeeac4864e88bc837ec2376c4621f5b7df9664",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 41,
+    "layoutInspectionCount": 41,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 41
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 616,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

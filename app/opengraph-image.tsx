@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const alt = 'SafetyHub.kz — обучение по охране труда и промышленной безопасности';
+export const alt = 'SafetyHub.kz';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -42,11 +42,9 @@ export default function OpenGraphImage() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
         <div style={{ maxWidth: 980, fontSize: 68, lineHeight: 1.06, fontWeight: 900 }}>
-          Обучение безопасности без отрыва от производства
+          SafetyHub.kz
         </div>
-        <div style={{ fontSize: 28, color: '#d7f5e1' }}>
-          Материалы, тестирование и проверяемые сертификаты
-        </div>
+        <div style={{ fontSize: 28, color: '#d7f5e1' }}>RU · KK · EN · 中文</div>
       </div>
     </div>,
     size,

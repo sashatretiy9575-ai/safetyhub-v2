@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "siz-normy-vydachi-rk",
+  "slug": "siz-normy-vydachi-rk",
+  "title": "PPE beyond box-ticking: how to check protection before work",
+  "description": "Helmet, goggles, gloves and respirator provide protection only when they are suitable for the task, are in good working order and are worn correctly.",
+  "coverImage": "/images/generated/article-ppe.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "Personal protective equipment is the last barrier between danger and a person. It does not correct a faulty machine or replace a guard, but can reduce the consequences if selected for a specific risk and used correctly."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Five questions before you wear PPE"
+    },
+    {
+      "type": "list",
+      "items": [
+        "What danger does it protect against in this particular task?",
+        "Is the model and protection class suitable for the material, tool and conditions?",
+        "Is the size correct and can the fit be adjusted?",
+        "Are there any cracks, tears, dirt, expired or missing parts?",
+        "Do I know the limitations and signs when the protection needs to be replaced?"
+      ],
+      "style": "ordered"
+    },
+    {
+      "tone": "warning",
+      "type": "callout",
+      "title": "“On me” does not mean “protects”",
+      "content": "An unsuitable filter, an unfastened helmet, a scratched visor or oversized gloves create a false sense of security. If you are in doubt about the choice or fit, check before starting work."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Quick inspection"
+    },
+    {
+      "rows": [
+        [
+          "Helmet",
+          "Case without cracks or strong dents; the internal equipment is intact; fit adjusted"
+        ],
+        [
+          "Safety glasses",
+          "Lenses provide clear vision; no cracks; temples or strap hold glasses"
+        ],
+        [
+          "Gloves",
+          "Material suitable for risk; no punctures or tears; size does not interfere with grip"
+        ],
+        [
+          "Respirator",
+          "Filter type corresponds to hazard; fit checked; valves and belts are OK"
+        ],
+        [
+          "Safety shoes",
+          "The sole is intact and clean; the toe is not deformed; lacing or clasps are in good condition"
+        ]
+      ],
+      "type": "table",
+      "caption": "What to see before your shift",
+      "headers": [
+        "PPE",
+        "Check"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Fit matters more than habit"
+    },
+    {
+      "type": "paragraph",
+      "content": "If the glasses fog up, the helmet slips, and the glove clings to parts, the person begins to adjust or remove the protection. This is a signal not to “endure”, but to choose a size, adjustment or compatible model. Several PPE should work together: the temples of the glasses should not interfere with the fit of the respirator, and the hood should not interfere with the fastening of the helmet."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "When immediate replacement is needed"
+    },
+    {
+      "type": "list",
+      "items": [
+        "after an impact, fall or contact with a substance if this could damage the protection;",
+        "in case of crack, rupture, deformation, loss of transparency or failure of fastening;",
+        "if the filter has exhausted its service life or there is an odor, breathing resistance or other signs according to the manufacturer’s instructions;",
+        "if PPE cannot be cleaned properly or has been stored incorrectly;",
+        "if the operation or hazard has changed and the current protection is not intended for them."
+      ],
+      "style": "unordered"
+    },
+    {
+      "type": "paragraph",
+      "content": "The calendar period is not permission to use the damaged item. Report the defect and receive a serviceable replacement in the manner established at your workplace. Do not repair the protector with tape, glue or random parts unless such repairs are provided by the manufacturer."
+    },
+    {
+      "tone": "success",
+      "type": "callout",
+      "title": "Good habit",
+      "content": "Inspect PPE twice: before use and after use. A second inspection helps spot damage early rather than at the start of the next urgent task."
+    },
+    {
+      "url": "/topics/biot",
+      "text": "Take a course on labor protection",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "PPE beyond box-ticking: how to check protection before work",
+    "ogImage": "/images/generated/article-ppe.webp",
+    "ogTitle": "PPE beyond box-ticking: how to check protection before work",
+    "indexable": true,
+    "description": "Helmet, goggles, gloves and respirator provide protection only when they are suitable for the task, are in good working order and are worn correctly.",
+    "ogDescription": "Helmet, goggles, gloves and respirator provide protection only when they are suitable for the task, are in good working order and are worn correctly."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-11",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K1500000414",
+      "title": "Labor Code of the Republic of Kazakhstan"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500012675",
+      "title": "Standards for issuing special clothing and other personal protective equipment"
+    }
+  ],
+  "createdAt": "2026-08-08T00:00:00.000Z",
+  "updatedAt": "2026-08-25T20:15:07.908Z"
+}

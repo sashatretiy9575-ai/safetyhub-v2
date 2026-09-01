@@ -18,7 +18,8 @@ export default async function EmployeeLearningHistoryPage({
   const history = await getAdminLearningHistory(parsed.data.userId);
   const userLabel =
     [history.user.name, history.user.surname].filter(Boolean).join(' ').trim() ||
-    history.user.email;
+    history.user.email ||
+    'Участник с ключом доступа';
 
   return (
     <section className="mx-auto max-w-3xl space-y-5">
@@ -26,7 +27,8 @@ export default async function EmployeeLearningHistoryPage({
         <div>
           <h1 className="font-display text-3xl font-bold">Учебная история</h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {userLabel} · {history.user.email}
+            {userLabel}
+            {history.user.email ? ` · ${history.user.email}` : ' · Вход по ключу доступа'}
           </p>
         </div>
         <Button asChild variant="outline">

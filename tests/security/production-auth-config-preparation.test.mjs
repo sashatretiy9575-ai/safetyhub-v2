@@ -5,6 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import {
   ProductionAuthConfigPreparationError,
+  cloudflareAlwaysPassTestSecret,
   configurationSha256,
   createProductionConfiguration,
   expectedProductionConfigurationSha256,
@@ -59,8 +60,9 @@ test('production Auth config preparation is isolated, exact, and does not push',
         production: `site_url = "${productionSiteUrl}"`,
       },
       {
-        source: 'additional_redirect_urls = ["http://localhost:3000/**"]',
-        production: `additional_redirect_urls = ["${productionSiteUrl}/**"]`,
+        source:
+          'additional_redirect_urls = ["http://localhost:3000/auth/login?email_locale=ru", "http://localhost:3000/kk/auth/login?email_locale=kk", "http://localhost:3000/en/auth/login?email_locale=en"]',
+        production: `additional_redirect_urls = ["${productionSiteUrl}/auth/login?email_locale=ru", "${productionSiteUrl}/kk/auth/login?email_locale=kk", "${productionSiteUrl}/en/auth/login?email_locale=en"]`,
       },
     ]);
 
@@ -69,6 +71,10 @@ test('production Auth config preparation is isolated, exact, and does not push',
     assert.equal(preparedConfig.includes('http://localhost:3000'), false);
     assert.equal(preparedConfig.includes(productionSiteUrl), true);
     assert.match(preparedConfig, /\[auth\.rate_limit\][\s\S]*?email_sent = 30/u);
+    assert.match(
+      preparedConfig,
+      /\[auth\.captcha\][\s\S]*?enabled = true[\s\S]*?provider = "turnstile"[\s\S]*?secret = "env\(SUPABASE_AUTH_CAPTCHA_SECRET\)"/u,
+    );
     assert.equal(await readFile(sourceConfigPath, 'utf8'), sourceBefore);
     assert.equal(Object.keys(prepared.templateSha256).length, 4);
     assert.deepEqual(prepared.templateSha256, expectedTemplateSha256);
@@ -76,7 +82,10 @@ test('production Auth config preparation is isolated, exact, and does not push',
       const actualTemplate = await readFile(path.join(prepared.temporaryRoot, relativePath));
       assert.equal(createHash('sha256').update(actualTemplate).digest('hex'), expectedHash);
     }
-    assert.match(prepared.nextCommand, /^Push-Location /u);
+    assert.match(prepared.nextCommand, /^if \(\[string\]::IsNullOrWhiteSpace/u);
+    assert.match(prepared.nextCommand, /SUPABASE_AUTH_CAPTCHA_SECRET/u);
+    assert.match(prepared.nextCommand, new RegExp(cloudflareAlwaysPassTestSecret, 'u'));
+    assert.match(prepared.nextCommand, /; Push-Location /u);
     assert.match(prepared.nextCommand, /; try \{ & /u);
     assert.equal(prepared.nextCommand.includes(localSupabaseCliPath), true);
     assert.match(prepared.nextCommand, / config push --project-ref /u);
@@ -99,6 +108,8 @@ test('production config hashes, email quota, and the two-line allowlist stay sou
   assert.equal(configurationSha256(productionConfiguration), expectedProductionConfigurationSha256);
   for (const configuration of [sourceConfiguration, productionConfiguration]) {
     assert.match(configuration, /\[auth\.rate_limit\][\s\S]*?email_sent = 30/u);
+    assert.match(configuration, /\[auth\.captcha\][\s\S]*?provider = "turnstile"/u);
+    assert.match(configuration, /secret = "env\(SUPABASE_AUTH_CAPTCHA_SECRET\)"/u);
   }
 
   const crlfSource = sourceConfiguration.replaceAll('\r\n', '\n').replaceAll('\n', '\r\n');
@@ -132,7 +143,9 @@ test('the printed command has a harmless explicit project-ref placeholder', () =
   const command = safeConfigPushCommand(path.resolve('C:/safe-temporary-workdir'));
   assert.match(command, /--project-ref 'REPLACE_WITH_TARGET_PROJECT_REF' \} finally/u);
   assert.equal(path.isAbsolute(localSupabaseCliPath), true);
-  assert.equal(command.indexOf('Push-Location'), 0);
+  assert.equal(command.indexOf('if ([string]::IsNullOrWhiteSpace'), 0);
+  assert.equal(command.indexOf('Push-Location') > 0, true);
   assert.equal(command.indexOf(localSupabaseCliPath) > command.indexOf('try {'), true);
-  assert.doesNotMatch(command, /SUPABASE_|NEXT_PUBLIC_|process\.env/u);
+  assert.match(command, /SUPABASE_AUTH_CAPTCHA_SECRET/u);
+  assert.doesNotMatch(command, /NEXT_PUBLIC_|process\.env/u);
 });

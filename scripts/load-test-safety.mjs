@@ -1,5 +1,15 @@
-export const PRODUCTION_PROJECT_REF = 'vezgxdooijznpjqrpvcv';
+export const PRODUCTION_PROJECT_REF = 'podkjjguhhdiecrgznoa';
+export const PROTECTED_PROJECT_REFS = Object.freeze([
+  PRODUCTION_PROJECT_REF,
+  // Retain the previous production ref as permanently protected. A stale
+  // operator environment must never turn an old SafetyHub project into a
+  // destructive load-test target.
+  'vezgxdooijznpjqrpvcv',
+]);
 export const DISPOSABLE_PROJECT_MARKER = 'DISPOSABLE SECURITY TEST';
+export const LOCAL_CI_LOAD_TEST_MARKER = 'LOCAL DISPOSABLE SUPABASE ONLY';
+export const LOCAL_CI_SUPABASE_URL = 'http://127.0.0.1:54321';
+export const LOCAL_CI_DATABASE_URL = 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
 
 export const CLEAN_LOAD_TEST_TABLES = Object.freeze([
   'profiles',
@@ -28,7 +38,7 @@ function assertProjectRef(value, label) {
 }
 
 function denyProductionRef(projectRef, label) {
-  if (projectRef === PRODUCTION_PROJECT_REF) {
+  if (PROTECTED_PROJECT_REFS.includes(projectRef)) {
     refuse(`${label} is the hard-denied production project`);
   }
 }
@@ -85,6 +95,32 @@ export function assertLoadTestTarget({ url, disposableRef, confirmation, marker 
   return targetRef;
 }
 
+export function assertLocalCiLoadTestTarget({
+  url,
+  databaseUrl,
+  ci,
+  githubActions,
+  runnerEnvironment,
+  marker,
+}) {
+  if (ci !== 'true' || githubActions !== 'true' || runnerEnvironment !== 'github-hosted') {
+    refuse('local load mode is restricted to a fresh GitHub-hosted CI runner');
+  }
+  if (marker !== LOCAL_CI_LOAD_TEST_MARKER) {
+    refuse(
+      `SAFETYHUB_LOCAL_LOAD_MARKER must exactly equal ${JSON.stringify(LOCAL_CI_LOAD_TEST_MARKER)}`,
+    );
+  }
+  if (url !== LOCAL_CI_SUPABASE_URL) {
+    refuse(`local CI target must exactly equal ${LOCAL_CI_SUPABASE_URL}`);
+  }
+  if (databaseUrl !== LOCAL_CI_DATABASE_URL) {
+    refuse('local CI database must be the exact disposable loopback database');
+  }
+
+  return 'local-ci';
+}
+
 export async function assertDisposableProjectMarker({
   projectRef,
   accessToken,
@@ -126,7 +162,10 @@ export async function assertDisposableProjectMarker({
     refuse('Supabase Management API returned unreadable project metadata');
   }
 
-  if (project?.ref === PRODUCTION_PROJECT_REF || project?.id === PRODUCTION_PROJECT_REF) {
+  if (
+    PROTECTED_PROJECT_REFS.includes(project?.ref) ||
+    PROTECTED_PROJECT_REFS.includes(project?.id)
+  ) {
     refuse('Management API metadata identifies the hard-denied production project');
   }
   if (project?.id !== projectRef) {

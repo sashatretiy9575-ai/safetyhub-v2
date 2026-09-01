@@ -21,20 +21,23 @@ test('public navigation uses one clear neutral account link on every surface', a
   const navigationItems = await read('components/layout/navigation-items.ts');
 
   assert.match(layout, /<AppShell accountMode="neutral">/);
-  assert.match(navigationItems, /neutral: \{ href: ROUTES\.profile, label: 'Аккаунт' \}/);
-  assert.match(navigationItems, /guest: \{ href: ROUTES\.signIn, label: 'Войти' \}/);
-  assert.match(navigationItems, /authenticated: \{ href: ROUTES\.profile, label: 'Профиль' \}/);
+  assert.match(
+    navigationItems,
+    /neutral: \{ href: ROUTES\.profile, messageKey: 'account\.neutral' \}/,
+  );
+  assert.match(navigationItems, /guest: \{ href: ROUTES\.signIn, messageKey: 'account\.guest' \}/);
+  assert.match(navigationItems, /messageKey: 'account\.authenticated'/);
   for (const source of [header, bottom]) {
     assert.match(source, /ACCOUNT_NAV_ITEMS\[accountMode\]/);
     assert.doesNotMatch(source, /Кабинет/);
   }
   assert.doesNotMatch(header, /MobileNav/);
-  assert.doesNotMatch(header, /href=\{ROUTES\.profile\}[\s\S]{0,240}?\{accountItem\.label\}/);
+  assert.match(header, /translations\(accountItem\.messageKey\)/);
   assert.match(header, /accountMode === 'authenticated' \? \(\s*accountMenu\s*\)/);
   const userMenu = await read('components/shared/user-menu.tsx');
   assert.doesNotMatch(userMenu, />\{email\}<\/p>/);
-  assert.match(userMenu, /isAdmin \? 'Админ-панель' : 'Профиль'/u);
-  assert.match(userMenu, /router\.push\(isAdmin \? ROUTES\.admin : ROUTES\.profile\)/u);
+  assert.match(userMenu, /isAdmin \? translations\('admin'\) : translations\('profile'\)/u);
+  assert.match(userMenu, /localizePathname\(ROUTES\.profile, locale\)/u);
   assert.doesNotMatch(layout, /getAuthContext|createClient|supabase/iu);
 });
 

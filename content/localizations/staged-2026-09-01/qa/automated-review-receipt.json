@@ -1,0 +1,1079 @@
+{
+  "schemaVersion": 1,
+  "batchId": "staged-2026-09-01",
+  "generatedAt": "2026-09-01T00:00:00.000Z",
+  "mode": "automated-only",
+  "productionPublished": false,
+  "sourceReceipt": {
+    "catalogChecksum": "9d34b6b4f106b6886a540e0b67c2f7be27ffa6b1e3e4656013e6192ed39c228a",
+    "courseCount": 5,
+    "presentationCount": 5,
+    "presentationPageCount": 198,
+    "variantCount": 15,
+    "questionCount": 150,
+    "optionCount": 600,
+    "correctMappingCount": 150,
+    "linkedDifferences": []
+  },
+  "translation": {
+    "sourceLocale": "ru",
+    "targetLocales": [
+      "kk",
+      "en",
+      "zh"
+    ],
+    "sourceTextUnitCount": 2141,
+    "supplementalTableCellUnitCount": 12,
+    "supplementalLegalLinkUnitCount": 5,
+    "supplementalCurrentLegalUnitCount": 59,
+    "providerFamily": "Google Translate",
+    "providerFamilyCount": 1,
+    "transports": [
+      {
+        "scope": "core",
+        "locales": [
+          "kk",
+          "en"
+        ],
+        "transport": "translate-a-single"
+      },
+      {
+        "scope": "core",
+        "locales": [
+          "zh"
+        ],
+        "transport": "mobile-web"
+      },
+      {
+        "scope": "supplemental-table-cells-and-legal-links",
+        "locales": [
+          "kk",
+          "en",
+          "zh"
+        ],
+        "transport": "mobile-web"
+      },
+      {
+        "scope": "privacy-1.3-and-terms-2.3",
+        "locales": [
+          "kk",
+          "en",
+          "zh"
+        ],
+        "transport": "translate-a-single"
+      }
+    ],
+    "forwardPasses": [
+      {
+        "engine": "google-translate-primary-execution",
+        "glossaryProtected": true
+      },
+      {
+        "engine": "google-translate-secondary-reversed-batch-execution",
+        "glossaryProtected": true
+      }
+    ],
+    "backTranslation": true,
+    "reconciliation": "invariant-preserving candidate with best RU token Dice score",
+    "independentProvider": false,
+    "independentExecutions": true,
+    "glossarySha256": "2c76313f8d5094de0dd3cdc43ce1249431c621be012154a8d71d192d99b975ac",
+    "overridesSha256": "15b6ebafef01e0f2da0d33a2e64170cba08ffc9360a6327670fe2b6276133de7",
+    "overrideFileSha256": "1d6457c7ea098ecedb5619c40687e7ceb7afdbd4ee7cea541a0ed5133ce06219",
+    "appliedOverrideCount": 656,
+    "independentSemanticReview": {
+      "status": "passed",
+      "path": "qa/independent-semantic-review.json",
+      "sha256": "5bc2bbbf6eedaf15310d7db3566e8892672ffdbbe71b19d405825741a24711db",
+      "bytes": 2015,
+      "providerFamily": "OpenAI independent language-model review",
+      "corpusSha256": "051b74a0f13888c8f2374c2abfcf519267c8c985a7cb21e06c0c1d4a066c01c5",
+      "reviewedSourceUnitCount": 2193,
+      "reviewedLocalizedUnitCount": 6579,
+      "acceptedOverrideFileSha256": "1d6457c7ea098ecedb5619c40687e7ceb7afdbd4ee7cea541a0ed5133ce06219",
+      "acceptedOverrideCount": 656,
+      "automatedOnly": true,
+      "noHumanApproval": true
+    }
+  },
+  "checks": {
+    "topologyFailures": [],
+    "warningUnitCount": 878,
+    "invariantFailureCount": 0,
+    "answerKeysIncluded": false,
+    "sourceStableIdsRetained": true
+  },
+  "residualRisk": [
+    "Automated-only translation has not received human linguistic or legal approval.",
+    "The two translation passes are independent executions but use the same provider family.",
+    "Independent semantic review is automated-only and does not replace human linguistic or legal approval.",
+    "Production upload/publication and hosted parity are intentionally deferred to the controlled release stage."
+  ],
+  "artifacts": [
+    {
+      "path": "articles/bezopasnyy-podem-gruza/en.json",
+      "bytes": 5333,
+      "sha256": "60a688e5296d5d0c53cfd5df665d41d84ac17a15c34346dcc5773b44afd9b522"
+    },
+    {
+      "path": "articles/bezopasnyy-podem-gruza/kk.json",
+      "bytes": 8314,
+      "sha256": "c105933c704f2ab14abb4852336dc1617a745bb91f8a421c08ea9f544d536c7c"
+    },
+    {
+      "path": "articles/bezopasnyy-podem-gruza/zh.json",
+      "bytes": 4944,
+      "sha256": "f71f69b1146dd82ef4f1f1bafe4d25f16ebda07dd3fc6367862b110842451dcb"
+    },
+    {
+      "path": "articles/elektrobezopasnost-na-rabochem-meste/en.json",
+      "bytes": 5525,
+      "sha256": "ea1fc11e18fcaa497cae2bf28a86a41a03535d2ba267de30ea473b4875883e2f"
+    },
+    {
+      "path": "articles/elektrobezopasnost-na-rabochem-meste/kk.json",
+      "bytes": 8571,
+      "sha256": "5536a9e04ace6e90db8ea2760e961caee76e31ce030ab3145eb66715697d070c"
+    },
+    {
+      "path": "articles/elektrobezopasnost-na-rabochem-meste/zh.json",
+      "bytes": 4916,
+      "sha256": "95e8adc1a3477a7ef12c49b149b6893b982032a657559b73d819f50b21814521"
+    },
+    {
+      "path": "articles/kak-podgotovitsya-k-testu-po-bezopasnosti/en.json",
+      "bytes": 6030,
+      "sha256": "7d90e2870e98433cd35abe7a06f26b18fe09c8eaf6b0494b91d6b3d7a7d1d446"
+    },
+    {
+      "path": "articles/kak-podgotovitsya-k-testu-po-bezopasnosti/kk.json",
+      "bytes": 8996,
+      "sha256": "97c998121dc34346b31f7a19fe90f2648b72cf950de2dc53dbb313d5f1e5156d"
+    },
+    {
+      "path": "articles/kak-podgotovitsya-k-testu-po-bezopasnosti/zh.json",
+      "bytes": 5783,
+      "sha256": "d7aad36d58d9c7fbd6539385ec921471540e089eeb721a247be0e0eaa3f67d01"
+    },
+    {
+      "path": "articles/kogda-ostanovit-opasnuyu-rabotu/en.json",
+      "bytes": 5570,
+      "sha256": "e071c5ee83cfd1e69d6ebfde4f414213795b402a24fe04645c19dd67cca97818"
+    },
+    {
+      "path": "articles/kogda-ostanovit-opasnuyu-rabotu/kk.json",
+      "bytes": 8413,
+      "sha256": "fc9bdba4e5ec6d2c083a965103e4d4818060996edc9692e858f426812f82ffff"
+    },
+    {
+      "path": "articles/kogda-ostanovit-opasnuyu-rabotu/zh.json",
+      "bytes": 5126,
+      "sha256": "4dd1e71507969f36a457e9dd6bca1847d12fd9febdaf0bb398f2b38b9e4f57e4"
+    },
+    {
+      "path": "articles/ohrana-truda-kazakhstan-2026/en.json",
+      "bytes": 5853,
+      "sha256": "72b6b3df3f5aa86a3866a904ab4867d7edf566faa8c4c01abd6efd1315040db3"
+    },
+    {
+      "path": "articles/ohrana-truda-kazakhstan-2026/kk.json",
+      "bytes": 9018,
+      "sha256": "33232aa1c860e117e72be1da35fb44212cff87aff5e6ea1bc34863182d83a113"
+    },
+    {
+      "path": "articles/ohrana-truda-kazakhstan-2026/zh.json",
+      "bytes": 5484,
+      "sha256": "7dc936e9704e3100ce5fc245b88730447d3b103ba3c68de0b7c9add24bcd2da3"
+    },
+    {
+      "path": "articles/pervaya-pomoshch-na-rabote/en.json",
+      "bytes": 5533,
+      "sha256": "144b4d86782ea64690f1c2cdd4519679a845737747d0839d028d10cc49003eec"
+    },
+    {
+      "path": "articles/pervaya-pomoshch-na-rabote/kk.json",
+      "bytes": 8878,
+      "sha256": "270b5b2f25e089259ca9c14bd05c64a5fdeb8de5e7d60ae2ea563f6a4fcc95e9"
+    },
+    {
+      "path": "articles/pervaya-pomoshch-na-rabote/zh.json",
+      "bytes": 5089,
+      "sha256": "8793e34d82025f389a1b4066bc7f7e2f70a41e59a462600916e1b9274a80d2cb"
+    },
+    {
+      "path": "articles/pervyy-den-na-novom-rabochem-meste/en.json",
+      "bytes": 5587,
+      "sha256": "c6d9d3a02284a58d186b7396af29c2373994e574fbe16b0287f3f615ced28d52"
+    },
+    {
+      "path": "articles/pervyy-den-na-novom-rabochem-meste/kk.json",
+      "bytes": 8541,
+      "sha256": "7e20abaa82f67d0182f2e9d15a964a5f58fbce0dbdca25e50e49be76ceec42be"
+    },
+    {
+      "path": "articles/pervyy-den-na-novom-rabochem-meste/zh.json",
+      "bytes": 5149,
+      "sha256": "c1e0892c4908d5d756e9360e1c12e87f54dbdd29d73b460876b67b0cd19d8671"
+    },
+    {
+      "path": "articles/pozharno-tehnicheskij-minimum/en.json",
+      "bytes": 5390,
+      "sha256": "011a617aa5293869387a53a5fcc6ad0fffd90b706d17a846f5c3197d8587e28d"
+    },
+    {
+      "path": "articles/pozharno-tehnicheskij-minimum/kk.json",
+      "bytes": 7902,
+      "sha256": "e51e2d0a0665c3162be42a73ddff2c12a6faf443cd048ee9452a55001c095040"
+    },
+    {
+      "path": "articles/pozharno-tehnicheskij-minimum/zh.json",
+      "bytes": 4988,
+      "sha256": "8634284bd4aee51ee8a6800e1c55f5de0bc8b4596e30bf1b49b6d40401361632"
+    },
+    {
+      "path": "articles/siz-normy-vydachi-rk/en.json",
+      "bytes": 5668,
+      "sha256": "d165e8afc31aa6495cea918b5ff02f153428d329b2c28200c252e2ea0c9c20e7"
+    },
+    {
+      "path": "articles/siz-normy-vydachi-rk/kk.json",
+      "bytes": 8693,
+      "sha256": "62555817fe3f255cc324d257519a966d8aa4e92c9ad57ff00d689336f353e4b2"
+    },
+    {
+      "path": "articles/siz-normy-vydachi-rk/zh.json",
+      "bytes": 5122,
+      "sha256": "4e68b5875ed4c3b15069f2c222f1fd62442f496cc1b451f9b5bdf606344ae6dd"
+    },
+    {
+      "path": "articles/soobshit-ob-opasnosti-i-incidentah/en.json",
+      "bytes": 5339,
+      "sha256": "9ace15bfee2a3b4a8b08e959fd0ab11fdbc24c75051c643409ec2312050777d2"
+    },
+    {
+      "path": "articles/soobshit-ob-opasnosti-i-incidentah/kk.json",
+      "bytes": 7947,
+      "sha256": "d992baf0e11818356ce7930ce6dab74722f38b0e8d5c0285707c4043c184a3f7"
+    },
+    {
+      "path": "articles/soobshit-ob-opasnosti-i-incidentah/zh.json",
+      "bytes": 4872,
+      "sha256": "d6eb13f489855878a1078b4e06649df981bf1906bdd298dbd9021dc6b1bbdb08"
+    },
+    {
+      "path": "courses/armaturshchik/en/assessment-import.json",
+      "bytes": 28647,
+      "sha256": "90505014bc0365042c93c9a6c1fa3f0b2c40e7e6905de026b26cac4b3138db74"
+    },
+    {
+      "path": "courses/armaturshchik/en/course-draft.json",
+      "bytes": 1063,
+      "sha256": "ec8fdcdd79906ae985b2ecc38830ef2209082a33b626144ca39e30aed4ad3fc5"
+    },
+    {
+      "path": "courses/armaturshchik/kk/assessment-import.json",
+      "bytes": 36448,
+      "sha256": "637f1665f72c01dc127f8cf9b3c37c815ef70c6d20d7b4d9673dbbe00f9d9738"
+    },
+    {
+      "path": "courses/armaturshchik/kk/course-draft.json",
+      "bytes": 1169,
+      "sha256": "7734017a6dd5b88f1b3d5f84ca5ccf933c26ddd2aef45bcfb027210f36ac6af7"
+    },
+    {
+      "path": "courses/armaturshchik/zh/assessment-import.json",
+      "bytes": 26836,
+      "sha256": "0038938a75d101715391a74011169234c64d8350e0b3470c51d3370fa7ef566d"
+    },
+    {
+      "path": "courses/armaturshchik/zh/course-draft.json",
+      "bytes": 1036,
+      "sha256": "a2c0e2cfb95eb8d827d8984af41f6860d3c349871e95af8db1cec9b5f5060586"
+    },
+    {
+      "path": "courses/biot/en/assessment-import.json",
+      "bytes": 28484,
+      "sha256": "b005710ad213241c0d46e021074f981abdd778a070543beb10b9d1d6cd51023c"
+    },
+    {
+      "path": "courses/biot/en/course-draft.json",
+      "bytes": 1070,
+      "sha256": "23315f54550a1b56f2b0b33f1edcfba23b52e2a17a5140e689a644b80ce705e9"
+    },
+    {
+      "path": "courses/biot/kk/assessment-import.json",
+      "bytes": 36574,
+      "sha256": "440fe2f94a3b45b506f50037bc6f6359df701c52c996731b296a64a5d6bd6c71"
+    },
+    {
+      "path": "courses/biot/kk/course-draft.json",
+      "bytes": 1270,
+      "sha256": "e7c06cc41bbab67489ceb2536a2d07256ac0d7504f8546aad5001bbdebb3aa96"
+    },
+    {
+      "path": "courses/biot/zh/assessment-import.json",
+      "bytes": 26611,
+      "sha256": "77b179665802f9127e7ffe5db4accedd91f0bfd0dd83866c2f4196fdedbcd3f3"
+    },
+    {
+      "path": "courses/biot/zh/course-draft.json",
+      "bytes": 1034,
+      "sha256": "aad497fc4479ea74b0e6307ef4d24bb62441a3a2e0bcceae8e3f028654fc9632"
+    },
+    {
+      "path": "courses/lesomontazhnye-raboty/en/assessment-import.json",
+      "bytes": 27832,
+      "sha256": "f8ef946ee0a1d17865c3a64b7b6b3532dceaa0857a40371f285761749c750ca0"
+    },
+    {
+      "path": "courses/lesomontazhnye-raboty/en/course-draft.json",
+      "bytes": 1118,
+      "sha256": "538a144e0ea6bec7c8c225d2d804ea68f8f226b43ffd1767d769f39e7546d576"
+    },
+    {
+      "path": "courses/lesomontazhnye-raboty/kk/assessment-import.json",
+      "bytes": 35657,
+      "sha256": "32008895eaa7df739b6b41f378626bcdf6b007057eb654f8221e8af2a5d2e9f7"
+    },
+    {
+      "path": "courses/lesomontazhnye-raboty/kk/course-draft.json",
+      "bytes": 1341,
+      "sha256": "a2eaa06ad40ddba9f8516e98d2202265c8c6415f7fcfd3ff1fdfa9958c62acde"
+    },
+    {
+      "path": "courses/lesomontazhnye-raboty/zh/assessment-import.json",
+      "bytes": 26318,
+      "sha256": "401c8f0d2795c06b3e537bc1760c8979fbce3aab449218772028e66f40144c9a"
+    },
+    {
+      "path": "courses/lesomontazhnye-raboty/zh/course-draft.json",
+      "bytes": 1083,
+      "sha256": "bebb741fae51b9bc0e35639f2de9385891d44f371de9e702187d46b8072718d7"
+    },
+    {
+      "path": "courses/plotnik/en/assessment-import.json",
+      "bytes": 28844,
+      "sha256": "677190c0a1e6861f2872e054939cb79c26b59d1f686fc42c9354f07654c8c5a4"
+    },
+    {
+      "path": "courses/plotnik/en/course-draft.json",
+      "bytes": 1036,
+      "sha256": "47f087347f91c8bab48e9f397893651f9390bd125934a57179bb14ea7ea94122"
+    },
+    {
+      "path": "courses/plotnik/kk/assessment-import.json",
+      "bytes": 37151,
+      "sha256": "281a5090d3ffc8ed7bc1e76668c684f32955e4761cdfd66ad8115ccfba7458e7"
+    },
+    {
+      "path": "courses/plotnik/kk/course-draft.json",
+      "bytes": 1183,
+      "sha256": "002cc7eedc67c1ba3e5720ed7ad11ad699e8e3f4e05277e2da76bb5dc15bd560"
+    },
+    {
+      "path": "courses/plotnik/zh/assessment-import.json",
+      "bytes": 26946,
+      "sha256": "955938983c7941bd084e7bae30b021a1940c5328065edc3890baefb19f375f5d"
+    },
+    {
+      "path": "courses/plotnik/zh/course-draft.json",
+      "bytes": 1028,
+      "sha256": "59f140d599445dc093671683530a90c90795e3da0e42940fe5284a3a5830e659"
+    },
+    {
+      "path": "courses/pozharnaya-bezopasnost/en/assessment-import.json",
+      "bytes": 27905,
+      "sha256": "f85c2f9f49f115c6e1bd9078f94c967505a8b9ee4f76ab38d593a34be43b8032"
+    },
+    {
+      "path": "courses/pozharnaya-bezopasnost/en/course-draft.json",
+      "bytes": 1059,
+      "sha256": "cf8b8004825d086cd473a05e275b6a78f0cef528cf3e10212d8a953c006836c7"
+    },
+    {
+      "path": "courses/pozharnaya-bezopasnost/kk/assessment-import.json",
+      "bytes": 34933,
+      "sha256": "77869bd5838c3ec7584fd59a2dd157c9efd24e34b4b0b53485000a7ade396a5d"
+    },
+    {
+      "path": "courses/pozharnaya-bezopasnost/kk/course-draft.json",
+      "bytes": 1193,
+      "sha256": "0a54c48c3af2a0b3107084aca9a8dca894791f56bc6cad3d6982e974fd18a739"
+    },
+    {
+      "path": "courses/pozharnaya-bezopasnost/zh/assessment-import.json",
+      "bytes": 26191,
+      "sha256": "6c4f9cfc5bc084d5c7a2a64e753d04beb042c8c88cc54a484864cf1fd6979103"
+    },
+    {
+      "path": "courses/pozharnaya-bezopasnost/zh/course-draft.json",
+      "bytes": 1039,
+      "sha256": "8e383848aa83890123a11049ec04d897cb5d12cef032c1f63cfdd6ebf902f1ca"
+    },
+    {
+      "path": "legal/privacy/1.2/en.json",
+      "bytes": 9646,
+      "sha256": "2abba739a7ed345569f3b53b409a77d134fbcaae8f5c55e2867595a9ac65d1ec"
+    },
+    {
+      "path": "legal/privacy/1.2/kk.json",
+      "bytes": 15537,
+      "sha256": "c12ca4cb1313cdef07ffa43dc9592fd9d4d3ce7c60501559fd6908797adea4c7"
+    },
+    {
+      "path": "legal/privacy/1.2/zh.json",
+      "bytes": 8433,
+      "sha256": "a6942b3b28e49a9b73752a2928fc83ae07bc819bc0f95b45448db3f5510ba722"
+    },
+    {
+      "path": "legal/privacy/1.3/en/artifact-receipt.json",
+      "bytes": 822,
+      "sha256": "3d8f331eb917d27151c32b3984d576a2c41707c6e72c7a4cb1402403055f4877"
+    },
+    {
+      "path": "legal/privacy/1.3/en/save-rpc.json",
+      "bytes": 13671,
+      "sha256": "7a4b68e46750f7ec9989d9d67e9fc7969d665186e210b75386ef2e5e284ad293"
+    },
+    {
+      "path": "legal/privacy/1.3/kk/artifact-receipt.json",
+      "bytes": 822,
+      "sha256": "48412aa6b21327087f09564e0aa2ad11faf8437e2ceae85fad92b9c851ae8862"
+    },
+    {
+      "path": "legal/privacy/1.3/kk/save-rpc.json",
+      "bytes": 21843,
+      "sha256": "907b292d30cba338f97c1fba76d538f34f5c08b196b09bb60b3a828ce3ceab1a"
+    },
+    {
+      "path": "legal/privacy/1.3/publication-receipt.json",
+      "bytes": 2808,
+      "sha256": "acc37a426dc3f78d914c7b27e4f38112ba287e0c3ac53c90e6e207c0ea5e2993"
+    },
+    {
+      "path": "legal/privacy/1.3/publish-rpc.json",
+      "bytes": 177,
+      "sha256": "6796a7292e6bcc13a39999fdc1630eeb6aecefb43f924c41c1f3702ce466e512"
+    },
+    {
+      "path": "legal/privacy/1.3/ru/artifact-receipt.json",
+      "bytes": 730,
+      "sha256": "ea1b621498165aa92e36510495067c1d1f39ea324c33ba967afc7c02f1313832"
+    },
+    {
+      "path": "legal/privacy/1.3/ru/save-rpc.json",
+      "bytes": 20692,
+      "sha256": "663d39dc459cfdcdd0a06dc3451728b74d86ca978a5b0fbf8f347bde169a6bb2"
+    },
+    {
+      "path": "legal/privacy/1.3/stage-rpc.json",
+      "bytes": 207,
+      "sha256": "b20150ce15f31a5e8cdfac3463f98c6d5b85b418c0ce47850921f779820af5b4"
+    },
+    {
+      "path": "legal/privacy/1.3/zh/artifact-receipt.json",
+      "bytes": 822,
+      "sha256": "3913013f3e106c9b6848859d811ffdddab93740b6431c22084e58de5f2117f2f"
+    },
+    {
+      "path": "legal/privacy/1.3/zh/save-rpc.json",
+      "bytes": 12105,
+      "sha256": "f8e52c2b32ef831ccb059e5d4b7bd4779673434f926ef7bc4d47c5d127521e52"
+    },
+    {
+      "path": "legal/terms/2.2/en.json",
+      "bytes": 7931,
+      "sha256": "111a22ecdc01d072064baa3f251a751fdaf55908a547364d99e07054ca4cbbe3"
+    },
+    {
+      "path": "legal/terms/2.2/kk.json",
+      "bytes": 12954,
+      "sha256": "53772a38b8fec6604d187141b77f6f5e506a542f045c86634c87abab22c7b018"
+    },
+    {
+      "path": "legal/terms/2.2/zh.json",
+      "bytes": 6747,
+      "sha256": "1fa73a8daa2988be8a97356c8432b4435d19ee469e53a828b50c61dc2b9ada5b"
+    },
+    {
+      "path": "legal/terms/2.3/en/artifact-receipt.json",
+      "bytes": 816,
+      "sha256": "ce48570dc6478ae0ef1159094f4d5353425a2a623a2cc0576b1f9039c94fec7e"
+    },
+    {
+      "path": "legal/terms/2.3/en/save-rpc.json",
+      "bytes": 10692,
+      "sha256": "b435e733e5f8d72da35d597c73e36b632267d20ee91a78a9a7dbbb02402ef843"
+    },
+    {
+      "path": "legal/terms/2.3/kk/artifact-receipt.json",
+      "bytes": 816,
+      "sha256": "e0a589ae4b801dc25cac5e8ce92d0d45158ec2dada0bf8f46ed2de35e7fa64dc"
+    },
+    {
+      "path": "legal/terms/2.3/kk/save-rpc.json",
+      "bytes": 17544,
+      "sha256": "4584cc07f45466f130cdaec206d4c5867d032454a1db83b5ac0a5e268a2423fd"
+    },
+    {
+      "path": "legal/terms/2.3/publication-receipt.json",
+      "bytes": 2791,
+      "sha256": "24bcaed5fc24e4cdc4a36b880f082d415f2cb00473e19feb8825c64aa18284f9"
+    },
+    {
+      "path": "legal/terms/2.3/publish-rpc.json",
+      "bytes": 175,
+      "sha256": "7ba4792968cd379097cb32c88f4a384aa9f7a8bd6fee6f188071715871ffe940"
+    },
+    {
+      "path": "legal/terms/2.3/ru/artifact-receipt.json",
+      "bytes": 724,
+      "sha256": "2b40d8eb9778d9438c12307b2330724061ebe3d52ee249ffe0d2ebb147bfc7ff"
+    },
+    {
+      "path": "legal/terms/2.3/ru/save-rpc.json",
+      "bytes": 16676,
+      "sha256": "ad7d133d1d91a1a276cd8c5a8bee01b31fafa1532e46757ffa1f8b17da900487"
+    },
+    {
+      "path": "legal/terms/2.3/stage-rpc.json",
+      "bytes": 203,
+      "sha256": "7ef583ed5148d5e93ada98a6a07cda9b774b3acae6aff88bb6ed2429507f9dab"
+    },
+    {
+      "path": "legal/terms/2.3/zh/artifact-receipt.json",
+      "bytes": 815,
+      "sha256": "6d50dcd017c0611cbc5b97d49f9b2e7bb0b1356256e2263be467f26f8f312668"
+    },
+    {
+      "path": "legal/terms/2.3/zh/save-rpc.json",
+      "bytes": 9290,
+      "sha256": "9e777bf5846ce18ca47400804a6524945f675e42edf4eed1db1a30304e234db7"
+    },
+    {
+      "path": "presentations/armaturshchik/en/artifact-receipt.json",
+      "bytes": 4119,
+      "sha256": "56b1617277a3b62a06f47f70883da270b9304e674a01a2c56b420f32dec786a9"
+    },
+    {
+      "path": "presentations/armaturshchik/en/assets/pdf/dd7d9f44fd399a645bc0098f15502c3cbe8c4efd933471464feeb24b9009e275/presentation.pdf",
+      "bytes": 2171096,
+      "sha256": "dd7d9f44fd399a645bc0098f15502c3cbe8c4efd933471464feeb24b9009e275"
+    },
+    {
+      "path": "presentations/armaturshchik/en/assets/pptx/db95211c418a56b31d09669d7687dde21b576a182dea7a458cf81fafb3c130b1/presentation.pptx",
+      "bytes": 2799915,
+      "sha256": "db95211c418a56b31d09669d7687dde21b576a182dea7a458cf81fafb3c130b1"
+    },
+    {
+      "path": "presentations/armaturshchik/en/pdf-receipt.json",
+      "bytes": 923,
+      "sha256": "6a54fa46cefde2aa8607e0e58f37d4bf91bf5430bef18e7228da46be1ff4c107"
+    },
+    {
+      "path": "presentations/armaturshchik/en/pptx-receipt.json",
+      "bytes": 2453,
+      "sha256": "a1e5912cce2cf505396ed55af44874654f575023133cf0d167a96922abdb5616"
+    },
+    {
+      "path": "presentations/armaturshchik/en/text-map.json",
+      "bytes": 109953,
+      "sha256": "f55fbdd741f58879f656afced42fcaba5dfd6e0e4366c2d35ce31d8a43e232b2"
+    },
+    {
+      "path": "presentations/armaturshchik/kk/artifact-receipt.json",
+      "bytes": 9224,
+      "sha256": "0a428ebfff57e5b6e2ed2cb5191a42ba1c9ff0170ac0ee2621fef957d08accad"
+    },
+    {
+      "path": "presentations/armaturshchik/kk/assets/pdf/38cf7a91d9e0eb591c9788afc77bc0ddfa25363900b86d272b789273972417f9/presentation.pdf",
+      "bytes": 2179184,
+      "sha256": "38cf7a91d9e0eb591c9788afc77bc0ddfa25363900b86d272b789273972417f9"
+    },
+    {
+      "path": "presentations/armaturshchik/kk/assets/pptx/037d7b1ff2cff893204f78f76e50b8984157605597752b60f98f063f53004d37/presentation.pptx",
+      "bytes": 2807354,
+      "sha256": "037d7b1ff2cff893204f78f76e50b8984157605597752b60f98f063f53004d37"
+    },
+    {
+      "path": "presentations/armaturshchik/kk/pdf-receipt.json",
+      "bytes": 923,
+      "sha256": "949495d1dac9cc2eaad8817355839652eb8ca02e129776016b71e1e63d776bb5"
+    },
+    {
+      "path": "presentations/armaturshchik/kk/pptx-receipt.json",
+      "bytes": 7558,
+      "sha256": "cf0473da3ab9af7a62c28592f167c906cdf5d6c2bc41edb8565301867505597a"
+    },
+    {
+      "path": "presentations/armaturshchik/kk/qa/layout-only-override-receipt.json",
+      "bytes": 2347,
+      "sha256": "f4fee4e1faa6fb36b6435d57384cc92716406a11856c6c7715844c1e7f927f96"
+    },
+    {
+      "path": "presentations/armaturshchik/kk/text-map.json",
+      "bytes": 121078,
+      "sha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d"
+    },
+    {
+      "path": "presentations/armaturshchik/zh/artifact-receipt.json",
+      "bytes": 4090,
+      "sha256": "0ec9136cb008429d11de99ba69ca8e25da5a6d7ebdac1e2359d1112e8ca949e1"
+    },
+    {
+      "path": "presentations/armaturshchik/zh/assets/pdf/4ac1daf98395fd21079f7cacd1229c990f2243b1c06ff8371c7eb06ccacb851d/presentation.pdf",
+      "bytes": 2460867,
+      "sha256": "4ac1daf98395fd21079f7cacd1229c990f2243b1c06ff8371c7eb06ccacb851d"
+    },
+    {
+      "path": "presentations/armaturshchik/zh/assets/pptx/31716dd37660917b47292b0e3357f33d2abb896dc7150227dc9f936b9d20c985/presentation.pptx",
+      "bytes": 2803329,
+      "sha256": "31716dd37660917b47292b0e3357f33d2abb896dc7150227dc9f936b9d20c985"
+    },
+    {
+      "path": "presentations/armaturshchik/zh/pdf-receipt.json",
+      "bytes": 923,
+      "sha256": "834a375af1983a5148b9ea12d53ff37ab4084fb876ceaa0c0f7eddd2847d97cd"
+    },
+    {
+      "path": "presentations/armaturshchik/zh/pptx-receipt.json",
+      "bytes": 2424,
+      "sha256": "116c3866c0509f2db36198f6ca7c0a43d59c3019e1f7a13e820191e0f2f64cc8"
+    },
+    {
+      "path": "presentations/armaturshchik/zh/text-map.json",
+      "bytes": 107643,
+      "sha256": "90b45c2b5889ec523149f5f92972ea7cd739db647d6b8e17481e479b8953e24c"
+    },
+    {
+      "path": "presentations/biot/en/artifact-receipt.json",
+      "bytes": 4092,
+      "sha256": "1368cc59a1272eaa9dc4267a53e5e82400ea5d8712bbf077f842fa55c4f6e8b3"
+    },
+    {
+      "path": "presentations/biot/en/assets/pdf/cead2abf1efaf41c7cecd5f306161a3b4eb433ba19157aba0ba62af7a1866e80/presentation.pdf",
+      "bytes": 1146679,
+      "sha256": "cead2abf1efaf41c7cecd5f306161a3b4eb433ba19157aba0ba62af7a1866e80"
+    },
+    {
+      "path": "presentations/biot/en/assets/pptx/64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3/presentation.pptx",
+      "bytes": 2365275,
+      "sha256": "64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3"
+    },
+    {
+      "path": "presentations/biot/en/pdf-receipt.json",
+      "bytes": 896,
+      "sha256": "1e135c4dde593dc7244fba4c4f14b02f4ae2ba63266d1238603e6854ae8d1c7b"
+    },
+    {
+      "path": "presentations/biot/en/pptx-receipt.json",
+      "bytes": 2435,
+      "sha256": "639b1b7bb07b7b9c93bb80d98c4d1c48c0718e7abfe8978165dc961ff36b7a8f"
+    },
+    {
+      "path": "presentations/biot/en/text-map.json",
+      "bytes": 236563,
+      "sha256": "27e8be2009aa9ecd08136c1c4ee80b7c53c18fc8592f4c94dd64a53d439d2231"
+    },
+    {
+      "path": "presentations/biot/kk/artifact-receipt.json",
+      "bytes": 11207,
+      "sha256": "60022407c76054c033c51411ddc573887a04fa4407d7f614efdf4bd9df3dc1d7"
+    },
+    {
+      "path": "presentations/biot/kk/assets/pdf/18218ce1d12e3c935891560007f51c662d76aea442b4ec0571ce157f1236af36/presentation.pdf",
+      "bytes": 1172260,
+      "sha256": "18218ce1d12e3c935891560007f51c662d76aea442b4ec0571ce157f1236af36"
+    },
+    {
+      "path": "presentations/biot/kk/assets/pptx/5d72761df15221f20c202d49c38927aa4b034d299ba47400a6112b8277066947/presentation.pptx",
+      "bytes": 2381056,
+      "sha256": "5d72761df15221f20c202d49c38927aa4b034d299ba47400a6112b8277066947"
+    },
+    {
+      "path": "presentations/biot/kk/pdf-receipt.json",
+      "bytes": 896,
+      "sha256": "a44a3429a8dcecdc3933116810c3c4d119ab96e8d0d7ee7e93a64fcad0b5de8f"
+    },
+    {
+      "path": "presentations/biot/kk/pptx-receipt.json",
+      "bytes": 9550,
+      "sha256": "e4d8e5ff0f2fbd162b7712789c99d5d4b1424c5b88dc3b7b67ef6a095c5bfbf6"
+    },
+    {
+      "path": "presentations/biot/kk/qa/layout-only-override-receipt.json",
+      "bytes": 3236,
+      "sha256": "b38bb90a57d325c09562dfdcaa68faff2ecc670fdf2baf98765c355ebde34584"
+    },
+    {
+      "path": "presentations/biot/kk/text-map.json",
+      "bytes": 261255,
+      "sha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e"
+    },
+    {
+      "path": "presentations/biot/zh/artifact-receipt.json",
+      "bytes": 4054,
+      "sha256": "150f1eadcd42567766f07effcd3744c939e6b37260094da32e6c4d048d2ac56f"
+    },
+    {
+      "path": "presentations/biot/zh/assets/pdf/5b8fe63d3ed41febf399695978a89fae44d7d1adf649ad37aa83f61c0774bfdf/presentation.pdf",
+      "bytes": 1566184,
+      "sha256": "5b8fe63d3ed41febf399695978a89fae44d7d1adf649ad37aa83f61c0774bfdf"
+    },
+    {
+      "path": "presentations/biot/zh/assets/pptx/84da5f207a17f06a27b735c395182a01f8aa22cd3775161129fa18a028f5e292/presentation.pptx",
+      "bytes": 2371719,
+      "sha256": "84da5f207a17f06a27b735c395182a01f8aa22cd3775161129fa18a028f5e292"
+    },
+    {
+      "path": "presentations/biot/zh/pdf-receipt.json",
+      "bytes": 896,
+      "sha256": "7f9792906e0c3c5c41251e44337160894ac2d3856f98a5db48fab74807c68402"
+    },
+    {
+      "path": "presentations/biot/zh/pptx-receipt.json",
+      "bytes": 2397,
+      "sha256": "032919a66a21c219be47fcec13b549c54344c69028cbac04f113ae696ec3687f"
+    },
+    {
+      "path": "presentations/biot/zh/text-map.json",
+      "bytes": 231205,
+      "sha256": "77f72665c018f85e71dc127ab9ee35541cc723406794850f88bf3e4b8dff042b"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/en/artifact-receipt.json",
+      "bytes": 6876,
+      "sha256": "1d5f9421f234c8bc23bae2d5ec191333e4432306f2f4f9107d3d2ccd41581dea"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/en/assets/pdf/af7f28d25b1988a13ab886d839a7cac3d968077f3701cbec083d6951992aa624/presentation.pdf",
+      "bytes": 1614386,
+      "sha256": "af7f28d25b1988a13ab886d839a7cac3d968077f3701cbec083d6951992aa624"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/en/assets/pptx/5c72a7d5efad877129b3cf0c21786cb914fd299297c14ce6fb39c29185bb0d45/presentation.pptx",
+      "bytes": 2488355,
+      "sha256": "5c72a7d5efad877129b3cf0c21786cb914fd299297c14ce6fb39c29185bb0d45"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/en/pdf-receipt.json",
+      "bytes": 947,
+      "sha256": "20bd4906a00cb2d0ba3accf4a7aa7b0c74ef4fc6600ada80c0aabc5e3073a92b"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/en/pptx-receipt.json",
+      "bytes": 5202,
+      "sha256": "5c0e24341364d9753bb986d4496ae55005e531107309224bd0b510dd6a482629"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/en/qa/layout-only-override-receipt.json",
+      "bytes": 1253,
+      "sha256": "24eea9e037cb43eb26e2eaadbb23ec3dd8d3d66bc2c63531b9876853ac3ec227"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/en/text-map.json",
+      "bytes": 139358,
+      "sha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/kk/artifact-receipt.json",
+      "bytes": 25158,
+      "sha256": "85391648b47e2ea6b80611b65d602b851cc449ecefe54038e3e61b95b6d4f8fd"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/kk/assets/pdf/3e2817af30b3422b6e027d8660d21a6f9ed9fa5d1c0641c7b4609e2d47b00afc/presentation.pdf",
+      "bytes": 1628071,
+      "sha256": "3e2817af30b3422b6e027d8660d21a6f9ed9fa5d1c0641c7b4609e2d47b00afc"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/kk/assets/pptx/be6064535ee6826f7fde69d46c94b80e14a42deb7e6c45f3a9deef976ddc58d0/presentation.pptx",
+      "bytes": 2499576,
+      "sha256": "be6064535ee6826f7fde69d46c94b80e14a42deb7e6c45f3a9deef976ddc58d0"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/kk/pdf-receipt.json",
+      "bytes": 947,
+      "sha256": "96906194a01c92b51737c97474d3b1d985eee89664df987e8c2bfeac8c987c67"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/kk/pptx-receipt.json",
+      "bytes": 23484,
+      "sha256": "2c3a15d2c0c482d3c534851191f35c94d046c5c6eb03ae805095585664050be3"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/kk/qa/layout-only-override-receipt.json",
+      "bytes": 9660,
+      "sha256": "18393bce7ff5dd54666b31556ec732fe54d7bce6c79a7221baf5684e6b5be7bb"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/kk/text-map.json",
+      "bytes": 156185,
+      "sha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/zh/artifact-receipt.json",
+      "bytes": 4169,
+      "sha256": "6030752e66242864a246347c40c2ae2a78866074ab39f0913b55a692e76fdcf9"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/zh/assets/pdf/9581df07a540fe856b636a5850fbdc7b5de8f0bf9eba93ade5568aa84d068d59/presentation.pdf",
+      "bytes": 1994937,
+      "sha256": "9581df07a540fe856b636a5850fbdc7b5de8f0bf9eba93ade5568aa84d068d59"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/zh/assets/pptx/efc292d495d415cf1d79f41672648ec95e27bfd1003fc1229244a8fdc6dd8bd3/presentation.pptx",
+      "bytes": 2493104,
+      "sha256": "efc292d495d415cf1d79f41672648ec95e27bfd1003fc1229244a8fdc6dd8bd3"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/zh/pdf-receipt.json",
+      "bytes": 947,
+      "sha256": "6735012945c7f2bdfb2f806a844b97c8a0d3fab960b13f268ddf18e15d51e838"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/zh/pptx-receipt.json",
+      "bytes": 2495,
+      "sha256": "a3c83444fbd5fc0b1d2cc9643f5dd3695728127359369d7ba6ab832c5e3183be"
+    },
+    {
+      "path": "presentations/lesomontazhnye-raboty/zh/text-map.json",
+      "bytes": 136217,
+      "sha256": "3f62b1ce6909c19a589795fbef177152dea78148f78a63a4dc2f8d33a19ea144"
+    },
+    {
+      "path": "presentations/plotnik/en/artifact-receipt.json",
+      "bytes": 4068,
+      "sha256": "e4abd45a4e9f6dd89c7b66234d997fc23fbd15743e91449bce73b735f5dda18c"
+    },
+    {
+      "path": "presentations/plotnik/en/assets/pdf/b1b2f47b2b226afac72f7648a702e5ecfe1baf26340261e63709d25d9303ea31/presentation.pdf",
+      "bytes": 1426775,
+      "sha256": "b1b2f47b2b226afac72f7648a702e5ecfe1baf26340261e63709d25d9303ea31"
+    },
+    {
+      "path": "presentations/plotnik/en/assets/pptx/c5aa6f8bd04300c57e92e200eba3ec7fa56b30c6fb68d67cf0fece77b9decc4d/presentation.pptx",
+      "bytes": 1930441,
+      "sha256": "c5aa6f8bd04300c57e92e200eba3ec7fa56b30c6fb68d67cf0fece77b9decc4d"
+    },
+    {
+      "path": "presentations/plotnik/en/pdf-receipt.json",
+      "bytes": 905,
+      "sha256": "d9a66193660fe5f4a97dba413212959e0d1d4a101be6f6ca69212d5c9a76821b"
+    },
+    {
+      "path": "presentations/plotnik/en/pptx-receipt.json",
+      "bytes": 2408,
+      "sha256": "4d9a84bbd6373f5a44b317327c121b545483728430223f46561cb3dd0fb3b153"
+    },
+    {
+      "path": "presentations/plotnik/en/text-map.json",
+      "bytes": 88170,
+      "sha256": "4ec763727f9db624572dc75a3599439dee89422925363c28b926ca4882c4f583"
+    },
+    {
+      "path": "presentations/plotnik/kk/artifact-receipt.json",
+      "bytes": 7034,
+      "sha256": "35a51ce0c804987c43d78bebf2aebfa497565005ca76f693b18bc4e79a30e3de"
+    },
+    {
+      "path": "presentations/plotnik/kk/assets/pdf/8fcbb77fbfbd6abc6005be7e99335e0e9234da4e37afb2b7bf3d9f67ee716656/presentation.pdf",
+      "bytes": 1433853,
+      "sha256": "8fcbb77fbfbd6abc6005be7e99335e0e9234da4e37afb2b7bf3d9f67ee716656"
+    },
+    {
+      "path": "presentations/plotnik/kk/assets/pptx/a9c05a91e1fa2759382c68d32787591fb6077e634872c1b0b2ea59e60defe2f9/presentation.pptx",
+      "bytes": 1935632,
+      "sha256": "a9c05a91e1fa2759382c68d32787591fb6077e634872c1b0b2ea59e60defe2f9"
+    },
+    {
+      "path": "presentations/plotnik/kk/pdf-receipt.json",
+      "bytes": 905,
+      "sha256": "bdba2527aa9f992fb0ec750ee86c418990c692f02d543a501e53483efa70aee0"
+    },
+    {
+      "path": "presentations/plotnik/kk/pptx-receipt.json",
+      "bytes": 5374,
+      "sha256": "1328e9288506ba8fdd97e8eede636beb810c25e1807d4f4bb7f3bbf4be6dcb18"
+    },
+    {
+      "path": "presentations/plotnik/kk/qa/layout-only-override-receipt.json",
+      "bytes": 1335,
+      "sha256": "5c48e14b350b32e444164f56ed2c99275e6c0ce087e218e7f4941c530c8f12ec"
+    },
+    {
+      "path": "presentations/plotnik/kk/text-map.json",
+      "bytes": 96974,
+      "sha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f"
+    },
+    {
+      "path": "presentations/plotnik/zh/artifact-receipt.json",
+      "bytes": 4058,
+      "sha256": "1854b5e69ab1f7920ede139fe8a04f46c6f7048a0e11c378cc936d1b0b05fed4"
+    },
+    {
+      "path": "presentations/plotnik/zh/assets/pdf/66ab1fafa568e2bad3ac8dd96170b402eade3c2dfa69f1176177e586f620b62f/presentation.pdf",
+      "bytes": 1702550,
+      "sha256": "66ab1fafa568e2bad3ac8dd96170b402eade3c2dfa69f1176177e586f620b62f"
+    },
+    {
+      "path": "presentations/plotnik/zh/assets/pptx/2c7ff0acf3bce75cc5ab9d7f90d32a045a990c59a47678801a232877d982a01f/presentation.pptx",
+      "bytes": 1932535,
+      "sha256": "2c7ff0acf3bce75cc5ab9d7f90d32a045a990c59a47678801a232877d982a01f"
+    },
+    {
+      "path": "presentations/plotnik/zh/pdf-receipt.json",
+      "bytes": 905,
+      "sha256": "60f79dd2232506959e07c1a5b4c15dfb27df5115c90dc0accc3c9d434106d5d6"
+    },
+    {
+      "path": "presentations/plotnik/zh/pptx-receipt.json",
+      "bytes": 2398,
+      "sha256": "1250d7546bce29710b89bf1057b918edbc79dad82d8113ee3bd2a97553b39d01"
+    },
+    {
+      "path": "presentations/plotnik/zh/text-map.json",
+      "bytes": 86352,
+      "sha256": "60ec2fa65e5489374626d691d309e4998b4f5f0b1cfaee6ab4efe80f4e36c6e5"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/en/artifact-receipt.json",
+      "bytes": 4150,
+      "sha256": "87867ecab16d042ca081d0d1f163365e87380bb75b52ea7fee09d166cc3fa03b"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/en/assets/pdf/9c7ab00a693999bd693755b8315b3549515f5e2942079ed6eee52b4f4b64c180/presentation.pdf",
+      "bytes": 624634,
+      "sha256": "9c7ab00a693999bd693755b8315b3549515f5e2942079ed6eee52b4f4b64c180"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/en/assets/pptx/dd65e1668cb4573f91822b7437e50e937b90e3dbed19fe4c11f417e4baa8d7a8/presentation.pptx",
+      "bytes": 1431083,
+      "sha256": "dd65e1668cb4573f91822b7437e50e937b90e3dbed19fe4c11f417e4baa8d7a8"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/en/pdf-receipt.json",
+      "bytes": 949,
+      "sha256": "ca5068054b5426d4d05f66b982054267c74ff494fdcd4d107f3f17dccf59ac95"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/en/pptx-receipt.json",
+      "bytes": 2476,
+      "sha256": "dbc58bf99bc2bc414e46b78d742ab7a92a95d0008ca5a3d967a59b647963eb9b"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/en/text-map.json",
+      "bytes": 158316,
+      "sha256": "6bac3a78a49622ca90609901e8677e5fe2805e2fc77ed1d15b82c4cde8148e05"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/kk/artifact-receipt.json",
+      "bytes": 4263,
+      "sha256": "f27ad779a2eb2595fe27d447d7c2043f20870dc69905ba83d18a51b25d12a72a"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/kk/assets/pdf/87d105fc0c0a40cd04d4028178ea58fe75e3fe60aa0e025a7b68cda5c2ad8815/presentation.pdf",
+      "bytes": 638461,
+      "sha256": "87d105fc0c0a40cd04d4028178ea58fe75e3fe60aa0e025a7b68cda5c2ad8815"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/kk/assets/pptx/37374afd69bd03eb9408a68b08d3709d0ddc3eabc43c489865fb6115dfea2c22/presentation.pptx",
+      "bytes": 1441499,
+      "sha256": "37374afd69bd03eb9408a68b08d3709d0ddc3eabc43c489865fb6115dfea2c22"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/kk/pdf-receipt.json",
+      "bytes": 949,
+      "sha256": "98e4ede5169c583fba21751bc04a9d6582b25a114e570c70a468b72d7be7ee03"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/kk/pptx-receipt.json",
+      "bytes": 2589,
+      "sha256": "e8f873e7671776b77dbc37655174a03c03e2a6fd7b25a25f576f9fd508863519"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/kk/text-map.json",
+      "bytes": 172632,
+      "sha256": "d12a1e65edc83511678354c8943234d4e6da3ff6de89d261311e09d60101103d"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/zh/artifact-receipt.json",
+      "bytes": 4129,
+      "sha256": "5dbb3af06a8fe6aa078027f95e0d3c62341b94c7cb7d4d7686686521d3435d41"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/zh/assets/pdf/708603a25126dd211662a770f283112ebc525f97fde1682afa4562b60e02ed84/presentation.pdf",
+      "bytes": 1014601,
+      "sha256": "708603a25126dd211662a770f283112ebc525f97fde1682afa4562b60e02ed84"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/zh/assets/pptx/e5f27d6a194ca2e561edb5ee733ef1c1ebc293ff7bbfa953ee1aaba9fcbabcab/presentation.pptx",
+      "bytes": 1435552,
+      "sha256": "e5f27d6a194ca2e561edb5ee733ef1c1ebc293ff7bbfa953ee1aaba9fcbabcab"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/zh/pdf-receipt.json",
+      "bytes": 950,
+      "sha256": "0000b93f8c751586035fdb8dd8490820fb5a9957f206277e97697226d3f685a6"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/zh/pptx-receipt.json",
+      "bytes": 2454,
+      "sha256": "a5141c453c7d073d0fb8d1c757ae1fe29d9e3a8eb38b9bfb59b8db097cbcc4d7"
+    },
+    {
+      "path": "presentations/pozharnaya-bezopasnost/zh/text-map.json",
+      "bytes": 155255,
+      "sha256": "6f3df1c021389290a48355df508d783f22227b0c56ae707aa0f381a5d8683578"
+    },
+    {
+      "path": "qa/independent-semantic-review.json",
+      "bytes": 2015,
+      "sha256": "5bc2bbbf6eedaf15310d7db3566e8892672ffdbbe71b19d405825741a24711db"
+    },
+    {
+      "path": "qa/layout-concise-gate-pass5.kk.json",
+      "bytes": 5802,
+      "sha256": "55438c6e37dad34aa0f4b36388409c9869f0c6241baf0281043868a2c4c1f900"
+    },
+    {
+      "path": "qa/layout-only-override-receipt.kk-lesomontazhnye-raboty.json",
+      "bytes": 9660,
+      "sha256": "18393bce7ff5dd54666b31556ec732fe54d7bce6c79a7221baf5684e6b5be7bb"
+    },
+    {
+      "path": "qa/presentation-layout-audit.all.json",
+      "bytes": 5755,
+      "sha256": "1edf7b171b8aad262cc7d9005d4a7d14c261e013bf01d5a8e7afee6d83dbcdd0"
+    },
+    {
+      "path": "qa/presentation-visual-qa-receipt.all.json",
+      "bytes": 42596,
+      "sha256": "126c9b8135d53aaf78f9b03208794c50719840470ac6625dc627cba732f83d3f"
+    },
+    {
+      "path": "qa/presentation-visual-qa-receipt.kk-en.json",
+      "bytes": 36015,
+      "sha256": "3df58d3f3a962fcc80764298115c34a26512f14b7fc1b8a786dc38c0ae180942"
+    },
+    {
+      "path": "qa/presentation-visual-qa-receipt.zh.json",
+      "bytes": 7588,
+      "sha256": "a172aa52215066979ac3f41d6601dc103f7d5778b4a7a750a14d2f9b542149cd"
+    },
+    {
+      "path": "qa/proposed-overrides.layout-concise-pass5.approved.json",
+      "bytes": 891,
+      "sha256": "c9f0f78b9b2967157118e1e13c6d4443420eeb5de49ba081b5c408a79af3c288"
+    },
+    {
+      "path": "qa/text-map-freeze-receipt.json",
+      "bytes": 6624,
+      "sha256": "e1173e47ffde429f5de6570ac160c411e62e46e174d23fac5d2f9ecdcb2b4168"
+    },
+    {
+      "path": "qa/text-unit-review.json",
+      "bytes": 2725266,
+      "sha256": "60c008b91fd58eba7614e341be40f5cb88ced56f675ed36a619440305a75d555"
+    }
+  ]
+}

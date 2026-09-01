@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "elektrobezopasnost-na-rabochem-meste",
+  "slug": "elektrobezopasnost-na-rabochem-meste",
+  "title": "Electrical safety for everyone: eight situations where unauthorized DIY is unsafe",
+  "description": "What should an ordinary user do if there is a damaged cable, sparking, a burning smell, a wet socket or a dropped wire.",
+  "coverImage": "/images/generated/article-electrical-safety.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "An electric shock does not require a large electrical panel or a high-voltage line. A damaged extension lead, a wet socket or a faulty metal enclosure can look ordinary—which is exactly why someone may reach out and touch it."
+    },
+    {
+      "tone": "warning",
+      "type": "callout",
+      "title": "Basic Rule",
+      "content": "Do not touch any person, equipment or wire that may be live. Stop others approaching and call trained electrical personnel or emergency services."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Eight “do not touch” signals"
+    },
+    {
+      "type": "list",
+      "items": [
+        "the copper core is visible, the insulation is cracked or the plug is stuck to the wires;",
+        "the socket, cable or housing becomes hotter than usual;",
+        "there is sparking, crackling, a burning smell or traces of soot;",
+        "the equipment is electrocuted or the protection is triggered;",
+        "water has entered an electrical device or is located near the connection;",
+        "the cable is pinched by a door, appliances, furniture or lies in the passage;",
+        "the shield is open, the cover is removed or the danger sign is damaged;",
+        "the wire fell on the ground, vehicle, fence or tree."
+      ],
+      "style": "unordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Correct reaction of an ordinary user"
+    },
+    {
+      "rows": [
+        [
+          "Extension cord damaged",
+          "Do not use it; label it as defective and hand it over for replacement"
+        ],
+        [
+          "There is a burning smell",
+          "Stop work, step away, report; shutdown is carried out in a safe, established manner"
+        ],
+        [
+          "Socket wet",
+          "Do not touch the outlet or nearby water; restrict access and call a specialist"
+        ],
+        [
+          "The machine has switched off again",
+          "Do not turn on repeatedly; report to find the cause"
+        ],
+        [
+          "Wire fell to the ground",
+          "Do not approach or touch objects nearby; warn people and call for help"
+        ]
+      ],
+      "type": "table",
+      "caption": "Do not repair anything you are not authorized to repair",
+      "headers": [
+        "Situation",
+        "Safe action"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Why “quick twist” is dangerous"
+    },
+    {
+      "type": "paragraph",
+      "content": "A seemingly disconnected device may receive voltage again, retain a charge, or be connected to another source. Safe electrical work requires a specific sequence of shutdown, testing, protection against activation, and approval. Duct tape over unknown damage is not this sequence."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "If a person comes under voltage"
+    },
+    {
+      "type": "paragraph",
+      "content": "Do not grab it with your hands. Call 112 immediately and inform dispatch that there may be an electrical shock. Achieve source shutdown in a safe manner through trained personnel. Approach and provide assistance only when it is confirmed that there is no electrical danger, following the instructions of the dispatcher and your training."
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "Before connecting",
+      "content": "Check the housing, cable and plug; Make sure the area is dry and the wire will not get under your feet or wheels. Use the equipment only for its intended purpose and under the conditions specified by the manufacturer."
+    },
+    {
+      "type": "quote",
+      "content": "Electricity does not forgive a tentative touch. Doubt is a sufficient reason to step away and call a specialist."
+    },
+    {
+      "url": "/topics",
+      "text": "Select training program",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "Electrical safety for everyone: eight situations where unauthorized DIY is unsafe",
+    "ogImage": "/images/generated/article-electrical-safety.webp",
+    "ogTitle": "Electrical safety for everyone: eight situations where unauthorized DIY is unsafe",
+    "indexable": true,
+    "description": "What should an ordinary user do if there is a damaged cable, sparking, a burning smell, a wet socket or a dropped wire.",
+    "ogDescription": "What should an ordinary user do if there is a damaged cable, sparking, a burning smell, a wet socket or a dropped wire."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-12",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500010907",
+      "title": "Safety rules for operating electrical installations"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500010889",
+      "title": "Safety regulations for the operation of consumer electrical installations"
+    }
+  ],
+  "createdAt": "2026-08-04T00:00:00.000Z",
+  "updatedAt": "2026-08-04T00:00:00.000Z"
+}

@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "courseId": "56c7fac7-7181-47e9-91cc-aa88e3c59191",
+  "slug": "biot",
+  "locale": "kk",
+  "title": "BIOT",
+  "description": "Еңбек қауіпсіздігі және еңбекті қорғаудың негізгі талаптары: қауіптер, тәуекелдерді бағалау, оқыту, бекіту, қорғаныс құралдары және төтенше жағдайлар кезіндегі процедуралар.",
+  "content": {
+    "modules": []
+  },
+  "seo": {},
+  "jurisdiction": "Қазақстан Республикасы",
+  "effectiveDate": "2026-08-21",
+  "sources": [],
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "importSequence": {
+    "firstAdminSaveExpectedVersion": null,
+    "serviceAssessmentImportExpectedVersion": 1,
+    "completionAdminSaveExpectedVersion": 2,
+    "presentationId": "${PRESENTATION_ID_FROM_IMMUTABLE_UPLOAD}"
+  },
+  "sourceTopologySha256": "1db3fe4c763c6ac9d54aea14e30fe27a6f10c630e82bfbe338fe46115c261ba4",
+  "sourceAnswerMappingSha256": "57e3387aa668d8e435d090409cadbc465325dbec4e3bf10161a77f5838013d1b",
+  "answerKeysIncluded": false
+}

@@ -14,7 +14,9 @@ export async function POST(request: Request) {
     const parsed = createAttemptSchema.safeParse(await readJsonBody(request));
     if (!parsed.success) return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     await requireUser();
-    return NextResponse.json(await startAttempt(parsed.data.testSlug, parsed.data.startNew));
+    return NextResponse.json(
+      await startAttempt(parsed.data.testSlug, parsed.data.startNew, parsed.data.locale),
+    );
   } catch (error) {
     if (error instanceof AttemptPolicyError) {
       return NextResponse.json(

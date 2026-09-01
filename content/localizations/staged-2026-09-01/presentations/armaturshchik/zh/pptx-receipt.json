@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slug": "armaturshchik",
+  "locale": "zh",
+  "productionPublished": false,
+  "contentSummary": "钢筋工: 通过控制工具、框架和工作区域安全地准备、加工、搬运和安装钢筋。",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved; only reviewed locale text and hidden provenance notes change.",
+  "source": {
+    "pptx": "content/source-materials/derived/armaturshchik/presentation.pptx",
+    "pptxSha256": "dca7ef29d82b24756a927831daaf566317e7de5653b7aab43d98492c385701f2",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/armaturshchik/zh/text-map.json",
+    "textMapSha256": "90b45c2b5889ec523149f5f92972ea7cd739db647d6b8e17481e479b8953e24c"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/zh/assets/pptx/31716dd37660917b47292b0e3357f33d2abb896dc7150227dc9f936b9d20c985/presentation.pptx",
+    "sha256": "31716dd37660917b47292b0e3357f33d2abb896dc7150227dc9f936b9d20c985",
+    "byteSize": 2803329,
+    "slideCount": 31
+  },
+  "edits": {
+    "translatedElementCount": 183,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 56,
+    "sourceNotesAdded": 31,
+    "textTopologySha256": "cb1cada17f79b0bc7f5b22eb84e431f6332cd9a614ec356fa4e91b308260563c",
+    "approvedLayoutOverrideCount": 0
+  },
+  "qa": {
+    "everySlideRendered": true,
+    "renderedSlideCount": 31,
+    "layoutInspectionCount": 31,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 31
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 405,
+    "approvedLayoutOverrideCount": 0,
+    "approvedLayoutOverrides": [],
+    "layoutOverrideReceipt": null,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "finalTextVerifiedAgainstMap": true,
+    "finalTableCellsVerifiedAgainstMap": true,
+    "templateTypographyRegressionCount": 0
+  }
+}

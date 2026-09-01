@@ -47,19 +47,31 @@ export function retrySecondsUntil(retryAt: number, nowMs = Date.now()) {
   return Math.max(0, Math.ceil((retryAt - nowMs) / 1000));
 }
 
-export function formatRetryDelay(seconds: number) {
+type RetryDelayLocale = 'ru' | 'kk' | 'en' | 'zh';
+
+const RETRY_DELAY_UNITS = {
+  ru: { second: 'с', minute: 'мин', hour: 'ч' },
+  kk: { second: 'с', minute: 'мин', hour: 'сағ' },
+  en: { second: 's', minute: 'min', hour: 'h' },
+  zh: { second: '秒', minute: '分钟', hour: '小时' },
+} as const satisfies Record<RetryDelayLocale, Record<'second' | 'minute' | 'hour', string>>;
+
+export function formatRetryDelay(seconds: number, locale: RetryDelayLocale = 'ru') {
   const safeSeconds = Math.max(1, Math.ceil(seconds));
-  if (safeSeconds < 60) return `${safeSeconds} с`;
+  const units = RETRY_DELAY_UNITS[locale];
+  if (safeSeconds < 60) return `${safeSeconds} ${units.second}`;
 
   const totalMinutes = Math.floor(safeSeconds / 60);
   const remainingSeconds = safeSeconds % 60;
   if (totalMinutes < 60) {
     return remainingSeconds > 0
-      ? `${totalMinutes} мин ${remainingSeconds} с`
-      : `${totalMinutes} мин`;
+      ? `${totalMinutes} ${units.minute} ${remainingSeconds} ${units.second}`
+      : `${totalMinutes} ${units.minute}`;
   }
 
   const hours = Math.floor(totalMinutes / 60);
   const remainingMinutes = totalMinutes % 60;
-  return remainingMinutes > 0 ? `${hours} ч ${remainingMinutes} мин` : `${hours} ч`;
+  return remainingMinutes > 0
+    ? `${hours} ${units.hour} ${remainingMinutes} ${units.minute}`
+    : `${hours} ${units.hour}`;
 }

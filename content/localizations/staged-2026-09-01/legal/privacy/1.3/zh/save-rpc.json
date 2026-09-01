@@ -1,0 +1,175 @@
+{
+  "function": "save_legal_document_localization",
+  "args": {
+    "p_document_type": "privacy",
+    "p_version": "1.3",
+    "p_locale": "zh",
+    "p_title": "隐私政策",
+    "p_body": {
+      "sections": [
+        {
+          "id": "privacy-scope",
+          "heading": "范围和依据",
+          "paragraphs": [
+            "该政策适用于网站和PWA SafetyHub.kz、四种语言版本、帐户、课程、测试、证书和管理功能。处理数据的目的是提供培训、进行手动配置文件验证、执行测试、颁发和验证证书、响应请求、保护服务并遵守适用的法律要求。",
+            "推断依据是用户同意、遵守已接受的条款和条件以及适用范围内的法律要求。它们对于每种情况的充分性必须由运营商在当地法律审查期间确认。一般监管起点是哈萨克斯坦共和国《个人数据及其保护法》。"
+          ],
+          "items": [],
+          "links": [
+            {
+              "label": "哈萨克斯坦共和国“关于个人数据及其保护”的法律，在“Adilet”门户网站上",
+              "url": "https://adilet.zan.kz/rus/docs/Z1300000094"
+            }
+          ]
+        },
+        {
+          "id": "privacy-authentication",
+          "heading": "帐号、登录和恢复",
+          "paragraphs": [
+            "对于俄语、哈萨克语和英语版本，使用信件中的一次性六位代码进行登录和电子邮件确认。密码、短信代码和联系电话号码不用作登录因素。",
+            "中文版不需要电子邮件、短信、密码或用户名。登录使用 discoverable WebAuthn passkey，并要求在设备上完成用户验证。生物识别数据和设备 PIN 不会传输给 SafetyHub，也不会由 SafetyHub 存储：验证由操作系统或用户的 authenticator 完成。",
+            "为了技术兼容性，中国账户被分配了一个内部不透明的合成身份验证标识符。它不是用户的地址，不用于邮件，并且永远不会向用户或管理员显示，也不包含在公共或管理响应、Telegram 消息、分析或应用程序日志中。",
+            "对于 passkey，系统会处理凭证 ID、公钥、签名计数器、已声明的 transports 和凭证状态。一次性 challenge receipt 的有效期不超过 5 分钟。恢复码仅显示一次；系统只存储其经过 salt 和 pepper 处理的摘要。恢复码使用后立即失效。管理员可在说明理由并留下审计记录后执行重置，并签发一次性 passkey 重新注册代码。"
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-profile-learning",
+          "heading": "简介、验证和培训",
+          "paragraphs": [
+            "配置文件包含名字、姓氏、职位、组织、带有所选国家/地区代码的联系电话、方形照片、首选区域设置、管理员手动验证的状态和时间。联系电话仅用于验证和支持；它不是身份验证因素，也不会传输到 SMS 提供商。",
+            "照片作为一个私有压缩WebP 文件存储在Supabase 存储中。不保存原始帧和中间帧，不公开访问头像，不执行面部识别和自动生物特征识别。相机流不会离开设备：仅将选定和处理的帧发送到服务器。",
+            "在明确接受当前文档后，个人资料会提交给管理员进行人工审核。当状态为“待审核”、“已拒绝”或个人资料未完成时，系统不开放课程材料和题目，不允许创建、恢复或完成考试尝试，也不颁发证书。决定只能由管理员在 Web 管理后台作出；Telegram 不作决定，也不改变申请状态。",
+            "对于培训，保存课程和测试的区域设置和版本、完成的答案、尝试的时间和状态、最佳结果以及已颁发、替换或撤销证书的元数据。对于同意，将存储文档类型和版本、复制区域设置、接受日期和操作来源。"
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-notifications",
+          "heading": "行政通知和电报",
+          "paragraphs": [
+            "新申请、课程完成和系统错误事件会以原子方式写入管理员内部收件箱。机器人还可向私有 Telegram 群组发送一份仅供参考的信息副本。Telegram 不可用不会回滚业务操作，也不会使内部收件箱中的事件不可见。",
+            "申请通知仅包含名字、姓氏、语言、时间和申请队列链接。课程完成通知仅包含名字、姓氏、课程名称、passed 或 failed 结果、分数和时间。System alert 仅包含稳定的 machine code、时间、correlation ID 和管理后台链接。",
+            "在 Telegram 中，禁止传输电子邮件、电话号码、职位、组织、照片、文档、答案、凭证元数据、质询、恢复数据和合成身份验证标识符。 Telegram 消息不包含批准或拒绝按钮，并且无法更改帐户状态。"
+          ],
+          "items": [],
+          "links": [
+            {
+              "label": "Telegram 隐私政策",
+              "url": "https://telegram.org/privacy"
+            }
+          ]
+        },
+        {
+          "id": "privacy-storage",
+          "heading": "Cookie 和本地存储",
+          "paragraphs": [
+            "必要的 cookie 用于登录、更新 HttpOnly 会话、PKCE-恢复电子邮件OTP、保护封闭路由和保存所选区域设置。 localStorage 可以存储主题、隐藏安装提示PWA、不完整的测试答案，以及对于管理员来说，本地编辑器草稿。该数据保留在所选浏览器中，直到用户或应用程序将其删除。不使用广告 cookie 和行为广告。",
+            "如果Cloudflare Turnstile 启用，则其技术数据和存储由Cloudflare 进行安全检查。"
+          ],
+          "items": [],
+          "links": [
+            {
+              "label": "隐私政策 Cloudflare Turnstile",
+              "url": "https://www.cloudflare.com/turnstile-privacy-policy/"
+            }
+          ]
+        },
+        {
+          "id": "privacy-processors",
+          "heading": "供应商及跨境加工",
+          "paragraphs": [
+            "提供商的存储区域和访问位置取决于所选区域、部署设置及其当前子处理器；该代码不保证仅存储在哈萨克斯坦。在产品发布前，运营者必须记录实际区域、合同和可接受的跨境转移机制。"
+          ],
+          "items": [
+            "Supabase - 身份验证、PostgreSQL、私有存储、短期签名链接、电子邮件代码传递、边缘功能和通知传递队列。",
+            "Vercel - 托管、CDN、无服务器执行和技术日志。",
+            "Cloudflare - 可选的反机器人检查 Turnstile（在配置中启用时）。",
+            "Telegram Bot API - 向私人管理组传送严格最小化的信息消息。"
+          ],
+          "links": [
+            {
+              "label": "Supabase DPA",
+              "url": "https://supabase.com/legal/customer-resources/data-processing-addendum"
+            },
+            {
+              "label": "地区 Supabase",
+              "url": "https://supabase.com/docs/guides/platform/regions"
+            },
+            {
+              "label": "Vercel Privacy Notice",
+              "url": "https://vercel.com/legal/privacy-notice"
+            },
+            {
+              "label": "Vercel DPA",
+              "url": "https://vercel.com/legal/dpa"
+            },
+            {
+              "label": "Telegram 隐私政策",
+              "url": "https://telegram.org/privacy"
+            }
+          ]
+        },
+        {
+          "id": "privacy-retention",
+          "heading": "储存期限和处置",
+          "paragraphs": [
+            "账户及个人资料数据、passkey 凭证、联系电话、照片、已完成的尝试、最佳成绩、证书、同意记录及相关管理审计，在账户存续期间保存；单个凭证则保存至其被重置为止。已使用的 recovery digest 立即失效；短期 challenge receipt 最迟在 5 分钟内过期。",
+            "成功的 Telegram 发送行存储 30 天，管理收件箱事件 - 90 天；历史审计不会因这些截止日期而减少。交付错误仅包含有限的类别和技术标识符，而不是完整的外部响应。",
+            "账户被永久删除时，应用会在已实现的级联删除范围内删除 Auth 账户、个人资料、照片、答案和尝试、最佳成绩、已验证数据、凭证和 recovery digests、证书及相关审计记录。被删除证书的公开 QR 验证随后返回“未找到文档”。已经下载到其他设备的 PDF 副本无法从该设备上被实际删除。供应商备份可按其技术周期更新。"
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-certificates",
+          "heading": "证书、报告和公众检查",
+          "paragraphs": [
+            "服务器只返回经授权的有限元数据、模板版本和已签名的 verification URL。PDF 证书、管理 PDF 报告和 ZIP 仅在用户或管理员的浏览器中生成；backend route 不生成这些文件的 bytes，PostgreSQL 或 Storage 也不保存这些 bytes。照片不会包含在 PDF、ZIP 或 QR 验证结果中。",
+            "使用不可预测的签名链接对证书进行公开验证可以泄露所有者的姓名、证书编号和状态、本地化测试名称、结果和颁发日期。如果您不想分享此信息，请勿发布此类链接。可以向用户公司的授权代表提供包含认证数据的公司报告以确认培训。"
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-rights",
+          "heading": "权利和上诉",
+          "paragraphs": [
+            "在适用法律规定的范围内，用户可以请求处理信息和数据副本，以及更正、限制或停止处理、撤回同意和删除账户。如存在强制性的法律依据，某些记录可能会继续保留；运营者必须说明该决定。",
+            "要发送请求或检查手动审核的状态，请使用文档上的联系人。可能需要身份验证来保护您的帐户。如果答复不令人满意，用户有权按照适用法律规定的方式向主管机关或法院提出申诉。"
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "privacy-security-localization",
+          "heading": "安全、本地化和文档更改",
+          "paragraphs": [
+            "应用会校验 WebAuthn origin、challenge 和签名，强制执行 user verification，并使用一次性电子邮件代码、角色与权限隔离、RLS、操作频率限制、浏览器安全响应头、关键操作审计和加密传输。不得向他人透露邮件验证码、passkey session 或 recovery code；任何措施都无法完全消除风险。",
+            "​​俄语副本是本地化的规范来源。 KK、EN 和 ZH 的副本会自动翻译、回译和自动检查，无需人类语言或法律批准。所有四个副本均作为一个版本发布，具有单独的不可变哈希值和相同的结构；自动翻译中仍然存在残余的风险语义或法律差异。",
+            "新的重要版本以新的编号和日期发布。已接受的版本仍然可以通过配置文件中的版本链接获取；如果当前版本尚未被接受，则需要单独同意。"
+          ],
+          "items": [],
+          "links": []
+        },
+        {
+          "id": "legal-contacts",
+          "heading": "根据文档联系方式",
+          "paragraphs": [
+            "致电或写入WhatsApp。对于书面请求，请保存聊天信件。"
+          ],
+          "items": [
+            "电话",
+            "WhatsApp",
+            "写入"
+          ],
+          "links": []
+        }
+      ]
+    },
+    "p_body_hash": null,
+    "p_complete": true
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "pervyy-den-na-novom-rabochem-meste",
+  "slug": "pervyy-den-na-novom-rabochem-meste",
+  "title": "First day at a new workplace: 12 questions before the start",
+  "description": "What a newbie should know about risks, routes, equipment, PPE and communications before attempting their first independent task.",
+  "coverImage": "/images/generated/article-new-worker.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "On the first day, you want to show independence and not ask “stupid” questions. But unfamiliar routes, signals and unwritten habits make the newbie especially vulnerable. A good start is not about speed, but about clarity."
+    },
+    {
+      "tone": "success",
+      "type": "callout",
+      "title": "Questioning is part of working safely",
+      "content": "If the explanation is not clear, ask to see the action again and repeat the order in your own words. Confirmed understanding is more useful than a polite nod."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Four questions about place"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Where is it allowed to walk and what areas are accessible only by permission?",
+        "Where are the nearest normal and emergency exits, assembly point and safe shelter, if provided?",
+        "How does traffic move and where does a pedestrian have limited visibility?",
+        "Where is the first aid kit, manual call point, telephone or other means of communication located?"
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Four questions about the task"
+    },
+    {
+      "type": "list",
+      "items": [
+        "What does a normal start, execution, and safe shutdown look like?",
+        "What are the most likely hazards here and how are they controlled?",
+        "What PPE, tools, guards or permits are needed for this particular operation?",
+        "When do I have to stop and who should I notify?"
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Four questions for help"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Who is my immediate supervisor and who is replacing him?",
+        "Who should I contact in case of equipment malfunction or shortage of PPE?",
+        "How is a hazard, injury or near-incident reported?",
+        "How to call emergency assistance and who will meet the service at the entrance?"
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Check understanding with action"
+    },
+    {
+      "rows": [
+        [
+          "evacuation",
+          "I can show you two paths and a collection point without prompting"
+        ],
+        [
+          "Stop",
+          "I know a safe way to stop my operation"
+        ],
+        [
+          "PPE",
+          "I know how to inspect, put on and adjust the necessary protection"
+        ],
+        [
+          "Communication",
+          "Saved the required number or know the available channel"
+        ],
+        [
+          "Boundaries",
+          "I understand what actions I cannot yet perform on my own"
+        ]
+      ],
+      "type": "table",
+      "caption": "Not just to hear, but to be able to show",
+      "headers": [
+        "Subject",
+        "Self-test"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Don’t copy a dangerous habit"
+    },
+    {
+      "type": "paragraph",
+      "content": "“We always do it this way” does not prove safety. Compare the technique shown with instructions, signs and protective devices. If an experienced colleague suggests bypassing the block, removing PPE, or shortening the procedure, stop and check with your manager."
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "At the end of the first shift",
+      "content": "Write down three things: what was unclear, where you noticed risk, and what skill needs to be repeated with a mentor. This is a short plan for a safe second day."
+    },
+    {
+      "type": "paragraph",
+      "content": "Training and safety briefing provide the basis, but a new task, new equipment or changed conditions require new clarification. Don't automatically transfer yesterday's method to today's work."
+    },
+    {
+      "url": "/topics",
+      "text": "Start training at SafetyHub",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "First day at a new workplace: 12 questions before the start",
+    "ogImage": "/images/generated/article-new-worker.webp",
+    "ogTitle": "First day at a new workplace: 12 questions before the start",
+    "indexable": true,
+    "description": "What a newbie should know about risks, routes, equipment, PPE and communications before attempting their first independent task.",
+    "ogDescription": "What a newbie should know about risks, routes, equipment, PPE and communications before attempting their first independent task."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-12",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K1500000414",
+      "title": "Labor Code of the Republic of Kazakhstan"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500012665",
+      "title": "Rules for training, instructing and testing knowledge on safety and labor protection"
+    }
+  ],
+  "createdAt": "2026-08-02T00:00:00.000Z",
+  "updatedAt": "2026-08-02T00:00:00.000Z"
+}

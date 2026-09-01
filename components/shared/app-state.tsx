@@ -2,16 +2,19 @@
 
 import Link from 'next/link';
 import { WarningCircle, ArrowClockwise, House } from '@phosphor-icons/react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { reportAppError } from '@/lib/observability';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 
 export function AppPageLoading() {
+  const t = useTranslations('AppState');
   return (
     <div
       className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-soft)]"
       role="status"
       aria-live="polite"
-      aria-label="Загрузка страницы"
+      aria-label={t('loadingAria')}
     >
       <div className="space-y-4">
         <div className="space-y-2">
@@ -26,7 +29,7 @@ export function AppPageLoading() {
         </div>
         <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
           <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-[var(--color-primary)]" />
-          Подготавливаем содержимое...
+          {t('loading')}
         </div>
       </div>
     </div>
@@ -43,6 +46,7 @@ type AppErrorStateProps = {
   onRetry?: () => void;
   retryLabel?: string;
   homeLabel?: string;
+  correlationLabel: string;
   compact?: boolean;
 };
 
@@ -52,11 +56,16 @@ export function AppErrorState({
   error,
   diagnostic: providedDiagnostic,
   onRetry,
-  retryLabel = 'Повторить попытку',
-  homeLabel = 'На главную',
+  retryLabel,
+  homeLabel,
+  correlationLabel,
   compact = false,
 }: AppErrorStateProps) {
+  const locale = useLocale() as AppLocale;
+  const common = useTranslations('Common');
   const diagnostic = providedDiagnostic ?? (error ? reportAppError(error, { source: 'app-error-state' }) : null);
+  const resolvedRetryLabel = retryLabel ?? common('retry');
+  const resolvedHomeLabel = homeLabel ?? common('home');
 
   return (
     <div
@@ -71,7 +80,7 @@ export function AppErrorState({
         <p className="text-sm text-[var(--color-text-muted)]">{description}</p>
         {diagnostic ? (
           <p className="break-all font-mono text-xs text-[var(--color-text-subtle)]">
-            Код обращения: {diagnostic.correlationId}
+            {correlationLabel}: {diagnostic.correlationId}
           </p>
         ) : null}
       </div>
@@ -81,15 +90,15 @@ export function AppErrorState({
             <span className="mr-2 inline-flex items-center">
               <ArrowClockwise size={16} />
             </span>
-            {retryLabel}
+            {resolvedRetryLabel}
           </Button>
         ) : null}
         <Button asChild variant="outline" className="min-h-11">
-          <Link href="/">
+          <Link href={localizePathname('/', locale)}>
             <span className="mr-2 inline-flex items-center">
               <House size={16} />
             </span>
-            {homeLabel}
+            {resolvedHomeLabel}
           </Link>
         </Button>
       </div>

@@ -4,9 +4,14 @@ import test from 'node:test';
 import {
   CLEAN_LOAD_TEST_TABLES,
   DISPOSABLE_PROJECT_MARKER,
+  LOCAL_CI_DATABASE_URL,
+  LOCAL_CI_LOAD_TEST_MARKER,
+  LOCAL_CI_SUPABASE_URL,
   PRODUCTION_PROJECT_REF,
+  PROTECTED_PROJECT_REFS,
   assertCleanLoadTestBaseline,
   assertDisposableProjectMarker,
+  assertLocalCiLoadTestTarget,
   assertLoadTestTarget,
   projectRefFromSupabaseUrl,
 } from '../../scripts/load-test-safety.mjs';
@@ -20,6 +25,18 @@ function validTarget(overrides = {}) {
     disposableRef: DISPOSABLE_REF,
     confirmation: DISPOSABLE_REF,
     marker: DISPOSABLE_PROJECT_MARKER,
+    ...overrides,
+  };
+}
+
+function validLocalCiTarget(overrides = {}) {
+  return {
+    url: LOCAL_CI_SUPABASE_URL,
+    databaseUrl: LOCAL_CI_DATABASE_URL,
+    ci: 'true',
+    githubActions: 'true',
+    runnerEnvironment: 'github-hosted',
+    marker: LOCAL_CI_LOAD_TEST_MARKER,
     ...overrides,
   };
 }
@@ -70,19 +87,43 @@ test('valid target requires one exact hosted ref, matching confirmation, and exa
   assert.equal(assertLoadTestTarget(validTarget()), DISPOSABLE_REF);
 });
 
-test('production is unconditionally denied in every ref-bearing input', () => {
+test('local load target is pinned to the exact GitHub-hosted loopback endpoint', () => {
+  assert.equal(assertLocalCiLoadTestTarget(validLocalCiTarget()), 'local-ci');
+
   for (const candidate of [
-    validTarget({ url: `https://${PRODUCTION_PROJECT_REF}.supabase.co` }),
-    validTarget({ disposableRef: PRODUCTION_PROJECT_REF }),
-    validTarget({ confirmation: PRODUCTION_PROJECT_REF }),
-    {
-      url: `https://${PRODUCTION_PROJECT_REF}.supabase.co`,
-      disposableRef: PRODUCTION_PROJECT_REF,
-      confirmation: PRODUCTION_PROJECT_REF,
-      marker: DISPOSABLE_PROJECT_MARKER,
-    },
+    validLocalCiTarget({ url: 'http://localhost:54321' }),
+    validLocalCiTarget({ url: 'https://127.0.0.1:54321' }),
+    validLocalCiTarget({ url: `${LOCAL_CI_SUPABASE_URL}/rest/v1` }),
+    validLocalCiTarget({ url: `${LOCAL_CI_SUPABASE_URL}?target=hosted` }),
+    validLocalCiTarget({ url: DISPOSABLE_URL }),
+    validLocalCiTarget({
+      databaseUrl: 'postgresql://postgres:postgres@podkjjguhhdiecrgznoa.supabase.co:5432/postgres',
+    }),
+    validLocalCiTarget({ databaseUrl: `${LOCAL_CI_DATABASE_URL}?target=hosted` }),
+    validLocalCiTarget({ ci: 'false' }),
+    validLocalCiTarget({ githubActions: 'false' }),
+    validLocalCiTarget({ runnerEnvironment: 'self-hosted' }),
+    validLocalCiTarget({ marker: DISPOSABLE_PROJECT_MARKER }),
   ]) {
-    assert.throws(() => assertLoadTestTarget(candidate), /hard-denied production project/u);
+    assert.throws(() => assertLocalCiLoadTestTarget(candidate), /Refusing destructive/u);
+  }
+});
+
+test('every current or historical production ref is denied in every ref-bearing input', () => {
+  for (const protectedRef of PROTECTED_PROJECT_REFS) {
+    for (const candidate of [
+      validTarget({ url: `https://${protectedRef}.supabase.co` }),
+      validTarget({ disposableRef: protectedRef }),
+      validTarget({ confirmation: protectedRef }),
+      {
+        url: `https://${protectedRef}.supabase.co`,
+        disposableRef: protectedRef,
+        confirmation: protectedRef,
+        marker: DISPOSABLE_PROJECT_MARKER,
+      },
+    ]) {
+      assert.throws(() => assertLoadTestTarget(candidate), /hard-denied production project/u);
+    }
   }
 });
 
@@ -300,32 +341,87 @@ test('Auth and data baseline errors, unknown counts, and nonzero rows all fail c
 });
 
 test('load harness completes every safety preflight before its first seed write', async () => {
-  const [harness, safety] = await Promise.all([
+  const [harness, safety, workflow] = await Promise.all([
     readFile(new URL('../../scripts/load-test-supabase.mjs', import.meta.url), 'utf8'),
     readFile(new URL('../../scripts/load-test-safety.mjs', import.meta.url), 'utf8'),
+    readFile(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),
   ]);
 
   const targetGuard = harness.indexOf('assertLoadTestTarget({');
   const markerGuard = harness.indexOf('await assertDisposableProjectMarker({');
   const baselineGuard = harness.indexOf('await assertCleanLoadTestBaseline(admin);');
-  const firstSeedWrite = harness.indexOf('admin.auth.admin.createUser({');
+  const localFixtureGuard = harness.indexOf(
+    'await prepareLocalCiLocaleFixture(process.env.SAFETYHUB_LOCAL_DATABASE_URL);',
+    baselineGuard,
+  );
+  const firstSeedDispatch = harness.indexOf('createZhLoadTestUser(admin, index', baselineGuard);
 
   assert.ok(targetGuard >= 0);
   assert.ok(markerGuard > targetGuard);
   assert.ok(baselineGuard > markerGuard);
-  assert.ok(firstSeedWrite > baselineGuard);
+  assert.ok(localFixtureGuard > baselineGuard);
+  assert.ok(firstSeedDispatch > localFixtureGuard);
+  assert.ok(firstSeedDispatch > baselineGuard);
+  assert.match(harness, /process\.env\.GITHUB_ACTIONS === 'true' && targetMode !== 'local-ci'/u);
+  assert.match(harness, /SUPABASE_ACCESS_TOKEN must not be present in local-ci load mode/u);
+  assert.match(harness, /LOCAL_CI_CONTENT_FIXTURE_FAILED/u);
+  assert.match(harness, /LOCAL_CI_FOUR_LOCALE_FIXTURE_INCOMPLETE/u);
+  assert.match(harness, /if \(process\.env\.SAFETYHUB_LOAD_TARGET === 'local-ci'\) return/u);
   assert.match(harness, /SAFETYHUB_LOAD_RESUME !== undefined/u);
+  assert.match(harness, /const MAX_MAU_PROFILE = 100/u);
+  assert.match(harness, /const LOAD_WAVES = \[25, 50, 100\]/u);
+  assert.match(harness, /positiveInteger\([\s\S]*'SAFETYHUB_LOAD_USERS'[\s\S]*MAX_MAU_PROFILE/u);
   assert.doesNotMatch(harness, /EXPECTED_PROJECT_REF/u);
-  assert.match(safety, new RegExp(PRODUCTION_PROJECT_REF, 'u'));
+  for (const protectedRef of PROTECTED_PROJECT_REFS) {
+    assert.match(safety, new RegExp(protectedRef, 'u'));
+  }
   assert.match(safety, /targetRef !== expectedRef/u);
   assert.match(safety, /project\?\.name !== DISPOSABLE_PROJECT_MARKER/u);
+  assert.match(safety, /url !== LOCAL_CI_SUPABASE_URL/u);
+  assert.match(safety, /databaseUrl !== LOCAL_CI_DATABASE_URL/u);
+  assert.match(safety, /runnerEnvironment !== 'github-hosted'/u);
   assert.doesNotMatch(harness, /\$\{user\.id\}\/avatar\.webp/u);
-  assert.match(harness, /begin_profile_avatar_upload/u);
-  assert.match(harness, /finish_profile_avatar_storage_write/u);
-  assert.match(harness, /mark_profile_avatar_staged/u);
-  assert.match(harness, /finalize_profile_avatar_upload/u);
+  assert.match(harness, /prepare_zh_registration_operation/u);
+  assert.match(harness, /attach_zh_registration_auth_user/u);
+  assert.match(harness, /mark_zh_registration_storage_written/u);
+  assert.match(harness, /finalize_zh_registration/u);
+  assert.match(harness, /verifyRegistrationResponse/u);
+  assert.match(harness, /verifyAuthenticationResponse/u);
+  assert.match(harness, /createSoftwareCredential/u);
+  assert.match(harness, /runZhAssertion/u);
+  assert.match(harness, /const objectKey = `\$\{id\}\/objects\/\$\{operationId\}\.webp`/u);
   assert.match(harness, /upsert: false/u);
   assert.match(harness, /admin\.auth\.admin\.generateLink\(/u);
   assert.match(harness, /client\.auth\.verifyOtp\(/u);
+  assert.match(harness, /list_published_courses_locale/u);
+  assert.match(harness, /get_published_course_locale/u);
+  assert.match(harness, /get_approved_course_presentation_locale/u);
+  assert.match(harness, /approved presentation metadata contract mismatch/u);
+  assert.match(harness, /presentationReadP95Ms/u);
+  assert.match(harness, /start_test_attempt_locale/u);
+  assert.match(harness, /list_admin_notification_inbox/u);
+  assert.match(harness, /claim_notification_deliveries/u);
+  assert.match(harness, /get_certificate_download_payload/u);
+  assert.match(harness, /zhRegistration:/u);
+  assert.match(harness, /zhAssertionWaveResults/u);
+  assert.doesNotMatch(harness, /throw new Error\([^\n]*\$\{email\}/u);
   assert.doesNotMatch(harness, /signInWithPassword|updateUserById\([^)]*password/u);
+
+  const localJob = workflow.slice(workflow.indexOf('  local-capacity-load:'));
+  assert.match(localJob, /node-version: 24/u);
+  assert.match(localJob, /SAFETYHUB_LOAD_TARGET: local-ci/u);
+  assert.match(localJob, /SAFETYHUB_LOCAL_LOAD_MARKER: LOCAL DISPOSABLE SUPABASE ONLY/u);
+  assert.match(localJob, /SAFETYHUB_LOAD_USERS: '100'/u);
+  assert.match(localJob, /SAFETYHUB_LOAD_SESSIONS: '100'/u);
+  assert.match(localJob, /\[\[ "\$API_URL" != "http:\/\/127\.0\.0\.1:54321" \]\]/u);
+  assert.match(
+    localJob,
+    /\[\[ "\$DB_URL" != "postgresql:\/\/postgres:postgres@127\.0\.0\.1:54322\/postgres" \]\]/u,
+  );
+  assert.match(localJob, /SAFETYHUB_LOCAL_DATABASE_URL=\$DB_URL/u);
+  assert.match(localJob, /env -u SUPABASE_ACCESS_TOKEN npm run test:load/u);
+  assert.doesNotMatch(
+    localJob,
+    /secrets\.|SAFETYHUB_LOAD_TEST_PROJECT_REF|SUPABASE_ACCESS_TOKEN=/u,
+  );
 });

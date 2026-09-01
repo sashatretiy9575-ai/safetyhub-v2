@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "courseId": "697acb0f-4761-4eef-bdd3-191939cf0afb",
+  "slug": "lesomontazhnye-raboty",
+  "locale": "zh",
+  "title": "脚手架搭设作业",
+  "description": "脚手架的安全安装和操作：设计、基础、连接、作业平台、围栏、通道、许可和条件控制。",
+  "content": {
+    "modules": []
+  },
+  "seo": {},
+  "jurisdiction": "哈萨克斯坦共和国",
+  "effectiveDate": "2026-08-21",
+  "sources": [],
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "importSequence": {
+    "firstAdminSaveExpectedVersion": null,
+    "serviceAssessmentImportExpectedVersion": 1,
+    "completionAdminSaveExpectedVersion": 2,
+    "presentationId": "${PRESENTATION_ID_FROM_IMMUTABLE_UPLOAD}"
+  },
+  "sourceTopologySha256": "1a758993fb6e13fa61e3088571de7545d563d257d2c36f7c849d124e50adaf06",
+  "sourceAnswerMappingSha256": "5ff9f8135ff97644765259acc8707c6cf660291bb1617bf62bce818ec7d75218",
+  "answerKeysIncluded": false
+}

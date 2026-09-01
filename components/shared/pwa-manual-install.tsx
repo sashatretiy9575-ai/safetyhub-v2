@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CheckCircle, DownloadSimple, ShareNetwork } from '@phosphor-icons/react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/components/shared/use-pwa-install';
 
@@ -18,34 +19,15 @@ function detectInstallPlatform(): InstallPlatform {
   return 'other';
 }
 
-const instructions: Record<InstallPlatform, readonly string[]> = {
-  ios: [
-    'Откройте SafetyHub в Safari.',
-    'Нажмите «Поделиться» в панели браузера.',
-    'Выберите «На экран Домой», затем нажмите «Добавить».',
-  ],
-  android: [
-    'Откройте меню браузера ⋮.',
-    'Выберите «Установить приложение» или «Добавить на главный экран».',
-    'Подтвердите установку.',
-  ],
-  desktop: [
-    'Найдите значок установки в адресной строке браузера.',
-    'Если значка нет, откройте меню браузера и выберите «Установить SafetyHub».',
-    'Подтвердите установку.',
-  ],
-  other: [
-    'Откройте меню браузера.',
-    'Найдите «Установить приложение» или «Добавить на главный экран».',
-    'Если пункта нет, откройте страницу в Safari, Chrome или Edge.',
-  ],
-};
-
 export function PwaManualInstall() {
+  const t = useTranslations('PwaManual');
   const { isInstallable, install, isStandalone } = usePwaInstall();
   const [platform, setPlatform] = useState<InstallPlatform>('other');
   const [showInstructions, setShowInstructions] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
+  const instructions = (['1', '2', '3'] as const).map((step) =>
+    t(`instructions.${platform}.${step}`),
+  );
 
   useEffect(() => setPlatform(detectInstallPlatform()), []);
 
@@ -73,17 +55,17 @@ export function PwaManualInstall() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <h3 id="install-app-title" className="font-display font-bold">
-            Приложение SafetyHub
+            {t('title')}
           </h3>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
             {isStandalone
-              ? 'Приложение уже установлено на этом устройстве.'
-              : 'Добавьте SafetyHub на главный экран для быстрого запуска.'}
+              ? t('installedDescription')
+              : t('description')}
           </p>
         </div>
         {isStandalone ? (
           <span className="inline-flex min-h-11 shrink-0 items-center gap-2 self-start rounded-full bg-[var(--color-primary-soft)] px-4 text-sm font-bold text-[var(--color-primary-hover)]">
-            <CheckCircle size={19} weight="fill" aria-hidden="true" /> Установлено
+            <CheckCircle size={19} weight="fill" aria-hidden="true" /> {t('installed')}
           </span>
         ) : (
           <Button
@@ -101,7 +83,7 @@ export function PwaManualInstall() {
             ) : (
               <DownloadSimple size={18} aria-hidden="true" />
             )}
-            {isInstalling ? 'Открываем…' : isInstallable ? 'Установить' : 'Как установить'}
+            {isInstalling ? t('installing') : isInstallable ? t('install') : t('howTo')}
           </Button>
         )}
       </div>
@@ -111,7 +93,7 @@ export function PwaManualInstall() {
           id="manual-install-instructions"
           className="mt-4 list-decimal space-y-2 border-t border-[var(--color-border)] pt-4 pl-5 text-sm text-[var(--color-text-muted)]"
         >
-          {instructions[platform].map((instruction) => (
+          {instructions.map((instruction) => (
             <li key={instruction} className="pl-1">
               {instruction}
             </li>

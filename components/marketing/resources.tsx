@@ -6,9 +6,12 @@ import { Container } from '@/components/ui/container';
 import { MarketingSlider } from '@/components/ui/marketing-slider';
 import { ROUTES } from '@/lib/constants';
 import { getArticles } from '@/lib/content/articles';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { localizePathname } from '@/i18n/config';
 
 export async function Resources() {
-  const posts = (await getArticles()).slice(0, 3);
+  const [locale, t] = await Promise.all([getLocale(), getTranslations('Home.resources')]);
+  const posts = (await getArticles(locale)).slice(0, 3);
 
   return (
     <section
@@ -22,15 +25,15 @@ export async function Resources() {
       <Container size="wide">
         <SectionHeading
           id="resources-heading"
-          eyebrow="Полезно перед тестом и сменой"
-          title="Безопасность на понятных примерах"
-          description="Короткие инструкции для обычных рабочих ситуаций: что заметить, как действовать и когда остановиться. Без канцелярита и лишней теории."
+          eyebrow={t('eyebrow')}
+          title={t('title')}
+          description={t('description')}
           action={
             <Link
-              href={ROUTES.blog}
+              href={localizePathname(ROUTES.blog, locale)}
               className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--color-primary)] px-5 text-sm font-bold text-[var(--color-primary-foreground)] shadow-[var(--shadow-card)] transition hover:bg-[var(--color-primary-hover)]"
             >
-              Открыть весь блог
+              {t('all')}
               <ArrowUpRight size={17} weight="bold" aria-hidden="true" />
             </Link>
           }
@@ -38,8 +41,8 @@ export async function Resources() {
 
         {posts.length > 0 ? (
           <MarketingSlider
-            label="Полезные статьи о безопасности"
-            itemLabel="Статья"
+            label={t('slider')}
+            itemLabel={t('item')}
             className="mt-6 sm:mt-8"
           >
             {posts.map((post) => (
@@ -54,7 +57,7 @@ export async function Resources() {
           </MarketingSlider>
         ) : (
           <p className="mt-6 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 p-6 text-sm text-[var(--color-text-muted)] backdrop-blur-xl">
-            Новые материалы уже готовятся. Загляните сюда чуть позже.
+            {t('empty')}
           </p>
         )}
       </Container>

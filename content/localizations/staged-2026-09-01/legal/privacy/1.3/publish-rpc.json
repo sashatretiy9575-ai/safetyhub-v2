@@ -1,0 +1,8 @@
+{
+  "function": "publish_legal_document_localizations",
+  "args": {
+    "p_document_type": "privacy",
+    "p_version": "1.3"
+  },
+  "executeOnlyDuringControlledRelease": true
+}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   ArrowCounterClockwise,
   ArrowLeft,
@@ -17,12 +18,7 @@ import {
   formatDeadlineSeconds,
   remainingDeadlineSeconds,
 } from '@/lib/attempt-deadline';
-import {
-  ClientRequestError,
-  clientRequest,
-  clientRequestMessage,
-  readClientResponseJson,
-} from '@/lib/client-request';
+import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import {
   clearQuizDraft,
   readQuizDraft,
@@ -35,6 +31,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CertificateDownloadButton } from '@/features/certificates/download-button';
 import { Progress } from '@/components/ui/progress';
+import { localizedClientRequestMessage } from '@/i18n/client-errors';
+import {
+  BUSINESS_TIME_ZONE,
+  HTML_LANGUAGE_BY_LOCALE,
+  localizePathname,
+  type AppLocale,
+} from '@/i18n/config';
 
 type AttemptErrorPayload = {
   error?: string;
@@ -43,67 +46,69 @@ type AttemptErrorPayload = {
 };
 type SaveState = 'idle' | 'saved' | 'error';
 
-function retryDate(value?: string) {
+function retryDate(value: string | undefined, locale: AppLocale) {
   if (!value || !Number.isFinite(Date.parse(value))) return null;
-  return new Date(value).toLocaleString('ru-RU', {
+  return new Date(value).toLocaleString(HTML_LANGUAGE_BY_LOCALE[locale], {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: BUSINESS_TIME_ZONE,
   });
-}
-
-function policyMessage(payload: AttemptErrorPayload, status: number) {
-  switch (payload.error) {
-    case 'ACCOUNT_APPROVAL_REQUIRED':
-      return 'Заявка ещё ожидает подтверждения администратора. До подтверждения вопросы и тест недоступны.';
-    case 'PROFILE_ONBOARDING_REQUIRED':
-      return 'Перед первым тестом заполните имя, должность и компанию, затем добавьте фотографию.';
-    case 'AVATAR_REQUIRED':
-      return 'Перед прохождением теста загрузите обязательную фотографию профиля.';
-    case 'ATTEMPT_ROLLING_LIMIT': {
-      const availableAt = retryDate(payload.retryAt);
-      return availableAt
-        ? `Повторное прохождение будет доступно ${availableAt}.`
-        : 'Дата следующего прохождения временно недоступна. Попробуйте открыть тест позже.';
-    }
-    case 'ATTEMPT_DAILY_LIMIT': {
-      const availableAt = retryDate(payload.retryAt);
-      return availableAt
-        ? `Лимит новых попыток исчерпан. Следующая попытка будет доступна ${availableAt}.`
-        : 'Сегодня использованы все 8 попыток по этому курсу. Попробуйте после полуночи.';
-    }
-    case 'ATTEMPT_NOT_FOUND':
-      return 'Эта попытка больше не существует. Начните новую попытку.';
-    case 'ATTEMPT_VARIANT_INVALID':
-      return 'Вариант теста недоступен. Начните новую попытку или обратитесь к администратору.';
-    case 'COURSE_CATALOG_MAINTENANCE':
-      return 'Каталог курсов временно обновляется. Уже начатые тесты можно продолжить; новую попытку начните чуть позже.';
-    case 'ATTEMPT_ALREADY_COMPLETED':
-      return 'Попытка уже завершена. Обновите страницу, чтобы увидеть результат.';
-    case 'ATTEMPT_EXPIRED':
-      return 'Время теста истекло. Сервер завершил попытку без результата.';
-    default:
-      return status === 401
-        ? 'Войдите, чтобы пройти тест.'
-        : 'Не удалось открыть тест. Попробуйте позже.';
-  }
 }
 
 async function readAttemptError(response: Response) {
   return (await readClientResponseJson<AttemptErrorPayload>(response)) ?? {};
 }
 
-function transportMessage(error: ConstructorParameters<typeof ClientRequestError>[0]) {
-  return clientRequestMessage(
-    new ClientRequestError(error),
-    'Не удалось связаться с сервером. Ответы сохранены на устройстве.',
-  );
-}
-
 export function QuizClient({ slug, title }: { slug: string; title: string }) {
   const router = useRouter();
+  const locale = useLocale() as AppLocale;
+  const t = useTranslations('Quiz');
+  const tErrors = useTranslations('Common.errors');
+  const policyMessage = useCallback(
+    (payload: AttemptErrorPayload, status: number) => {
+      switch (payload.error) {
+        case 'ACCOUNT_APPROVAL_REQUIRED':
+          return t('errors.approvalRequired');
+        case 'PROFILE_ONBOARDING_REQUIRED':
+          return t('errors.onboardingRequired');
+        case 'AVATAR_REQUIRED':
+          return t('errors.avatarRequired');
+        case 'ATTEMPT_ROLLING_LIMIT': {
+          const availableAt = retryDate(payload.retryAt, locale);
+          return availableAt
+            ? t('errors.rollingLimitAt', { availableAt })
+            : t('errors.rollingLimitUnknown');
+        }
+        case 'ATTEMPT_DAILY_LIMIT': {
+          const availableAt = retryDate(payload.retryAt, locale);
+          return availableAt
+            ? t('errors.dailyLimitAt', { availableAt })
+            : t('errors.dailyLimitUnknown', { count: 8 });
+        }
+        case 'ATTEMPT_NOT_FOUND':
+          return t('errors.notFound');
+        case 'ATTEMPT_VARIANT_INVALID':
+          return t('errors.variantInvalid');
+        case 'COURSE_CATALOG_MAINTENANCE':
+          return t('errors.catalogMaintenance');
+        case 'ATTEMPT_ALREADY_COMPLETED':
+          return t('errors.alreadyCompleted');
+        case 'ATTEMPT_EXPIRED':
+          return t('errors.expired');
+        default:
+          return status === 401 ? t('errors.unauthenticated') : t('errors.openFailed');
+      }
+    },
+    [locale, t],
+  );
+  const transportMessage = useCallback(
+    (error: unknown) =>
+      localizedClientRequestMessage(error, t('errors.transportWithDraft'), tErrors),
+    [t, tErrors],
+  );
   const [attempt, setAttempt] = useState<AttemptPayload | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
@@ -187,10 +192,10 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
       setErrorCode(payload.error ?? 'REQUEST_FAILED');
       setError(policyMessage(payload, response.status));
       if (payload.error === 'PROFILE_ONBOARDING_REQUIRED' || payload.error === 'AVATAR_REQUIRED') {
-        router.replace('/onboarding');
+        router.replace(localizePathname('/onboarding', locale));
       }
     },
-    [applyTerminalAttempt, router],
+    [applyTerminalAttempt, locale, policyMessage, router],
   );
 
   const refreshAttemptStatus = useCallback(
@@ -216,18 +221,13 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           applyTerminalAttempt(payload);
         }
       } catch (requestError) {
-        setError(
-          clientRequestMessage(
-            requestError,
-            'Не удалось подтвердить срок на сервере. Повторите проверку.',
-          ),
-        );
+        setError(localizedClientRequestMessage(requestError, t('errors.expiryCheck'), tErrors));
       } finally {
         checkingExpiryRef.current = false;
         if (mountedRef.current) setCheckingExpiry(false);
       }
     },
-    [applyResponseError, applyTerminalAttempt],
+    [applyResponseError, applyTerminalAttempt, t, tErrors, transportMessage],
   );
 
   const loadAttempt = useCallback(
@@ -239,7 +239,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
         const result = await clientRequest('/api/attempts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ testSlug: slug, startNew }),
+          body: JSON.stringify({ testSlug: slug, startNew, locale }),
         });
         if (!result.ok) {
           if (result.response) await applyResponseError(result.response);
@@ -252,6 +252,12 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
 
         const payload = await readClientResponseJson<AttemptPayload>(result.response);
         if (!payload) throw new Error('INVALID_ATTEMPT_RESPONSE');
+        if (payload.locale !== locale) {
+          window.location.replace(
+            localizePathname(`/topics/${payload.testSlug}/test`, payload.locale),
+          );
+          return;
+        }
         attemptRef.current = payload;
         setAttempt(payload);
         setReviewing(false);
@@ -279,14 +285,12 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
         }
       } catch (requestError) {
         setErrorCode('REQUEST_FAILED');
-        setError(
-          clientRequestMessage(requestError, 'Не удалось загрузить тест. Попробуйте снова.'),
-        );
+        setError(localizedClientRequestMessage(requestError, t('errors.loadFailed'), tErrors));
       } finally {
         if (mountedRef.current) setLoading(false);
       }
     },
-    [applyResponseError, persistDraft, slug],
+    [applyResponseError, locale, persistDraft, slug, t, tErrors, transportMessage],
   );
 
   useEffect(() => {
@@ -324,7 +328,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
     if (anchor === null) {
       remainingSecondsRef.current = null;
       setRemainingSeconds(null);
-      setError('Сервер не вернул корректный срок теста. Обновите страницу.');
+      setError(t('errors.invalidDeadline'));
       return;
     }
 
@@ -343,7 +347,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
     updateTimer();
     const interval = window.setInterval(updateTimer, 1000);
     return () => window.clearInterval(interval);
-  }, [attempt, refreshAttemptStatus]);
+  }, [attempt, refreshAttemptStatus, t]);
 
   useEffect(() => {
     if (!localBackupFailedRef.current && !submissionLocked) return;
@@ -379,7 +383,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
     if (!persisted) {
       setSaveState('error');
       setSaveError(
-        'Браузер не разрешил локальное сохранение. Не закрывайте страницу до отправки теста.',
+        t('errors.localSaveFailed'),
       );
     } else {
       setSaveState('saved');
@@ -437,12 +441,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
       setSaveError('');
       if (typeof window !== 'undefined') clearQuizDraft(window.localStorage, payload.attemptId);
     } catch (requestError) {
-      setError(
-        clientRequestMessage(
-          requestError,
-          'Не удалось отправить тест. Ответы сохранены; безопасно повторите отправку.',
-        ),
-      );
+      setError(localizedClientRequestMessage(requestError, t('errors.submitFailed'), tErrors));
     } finally {
       if (mountedRef.current) setSubmitting(false);
     }
@@ -453,7 +452,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
       <section className="py-16">
         <Container size="narrow">
           <p role="status" className="text-center text-sm text-[var(--color-text-muted)]">
-            Загружаем тест…
+            {t('loading')}
           </p>
         </Container>
       </section>
@@ -471,17 +470,21 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
               <div className="flex flex-wrap justify-center gap-3">
                 {errorCode === 'UNAUTHENTICATED' ? (
                   <Button asChild>
-                    <Link href="/auth/login">Войти</Link>
+                    <Link href={localizePathname('/auth/login', locale)}>{t('signIn')}</Link>
                   </Button>
                 ) : onboardingAction ? (
-                  <Button onClick={() => router.push('/onboarding')}>Заполнить профиль</Button>
+                  <Button onClick={() => router.push(localizePathname('/onboarding', locale))}>
+                    {t('completeProfile')}
+                  </Button>
                 ) : approvalAction ? (
-                  <Button onClick={() => router.push('/profile')}>Открыть статус заявки</Button>
+                  <Button onClick={() => router.push(localizePathname('/profile', locale))}>
+                    {t('openApproval')}
+                  </Button>
                 ) : errorCode === 'ATTEMPT_NOT_FOUND' ? (
-                  <Button onClick={() => void loadAttempt(true)}>Начать новую попытку</Button>
+                  <Button onClick={() => void loadAttempt(true)}>{t('newAttempt')}</Button>
                 ) : (
                   <Button variant="outline" onClick={() => void loadAttempt(false)}>
-                    Повторить
+                    {t('retry')}
                   </Button>
                 )}
               </div>
@@ -514,10 +517,10 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
               <div>
                 <h1 className="font-display text-3xl font-black">
                   {passed
-                    ? 'Тест пройден'
+                    ? t('result.passedTitle')
                     : expired
-                      ? 'Время теста истекло'
-                      : 'Порог пока не достигнут'}
+                      ? t('result.expiredTitle')
+                      : t('result.failedTitle')}
                 </h1>
                 <p className="mt-2 text-[var(--color-text-muted)]">{title}</p>
               </div>
@@ -528,7 +531,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                       {attempt.score}/{attempt.total}
                     </strong>
                     <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-                      {percent}% правильных ответов
+                      {t('result.correctPercent', { percent: percent ?? 0 })}
                     </p>
                   </div>
                   <Progress value={percent ?? 0} className="h-3" />
@@ -536,26 +539,23 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     <div className="rounded-xl border border-[var(--color-warning)] bg-[var(--color-accent-amber-soft)] p-4 text-left">
                       <p className="font-bold">
                         {attempt.certificatePendingVerification
-                          ? 'Результат ожидает проверки данных'
-                          : 'Результат готов к выдаче сертификата'}
+                          ? t('result.pendingVerification')
+                          : t('result.readyForCertificate')}
                       </p>
                       <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                        Первая выдача выполняется администратором явно. Результат уже сохранён, а
-                        повторное прохождение можно использовать, чтобы улучшить балл.
+                        {t('result.certificateAdminIssue')}
                       </p>
                     </div>
                   ) : null}
                   <p className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4 text-left text-sm leading-6 text-[var(--color-text-muted)]">
-                    Итог сохранён в личном кабинете. Правильные варианты и ключи ответов не
-                    показываются: повторите материал курса перед следующей попыткой.
+                    {t('result.savedNoAnswers')}
                   </p>
                 </>
               ) : expired ? (
                 <div className="space-y-2 border-y border-dashed border-[var(--color-border)] py-5">
-                  <strong className="text-lg">Попытка завершена сервером</strong>
+                  <strong className="text-lg">{t('result.expiredServer')}</strong>
                   <p className="text-sm text-[var(--color-text-muted)]">
-                    Отведённые {attempt.durationMinutes} мин. закончились. Балл и правильные
-                    варианты не рассчитывались и не раскрываются.
+                    {t('result.expiredDescription', { minutes: attempt.durationMinutes })}
                   </p>
                 </div>
               ) : (
@@ -564,8 +564,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     {attempt.score ?? 0}/{attempt.total}
                   </strong>
                   <p className="text-sm text-[var(--color-text-muted)]">
-                    Лучший балл сохранён в личном кабинете. Повторите материал курса перед новым
-                    прохождением.
+                    {t('result.failedDescription')}
                   </p>
                   <Progress value={percent ?? 0} className="h-3" />
                 </div>
@@ -579,17 +578,19 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                 <Button variant="outline" onClick={() => void loadAttempt(true)}>
                   <ArrowCounterClockwise size={18} />
                   {expired
-                    ? 'Начать новую попытку'
+                    ? t('newAttempt')
                     : passed
-                      ? 'Улучшить результат'
-                      : 'Пройти снова'}
+                      ? t('improveResult')
+                      : t('retake')}
                 </Button>
                 {attempt.certificateId ? (
                   <CertificateDownloadButton certificateId={attempt.certificateId} size="md">
-                    Сертификат
+                    {t('certificate')}
                   </CertificateDownloadButton>
                 ) : null}
-                <Button onClick={() => router.push('/profile')}>Открыть аккаунт</Button>
+                <Button onClick={() => router.push(localizePathname('/profile', locale))}>
+                  {t('openAccount')}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -608,30 +609,34 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
             <CardContent className="space-y-6 p-4 min-[320px]:p-5 md:p-8">
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-bold text-[var(--color-primary)]">Перед отправкой</p>
+                  <p className="text-sm font-bold text-[var(--color-primary)]">
+                    {t('review.eyebrow')}
+                  </p>
                   <span
                     role="timer"
-                    aria-label={`Осталось времени ${timerText}`}
+                    aria-label={t('timerAria', { time: timerText })}
                     className="rounded-full bg-[var(--color-surface-muted)] px-3 py-1 text-sm font-black tabular-nums"
                   >
                     {timerText}
                   </span>
                 </div>
-                <h1 className="font-display mt-1 text-2xl font-black">Проверьте ответы</h1>
+                <h1 className="font-display mt-1 text-2xl font-black">
+                  {t('review.title')}
+                </h1>
                 <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-                  После подтверждения попытка будет завершена. Пока можно изменить любой выбор.
+                  {t('review.description')}
                 </p>
               </div>
               {remainingSeconds === 0 && (
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-[var(--color-accent-amber-soft)] p-3 text-sm">
-                  <span>Время закончилось. Сервер должен подтвердить итоговый статус.</span>
+                  <span>{t('review.expired')}</span>
                   <button
                     type="button"
                     className="min-h-11 font-bold text-[var(--color-primary)]"
                     disabled={checkingExpiry}
                     onClick={() => void refreshAttemptStatus(attempt.attemptId)}
                   >
-                    {checkingExpiry ? 'Проверяем…' : 'Проверить'}
+                    {checkingExpiry ? t('checking') : t('check')}
                   </button>
                 </div>
               )}
@@ -650,7 +655,9 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                         {index + 1}. {question.text}
                       </p>
                       <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-                        {selected ? `Выбрано: ${selected.text}` : 'Ответ не выбран'}
+                        {selected
+                          ? t('review.selected', { answer: selected.text })
+                          : t('review.notSelected')}
                       </p>
                       <button
                         type="button"
@@ -658,7 +665,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                         className="mt-2 min-h-11 text-sm font-bold text-[var(--color-primary)]"
                         onClick={() => navigateToQuestion(index)}
                       >
-                        Изменить ответ
+                        {t('review.change')}
                       </button>
                     </li>
                   );
@@ -672,7 +679,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   disabled={submissionLocked || submitting}
                   onChange={(event) => setReviewConfirmed(event.target.checked)}
                 />
-                Я проверил ответы и подтверждаю окончательную отправку.
+                {t('review.confirmation')}
               </label>
               {error && (
                 <p role="alert" className="text-sm text-[var(--color-danger)]">
@@ -686,17 +693,17 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   disabled={submissionLocked || submitting}
                 >
                   <ArrowLeft size={18} />
-                  Вернуться
+                  {t('back')}
                 </Button>
                 <Button
                   onClick={() => void submitAttempt()}
                   disabled={!allAnswered || !reviewConfirmed || submitting}
                 >
                   {submitting
-                    ? 'Отправляем…'
+                    ? t('submitting')
                     : submissionLocked
-                      ? 'Повторить отправку'
-                      : 'Подтвердить отправку'}
+                      ? t('retrySubmit')
+                      : t('confirmSubmit')}
                   <CheckCircle size={18} />
                 </Button>
               </div>
@@ -715,7 +722,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
   const progress = (answers.length / attempt.questions.length) * 100;
   const saveLabel =
     saveState === 'saved'
-      ? 'Черновик сохранён на этом устройстве'
+      ? t('draftSaved')
       : saveState === 'error'
         ? saveError
         : '';
@@ -725,23 +732,23 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
       <Container size="narrow">
         <div className="mb-5 flex items-center justify-between gap-3">
           <Link
-            href={`/topics/${slug}`}
+            href={localizePathname(`/topics/${slug}`, locale)}
             onClick={(event) => {
               if (
                 localBackupFailedRef.current &&
-                !window.confirm('Локальный черновик недоступен. Всё равно выйти?')
+                !window.confirm(t('leaveWithoutDraft'))
               ) {
                 event.preventDefault();
               }
             }}
             className="inline-flex min-h-11 items-center gap-1 text-sm font-bold text-[var(--color-text-muted)]"
           >
-            <CaretLeft size={16} />К теме
+            <CaretLeft size={16} /> {t('toCourse')}
           </Link>
           <div className="flex items-center gap-2">
             <span
               role="timer"
-              aria-label={`Осталось времени ${timerText}`}
+              aria-label={t('timerAria', { time: timerText })}
               className="rounded-full bg-[var(--color-surface-muted)] px-3 py-1 text-xs font-black tabular-nums"
             >
               {timerText}
@@ -753,19 +760,19 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
         </div>
         {remainingSeconds === 0 && (
           <div className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-[var(--color-accent-amber-soft)] p-3 text-sm">
-            <span>Время на клиентском таймере закончилось. Подтверждаем статус на сервере.</span>
+            <span>{t('timerExpired')}</span>
             <button
               type="button"
               className="min-h-11 shrink-0 font-bold text-[var(--color-primary)]"
               disabled={checkingExpiry}
               onClick={() => void refreshAttemptStatus(attempt.attemptId)}
             >
-              {checkingExpiry ? 'Проверяем…' : 'Проверить'}
+              {checkingExpiry ? t('checking') : t('check')}
             </button>
           </div>
         )}
         <Progress value={progress} className="mb-4 h-3" />
-        <nav aria-label="Вопросы теста" className="mb-7 flex justify-center gap-2">
+        <nav aria-label={t('questionsAria')} className="mb-7 flex justify-center gap-2">
           {attempt.questions.map((question, index) => {
             const answered = answers.some((answer) => answer.questionId === question.id);
             const current = index === currentIndex;
@@ -773,7 +780,11 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
               <button
                 key={question.id}
                 type="button"
-                aria-label={`Вопрос ${index + 1}${answered ? ', ответ выбран' : ''}`}
+                aria-label={
+                  answered
+                    ? t('questionAnsweredAria', { number: index + 1 })
+                    : t('questionAria', { number: index + 1 })
+                }
                 aria-current={current ? 'step' : undefined}
                 onClick={() => navigateToQuestion(index)}
                 className={`grid size-11 place-items-center rounded-full border-2 text-sm font-black transition-colors ${
@@ -793,7 +804,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           <CardContent className="space-y-6 p-4 min-[320px]:p-5 md:p-8">
             <h1 className="font-display text-xl leading-tight font-bold">{currentQuestion.text}</h1>
             <fieldset className="space-y-3">
-              <legend className="sr-only">Выберите ответ</legend>
+              <legend className="sr-only">{t('chooseAnswer')}</legend>
               {currentQuestion.options.map((option) => {
                 const selected = selectedOptionId === option.id;
                 return (
@@ -832,7 +843,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                       if (saved) setSaveError('');
                     }}
                   >
-                    Повторить локальное сохранение
+                    {t('retryLocalSave')}
                   </button>
                 )}
               </div>
@@ -849,11 +860,11 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                 disabled={currentIndex === 0}
               >
                 <ArrowLeft size={18} />
-                Назад
+                {t('previous')}
               </Button>
               {currentIndex === attempt.questions.length - 1 ? (
                 <Button onClick={openReview} disabled={!allAnswered}>
-                  Проверить ответы
+                  {t('reviewAnswers')}
                   <CheckCircle size={18} />
                 </Button>
               ) : (
@@ -861,7 +872,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   onClick={() => navigateToQuestion(currentIndex + 1)}
                   disabled={!selectedOptionId}
                 >
-                  Далее
+                  {t('next')}
                   <ArrowRight size={18} />
                 </Button>
               )}

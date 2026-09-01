@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-01T00:00:00.000Z",
+  "state": "TEXT_MAPS_FROZEN",
+  "productionPublished": false,
+  "override": {
+    "path": "content/localizations/translation-overrides.ru-kk-en-zh.json",
+    "bytes": 815880,
+    "sha256": "1d6457c7ea098ecedb5619c40687e7ceb7afdbd4ee7cea541a0ed5133ce06219",
+    "itemCount": 656
+  },
+  "independentSemanticReview": {
+    "path": "content/localizations/staged-2026-09-01/qa/independent-semantic-review.json",
+    "bytes": 2015,
+    "sha256": "5bc2bbbf6eedaf15310d7db3566e8892672ffdbbe71b19d405825741a24711db",
+    "corpusSha256": "051b74a0f13888c8f2374c2abfcf519267c8c985a7cb21e06c0c1d4a066c01c5",
+    "validationFailureCount": 0,
+    "unresolvedMaterialFindingCount": 0
+  },
+  "presentationLayoutAudit": {
+    "sourcePath": "content/localizations/staged-2026-09-01/qa/presentation-layout-audit.all.json",
+    "sourceFileSha256": "1edf7b171b8aad262cc7d9005d4a7d14c261e013bf01d5a8e7afee6d83dbcdd0",
+    "deckLocaleCount": 15,
+    "inspectedSlideCount": 594,
+    "regressionCount": 0
+  },
+  "pass5Rejection": {
+    "gateSha256": "41d38da02f6fcdfceb22a325f141b9d4860baa120bb0b9248f162aa70f288197",
+    "gateFileSha256": "55438c6e37dad34aa0f4b36388409c9869f0c6241baf0281043868a2c4c1f900",
+    "emptyApprovedFileSha256": "c9f0f78b9b2967157118e1e13c6d4443420eeb5de49ba081b5c408a79af3c288",
+    "acceptedTitlePreserved": "Құрылыс мінбесі: жүйе, орнықтылық",
+    "rejectedTargetApplied": false
+  },
+  "layoutOnlyCorrection": {
+    "receiptPath": "content/localizations/staged-2026-09-01/qa/layout-only-override-receipt.kk-lesomontazhnye-raboty.json",
+    "receiptSha256": "18393bce7ff5dd54666b31556ec732fe54d7bce6c79a7221baf5684e6b5be7bb",
+    "locale": "kk",
+    "slug": "lesomontazhnye-raboty",
+    "slide": 10,
+    "shapeId": "4",
+    "textChanged": false,
+    "fontChanged": false,
+    "neighborContentMoved": false,
+    "newlyIntersectedNeighborCount": 0
+  },
+  "mapCount": 15,
+  "localizedSlideCount": 594,
+  "combinedMapManifestSha256": "61f9ba8a2ef5ba33cf66e9d7fe42aa77707b35387fd76110c5899795e28fa0b8",
+  "maps": [
+    {
+      "locale": "kk",
+      "slug": "plotnik",
+      "path": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/text-map.json",
+      "bytes": 96974,
+      "sha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+      "slideCount": 25
+    },
+    {
+      "locale": "kk",
+      "slug": "armaturshchik",
+      "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/kk/text-map.json",
+      "bytes": 121078,
+      "sha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+      "slideCount": 31
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/kk/text-map.json",
+      "bytes": 156185,
+      "sha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "slideCount": 42
+    },
+    {
+      "locale": "kk",
+      "slug": "biot",
+      "path": "content/localizations/staged-2026-09-01/presentations/biot/kk/text-map.json",
+      "bytes": 261255,
+      "sha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+      "slideCount": 59
+    },
+    {
+      "locale": "kk",
+      "slug": "pozharnaya-bezopasnost",
+      "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/kk/text-map.json",
+      "bytes": 172632,
+      "sha256": "d12a1e65edc83511678354c8943234d4e6da3ff6de89d261311e09d60101103d",
+      "slideCount": 41
+    },
+    {
+      "locale": "en",
+      "slug": "plotnik",
+      "path": "content/localizations/staged-2026-09-01/presentations/plotnik/en/text-map.json",
+      "bytes": 88170,
+      "sha256": "4ec763727f9db624572dc75a3599439dee89422925363c28b926ca4882c4f583",
+      "slideCount": 25
+    },
+    {
+      "locale": "en",
+      "slug": "armaturshchik",
+      "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/en/text-map.json",
+      "bytes": 109953,
+      "sha256": "f55fbdd741f58879f656afced42fcaba5dfd6e0e4366c2d35ce31d8a43e232b2",
+      "slideCount": 31
+    },
+    {
+      "locale": "en",
+      "slug": "lesomontazhnye-raboty",
+      "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/en/text-map.json",
+      "bytes": 139358,
+      "sha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+      "slideCount": 42
+    },
+    {
+      "locale": "en",
+      "slug": "biot",
+      "path": "content/localizations/staged-2026-09-01/presentations/biot/en/text-map.json",
+      "bytes": 236563,
+      "sha256": "27e8be2009aa9ecd08136c1c4ee80b7c53c18fc8592f4c94dd64a53d439d2231",
+      "slideCount": 59
+    },
+    {
+      "locale": "en",
+      "slug": "pozharnaya-bezopasnost",
+      "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/en/text-map.json",
+      "bytes": 158316,
+      "sha256": "6bac3a78a49622ca90609901e8677e5fe2805e2fc77ed1d15b82c4cde8148e05",
+      "slideCount": 41
+    },
+    {
+      "locale": "zh",
+      "slug": "plotnik",
+      "path": "content/localizations/staged-2026-09-01/presentations/plotnik/zh/text-map.json",
+      "bytes": 86352,
+      "sha256": "60ec2fa65e5489374626d691d309e4998b4f5f0b1cfaee6ab4efe80f4e36c6e5",
+      "slideCount": 25
+    },
+    {
+      "locale": "zh",
+      "slug": "armaturshchik",
+      "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/zh/text-map.json",
+      "bytes": 107643,
+      "sha256": "90b45c2b5889ec523149f5f92972ea7cd739db647d6b8e17481e479b8953e24c",
+      "slideCount": 31
+    },
+    {
+      "locale": "zh",
+      "slug": "lesomontazhnye-raboty",
+      "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/zh/text-map.json",
+      "bytes": 136217,
+      "sha256": "3f62b1ce6909c19a589795fbef177152dea78148f78a63a4dc2f8d33a19ea144",
+      "slideCount": 42
+    },
+    {
+      "locale": "zh",
+      "slug": "biot",
+      "path": "content/localizations/staged-2026-09-01/presentations/biot/zh/text-map.json",
+      "bytes": 231205,
+      "sha256": "77f72665c018f85e71dc127ab9ee35541cc723406794850f88bf3e4b8dff042b",
+      "slideCount": 59
+    },
+    {
+      "locale": "zh",
+      "slug": "pozharnaya-bezopasnost",
+      "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/zh/text-map.json",
+      "bytes": 155255,
+      "sha256": "6f3df1c021389290a48355df508d783f22227b0c56ae707aa0f381a5d8683578",
+      "slideCount": 41
+    }
+  ],
+  "validationFailures": []
+}

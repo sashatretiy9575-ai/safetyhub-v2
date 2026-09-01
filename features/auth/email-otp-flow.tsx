@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { SignIn, UserPlus } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { FieldError } from '@/features/auth/form-controls';
 import {
   formatRetryDelay,
@@ -12,11 +13,13 @@ import {
   retrySecondsUntil,
 } from '@/features/auth/otp-rate-limit';
 import { Turnstile, type TurnstileHandle } from '@/features/auth/turnstile';
-import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
+import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { emailOtpStartSchema, emailOtpVerifySchema } from '@/lib/validation/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { localizedClientRequestMessage } from '@/i18n/client-errors';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 
 type EmailOtpIntent = 'login' | 'register';
 type EmailOtpStage = 'email' | 'code';
@@ -37,19 +40,6 @@ const ATTEMPT_STORAGE_KEY = 'safetyhub-email-otp:attempt';
 const SEND_COOLDOWN_STORAGE_KEY = 'safetyhub-email-otp:send-cooldown';
 const SEND_RATE_LIMITED_ERROR = 'SEND_RATE_LIMITED';
 const VERIFY_RATE_LIMITED_ERROR = 'VERIFY_RATE_LIMITED';
-
-const sendErrorMessages: Record<string, string> = {
-  CAPTCHA_FAILED: 'Проверка безопасности истекла. Пройдите её снова.',
-  INVALID_REQUEST: 'Проверьте введённый email.',
-  OTP_UNAVAILABLE: 'Не удалось отправить код. Повторите позже.',
-};
-
-const verifyErrorMessages: Record<string, string> = {
-  OTP_CODE_INVALID: 'Код неверен, истёк или уже использован. Проверьте его либо запросите новый.',
-  INVALID_REQUEST: 'Введите email и шестизначный код.',
-  OTP_UNAVAILABLE: 'Не удалось проверить код. Повторите позже.',
-  AUTH_CONTEXT_UNAVAILABLE: 'Сессия подтверждена, но профиль пока недоступен. Повторите позже.',
-};
 
 function readStoredAttempt(intent: EmailOtpIntent): StoredAttempt | null {
   try {
@@ -145,17 +135,20 @@ function clearStoredSendCooldown() {
   }
 }
 
-function safeLanding(value: unknown) {
+function safeLanding(value: unknown, locale: AppLocale) {
   return value === '/admin' ||
-    value === '/auth/legal' ||
-    value === '/onboarding' ||
-    value === '/profile'
+    value === localizePathname('/auth/legal', locale) ||
+    value === localizePathname('/onboarding', locale) ||
+    value === localizePathname('/profile', locale)
     ? value
-    : '/profile';
+    : localizePathname('/profile', locale);
 }
 
 export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('AuthOtp');
+  const errorT = useTranslations('Common.errors');
   const [stage, setStage] = useState<EmailOtpStage>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
@@ -193,9 +186,9 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
     if (storedAttempt) {
       setSentAt(storedAttempt.sentAt);
       setStage('code');
-      setStatus('Введите код из письма. Если письмо не пришло, запросите новый код.');
+      setStatus(t('storedStatus'));
     }
-  }, [intent]);
+  }, [intent, t]);
 
   useEffect(() => {
     if (!retryActive) return;
@@ -237,6 +230,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
           email: normalizedEmail,
           intent,
           captchaToken,
+          locale,
         }),
       });
       const payload = await readClientResponseJson<{
@@ -258,10 +252,18 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
           setError(SEND_RATE_LIMITED_ERROR);
           return;
         }
+        const localizedCodeMessage =
+          errorCode === 'CAPTCHA_FAILED'
+            ? t('captchaFailed')
+            : errorCode === 'INVALID_REQUEST'
+              ? t('requestInvalid')
+              : errorCode === 'OTP_UNAVAILABLE'
+                ? t('sendUnavailable')
+                : null;
         const fallbackMessage = result.ok
-          ? 'Не удалось отправить код. Повторите позже.'
-          : clientRequestMessage(result.error, 'Не удалось отправить код. Повторите позже.');
-        setError((errorCode && sendErrorMessages[errorCode]) || fallbackMessage);
+          ? t('sendUnavailable')
+          : localizedClientRequestMessage(result.error, t('sendUnavailable'), errorT);
+        setError(localizedCodeMessage || fallbackMessage);
         return;
       }
 
@@ -273,11 +275,11 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       setSendRetryAt(nextRetryAt);
       setRetryClock(nextSentAt);
       setStage('code');
-      setStatus('Если этот адрес можно использовать, код отправлен. Введите шесть цифр из письма.');
+      setStatus(t('sentStatus'));
       storeAttempt(normalizedEmail, nextSentAt);
       storeSendCooldown(normalizedEmail, nextRetryAt);
     } catch (requestError) {
-      setError(clientRequestMessage(requestError, 'Не удалось отправить код. Повторите позже.'));
+      setError(localizedClientRequestMessage(requestError, t('sendUnavailable'), errorT));
     } finally {
       resetCaptcha();
       inFlightActionRef.current = null;
@@ -301,7 +303,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
     if (!parsed.success) {
       const nextErrors: FieldErrors = {};
       const flattened = parsed.error.flatten().fieldErrors;
-      if (flattened.email?.length) nextErrors.email = 'Введите корректный email.';
+      if (flattened.email?.length) nextErrors.email = t('emailInvalid');
       setFieldErrors(nextErrors);
       setError('');
       requestAnimationFrame(() => emailRef.current?.focus());
@@ -324,12 +326,13 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
     const parsed = emailOtpVerifySchema.safeParse({
       email,
       code,
+      locale,
     });
     if (!parsed.success) {
       const nextErrors: FieldErrors = {};
       const flattened = parsed.error.flatten().fieldErrors;
-      if (flattened.email?.length) nextErrors.email = 'Введите корректный email.';
-      if (flattened.code?.length) nextErrors.code = 'Введите шестизначный код.';
+      if (flattened.email?.length) nextErrors.email = t('emailInvalid');
+      if (flattened.code?.length) nextErrors.code = t('codeInvalid');
       setFieldErrors(nextErrors);
       setError('');
       requestAnimationFrame(() => (nextErrors.email ? emailRef.current : codeRef.current)?.focus());
@@ -365,10 +368,20 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
           setError(VERIFY_RATE_LIMITED_ERROR);
           return;
         }
+        const localizedCodeMessage =
+          errorCode === 'OTP_CODE_INVALID'
+            ? t('otpInvalid')
+            : errorCode === 'INVALID_REQUEST'
+              ? t('verifyInvalid')
+              : errorCode === 'OTP_UNAVAILABLE'
+                ? t('verifyUnavailable')
+                : errorCode === 'AUTH_CONTEXT_UNAVAILABLE'
+                  ? t('contextUnavailable')
+                  : null;
         const fallbackMessage = result.ok
-          ? 'Не удалось проверить код. Повторите позже.'
-          : clientRequestMessage(result.error, 'Не удалось проверить код. Повторите позже.');
-        setError((errorCode && verifyErrorMessages[errorCode]) || fallbackMessage);
+          ? t('verifyUnavailable')
+          : localizedClientRequestMessage(result.error, t('verifyUnavailable'), errorT);
+        setError(localizedCodeMessage || fallbackMessage);
         if (errorCode === 'OTP_CODE_INVALID') {
           setCode('');
           requestAnimationFrame(() => codeRef.current?.focus());
@@ -378,10 +391,10 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
 
       clearStoredAttempt();
       clearStoredSendCooldown();
-      router.replace(safeLanding(payload?.redirectTo));
+      router.replace(safeLanding(payload?.redirectTo, locale));
       router.refresh();
     } catch (requestError) {
-      setError(clientRequestMessage(requestError, 'Не удалось проверить код. Повторите позже.'));
+      setError(localizedClientRequestMessage(requestError, t('verifyUnavailable'), errorT));
     } finally {
       inFlightActionRef.current = null;
       setBusy(null);
@@ -400,16 +413,16 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
   };
 
   const Icon = isRegister ? UserPlus : SignIn;
-  const title = isRegister ? 'Создать аккаунт' : 'Вход или регистрация';
+  const title = isRegister ? t('registerTitle') : t('loginTitle');
   const visibleError =
     error === SEND_RATE_LIMITED_ERROR
       ? sendRetrySeconds > 0
-        ? `Лимит отправки кода исчерпан. Повторите через ${formatRetryDelay(sendRetrySeconds)}.`
-        : 'Время ожидания истекло. Теперь можно запросить новый код.'
+        ? t('sendLimit', { delay: formatRetryDelay(sendRetrySeconds, locale) })
+        : t('sendLimitExpired')
       : error === VERIFY_RATE_LIMITED_ERROR
         ? verifyRetrySeconds > 0
-          ? `Слишком много попыток проверки. Повторите через ${formatRetryDelay(verifyRetrySeconds)}.`
-          : 'Время ожидания истекло. Теперь можно снова проверить код.'
+          ? t('verifyLimit', { delay: formatRetryDelay(verifyRetrySeconds, locale) })
+          : t('verifyLimitExpired')
         : error;
 
   return (
@@ -421,8 +434,8 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
         <h1 className="font-display text-2xl font-bold">{title}</h1>
         <p className="text-sm text-[var(--color-text-muted)]">
           {stage === 'email'
-            ? 'Укажите email — пришлём одноразовый шестизначный код.'
-            : 'Введите код из письма. Он действует ограниченное время и используется один раз.'}
+            ? t('emailDescription')
+            : t('codeDescription')}
         </p>
       </div>
 
@@ -435,7 +448,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       {stage === 'email' && (
         <form onSubmit={requestCode} className="space-y-4" noValidate>
           <div className="space-y-2">
-            <Label htmlFor={`${intent}-email`}>Email</Label>
+            <Label htmlFor={`${intent}-email`}>{t('emailLabel')}</Label>
             <Input
               id={`${intent}-email`}
               ref={emailRef}
@@ -459,10 +472,10 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
             disabled={busy !== null || sendRetrySeconds > 0}
           >
             {busy === 'send'
-              ? 'Отправляем...'
+              ? t('sending')
               : sendRetrySeconds > 0
-                ? `Повторить через ${formatRetryDelay(sendRetrySeconds)}`
-                : 'Получить код'}
+                ? t('retryIn', { delay: formatRetryDelay(sendRetrySeconds, locale) })
+                : t('send')}
           </Button>
           <Button
             type="button"
@@ -471,11 +484,11 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
             disabled={busy !== null}
             onClick={() => {
               setStage('code');
-              setStatus('Введите email и код из уже полученного письма.');
+              setStatus(t('existingStatus'));
               setError('');
             }}
           >
-            У меня уже есть код
+            {t('haveCode')}
           </Button>
         </form>
       )}
@@ -483,7 +496,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       {stage === 'code' && (
         <form onSubmit={verifyCode} className="space-y-4" noValidate>
           <div className="space-y-2">
-            <Label htmlFor={`${intent}-code-email`}>Email</Label>
+            <Label htmlFor={`${intent}-code-email`}>{t('emailLabel')}</Label>
             <Input
               id={`${intent}-code-email`}
               ref={emailRef}
@@ -507,7 +520,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
             <FieldError id={`${intent}-code-email-error`} message={fieldErrors.email} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`${intent}-code`}>Код из письма</Label>
+            <Label htmlFor={`${intent}-code`}>{t('codeLabel')}</Label>
             <Input
               id={`${intent}-code`}
               ref={codeRef}
@@ -534,10 +547,10 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
             disabled={busy !== null || verifyRetrySeconds > 0}
           >
             {busy === 'verify'
-              ? 'Проверяем...'
+              ? t('verifying')
               : verifyRetrySeconds > 0
-                ? `Повторить через ${formatRetryDelay(verifyRetrySeconds)}`
-                : 'Подтвердить код'}
+                ? t('retryIn', { delay: formatRetryDelay(verifyRetrySeconds, locale) })
+                : t('verify')}
           </Button>
           <div className="grid gap-2 sm:grid-cols-2">
             <Button
@@ -548,8 +561,8 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
               onClick={requestCode}
             >
               {sendRetrySeconds > 0
-                ? `Отправить ещё раз через ${formatRetryDelay(sendRetrySeconds)}`
-                : 'Отправить ещё раз'}
+                ? t('resendIn', { delay: formatRetryDelay(sendRetrySeconds, locale) })
+                : t('resend')}
             </Button>
             <Button
               type="button"
@@ -558,7 +571,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
               disabled={busy !== null}
               onClick={changeEmail}
             >
-              Изменить email
+              {t('changeEmail')}
             </Button>
           </div>
         </form>
@@ -583,12 +596,12 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       )}
 
       <p className="text-center text-sm text-[var(--color-text-muted)]">
-        {isRegister ? 'Уже есть аккаунт? ' : 'Нет аккаунта? '}
+        {isRegister ? `${t('registerLinkLead')} ` : `${t('loginLinkLead')} `}
         <Link
-          href={isRegister ? '/auth/login' : '/auth/register'}
+          href={localizePathname(isRegister ? '/auth/login' : '/auth/register', locale)}
           className="font-medium text-[var(--color-primary)] hover:underline"
         >
-          {isRegister ? 'Войти' : 'Регистрация'}
+          {isRegister ? t('loginLink') : t('registerLink')}
         </Link>
       </p>
     </>

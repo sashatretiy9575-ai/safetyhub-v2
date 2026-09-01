@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "kogda-ostanovit-opasnuyu-rabotu",
+  "slug": "kogda-ostanovit-opasnuyu-rabotu",
+  "title": "When work needs to stop: seven clear signals",
+  "description": "How to recognize an immediate hazard, correctly stop the action and report the problem without conflict and heroism.",
+  "coverImage": "/images/generated/article-stop-work.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "Stopping work is not a punishment or a sign of weakness. This is a controlled pause when actual conditions no longer correspond to a safe way to perform a task. The earlier the signal is noticed, the fewer the consequences."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Seven stop-work warning signs"
+    },
+    {
+      "type": "list",
+      "items": [
+        "safety guard, lockout, alarm or emergency stop missing or faulty;",
+        "there is smoke, sparking, a gas or burning odor, unusual heating, vibration or noise;",
+        "people have entered the danger zone, and the operator cannot reliably control their position;",
+        "conditions have changed: rain, wind, poor visibility, spills, collapse, movement of other equipment;",
+        "the required tool or PPE is missing, they are damaged or not suitable for the task;",
+        "the task goes beyond the scope of instruction, clearance, work order or your training;",
+        "you do not understand the command, communication signals are lost or the actions of the participants contradict each other."
+      ],
+      "style": "unordered"
+    },
+    {
+      "tone": "warning",
+      "type": "callout",
+      "title": "Do not eliminate one hazard by creating another",
+      "content": "Do not go under a load, remove a protective cover, touch a damaged cable, or enter a gas-contaminated area for a “quick fix” unless it is a safe procedure and your training to do so."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "How to stop the action"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Give a clear, established stop signal. If there is no single signal, say loudly and clearly: “Stop, hazard.”",
+        "Stop your activity in a safe way; do not make a sudden maneuver that will create a new risk.",
+        "Warn people nearby and, within your capabilities, prevent anyone from entering the danger zone.",
+        "Tell your manager: what you saw, where, when and what it threatens.",
+        "Resume work only after the cause has been eliminated, safe conditions have been confirmed and the task is clear."
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Calm message formula"
+    },
+    {
+      "rows": [
+        [
+          "Fact",
+          "The opening fencing on the site is damaged"
+        ],
+        [
+          "risk",
+          "A person may fall from a height"
+        ],
+        [
+          "My action",
+          "I stopped moving materials nearby"
+        ],
+        [
+          "Request",
+          "It is necessary to fence off the opening and confirm a safe route"
+        ]
+      ],
+      "type": "table",
+      "caption": "Fact - risk - request",
+      "headers": [
+        "Part",
+        "Example"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": "This formula eliminates the dispute about intentions. You do not blame your colleague or prove who is right, but show an observable fact and the next safe step. If hazard is not resolved, use the organization's escalation channel."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "What does the employee's right say?"
+    },
+    {
+      "type": "paragraph",
+      "content": "The Labor Code of Kazakhstan establishes guarantees in the field of labor safety and health, including refusal to perform work if there is an immediate danger to life and health. Please check the instructions of your workplace for the specific procedure for notification and further actions. In an emergency, people are first taken out of danger, then messages are issued."
+    },
+    {
+      "tone": "success",
+      "type": "callout",
+      "title": "Correct stop result",
+      "content": "Not just “working again”, but the reason is clear, risk has been eliminated or controlled, participants have received the same instructions and are ready to continue safely."
+    },
+    {
+      "url": "/topics/biot",
+      "text": "Test knowledge of labor protection",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "When work needs to stop: seven clear signals",
+    "ogImage": "/images/generated/article-stop-work.webp",
+    "ogTitle": "When work needs to stop: seven clear signals",
+    "indexable": true,
+    "description": "How to recognize an immediate hazard, correctly stop the action and report the problem without conflict and heroism.",
+    "ogDescription": "How to recognize an immediate hazard, correctly stop the action and report the problem without conflict and heroism."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-11",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K1500000414",
+      "title": "Labor Code of the Republic of Kazakhstan"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500012665",
+      "title": "Rules for training, instructing and testing knowledge on safety and labor protection"
+    }
+  ],
+  "createdAt": "2026-08-06T00:00:00.000Z",
+  "updatedAt": "2026-08-25T20:15:07.694Z"
+}

@@ -1,24 +1,27 @@
 import { MapPin, Phone, WhatsappLogo } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { Logo } from '@/components/shared/logo';
 import { ContactLink } from '@/components/shared/contact-link';
 import { Container } from '@/components/ui/container';
-import { CONTACT_DETAILS, ROUTES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants';
+import { localizePathname } from '@/i18n/config';
 import type { SiteContactSettings } from '@/lib/site-contacts-shared';
 
 const NAV_LINKS = [
-  { href: ROUTES.topics, label: 'Курсы' },
-  { href: ROUTES.blog, label: 'Блог' },
-  { href: ROUTES.contacts, label: 'Контакты' },
-  { href: ROUTES.faq, label: 'FAQ' },
+  { href: ROUTES.topics, messageKey: 'nav.topics' },
+  { href: ROUTES.blog, messageKey: 'nav.blog' },
+  { href: ROUTES.contacts, messageKey: 'nav.contacts' },
+  { href: ROUTES.faq, messageKey: 'nav.faq' },
 ] as const;
 
 const LEGAL_LINKS = [
-  { href: ROUTES.privacy, label: 'Конфиденциальность' },
-  { href: ROUTES.terms, label: 'Условия использования' },
+  { href: ROUTES.privacy, messageKey: 'footer.privacy' },
+  { href: ROUTES.terms, messageKey: 'footer.terms' },
 ] as const;
 
-export function Footer({ contacts }: { contacts: SiteContactSettings }) {
+export async function Footer({ contacts }: { contacts: SiteContactSettings }) {
+  const [locale, translations] = await Promise.all([getLocale(), getTranslations('Shell')]);
   const year = new Date().getFullYear();
 
   return (
@@ -28,8 +31,7 @@ export function Footer({ contacts }: { contacts: SiteContactSettings }) {
           <div className="max-w-md">
             <Logo inverse />
             <p className="mt-3 max-w-sm text-[15px] leading-6 text-white/68">
-              Практичное онлайн-обучение по охране труда, пожарной и промышленной безопасности для
-              сотрудников и команд.
+              {translations('footer.description')}
             </p>
             <ContactLink
               kind="whatsapp"
@@ -42,23 +44,23 @@ export function Footer({ contacts }: { contacts: SiteContactSettings }) {
                 className="text-[#67ca8e]"
                 aria-hidden="true"
               />
-              Написать в WhatsApp
+              {translations('whatsapp')}
             </ContactLink>
           </div>
 
-          <nav aria-label="Навигация в подвале">
+          <nav aria-label={translations('footer.navigation')}>
             <h2 className="text-xs font-semibold tracking-[0.16em] text-white/45 uppercase">
-              Разделы
+              {translations('footer.sections')}
             </h2>
             <ul className="mt-3 grid grid-cols-2 gap-x-4 md:grid-cols-1">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
-                    href={link.href}
+                    href={localizePathname(link.href, locale)}
                     prefetch={false}
                     className="inline-flex min-h-11 items-center text-sm font-semibold text-white/75 transition-colors duration-150 hover:text-white"
                   >
-                    {link.label}
+                    {translations(link.messageKey)}
                   </Link>
                 </li>
               ))}
@@ -67,7 +69,7 @@ export function Footer({ contacts }: { contacts: SiteContactSettings }) {
 
           <div>
             <h2 className="text-xs font-semibold tracking-[0.16em] text-white/45 uppercase">
-              Связаться
+              {translations('footer.contact')}
             </h2>
             <div className="mt-3 grid gap-1 text-[15px]">
               <ContactLink
@@ -90,31 +92,34 @@ export function Footer({ contacts }: { contacts: SiteContactSettings }) {
                   className="shrink-0 text-white/50"
                   aria-hidden="true"
                 />
-                {CONTACT_DETAILS.city}
+                {translations('footer.city')}
               </div>
-              <p className="pl-8 text-xs leading-5 text-white/55">{CONTACT_DETAILS.hours}</p>
+              <p className="pl-8 text-xs leading-5 text-white/55">{translations('footer.hours')}</p>
             </div>
           </div>
         </div>
 
         <div className="mt-6 border-t border-white/10 pt-4 text-xs text-white/50 md:mt-8">
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-            <p>© {year} SafetyHub.kz. Все права защищены.</p>
-            <nav aria-label="Юридическая информация" className="flex flex-wrap gap-x-5 gap-y-1">
+            <p>{translations('footer.copyright', { year })}</p>
+            <nav
+              aria-label={translations('footer.legalNavigation')}
+              className="flex flex-wrap gap-x-5 gap-y-1"
+            >
               {LEGAL_LINKS.map((link) => (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  href={localizePathname(link.href, locale)}
                   prefetch={false}
                   className="inline-flex min-h-9 items-center text-white/45 transition-colors duration-150 hover:text-white/80"
                 >
-                  {link.label}
+                  {translations(link.messageKey)}
                 </Link>
               ))}
             </nav>
           </div>
           <p className="mt-1 flex min-h-11 flex-wrap items-center gap-x-1 sm:mt-0">
-            <span>Разработка сайта — </span>
+            <span>{translations('footer.development')}</span>
             <a
               href="https://rc-web.kz/"
               target="_blank"

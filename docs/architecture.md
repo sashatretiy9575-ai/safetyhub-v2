@@ -12,6 +12,42 @@ SafetyHub — Next.js App Router приложение с тремя интерф
 `features` — прикладные сценарии, `lib` — общие контракты, `supabase` — миграции,
 SQL-тесты и Edge Functions, `content` — локальный development fallback и seed.
 
+## Локали и URL
+
+Публичный и learner-контуры используют единый тип `AppLocale` со значениями
+`ru`, `kk`, `en`, `zh`. Русский остаётся default locale без префикса, а казахский,
+английский и упрощённый китайский доступны под `/kk`, `/en`, `/zh`. Админка,
+`/api`, Next internals, metadata endpoints и неизменяемые assets не получают
+locale aliases; `/admin` всегда получает русский request context.
+
+Существующее дерево App Router не дублируется. `proxy.ts` разбирает внешний URL,
+записывает проверенные `x-safetyhub-locale` и `x-safetyhub-pathname`, затем
+переписывает локализованный URL на существующий внутренний route. До rewrite
+вычисляются protected-path и CSP nonce, поэтому `/zh/profile` и
+`/en/topics/{slug}/test` проходят тот же Supabase cookie refresh и те же
+authorization gates, что и непрефиксные маршруты. Locale-prefixed API/admin/asset
+URL не переписываются и завершаются 404.
+
+Порядок определения языка для первого непрефиксного запроса: locale-cookie,
+взвешенный `Accept-Language`, затем RU. Явный `/kk`, `/en` или `/zh` всегда имеет
+приоритет и обновляет годовую `SameSite=Lax` cookie. Переключатель языка сначала
+обновляет cookie, затем открывает тот же нормализованный pathname и сохраняет
+query string. Синхронизация `profiles.preferred_locale` добавляется поверх этого
+контракта после аутентификации и не меняет URL-правила.
+
+`next-intl` загружает один из четырёх каталогов `messages/*.json`; типы ключей
+выводятся из RU-каталога, а тест требует точного совпадения ключей и ICU-параметров
+во всех языках. Runtime fallback на русский не используется. HTML `lang`,
+canonical, `hreflang`, Open Graph locale, JSON-LD language и sitemap alternates
+формируются из того же locale-контракта.
+
+Manifest и offline shell имеют отдельные locale endpoints `/manifest/{locale}`
+и `/offline/{locale}`. Service Worker precache-ит все восемь документов, выбирает
+offline fallback по префиксу исходной навигации и по-прежнему полностью обходит
+auth/profile/test/callback маршруты. Китайская оболочка использует локальный
+subset Noto Sans SC только при `data-locale="zh"`; остальные маршруты не
+загружают CJK asset.
+
 ## Данные и доверительные границы
 
 Supabase предоставляет Auth, PostgreSQL и Storage. Браузер не считается
@@ -62,7 +98,10 @@ Service-role key доступен только серверу и служебн�
 
 На странице курса PDF не встраивается и не рендерится в браузере. Одна и та же
 same-origin download route повторно проверяет активную сессию и ручное состояние
-`approved`, после чего сервер потоково отдаёт проверенный объект с
+`approved`, актуальные legal acceptance и locale binding. Перед Storage route
+атомарно расходует actor/network budget и берёт короткую actor/global lease;
+объект передаётся без буферизации, с точным byte ceiling, 60-секундным deadline
+и освобождением lease при EOF, ошибке, отмене или разрыве клиента. Ответ сохраняет
 `Content-Disposition: attachment` и `Cache-Control: private, no-store`.
 Неавторизованный, pending или rejected пользователь не может использовать маршрут
 или Storage URL в обход интерфейса. Прогресс чтения PDF не записывается в базу и
@@ -89,6 +128,21 @@ same-origin download route повторно проверяет активную 
 аттестации и попытки — одной транзакцией, но сохраняет Auth account, профиль,
 роль, настройки и аудит. После удаления старый QR возвращает «Сертификат не
 найден».
+
+Сервер сертификатов выполняет только авторизацию, bounded metadata lookup и
+создание HMAC-подписанного verification URL. Бывший PDF endpoint отвечает
+`CERTIFICATE_PDF_CLIENT_ONLY`; фактический PDF формирует отдельный browser Web
+Worker, который после действия пользователя динамически загружает `pdf-lib`, QR,
+неизменяемый шаблон и locale font. В browser graph этого контура нет
+`node:fs`, `node:path` или `node:crypto`, а HMAC secret никогда не передаётся
+клиенту.
+
+Административный export повторно проверяет выбор actor-bound RPC и возвращает
+только JSON metadata максимум для 500 сертификатов. Worker формирует русский
+сводный отчёт и ZIP с concurrency 2. При наличии File System Access API архив
+пишется потоком в выбранный файл; иначе браузер получает отдельные архивы не
+более 100 сертификатов каждый. Прогресс и отмена остаются клиентскими, PDF/ZIP
+bytes не создаются route handlers и не сохраняются в PostgreSQL или Storage.
 
 ## Редакторы и граница ключей ответов
 
@@ -134,26 +188,55 @@ Forward-only миграции — единственный источник ис
 профили, учебную историю или аудит. Правила синхронизации и cutover описаны в
 `docs/content-and-database-workflow.md` и обязательны для будущих изменений.
 
+Four-locale authoring, service-only assessment import, locale-specific presentation
+paths и атомарные publication contracts описаны в
+`docs/admin-localization-workflow.md`. Эти контракты сохраняют private answer-key
+boundary: browser editor видит только публичный текст курса и агрегированные counts.
+
 ## Auth, согласия и ручное одобрение
 
-Единственный пользовательский способ входа — шестизначный одноразовый код из
-email (email OTP). В приложении нет password login, reset password, invitation
-ticket или SMS-auth flow; номер в профиле — контактный, а не фактор
-аутентификации. Это ограничение продублировано в Auth provider: trigger на
-Нативный Supabase email OTP технически создаёт для нового пользователя
+RU/KK/EN используют шестизначный одноразовый код из email (email OTP). ZH
+использует отдельный discoverable WebAuthn passkey с обязательной проверкой
+пользователя устройством; email, SMS, password и username в китайском flow нет.
+Номер в профиле во всех локалях остаётся только контактным полем. Нативный
+Supabase email OTP технически создаёт для нового пользователя
 внутренний случайный password hash, поэтому `auth.users.encrypted_password` не
 является корректным признаком passwordless и не блокируется database trigger.
 Вместо этого `enforce_email_otp_access_token` работает как Supabase Custom
-Access Token Hook: access token выдаётся только для `email/signup`, `otp`,
-`magiclink` и продолжения уже разрешённой сессии `token_refresh`; password,
-recovery, invite, OAuth, phone и anonymous methods получают отказ до выдачи
-JWT. Это делает email-код единственным способом получить рабочую SafetyHub
-сессию, хотя внутренний provider hash существует и никогда не выдаётся человеку.
-Код отправляется через Supabase Auth после server-side проверки Turnstile,
-same-origin и coarse IP quota. Login и registration используют единый
+Access Token Hook. Для обычных аккаунтов access token выдаётся только для
+`email/signup`, `otp`, `magiclink` и продолжения уже разрешённой сессии
+`token_refresh`. Для synthetic ZH identity допускается только server-generated
+`magiclink`, связанный с одноразовым двухминутным grant после проверенной
+WebAuthn-операции. Hook привязывает полученный `session_id` к текущему
+`auth_epoch`, а refresh разрешается только для этой точной пары; reset passkey
+удаляет разрешённые сессии, увеличивает epoch и инвалидирует старые refresh
+tokens. Дополнительный request-time gate сверяет epoch и `session_id`
+для каждого application authorization, поэтому уже выданный access token также
+перестаёт работать сразу после reset. Provider-only `@auth.invalid` адрес
+в обязательном JWT email claim заменяется пустой строкой и не входит в browser
+или admin projections. Password, recovery, invite, OAuth, phone и anonymous
+methods получают отказ до выдачи JWT.
+Код отправляется через Supabase Auth после same-origin и coarse IP quota;
+переданный приложением Turnstile token проверяет сам Supabase Auth provider, без
+второй попытки Siteverify одноразового токена. Login и registration используют единый
 `signInWithOtp`-шлюз с разрешённым созданием неизвестного email: поэтому форма
 входа не подтверждает существование аккаунта и не оставляет нового пользователя
-без письма. Проверка кода создаёт обычную Supabase-сессию.
+без письма. После принятой provider-ом отправки приложение создаёт отдельный
+opaque receipt: cookie содержит только 32 случайных байта, а private DB — только
+HMAC receipt и HMAC нормализованного email, expiry не более часа и счётчик не
+более шести попыток. До provider proof изменяется только coarse network quota;
+неверный CAPTCHA или код не может расходовать общий victim-email budget.
+Успешная проверка кода атомарно удаляет receipt до сохранения обычной
+Supabase-сессии.
+
+ZH challenge хранится только как SHA-256 receipt, живёт не более пяти минут и
+потребляется ровно один раз. Private-таблицы держат credential ID, public key,
+monotonic counter, user handle и salted/peppered recovery digest; browser grants
+на эти данные отсутствуют. Создание Auth user и immutable avatar связано durable
+registration operation: orphan Auth или Storage объект переводится в cleanup
+state и удаляется bounded lease-worker. После успешной регистрации профиль
+сразу получает `preferred_locale = 'zh'` и `pending`; существующие approval/RLS
+gates продолжают закрывать обучение.
 
 Шаблоны email для password recovery и legacy invite — статические уведомления
 без token, hash, redirect URL или password reset promise. Они остаются явной
@@ -188,7 +271,11 @@ receipt; корректность не зависит от периодичес�
 Cloudflare Turnstile загружается только после submit защищённой формы. Используется
 один нативный Managed widget с `execution: execute`; токен продолжает ровно один
 отложенный submit и сбрасывается после ошибки, истечения или использования.
-Серверная Siteverify-проверка, action/hostname checks и rate limit обязательны.
+Supabase Auth выполняет единственную Siteverify-проверку через server-only
+`SUPABASE_AUTH_CAPTCHA_SECRET`; приложение проверяет наличие токена и передаёт его
+в `signInWithOtp`, но не пытается повторно использовать одноразовый token.
+Production widget ограничивается canonical hostname в Cloudflare, а coarse IP
+rate limit применяется до вызова provider.
 
 Тема управляется одной runtime-функцией: класс, `color-scheme`, `theme-color` и
 фон `html/body` переключаются согласованно. Цвета оболочки — `#f7f8fa` для светлой

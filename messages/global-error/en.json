@@ -1,0 +1,12 @@
+{
+  "AppState": {
+    "criticalTitle": "A critical error occurred",
+    "criticalDescription": "The application could not open completely. Refresh the page or return home.",
+    "digestId": "Error ID"
+  },
+  "Common": {
+    "retry": "Try again",
+    "home": "Go to home",
+    "correlationIdPlain": "Reference code"
+  }
+}

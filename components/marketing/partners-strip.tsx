@@ -3,29 +3,15 @@ import { DeviceMobile, ListChecks, UserCircle } from '@phosphor-icons/react/dist
 import { SectionHeading } from '@/components/marketing/_shared/section-heading';
 import { SectionShell } from '@/components/marketing/_shared/section-shell';
 import { MarketingSlider } from '@/components/ui/marketing-slider';
-
-const PLATFORM_BENEFITS = [
-  {
-    icon: DeviceMobile,
-    image: '/images/generated/benefit-mobile-v2.webp',
-    title: 'Работает на телефоне',
-    text: 'Без установки отдельного приложения.',
-  },
-  {
-    icon: ListChecks,
-    image: '/images/generated/benefit-quiz-v2.webp',
-    title: '10 вопросов после курса',
-    text: 'Короткая проверка занимает несколько минут.',
-  },
-  {
-    icon: UserCircle,
-    image: '/images/generated/benefit-results-v2.webp',
-    title: 'Результаты сохраняются',
-    text: 'Лучшие результаты и сертификаты доступны в аккаунте.',
-  },
-] as const;
+import { useTranslations } from 'next-intl';
 
 export function PartnersStrip() {
+  const t = useTranslations('Home.benefits');
+  const benefits = [
+    { icon: DeviceMobile, image: '/images/generated/benefit-mobile-v2.webp', title: t('mobileTitle'), text: t('mobileText') },
+    { icon: ListChecks, image: '/images/generated/benefit-quiz-v2.webp', title: t('quizTitle'), text: t('quizText') },
+    { icon: UserCircle, image: '/images/generated/benefit-results-v2.webp', title: t('resultsTitle'), text: t('resultsText') },
+  ] as const;
   return (
     <SectionShell
       id="benefits"
@@ -34,17 +20,17 @@ export function PartnersStrip() {
     >
       <SectionHeading
         id="benefits-heading"
-        eyebrow="Возможности платформы"
-        title="Учитесь с телефона, сохраняйте результат"
-        description="Материалы и тесты всегда под рукой, а лучшие результаты остаются в аккаунте."
+        eyebrow={t('eyebrow')}
+        title={t('title')}
+        description={t('description')}
       />
 
       <MarketingSlider
-        label="Возможности платформы"
-        itemLabel="Преимущество"
+        label={t('slider')}
+        itemLabel={t('item')}
         className="mt-7 sm:mt-10"
       >
-        {PLATFORM_BENEFITS.map(({ icon: Icon, image, title, text }, index) => (
+        {benefits.map(({ icon: Icon, image, title, text }, index) => (
           <article
             key={title}
             className="group flex h-full min-h-[16rem] flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/78 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl"

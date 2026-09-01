@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "slug": "armaturshchik",
+  "locale": "kk",
+  "productionPublished": false,
+  "contentSummary": "Арматуршы: Құралды, жақтауды және жұмыс аймағын басқара отырып, арматураны қауіпсіз дайындау, өңдеу, өңдеу және орнату.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved. Reviewed locale text and hidden provenance notes change; one independently authorized width-only title correction is recorded and bounded without moving neighboring content.",
+  "source": {
+    "pptx": "content/source-materials/derived/armaturshchik/presentation.pptx",
+    "pptxSha256": "dca7ef29d82b24756a927831daaf566317e7de5653b7aab43d98492c385701f2",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/armaturshchik/kk/text-map.json",
+    "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/kk/assets/pptx/037d7b1ff2cff893204f78f76e50b8984157605597752b60f98f063f53004d37/presentation.pptx",
+    "sha256": "037d7b1ff2cff893204f78f76e50b8984157605597752b60f98f063f53004d37",
+    "byteSize": 2807354,
+    "slideCount": 31
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/kk/assets/pdf/38cf7a91d9e0eb591c9788afc77bc0ddfa25363900b86d272b789273972417f9/presentation.pdf",
+    "sha256": "38cf7a91d9e0eb591c9788afc77bc0ddfa25363900b86d272b789273972417f9",
+    "byteSize": 2179184,
+    "pageCount": 31,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "edits": {
+    "translatedElementCount": 182,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 57,
+    "sourceNotesAdded": 31,
+    "textTopologySha256": "be02bd2956eb04936acbfb00442036f3861b0d0ab50b11599ee39e84db743459",
+    "approvedLayoutOverrideCount": 2
+  },
+  "qa": {
+    "status": "passed",
+    "automatedOnly": true,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 31
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 405,
+    "approvedLayoutOverrideCount": 2,
+    "approvedLayoutOverrides": [
+      {
+        "locale": "kk",
+        "slug": "armaturshchik",
+        "slide": 23,
+        "shapeId": "12",
+        "translatedText": "Арматураны байлау, дәнекерлеу немесе муфталы қосылыс технологиясы бұзылған",
+        "sourceBbox": [
+          368,
+          310,
+          304,
+          72
+        ],
+        "finalBbox": [
+          368,
+          310,
+          330,
+          72
+        ],
+        "reason": "Width-only correction preserves the 20 px body typography and removes the extra wrapped line without entering the adjacent control column.",
+        "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+        "sourceTextSha256": "9e442635ec5f2a00624bda3cac47e3177892abee449b93dcdc433e6c5b307a37",
+        "translatedTextSha256": "c26d911fa0da40e05a0467dc7c120b9db1700800ba7f06a084ce81f3b9040707",
+        "newlyIntersectedNeighborCount": 0
+      },
+      {
+        "locale": "kk",
+        "slug": "armaturshchik",
+        "slide": 26,
+        "shapeId": "5",
+        "name": "IMAGE_CAPTION",
+        "translatedText": "Пайдалануға жарамдылық сынақ тәуекелімен емес, тексеру және белгіленген тексеру арқылы расталады.",
+        "sourceBbox": [
+          824,
+          548,
+          396,
+          88
+        ],
+        "finalBbox": [
+          824,
+          548,
+          396,
+          88
+        ],
+        "finalFontSizePx": 18,
+        "minimumReadableFontSizePx": 18,
+        "reason": "Bounded 18 px caption typography clears the PowerPoint vertical overflow without entering the immutable visible-source/footer zone.",
+        "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+        "sourceTextSha256": "2722fde2d93e1506835f42c2c12a2c66e1bb5f2a73a36d87c12910217c8e49c4",
+        "translatedTextSha256": "a3ccf6d98b3844d8ece624fd5ec4f7a7a30201fafe35051f8420ad859a5035b5",
+        "newlyIntersectedNeighborCount": 0
+      }
+    ],
+    "layoutOverrideReceipt": {
+      "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/kk/qa/layout-only-override-receipt.json",
+      "sha256": "f4fee4e1faa6fb36b6435d57384cc92716406a11856c6c7715844c1e7f927f96",
+      "byteSize": 2347,
+      "schemaVersion": 1,
+      "locale": "kk",
+      "slug": "armaturshchik",
+      "productionPublished": false,
+      "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+      "overrideCount": 2,
+      "allOtherElementGeometryUnchanged": true,
+      "neighborContentMoved": false,
+      "newlyIntersectedNeighborCount": 0,
+      "semanticsChanged": false,
+      "overrides": [
+        {
+          "locale": "kk",
+          "slug": "armaturshchik",
+          "slide": 23,
+          "shapeId": "12",
+          "translatedText": "Арматураны байлау, дәнекерлеу немесе муфталы қосылыс технологиясы бұзылған",
+          "sourceBbox": [
+            368,
+            310,
+            304,
+            72
+          ],
+          "finalBbox": [
+            368,
+            310,
+            330,
+            72
+          ],
+          "reason": "Width-only correction preserves the 20 px body typography and removes the extra wrapped line without entering the adjacent control column.",
+          "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+          "sourceTextSha256": "9e442635ec5f2a00624bda3cac47e3177892abee449b93dcdc433e6c5b307a37",
+          "translatedTextSha256": "c26d911fa0da40e05a0467dc7c120b9db1700800ba7f06a084ce81f3b9040707",
+          "newlyIntersectedNeighborCount": 0
+        },
+        {
+          "locale": "kk",
+          "slug": "armaturshchik",
+          "slide": 26,
+          "shapeId": "5",
+          "name": "IMAGE_CAPTION",
+          "translatedText": "Пайдалануға жарамдылық сынақ тәуекелімен емес, тексеру және белгіленген тексеру арқылы расталады.",
+          "sourceBbox": [
+            824,
+            548,
+            396,
+            88
+          ],
+          "finalBbox": [
+            824,
+            548,
+            396,
+            88
+          ],
+          "finalFontSizePx": 18,
+          "minimumReadableFontSizePx": 18,
+          "reason": "Bounded 18 px caption typography clears the PowerPoint vertical overflow without entering the immutable visible-source/footer zone.",
+          "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+          "sourceTextSha256": "2722fde2d93e1506835f42c2c12a2c66e1bb5f2a73a36d87c12910217c8e49c4",
+          "translatedTextSha256": "a3ccf6d98b3844d8ece624fd5ec4f7a7a30201fafe35051f8420ad859a5035b5",
+          "newlyIntersectedNeighborCount": 0
+        }
+      ]
+    },
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "pptxRenderedSlideCount": 31,
+    "pdfRenderedPageCount": 31,
+    "pageTextLayerCount": 31,
+    "localizedTextUnitCount": 239,
+    "localizedTextMismatchCount": 0,
+    "missingGlyphSentinelCount": 0,
+    "templateTypographyRegressionCount": 0,
+    "templateTypographyReport": "content/localizations/staged-2026-09-01/qa/presentation-layout-audit.all.json",
+    "canvasOverflowCount": 0,
+    "canvasOverflowCheck": "Test passed. No overflow detected.",
+    "textFrameOverflowCount": 0,
+    "textFrameObservedOverflowCount": 0,
+    "sourceTextFrameObservedOverflowCount": 0,
+    "inheritedWithinToleranceTextFrameOverflowCount": 0,
+    "newlyIntroducedTextFrameOverflowCount": 0,
+    "inspectedTextFrameCount": 239,
+    "textFrameOverflowEngine": "Microsoft PowerPoint TextFrame2 bounds, source-relative regression comparison",
+    "nonblankPageChecks": 31,
+    "pdfUnsafeActionCount": 0,
+    "pdfEmbeddedFileCount": 0,
+    "visualMethod": "all-slide artifact-tool raster, all-page PDF.js 1600x900 raster/pixel inspection, contact sheets, localized text-layer comparison and padded-canvas overflow test",
+    "presentationTextMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d"
+  },
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

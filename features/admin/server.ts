@@ -320,7 +320,7 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
   const presentationResult = presentationId
     ? await admin
         .from('course_presentations')
-        .select('id,page_count,sha256,byte_size,status')
+        .select('id,locale,page_count,sha256,byte_size,status')
         .eq('id', presentationId)
         .eq('course_id', testResult.data.id)
         .maybeSingle()
@@ -330,6 +330,7 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
   const presentation = presentationResult.data;
   const safePresentation =
     presentation &&
+    presentation.locale === 'ru' &&
     Number.isInteger(presentation.page_count) &&
     presentation.page_count > 0 &&
     typeof presentation.sha256 === 'string' &&
@@ -339,6 +340,7 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
     ['staging', 'validating', 'ready', 'rejected', 'retired'].includes(presentation.status)
       ? {
           id: presentation.id,
+          locale: 'ru' as const,
           pageCount: presentation.page_count,
           sha256: presentation.sha256,
           byteSize: Number(presentation.byte_size),

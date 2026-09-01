@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "slug": "lesomontazhnye-raboty",
+  "locale": "en",
+  "productionPublished": false,
+  "contentSummary": "Scaffolding erection work: Safe installation and operation of scaffolding: design, foundation, connections, working platform, fencing, access, permission and control of conditions.",
+  "designDescription": "Template-preserving 16:9 SafetyHub training deck. Source master/layout hierarchy, typography, safety-green accents, imagery, crops, logos, spacing, footer treatment and one-to-one page topology are preserved. Reviewed locale text and hidden provenance notes change; one independently authorized width-only title correction is recorded and bounded without moving neighboring content.",
+  "source": {
+    "pptx": "content/source-materials/derived/lesomontazhnye-raboty/presentation.pptx",
+    "pptxSha256": "582338c561283acc27a932f586eaccc31e14adaee0d6a4c4648a70355d738c27",
+    "textMap": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/en/text-map.json",
+    "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590"
+  },
+  "pptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/en/assets/pptx/5c72a7d5efad877129b3cf0c21786cb914fd299297c14ce6fb39c29185bb0d45/presentation.pptx",
+    "sha256": "5c72a7d5efad877129b3cf0c21786cb914fd299297c14ce6fb39c29185bb0d45",
+    "byteSize": 2488355,
+    "slideCount": 42
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/en/assets/pdf/af7f28d25b1988a13ab886d839a7cac3d968077f3701cbec083d6951992aa624/presentation.pdf",
+    "sha256": "af7f28d25b1988a13ab886d839a7cac3d968077f3701cbec083d6951992aa624",
+    "byteSize": 1614386,
+    "pageCount": 42,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "edits": {
+    "translatedElementCount": 211,
+    "translatedTableCellCount": 0,
+    "retainedElementCount": 72,
+    "sourceNotesAdded": 42,
+    "textTopologySha256": "c0618b21b752a8222e265df06294c5e02f309c546b5bbbc528f1c86632aab5d0",
+    "approvedLayoutOverrideCount": 1
+  },
+  "qa": {
+    "status": "passed",
+    "automatedOnly": true,
+    "sourceThemePreserved": true,
+    "sourceMasterLayoutHierarchyPreserved": true,
+    "masterLayoutTopology": {
+      "slideMasterCount": 2,
+      "slideLayoutCount": 2,
+      "slideMasterRelationshipPartCount": 2,
+      "slideLayoutRelationshipPartCount": 2,
+      "slideRelationshipPartCount": 42
+    },
+    "sourceGeometryVerified": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "verifiedGeometryElementCount": 510,
+    "approvedLayoutOverrideCount": 1,
+    "approvedLayoutOverrides": [
+      {
+        "locale": "en",
+        "slug": "lesomontazhnye-raboty",
+        "slide": 42,
+        "shapeId": "4",
+        "translatedText": "Design documentation, the system technical manual, assigned roles and a safe zone are in place.",
+        "sourceBbox": [
+          152,
+          214,
+          1000,
+          54
+        ],
+        "finalBbox": [
+          152,
+          214,
+          1000,
+          66
+        ],
+        "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+        "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+        "sourceTextSha256": "24670a774d9f339942a62f854bb1f98804ee8fe4d13b7c37b18e878b10b9d44a",
+        "translatedTextSha256": "225c318f1c21718a0fbd92f9a811599a274f4364f80d0dcb0ab1949f5c9f67ed",
+        "newlyIntersectedNeighborCount": 0
+      }
+    ],
+    "layoutOverrideReceipt": {
+      "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/en/qa/layout-only-override-receipt.json",
+      "sha256": "24eea9e037cb43eb26e2eaadbb23ec3dd8d3d66bc2c63531b9876853ac3ec227",
+      "byteSize": 1253,
+      "schemaVersion": 1,
+      "locale": "en",
+      "slug": "lesomontazhnye-raboty",
+      "productionPublished": false,
+      "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+      "overrideCount": 1,
+      "allOtherElementGeometryUnchanged": true,
+      "neighborContentMoved": false,
+      "newlyIntersectedNeighborCount": 0,
+      "semanticsChanged": false,
+      "overrides": [
+        {
+          "locale": "en",
+          "slug": "lesomontazhnye-raboty",
+          "slide": 42,
+          "shapeId": "4",
+          "translatedText": "Design documentation, the system technical manual, assigned roles and a safe zone are in place.",
+          "sourceBbox": [
+            152,
+            214,
+            1000,
+            54
+          ],
+          "finalBbox": [
+            152,
+            214,
+            1000,
+            66
+          ],
+          "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+          "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+          "sourceTextSha256": "24670a774d9f339942a62f854bb1f98804ee8fe4d13b7c37b18e878b10b9d44a",
+          "translatedTextSha256": "225c318f1c21718a0fbd92f9a811599a274f4364f80d0dcb0ab1949f5c9f67ed",
+          "newlyIntersectedNeighborCount": 0
+        }
+      ]
+    },
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "emptyInheritedPlaceholderCount": 0,
+    "pptxRenderedSlideCount": 42,
+    "pdfRenderedPageCount": 42,
+    "pageTextLayerCount": 42,
+    "localizedTextUnitCount": 283,
+    "localizedTextMismatchCount": 0,
+    "missingGlyphSentinelCount": 0,
+    "templateTypographyRegressionCount": 0,
+    "templateTypographyReport": "content/localizations/staged-2026-09-01/qa/presentation-layout-audit.all.json",
+    "canvasOverflowCount": 0,
+    "canvasOverflowCheck": "Test passed. No overflow detected.",
+    "textFrameOverflowCount": 0,
+    "textFrameObservedOverflowCount": 0,
+    "sourceTextFrameObservedOverflowCount": 0,
+    "inheritedWithinToleranceTextFrameOverflowCount": 0,
+    "newlyIntroducedTextFrameOverflowCount": 0,
+    "inspectedTextFrameCount": 283,
+    "textFrameOverflowEngine": "Microsoft PowerPoint TextFrame2 bounds, source-relative regression comparison",
+    "nonblankPageChecks": 42,
+    "pdfUnsafeActionCount": 0,
+    "pdfEmbeddedFileCount": 0,
+    "visualMethod": "all-slide artifact-tool raster, all-page PDF.js 1600x900 raster/pixel inspection, contact sheets, localized text-layer comparison and padded-canvas overflow test",
+    "presentationTextMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590"
+  },
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

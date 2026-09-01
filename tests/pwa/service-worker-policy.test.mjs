@@ -42,7 +42,7 @@ test('authenticated navigations and generated downloads bypass the service worke
   assert.ok(privateBypass >= 0 && privateBypass < navigationHandler);
   assert.match(worker, /\(\?:api\|auth\|admin\|profile\|account\|onboarding\|callback\)/u);
   assert.match(worker, /topics\\\/\[\^\/\]\+\\\/test/u);
-  assert.match(worker, /CACHE_PREFIX\}v6/u);
+  assert.match(worker, /CACHE_PREFIX\}v7/u);
 });
 
 test('retired legacy auth links still bypass the service worker without exchanging state', async () => {
@@ -108,17 +108,21 @@ test('offline action, splash, shortcuts, and automatic install prompt match thei
 });
 
 test('manual installation remains available without beforeinstallprompt and explains iOS', async () => {
-  const [manual, menu, profile] = await Promise.all([
+  const [manual, menu, profile, ruMessages] = await Promise.all([
     read('components/shared/pwa-manual-install.tsx'),
     read('components/shared/user-menu.tsx'),
     read('app/(account)/profile/page.tsx'),
+    read('messages/ru.json'),
   ]);
+  const ru = JSON.parse(ruMessages);
 
   assert.match(manual, /if \(!isInstallable\)/);
-  assert.match(manual, /Откройте SafetyHub в Safari/);
-  assert.match(manual, /На экран Домой/);
-  assert.match(manual, /Установить приложение/);
-  assert.match(menu, /Установить приложение/);
+  assert.match(manual, /t\(`instructions\.\$\{platform\}\.\$\{step\}`\)/);
+  assert.match(ru.PwaManual.instructions.ios['1'], /Safari/u);
+  assert.match(ru.PwaManual.instructions.ios['3'], /На экран Домой/u);
+  assert.match(ru.PwaManual.instructions.android['2'], /Установить приложение/u);
+  assert.match(menu, /translations\('install'\)/);
+  assert.equal(ru.Shell.userMenu.install, 'Установить приложение');
   assert.match(menu, /#install-app/);
   assert.match(profile, /<PwaManualInstall \/>/);
 });

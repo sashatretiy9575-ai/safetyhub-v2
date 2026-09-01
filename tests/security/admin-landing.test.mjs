@@ -12,9 +12,11 @@ test('email-code verification uses the server-authorized role landing instead of
   ]);
 
   assert.match(route, /rpc\('get_auth_context'\)/u);
-  assert.match(route, /redirectTo: landingPath\(authContext\)/u);
-  assert.match(flow, /value === '\/admin'[\s\S]*value === '\/auth\/legal'[\s\S]*value === '\/onboarding'[\s\S]*value === '\/profile'/u);
-  assert.match(flow, /router\.replace\(safeLanding\(payload\?\.redirectTo\)\)/u);
+  assert.match(route, /redirectTo: landingPath\(authContext, locale\)/u);
+  assert.match(route, /localizedAccountPath\('\/auth\/legal', locale\)/u);
+  assert.match(route, /localizedAccountPath\([\s\S]*?'\/onboarding'[\s\S]*?'\/profile'[\s\S]*?locale/u);
+  assert.match(flow, /value === '\/admin'[\s\S]*localizePathname\('\/auth\/legal', locale\)[\s\S]*localizePathname\('\/onboarding', locale\)[\s\S]*localizePathname\('\/profile', locale\)/u);
+  assert.match(flow, /router\.replace\(safeLanding\(payload\?\.redirectTo, locale\)\)/u);
   assert.doesNotMatch(flow, /router\.replace\('\/profile'\)/u);
   assert.match(auth, /return role === 'admin' \? '\/admin' : '\/profile'/u);
 });
@@ -30,7 +32,7 @@ test('retired callback discards legacy links and direct participant workspace ro
   assert.match(profile, /if \(context\.role === 'admin'\) redirect\('\/admin'\)/u);
 });
 
-test('all individual certificate actions use the fetch-and-blob download control', async () => {
+test('all individual certificate actions use the metadata-and-worker download control', async () => {
   const [download, profile, quiz, admin] = await Promise.all([
     read('features/certificates/download-button.tsx'),
     read('app/(account)/profile/page.tsx'),
@@ -38,10 +40,12 @@ test('all individual certificate actions use the fetch-and-blob download control
     read('components/admin/attestations-manager-panels.tsx'),
   ]);
 
-  assert.match(download, /timeoutMs: 60_000/u);
-  assert.match(download, /startsWith\('application\/pdf'\)/u);
-  assert.match(download, /String\.fromCharCode\(\.\.\.signature\) === '%PDF-'/u);
-  assert.match(download, /document\.body\.append\(link\)/u);
+  assert.match(download, /\/metadata/u);
+  assert.match(download, /Accept: 'application\/json'/u);
+  assert.match(download, /assertCertificateRenderMetadata/u);
+  assert.match(download, /import\('@\/lib\/pdf\/certificate-client'\)/u);
+  assert.match(download, /downloadCertificateInBrowser/u);
+  assert.doesNotMatch(download, /response\.blob\(\)|application\/pdf|String\.fromCharCode/u);
   for (const source of [profile, quiz, admin]) {
     assert.match(source, /CertificateDownloadButton/u);
     assert.doesNotMatch(source, /href=\{`\/api\/certificates\//u);

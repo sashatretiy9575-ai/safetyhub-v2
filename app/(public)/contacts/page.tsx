@@ -1,34 +1,42 @@
 import { Clock, MapPin } from '@phosphor-icons/react/dist/ssr';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { ContactActions } from '@/components/shared/contact-actions';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
-import { CONTACT_DETAILS } from '@/lib/constants';
 import { getSiteContacts } from '@/lib/site-contacts';
 import { buildMetadata } from '@/lib/seo';
 
-export const metadata = buildMetadata({
-  title: 'Связаться с SafetyHub',
-  description: 'Контакты SafetyHub: телефон, WhatsApp, город и часы работы.',
-  path: '/contacts',
-});
+export async function generateMetadata() {
+  const t = await getTranslations('Contacts');
+  return buildMetadata({
+    title: t('metadataTitle'),
+    description: t('metadataDescription'),
+    path: '/contacts',
+    locale: await getLocale(),
+  });
+}
 
 export default async function ContactsPage() {
-  const contacts = await getSiteContacts();
+  const [contacts, t, shellT] = await Promise.all([
+    getSiteContacts(),
+    getTranslations('Contacts'),
+    getTranslations('Shell.footer'),
+  ]);
   const details = [
     {
       icon: MapPin,
-      label: 'Город',
-      value: CONTACT_DETAILS.city,
+      label: t('city'),
+      value: shellT('city'),
       href: 'https://www.google.com/maps/search/?api=1&query=Almaty%2C%20Kazakhstan',
     },
-    { icon: Clock, label: 'Часы работы', value: CONTACT_DETAILS.hours },
+    { icon: Clock, label: t('hours'), value: shellT('hours') },
   ] as const;
   return (
     <>
       <PageHeader
-        title="Связаться с SafetyHub"
-        description="Подскажем программу и ответим на вопросы об обучении."
-        eyebrow="Контакты"
+        title={t('title')}
+        description={t('description')}
+        eyebrow={t('eyebrow')}
         variant="contact"
         className="[&>div:last-child>p]:text-[15px] sm:[&>div:last-child>p]:text-base"
       />
@@ -41,10 +49,10 @@ export default async function ContactsPage() {
                 id="contact-options-heading"
                 className="text-[20px] leading-tight font-bold tracking-[-0.02em] sm:text-2xl"
               >
-                Удобный способ связи
+                {t('method')}
               </h2>
               <p className="mt-2 max-w-lg text-sm leading-5 text-[var(--color-text-muted)] sm:text-[15px] sm:leading-6">
-                Для быстрого ответа укажите тему курса и примерное количество участников.
+                {t('hint')}
               </p>
               <div className="mt-5 max-w-xl">
                 <ContactActions contacts={contacts} />

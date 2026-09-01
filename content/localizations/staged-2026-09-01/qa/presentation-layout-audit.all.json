@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "scope": {
+    "locales": [
+      "kk",
+      "en",
+      "zh"
+    ],
+    "slugs": [
+      "plotnik",
+      "armaturshchik",
+      "lesomontazhnye-raboty",
+      "biot",
+      "pozharnaya-bezopasnost"
+    ],
+    "deckLocaleCount": 15,
+    "sourceSlideCount": 594,
+    "inspectedSlideCount": 594
+  },
+  "state": "PRE_FREEZE_LAYOUT_AUDIT",
+  "releaseGate": "FAIL_CLOSED_UNTIL_ZERO_REGRESSIONS_AND_TEXT_MAPS_FROZEN",
+  "rules": {
+    "fontShrinkTolerancePx": 0.5,
+    "oneLineTitleMustRemainOneLine": true
+  },
+  "regressionCount": 0,
+  "regressionCountByCode": {},
+  "decks": [
+    {
+      "locale": "kk",
+      "slug": "plotnik",
+      "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+      "slideCount": 25,
+      "inspectedSlideCount": 25,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/kk/plotnik/qa/layout-regressions.json"
+    },
+    {
+      "locale": "kk",
+      "slug": "armaturshchik",
+      "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+      "slideCount": 31,
+      "inspectedSlideCount": 31,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/kk/armaturshchik/qa/layout-regressions.json"
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "slideCount": 42,
+      "inspectedSlideCount": 42,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/kk/lesomontazhnye-raboty/qa/layout-regressions.json"
+    },
+    {
+      "locale": "kk",
+      "slug": "biot",
+      "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+      "slideCount": 59,
+      "inspectedSlideCount": 59,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/kk/biot/qa/layout-regressions.json"
+    },
+    {
+      "locale": "kk",
+      "slug": "pozharnaya-bezopasnost",
+      "textMapSha256": "d12a1e65edc83511678354c8943234d4e6da3ff6de89d261311e09d60101103d",
+      "slideCount": 41,
+      "inspectedSlideCount": 41,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/kk/pozharnaya-bezopasnost/qa/layout-regressions.json"
+    },
+    {
+      "locale": "en",
+      "slug": "plotnik",
+      "textMapSha256": "4ec763727f9db624572dc75a3599439dee89422925363c28b926ca4882c4f583",
+      "slideCount": 25,
+      "inspectedSlideCount": 25,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/en/plotnik/qa/layout-regressions.json"
+    },
+    {
+      "locale": "en",
+      "slug": "armaturshchik",
+      "textMapSha256": "f55fbdd741f58879f656afced42fcaba5dfd6e0e4366c2d35ce31d8a43e232b2",
+      "slideCount": 31,
+      "inspectedSlideCount": 31,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/en/armaturshchik/qa/layout-regressions.json"
+    },
+    {
+      "locale": "en",
+      "slug": "lesomontazhnye-raboty",
+      "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+      "slideCount": 42,
+      "inspectedSlideCount": 42,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/en/lesomontazhnye-raboty/qa/layout-regressions.json"
+    },
+    {
+      "locale": "en",
+      "slug": "biot",
+      "textMapSha256": "27e8be2009aa9ecd08136c1c4ee80b7c53c18fc8592f4c94dd64a53d439d2231",
+      "slideCount": 59,
+      "inspectedSlideCount": 59,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/en/biot/qa/layout-regressions.json"
+    },
+    {
+      "locale": "en",
+      "slug": "pozharnaya-bezopasnost",
+      "textMapSha256": "6bac3a78a49622ca90609901e8677e5fe2805e2fc77ed1d15b82c4cde8148e05",
+      "slideCount": 41,
+      "inspectedSlideCount": 41,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/en/pozharnaya-bezopasnost/qa/layout-regressions.json"
+    },
+    {
+      "locale": "zh",
+      "slug": "plotnik",
+      "textMapSha256": "60ec2fa65e5489374626d691d309e4998b4f5f0b1cfaee6ab4efe80f4e36c6e5",
+      "slideCount": 25,
+      "inspectedSlideCount": 25,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/zh/plotnik/qa/layout-regressions.json"
+    },
+    {
+      "locale": "zh",
+      "slug": "armaturshchik",
+      "textMapSha256": "90b45c2b5889ec523149f5f92972ea7cd739db647d6b8e17481e479b8953e24c",
+      "slideCount": 31,
+      "inspectedSlideCount": 31,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/zh/armaturshchik/qa/layout-regressions.json"
+    },
+    {
+      "locale": "zh",
+      "slug": "lesomontazhnye-raboty",
+      "textMapSha256": "3f62b1ce6909c19a589795fbef177152dea78148f78a63a4dc2f8d33a19ea144",
+      "slideCount": 42,
+      "inspectedSlideCount": 42,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/zh/lesomontazhnye-raboty/qa/layout-regressions.json"
+    },
+    {
+      "locale": "zh",
+      "slug": "biot",
+      "textMapSha256": "77f72665c018f85e71dc127ab9ee35541cc723406794850f88bf3e4b8dff042b",
+      "slideCount": 59,
+      "inspectedSlideCount": 59,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/zh/biot/qa/layout-regressions.json"
+    },
+    {
+      "locale": "zh",
+      "slug": "pozharnaya-bezopasnost",
+      "textMapSha256": "6f3df1c021389290a48355df508d783f22227b0c56ae707aa0f381a5d8683578",
+      "slideCount": 41,
+      "inspectedSlideCount": 41,
+      "regressionCount": 0,
+      "report": "tmp/stage6/presentation-localization/zh/pozharnaya-bezopasnost/qa/layout-regressions.json"
+    }
+  ],
+  "regressions": []
+}

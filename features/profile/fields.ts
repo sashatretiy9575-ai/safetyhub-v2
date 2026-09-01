@@ -16,6 +16,14 @@ export type ProfileSubmissionValues = ProfileValues &
 
 export type ProfileSubmissionField = ProfileField | 'phone';
 
+export type ProfileValidationError = Readonly<
+  | { code: 'REQUIRED' }
+  | { code: 'CONTROL_CHARACTERS' }
+  | { code: 'TOO_LONG'; maxLength: number }
+  | { code: 'PHONE_COUNTRY_REQUIRED' }
+  | { code: 'PHONE_INVALID' }
+>;
+
 export type ApprovedIdentity = ProfileValues &
   Readonly<{
     version: number;
@@ -40,16 +48,16 @@ export function normalizeProfileText(value: string) {
 
 export function profileFieldError(field: ProfileField, value: string) {
   const normalized = normalizeProfileText(value);
-  if (!normalized) return 'Заполните поле.';
-  if (CONTROL_CHARACTERS.test(normalized)) return 'Удалите недопустимые служебные символы.';
+  if (!normalized) return { code: 'REQUIRED' } as const;
+  if (CONTROL_CHARACTERS.test(normalized)) return { code: 'CONTROL_CHARACTERS' } as const;
   if (normalized.length > PROFILE_FIELD_LIMITS[field]) {
-    return `Не более ${PROFILE_FIELD_LIMITS[field]} символов.`;
+    return { code: 'TOO_LONG', maxLength: PROFILE_FIELD_LIMITS[field] } as const;
   }
   return null;
 }
 
 export function validateProfileValues(values: ProfileValues) {
-  const errors: Partial<Record<ProfileField, string>> = {};
+  const errors: Partial<Record<ProfileField, ProfileValidationError>> = {};
   for (const field of Object.keys(PROFILE_FIELD_LIMITS) as ProfileField[]) {
     const error = profileFieldError(field, values[field]);
     if (error) errors[field] = error;
@@ -79,15 +87,16 @@ export function normalizeProfileSubmissionValues(
 }
 
 export function validateProfileSubmissionValues(values: ProfileSubmissionValues) {
-  const errors: Partial<Record<ProfileSubmissionField, string>> = validateProfileValues(values);
+  const errors: Partial<Record<ProfileSubmissionField, ProfileValidationError>> =
+    validateProfileValues(values);
   if (!isPhoneCountryCode(values.phone.countryIso2)) {
-    errors.phone = 'Выберите страну номера.';
+    errors.phone = { code: 'PHONE_COUNTRY_REQUIRED' };
   } else if (
     !values.phone.nationalNumber.trim() ||
     values.phone.nationalNumber.trim().length > 64 ||
     !/[0-9]/u.test(values.phone.nationalNumber)
   ) {
-    errors.phone = 'Введите действующий номер телефона.';
+    errors.phone = { code: 'PHONE_INVALID' };
   }
   return errors;
 }

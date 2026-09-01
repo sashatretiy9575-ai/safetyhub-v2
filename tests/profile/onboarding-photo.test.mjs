@@ -25,7 +25,10 @@ test('email-OTP registration enters required onboarding without a password callb
   assert.match(constants, /onboarding: '\/onboarding'/);
   assert.match(constants, /\^\\\/onboarding/);
   assert.match(page, /onboarding_completed_at/);
-  assert.match(page, /context\.approval\.state === 'approved' \? '\/topics' : '\/profile'/);
+  assert.match(
+    page,
+    /localizePathname\(context\.approval\.state === 'approved' \? '\/topics' : '\/profile', locale\)/,
+  );
   assert.match(form, /name/);
   assert.match(form, /surname/);
   assert.match(form, /job/);
@@ -53,11 +56,12 @@ test('avatar flow supports camera, system fallback, crop controls, and mandatory
   assert.match(uploader, /navigator\.mediaDevices\.getUserMedia/);
   assert.match(uploader, /facingMode: \{ ideal: 'user' \}/);
   assert.match(uploader, /capture="user"/);
-  assert.match(uploader, /Сделать фото/);
-  assert.match(uploader, /Выбрать из устройства/);
-  assert.match(uploader, /Сфотографировать/);
-  assert.match(uploader, /Переснять/);
-  assert.match(uploader, /Использовать фото/);
+  assert.match(uploader, /useTranslations\('Avatar'\)/);
+  assert.match(uploader, /t\('take'\)/);
+  assert.match(uploader, /t\('choose'\)/);
+  assert.match(uploader, /t\('capture'\)/);
+  assert.match(uploader, /t\('retake'\)/);
+  assert.match(uploader, /t\('usePhoto'\)/);
   assert.match(uploader, /getTracks\(\)\.forEach\(\(track\) => track\.stop\(\)\)/);
   assert.match(uploader, /pagehide/);
   assert.match(uploader, /visibilitychange/);

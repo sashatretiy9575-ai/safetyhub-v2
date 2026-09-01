@@ -39,8 +39,13 @@ function mapValue(value, key) {
 
 function unsafePdfToken(bytes) {
   const source = new TextDecoder('latin1').decode(bytes);
-  if (/\/Encrypt\b/u.test(source)) return 'encrypted';
-  if (/\/(?:JavaScript|JS|Launch|EmbeddedFiles?|Filespec|EF)\b/u.test(source)) return 'unsafe';
+  // Compressed image/font streams are arbitrary binary and may contain byte
+  // sequences such as `/JS` by chance. Scan only PDF object syntax outside
+  // stream bodies; pdf.js independently inspects parsed document/page actions,
+  // attachments and annotations below.
+  const objectSyntax = source.replace(/\bstream\r?\n[\s\S]*?\bendstream\b/gu, 'stream\nendstream');
+  if (/\/Encrypt\b/u.test(objectSyntax)) return 'encrypted';
+  if (/\/(?:JavaScript|JS|Launch|EmbeddedFiles?|Filespec|EF)\b/u.test(objectSyntax)) return 'unsafe';
   return null;
 }
 

@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "kak-podgotovitsya-k-testu-po-bezopasnosti",
+  "slug": "kak-podgotovitsya-k-testu-po-bezopasnosti",
+  "title": "How to prepare for a safety test without cramming",
+  "description": "A method of short lessons that helps you understand the logic of safe decisions, calmly pass the test and apply knowledge in your work.",
+  "coverImage": "/images/generated/article-test-prep.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "A safety test is not meant to test rote recall of wording. The useful goal of preparation is to recognize a hazard quickly and choose an action that protects people first, then equipment and the process. This approach also helps with unfamiliar questions."
+    },
+    {
+      "tone": "success",
+      "type": "callout",
+      "title": "Short sessions work better than marathons",
+      "content": "Divide the preparation into several sessions of 15-25 minutes. After each topic, answer the questions without prompting and return only to mistakes."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "First, assemble a topic map"
+    },
+    {
+      "type": "paragraph",
+      "content": "Open the course syllabus and write out the major sections: workplace hazards, PPE, fire, first aid, emergency procedures, safe operation of equipment. Mark the topics in three colors: I understand, I’m confused, I haven’t studied. Start not with your favorite section, but with the last group."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Teach through scenarios"
+    },
+    {
+      "rows": [
+        [
+          "What is hazard here?",
+          "Ability to notice the source of harm"
+        ],
+        [
+          "Who might get hurt?",
+          "Understanding the area and consequences"
+        ],
+        [
+          "What to do first?",
+          "Action priority"
+        ],
+        [
+          "When not to continue?",
+          "Safe work limit"
+        ]
+      ],
+      "type": "table",
+      "caption": "Four questions for each topic",
+      "headers": [
+        "Question",
+        "What does it check"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": "For example, instead of memorizing a list about a damaged cable, imagine the scene: a cable sparks in a wet passage. hazard - current and fire; you can't get close; first limit access and call a trained specialist. One scenario binds several rules at once."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Solve the error, don’t memorize the letter"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Answer without prompting and mark your confidence: sure, doubtful or guessing.",
+        "After checking, explain in your own words why the correct option is safer than the others.",
+        "Find a rule or course fragment that supports the solution.",
+        "Create a similar example from your own work.",
+        "Repeat this question the next day, mixing it with other topics."
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "What to do on test day"
+    },
+    {
+      "type": "list",
+      "items": [
+        "check your device, internet, charge and quiet place in advance;",
+        "carefully read the negations and restrictions: “impossible”, “except”, “first of all”;",
+        "first exclude clearly dangerous options: unauthorized repairs, entering a dangerous zone, concealing an event;",
+        "do not change the answer just because of anxiety - change it if you find a specific error in the reasoning;",
+        "if the format allows, leave a few minutes for questions where you were in doubt."
+      ],
+      "style": "unordered"
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "If the result is lower than expected",
+      "content": "This is not a sentence and not a reason to mindlessly repeat the entire course. Write down the error topics, re-analyze the scenarios and try again in the prescribed order. The value of the test is to show the gap to the real work."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Three day plan"
+    },
+    {
+      "rows": [
+        [
+          "First",
+          "Topic map, study of weak sections, 10 test questions"
+        ],
+        [
+          "Second",
+          "Error scenarios, mixed mini-test, repeat without prompt"
+        ],
+        [
+          "Third",
+          "Short repetition of brake lights and calm test performance"
+        ]
+      ],
+      "type": "table",
+      "headers": [
+        "Day",
+        "Task"
+      ]
+    },
+    {
+      "type": "quote",
+      "content": "Good preparation ends not with “I remember the answer,” but with “I understand why it’s safer.”"
+    },
+    {
+      "url": "/topics",
+      "text": "Select a course and take the test",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "How to prepare for a safety test without cramming",
+    "ogImage": "/images/generated/article-test-prep.webp",
+    "ogTitle": "How to prepare for a safety test without cramming",
+    "indexable": true,
+    "description": "A method of short lessons that helps you understand the logic of safe decisions, calmly pass the test and apply knowledge in your work.",
+    "ogDescription": "A method of short lessons that helps you understand the logic of safe decisions, calmly pass the test and apply knowledge in your work."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-12",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500012665",
+      "title": "Rules for training, instructing and testing knowledge on safety and labor protection"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K1500000414",
+      "title": "Labor Code of the Republic of Kazakhstan"
+    }
+  ],
+  "createdAt": "2026-08-11T00:00:00.000Z",
+  "updatedAt": "2026-08-11T00:00:00.000Z"
+}

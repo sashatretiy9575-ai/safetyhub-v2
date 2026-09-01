@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { notFound, permanentRedirect } from 'next/navigation';
 import {
   ArrowLeft,
@@ -28,16 +29,17 @@ import {
 import { articleJsonLd, breadcrumbsJsonLd, buildMetadata } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { getSiteContacts } from '@/lib/site-contacts';
+import { htmlLanguage, localizePathname, type AppLocale } from '@/i18n/config';
 
 export async function generateStaticParams() {
   return (await getArticleSlugs()).map((slug) => ({ slug }));
 }
 
-function formatDate(value: string | undefined) {
+function formatDate(value: string | undefined, locale: AppLocale) {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat('ru-RU', {
+  return new Intl.DateTimeFormat(htmlLanguage(locale), {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -51,7 +53,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const locale = await getLocale();
+  const article = await getArticleBySlug(slug, locale);
   if (!article) return {};
   return buildMetadata({
     title: article.seo?.title ?? article.title,
@@ -64,6 +67,7 @@ export async function generateMetadata({
     type: 'article',
     publishedTime: article.createdAt,
     modifiedTime: article.updatedAt,
+    locale,
   });
 }
 
@@ -84,7 +88,7 @@ function TocLinks({ items }: { items: ArticleTocItem[] }) {
   );
 }
 
-function ArticleSources({ article }: { article: Article }) {
+function ArticleSources({ article, label, empty }: { article: Article; label: string; empty: string }) {
   const sourceCount = article.sources?.length ?? 0;
 
   return (
@@ -93,7 +97,7 @@ function ArticleSources({ article }: { article: Article }) {
       className="group mt-10 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)]"
     >
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 px-4 py-2.5 font-bold marker:content-none md:px-5 [&::-webkit-details-marker]:hidden">
-        <span>Нормативные источники ({sourceCount})</span>
+        <span>{label}</span>
         <span
           aria-hidden="true"
           className="text-xl text-[var(--color-primary)] transition-transform group-open:rotate-45"
@@ -118,16 +122,26 @@ function ArticleSources({ article }: { article: Article }) {
             ))}
           </ol>
         ) : (
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Для этой версии материала нормативные источники пока не указаны.
-          </p>
+          <p className="text-sm text-[var(--color-text-muted)]">{empty}</p>
         )}
       </div>
     </details>
   );
 }
 
-function RelatedArticles({ articles }: { articles: Omit<Article, 'blocks'>[] }) {
+function RelatedArticles({
+  articles,
+  locale,
+  eyebrow,
+  title,
+  allLabel,
+}: {
+  articles: Omit<Article, 'blocks'>[];
+  locale: AppLocale;
+  eyebrow: string;
+  title: string;
+  allLabel: string;
+}) {
   if (articles.length === 0) return null;
   return (
     <section
@@ -137,20 +151,20 @@ function RelatedArticles({ articles }: { articles: Omit<Article, 'blocks'>[] }) 
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-bold tracking-[0.18em] text-[var(--color-primary)] uppercase">
-            Продолжить чтение
+            {eyebrow}
           </p>
           <h2
             id="related-articles-title"
             className="font-display mt-1 text-2xl font-bold md:text-3xl"
           >
-            Ещё по делу
+            {title}
           </h2>
         </div>
         <Link
-          href="/blog"
+          href={localizePathname('/blog', locale)}
           className="inline-flex min-h-11 items-center gap-1 rounded-full bg-[var(--color-primary-soft)] px-4 font-bold text-[var(--color-primary-hover)] transition hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-foreground)]"
         >
-          Весь блог <ArrowRight aria-hidden="true" size={16} />
+          {allLabel} <ArrowRight aria-hidden="true" size={16} />
         </Link>
       </div>
       <div className="mt-6 grid items-stretch gap-5 md:grid-cols-3">
@@ -170,30 +184,35 @@ function RelatedArticles({ articles }: { articles: Omit<Article, 'blocks'>[] }) 
 
 export default async function BlogArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [article, allArticles, contacts] = await Promise.all([
-    getArticleBySlug(slug),
-    getArticles(),
+  const locale = await getLocale();
+  const [article, allArticles, contacts, t] = await Promise.all([
+    getArticleBySlug(slug, locale),
+    getArticles(locale),
     getSiteContacts(),
+    getTranslations('Blog'),
   ]);
 
   if (!article) {
     const destination = await getArticleRedirectBySlug(slug);
-    if (destination) permanentRedirect(`/blog/${destination}`);
+    if (destination) permanentRedirect(localizePathname(`/blog/${destination}`, locale));
     notFound();
   }
 
   const toc = getArticleToc(article.blocks);
   const readTime = estimateArticleReadTime(article.blocks);
   const relatedArticles = allArticles.filter((item) => item.slug !== article.slug).slice(0, 3);
-  const author = article.author ?? 'Редакция SafetyHub';
-  const publishedDate = formatDate(article.createdAt);
+  const author = article.author ?? t('editorial');
+  const publishedDate = formatDate(article.createdAt, locale);
   const showToc = toc.length >= 4 && readTime >= 2;
 
   const schemas: object[] = [
     breadcrumbsJsonLd([
-      { name: 'Главная', url: absoluteUrl('/') },
-      { name: 'Блог', url: absoluteUrl('/blog') },
-      { name: article.title, url: absoluteUrl(`/blog/${article.slug}`) },
+      { name: t('breadcrumbsHome'), url: absoluteUrl(localizePathname('/', locale)) },
+      { name: t('breadcrumbsBlog'), url: absoluteUrl(localizePathname('/blog', locale)) },
+      {
+        name: article.title,
+        url: absoluteUrl(localizePathname(`/blog/${article.slug}`, locale)),
+      },
     ]),
   ];
   if (article.createdAt) {
@@ -205,7 +224,8 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
         datePublished: article.createdAt,
         dateModified: article.updatedAt,
         author,
-        url: absoluteUrl(`/blog/${article.slug}`),
+        url: absoluteUrl(localizePathname(`/blog/${article.slug}`, locale)),
+        locale,
       }),
     );
   }
@@ -216,11 +236,11 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
       <article className="py-6 md:py-14">
         <Container size="wide">
           <Link
-            href="/blog"
+            href={localizePathname('/blog', locale)}
             className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-primary)]"
           >
             <ArrowLeft aria-hidden="true" size={16} weight="bold" />
-            Все статьи
+            {t('allArticles')}
           </Link>
 
           <div
@@ -233,7 +253,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
                   className="size-2 rounded-full bg-[var(--color-primary)]"
                   aria-hidden="true"
                 />
-                Практическое руководство
+                {t('cardEyebrow')}
               </p>
               <h1 className="font-display mt-3 text-[30px] leading-[1.16] font-black tracking-[-0.035em] text-balance sm:text-[38px] lg:text-[48px]">
                 {article.title}
@@ -244,20 +264,20 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
               <dl className="mt-6 flex flex-wrap justify-start gap-2 text-xs text-[var(--color-text-muted)] sm:text-sm">
                 <div className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3">
                   <UserCircle aria-hidden="true" size={18} />
-                  <dt className="sr-only">Автор</dt>
+                  <dt className="sr-only">{t('author')}</dt>
                   <dd>{author}</dd>
                 </div>
                 {publishedDate ? (
                   <div className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3">
                     <CalendarBlank aria-hidden="true" size={18} />
-                    <dt className="sr-only">Дата публикации</dt>
+                    <dt className="sr-only">{t('published')}</dt>
                     <dd>{publishedDate}</dd>
                   </div>
                 ) : null}
                 <div className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-[var(--color-primary-soft)] px-3 text-[var(--color-primary-hover)]">
                   <Clock aria-hidden="true" size={18} />
-                  <dt className="sr-only">Время чтения</dt>
-                  <dd>{readTime} мин чтения</dd>
+                  <dt className="sr-only">{t('readTimeLabel')}</dt>
+                  <dd>{t('readTime', { count: readTime })}</dd>
                 </div>
               </dl>
             </header>
@@ -292,7 +312,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
               className="group mx-auto mt-8 max-w-[70rem] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-soft)]"
             >
               <summary className="flex min-h-13 cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 font-bold marker:content-none md:px-6 [&::-webkit-details-marker]:hidden">
-                <span>Оглавление</span>
+                <span>{t('toc')}</span>
                 <span
                   aria-hidden="true"
                   className="text-xl text-[var(--color-primary)] transition-transform group-open:rotate-45"
@@ -300,7 +320,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
                   +
                 </span>
               </summary>
-              <nav aria-label="Оглавление статьи">
+              <nav aria-label={t('tocAria')}>
                 <div className="border-t border-[var(--color-border)] px-4 py-4 md:px-6">
                   <TocLinks items={toc} />
                 </div>
@@ -310,10 +330,20 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
 
           <div data-article-region="body" className="mx-auto mt-10 max-w-[70rem] md:mt-12">
             <ArticleRenderer blocks={article.blocks} contacts={contacts} />
-            <ArticleSources article={article} />
+            <ArticleSources
+              article={article}
+              label={t('sources', { count: article.sources?.length ?? 0 })}
+              empty={t('sourcesEmpty')}
+            />
           </div>
 
-          <RelatedArticles articles={relatedArticles} />
+          <RelatedArticles
+            articles={relatedArticles}
+            locale={locale}
+            eyebrow={t('continueEyebrow')}
+            title={t('relatedTitle')}
+            allLabel={t('all')}
+          />
         </Container>
       </article>
     </>

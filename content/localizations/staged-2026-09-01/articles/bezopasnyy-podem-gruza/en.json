@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "sourceSlug": "bezopasnyy-podem-gruza",
+  "slug": "bezopasnyy-podem-gruza",
+  "title": "How to lift and carry a load without jerking or trying to be a hero",
+  "description": "Practical testing of route, weight, grip and assistance before manually moving a box, part or tool.",
+  "coverImage": "/images/generated/article-manual-lifting.webp",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": "The back often suffers not because of one huge box, but because of repeated uncomfortable movements: reaching over the side, turning around with a load, lifting an object with unknown contents. The best movement is the one that was avoided by a cart, a lift, or a change in route."
+    },
+    {
+      "tone": "info",
+      "type": "callout",
+      "title": "There is no universal safe weight",
+      "content": "risk depends not only on kilograms, but also on size, shape, height, frequency of lifting, distance, floor covering and human condition. Follow the rules and instructions of your workplace; If in doubt, use assistance or mechanization."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Check before lifting"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Find out the mass and contents. If there are no markings, do not check the weight with a sharp jerk.",
+        "Evaluate the shape: whether there are secure handles, sharp edges, contents shifting or poor visibility.",
+        "Inspect the path and installation location: the doors are open, the passage is clear, the floor is dry, the height is clear.",
+        "Select a cart, lifting device or partner before the load is in hand.",
+        "Agree on the commands if you are carrying it together: who leads, when to lift, walk and lower."
+      ],
+      "style": "ordered"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "The movement itself"
+    },
+    {
+      "type": "paragraph",
+      "content": "Get close to the object, provide stable support and grasp it securely. Lift smoothly without jerking, keep the load close to your body and watch the route. To change direction, move your legs rather than twisting your body under load. Lower in the same controlled manner, keeping your fingers out of pinch zones."
+    },
+    {
+      "rows": [
+        [
+          "Weight blocks view",
+          "Cart, second person or other means of transportation"
+        ],
+        [
+          "No comfortable grip",
+          "Containers with handles, gripping device or repackaging"
+        ],
+        [
+          "You need to reach above your shoulders",
+          "Change storage height or use lifting device"
+        ],
+        [
+          "Long route ahead",
+          "Use wheeled vehicles and clear the way in advance"
+        ],
+        [
+          "Need a lot of repetitions",
+          "Alternate tasks and mechanize the process according to a local procedure"
+        ]
+      ],
+      "type": "table",
+      "caption": "When the plan needs to be changed",
+      "headers": [
+        "Sign",
+        "Best solution"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Carrying for two"
+    },
+    {
+      "type": "paragraph",
+      "content": "Having two people does not automatically make a manual lift safe. Differences in height, pace and visibility can tilt the load. One participant must give short commands. Lift and lower together; if either person loses their grip, say so immediately and stop the movement safely instead of silently trying to hold the whole load alone."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "Warning signs from the body"
+    },
+    {
+      "type": "paragraph",
+      "content": "Pain, numbness, weakness, dizziness or extreme fatigue is a reason to stop and report the condition. Don’t “work out” the pain with another lift. If symptoms appear suddenly, worsen, or are associated with injury, seek medical attention as directed."
+    },
+    {
+      "type": "quote",
+      "content": "Professionalism is not about lifting the most, but choosing a method that can be safely repeated for the entire shift."
+    },
+    {
+      "url": "/topics/biot",
+      "text": "Study labor protection",
+      "type": "button",
+      "style": "primary"
+    }
+  ],
+  "seo": {
+    "title": "How to lift and carry a load without jerking or trying to be a hero",
+    "ogImage": "/images/generated/article-manual-lifting.webp",
+    "ogTitle": "How to lift and carry a load without jerking or trying to be a hero",
+    "indexable": true,
+    "description": "Practical testing of route, weight, grip and assistance before manually moving a box, part or tool.",
+    "ogDescription": "Practical testing of route, weight, grip and assistance before manually moving a box, part or tool."
+  },
+  "jurisdiction": "Republic of Kazakhstan",
+  "effectiveDate": "2026-08-11",
+  "sources": [
+    {
+      "url": "https://adilet.zan.kz/rus/docs/K1500000414",
+      "title": "Labor Code of the Republic of Kazakhstan"
+    },
+    {
+      "url": "https://adilet.zan.kz/rus/docs/V1500012665",
+      "title": "Rules for training, instructing and testing knowledge on safety and labor protection"
+    }
+  ],
+  "createdAt": "2026-08-03T00:00:00.000Z",
+  "updatedAt": "2026-08-25T20:15:07.518Z"
+}

@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import {
+  AttemptPolicyError,
+  parseAttemptRpcError,
+} from '../../features/learning/policy-error.ts';
 
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 
@@ -41,6 +45,32 @@ test('every learner attempt RPC enforces approval before its domain work', async
   );
 });
 
+test('the shared learner gate enforces active, approval, then current legal acceptance', async () => {
+  const [migration, policyError] = await Promise.all([
+    read('supabase/migrations/20260901108000_security_boundary_hardening.sql'),
+    read('features/learning/policy-error.ts'),
+  ]);
+  const gate = migration.match(
+    /create or replace function private\.require_approved_learner\(\)[\s\S]*?\n\$\$;/u,
+  )?.[0];
+  assert.ok(gate, 'the forward-only hardening migration must replace the shared learner gate');
+  const active = gate.indexOf('private.require_active_user()');
+  const approval = gate.indexOf("message = 'ACCOUNT_APPROVAL_REQUIRED'");
+  const legal = gate.indexOf('private.has_current_legal_acceptance(v_user_id)');
+  assert.ok(active >= 0 && approval > active && legal > approval);
+  assert.match(gate, /errcode = '55000',[\s\S]*message = 'LEGAL_ACCEPTANCE_REQUIRED'/u);
+  assert.match(policyError, /\| 'LEGAL_ACCEPTANCE_REQUIRED'/u);
+  assert.match(
+    policyError,
+    /code === 'ACCOUNT_APPROVAL_REQUIRED' \|\| code === 'LEGAL_ACCEPTANCE_REQUIRED'[\s\S]*?\? 403/u,
+  );
+
+  const mapped = parseAttemptRpcError({ message: 'LEGAL_ACCEPTANCE_REQUIRED' });
+  assert.ok(mapped instanceof AttemptPolicyError);
+  assert.equal(mapped.code, 'LEGAL_ACCEPTANCE_REQUIRED');
+  assert.equal(mapped.status, 403);
+});
+
 test('browser roles cannot bypass learner approval with direct revision reads', async () => {
   const migration = await read(
     'supabase/migrations/20260831111000_approved_learner_attempt_access.sql',
@@ -71,9 +101,12 @@ test('the quiz explains approval denial and sends the learner to their status', 
   const client = await read('components/quiz/quiz-client.tsx');
 
   assert.match(client, /case 'ACCOUNT_APPROVAL_REQUIRED':/);
-  assert.match(client, /Заявка ещё ожидает подтверждения администратора/);
+  assert.match(client, /return t\('errors\.approvalRequired'\)/);
   assert.match(client, /const approvalAction = errorCode === 'ACCOUNT_APPROVAL_REQUIRED';/);
-  assert.match(client, /router\.push\('\/profile'\).*Открыть статус заявки/s);
+  assert.match(
+    client,
+    /router\.push\(localizePathname\('\/profile', locale\)\)[\s\S]*t\('openApproval'\)/,
+  );
 });
 
 test('SQL regression scenario distinguishes pending/rejected from approved', async () => {
@@ -86,7 +119,18 @@ test('SQL regression scenario distinguishes pending/rejected from approved', asy
   assert.match(sql, /rejected learner bypassed attempt approval gate/);
   assert.match(sql, /approved learner did not pass attempt approval gate/);
   assert.match(sql, /sqlerrm = 'ACCOUNT_APPROVAL_REQUIRED'/);
+  assert.match(sql, /sqlerrm = 'LEGAL_ACCEPTANCE_REQUIRED'/);
   assert.match(sql, /sqlerrm = 'ATTEMPT_NOT_FOUND'/);
+  assert.match(sql, /legal rejection consumed the completion quota/u);
+  assert.match(sql, /legal rejection mutated the expired attempt/u);
+  assert.match(
+    sql,
+    /approved learner without current legal acceptance reached presentation lookup/u,
+  );
+  assert.match(
+    sql,
+    /approved learner without current legal acceptance reached localized presentation lookup/u,
+  );
 });
 
 test('downstream attempt fixtures satisfy approval before testing later guards', async () => {

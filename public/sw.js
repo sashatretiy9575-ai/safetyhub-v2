@@ -1,6 +1,12 @@
 const CACHE_PREFIX = 'safetyhub-static-';
-const CACHE_VERSION = `${CACHE_PREFIX}v6`;
+const CACHE_VERSION = `${CACHE_PREFIX}v7`;
 const OFFLINE_URL = '/offline.html';
+const OFFLINE_URLS = {
+  ru: '/offline/ru',
+  kk: '/offline/kk',
+  en: '/offline/en',
+  zh: '/offline/zh',
+};
 const NAVIGATION_TIMEOUT_MS = 6000;
 const RUNTIME_MAX_ENTRIES = 48;
 const RUNTIME_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
@@ -8,6 +14,8 @@ const CACHED_AT_HEADER = 'x-safetyhub-cached-at';
 const PRECACHE_URLS = [
   OFFLINE_URL,
   '/manifest.json',
+  ...Object.values(OFFLINE_URLS),
+  ...Object.keys(OFFLINE_URLS).map((locale) => `/manifest/${locale}`),
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
   '/icons/maskable-512x512.png',
@@ -33,6 +41,15 @@ function isPrivatePath(pathname) {
 
 function isAuthCallbackPath(pathname) {
   return AUTH_CALLBACK_PATH.test(pathname);
+}
+
+function localeFromPathname(pathname) {
+  const locale = pathname.split('/')[1];
+  return Object.hasOwn(OFFLINE_URLS, locale) ? locale : 'ru';
+}
+
+function offlineUrlForPathname(pathname) {
+  return OFFLINE_URLS[localeFromPathname(pathname)] || OFFLINE_URL;
 }
 
 async function authCallbackResponse(event) {
@@ -90,6 +107,7 @@ async function freshCachedResponse(cache, request) {
 }
 
 async function navigationResponse(event) {
+  const offlineUrl = offlineUrlForPathname(new URL(event.request.url).pathname);
   const network = Promise.resolve(event.preloadResponse)
     .catch(() => undefined)
     .then((preloaded) => preloaded || fetch(event.request))
@@ -107,9 +125,13 @@ async function navigationResponse(event) {
   try {
     const response = await Promise.race([network, timeout]);
     if (response) return response;
-    return (await caches.match(OFFLINE_URL)) || Response.error();
+    return (
+      (await caches.match(offlineUrl)) || (await caches.match(OFFLINE_URL)) || Response.error()
+    );
   } catch {
-    return (await caches.match(OFFLINE_URL)) || Response.error();
+    return (
+      (await caches.match(offlineUrl)) || (await caches.match(OFFLINE_URL)) || Response.error()
+    );
   } finally {
     clearTimeout(timer);
   }
@@ -127,13 +149,15 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     Promise.all([
-      caches.keys().then((keys) =>
-        Promise.all(
-          keys
-            .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_VERSION)
-            .map((key) => caches.delete(key)),
+      caches
+        .keys()
+        .then((keys) =>
+          Promise.all(
+            keys
+              .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_VERSION)
+              .map((key) => caches.delete(key)),
+          ),
         ),
-      ),
       self.registration.navigationPreload?.enable() ?? Promise.resolve(),
     ]).then(() => self.clients.claim()),
   );
@@ -172,6 +196,8 @@ self.addEventListener('fetch', (event) => {
 
   const isStaticAsset =
     STATIC_PREFIXES.some((prefix) => url.pathname.startsWith(prefix)) ||
+    url.pathname.startsWith('/manifest/') ||
+    url.pathname.startsWith('/offline/') ||
     url.pathname === '/manifest.json' ||
     url.pathname === OFFLINE_URL;
 
@@ -188,6 +214,8 @@ self.addEventListener('fetch', (event) => {
 
   event.waitUntil(networkPromise.then(() => undefined).catch(() => undefined));
   event.respondWith(
-    cachedPromise.then((cachedResponse) => cachedResponse || networkPromise).catch(() => networkPromise),
+    cachedPromise
+      .then((cachedResponse) => cachedResponse || networkPromise)
+      .catch(() => networkPromise),
   );
 });

@@ -10,6 +10,8 @@ export type IdentityVerificationStatus = 'unverified' | 'verified' | 'revoked';
 export type CertificateIssueSource = 'manual' | 'score_improvement' | 'identity_correction';
 export type LegalDocumentType = 'privacy' | 'terms';
 export type LegalAcceptanceSource = 'registration' | 'profile';
+export type AppLocale = 'ru' | 'kk' | 'en' | 'zh';
+export type AccountApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
 
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
@@ -24,6 +26,9 @@ export type ProfileRow = {
   job: string;
   organization: string;
   organization_id: string | null;
+  phone_country_iso2: string | null;
+  phone_e164: string | null;
+  preferred_locale: AppLocale;
   avatar_updated_at: string | null;
   onboarding_completed_at: string | null;
   created_at: string;
@@ -38,6 +43,9 @@ export type AuthContextRpcRow = {
   profile_surname: string;
   profile_job: string;
   profile_organization: string;
+  profile_phone_country_iso2: string | null;
+  profile_phone_e164: string | null;
+  profile_preferred_locale: AppLocale;
   profile_avatar_updated_at: string | null;
   profile_onboarding_completed_at: string | null;
   profile_identity_state: 'pending' | 'verified' | 'changed' | 'revoked';
@@ -46,6 +54,11 @@ export type AuthContextRpcRow = {
   role: AppRole;
   status: AccountStatus;
   deletion_pending: boolean;
+  approval_state: AccountApprovalState;
+  approval_requested_at: string | null;
+  approval_due_at: string | null;
+  approval_decided_at: string | null;
+  approval_rejection_reason: string | null;
   capabilities: string[];
   has_current_legal_acceptance: boolean;
 };
@@ -190,6 +203,7 @@ export type AttemptRow = {
   pass_score: number;
   attempts_per_day: number;
   reset_timezone: string;
+  locale: AppLocale;
   status: AttemptStatus;
   answers: number[] | null;
   score: number | null;
@@ -201,6 +215,7 @@ export type AttemptRow = {
 export type CoursePresentationRow = {
   id: string;
   course_id: string | null;
+  locale: AppLocale;
   storage_bucket: 'course-presentations-staging' | 'course-presentations';
   storage_path: string;
   thumbnail_path: string | null;
@@ -252,6 +267,8 @@ export type CertificateRow = {
   organization: string;
   test_slug: string;
   test_title: string;
+  localized_test_title: string;
+  locale: AppLocale;
   score: number;
   total: number;
   pass_score: number;
@@ -273,6 +290,31 @@ export type LegalAcceptanceRow = {
   version: string;
   accepted_at: string;
   source: LegalAcceptanceSource;
+};
+
+export type DraftLocalizationRow = {
+  locale: AppLocale;
+  title: string;
+  description: string;
+  content_hash: string;
+  reviewed_content_hash: string | null;
+  translation_qa: Json;
+  status: 'missing' | 'draft' | 'complete';
+  draft_version: number;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type RevisionLocalizationRow = {
+  revision_id: string;
+  locale: AppLocale;
+  title: string;
+  description: string;
+  content_hash: string;
+  translation_qa: Json;
+  published_at: string;
+  published_by: string | null;
 };
 
 type JsonRpc = { Args: Record<string, unknown>; Returns: Json };
@@ -308,6 +350,12 @@ export type Database = {
         user_id: string;
         status: AccountStatus;
         deletion_pending: boolean;
+        approval_state: AccountApprovalState;
+        approval_requested_at: string | null;
+        approval_due_at: string | null;
+        approval_decided_at: string | null;
+        approval_decided_by: string | null;
+        approval_rejection_reason: string | null;
         suspended_at: string | null;
         suspended_by: string | null;
         suspension_reason: string | null;
@@ -342,6 +390,14 @@ export type Database = {
       }>;
       articles: Table<ArticleRow>;
       article_drafts: Table<ArticleDraftRow>;
+      article_draft_localizations: Table<
+        DraftLocalizationRow & {
+          article_id: string;
+          blocks: Json;
+          seo: Json;
+          sources: Json;
+        }
+      >;
       article_revisions: Table<{
         id: string;
         article_id: string;
@@ -359,12 +415,57 @@ export type Database = {
         published_at: string;
         published_by: string | null;
       }>;
+      article_revision_localizations: Table<
+        RevisionLocalizationRow & {
+          blocks: Json;
+          seo: Json;
+          sources: Json;
+        }
+      >;
       article_slug_redirects: Table<{ old_slug: string; article_id: string; created_at: string }>;
       tests: Table<TestRow>;
       course_drafts: Table<CourseDraftRow>;
+      course_draft_localizations: Table<
+        DraftLocalizationRow & {
+          test_id: string;
+          content: Json;
+          question_variants: Json;
+          seo: Json;
+          sources: Json;
+        }
+      >;
+      course_draft_presentations: Table<{
+        test_id: string;
+        locale: AppLocale;
+        presentation_id: string;
+      }>;
       course_slug_redirects: Table<{ old_slug: string; test_id: string; created_at: string }>;
       test_revisions: Table<TestRevisionRow>;
+      test_revision_localizations: Table<
+        RevisionLocalizationRow & {
+          content: Json;
+          seo: Json;
+          sources: Json;
+        }
+      >;
       test_revision_variants: Table<TestRevisionVariantRow>;
+      test_revision_variant_localizations: Table<{
+        revision_id: string;
+        variant_id: string;
+        locale: AppLocale;
+        questions: Json;
+        explanations: Json;
+        question_count: number;
+        structure_hash: string;
+        content_hash: string;
+        created_at: string;
+      }>;
+      test_revision_presentations: Table<{
+        revision_id: string;
+        locale: AppLocale;
+        presentation_id: string;
+        created_at: string;
+      }>;
       course_presentations: Table<CoursePresentationRow>;
       course_catalog_batches: Table<{
         id: string;
@@ -401,6 +502,19 @@ export type Database = {
         is_current: boolean;
         created_at: string;
       }>;
+      legal_document_localizations: Table<{
+        document_type: LegalDocumentType;
+        version: string;
+        locale: AppLocale;
+        title: string;
+        body: Json;
+        body_hash: string;
+        status: 'draft' | 'complete' | 'published';
+        published_at: string | null;
+        published_by: string | null;
+        created_at: string;
+        updated_at: string;
+      }>;
       legal_acceptances: Table<LegalAcceptanceRow>;
       site_settings: Table<{
         singleton: boolean;
@@ -434,6 +548,7 @@ export type Database = {
     Functions: {
       get_my_capabilities: { Args: Record<PropertyKey, never>; Returns: string[] };
       get_auth_context: { Args: Record<PropertyKey, never>; Returns: AuthContextRpcRow[] };
+      set_preferred_locale: { Args: { p_locale: AppLocale }; Returns: Json };
       update_profile: {
         Args: { p_name: string; p_surname: string; p_job: string; p_organization: string };
         Returns: Json;
@@ -477,6 +592,10 @@ export type Database = {
         Args: { p_worker_id: string; p_limit?: number };
         Returns: Json;
       };
+      claim_course_presentation_download_lease: {
+        Args: { p_actor_id: string; p_lease_seconds?: number };
+        Returns: Json;
+      };
       complete_profile_avatar_reconciliation: {
         Args: {
           p_operation_token: string;
@@ -487,6 +606,27 @@ export type Database = {
         Returns: Json;
       };
       prune_terminal_avatar_upload_operations: { Args: { p_limit?: number }; Returns: Json };
+      issue_email_otp_challenge: {
+        Args: {
+          p_challenge_hash: string;
+          p_email_hash: string;
+          p_expires_in_seconds?: number;
+        };
+        Returns: Json;
+      };
+      consume_email_otp_challenge_attempt: {
+        Args: { p_challenge_hash: string; p_email_hash: string };
+        Returns: Json;
+      };
+      complete_email_otp_challenge: {
+        Args: { p_challenge_hash: string; p_email_hash: string };
+        Returns: boolean;
+      };
+      prune_email_otp_challenges: { Args: { p_limit?: number }; Returns: Json };
+      release_course_presentation_download_lease: {
+        Args: { p_actor_id: string; p_lease_id: string };
+        Returns: boolean;
+      };
       search_profile_organizations: {
         Args: { p_query: string; p_limit?: number };
         Returns: string[];
@@ -517,6 +657,17 @@ export type Database = {
         };
         Returns: Json;
       };
+      get_legal_document_localization: {
+        Args: {
+          p_document_type: LegalDocumentType;
+          p_version: string | null;
+          p_locale: AppLocale;
+        };
+        Returns: Json;
+      };
+      save_legal_document_localization: JsonRpc;
+      stage_legal_document_version: JsonRpc;
+      publish_legal_document_localizations: JsonRpc;
       accept_current_legal_documents: {
         Args: {
           p_privacy_version: string;
@@ -524,6 +675,14 @@ export type Database = {
           p_terms_version: string;
           p_terms_body_revision: string;
         };
+        Returns: Json;
+      };
+      save_article_localization_draft: JsonRpc;
+      publish_article_revision_v3: JsonRpc;
+      get_article_editor_localizations: JsonRpc;
+      list_published_articles_locale: JsonRpc;
+      get_published_article_locale: {
+        Args: { p_slug: string; p_locale: AppLocale };
         Returns: Json;
       };
       save_article_draft: JsonRpc;
@@ -540,6 +699,22 @@ export type Database = {
       set_article_status_v2: JsonRpc;
       delete_article: JsonRpc;
       resolve_article_slug: { Args: { p_old_slug: string }; Returns: string | null };
+      save_course_localization_draft: JsonRpc;
+      import_course_assessment_localization: JsonRpc;
+      publish_course_revision_v4: JsonRpc;
+      get_course_editor_localizations: JsonRpc;
+      get_published_course_locale: {
+        Args: { p_slug: string; p_locale: AppLocale };
+        Returns: Json;
+      };
+      get_approved_course_presentation_locale: {
+        Args: { p_course_slug: string; p_asset: string; p_locale: AppLocale };
+        Returns: {
+          presentation_id: string;
+          content_type: string;
+          byte_size: number | null;
+        }[];
+      };
       save_course_draft: JsonRpc;
       save_course_draft_v2: JsonRpc;
       save_and_publish_course_v2: JsonRpc;
@@ -614,6 +789,10 @@ export type Database = {
       mark_content_asset_orphan: JsonRpc;
       delete_verified_orphan_asset: JsonRpc;
       start_test_attempt: { Args: { p_test_slug: string }; Returns: Json };
+      start_test_attempt_locale: {
+        Args: { p_test_slug: string; p_locale: AppLocale };
+        Returns: Json;
+      };
       resume_test_attempt: { Args: { p_test_slug: string }; Returns: Json };
       get_test_attempt: { Args: { p_attempt_id: string }; Returns: Json };
       complete_test_attempt: { Args: { p_attempt_id: string; p_answers: Json }; Returns: Json };
@@ -759,6 +938,15 @@ export type Database = {
       get_certificate_export_job: { Args: { p_job_id: string }; Returns: Json };
       resolve_certificate_export_job: { Args: { p_job_id: string }; Returns: Json };
       prune_certificate_export_jobs: { Args: { p_limit?: number }; Returns: number };
+      list_admin_notification_inbox: JsonRpc;
+      mark_admin_notifications_read: { Args: { p_event_ids: string[] }; Returns: Json };
+      retry_admin_notification_delivery: { Args: { p_event_id: string }; Returns: Json };
+      emit_system_notification_alert: JsonRpc;
+      claim_notification_deliveries: JsonRpc;
+      complete_notification_delivery: JsonRpc;
+      fail_notification_delivery: JsonRpc;
+      prune_notification_data: JsonRpc;
+      set_runtime_feature_flag: JsonRpc;
       list_organization_cleanup_clusters: { Args: { p_limit?: number }; Returns: Json };
       preview_organization_merge: {
         Args: { p_source_ids: string[]; p_target_id: string };
@@ -897,6 +1085,8 @@ export type Database = {
       list_admin_access_outbox_page: JsonRpc;
     };
     Enums: {
+      app_locale: AppLocale;
+      account_approval_state: AccountApprovalState;
       app_role: 'user' | 'admin' | 'superadmin';
       product_role: AppRole;
       account_status: AccountStatus;

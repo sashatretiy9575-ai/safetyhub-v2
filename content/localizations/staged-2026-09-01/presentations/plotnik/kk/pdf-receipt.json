@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "slug": "plotnik",
+  "locale": "kk",
+  "productionPublished": false,
+  "sourcePptx": {
+    "path": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/assets/pptx/a9c05a91e1fa2759382c68d32787591fb6077e634872c1b0b2ea59e60defe2f9/presentation.pptx",
+    "sha256": "a9c05a91e1fa2759382c68d32787591fb6077e634872c1b0b2ea59e60defe2f9"
+  },
+  "pdf": {
+    "path": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/assets/pdf/8fcbb77fbfbd6abc6005be7e99335e0e9234da4e37afb2b7bf3d9f67ee716656/presentation.pdf",
+    "sha256": "8fcbb77fbfbd6abc6005be7e99335e0e9234da4e37afb2b7bf3d9f67ee716656",
+    "byteSize": 1433853,
+    "pageCount": 25,
+    "aspectRatio": "16:9",
+    "mimeType": "application/pdf"
+  },
+  "export": {
+    "engine": "Microsoft PowerPoint fixed-format PDF",
+    "onePagePerSlide": true,
+    "notesRendered": false
+  }
+}

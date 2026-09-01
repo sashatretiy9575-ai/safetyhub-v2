@@ -22,6 +22,8 @@ import {
   type ArticleLifecycleStatus,
 } from '@/lib/validation/article';
 import { contentSeoSchema, defaultContentSeo, type ContentSeo } from '@/lib/validation/content-seo';
+import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
+import type { Json } from '@/lib/supabase/types';
 
 export type ArticleBlock = ArticleBlockInput;
 export type ArticlePublicationState =
@@ -188,7 +190,7 @@ const getCachedArticles = unstable_cache(getArticlesFromSource, ['content-articl
   tags: [CONTENT_CACHE_TAG, ARTICLES_CACHE_TAG],
 });
 
-export const getArticles = cache(getCachedArticles);
+const getLegacyArticles = cache(getCachedArticles);
 
 async function getArticleBySlugFromSource(slug: string): Promise<Article | null> {
   const supabase = createPublicClient();
@@ -280,8 +282,152 @@ const getCachedArticleBySlug = unstable_cache(getArticleBySlugFromSource, ['cont
   tags: [CONTENT_CACHE_TAG, ARTICLES_CACHE_TAG],
 });
 
-export const getArticleBySlug = cache((slug: string) =>
+const getLegacyArticleBySlug = cache((slug: string) =>
   isContentSlug(slug) ? getCachedArticleBySlug(slug) : Promise.resolve(null),
+);
+
+type LocalizedArticleRpcClient = {
+  rpc(
+    name: 'list_published_articles_locale' | 'get_published_article_locale',
+    args: Record<string, unknown>,
+  ): PromiseLike<{
+    data: Json;
+    error: { code?: string; message?: string } | null;
+    status: number;
+  }>;
+};
+
+const lastKnownLocalizedArticles = new Map<AppLocale, Omit<Article, 'blocks'>[]>();
+const lastKnownLocalizedArticlesBySlug = new Map<string, Article | null>();
+
+function localizedArticleKey(locale: AppLocale, slug: string) {
+  return `${locale}:${slug}`;
+}
+
+function localizedArticleSummary(value: Record<string, unknown>): Omit<Article, 'blocks'> | null {
+  if (
+    typeof value.slug !== 'string' ||
+    !isContentSlug(value.slug) ||
+    typeof value.title !== 'string' ||
+    typeof value.description !== 'string'
+  ) {
+    return null;
+  }
+  const coverImage = publicCoverImage(value.coverImage);
+  return {
+    id: typeof value.id === 'string' ? value.id : undefined,
+    slug: value.slug,
+    title: value.title,
+    description: value.description,
+    coverImage,
+    createdAt: typeof value.publishedAt === 'string' ? value.publishedAt : undefined,
+    updatedAt: typeof value.publishedAt === 'string' ? value.publishedAt : undefined,
+    seo: contentSeoSchema.safeParse(value.seo).success
+      ? contentSeoSchema.parse(value.seo)
+      : defaultContentSeo(value.title, value.description, coverImage),
+    ...metadataFields(value),
+  };
+}
+
+async function getLocalizedArticlesFromSource(locale: AppLocale) {
+  const supabase = createPublicClient();
+  if (!supabase) return getLegacyArticles();
+  try {
+    const { data, error, status } = await (supabase as unknown as LocalizedArticleRpcClient).rpc(
+      'list_published_articles_locale',
+      { p_locale: locale, p_limit: 50 },
+    );
+    if (error) {
+      return fallbackAfterContentFailure({
+        configured: true,
+        error,
+        fallback: () => lastKnownLocalizedArticles.get(locale) ?? [],
+        operation: `list ${locale} articles`,
+        status,
+      });
+    }
+    const raw = data && typeof data === 'object' && !Array.isArray(data) ? data : null;
+    const items = raw && 'items' in raw && Array.isArray(raw.items) ? raw.items : [];
+    const articles = items.flatMap((item) => {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) return [];
+      const article = localizedArticleSummary(item as Record<string, unknown>);
+      return article ? [article] : [];
+    });
+    lastKnownLocalizedArticles.set(locale, articles);
+    return articles;
+  } catch (error) {
+    if (error instanceof ContentSourceError) throw error;
+    return fallbackAfterContentFailure({
+      configured: true,
+      error,
+      fallback: () => lastKnownLocalizedArticles.get(locale) ?? [],
+      operation: `list ${locale} articles`,
+    });
+  }
+}
+
+const getCachedLocalizedArticles = unstable_cache(
+  getLocalizedArticlesFromSource,
+  ['content-articles-localized-v1'],
+  {
+    revalidate: CONTENT_CACHE_REVALIDATE_SECONDS,
+    tags: [CONTENT_CACHE_TAG, ARTICLES_CACHE_TAG],
+  },
+);
+
+export const getArticles = cache((locale: AppLocale = DEFAULT_LOCALE) =>
+  getCachedLocalizedArticles(locale),
+);
+
+async function getLocalizedArticleBySlugFromSource(slug: string, locale: AppLocale) {
+  const supabase = createPublicClient();
+  if (!supabase) return getLegacyArticleBySlug(slug);
+  const key = localizedArticleKey(locale, slug);
+  try {
+    const { data, error, status } = await (supabase as unknown as LocalizedArticleRpcClient).rpc(
+      'get_published_article_locale',
+      { p_slug: slug, p_locale: locale },
+    );
+    if (error) {
+      return fallbackAfterContentFailure({
+        configured: true,
+        error,
+        fallback: () => lastKnownLocalizedArticlesBySlug.get(key) ?? null,
+        operation: `read ${locale} article ${slug}`,
+        status,
+      });
+    }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+    const raw = data as Record<string, unknown>;
+    const summary = localizedArticleSummary(raw);
+    if (!summary || !articleBlocksSchema.safeParse(raw.blocks).success) return null;
+    const article: Article = { ...summary, blocks: raw.blocks };
+    lastKnownLocalizedArticlesBySlug.set(key, article);
+    return article;
+  } catch (error) {
+    if (error instanceof ContentSourceError) throw error;
+    return fallbackAfterContentFailure({
+      configured: true,
+      error,
+      fallback: () => lastKnownLocalizedArticlesBySlug.get(key) ?? null,
+      operation: `read ${locale} article ${slug}`,
+    });
+  }
+}
+
+const getCachedLocalizedArticleBySlug = unstable_cache(
+  getLocalizedArticleBySlugFromSource,
+  ['content-article-localized-v1'],
+  {
+    revalidate: CONTENT_CACHE_REVALIDATE_SECONDS,
+    tags: [CONTENT_CACHE_TAG, ARTICLES_CACHE_TAG],
+  },
+);
+
+export const getArticleBySlug = cache((slug: string, locale: AppLocale = DEFAULT_LOCALE) =>
+  isContentSlug(slug)
+    ? getCachedLocalizedArticleBySlug(slug, locale)
+    : Promise.resolve(null),
 );
 
 type ArticleRedirectClient = {

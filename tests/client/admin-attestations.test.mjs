@@ -116,7 +116,7 @@ test('attestation screen is responsive and exposes selection, filters, and confi
   assert.match(manager, /resolvedSelection\.ready/);
   assert.match(manager, /resolvedSelection\.exportable/);
   assert.match(manager, /row\.certificateState === 'issued' && row\.certificateId/);
-  assert.match(manager, /selectionSummary\.exportable > 100/);
+  assert.match(manager, /recordIds\.length > 100/);
   assert.match(manager, /\/api\/admin\/attestations\/export-jobs/);
   assert.doesNotMatch(manager, /certificateIds\.length > 100/);
   assert.match(manager, /sticky bottom-/);

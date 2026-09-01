@@ -1,4 +1,5 @@
 import { notFound, permanentRedirect } from 'next/navigation';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { getTopicBySlug, getTopicRedirectBySlug, getTopicSlugs } from '@/lib/content/topics';
 import { CourseMaterialActions } from '@/components/topics/course-material-actions';
 import { JsonLd } from '@/components/shared/json-ld';
@@ -6,6 +7,7 @@ import { breadcrumbsJsonLd, buildMetadata, courseJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { TopicSourcesCard } from '@/components/topics/topic-sources-card';
 import { getAuthContext } from '@/features/auth/server';
+import { localizePathname } from '@/i18n/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +18,8 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  const topic = await getTopicBySlug(slug);
+  const locale = await getLocale();
+  const [topic, t] = await Promise.all([getTopicBySlug(slug, locale), getTranslations('Topics')]);
   if (!topic) return {};
 
   return buildMetadata({
@@ -28,20 +31,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     noindex: !topic.seo.indexable,
     path: `/topics/${slug}`,
     type: 'article',
-    keywords: [topic.title, 'тестирование по безопасности'],
+    keywords: [topic.title, t('seoKeyword')],
+    locale,
   });
 }
 
 export default async function TopicPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const [locale, t, courseT, footerT] = await Promise.all([
+    getLocale(),
+    getTranslations('Topics'),
+    getTranslations('Course'),
+    getTranslations('Shell.footer'),
+  ]);
 
-  const topic = await getTopicBySlug(slug);
+  const topic = await getTopicBySlug(slug, locale);
   if (!topic) {
     const destination = await getTopicRedirectBySlug(slug);
-    if (destination) permanentRedirect(`/topics/${destination}`);
-    if (slug === 'industrial-safety') permanentRedirect('/topics');
-    if (slug === 'fire-safety') permanentRedirect('/topics/pozharnaya-bezopasnost');
-    if (slug === 'occupational-health') permanentRedirect('/topics/biot');
+    if (destination) permanentRedirect(localizePathname(`/topics/${destination}`, locale));
+    if (slug === 'industrial-safety') permanentRedirect(localizePathname('/topics', locale));
+    if (slug === 'fire-safety')
+      permanentRedirect(localizePathname('/topics/pozharnaya-bezopasnost', locale));
+    if (slug === 'occupational-health') permanentRedirect(localizePathname('/topics/biot', locale));
     notFound();
   }
 
@@ -59,12 +70,18 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
           courseJsonLd({
             name: topic.title,
             description: topic.description,
-            url: absoluteUrl(`/topics/${topic.slug}`),
+            url: absoluteUrl(localizePathname(`/topics/${topic.slug}`, locale)),
+            locale,
+            credentialName: courseT('credentialAwarded'),
+            locationName: footerT('city'),
           }),
           breadcrumbsJsonLd([
-            { name: 'Главная', url: absoluteUrl('/') },
-            { name: 'Курсы', url: absoluteUrl('/topics') },
-            { name: topic.title, url: absoluteUrl(`/topics/${topic.slug}`) },
+            { name: t('breadcrumbHome'), url: absoluteUrl(localizePathname('/', locale)) },
+            { name: t('breadcrumbCourses'), url: absoluteUrl(localizePathname('/topics', locale)) },
+            {
+              name: topic.title,
+              url: absoluteUrl(localizePathname(`/topics/${topic.slug}`, locale)),
+            },
           ]),
         ]}
       />

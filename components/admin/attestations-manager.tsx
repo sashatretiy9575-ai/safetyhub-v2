@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CaretDown } from '@phosphor-icons/react/dist/csr/CaretDown';
 import { DotsThree } from '@phosphor-icons/react/dist/csr/DotsThree';
-import { DownloadSimple } from '@phosphor-icons/react/dist/csr/DownloadSimple';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import type {
   AdminAttestationPage,
@@ -14,6 +13,14 @@ import type {
   AdminAttestationMutationItem,
 } from '@/features/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
+import {
+  assertCertificateExportMetadata,
+  type CertificateExportMetadata,
+} from '@/lib/pdf/certificate-client-contract';
+import {
+  downloadCertificateExportInBrowser,
+  requestCertificateArchiveFileHandle,
+} from '@/lib/pdf/certificate-client';
 import { formatDateTime } from '@/lib/utils';
 import {
   AttestationsActionDialog,
@@ -113,7 +120,9 @@ export function AttestationsManager({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [exportJob, setExportJob] = useState<CertificateExportJob | null>(null);
+  const [exportProgress, setExportProgress] = useState<{ completed: number; total: number } | null>(
+    null,
+  );
   const [detail, setDetail] = useState<AdminAttestationRow | null>(null);
   const [bulkActionsOpen, setBulkActionsOpen] = useState(false);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
@@ -121,6 +130,7 @@ export function AttestationsManager({
   const bulkActionsPanelRef = useRef<HTMLElement>(null);
   const closeBulkActions = useCallback(() => setBulkActionsOpen(false), []);
   const idempotencyKeyRef = useRef('');
+  const exportAbortRef = useRef<AbortController | null>(null);
   useEffect(() => {
     setClientReady(true);
   }, []);
@@ -424,79 +434,87 @@ export function AttestationsManager({
 
   const downloadZip = async () => {
     if (recordIds.length === 0) return;
-    if (selectionSummary.exportable > 100) {
-      setBusy(true);
-      setExportJob(null);
-      setMessage(`Подготавливаем архив из ${selectionSummary.exportable} сертификатов в фоне…`);
-      try {
-        const result = await clientRequest(
+    const controller = new AbortController();
+    exportAbortRef.current = controller;
+    setBusy(true);
+    setExportProgress({ completed: 0, total: selectionSummary.exportable });
+    setMessage('Получаем данные сертификатов. PDF и ZIP будут сформированы только в браузере…');
+    try {
+      const fileHandle = await requestCertificateArchiveFileHandle(
+        `safetyhub-certificates-${new Date().toISOString().slice(0, 10)}.zip`,
+      );
+      let metadataResponse: Response | undefined;
+      if (recordIds.length > 100) {
+        const jobResult = await clientRequest(
           '/api/admin/attestations/export-jobs',
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ attestationIds: recordIds }),
           },
-          { timeoutMs: 30_000 },
+          { timeoutMs: 30_000, signal: controller.signal },
         );
-        const payload = await readClientResponseJson<CertificateExportJob | { error?: string }>(
-          result.response,
+        const job = await readClientResponseJson<CertificateExportJob | { error?: string }>(
+          jobResult.response,
         );
-        if (!result.ok || !payload || !('downloadUrl' in payload)) {
+        if (!jobResult.ok || !job || !('downloadUrl' in job)) {
           setMessage(
-            result.ok
-              ? 'Сервер вернул неполные данные большого архива.'
-              : clientRequestMessage(result.error, 'Не удалось подготовить большой архив.'),
+            jobResult.ok
+              ? 'Сервер вернул неполные данные большого экспорта.'
+              : clientRequestMessage(jobResult.error, 'Не удалось подготовить большой экспорт.'),
           );
           return;
         }
-        setExportJob(payload);
-        setMessage(
-          `Архив подготовлен: ${payload.eligible} сертификатов, пропущено ${payload.skipped}.`,
+        const metadataResult = await clientRequest(
+          job.downloadUrl,
+          { headers: { Accept: 'application/json' } },
+          { timeoutMs: 60_000, signal: controller.signal },
         );
-      } catch (requestError) {
-        setMessage(clientRequestMessage(requestError, 'Не удалось подготовить большой архив.'));
-      } finally {
-        setBusy(false);
-      }
-      return;
-    }
-    setBusy(true);
-    setMessage('Формируем ZIP. Это может занять некоторое время…');
-    try {
-      const result = await clientRequest(
-        '/api/admin/attestations/export',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ attestationIds: recordIds }),
-        },
-        { timeoutMs: 120_000 },
-      );
-      if (!result.ok) {
-        const payload = await readClientResponseJson<{ error?: string }>(result.response);
-        if (payload?.error === 'EXPORT_CERTIFICATE_LIMIT_EXCEEDED') {
-          setMessage(
-            'После серверной проверки найдено более 100 действующих сертификатов. Уточните фильтр.',
-          );
-        } else {
-          setMessage(clientRequestMessage(result.error, 'Не удалось сформировать ZIP.'));
+        if (!metadataResult.ok) {
+          setMessage(clientRequestMessage(metadataResult.error, 'Не удалось получить данные экспорта.'));
+          return;
         }
-        return;
+        metadataResponse = metadataResult.response;
+      } else {
+        const metadataResult = await clientRequest(
+          '/api/admin/attestations/export',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ attestationIds: recordIds }),
+          },
+          { timeoutMs: 60_000, signal: controller.signal },
+        );
+        if (!metadataResult.ok) {
+          setMessage(clientRequestMessage(metadataResult.error, 'Не удалось получить данные экспорта.'));
+          return;
+        }
+        metadataResponse = metadataResult.response;
       }
-      const blob = await result.response.blob();
-      const disposition = result.response.headers.get('content-disposition') ?? '';
-      const match = disposition.match(/filename="?([^";]+)"?/i);
-      const filename = match?.[1] ?? 'safetyhub-certificates.zip';
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1_000);
-      setMessage('ZIP сформирован и передан на скачивание.');
+      const metadata = await readClientResponseJson<CertificateExportMetadata>(metadataResponse);
+      assertCertificateExportMetadata(metadata);
+      const result = await downloadCertificateExportInBrowser(metadata, {
+        fileHandle,
+        signal: controller.signal,
+        onProgress: (progress) => {
+          setExportProgress(progress);
+          setMessage(`Формируем сертификаты в браузере: ${progress.completed} из ${progress.total}…`);
+        },
+      });
+      setMessage(
+        result.streamed
+          ? 'ZIP сформирован в браузере и записан в выбранный файл.'
+          : `ZIP сформирован в браузере и передан на скачивание${result.archives > 1 ? ` (${result.archives} частей по 100 сертификатов максимум)` : ''}.`,
+      );
     } catch (requestError) {
-      setMessage(clientRequestMessage(requestError, 'Не удалось сформировать ZIP.'));
+      if (controller.signal.aborted || (requestError instanceof DOMException && requestError.name === 'AbortError')) {
+        setMessage('Формирование ZIP отменено.');
+      } else {
+        setMessage(clientRequestMessage(requestError, 'Не удалось сформировать ZIP в браузере.'));
+      }
     } finally {
+      if (exportAbortRef.current === controller) exportAbortRef.current = null;
+      setExportProgress(null);
       setBusy(false);
     }
   };
@@ -522,20 +540,13 @@ export function AttestationsManager({
         </p>
       ) : null}
 
-      {exportJob?.state === 'ready' ? (
+      {exportProgress ? (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--color-primary)] bg-[var(--color-primary-soft)] px-4 py-3 text-sm">
           <p>
-            Большой архив готов: {exportJob.eligible} PDF. Ссылка действует до{' '}
-            {new Date(exportJob.expiresAt).toLocaleTimeString('ru-RU', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-            .
+            Формирование в браузере: {exportProgress.completed} из {exportProgress.total} PDF.
           </p>
-          <Button asChild size="sm">
-            <a href={exportJob.downloadUrl} download>
-              <DownloadSimple /> Скачать архив
-            </a>
+          <Button size="sm" variant="outline" onClick={() => exportAbortRef.current?.abort()}>
+            <X /> Отменить
           </Button>
         </div>
       ) : null}

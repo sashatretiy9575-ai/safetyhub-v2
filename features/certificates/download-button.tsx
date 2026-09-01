@@ -1,32 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { DownloadSimple, SpinnerGap } from '@phosphor-icons/react';
 import { Button, type ButtonProps } from '@/components/ui/button';
-import { clientRequest, clientRequestMessage } from '@/lib/client-request';
-
-function responseFilename(disposition: string | null, fallback: string) {
-  if (!disposition) return fallback;
-  const encoded = disposition.match(/filename\*=UTF-8''([^;]+)/iu)?.[1];
-  if (encoded) {
-    try {
-      return decodeURIComponent(encoded);
-    } catch {
-      // Continue with the ASCII fallback from the same header.
-    }
-  }
-  return disposition.match(/filename="?([^";]+)"?/iu)?.[1] ?? fallback;
-}
-
-async function isPdf(blob: Blob) {
-  if (blob.size < 5) return false;
-  const signature = new Uint8Array(await blob.slice(0, 5).arrayBuffer());
-  return String.fromCharCode(...signature) === '%PDF-';
-}
+import {
+  clientRequest,
+  readClientResponseJson,
+} from '@/lib/client-request';
+import {
+  assertCertificateRenderMetadata,
+  type CertificateRenderMetadata,
+} from '@/lib/pdf/certificate-client-contract';
+import { localizedClientRequestMessage } from '@/i18n/client-errors';
 
 export function CertificateDownloadButton({
   certificateId,
-  children = 'Скачать PDF',
+  children,
   variant = 'primary',
   size = 'sm',
   className,
@@ -37,47 +27,41 @@ export function CertificateDownloadButton({
   size?: ButtonProps['size'];
   className?: string;
 }) {
+  const t = useTranslations('Certificate');
+  const errorT = useTranslations('Common.errors');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const abortRef = useRef<AbortController | null>(null);
 
   const download = async () => {
-    if (busy) return;
+    if (busy) {
+      abortRef.current?.abort();
+      return;
+    }
+    const controller = new AbortController();
+    abortRef.current = controller;
     setBusy(true);
     setMessage('');
     try {
       const result = await clientRequest(
-        `/api/certificates/${certificateId}`,
-        { headers: { Accept: 'application/pdf' } },
-        { timeoutMs: 60_000 },
+        `/api/certificates/${certificateId}/metadata`,
+        { headers: { Accept: 'application/json' } },
+        { timeoutMs: 30_000, signal: controller.signal },
       );
       if (!result.ok) {
-        setMessage(clientRequestMessage(result.error, 'PDF не удалось скачать.'));
+        setMessage(localizedClientRequestMessage(result.error, t('downloadFailed'), errorT));
         return;
       }
-      const blob = await result.response.blob();
-      if (!result.response.headers.get('content-type')?.startsWith('application/pdf') || !(await isPdf(blob))) {
-        setMessage('Сервер вернул повреждённый PDF. Повторите попытку.');
-        return;
-      }
-
-      const filename = responseFilename(
-        result.response.headers.get('content-disposition'),
-        `safetyhub-certificate-${certificateId}.pdf`,
-      );
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.rel = 'noopener';
-      link.hidden = true;
-      document.body.append(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
-      setMessage('PDF передан браузеру для скачивания.');
+      const metadata = await readClientResponseJson<CertificateRenderMetadata>(result.response);
+      assertCertificateRenderMetadata(metadata);
+      const { downloadCertificateInBrowser } = await import('@/lib/pdf/certificate-client');
+      await downloadCertificateInBrowser(metadata, { signal: controller.signal });
+      setMessage(t('generated'));
     } catch (error) {
-      setMessage(clientRequestMessage(error, 'PDF не удалось скачать.'));
+      if (controller.signal.aborted) setMessage(t('cancelled'));
+      else setMessage(localizedClientRequestMessage(error, t('downloadFailed'), errorT));
     } finally {
+      if (abortRef.current === controller) abortRef.current = null;
       setBusy(false);
     }
   };
@@ -89,16 +73,19 @@ export function CertificateDownloadButton({
         variant={variant}
         size={size}
         className={className}
-        disabled={busy}
         onClick={() => void download()}
       >
         {busy ? <SpinnerGap className="animate-spin" /> : <DownloadSimple />}
-        {busy ? 'Готовим PDF…' : children}
+        {busy ? t('cancel') : (children ?? t('downloadPdf'))}
       </Button>
       {message ? (
         <span
-          role={message.startsWith('PDF передан') ? 'status' : 'alert'}
-          className={message.startsWith('PDF передан') ? 'sr-only' : 'text-xs text-[var(--color-danger)]'}
+          role={message === t('generated') ? 'status' : 'alert'}
+          className={
+            message === t('generated')
+              ? 'sr-only'
+              : 'text-xs text-[var(--color-danger)]'
+          }
         >
           {message}
         </span>

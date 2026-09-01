@@ -1,0 +1,9 @@
+{
+  "function": "stage_legal_document_version",
+  "args": {
+    "p_document_type": "privacy",
+    "p_version": "1.3",
+    "p_body_revision": "privacy-1.3",
+    "p_effective_at": "2026-09-01T00:00:00Z"
+  }
+}

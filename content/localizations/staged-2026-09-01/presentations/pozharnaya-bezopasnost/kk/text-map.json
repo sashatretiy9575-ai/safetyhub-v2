@@ -1,0 +1,3501 @@
+{
+  "schemaVersion": 1,
+  "slug": "pozharnaya-bezopasnost",
+  "locale": "kk",
+  "sourcePptx": "content/source-materials/derived/pozharnaya-bezopasnost/presentation.pptx",
+  "slideCount": 41,
+  "slides": [
+    {
+      "slide": 1,
+      "slideId": "sl/y90nupkv",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/7qp4be9c",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "COURSE_KICKER",
+          "text": "УЧЕБНЫЙ КУРС",
+          "sourceTextSha256": "75cac1330e9d5668307c2a56beaadcfde7e96292c2b1cf30849e5d8cc270ded1",
+          "translatedText": "ОҚУ КУРСЫ"
+        },
+        {
+          "id": "sh/65g3298r",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "DECK_TITLE",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/sryl4zqx",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "DECK_SUBTITLE",
+          "text": "Предупреждение пожара, эвакуация и безопасное применение огнетушителя",
+          "sourceTextSha256": "8debfb6cf3d918937c5650e5c84da14ed11fba9dde3f023b164859a8a20edebe",
+          "translatedText": "Өрттің алдын алу, эвакуация және өрт сөндіргішті қауіпсіз пайдалану"
+        },
+        {
+          "id": "sh/fu94fe98",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "DECK_AUDIENCE",
+          "text": "Учебный курс для рабочих и линейного персонала",
+          "sourceTextSha256": "f39f8059374d9aa573c6b106502b3275b17b1467ce37f81f9067fadfbf52df00",
+          "translatedText": "Жұмысшылар мен желілік қызметкерлерді оқыту курсы"
+        },
+        {
+          "id": "sh/ul4vaxgb",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/vmdcj2xw",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        }
+      ]
+    },
+    {
+      "slide": 2,
+      "slideId": "sl/hwbqtkby",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/9072xkry",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "После курса работник сможет",
+          "sourceTextSha256": "4d0cf225b066ac4e94a63069ec59a5c5eccf08eaf1c1126690df72b4cac39d05",
+          "translatedText": "Курстан кейін жұмыскер мүмкін болады"
+        },
+        {
+          "id": "sh/ozy1ofad",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "LIST_NUMBER_1",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/a10jqpsj",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "LIST_ITEM_1",
+          "text": "Назвать первые действия при дыме, запахе гари, тревоге или открытом огне.",
+          "sourceTextSha256": "c4a9e162564c31a5185dd7a05220f86ffa9f69ac52dd76d4c203106b77b2dd1c",
+          "translatedText": "Түтін, жану иісі, дабыл немесе ашық өрт кезіндегі алғашқы әрекеттерді атаңыз."
+        },
+        {
+          "id": "sh/x4r21kru",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "LIST_NUMBER_2",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/r65knqtk",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "LIST_ITEM_2",
+          "text": "Понимать условия горения, опасные факторы и способы прекращения пожара.",
+          "sourceTextSha256": "da637c04fa29c8b298908fdfd37d8c54e6a6409ca5fe360ebc006ef1bcd5a98f",
+          "translatedText": "Өрт жағдайларын, қауіптілігін және өртті тоқтату әдістерін түсініңіз."
+        },
+        {
+          "id": "sh/q5wjelsz",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "LIST_NUMBER_3",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/9wnqhczy",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "LIST_ITEM_3",
+          "text": "Выбрать подходящий огнетушитель по маркировке и оценить безопасность тушения.",
+          "sourceTextSha256": "88fc31c3289b42268a428d07ee976267a73b90814e28c52e818a89e86549b41d",
+          "translatedText": "Таңбаға сәйкес сәйкес өрт сөндіргіш таңдаңыз және сөндіру қауіпсіздігін бағалаңыз."
+        },
+        {
+          "id": "sh/mtwrmxg7",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "LIST_NUMBER_4",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/wjy9sry9",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "LIST_ITEM_4",
+          "text": "Эвакуироваться, сообщить 101/112 и действовать на пункте сбора.",
+          "sourceTextSha256": "764606509f98dece5ed41a635de7e34df49ff8ad9dd1718f7f483841bceedb34",
+          "translatedText": "Эвакуациялаңыз, 101/112 нөміріне хабарлаңыз және жинау орнында әрекет етіңіз."
+        },
+        {
+          "id": "sh/bip8jmho",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Жизнь и безопасная эвакуация имеют приоритет над имуществом и тушением.",
+          "sourceTextSha256": "fa8cc5533467b5dc7fa245d17737ac2485a27aa9f4effe26eb8eae766db77315",
+          "translatedText": "Тіршілік пен қауіпсіздік эвакуация мүлік пен өрт сөндіруге қарағанда басым."
+        },
+        {
+          "id": "sh/s72xofmh",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/76twva5c",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/65kfmpor",
+          "shapeId": "23",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        }
+      ]
+    },
+    {
+      "slide": 3,
+      "slideId": "sl/ofy9wn61",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/cza94vmx",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Логика курса",
+          "sourceTextSha256": "9811ffd0b4bd51ed3b5d8cdebadc40ec24d961f5312280f37c2a3b31c3efff99",
+          "translatedText": "Курс логикасы"
+        },
+        {
+          "id": "sh/d0jax03i",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "LIST_NUMBER_1",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/3ah8rqlg",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "LIST_ITEM_1",
+          "text": "Первые действия и основы горения.",
+          "sourceTextSha256": "63f3c70672594d125dcb12b2920779233a1c1ebc8bb1bef7d5ea5f2040129398",
+          "translatedText": "Алғашқы әрекеттер және жанудың негіздері."
+        },
+        {
+          "id": "sh/obq90bml",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "LIST_NUMBER_2",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/m5cra54z",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "LIST_ITEM_2",
+          "text": "Классы пожаров и выбор огнетушителя.",
+          "sourceTextSha256": "94b7b0fee3dff4b1122d88a197bf4539672552283726ff320c3f69c516a578e0",
+          "translatedText": "Өрт сыныптары және өрт сөндіргішті таңдау."
+        },
+        {
+          "id": "sh/n6ls3alk",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "LIST_NUMBER_3",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/m1c3mlsn",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "LIST_ITEM_3",
+          "text": "Эвакуация, сообщение и пункт сбора.",
+          "sourceTextSha256": "24b62c1117f8a9daf17ef59d9646ab571d5df658801a1d84e9d5d4da838ab862",
+          "translatedText": "эвакуация, хабар және жинау нүктесі."
+        },
+        {
+          "id": "sh/943mhgre",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "LIST_NUMBER_4",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/v6l4jq94",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "LIST_ITEM_4",
+          "text": "Профилактика и огневые работы.",
+          "sourceTextSha256": "6030877c9ae6663d17a6309c861f13c435eb068abfbf3224ac8be97b837ca0e3",
+          "translatedText": "Алдын алу және отты жұмыстар."
+        },
+        {
+          "id": "sh/a5c3ql8z",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "LIST_NUMBER_5",
+          "text": "05",
+          "sourceTextSha256": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+          "translatedText": "05"
+        },
+        {
+          "id": "sh/w7ulsvqp",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "LIST_ITEM_5",
+          "text": "Практические сценарии и итоговый алгоритм.",
+          "sourceTextSha256": "0d805ff49cd4f21a40b9b4d63b210d4dc02316938a93a55d30ca34b2ba2d681e",
+          "translatedText": "Практикалық сценарийлер және қорытынды алгоритм."
+        },
+        {
+          "id": "sh/i9w3u58v",
+          "shapeId": "19",
+          "kind": "shape",
+          "text": "КУРС",
+          "sourceTextSha256": "0181e92ec27149039fb2f998972369363d8dbe9989444c5c3aec7e1ff0b98640",
+          "translatedText": "КУРС"
+        },
+        {
+          "id": "sh/f29gbyx0",
+          "shapeId": "21",
+          "kind": "shape",
+          "text": "смысловых блоков",
+          "sourceTextSha256": "b9127e0dd9ea43a0023b523b097f92de1175fd6f49a2293dd77d08efefb9dbd0",
+          "translatedText": "семантикалық блоктар"
+        },
+        {
+          "id": "sh/re9g7yxo",
+          "shapeId": "25",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/sfix03y9",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/batgjixs",
+          "shapeId": "29",
+          "kind": "shape",
+          "name": "AGENDA_COUNT_CIRCLE",
+          "text": "5",
+          "sourceTextSha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+          "translatedText": "5"
+        }
+      ]
+    },
+    {
+      "slide": 4,
+      "slideId": "sl/jyx0ra1s",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/0ba143al",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "01",
+          "sourceTextSha256": "938db8c9f82c8cb58d3f3ef4fd250036a48d26a712753d2fde5abd03a85cabf4",
+          "translatedText": "01"
+        },
+        {
+          "id": "sh/ql8jytsj",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Сигнал и основы горения",
+          "sourceTextSha256": "556d25abddda1ab657450df52028c4d85654229dd2e511475b6f83d40d68c201",
+          "translatedText": "Сигнал және жану негіздері"
+        },
+        {
+          "id": "sh/doj29oba",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "При признаках пожара сначала предупредить людей, сообщить и начать эвакуацию.",
+          "sourceTextSha256": "70ca2443f709b9ba56a7e21a593a6f5288172a9f28bd6d25de84e940852238eb",
+          "translatedText": "Өрт белгілері байқалса, алдымен адамдарды ескертіп, хабардар етіп, эвакуациялауды бастаңыз."
+        },
+        {
+          "id": "sh/kbm987y5",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/5cva1cfq",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        }
+      ]
+    },
+    {
+      "slide": 5,
+      "slideId": "sl/i107q5of",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/dgbulwnm",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Тревога требует немедленного действия",
+          "sourceTextSha256": "34c86da4519b7411817f30ed2859febc64c67c9fc2a362e2147d1a203676f013",
+          "translatedText": "Дабыл дереу әрекет етуді қажет етеді"
+        },
+        {
+          "id": "sh/yhkbe1o7",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/l4bupwny",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Сообщить",
+          "sourceTextSha256": "66d3e4d7b4eefde68b7113ff0bf5e445080364b21ef781ce57af4f3233b9c428",
+          "translatedText": "Есеп"
+        },
+        {
+          "id": "sh/032tgr6d",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Подать сигнал и позвонить 101 или 112, если это предусмотрено ролью.",
+          "sourceTextSha256": "7b2950a498db24be275fd3ade1473eb987d1d806b2acd3b400f88346db3ab261",
+          "translatedText": "Рөл қажет болса, сигнал беріп, 101 немесе 112 нөміріне қоңырау шалыңыз."
+        },
+        {
+          "id": "sh/m5kbi1oj",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/w32dkbuh",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Предупредить",
+          "sourceTextSha256": "99c377a34170666f16b7b32174cadbdcfef21f02bb2c1d1fe1562c5a264f81d0",
+          "translatedText": "Ескерту"
+        },
+        {
+          "id": "sh/x4vedgvm",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Оповестить людей рядом и выполнять указания системы оповещения.",
+          "sourceTextSha256": "249b250c79d2f57e3e14987bca74768970429480ea0617e7531e31df1949a950",
+          "translatedText": "Маңайдағы адамдарға хабарлаңыз және ескерту жүйесінің нұсқауларын орындаңыз."
+        },
+        {
+          "id": "sh/v2twb6dw",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/k7mxovud",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Эвакуироваться",
+          "sourceTextSha256": "391232709eae53b63694abd8809858b2cfd9e017dc6cf21dd5bc3a3d489bf91f",
+          "translatedText": "Эвакуация"
+        },
+        {
+          "id": "sh/58vehgvy",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Идти по безопасному маршруту, не задерживаясь за вещами.",
+          "sourceTextSha256": "140f79366b9bf349b2595d838ee6095d85b2bb4c6c21019529bd5ae5d640da02",
+          "translatedText": "Бір нәрсеге тоқтамай, қауіпсіз жолды ұстаныңыз."
+        },
+        {
+          "id": "sh/j6dwfqds",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/sb6xsvu9",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Собраться",
+          "sourceTextSha256": "c9ee1c79739e5f52a0938dfdcbe7cb50d9654a7e51bb086123ee4f9697c959f7",
+          "translatedText": "Дайын болыңыз"
+        },
+        {
+          "id": "sh/tcfel0vu",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Прибыть на пункт сбора, пройти перекличку и не возвращаться.",
+          "sourceTextSha256": "d3c09c15c51f93509d0e55a53fd03deec00fcb2698b97daf0bc550ff7e97845b",
+          "translatedText": "Қабылдау орнына келіңіз, қоңырау шалу арқылы өтіңіз және оралмаңыз."
+        },
+        {
+          "id": "sh/fe94nm1w",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Опасная фраза «не поднимайте тревогу» удалена: тревогу подают незамедлительно.",
+          "sourceTextSha256": "bebfb876b04ccdf77305ca56e526f3707bd26780beef9e3eb3d76f990a4b4ba9",
+          "translatedText": "«Дабылды көтермеу» қауіпті тіркесі жойылды: дабыл бірден көтеріледі."
+        },
+        {
+          "id": "sh/3i94r61s",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности • Рекомендации МЧС: 101/112",
+          "sourceTextSha256": "ec6ef335bb04d9bc526de6c0969aaa222fb3acb7007fe40992b7493b9c47bb46",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері • Төтенше жағдайлар министрлігінің ұсыныстары: 101/112"
+        },
+        {
+          "id": "sh/2h0ni107",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/5o7mhcju",
+          "shapeId": "28",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "05",
+          "sourceTextSha256": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+          "translatedText": "05"
+        }
+      ]
+    },
+    {
+      "slide": 6,
+      "slideId": "sl/x8f69ofe",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/yhg7epsj",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Пожар — неконтролируемое горение",
+          "sourceTextSha256": "27ea004e0d6c12759da72cc4b1fc039851bfd28ec9f6b69393cea4988f3097a0",
+          "translatedText": "Өрт - бақылаусыз жану"
+        },
+        {
+          "id": "sh/zi98nu94",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Он создаёт угрозу людям, имуществу, процессам и окружающей среде. • Развитие зависит от горючего, кислорода, энергии зажигания и условий помещения. • Небольшой очаг может быстро стать непригодным для ручного тушения. • Раннее обнаружение и сообщение сокращают время свободного развития.",
+          "sourceTextSha256": "f69a4859cbc040b2e21e56fd967037d8ff82bd017db60796858f1f660c4d6321",
+          "translatedText": "• Өрт адамдарға, мүлікке, процестерге және қоршаған ортаға қауіп төндіреді. • Оның өршуі жанғыш материалға, оттегіне, тұтану энергиясына және үй-жай жағдайына байланысты. • Шағын өрт ошағы қол өрт сөндіргішімен сөндіруге келмейтін деңгейге тез жетуі мүмкін. • Ерте анықтау және хабарлау өрттің бақылаусыз даму уақытын қысқартады."
+        },
+        {
+          "id": "sh/ml07i9sv",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Размер пламени — не единственный показатель опасности; дым может быть критичнее.",
+          "sourceTextSha256": "f0e7f03da11d5ccc5627da09944db59b299823620884c7ea57d5dc27b30748a5",
+          "translatedText": "Жалын мөлшері қауіптің жалғыз көрсеткіші емес; түтін маңыздырақ болуы мүмкін."
+        },
+        {
+          "id": "sh/h4bupgn6",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/w32twb6l",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "06",
+          "sourceTextSha256": "aacd834b5cdc64a329e27649143406dd068306542988dfc250d6184745894849",
+          "translatedText": "06"
+        }
+      ]
+    },
+    {
+      "slide": 7,
+      "slideId": "sl/gnmp4jqx",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/cb2tkvap",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Опасные факторы действуют до пламени",
+          "sourceTextSha256": "4339b54c98c90c266d90486a3a32029713e3dc94b1ddda5c56eeb69f534a8238",
+          "translatedText": "Қауіпті факторлар жалын алдында әрекет етеді"
+        },
+        {
+          "id": "sh/dcbud0ra",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "РИСК / ИСТОЧНИК",
+          "sourceTextSha256": "851ce8823ffad38155e037c57ecdf78a20c64bd1f2a0c5a2d45ea6e2edc50856",
+          "translatedText": "тәуекел / КӨЗ"
+        },
+        {
+          "id": "sh/ydkbm5sv",
+          "shapeId": "4",
+          "kind": "shape",
+          "text": "ПОСЛЕДСТВИЕ",
+          "sourceTextSha256": "1da37746aeb7df559ec9874df174a32f36affa7af0d1ac18594d03355f832a05",
+          "translatedText": "НӘТИЖЕЛЕР"
+        },
+        {
+          "id": "sh/zedcfa9g",
+          "shapeId": "5",
+          "kind": "shape",
+          "text": "МЕРА КОНТРОЛЯ",
+          "sourceTextSha256": "cf1c1f59a983a25c36423810031eef35d5f3f4404bf5c103b874132628f23721",
+          "translatedText": "БАҚЫЛАУ ШАРАСЫ"
+        },
+        {
+          "id": "sh/l0vuh0rm",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "Дым и токсичные продукты",
+          "sourceTextSha256": "1709da6af6357c01e009f03603e78f0f76227259835873870e7d9a74e6970014",
+          "translatedText": "Түтін және улы өнімдер"
+        },
+        {
+          "id": "sh/eh0ba1sr",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Отравление, потеря ориентации",
+          "sourceTextSha256": "fb90a3f5d6b8e18f7fbb28331e548dd7078f6f52df9b7966e35f8352a60acef1",
+          "translatedText": "Улану, бағдардың бұзылуы"
+        },
+        {
+          "id": "sh/fi9c369c",
+          "shapeId": "9",
+          "kind": "shape",
+          "text": "Раннее оповещение и эвакуация",
+          "sourceTextSha256": "c376ac9a40494d32b1b92933959f66accef194e3a399cee2d93fa33c2bd51002",
+          "translatedText": "Ерте ескерту және эвакуация"
+        },
+        {
+          "id": "sh/a9ojq5kz",
+          "shapeId": "11",
+          "kind": "shape",
+          "text": "Высокая температура",
+          "sourceTextSha256": "f462fd365a54b9c3718a271f9301215e7c732fad2f2f4b662105ad967f814326",
+          "translatedText": "Жоғары температура"
+        },
+        {
+          "id": "sh/xcz2l03q",
+          "shapeId": "12",
+          "kind": "shape",
+          "text": "Ожоги и тепловое воздействие",
+          "sourceTextSha256": "e2a2db6e7869ba35f0fdf6220eaa7b31e56fed26744f04e2a6a1c2a7a9fbd154",
+          "translatedText": "Күйік және қызу әсері"
+        },
+        {
+          "id": "sh/cbq1sv25",
+          "shapeId": "13",
+          "kind": "shape",
+          "text": "Дистанция и защищённый маршрут",
+          "sourceTextSha256": "301f6f47e67a659ddd30a2bcf5601b17bcfc80a6e06e97c20885b09ad749159a",
+          "translatedText": "Қашықтық және қорғалған маршрут"
+        },
+        {
+          "id": "sh/25ojml43",
+          "shapeId": "15",
+          "kind": "shape",
+          "text": "Снижение кислорода",
+          "sourceTextSha256": "cc3b55194911f421d44d35232ce9b8bdbce4e91be300a203f54163fa375b92b7",
+          "translatedText": "Азайған оттегі"
+        },
+        {
+          "id": "sh/p8fih03e",
+          "shapeId": "16",
+          "kind": "shape",
+          "text": "Потеря сознания",
+          "sourceTextSha256": "aafe22f75cf100f01a7eb8385a760a5843dc1611d2cd7493a4a49deea5227db7",
+          "translatedText": "Естің жоғалуы"
+        },
+        {
+          "id": "sh/o761ov2t",
+          "shapeId": "17",
+          "kind": "shape",
+          "text": "Не входить без специальной защиты",
+          "sourceTextSha256": "e5bcb2049479d8bf26e99f032ef0b454cef12438c6d83bda5035ce4baa43082a",
+          "translatedText": "Арнайы қорғаныссыз кіруге болмайды"
+        },
+        {
+          "id": "sh/eh4jil4r",
+          "shapeId": "19",
+          "kind": "shape",
+          "text": "Обрушение и взрыв",
+          "sourceTextSha256": "81f670ae927bdd9b4455875f91b340a6f78f79491ab8b5e19d96930d38045229",
+          "translatedText": "құлау және жарылыс"
+        },
+        {
+          "id": "sh/id4ju1oz",
+          "shapeId": "20",
+          "kind": "shape",
+          "text": "Травмы и блокирование выхода",
+          "sourceTextSha256": "820b9f096319246946011897600ce7c1e15634155b93341c58fd4d562bbc3014",
+          "translatedText": "Жарақаттар және бітелген шығу"
+        },
+        {
+          "id": "sh/jedkn654",
+          "shapeId": "21",
+          "kind": "shape",
+          "text": "Не приближаться и сообщить службам",
+          "sourceTextSha256": "39c1ae396bebb5a20397e11d916bc2e46abdfd992657f7ed020130ce56062865",
+          "translatedText": "Жақындап, билікке хабар бермеңіз"
+        },
+        {
+          "id": "sh/4fm1wb6p",
+          "shapeId": "22",
+          "kind": "shape",
+          "text": "В задымлённое помещение не возвращаются без специальных полномочий и защиты.",
+          "sourceTextSha256": "dacf4883484a6c9063a2b78885760f8585b46dfca572ffa6acd34af310be7a54",
+          "translatedText": "Арнайы қуаттарсыз және қорғаныссыз түтін бөлмеге оралмаңыз."
+        },
+        {
+          "id": "sh/s3ml0v61",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/d4f2t0nm",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "07",
+          "sourceTextSha256": "19b100ab7725c612f3d80ff203ca53cea5cadaafae3bf0f88f0fb4089fe08815",
+          "translatedText": "07"
+        }
+      ]
+    },
+    {
+      "slide": 8,
+      "slideId": "sl/fu1gfa1s",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/18byd4zy",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Причины связаны с контролем источников",
+          "sourceTextSha256": "38848a27bad352cd08362bbcac8c67158f3b22400742331788ea50197729e37f",
+          "translatedText": "Себептер — тұтану көзін бақылауға қатысты"
+        },
+        {
+          "id": "sh/g72x4zyd",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Неисправное электрооборудование, перегрузка и повреждённая изоляция. • Открытое пламя, искры и огневые работы без подготовки. • Неправильное хранение горючих материалов и разливы жидкостей. • Курение вне отведённого места, горячие поверхности и нарушение уборки.",
+          "sourceTextSha256": "5f556a8cd58624815e1b55b7364db89ddfa72849469cf8c1199f38831ff71a48",
+          "translatedText": "• Ақаулы электр жабдығы, шамадан тыс жүктеме және зақымдалған оқшаулау. • Ашық жалын, ұшқын және отты жұмыстар дайындықсыз. • Жанғыш материалдарды және төгілген сұйықтықтарды дұрыс сақтамау. • Белгіленген аумақтан тыс темекі шегу, ыстық беттер және нашар тазалау."
+        },
+        {
+          "id": "sh/6h0fypgb",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "Профилактика управляет источником зажигания и пожарной нагрузкой одновременно.",
+          "sourceTextSha256": "7dd1f0c5c2223133238bb1685a7e39251c4e782eb413be6e71de076a1fa1e899",
+          "translatedText": "Алдын алу бір уақытта тұтану көзі мен өрт жүктемесін басқарады."
+        },
+        {
+          "id": "sh/id0fu50z",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/o7ydoret",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "08",
+          "sourceTextSha256": "323783be9a53a31e158ec9600626a4703e99f4e183bc1acb8772cbdf5c3a1ece",
+          "translatedText": "08"
+        }
+      ]
+    },
+    {
+      "slide": 9,
+      "slideId": "sl/udsvah03",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1cfmhgne",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Для горения нужны три условия",
+          "sourceTextSha256": "cde0f8fd46a160b0c75adf05df28056981506f8322d36fade6bd96b064b0bcfe",
+          "translatedText": "Жану үшін үш шарт қажет"
+        },
+        {
+          "id": "sh/0b65obm9",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Горючее вещество — материал, пары или газ, способные поддерживать горение. • Окислитель — обычно кислород воздуха. • Источник зажигания — пламя, искра, горячая поверхность или иная энергия. • Управление любым элементом может предотвратить возникновение или развитие пожара.",
+          "sourceTextSha256": "a971541ab6bbfd98a9c70bbdb70f628fb33086d2178024aee456b721e0b57472",
+          "translatedText": "• Жанғыш зат – жануды қолдауға қабілетті материал, бу немесе газ. • Тотықтырғыш агент әдетте ауадағы оттегі болып табылады. • Тұтану көзі - жалын, ұшқын, ыстық бет немесе басқа энергия. • Кез келген элементті басқару өрттің пайда болуын немесе дамуын болдырмайды."
+        },
+        {
+          "id": "sh/9gzml0nq",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Огненный треугольник помогает выбрать меру профилактики и тушения.",
+          "sourceTextSha256": "0ea36563a5f8292d2266ddd403ebcb127e12dec1d1bc61419b2f604733cfe393",
+          "translatedText": "Өрт үшбұрышы алдын алу және сөндіру шарасын таңдауға көмектеседі."
+        },
+        {
+          "id": "sh/oza1gfyh",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/p0ji9kf2",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "09",
+          "sourceTextSha256": "3514acf61732f662da19625f7fe781c3e483f2dce8506012f3bb393f5003e105",
+          "translatedText": "09"
+        }
+      ]
+    },
+    {
+      "slide": 10,
+      "slideId": "sl/m90b6t0r",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xc3mho32",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Тепло распространяется четырьмя путями",
+          "sourceTextSha256": "ec5444cd9f5c01fab06716913fa305b9a758cf3ab6c6f393a5e1f2ce347a90b9",
+          "translatedText": "Жылу төрт жолмен таралады"
+        },
+        {
+          "id": "sh/cbu58j2h",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Теплопроводность передаёт тепло через материал и соединённые конструкции. • Конвекция переносит горячие газы и дым вверх и по помещениям. • Излучение нагревает предметы на расстоянии. • Пламя непосредственно зажигает материалы при контакте.",
+          "sourceTextSha256": "d43cf52a22813326610e2ed4ec8ce22e9c652e0e0823222f4b99cf3e37062879",
+          "translatedText": "• Өткізгіштік жылуды материал мен жалғанған құрылымдар арқылы тасымалдайды. • Конвекция ыстық газдар мен түтінді жоғары және бөлмелер бойына тасымалдайды. • Радиация алыстағы заттарды қыздырады. • Жалын жанасу кезінде материалдарды тікелей тұтандырады."
+        },
+        {
+          "id": "sh/l036l83y",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Закрытая дверь может замедлить распространение дыма и тепла.",
+          "sourceTextSha256": "a23bf7a50f9f76c3a93af915daa49f7bed2cbc478e40f224ce62a9a31d8b3b4a",
+          "translatedText": "Жабық есік түтін мен жылудың таралуын бәсеңдетуі мүмкін."
+        },
+        {
+          "id": "sh/s7yt4b21",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/d87uxg3m",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "10",
+          "sourceTextSha256": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+          "translatedText": "10"
+        }
+      ]
+    },
+    {
+      "slide": 11,
+      "slideId": "sl/jetc3ut0",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xcryxg7y",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Горение прекращают воздействием на условие",
+          "sourceTextSha256": "b9dfe1a25484b1699d3ac2edd7c3df482fee2b0857270f5e3bb80e04b604a0ae",
+          "translatedText": "Жағдайға әсер ету арқылы жану тоқтатылады"
+        },
+        {
+          "id": "sh/250zy18b",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/98rytw72",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Охладить",
+          "sourceTextSha256": "291d0e8a986a8f0280438ffb5e6b83c4c4cb2684d9e07eeacc40871af702e4bd",
+          "translatedText": "Керемет"
+        },
+        {
+          "id": "sh/o7ih0r6h",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Снизить температуру подходящим огнетушащим веществом.",
+          "sourceTextSha256": "5339aba2623aa33e40633aeb2ca33d20a1b666b773ca87dd44a633acec7e1f40",
+          "translatedText": "Сәйкес өрт сөндіргішпен температураны төмендетіңіз."
+        },
+        {
+          "id": "sh/61kzalof",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/ofqtgnyt",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Изолировать",
+          "sourceTextSha256": "9a8507b5423f6ceea6c22a5f3d9264e090e1a22467972f8e52565caf0cb7377a",
+          "translatedText": "Оқшаулау"
+        },
+        {
+          "id": "sh/9gza9sze",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Ограничить доступ кислорода или закрыть поверхность.",
+          "sourceTextSha256": "7a2e8973e27ef173efceff1e7f4c07fba288a5e02813678a465a4fda492df421",
+          "translatedText": "Оттегіге қол жеткізуді немесе жабу бетін шектеңіз."
+        },
+        {
+          "id": "sh/nehs7iho",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/0b6tc3yx",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Удалить горючее",
+          "sourceTextSha256": "e5f8d4615f2e16c3e7ccf0d60536e810e157cf9fbccf1cb840f9058199edeefc",
+          "translatedText": "Жанғышты жою"
+        },
+        {
+          "id": "sh/1cfa58zi",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Остановить подачу или убрать материал, если это безопасно.",
+          "sourceTextSha256": "e14cf79596475af90b9586bdcb7ce5f28d0c8c842fc8a9551ebc0e83af421536",
+          "translatedText": "Беруді тоқтатыңыз немесе қауіпсіз болса, материалды алып тастаңыз."
+        },
+        {
+          "id": "sh/zaxs3yhc",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/cn6t83y1",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Прервать реакцию",
+          "sourceTextSha256": "16e264b282badb979a341b1d7fe231204969e606cd8df0da2e48ed461e71c611",
+          "translatedText": "Реакцияны тоқтату"
+        },
+        {
+          "id": "sh/dofa18z6",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Применить подходящий состав для данного класса пожара.",
+          "sourceTextSha256": "531dc7f8c4121d84cbc4efe6c07290f3d4b7142bd9137196e4e3b370d0a2dfc4",
+          "translatedText": "Өрт сыныбына сәйкес келетін композицияны қолданыңыз."
+        },
+        {
+          "id": "sh/7650nq5s",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Неподходящее средство может распространить огонь или создать новую опасность.",
+          "sourceTextSha256": "f9a30349e63185494230cd19b39d6d9d999e1314b7e7c78f336384f2574e1e5c",
+          "translatedText": "Қате өнім өртті таратуы немесе жаңа қауіп жасауы мүмкін."
+        },
+        {
+          "id": "sh/j2lgjq5w",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/y1czalob",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "11",
+          "sourceTextSha256": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+          "translatedText": "11"
+        }
+      ]
+    },
+    {
+      "slide": 12,
+      "slideId": "sl/8f2psfyx",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1gbm9s3a",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "02",
+          "sourceTextSha256": "a953f09a1b6b6725b81956e9ad0b1eb49e3ad40004c04307ef8af6246a054116",
+          "translatedText": "02"
+        },
+        {
+          "id": "sh/ra943il8",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Классы и огнетушители",
+          "sourceTextSha256": "2eab44d70df69e2a2ba2878c79678d2ae3e9d9681c6d8268c7614b509dfbe907",
+          "translatedText": "Сыныптар және өрт сөндіргіштер"
+        },
+        {
+          "id": "sh/q903ad4n",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Выбор выполняют по горящему материалу, наличию напряжения и маркировке конкретного огнетушителя.",
+          "sourceTextSha256": "9d24de618864509f4edc205353ef3bbda16e4c67196e9d218c554d490369c3b2",
+          "translatedText": "Таңдау жанып жатқан материалға, кернеудің болуына және белгілі бір өрт сөндіргіштің таңбалануына байланысты жасалады."
+        },
+        {
+          "id": "sh/a543mx4r",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/wvupgz6t",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "12",
+          "sourceTextSha256": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+          "translatedText": "12"
+        }
+      ]
+    },
+    {
+      "slide": 13,
+      "slideId": "sl/hgzapcr6",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/q50nydsj",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Класс пожара определяет горючее",
+          "sourceTextSha256": "5c6b9e3e505adc98d1c38242d0bf3e4ca3bd0331024db1a72906c0e8ae17eeab",
+          "translatedText": "Өрт класы отынды анықтайды"
+        },
+        {
+          "id": "sh/bq9orito",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• A — твёрдые материалы, обычно с образованием тлеющих углей. • B — горючие жидкости и плавящиеся твёрдые вещества. • C — горючие газы; D — горючие металлы. • Для электрооборудования под напряжением учитывают электрический риск и маркировку средства; класс F применяют к пищевым маслам и жирам, если он предусмотрен для объекта.",
+          "sourceTextSha256": "4fff75862510d9a88f4163cf96236bb4b1e9f52539913059ee92294073d1fa97",
+          "translatedText": "• A – әдетте жанып тұрған көмір түзетін қатты материалдар. • B – тұтанғыш сұйықтықтар мен балқитын қатты заттар. • С – жанғыш газдар; D – жанғыш металдар. • Ток бар электр жабдықтары үшін электр тәуекел және өнімнің таңбасын ескеріңіз; F класы тағамдық майлар мен тоң майларға қолданылады, егер ол нысан үшін қарастырылған болса."
+        },
+        {
+          "id": "sh/21gnuts7",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Цвет корпуса или иностранный ярлык не заменяет обозначение класса и инструкцию.",
+          "sourceTextSha256": "bf9a27508c448fc7a20623c14b524b2f0c90687ebece0fcccca097bc50827021",
+          "translatedText": "Корпус түсі немесе шетелдік жапсырма сынып белгісі мен нұсқауларды алмастырмайды."
+        },
+        {
+          "id": "sh/hcfy9k3u",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/gb6x0zm9",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/vaxg7ulo",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "13",
+          "sourceTextSha256": "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278",
+          "translatedText": "13"
+        }
+      ]
+    },
+    {
+      "slide": 14,
+      "slideId": "sl/6lsnupw7",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xc7eds76",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Напряжение ограничивает выбор средства",
+          "sourceTextSha256": "75f66af4fdf8d1f630784e0c9781e5aef91aa3160fb2975cedb41fa4b5c97266",
+          "translatedText": "Кернеу емді таңдауды шектейді"
+        },
+        {
+          "id": "sh/kfidonqx",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "• Если возможно, безопасно обесточьте оборудование по установленной процедуре. • Не применяйте воду или пену к оборудованию под напряжением, если средство не предназначено для этого. • Соблюдайте маркировку огнетушителя и безопасную дистанцию изготовителя. • После снятия напряжения учитывайте класс фактически горящего материала.",
+          "sourceTextSha256": "7362651cdb7f4b15587d932fddb10be795254ba59c9acdb25dd8963099666981",
+          "translatedText": "• Мүмкін болса, орнатылған процедураға сәйкес жабдықты қауіпсіз түрде токтан ажыратыңыз. • Өнім арнайы пайдалануға арналмаған болса, ток өткізетін жабдыққа су немесе көбік қолданбаңыз. • Өрт сөндіргіштің белгілерін және өндірушінің қауіпсіздік арақашықтықтарын сақтаңыз. • Кернеуді босатқаннан кейін, шын мәнінде жанып жатқан материалдың сыныбын қарастырыңыз."
+        },
+        {
+          "id": "sh/zi5c3y98",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Выключатель оборудования не всегда гарантирует отсутствие напряжения.",
+          "sourceTextSha256": "2e220b709385ccb132a8283fb02d279b887589103cb6e293fbdf6524f5b15608",
+          "translatedText": "Жабдық қосқышы әрқашан кернеудің жоқтығына кепілдік бермейді."
+        },
+        {
+          "id": "sh/a1wze9g7",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/b2507exs",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "14",
+          "sourceTextSha256": "8527a891e224136950ff32ca212b45bc93f69fbb801c3b1ebedac52775f99e61",
+          "translatedText": "14"
+        },
+        {
+          "id": "sh/y5wjitgj",
+          "shapeId": "16",
+          "kind": "shape",
+          "name": "STOP_SIGN",
+          "text": "СТОП",
+          "sourceTextSha256": "b9e25ea0cee74abd54acfd57ccb3bd906be0673a755d04e4e976baa9b0e283b7",
+          "translatedText": "ТОҚТАТУ"
+        }
+      ]
+    },
+    {
+      "slide": 15,
+      "slideId": "sl/vaxsvy10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/547mhg3m",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Тип огнетушителя выбирают по задаче",
+          "sourceTextSha256": "c01c3d1109b7150ac2ebabcfc2741d0830a346e7197280e2db0fbf3c2cbd0645",
+          "translatedText": "Өрт сөндіргіш тапсырмаға сай таңдалады"
+        },
+        {
+          "id": "sh/k3y5ov21",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Водный охлаждает и применяется только к подходящим материалам и условиям. • Пенный изолирует поверхность горючей жидкости, но имеет ограничения по электрическому риску. • Порошковый универсален по многим классам, но снижает видимость и загрязняет оборудование. • Углекислотный не оставляет остатка, но требует учёта удушья, холода раструба и повторного возгорания.",
+          "sourceTextSha256": "03df82901d5c893dacf2911ede218f1f5e911cbe768af57b9c2082122c2078e0",
+          "translatedText": "• Су салқындайды және тек қолайлы материалдар мен шарттарға қолданылады. • Көбік тұтанғыш сұйықтықтың бетін оқшаулайды, бірақ электрлік қауіпті шектеулерге ие. • Ұнтақ көптеген сыныптарда әмбебап болып табылады, бірақ көрінуді азайтады және жабдықты ластайды. • Көмірқышқыл газы қалдық қалдырмайды, бірақ тұншығуды, суық қоңырауды және қайта тұтануды қарастыруды қажет етеді."
+        },
+        {
+          "id": "sh/t87ml0ji",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Выбирайте по этикетке конкретного огнетушителя, а не по привычке.",
+          "sourceTextSha256": "9c436f02ab50259d939f08de55eb6af64ff6807143ef7c267b87fc82654e9731",
+          "translatedText": "Әдеттегідей емес, арнайы өрт сөндіргіштің жапсырмасына сәйкес таңдаңыз."
+        },
+        {
+          "id": "sh/wrm9kvep",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/hsvat0fa",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/upkrilwj",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "15",
+          "sourceTextSha256": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+          "translatedText": "15"
+        }
+      ]
+    },
+    {
+      "slide": 16,
+      "slideId": "sl/gny5sjyp",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/8z2h8bq1",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "У каждого типа есть ограничения",
+          "sourceTextSha256": "31e8314b24092b1803e3757101f5ce3ddffa2e02d6df642567d245ad82735a5d",
+          "translatedText": "Әр түрдің шектеулері бар"
+        },
+        {
+          "id": "sh/9kby1g7m",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "РИСК / ИСТОЧНИК",
+          "sourceTextSha256": "851ce8823ffad38155e037c57ecdf78a20c64bd1f2a0c5a2d45ea6e2edc50856",
+          "translatedText": "тәуекел / КӨЗ"
+        },
+        {
+          "id": "sh/ytkf2h8j",
+          "shapeId": "4",
+          "kind": "shape",
+          "text": "ПОСЛЕДСТВИЕ",
+          "sourceTextSha256": "1da37746aeb7df559ec9874df174a32f36affa7af0d1ac18594d03355f832a05",
+          "translatedText": "НӘТИЖЕЛЕР"
+        },
+        {
+          "id": "sh/zutgvm94",
+          "shapeId": "5",
+          "kind": "shape",
+          "text": "МЕРА КОНТРОЛЯ",
+          "sourceTextSha256": "cf1c1f59a983a25c36423810031eef35d5f3f4404bf5c103b874132628f23721",
+          "translatedText": "БАҚЫЛАУ ШАРАСЫ"
+        },
+        {
+          "id": "sh/lwbyxwra",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "Вода",
+          "sourceTextSha256": "6cde33c7ddeb08cf40f556024d643b74f32be57fde2bed915d3494fdd2ee4907",
+          "translatedText": "Су"
+        },
+        {
+          "id": "sh/ip4zel83",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Электрический риск; реакция с отдельными веществами",
+          "sourceTextSha256": "2c374e113b3c431750bdde2c1da04ffa99bcfddb41663115c6dce0509b8d8da1",
+          "translatedText": "Электр тәуекел; жеке заттармен реакция"
+        },
+        {
+          "id": "sh/3qdg7qpo",
+          "shapeId": "9",
+          "kind": "shape",
+          "text": "Применять только по маркировке и после оценки",
+          "sourceTextSha256": "def3a11153a1d9042144916822239c454b51f4c087068f040bd7eb2e575ec570",
+          "translatedText": "Тек таңбаланғандай және бағалаудан кейін пайдаланыңыз"
+        },
+        {
+          "id": "sh/e1sf65o3",
+          "shapeId": "11",
+          "kind": "shape",
+          "text": "Пена",
+          "sourceTextSha256": "fb7fcc0fc0ed02138521c4e95b9973146a386c5e2302d66425911f688a57dbc5",
+          "translatedText": "Көбік"
+        },
+        {
+          "id": "sh/1ojy10ne",
+          "shapeId": "12",
+          "kind": "shape",
+          "text": "Проводимость и несовместимость с отдельными жидкостями",
+          "sourceTextSha256": "9f16235878d6c57dc467e9655c27fe6d785a283cdc33cf50115d2d06f9ab0b36",
+          "translatedText": "Өткізгіштік және белгілі бір сұйықтықтармен үйлеспеушілік"
+        },
+        {
+          "id": "sh/gnax8v6t",
+          "shapeId": "13",
+          "kind": "shape",
+          "text": "Не использовать вне обозначенной области",
+          "sourceTextSha256": "4795fbdb7cc259f669895662e95ee662fc43ca41a54b120208d809346423d840",
+          "translatedText": "Белгіленген аумақтан тыс қолданбаңыз"
+        },
+        {
+          "id": "sh/2pcfa5oz",
+          "shapeId": "15",
+          "kind": "shape",
+          "text": "Порошок",
+          "sourceTextSha256": "735c7f869f40f0e015498381a5821807fdb8e8aabf18928cef24f488f21e8c57",
+          "translatedText": "Ұнтақ"
+        },
+        {
+          "id": "sh/ps3y5knq",
+          "shapeId": "16",
+          "kind": "shape",
+          "text": "Пыль, потеря видимости, повторное возгорание",
+          "sourceTextSha256": "b3fd19721d8f113d49d78d3a00fef48b4a46f3116179a262c1938eaff3fe047b",
+          "translatedText": "Шаң, көру қабілетінің жоғалуы, қайта тұтану"
+        },
+        {
+          "id": "sh/oruhcf65",
+          "shapeId": "17",
+          "kind": "shape",
+          "text": "Сохранять выход и контролировать очаг",
+          "sourceTextSha256": "4190c0989e14ebcca18368d74163234e379f20079aa7365dfbe9d1d22fe8c0ea",
+          "translatedText": "Шығуды қамтамасыз етіңіз және індетті бақылаңыз"
+        },
+        {
+          "id": "sh/atczepob",
+          "shapeId": "19",
+          "kind": "shape",
+          "text": "CO₂",
+          "sourceTextSha256": "9049b29a14aeea60090f58dc63069ca533e24f66a44389bfd9e0a2e2589bdd19",
+          "translatedText": "CO₂"
+        },
+        {
+          "id": "sh/mpgj6t8j",
+          "shapeId": "20",
+          "kind": "shape",
+          "text": "Холодовой ожог, вытеснение кислорода",
+          "sourceTextSha256": "122b15678a9a801f6b7b045cae956b589975a3a59f18bc9a6ed02ad4dc8c321b",
+          "translatedText": "Суық күйік, оттегінің ығысуы"
+        },
+        {
+          "id": "sh/7qp0zepo",
+          "shapeId": "21",
+          "kind": "shape",
+          "text": "Не касаться раструба, проветрить безопасно",
+          "sourceTextSha256": "7099495348d0f8d93f27e89f26e30815fb836cb55c6b407ddf84467e64aeadac",
+          "translatedText": "Раструбқа қол тигізбеңіз, үй-жайды қауіпсіз желдетіңіз"
+        },
+        {
+          "id": "sh/8by18jq9",
+          "shapeId": "22",
+          "kind": "shape",
+          "text": "Огнетушащая способность не отменяет опасности самого способа тушения.",
+          "sourceTextSha256": "35f84b326d6b507a693bf9f349cc750e5b6cf09c4ee8e93ff8de46a430dd162d",
+          "translatedText": "Өртті сөндіру қабілеті сөндіру әдісінің қауіптілігін жоққа шығармайды."
+        },
+        {
+          "id": "sh/kne14jqd",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/lo7ixo7y",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "16",
+          "sourceTextSha256": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+          "translatedText": "16"
+        }
+      ]
+    },
+    {
+      "slide": 17,
+      "slideId": "sl/14bup87q",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1c7e50ni",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Маркировка содержит решение для работника",
+          "sourceTextSha256": "67db3aa69ff5e867cff89e67c80cc1581ecd2a52cea682c01a85248e378c0f37",
+          "translatedText": "Таңбалау қызметкерге шешім береді"
+        },
+        {
+          "id": "sh/gbedwfmx",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Проверьте тип заряда и обозначенные классы пожара. • Прочитайте ограничения по напряжению, температуре и способу применения. • Убедитесь, что инструкция читаема, пломба цела и срок обслуживания действителен. • Если маркировка неясна, не используйте средство наугад.",
+          "sourceTextSha256": "82b9734f851064fbf1adfae6d909aa80226d2a11f38c5dd483ab8c47358dedee",
+          "translatedText": "• Заряд түрін және белгіленген өрт сыныптарын тексеріңіз. • Кернеуді, температураны және қолдану шектеулерін оқыңыз. • Нұсқаулардың оқылатынына, пломбаның бүтіндігіне және қызмет көрсету мерзімі жарамды екеніне көз жеткізіңіз. • Таңбалау түсініксіз болса, өнімді кездейсоқ пайдаланбаңыз."
+        },
+        {
+          "id": "sh/t8ne10n6",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Старая иностранная цветовая схема не используется как обязательная маркировка Казахстана.",
+          "sourceTextSha256": "bd1d01d097a7e4f29f90805c33f4c21fe45ed94dd6d14723a83a25eabeb7aa1a",
+          "translatedText": "Ескі шетелдік түс схемасы Қазақстан үшін міндетті таңбалау ретінде пайдаланылмайды."
+        },
+        {
+          "id": "sh/4by9or6l",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/pc7qhwn6",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/29grm1of",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "17",
+          "sourceTextSha256": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+          "translatedText": "17"
+        }
+      ]
+    },
+    {
+      "slide": 18,
+      "slideId": "sl/y5wne50z",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/wrelszu9",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Внешняя проверка занимает несколько секунд",
+          "sourceTextSha256": "b8eca95b0ae6d9270c58f3b2e6e251442951580cddb76c5c74b5c885df5b1c98",
+          "translatedText": "Сыртқы растауға бірнеше секунд кетеді"
+        },
+        {
+          "id": "sh/je5knut0",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/4felwzu5",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Доступ",
+          "sourceTextSha256": "a6a60f97b0163efe6eb808c4f2d5c2962853ddcf776d8bafe0a41b6aaef2503d",
+          "translatedText": "Қол жеткізу"
+        },
+        {
+          "id": "sh/5gnmp4bq",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Огнетушитель виден, обозначен и не загромождён.",
+          "sourceTextSha256": "206ca0348324419f506caaa8f923c16aea581e32dcfe47a770dadaced0199b38",
+          "translatedText": "өрт сөндіргіш көрінеді, белгіленген және кедергісіз."
+        },
+        {
+          "id": "sh/rip4retw",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/fapkr6pw",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Состояние",
+          "sourceTextSha256": "ca285db3dd751eb1ec8945e0c6429f0f4bcbea41d9a35d9575b8f6a91b611a58",
+          "translatedText": "Күй"
+        },
+        {
+          "id": "sh/upg3i18r",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Корпус, шланг, раструб и рукоятка без повреждений и коррозии.",
+          "sourceTextSha256": "5756f230d0a3374ead3a69cdbcd6fcb9e43a3988ccd3c10fe402b503655fd619",
+          "translatedText": "Корпус, шланг, раструб және тұтқа зақымданбаған әрі тот баспаған."
+        },
+        {
+          "id": "sh/gbylkbqh",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/7mpknmp0",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Готовность",
+          "sourceTextSha256": "f5ebb4335b88054a5f7819c0ed37848ca2a2754826ada92a13d4fb3db0822790",
+          "translatedText": "Дайын"
+        },
+        {
+          "id": "sh/6lg3e18f",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Пломба и чека целы; индикатор давления в допустимой зоне, если он есть.",
+          "sourceTextSha256": "7c6df57b044500cd8fb9d0328a6b709f3adc33076365e5b96d92db655d3ee819",
+          "translatedText": "Мөр мен түбіртек бүтін; рұқсат етілген аймақтағы қысым көрсеткіші, егер бар болса."
+        },
+        {
+          "id": "sh/snylgrql",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/bi94zqp4",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Обслуживание",
+          "sourceTextSha256": "2c781b543593ad8f803f2b50988750c21675d6ce566973c44bfeb14a647b9293",
+          "translatedText": "Қызмет көрсету"
+        },
+        {
+          "id": "sh/qh03ql8j",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Маркировка и отметка контроля читаемы и действительны.",
+          "sourceTextSha256": "942ddf196a97dc82f57fcf41efb99828eb7983a1a685a7be7d919385cb35fcde",
+          "translatedText": "Таңбалау және тексеру белгісі анық және жарамды."
+        },
+        {
+          "id": "sh/8zm5kzax",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Повреждённый огнетушитель не проверяют пуском в помещении.",
+          "sourceTextSha256": "70936b2b8b9e84db853b6ddb0c431f0a60f307d7fd9e58751fe54bafe85b144b",
+          "translatedText": "Зақымдалған өрт сөндіргіш үй ішінде іске қосу арқылы тексерілмейді."
+        },
+        {
+          "id": "sh/w36poza9",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/x4f6x4re",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/q5kna5sz",
+          "shapeId": "28",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "18",
+          "sourceTextSha256": "4ec9599fc203d176a301536c2e091a19bc852759b255bd6818810a42c5fed14a",
+          "translatedText": "18"
+        }
+      ]
+    },
+    {
+      "slide": 19,
+      "slideId": "sl/nid43ytk",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/9gb6xgbi",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Размещение зависит от категории помещения",
+          "sourceTextSha256": "a94ff30e0d1dbb7dd25ccc9eb97c3e1641cc875dfbf464f23b651e936727e553",
+          "translatedText": "Орналастыру бөлме санатына байланысты"
+        },
+        {
+          "id": "sh/8v2pobax",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Предельное расстояние до возможного очага: 20 м для общественных зданий. • Для категорий А, Б и В1–В4 — 30 м; для категории Г — 40 м; для категории Д — 70 м. • Размещают на видных местах и у эвакуационных выходов без препятствия эвакуации. • Верх огнетушителя: не выше 1,5 м; при полной массе 15 кг и более — не выше 1,0 м.",
+          "sourceTextSha256": "07e1ddeb084727665b12c6473a6365b78603a32aa2bea924f365490eff364ffc",
+          "translatedText": "• Ықтимал өрт ошағына дейінгі шекті қашықтық: қоғамдық ғимараттар үшін 20 м. • А, Б және В1–В4 санаттары үшін — 30 м; Г санаты үшін — 40 м; Д санаты үшін — 70 м. • Өрт сөндіргіштерді эвакуацияға кедергі келтірмей, көрінетін орындарға және эвакуациялық шығу жолдарының жанына орналастырады. • Өрт сөндіргіштің жоғарғы жағы 1,5 м-ден жоғары болмауға тиіс; толық массасы 15 кг және одан көп болса — 1,0 м-ден жоғары емес."
+        },
+        {
+          "id": "sh/xkbq10be",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Универсальные «30 м и 1,1 м» из старого материала были ошибочны.",
+          "sourceTextSha256": "399aa20f1184e8e166b5bd990aedbeac3d1e8716a4f025c13c6665b77ebf6643",
+          "translatedText": "Ескі материалдан әмбебап «30 м және 1,1 м» қате болды."
+        },
+        {
+          "id": "sh/cri1gnql",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности, приложение о первичных средствах",
+          "sourceTextSha256": "9641fb09b12852541763d50f17e00906d63bdf26b0ceeecf7f0ab54abf6eb73c",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері, негізгі құралдарға қосымша"
+        },
+        {
+          "id": "sh/dsri9sr6",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/qpgjex8f",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "19",
+          "sourceTextSha256": "9400f1b21cb527d7fa3d3eabba93557a18ebe7a2ca4e471cfe5e4c5b4ca7f767",
+          "translatedText": "19"
+        }
+      ]
+    },
+    {
+      "slide": 20,
+      "slideId": "sl/zyxsni5k",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/qpwjmh8n",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Сначала решите: тушить или уходить",
+          "sourceTextSha256": "0ba3d618159b57ee6b5d13d0268e4066db8426aecfe6ae6846c2fc60784d5bf1",
+          "translatedText": "Алдымен шешіңіз: өшіріңіз немесе кетіңіз"
+        },
+        {
+          "id": "sh/3ml0rmpw",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "• Тушение допустимо только для небольшого начального очага при наличии обучения. • Есть исправный подходящий огнетушитель и безопасный путь отхода за спиной. • Нет плотного дыма, угрозы взрыва, токсичного выброса или быстрого распространения. • Если любое условие не выполнено — предупредите, эвакуируйтесь и сообщите службам.",
+          "sourceTextSha256": "46b611a687d0547ed2a8cec6a3dcf9e3de845b904cd6b380e5d4bf9a1902727d",
+          "translatedText": "• Өртті сөндіруге тек оқудан өткен жағдайда және өрт ошағы бастапқы әрі шағын болғанда ғана рұқсат етіледі. • Жарамды, осы өртке сәйкес келетін өрт сөндіргіш және арқаңызда қауіпсіз шегіну жолы болуы керек. • Қою түтін, жарылыс қаупі, улы заттардың шығуы немесе өрттің тез таралуы болмауға тиіс. • Осы шарттардың кез келгені орындалмаса, адамдарды ескертіңіз, эвакуацияланыңыз және тиісті қызметтерге хабарлаңыз."
+        },
+        {
+          "id": "sh/gjuhg7ql",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Огнетушитель не обязывает рисковать жизнью.",
+          "sourceTextSha256": "4b10b11968325958a3c7ebbe988a9a1e835ab1f213f80bb0a8c94b5af1183d27",
+          "translatedText": "өрт сөндіргіш сіздің өміріңізді қатерге тігуге міндеттемейді."
+        },
+        {
+          "id": "sh/rid4nuhs",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Рекомендации МЧС: не подвергать жизнь опасности",
+          "sourceTextSha256": "6abe9ca71c0ad2fb59f5ed97a934e7fa164abdc9dede6630f221b131ace59a70",
+          "translatedText": "Стандарт: Төтенше жағдайлар министрлігінің ұсынымдары: өмірге қауіп төндірмеу"
+        },
+        {
+          "id": "sh/qh4nupg7",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/pwvmlkzm",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "20",
+          "sourceTextSha256": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+          "translatedText": "20"
+        },
+        {
+          "id": "sh/2t4nqpgb",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STOP_SIGN",
+          "text": "СТОП",
+          "sourceTextSha256": "b9e25ea0cee74abd54acfd57ccb3bd906be0673a755d04e4e976baa9b0e283b7",
+          "translatedText": "ТОҚТАТУ"
+        }
+      ]
+    },
+    {
+      "slide": 21,
+      "slideId": "sl/m1wvqtk3",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/1gbmxs7a",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Огнетушитель применяют устойчиво и точно",
+          "sourceTextSha256": "f2f9ca3ce86586676a25ba21b2a92c9664be955eb857f3d2965cf550c9a9420a",
+          "translatedText": "өрт сөндіргіш тұрақты және дәл пайдаланылады"
+        },
+        {
+          "id": "sh/qp03yt8n",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/dcb2t87y",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Подготовить",
+          "sourceTextSha256": "b99cc354e03b7bee5283a92560856ac772244fd2061f3a16520c02227d918b83",
+          "translatedText": "Дайындаңыз"
+        },
+        {
+          "id": "sh/sb2lk36t",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Снять пломбу и выдернуть чеку в безопасном положении.",
+          "sourceTextSha256": "00940b5e771c142034102ad63b725ded01a43c3421bcca8b28f69189671870ef",
+          "translatedText": "Қауіпсіз қалыпта тұрып, пломбаны алып, сақтандырғыш істікті суырыңыз."
+        },
+        {
+          "id": "sh/al43uxor",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/4jax4nqd",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Направить",
+          "sourceTextSha256": "52e3d389930f82d4c626cf4d59716e7dbac6861b74c4b09656ea832401fabfd4",
+          "translatedText": "Жіберу"
+        },
+        {
+          "id": "sh/5kjydsri",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Удерживать насадку на основание пламени, а не в дым.",
+          "sourceTextSha256": "5b1d9d4ff218c56e6ed159d97065e73da992f24aa09c8420a1fb8ba9c198169c",
+          "translatedText": "Саптаманы түтінге емес, жалынның түбінен ұстаңыз."
+        },
+        {
+          "id": "sh/jy1gbi9s",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/wvax03q1",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Подать",
+          "sourceTextSha256": "b5d036eaf1b88a145078ed3b421fa1c9e7b4e38b0a2e123823fbd06d71f7f08d",
+          "translatedText": "Жіберіңіз"
+        },
+        {
+          "id": "sh/hwjy98rm",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Нажать рычаг и подавать состав коротко или непрерывно по инструкции.",
+          "sourceTextSha256": "22146b8c3b51c5c3705220047a720425cc6773a03c9f2b3b03834f97f46071c7",
+          "translatedText": "Тұтқаны басып, қоспаны нұсқауларға сәйкес қысқа уақытқа немесе үздіксіз төгіңіз."
+        },
+        {
+          "id": "sh/vu1w7y9g",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/8rqxw3q5",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Перемещать",
+          "sourceTextSha256": "d0e704ffbefbe103b931f2fb2fd20f24d0d519554b4a961bf70b4ad41ac7ae3e",
+          "translatedText": "Жылжыту"
+        },
+        {
+          "id": "sh/9sze58rq",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Обрабатывать очаг системно, сохраняя выход и контроль обстановки.",
+          "sourceTextSha256": "7c47c834e34e13b388abf660fe1fe5360de0bd6885511b2b0c29bda23d47a6ea",
+          "translatedText": "Шығу жолын сақтап және жағдайды бақылап, өрт ошағын жүйелі түрде сөндіру."
+        },
+        {
+          "id": "sh/nm9cru18",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Конкретная последовательность уточняется по маркировке огнетушителя.",
+          "sourceTextSha256": "45f64be34c675a2992aaf1319bcb12f2703ff61ec401244ccdf6b68bcdb506a9",
+          "translatedText": "Арнайы реттілік өрт сөндіргіштің таңбалауымен анықталады."
+        },
+        {
+          "id": "sh/fi9c3a1c",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/ehgvu5kr",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "21",
+          "sourceTextSha256": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+          "translatedText": "21"
+        }
+      ]
+    },
+    {
+      "slide": 22,
+      "slideId": "sl/5onypobq",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/6987itcr",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Путь отхода остаётся за спиной",
+          "sourceTextSha256": "5e815b50b6d0c8025c426473901b466ae80b25180e1e03cd5b19fd42ff59b575",
+          "translatedText": "Қашу жолы артта қалады"
+        },
+        {
+          "id": "sh/7a18rydc",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Подходите только настолько, насколько позволяет инструкция и тепловое воздействие. • Не входите в дым и не позволяйте огню отрезать выход. • Учитывайте направление дыма и ветра, не стойте в выбросе продуктов горения. • Отступайте сразу при росте пламени, ухудшении видимости или окончании заряда.",
+          "sourceTextSha256": "e3239e30f98650174257dd273a671d3cd12dc7e6aea539b824f801ddb4af3147",
+          "translatedText": "• Нұсқаулар мен термиялық әсер ету мүмкіндігінше жақындаңыз. • Түтіннің ішіне баспаңыз немесе оттың шығуына жол бермеңіз. • Түтін мен желдің бағытын ескеріңіз, жану өнімдерінің шығуында тұрмаңыз. • Жалын ұлғайса, көріну нашарласа немесе заряды бітсе, дереу шегініңіз."
+        },
+        {
+          "id": "sh/il87etcv",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Положение работника важнее попытки приблизиться к очагу максимально близко.",
+          "sourceTextSha256": "4a5ab63d2b91186bb88035530775198a124e20f0e93cab710c7dfcdb60427851",
+          "translatedText": "Өртке барынша жақындауға тырысқаннан гөрі жұмысшының орны маңыздырақ."
+        },
+        {
+          "id": "sh/p4z6tcri",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/436507qx",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "22",
+          "sourceTextSha256": "785f3ec7eb32f30b90cd0fcf3657d388b5ff4297f2f9716ff66e9b69c05ddd09",
+          "translatedText": "22"
+        }
+      ]
+    },
+    {
+      "slide": 23,
+      "slideId": "sl/c7uhcr6t",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/90vqdczq",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Тушение прекращают при потере контроля",
+          "sourceTextSha256": "56a430e6cefbb824f170ab081e6c428e221f026f1537bcdccf26cea4f996c32f",
+          "translatedText": "Басқару жоғалған кезде сөндіру тоқтатылады"
+        },
+        {
+          "id": "sh/w3m9o7yh",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "• Огонь распространяется за пределы начального очага или вверх по конструкции. • Дым становится плотным, видимость ухудшается или путь отхода меняется. • Есть подозрение на газ, взрыв, опасные вещества или скрытое горение. • Огнетушитель не действует, заряд закончился или средство выбрано неверно.",
+          "sourceTextSha256": "e9363d920f729b5e8f0ee3d73849ecbac7ede6a7d80031ae9b0abc2a213d4192",
+          "translatedText": "• Өрт бастапқы ошақ шегінен шығып немесе конструкция бойымен жоғары таралады. • Түтін қоюланады, көріну нашарлайды немесе шегіну жолы өзгереді. • Газ, жарылыс, қауіпті заттар немесе жасырын жану күдігі бар. • Өрт сөндіргіш жұмыс істемейді, өрт сөндіргіш заты таусылды немесе құрал дұрыс таңдалмаған."
+        },
+        {
+          "id": "sh/jqd8jmhs",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Отступить вовремя — профессиональное решение, а не неудача.",
+          "sourceTextSha256": "77fb2f1f2237b2e5ec78fe3b65fea27f5aa8de2aeab5cab5a176312c29be8d51",
+          "translatedText": "Уақытында шегіну - сәтсіздік емес, кәсіби шешім."
+        },
+        {
+          "id": "sh/69gry94v",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/rapsrelg",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "23",
+          "sourceTextSha256": "535fa30d7e25dd8a49f1536779734ec8286108d115da5045d77f3b4185d8f790",
+          "translatedText": "23"
+        },
+        {
+          "id": "sh/edgr294r",
+          "shapeId": "16",
+          "kind": "shape",
+          "name": "STOP_SIGN",
+          "text": "СТОП",
+          "sourceTextSha256": "b9e25ea0cee74abd54acfd57ccb3bd906be0673a755d04e4e976baa9b0e283b7",
+          "translatedText": "ТОҚТАТУ"
+        }
+      ]
+    },
+    {
+      "slide": 24,
+      "slideId": "sl/7qto7e10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/0r6p4nul",
+          "shapeId": "3",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "03",
+          "sourceTextSha256": "0b8efa5a3bf104413a725c6ff0459a6be12b1fd33314cbb138745baf39504ae5",
+          "translatedText": "03"
+        },
+        {
+          "id": "sh/2to76dcr",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Эвакуация и сообщение",
+          "sourceTextSha256": "7954d1883bd75ea5f96e8fb9bc21d34f678bf5f8b549f66e8979df1929d2f7a8",
+          "translatedText": "эвакуация және хабар"
+        },
+        {
+          "id": "sh/9wzq1svi",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Маршрут, связь и учёт людей должны быть понятны до возникновения пожара.",
+          "sourceTextSha256": "17e6e2c7d746a3d756a18188606550c70e26cf896f183605c19c84e9999cd90e",
+          "translatedText": "Өрт шыққанға дейін адамдардың жүру жолы, байланысы және есебі анық болуы керек."
+        },
+        {
+          "id": "sh/8veh8ril",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/9wni1wjq",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "24",
+          "sourceTextSha256": "c2356069e9d1e79ca924378153cfbbfb4d4416b1f99d41a2940bfdb66c5319db",
+          "translatedText": "24"
+        }
+      ]
+    },
+    {
+      "slide": 25,
+      "slideId": "sl/69wfm9o7",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/xg7axgf2",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Эвакуационные пути всегда свободны",
+          "sourceTextSha256": "08d624f788e00eecbef33ac804c61e704428033eaf21b02865b2f2e0cecd491d",
+          "translatedText": "Эвакуация жолдары әрқашан анық"
+        },
+        {
+          "id": "sh/cfyt4beh",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Проходы, лестницы, двери и выходы не загромождают материалом и оборудованием. • Двери на пути эвакуации открываются и не блокируются самодельными устройствами. • Знаки и аварийное освещение должны быть видимыми. • Неисправный или перекрытый путь сообщают немедленно.",
+          "sourceTextSha256": "5289f74510d1bdcfb70769e4b943b60ff0bcacba34b9f77384fddb2642f754a9",
+          "translatedText": "• Өткелдер, баспалдақтар, есіктер мен шығулар материалмен және жабдықпен толтырылмаған. • Эфир жолындағы есіктер ашық және импровизацияланған құрылғылармен жабылмайды. • Белгілер мен авариялық жарықтандыру көрінуі керек. • Қате немесе бұғатталған жол туралы дереу хабарланады."
+        },
+        {
+          "id": "sh/pc7atgf6",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Эвакуационный путь проверяют в обычной работе, а не во время тревоги.",
+          "sourceTextSha256": "e5f89af7d1d21d37deea43b0e319f735f56e02a4c40d344ceb529a52730f5c0c",
+          "translatedText": "Шығу жолы дабыл кезінде емес, қалыпты жұмыс кезінде тексеріледі."
+        },
+        {
+          "id": "sh/wza9cbqp",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/h0jalgra",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/uxsra18j",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "25",
+          "sourceTextSha256": "b7a56873cd771f2c446d369b649430b65a756ba278ff97ec81bb6f55b2e73569",
+          "translatedText": "25"
+        }
+      ]
+    },
+    {
+      "slide": 26,
+      "slideId": "sl/l0bepsfm",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/uhk36lk7",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "План эвакуации нужно уметь читать",
+          "sourceTextSha256": "73b3a33c65727f36179168fc6fa1620509909c374e320f1e3ad82a63bc3349bb",
+          "translatedText": "Эвакуация жоспарын оқи білуіңіз керек"
+        },
+        {
+          "id": "sh/vitkzqlc",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Найдите своё текущее положение, основной и запасной маршрут. • Отметьте ручные извещатели, средства тушения и место сбора, если они показаны. • Сверьте план с фактическими дверями и проходами. • Изменение планировки требует актуализации схемы и инструктажа.",
+          "sourceTextSha256": "03c8503fe7876485e8a40e11a2ad23d3950e2e26f36d23865633dd4b8de26a41",
+          "translatedText": "• Ағымдағы орынды, негізгі бағытты және балама бағытты табыңыз. • Көрсетілген болса, қолмен шақыру нүктелерін, сөндіру құралдарын және жинау орнын белгілеңіз. • Жоспарды нақты есіктер мен өткелдермен салыстырыңыз. • Орналасуды өзгерту диаграмма мен нұсқауларды жаңартуды қажет етеді."
+        },
+        {
+          "id": "sh/tgr2xg3m",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "IMAGE_CAPTION",
+          "text": "План — подсказка маршрута, но решение учитывает фактический дым и преграды.",
+          "sourceTextSha256": "cb92f7fa66e954eb842737e1f42a3b80527ab7dcba672857608b3858c9a3dd4e",
+          "translatedText": "Жоспар маршрут туралы нұсқау, бірақ шешім нақты түтін мен кедергілерді ескереді."
+        },
+        {
+          "id": "sh/lcr2tw3a",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/lsja143i",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "26",
+          "sourceTextSha256": "5f9c4ab08cac7457e9111a30e4664920607ea2c115a1433d7be98e97e64244ca",
+          "translatedText": "26"
+        }
+      ]
+    },
+    {
+      "slide": 27,
+      "slideId": "sl/4vyxknqp",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/kn694nmx",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "При звонке 101 или 112 сообщите главное",
+          "sourceTextSha256": "1e6704f5c1d3576eded8fdfac830edd88f2866b4b93e1ca41bfe4289552db513",
+          "translatedText": "101/112-ге қоңырау: негізгісін айтыңыз"
+        },
+        {
+          "id": "sh/7qxsfi5o",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/8r698nm9",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Адрес",
+          "sourceTextSha256": "da82e80563d75a61fbce09312eacb845cd9004e2e68839c57a00133596688c55",
+          "translatedText": "Мекенжай"
+        },
+        {
+          "id": "sh/9sfahsnu",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Объект, участок, этаж, ориентир и безопасный въезд.",
+          "sourceTextSha256": "a67d94c3de85f4d7e8a93016f7d6cc9b85f55e380c577c6c866e5daff2d26064",
+          "translatedText": "Нысан, алаң, еден, бағдар және қауіпсіз кіру."
+        },
+        {
+          "id": "sh/vuxsj250",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/ju5gv294",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Что горит",
+          "sourceTextSha256": "2fae68086d55f85a91a559fa0566b0e21b2dc39a1c8a1826e977d9653645e670",
+          "translatedText": "Не жанып жатыр"
+        },
+        {
+          "id": "sh/ytwfmx8j",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Материал, оборудование, помещение и видимые признаки.",
+          "sourceTextSha256": "812a21894958390b95541dd3eb38021a63a669fca51524144bde76e028a3320f",
+          "translatedText": "Материал, жабдықтар, үй-жайлар және көрінетін белгілер."
+        },
+        {
+          "id": "sh/kvyxo7qp",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/bq5gr298",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Люди и опасности",
+          "sourceTextSha256": "6ba45df2cbf78e29936b6f883fed3c87097c2421fdc586321c333addef43fe02",
+          "translatedText": "Адамдар, қауіптер"
+        },
+        {
+          "id": "sh/apwfix8n",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Пострадавшие, заблокированные, газ, баллоны или химикаты.",
+          "sourceTextSha256": "10159c1d0d15d78e383c6af6539df96d3eb8252f193092c51afa470ba6462135",
+          "translatedText": "Жараланған, қысылған, газ, баллондар немесе химиялық заттар."
+        },
+        {
+          "id": "sh/wrexk7qt",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/vmpg3m9c",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Контакт",
+          "sourceTextSha256": "5bc9a8a2e214064999744904bddd9dc8a6cca02f7905451f9fc33ad97d3fecf5",
+          "translatedText": "Байланыс"
+        },
+        {
+          "id": "sh/ulgzuh8r",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Имя, номер и кто встретит прибывающие подразделения.",
+          "sourceTextSha256": "541ac2a3ccb7a4a79dfea06d6d05d6c18e987c26eb8ed0b54181ce0437552bc2",
+          "translatedText": "Аты-жөні, нөмірі және келген бірліктерді кім қарсы алады."
+        },
+        {
+          "id": "sh/sj214va5",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Не завершайте разговор раньше диспетчера и отвечайте кратко и точно.",
+          "sourceTextSha256": "fd86d2434791b958ee7be68ec0d366ac8e141e825e07d096624c8423c8351a1b",
+          "translatedText": "Диспетчерден бұрын әңгімені аяқтамаңыз және қысқа әрі нақты жауап беріңіз."
+        },
+        {
+          "id": "sh/0nm18fa1",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Рекомендации МЧС: 101/112",
+          "sourceTextSha256": "5193fa7841a0486b7017fc9693255ff0756b8a91198cb84a1ce08998d57e97ea",
+          "translatedText": "Стандарт: Төтенше жағдайлар министрлігінің ұсыныстары: 101/112"
+        },
+        {
+          "id": "sh/1ov210bm",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/up0ju1sr",
+          "shapeId": "28",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "27",
+          "sourceTextSha256": "670671cd97404156226e507973f2ab8330d3022ca96e0c93bdbdb320c41adcaf",
+          "translatedText": "27"
+        }
+      ]
+    },
+    {
+      "slide": 28,
+      "slideId": "sl/3mdove10",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/q9cz6xkv",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Выходите быстро, но без паники",
+          "sourceTextSha256": "efef812036d825d63b76b4891aa2000af51379bc1559c659b914d6812fdbb3a8",
+          "translatedText": "Тез шығыңыз, бірақ үрейленбеңіз"
+        },
+        {
+          "id": "sh/ralgf21g",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Оставьте личные вещи и двигайтесь по ближайшему безопасному маршруту. • Помогайте по назначенной роли, не создавая встречного потока. • Закройте дверь за собой, если это безопасно, но не запирайте её. • Лифт не используют, если он не предназначен для эвакуации по специальной процедуре.",
+          "sourceTextSha256": "fbc8a5a5f2235024988525e2ce9406d666407ee8914bcf1232eab4b80bdc1bd4",
+          "translatedText": "• Жеке заттарыңызды қалдырыңыз және ең жақын қауіпсіз жолды таңдаңыз. • Айқас ағын жасамай, тағайындалған рөлге көмектесіңіз. • Қауіпсіз болса, есікті артыңыздан жабыңыз, бірақ оны құлыптамаңыз. • Арнайы тәртіп бойынша эвакуациялауға арналмаған лифт пайдаланылмайды."
+        },
+        {
+          "id": "sh/exwzahkr",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Закрытая незапертая дверь может замедлить распространение дыма и огня.",
+          "sourceTextSha256": "9687ca3a369e38a020f10d06cfb839e3b3fb4f710508c12a3c6d2d11d40f112c",
+          "translatedText": "Жабық, құлпы ашылған есік түтін мен өрттің таралуын бәсеңдетуі мүмкін."
+        },
+        {
+          "id": "sh/lg3690fq",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/kfu5gfe5",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "28",
+          "sourceTextSha256": "59e19706d51d39f66711c2653cd7eb1291c94d9b55eb14bda74ce4dc636d015a",
+          "translatedText": "28"
+        }
+      ]
+    },
+    {
+      "slide": 29,
+      "slideId": "sl/i5o3q10v",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/tk36hwby",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Пункт сбора нужен для учёта людей",
+          "sourceTextSha256": "e2c3cbb611dbfe388e4daba887ed86ac4b3c21d8f54b89b631ce6d6901a7213c",
+          "translatedText": "Адамдарды санау үшін жинау нүктесі қажет"
+        },
+        {
+          "id": "sh/8jup8rad",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Прибывайте в назначенное место и оставайтесь со своей группой. • Сообщите о себе ответственному за перекличку. • Передайте сведения о возможном местонахождении отсутствующего человека. • Не уходите с пункта сбора и не возвращайтесь в здание без разрешения.",
+          "sourceTextSha256": "ace51a0659ff96a1e1e652a7f71250a2534c7a66cb3bedf874a4999144e634c9",
+          "translatedText": "• Белгіленген жерге жетіп, тобыңызбен бірге болыңыз. • Шақыруға жауапты адамға өзіңізді хабарлаңыз. • Хабар-ошарсыз кеткен адамның мүмкін болатын жері туралы ақпарат беріңіз. • Рұқсатсыз жинау орнын тастамаңыз немесе ғимаратқа оралмаңыз."
+        },
+        {
+          "id": "sh/h8n6lwbu",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Самовольный уход может направить спасателей на ненужный поиск.",
+          "sourceTextSha256": "838ebb1434f236fac932a75f6ebc7f5f80f01b457deb51ea334e58ea51baa610",
+          "translatedText": "Рұқсатсыз кету құтқарушыларды қажетсіз іздеуге бағыттауы мүмкін."
+        },
+        {
+          "id": "sh/kf2tw7a1",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/5gbupcrm",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "29",
+          "sourceTextSha256": "35135aaa6cc23891b40cb3f378c53a17a1127210ce60e125ccf03efcfdaec458",
+          "translatedText": "29"
+        }
+      ]
+    },
+    {
+      "slide": 30,
+      "slideId": "sl/wnqh07ex",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/po72d8nm",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Повторный вход запрещён без разрешения",
+          "sourceTextSha256": "68a306f949b0e9ccfc980cbb59113d9d314a12eb86af45794c56e23e2cae8851",
+          "translatedText": "Рұқсатсыз қайта кіруге тыйым салынады"
+        },
+        {
+          "id": "sh/cril836d",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "• Не возвращайтесь за документами, телефоном, одеждой или инструментом. • Не входите искать коллегу: сообщите его возможное местонахождение спасателям. • Не пересекайте ограждение и не мешайте подъезду подразделений. • Возвращение допускается только после официального разрешения ответственного лица.",
+          "sourceTextSha256": "c5bb7c8e0a1b5538783b6005cb12287c8a42cf92a0848edc497de04c552a8b75",
+          "translatedText": "• Құжат, телефон, киім немесе құрал үшін кері оралмаңыз. • Әріптесті іздеу үшін ішке кірмеңіз: оның ықтимал орналасқан жерін құтқарушыларға хабарлаңыз. • Қоршаудан өтпеңіз және жедел қызмет бөлімшелерінің келуіне кедергі жасамаңыз. • Ішке қайта кіруге жауапты тұлғаның ресми рұқсатынан кейін ғана болады."
+        },
+        {
+          "id": "sh/ru5k3ep8",
+          "shapeId": "8",
+          "kind": "shape",
+          "text": "Даже если дыма не видно, внутри могут сохраняться токсичные газы и риск обрушения.",
+          "sourceTextSha256": "ce9e375f0d769a652ef7e50d3ca84d4a1d9f02726415c73d1ee8f71ede734520",
+          "translatedText": "Түтін көрінбесе де, ішінде улы газдар қалуы және тәуекел құлауы мүмкін."
+        },
+        {
+          "id": "sh/2l8f6p0r",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/3mhwzu1c",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "30",
+          "sourceTextSha256": "624b60c58c9d8bfb6ff1886c2fd605d2adeb6ea4da576068201b6c6958ce93f4",
+          "translatedText": "30"
+        },
+        {
+          "id": "sh/q9sfap03",
+          "shapeId": "16",
+          "kind": "shape",
+          "name": "STOP_SIGN",
+          "text": "СТОП",
+          "sourceTextSha256": "b9e25ea0cee74abd54acfd57ccb3bd906be0673a755d04e4e976baa9b0e283b7",
+          "translatedText": "ТОҚТАТУ"
+        }
+      ]
+    },
+    {
+      "slide": 31,
+      "slideId": "sl/lcn6tkb6",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/dgja98fe",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SECTION_NUMBER",
+          "text": "04",
+          "sourceTextSha256": "6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0",
+          "translatedText": "04"
+        },
+        {
+          "id": "sh/zilsbyx4",
+          "shapeId": "4",
+          "kind": "shape",
+          "name": "SECTION_TITLE",
+          "text": "Профилактика и огневые работы",
+          "sourceTextSha256": "f7c8a5cc92e942386841edbe21f4d57896423853424c4d2279401cdc33150151",
+          "translatedText": "Алдын алу және отты жұмыстар"
+        },
+        {
+          "id": "sh/ehsr2dgz",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "SECTION_LEAD",
+          "text": "Пожар предотвращают ежедневным контролем порядка, электричества, горючих материалов и источников зажигания.",
+          "sourceTextSha256": "9ef46244761b53fa7e1dad73dca73baac6565261739866aecc20e89ba4966735",
+          "translatedText": "Өрттің алдын алу тәртіпті, электр қуатын, жанғыш материалдарды және тұтану көздерін күнделікті бақылау арқылы жүзеге асырылады."
+        },
+        {
+          "id": "sh/ul8rq9gf",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/4vm5g7al",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "31",
+          "sourceTextSha256": "eb1e33e8a81b697b75855af6bfcdbcbf7cbbde9f94962ceaec1ed8af21f5a50f",
+          "translatedText": "31"
+        }
+      ]
+    },
+    {
+      "slide": 32,
+      "slideId": "sl/6l0j294r",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/kr61sfy1",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Порядок снижает пожарную нагрузку",
+          "sourceTextSha256": "21841aa248d31386d2f75d26f42876bce25a700a9eed419e59b2de05b1e61a7c",
+          "translatedText": "Реттілік өрт жүктемесін азайтады"
+        },
+        {
+          "id": "sh/lszilkfm",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Горючие отходы удаляют регулярно в предусмотренную тару. • Проходы, выходы, пожарные шкафы и огнетушители не загромождают. • Разливы убирают по процедуре, а загрязнённые материалы безопасно изолируют. • Временное хранение не превращают в постоянный склад.",
+          "sourceTextSha256": "4464baaba274cf38b3173788e6534257b184807d250b607629fd0889805051a2",
+          "translatedText": "• Жанғыш қалдықтар берілген контейнерлерге жүйелі түрде тасталады. • Өткелдер, шығулар, өртке қарсы шкафтар мен өрт сөндіргіштер жабылмаған. • Төгілген заттар процедураға сәйкес тазартылады және ластанған материалдар қауіпсіз түрде сақталады. • Уақытша сақтау орны тұрақты қоймаға айналмайды."
+        },
+        {
+          "id": "sh/8vq1wzyd",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Уборка — элемент пожарной профилактики, а не только внешний порядок.",
+          "sourceTextSha256": "96219b458470f6c7143034bbdaffb71bc71ceb60a9a914d2be3c152e9d05813a",
+          "translatedText": "Тазалау тек сыртқы тәртіп емес, өрттің алдын алу элементі болып табылады."
+        },
+        {
+          "id": "sh/ry94z29w",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/qx0nqx8b",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/d0bm1c7m",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "32",
+          "sourceTextSha256": "e29c9c180c6279b0b02abd6a1801c7c04082cf486ec027aa13515e4f3884bb6b",
+          "translatedText": "32"
+        }
+      ]
+    },
+    {
+      "slide": 33,
+      "slideId": "sl/nax4b2dk",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/lk3m50nq",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Электрическую неисправность не маскируют",
+          "sourceTextSha256": "344f63eb39f212cdaa2de1fb645384c21f702b70be591a469d58c22da2b4179a",
+          "translatedText": "Электр ақауы жасырылмаған"
+        },
+        {
+          "id": "sh/0jalwfm5",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Не перегружайте сеть и не применяйте самодельные удлинители и соединения. • Повреждённый кабель, нагрев, запах и искрение требуют отключения и сообщения. • Оборудование отключают по завершении, если это предусмотрено инструкцией. • Электрощиты и защитные устройства сохраняют доступными и закрытыми.",
+          "sourceTextSha256": "f59d8a4915ab3e8d4a91bd62773442bcd7f51425b7b157537158e51d08b25170",
+          "translatedText": "• Желіні шамадан тыс жүктемеңіз немесе қолдан жасалған ұзартқыш сымдарды немесе қосылымдарды пайдаланбаңыз. • Зақымдалған кабель, жылу, иіс және ұшқынның шығуы ажыратуды және хабарлауды қажет етеді. • Нұсқауларда қарастырылған болса, жабдық аяқталғаннан кейін өшіріледі. • Электр панельдері мен қорғаныс құрылғылары қолжетімді және жабық күйде сақталады."
+        },
+        {
+          "id": "sh/9o3m9knm",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Повторное включение сработавшей защиты без выяснения причины опасно.",
+          "sourceTextSha256": "39e2de48af714c89fc2bdead13ac366d73c0d00eb6f53ea56e25c9f5952b6d7c",
+          "translatedText": "Іске қосылған қорғанысты себебін білмей қайта қосу қауіпті."
+        },
+        {
+          "id": "sh/grad8zah",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/hsjuhkb2",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/upsv6psb",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "33",
+          "sourceTextSha256": "c6f3ac57944a531490cd39902d0f777715fd005efac9a30622d5f5205e7f6894",
+          "translatedText": "33"
+        }
+      ]
+    },
+    {
+      "slide": 34,
+      "slideId": "sl/ofu103u5",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/pwzm1kbm",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Горючие жидкости хранят контролируемо",
+          "sourceTextSha256": "2b5588fa696e845a597c103d2ca4793ba85eb6fb5c70b690eead2eb59777312e",
+          "translatedText": "Жанғыш сұйықтықтар бақылауда сақталады"
+        },
+        {
+          "id": "sh/ovq58fu1",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Используют совместимую закрытую тару с читаемой маркировкой. • Количество на рабочем месте ограничивают производственной потребностью и локальными правилами. • Исключают нагрев, искры, разливы и совместное хранение несовместимых веществ. • Проветривание и аварийный сбор разлива готовят заранее.",
+          "sourceTextSha256": "13cd70a2aa326247f0baf2b3dae7e6d6ca36d8f920cb290dcc25eb1ce65ea6f5",
+          "translatedText": "• Таңбасы анық көрінетін, үйлесімді жабық ыдысты пайдаланады. • Жұмыс орнындағы зат мөлшерін өндірістік қажеттілікпен және жергілікті ережелермен шектейді. • Қызуды, ұшқынды, төгілуді және үйлеспейтін заттарды бірге сақтауды болдырмайды. • Желдету мен төгіндіні авариялық жинау құралдарын алдын ала дайындайды."
+        },
+        {
+          "id": "sh/d0zm54bi",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Перелитая в немаркированную тару жидкость создаёт двойной риск.",
+          "sourceTextSha256": "dcded03adfc613001839c448bc3037152401ddec86766150555599dcb3657a41",
+          "translatedText": "Белгісіз контейнерге құйылған сұйықтық қос тәуекел жасайды."
+        },
+        {
+          "id": "sh/0vidkfu5",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/1wredkbq",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/e90vipcz",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "34",
+          "sourceTextSha256": "86e50149658661312a9e0b35558d84f6c6d3da797f552a9657fe0558ca40cdef",
+          "translatedText": "34"
+        }
+      ]
+    },
+    {
+      "slide": 35,
+      "slideId": "sl/1obmtofm",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/idonexon",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Курение — только в отведённом месте",
+          "sourceTextSha256": "bfb7b2910ee8d2d9fb3ee9e7f15fe78ba60a7b0af3ac81c66cac39d2c40ba4d8",
+          "translatedText": "Темекі шегу – тек белгіленген жерде"
+        },
+        {
+          "id": "sh/3ex47ip8",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Место обозначается и организуется с учётом пожарного риска. • Курение запрещено в складах, производственных зонах и других местах, где это установлено. • Окурки полностью гасят и помещают в предусмотренную негорючую ёмкость. • Электронные устройства для курения также подчиняются локальному режиму.",
+          "sourceTextSha256": "da1ce5f841093c2553cf923365417503a6bdccd2ee633468cc9fc33091e185f8",
+          "translatedText": "• Орын өрт қаупін ескере отырып белгіленген және ұйымдастырылған. • Қоймаларда, өндіріс орындарында және ол орнатылған басқа жерлерде темекі шегуге тыйым салынады. • Темекі тұқылдары толығымен сөндіріліп, берілген жанбайтын контейнерге салынады. • Электрондық темекі шегу құрылғылары да жергілікті режимге бағынады."
+        },
+        {
+          "id": "sh/u943ador",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Отсутствие открытого пламени не означает отсутствие источника нагрева.",
+          "sourceTextSha256": "dc21c00a4ff815465c0fdff12519c72bf7e9596b379da0fa214b1fa9c175b8a8",
+          "translatedText": "Ашық оттың болмауы қыздыру көзінің жоқтығын білдірмейді."
+        },
+        {
+          "id": "sh/5of6xcbi",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/4n65o7ax",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/3mxov2tc",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "35",
+          "sourceTextSha256": "9f14025af0065b30e47e23ebb3b491d39ae8ed17d33739e5ff3827ffb3634953",
+          "translatedText": "35"
+        }
+      ]
+    },
+    {
+      "slide": 36,
+      "slideId": "sl/m9s3ehgf",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/5s3atkbq",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Огневые работы готовят до зажигания дуги",
+          "sourceTextSha256": "dd5e3f0118a532f4cd27eb6d1be162bc2793a50c0705e8772a0f847abb1dc26b",
+          "translatedText": "Отты жұмысты доға тұтанғанша дайындаңыз"
+        },
+        {
+          "id": "sh/qtcb2psb",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/dwnax4bm",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Разрешить",
+          "sourceTextSha256": "241ed4211aa18e99163bd6abb7cfe7133d3c5a12e4c4d43b13145333a191aad6",
+          "translatedText": "Рұқсат ету"
+        },
+        {
+          "id": "sh/svet4zah",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Определить место, наряд-допуск, ответственных и время.",
+          "sourceTextSha256": "5ca4787bea2b09707d117402d180871001e8f8477385b930ce1a77001570db6d",
+          "translatedText": "Орын, наряд-рұқсат, жауапты және уақытты анықтаңыз."
+        },
+        {
+          "id": "sh/exwb69s7",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/kfi54n2l",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Подготовить",
+          "sourceTextSha256": "b99cc354e03b7bee5283a92560856ac772244fd2061f3a16520c02227d918b83",
+          "translatedText": "Дайындаңыз"
+        },
+        {
+          "id": "sh/lgr6xs36",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Удалить или защитить горючее, изолировать оборудование, проверить среду.",
+          "sourceTextSha256": "48ab5b385c51efce63b3f57b5a8daa1294fc31d330ffee3a3c89421037d3cf26",
+          "translatedText": "Жанғыш материалды алып тастаңыз немесе бекітіңіз, жабдықты, сынақ ортасын оқшаулаңыз."
+        },
+        {
+          "id": "sh/zepovil0",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/83i5872h",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Обеспечить",
+          "sourceTextSha256": "6bf513d2daeb2d77f735348cfb4ab6a29f40821b28891e561c05dfd0f103c8e8",
+          "translatedText": "Беріңіз"
+        },
+        {
+          "id": "sh/94r61c32",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Средства тушения, ограждение, вентиляцию, связь и наблюдение.",
+          "sourceTextSha256": "a9108388e8175fded5465e2001a43db04cb3113e4b0d682db51933c866bce9d3",
+          "translatedText": "Өрт сөндіру құралдары, қоршаулар, желдету, байланыс және бақылау."
+        },
+        {
+          "id": "sh/729oz2lw",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/w72pc72t",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Контролировать",
+          "sourceTextSha256": "e50e1b4b516653ee3678a7b5260f7d6f5d2eb0d398e51ef18cec4b8823287a48",
+          "translatedText": "Монитор"
+        },
+        {
+          "id": "sh/h8b65cje",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Следить во время и после окончания в установленном порядке.",
+          "sourceTextSha256": "da1f0f724f6437982b5549f56f472360aa2921f4daf57244182984a0764e7220",
+          "translatedText": "Аяқтау кезінде және аяқталғаннан кейін белгіленген тәртіпте бақылаңыз."
+        },
+        {
+          "id": "sh/3mpon2tc",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Переносная ширма не заменяет удаление скрытых горючих материалов.",
+          "sourceTextSha256": "8274847f7c2c989e5271506a7b018c720b538cd41fd1a17c7681127d95f6b72d",
+          "translatedText": "Портативті экран жасырын жанғыш материалдарды алып тастауды алмастыра алмайды."
+        },
+        {
+          "id": "sh/rqpormt8",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/qpgnyhc3",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/twnmhsva",
+          "shapeId": "28",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "36",
+          "sourceTextSha256": "76a50887d8f1c2e9301755428990ad81479ee21c25b43215cf524541e0503269",
+          "translatedText": "36"
+        }
+      ]
+    },
+    {
+      "slide": 37,
+      "slideId": "sl/jyhsreh4",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/61c7md0r",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Пожарный пост наблюдает и после работы",
+          "sourceTextSha256": "e768087a913d24d7b83de467aa31fca9c05f4436151538483b24943ce748a3ca",
+          "translatedText": "Өрт кезекшісі жұмыстан соң да бақылайды"
+        },
+        {
+          "id": "sh/7m58vyhw",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "• Наблюдающий контролирует зону искр, скрытые полости и прилегающие помещения. • Он имеет связь, знает способ остановки и расположение средств тушения. • Пост не совмещают с задачей, отвлекающей от контроля. • Продолжительность контроля после работ устанавливается правилами и локальным допуском.",
+          "sourceTextSha256": "9d629131fddaa6119fadf65f4ff30473bce9315604e28e770792280ef4a0c50b",
+          "translatedText": "• Бақылаушы ұшқын таралу аймағын, жасырын қуыстарды және іргелес үй-жайларды бақылайды. • Оның байланыс құралы бар, ол жұмысты тоқтату тәсілін және өрт сөндіру құралдарының орналасуын біледі. • Өрт бақылау кезекшілігін бақылаудан алаңдататын басқа міндетпен қатар атқармайды. • Жұмыстан кейінгі бақылау ұзақтығы ережелермен және жергілікті рұқсатпен белгіленеді."
+        },
+        {
+          "id": "sh/ixc7it0f",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Тление может обнаружиться после ухода сварщика.",
+          "sourceTextSha256": "154bc28dc30b66a3d7ab57a2b006842b17a7f9501b71911958c47460f9828460",
+          "translatedText": "Тұтану дәнекерлеуші кеткеннен кейін анықталуы мүмкін."
+        },
+        {
+          "id": "sh/9cfa9gry",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Правила пожарной безопасности",
+          "sourceTextSha256": "cee07eac1cfd62ad790bbc9ac63b3aa7436db27eaef00acb849832cb542b4557",
+          "translatedText": "Стандарт: Өрт қауіпсіздігі ережелері"
+        },
+        {
+          "id": "sh/8b69gbqd",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/naxs7q9s",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "37",
+          "sourceTextSha256": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
+          "translatedText": "37"
+        }
+      ]
+    },
+    {
+      "slide": 38,
+      "slideId": "sl/ofahkri5",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/kvy1kbep",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Дым или запах гари — уже повод действовать",
+          "sourceTextSha256": "d9fb2433a3fcaceb8f5be5872b4b68a955b04a293894dc09e94439737c48bbb2",
+          "translatedText": "Түтін не күйген иіс — әрекет ету белгісі"
+        },
+        {
+          "id": "sh/7yp0f6dg",
+          "shapeId": "5",
+          "kind": "shape",
+          "name": "STEP_NUMBER_1",
+          "text": "1",
+          "sourceTextSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "translatedText": "1"
+        },
+        {
+          "id": "sh/8zi1obe1",
+          "shapeId": "6",
+          "kind": "shape",
+          "name": "STEP_TITLE_1",
+          "text": "Не игнорировать",
+          "sourceTextSha256": "f9be3e315767e48ebfa69d87c6273d2caadbe0b4b5247cc33f361b8fed10aa75",
+          "translatedText": "Елемей қоймаңыз"
+        },
+        {
+          "id": "sh/90rihgv6",
+          "shapeId": "7",
+          "kind": "shape",
+          "name": "STEP_BODY_1",
+          "text": "Остановить безопасно выполняемую операцию и оценить путь выхода.",
+          "sourceTextSha256": "c7716e912a69ab484ddb2ebb847b884f84e34dae9e4bbff5e4b7822331357051",
+          "translatedText": "Қауіпсіз жұмысты тоқтатып, шығу жолын бағалаңыз."
+        },
+        {
+          "id": "sh/v290jqdc",
+          "shapeId": "9",
+          "kind": "shape",
+          "name": "STEP_NUMBER_2",
+          "text": "2",
+          "sourceTextSha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "translatedText": "2"
+        },
+        {
+          "id": "sh/3it0j25o",
+          "shapeId": "10",
+          "kind": "shape",
+          "name": "STEP_TITLE_2",
+          "text": "Подать сигнал",
+          "sourceTextSha256": "3ee9fda456dd85e3c7490b42c6085874cd5665a427af36c4622ae128d5595ce8",
+          "translatedText": "Сигнал беріңіз"
+        },
+        {
+          "id": "sh/ih0zqxoj",
+          "shapeId": "11",
+          "kind": "shape",
+          "name": "STEP_BODY_2",
+          "text": "Предупредить людей и сообщить по 101/112 и локальной схеме.",
+          "sourceTextSha256": "6b1773b9c86ec9b5994d66a1f698b9474926861fe94f552b4e557a138b52ce07",
+          "translatedText": "Адамдарды ескертіп, 101/112 және жергілікті схема арқылы хабарлаңыз."
+        },
+        {
+          "id": "sh/4j2hs7m9",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "STEP_NUMBER_3",
+          "text": "3",
+          "sourceTextSha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+          "translatedText": "3"
+        },
+        {
+          "id": "sh/ve90f25s",
+          "shapeId": "14",
+          "kind": "shape",
+          "name": "STEP_TITLE_3",
+          "text": "Эвакуироваться",
+          "sourceTextSha256": "391232709eae53b63694abd8809858b2cfd9e017dc6cf21dd5bc3a3d489bf91f",
+          "translatedText": "Эвакуация"
+        },
+        {
+          "id": "sh/ud0zmxo7",
+          "shapeId": "15",
+          "kind": "shape",
+          "name": "STEP_BODY_3",
+          "text": "Двигаться по безопасному пути, закрывая двери без запирания.",
+          "sourceTextSha256": "3c37194e5a57f38acd81a11dee9b2e93629a77450b4f80c98e8214546b03f9dd",
+          "translatedText": "Есіктерді құлыптамай жауып, қауіпсіз түрде жүргізіңіз."
+        },
+        {
+          "id": "sh/gfihon6d",
+          "shapeId": "17",
+          "kind": "shape",
+          "name": "STEP_NUMBER_4",
+          "text": "4",
+          "sourceTextSha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "translatedText": "4"
+        },
+        {
+          "id": "sh/fad0rm5w",
+          "shapeId": "18",
+          "kind": "shape",
+          "name": "STEP_TITLE_4",
+          "text": "Передать сведения",
+          "sourceTextSha256": "e8d6357908ba992e34e11f040eaf351248c58081f4119fbe2a34b91bfe1ed7c9",
+          "translatedText": "Ақпаратты жіберіңіз"
+        },
+        {
+          "id": "sh/e94jyh4b",
+          "shapeId": "19",
+          "kind": "shape",
+          "name": "STEP_BODY_4",
+          "text": "Указать точное место, признаки и возможные опасные материалы.",
+          "sourceTextSha256": "35c004e59720f5d17d9a35a4136e62dbf9238d8946c87e59b90a839bca23d554",
+          "translatedText": "Нақты орынды, белгілерді және ықтимал қауіпті материалдарды көрсетіңіз."
+        },
+        {
+          "id": "sh/w76lsv6p",
+          "shapeId": "22",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Не ждите видимого пламени или повторного сигнала.",
+          "sourceTextSha256": "c4fb346d8937ded8a775df4d826bc0700b2153b4a68224923400b729b3c75c7f",
+          "translatedText": "Көрінетін жалынды немесе қайталанатын сигналды күтпеңіз."
+        },
+        {
+          "id": "sh/kbqlwv61",
+          "shapeId": "26",
+          "kind": "shape",
+          "name": "VISIBLE_SOURCE",
+          "text": "Норма: Рекомендации МЧС: 101/112",
+          "sourceTextSha256": "5193fa7841a0486b7017fc9693255ff0756b8a91198cb84a1ce08998d57e97ea",
+          "translatedText": "Стандарт: Төтенше жағдайлар министрлігінің ұсыныстары: 101/112"
+        },
+        {
+          "id": "sh/lczmp07m",
+          "shapeId": "27",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/ed43i18r",
+          "shapeId": "28",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "38",
+          "sourceTextSha256": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+          "translatedText": "38"
+        }
+      ]
+    },
+    {
+      "slide": 39,
+      "slideId": "sl/twb2lg7e",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/50769kvu",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Сценарий: загорелась корзина у выхода",
+          "sourceTextSha256": "314808ed3dbfaefe0a444aa104ee6eef14e6ab60262db72af723af9b342e9b6d",
+          "translatedText": "Сценарий: шығудағы себет өртенді"
+        },
+        {
+          "id": "sh/4ze50fu9",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "СЦЕНАРИЙ",
+          "sourceTextSha256": "87c60efb2adcc7662010ba5c7fe78c4d816f2d776c5d2235fb0bffedf7d4262c",
+          "translatedText": "SCRIPT"
+        },
+        {
+          "id": "sh/q1gn2pcf",
+          "shapeId": "5",
+          "kind": "shape",
+          "text": "• Оцените: очаг мал, но расположен рядом с маршрутом эвакуации. • Подайте сигнал и обеспечьте выход людей, не позволяя огню отрезать дверь. • Тушите только при обучении, подходящем огнетушителе и свободном пути отхода. • При росте дыма немедленно отступите, закройте дверь без запирания и идите на сбор.",
+          "sourceTextSha256": "8a52d4a7cda22eaeda331909007b7fc85b199347fec116b14c831fd1b6c66244",
+          "translatedText": "• Бағалаңыз: өрт ошағы шағын, бірақ эвакуация бағытына жақын орналасқан. • Дабыл беріп, өрттің есікке баратын жолды кесуіне жол бермей, адамдардың шығуын қамтамасыз етіңіз. • Тек оқытылған болсаңыз, өрт сөндіргіш сәйкес келсе және шегіну жолы бос болса ғана сөндіруге кірісіңіз. • Түтін көбейсе, дереу шегініңіз, есікті құлыптамай жабыңыз және жиналу орнына барыңыз."
+        },
+        {
+          "id": "sh/76lozqdg",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Выход не должен оказаться между работником и огнём.",
+          "sourceTextSha256": "1d4934f7209d2d2e7c498979480923064521b35c03909dd3bd638bee11153132",
+          "translatedText": "Шығу жұмысшы мен өрт арасында болмауы керек."
+        },
+        {
+          "id": "sh/qx47mdkr",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/rid8vi1c",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "39",
+          "sourceTextSha256": "0b918943df0962bc7a1824c0555a389347b4febdc7cf9d1254406d80ce44e3f9",
+          "translatedText": "39"
+        }
+      ]
+    },
+    {
+      "slide": 40,
+      "slideId": "sl/5ojatgfe",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/y9gzu50n",
+          "shapeId": "2",
+          "kind": "shape",
+          "name": "SLIDE_TITLE",
+          "text": "Сценарий: дым из электрощита",
+          "sourceTextSha256": "a2a3ea0c1edf24f0cd2760b488c5923cceb8c326fcd871216fc8d8220bfd9010",
+          "translatedText": "Сценарий: электр панелінен шыққан түтін"
+        },
+        {
+          "id": "sh/zapg3qh8",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "СЦЕНАРИЙ",
+          "sourceTextSha256": "87c60efb2adcc7662010ba5c7fe78c4d816f2d776c5d2235fb0bffedf7d4262c",
+          "translatedText": "SCRIPT"
+        },
+        {
+          "id": "sh/x8ny10z2",
+          "shapeId": "5",
+          "kind": "shape",
+          "text": "• Не открывайте шкаф без полномочий и не касайтесь корпуса при подозрении на напряжение. • Подайте тревогу, сообщите 101/112 и организуйте эвакуацию. • Обесточивание выполняет уполномоченное лицо по безопасной процедуре. • Применение огнетушителя допустимо только при подходящей маркировке и безопасном пути отхода.",
+          "sourceTextSha256": "a099d9f3e8809742f32b847bdbbfb070d93f51294c974c3721ffe585ba84a028",
+          "translatedText": "• Шкафты рұқсатсыз ашпаңыз және кернеу бар деп күдіктенсеңіз, шкафты ұстамаңыз. • Дабыл қағып, 101/112 нөміріне хабарлаңыз және эвакуацияны ұйымдастырыңыз. • Токты өшіруді уәкілетті тұлға қауіпсіз процедураны сақтай отырып жүзеге асырады. • Өрт сөндіргішті пайдалануға оның дұрыс белгіленген және қауіпсіз қашу жолы болған жағдайда ғана рұқсат етіледі."
+        },
+        {
+          "id": "sh/ojexobil",
+          "shapeId": "8",
+          "kind": "shape",
+          "name": "KEY_TAKEAWAY",
+          "text": "Скрытая электрическая и дуговая опасность может быть выше видимого пламени.",
+          "sourceTextSha256": "45089e86c393f8802f97571c8a0dbaaaaf733d374c6f5cc3ea1eeb6b43192bbb",
+          "translatedText": "Жасырын электр және доға қауіп көрінетін жалыннан жоғары болуы мүмкін."
+        },
+        {
+          "id": "sh/fu54vudk",
+          "shapeId": "12",
+          "kind": "shape",
+          "name": "DECK_FOOTER",
+          "text": "Пожарная безопасность",
+          "sourceTextSha256": "577284c55c45efaea6c32d17c1fee9306f3674610750de094559e7be2527305b",
+          "translatedText": "өрт қауіпсіздігі"
+        },
+        {
+          "id": "sh/etw32pwz",
+          "shapeId": "13",
+          "kind": "shape",
+          "name": "SLIDE_NUMBER",
+          "text": "40",
+          "sourceTextSha256": "d59eced1ded07f84c145592f65bdf854358e009c5cd705f5215bf18697fed103",
+          "translatedText": "40"
+        }
+      ]
+    },
+    {
+      "slide": 41,
+      "slideId": "sl/cnmpwjmp",
+      "layoutId": "/ppt/slideLayouts/slideLayout2.xml",
+      "masterLayoutId": "/ppt/slideMasters/slideMaster2.xml",
+      "elements": [
+        {
+          "id": "sh/wjqpwnit",
+          "shapeId": "21",
+          "kind": "shape",
+          "name": "CHECKLIST_TITLE",
+          "text": "Итоговый алгоритм при пожаре",
+          "sourceTextSha256": "31413a29be22ed88eb1189a846510dee9e815abb3a9063bdfc35fae2dd6b2954",
+          "translatedText": "Өрт кезіндегі соңғы алгоритм"
+        },
+        {
+          "id": "sh/szi98fi9",
+          "shapeId": "3",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/f298ju10",
+          "shapeId": "4",
+          "kind": "shape",
+          "text": "Сообщить: тревога, 101 или 112, точное место и опасности.",
+          "sourceTextSha256": "66c51c7135dcad087d67050671a6e3d96b92300a3d9afe0252cc488a269a596d",
+          "translatedText": "Есеп: дабыл, 101 немесе 112, нақты орын және қауіптер."
+        },
+        {
+          "id": "sh/h4bqlkj6",
+          "shapeId": "6",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/g3i9czil",
+          "shapeId": "7",
+          "kind": "shape",
+          "text": "Предупредить: людей рядом и ответственных по локальной схеме.",
+          "sourceTextSha256": "77e2ffd0ea8e496c8959bb09debf5fd78475c2dfb26c0c8fe198c173dfb99136",
+          "translatedText": "Ескерту: жақын маңдағы және жергілікті схемаға сәйкес жауапты адамдар."
+        },
+        {
+          "id": "sh/25krep0r",
+          "shapeId": "9",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/cvqp43qh",
+          "shapeId": "10",
+          "kind": "shape",
+          "text": "Эвакуироваться: безопасный маршрут, дверь закрыть без запирания.",
+          "sourceTextSha256": "e89e9ab6f000ab3a698f2c742da18bdd0bd897526048bf4b38e5d99850363161",
+          "translatedText": "Эвакуация: қауіпсіз жол, есікті құлыптаусыз жабыңыз."
+        },
+        {
+          "id": "sh/qt872t8b",
+          "shapeId": "12",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/ruh8by9w",
+          "shapeId": "13",
+          "kind": "shape",
+          "text": "Собраться: перекличка, сведения об отсутствующих, запрет повторного входа.",
+          "sourceTextSha256": "daf06d46f13f9d1be1d254117e86e6cd37c8253808ef66eb6d59272238cdc753",
+          "translatedText": "Жинау: шақыру, келмегендер туралы ақпарат, қайта кіруге тыйым салу."
+        },
+        {
+          "id": "sh/10jqh8ry",
+          "shapeId": "15",
+          "kind": "shape",
+          "text": "✓",
+          "sourceTextSha256": "1dabba21cdad44541f6b15796f8d22978fc7ea10c46aeceeeeb66c23b3ac7604",
+          "translatedText": "✓"
+        },
+        {
+          "id": "sh/exsr6t87",
+          "shapeId": "16",
+          "kind": "shape",
+          "text": "Тушить только безопасный начальный очаг при выполнении всех условий.",
+          "sourceTextSha256": "3a152ada47ad234511b154f6c87f2412b69205375cccd3b0c1f3870a1ec88c15",
+          "translatedText": "Барлық шарттар орындалған кезде қауіпсіз бастапқы өртті ғана сөндіріңіз."
+        },
+        {
+          "id": "sh/zy18fy9s",
+          "shapeId": "17",
+          "kind": "shape",
+          "text": "Нажмите «Начать тест»",
+          "sourceTextSha256": "7def4d3ecea04d21659749684677aa095ef9e1b37b0d1abf8c22500ebc745c2e",
+          "translatedText": "«Сынақты бастау» түймесін басыңыз"
+        },
+        {
+          "id": "sh/83u9cnqp",
+          "shapeId": "18",
+          "kind": "shape",
+          "text": "Актуализировано: 21.08.2026",
+          "sourceTextSha256": "3612380a2a5a26e814543ff9385ccb697367c259e8ded06d6603b16d86cd2adf",
+          "translatedText": "Жаңартылған: 21/08/2026"
+        }
+      ]
+    }
+  ]
+}

@@ -1,10 +1,12 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { DownloadSimple, X } from '@phosphor-icons/react';
 import { usePWA } from '@/components/shared/pwa-provider';
 import { Button } from '@/components/ui/button';
+import { splitLocalePathname } from '@/i18n/config';
 
 const DISMISSAL_KEY = 'safetyhub:pwa-install-dismissal:v2';
 const SESSION_KEY = 'safetyhub:pwa-install-shown:v1';
@@ -45,17 +47,19 @@ function markShownThisSession() {
 }
 
 function routeAllowsAutomaticPrompt(pathname: string) {
+  const routePathname = splitLocalePathname(pathname).pathname;
   return !(
-    pathname.startsWith('/admin') ||
-    pathname.startsWith('/auth') ||
-    pathname.startsWith('/onboarding') ||
-    pathname.startsWith('/profile') ||
-    pathname.startsWith('/install') ||
-    /^\/topics\/[^/]+\/test(?:\/|$)/.test(pathname)
+    routePathname.startsWith('/admin') ||
+    routePathname.startsWith('/auth') ||
+    routePathname.startsWith('/onboarding') ||
+    routePathname.startsWith('/profile') ||
+    routePathname.startsWith('/install') ||
+    /^\/topics\/[^/]+\/test(?:\/|$)/.test(routePathname)
   );
 }
 
 export function PWAInstallOverlay() {
+  const translations = useTranslations('Pwa');
   const pathname = usePathname();
   const { isInstallable, install, isStandalone } = usePWA();
   const [isPhone, setIsPhone] = React.useState(false);
@@ -129,10 +133,10 @@ export function PWAInstallOverlay() {
       </span>
       <div className="min-w-0 flex-1">
         <p id="pwa-install-title" className="truncate text-sm font-black">
-          Установить SafetyHub
+          {translations('title')}
         </p>
         <p className="truncate text-xs text-[var(--color-text-muted)]">
-          Быстрый запуск с экрана телефона
+          {translations('description')}
         </p>
       </div>
       <Button
@@ -142,13 +146,13 @@ export function PWAInstallOverlay() {
         disabled={isInstalling}
         className="min-h-11 shrink-0 px-3"
       >
-        {isInstalling ? 'Открываем…' : 'Установить'}
+        {isInstalling ? translations('installing') : translations('install')}
       </Button>
       <button
         type="button"
         onClick={dismiss}
         className="grid size-11 shrink-0 place-items-center rounded-full text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]"
-        aria-label="Закрыть предложение установки"
+        aria-label={translations('dismiss')}
       >
         <X size={19} aria-hidden="true" />
       </button>

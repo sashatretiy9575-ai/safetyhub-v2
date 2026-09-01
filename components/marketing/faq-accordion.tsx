@@ -3,23 +3,16 @@ import { ContactLink } from '@/components/shared/contact-link';
 import { Container } from '@/components/ui/container';
 import { QUIZ_POLICY } from '@/lib/constants';
 import { getSiteContacts } from '@/lib/site-contacts';
+import { getTranslations } from 'next-intl/server';
 
-export const FAQ_DATA = [
-  {
-    question: 'Можно ли проходить обучение с телефона?',
-    answer:
-      'Да. Материалы, тесты и аккаунт адаптированы для телефона, планшета и компьютера. Устанавливать отдельное приложение не нужно.',
-  },
-  {
-    question: 'Сколько вопросов содержит тест?',
-    answer: `Каждый тест содержит ровно ${QUIZ_POLICY.questionCount} вопросов. Для успешного результата нужно правильно ответить минимум на ${QUIZ_POLICY.passScore}, то есть набрать ${QUIZ_POLICY.passPercent}%.`,
-  },
-  {
-    question: 'Где посмотреть лучший результат?',
-    answer:
-      'После входа откройте профиль. Для каждого курса там показаны лучший балл, статус аттестации и доступные сертификаты без списка отдельных попыток.',
-  },
-] as const;
+export async function getFaqData() {
+  const t = await getTranslations('Faq');
+  return [
+    { question: t('phoneQuestion'), answer: t('phoneAnswer') },
+    { question: t('countQuestion'), answer: t('countAnswer', QUIZ_POLICY) },
+    { question: t('resultQuestion'), answer: t('resultAnswer') },
+  ] as const;
+}
 
 export async function FaqAccordion({
   withHeader = true,
@@ -28,14 +21,18 @@ export async function FaqAccordion({
   withHeader?: boolean;
   headingLevel?: 1 | 2;
 }) {
-  const contacts = await getSiteContacts();
+  const [contacts, t, faqData] = await Promise.all([
+    getSiteContacts(),
+    getTranslations('Faq'),
+    getFaqData(),
+  ]);
   const Heading = headingLevel === 1 ? 'h1' : 'h2';
 
   return (
     <section
       id="faq"
       aria-labelledby={withHeader ? 'faq-heading' : undefined}
-      aria-label={withHeader ? undefined : 'Ответы перед началом обучения'}
+      aria-label={withHeader ? undefined : t('title')}
       className="py-10 [contain-intrinsic-size:auto_520px] [content-visibility:auto] sm:py-14 lg:py-16"
     >
       <Container size="wide">
@@ -56,18 +53,17 @@ export async function FaqAccordion({
                 id="faq-heading"
                 className="mt-2 text-[22px] leading-[1.22] font-bold tracking-[-0.025em] text-balance sm:text-[28px] lg:text-[36px]"
               >
-                Ответы перед началом обучения
+                {t('title')}
               </Heading>
               <p className="mt-2.5 text-[14px] leading-[1.5] text-[var(--color-text-muted)] sm:text-[15px] sm:leading-6 lg:text-base">
-                Коротко о курсах, тестах и аккаунте. Если нужного ответа нет, напишите нам — поможем
-                разобраться.
+                {t('description')}
               </p>
             </div>
           ) : null}
 
           <div className={withHeader ? 'min-w-0' : 'ml-auto w-full max-w-[780px]'}>
             <div className="space-y-3">
-              {FAQ_DATA.map((item) => (
+              {faqData.map((item) => (
                 <details
                   key={item.question}
                   className="group overflow-hidden rounded-[20px] border border-[var(--color-border)] bg-[var(--color-surface)]/72 shadow-[var(--shadow-soft)] backdrop-blur-xl open:border-[var(--color-border-strong)]"
@@ -91,7 +87,7 @@ export async function FaqAccordion({
               className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] px-4 text-sm font-bold text-[var(--color-primary)] transition hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)]"
             >
               <WhatsappLogo size={20} weight="fill" aria-hidden="true" />
-              Задать другой вопрос
+              {t('other')}
             </ContactLink>
           </div>
         </div>

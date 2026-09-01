@@ -1,22 +1,38 @@
 <!doctype html>
-<html lang="ru">
+{{ if or (eq .RedirectTo "https://safetyhub.kz/en/auth/login?email_locale=en") (eq .RedirectTo "http://localhost:3000/en/auth/login?email_locale=en") }}
+<html lang="en">
   <body style="margin:0;background:#f4f7f5;color:#173d2b;font-family:Arial,sans-serif">
-    <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-      <div style="border-radius:20px;background:#ffffff;padding:32px;box-shadow:0 8px 30px rgba(23,61,43,.08)">
-        <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25">Вход в SafetyHub</h1>
-        <p style="margin:0 0 20px;font-size:16px;line-height:1.6">
-          Введите этот одноразовый код в SafetyHub:
-        </p>
-        <div style="margin:0 0 20px;border-radius:14px;background:#e7f5ed;padding:18px;text-align:center;font-family:Consolas,monospace;font-size:32px;font-weight:700;letter-spacing:8px">
-          {{ .Token }}
-        </div>
-        <p style="margin:0 0 12px;font-size:14px;line-height:1.6">
-          Код действует один час и используется только один раз. Никому его не сообщайте.
-        </p>
-        <p style="margin:0;font-size:14px;line-height:1.6;color:#5f7168">
-          Если вы не запрашивали код, просто проигнорируйте это письмо.
-        </p>
-      </div>
-    </div>
+    <div style="max-width:520px;margin:0 auto;padding:32px 20px"><div style="border-radius:20px;background:#ffffff;padding:32px;box-shadow:0 8px 30px rgba(23,61,43,.08)">
+      <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25">Your SafetyHub code</h1>
+      <p style="margin:0 0 20px;font-size:16px;line-height:1.6">Enter this one-time code in SafetyHub:</p>
+      <div style="margin:0 0 20px;border-radius:14px;background:#e7f5ed;padding:18px;text-align:center;font-family:Consolas,monospace;font-size:32px;font-weight:700;letter-spacing:8px">{{ .Token }}</div>
+      <p style="margin:0 0 12px;font-size:14px;line-height:1.6">The code is valid for one hour and can only be used once. Do not share it.</p>
+      <p style="margin:0;font-size:14px;line-height:1.6;color:#5f7168">If you did not request this code, ignore this email.</p>
+    </div></div>
   </body>
 </html>
+{{ else if or (eq .RedirectTo "https://safetyhub.kz/kk/auth/login?email_locale=kk") (eq .RedirectTo "http://localhost:3000/kk/auth/login?email_locale=kk") }}
+<html lang="kk">
+  <body style="margin:0;background:#f4f7f5;color:#173d2b;font-family:Arial,sans-serif">
+    <div style="max-width:520px;margin:0 auto;padding:32px 20px"><div style="border-radius:20px;background:#ffffff;padding:32px;box-shadow:0 8px 30px rgba(23,61,43,.08)">
+      <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25">SafetyHub кодыңыз</h1>
+      <p style="margin:0 0 20px;font-size:16px;line-height:1.6">Осы бір реттік кодты SafetyHub-та енгізіңіз:</p>
+      <div style="margin:0 0 20px;border-radius:14px;background:#e7f5ed;padding:18px;text-align:center;font-family:Consolas,monospace;font-size:32px;font-weight:700;letter-spacing:8px">{{ .Token }}</div>
+      <p style="margin:0 0 12px;font-size:14px;line-height:1.6">Код бір сағат жарамды және бір рет қана қолданылады. Оны ешкімге айтпаңыз.</p>
+      <p style="margin:0;font-size:14px;line-height:1.6;color:#5f7168">Егер кодты сұратпаған болсаңыз, бұл хатты елемеңіз.</p>
+    </div></div>
+  </body>
+</html>
+{{ else }}
+<html lang="ru">
+  <body style="margin:0;background:#f4f7f5;color:#173d2b;font-family:Arial,sans-serif">
+    <div style="max-width:520px;margin:0 auto;padding:32px 20px"><div style="border-radius:20px;background:#ffffff;padding:32px;box-shadow:0 8px 30px rgba(23,61,43,.08)">
+      <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25">Код SafetyHub</h1>
+      <p style="margin:0 0 20px;font-size:16px;line-height:1.6">Введите этот одноразовый код в SafetyHub:</p>
+      <div style="margin:0 0 20px;border-radius:14px;background:#e7f5ed;padding:18px;text-align:center;font-family:Consolas,monospace;font-size:32px;font-weight:700;letter-spacing:8px">{{ .Token }}</div>
+      <p style="margin:0 0 12px;font-size:14px;line-height:1.6">Код действует один час и используется только один раз. Никому его не сообщайте.</p>
+      <p style="margin:0;font-size:14px;line-height:1.6;color:#5f7168">Если вы не запрашивали код, просто проигнорируйте это письмо.</p>
+    </div></div>
+  </body>
+</html>
+{{ end }}

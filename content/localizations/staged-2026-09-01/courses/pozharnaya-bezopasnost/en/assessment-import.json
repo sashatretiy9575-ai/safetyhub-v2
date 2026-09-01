@@ -1,0 +1,716 @@
+{
+  "version": 1,
+  "courseId": "5641b254-4aa5-4a8c-a7cf-4364a1de6db0",
+  "locale": "en",
+  "expectedVersion": 1,
+  "questionVariants": [
+    {
+      "id": "cca1995b-d347-56c1-90d2-02bd7a87cb8e",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "9600e24e-2e63-5d17-84f1-fedfa9c739ad",
+          "text": "worker noticed smoke and a burning smell. Which first decision is correct?",
+          "options": [
+            {
+              "id": "a23f4c20-2790-5769-bfcf-2e4e8ab9eba3",
+              "text": "Wait for an open flame to appear."
+            },
+            {
+              "id": "a67c2c6c-8bbc-587b-a68a-9d8f493f8c9c",
+              "text": "End the current operation first."
+            },
+            {
+              "id": "1121fc84-294b-53f4-8f30-21cb7a3379c6",
+              "text": "Open all doors and windows without reporting a fire."
+            },
+            {
+              "id": "7030608f-d7e9-5dec-bdea-d56b753d3d77",
+              "text": "Sound the alarm immediately, notify 101/112 and begin evacuation actions."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "21bc1c81-cadc-5fd7-a4d1-15964e140615",
+          "text": "The initial source of the fire grows, the room quickly fills with smoke. Is it possible to continue extinguishing?",
+          "options": [
+            {
+              "id": "e8c5350a-62a0-5962-916a-d938736cbbf5",
+              "text": "Yes, if there is another person in the room."
+            },
+            {
+              "id": "e03cc981-4d67-50e6-8559-2c91f1f39152",
+              "text": "Yes, if you stand closer to the fire."
+            },
+            {
+              "id": "4cac5d98-78b6-5587-a2c5-bd6280d5de46",
+              "text": "No; You must immediately stop extinguishing, close the door without locking it and evacuate."
+            },
+            {
+              "id": "77aa9486-d9b2-57dc-bf83-2eb8cf79bfc5",
+              "text": "Yes, until fire extinguisher is completely discharged."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "e6eecce6-4f42-574c-b157-4f70e409a21f",
+          "text": "Electrical equipment has caught fire and remains energized. What to consider when choosing a fire extinguisher?",
+          "options": [
+            {
+              "id": "d5ccd973-f626-5573-afee-2a2d2b8d02f9",
+              "text": "Use a product approved by the label for electrical equipment and observe safe conditions of use."
+            },
+            {
+              "id": "deddf6a1-d043-5fec-999a-c807513d8bd4",
+              "text": "Cover the equipment with a wet cloth using your hands."
+            },
+            {
+              "id": "68018f72-4f83-55fa-b177-56dc280855dd",
+              "text": "Use a water jet regardless of voltage."
+            },
+            {
+              "id": "281529fe-8f98-539b-b82f-034a197ff457",
+              "text": "Apply foam without disconnecting and checking markings."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "e1b2b29e-e303-5521-809d-dda793bccc2a",
+          "text": "After hot work, surveillance of the site was completed immediately. What's wrong?",
+          "options": [
+            {
+              "id": "13edb70c-fcf1-5730-a37b-f13d0cc2d118",
+              "text": "Observation is only necessary before work begins."
+            },
+            {
+              "id": "ba90bb26-e6f3-5793-9deb-ca649fd43979",
+              "text": "The place must be monitored after completion during the period established for the conditions according to the order and procedure."
+            },
+            {
+              "id": "9310fe1f-c0d9-58d7-8b06-36826dce839d",
+              "text": "After turning off the tool, smoldering is not possible."
+            },
+            {
+              "id": "b5b9975f-4ca9-5221-9af5-5c51689dea6e",
+              "text": "Supervision is only required when working outdoors."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "e6e947f9-a053-5820-a7b7-1be40657769c",
+          "text": "How to stop burning using the fire triangle model?",
+          "options": [
+            {
+              "id": "9001de08-3689-59b9-a1b0-d27f889ee42b",
+              "text": "Add flammable material."
+            },
+            {
+              "id": "0f7e38b6-ba82-540b-9504-3dfa02a35a58",
+              "text": "Increase the temperature of the fire."
+            },
+            {
+              "id": "3c9dd856-9904-5bcf-8060-e81debf0ea31",
+              "text": "Eliminate at least one necessary factor: fuel, oxidizer, or heat source."
+            },
+            {
+              "id": "80e95be0-405e-5124-846a-3ab26dd24306",
+              "text": "Increase air flow."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "e8cfd42b-8ca5-59d8-900a-f11155c35f23",
+          "text": "What determines the maximum distance to a fire extinguisher in a room?",
+          "options": [
+            {
+              "id": "bcb3e165-8109-5716-8018-8d9a09308c45",
+              "text": "Only on the color of the fire extinguisher."
+            },
+            {
+              "id": "2909c63b-7b0a-5e0a-964c-68c614a94a12",
+              "text": "Always only from the universal value of 30 meters."
+            },
+            {
+              "id": "94ac6e42-f132-5c03-84fd-b2fd685502d1",
+              "text": "Only from the growth of employees."
+            },
+            {
+              "id": "0103be91-41c2-597f-b5b7-f4beed9fa7c9",
+              "text": "From the purpose and category of the premises; the rules provide different values ​​of 20, 30, 40 or 70 meters."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "71f7fc27-7d78-5126-a030-755aa27f8bec",
+          "text": "The emergency exit is cluttered with boxes. Which requirement is violated?",
+          "options": [
+            {
+              "id": "77ab2d84-1127-5e13-8172-1eda38d41644",
+              "text": "Paths and exits must remain clear and accessible at all times."
+            },
+            {
+              "id": "f4f03d98-54cc-5643-8c8c-86e641a2da8b",
+              "text": "Boxes are prohibited during business hours only."
+            },
+            {
+              "id": "88631dad-95df-5c49-b765-506990950ec7",
+              "text": "Obstruction is permitted with a fire extinguisher."
+            },
+            {
+              "id": "8195ee12-3a85-57e9-961b-023698e9bca3",
+              "text": "The exit can be blocked if there is a window nearby."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "186672fa-6fe0-5ba1-b05f-7d113cb09598",
+          "text": "What is the correct sequence when detecting a fire?",
+          "options": [
+            {
+              "id": "294ac2ce-10b6-5740-a157-b68e09e7355b",
+              "text": "First collect personal belongings, then close the exits."
+            },
+            {
+              "id": "99f56786-7830-5b87-9332-5354114e9bc3",
+              "text": "Wait for instructions from colleagues and do not sound the alarm."
+            },
+            {
+              "id": "33bc128e-9805-5e10-ac61-733fd0e05c2a",
+              "text": "Report 101/112, warn people, evacuate, meet services; extinguish only the safe initial fire."
+            },
+            {
+              "id": "96dc61bd-ba23-594b-a8d4-5183d33e34a8",
+              "text": "First, simmer until all funds are used up, then report."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "5ddf5d4e-3ef7-57a8-802e-f2dc2b827a99",
+          "text": "How to prepare the portable fire extinguisher for use?",
+          "options": [
+            {
+              "id": "4b010dab-b397-57c8-b805-88fba78b50b3",
+              "text": "Open the housing and mix the charge manually."
+            },
+            {
+              "id": "5fd8f7c1-71a5-5b0e-a16b-fd1eae979d8a",
+              "text": "First point the nozzle at people for testing."
+            },
+            {
+              "id": "61396b00-e2d1-53f1-9355-e22882450a76",
+              "text": "Lay the fire extinguisher horizontally and strike its cylinder."
+            },
+            {
+              "id": "47d6d6ea-1adf-5c1c-b543-284263d7940e",
+              "text": "Remove the seal and safety pin as instructed, aim the nozzle at the base of the flames and operate the fire extinguisher."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "d4594fcc-e8ae-557e-835e-80e0df35af26",
+          "text": "What is a Class A fire?",
+          "options": [
+            {
+              "id": "d1de72e0-c0f0-50fd-8d57-afee0056dfd3",
+              "text": "Combustion of gases."
+            },
+            {
+              "id": "51ed51b2-c235-5835-b37a-86e8610b548c",
+              "text": "The combustion of solids, usually of organic origin, often producing smoldering coals."
+            },
+            {
+              "id": "f7f294a1-f94e-5ef5-828c-7a488d637d53",
+              "text": "Combustion of metals."
+            },
+            {
+              "id": "de49df16-69d7-5328-98e9-042f1e475239",
+              "text": "Combustion of cooking oils and fats."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "d218d7d0-22a9-528d-8c09-d003ce99d0c4",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "4c4a5f08-d028-55b7-ae74-4d16a93a2c9f",
+          "text": "The fire alarm has sounded, but no flames are visible. How to proceed?",
+          "options": [
+            {
+              "id": "9322daeb-72bb-56c8-ad44-3c94603fe1d8",
+              "text": "Hide indoors until the fire is confirmed."
+            },
+            {
+              "id": "ac9d822c-6ae0-50dc-a8dd-d5480eb666c6",
+              "text": "Follow the established evacuation procedure and the instructions of the responsible personnel, without ignoring the signal."
+            },
+            {
+              "id": "868e9eb9-78d2-5051-8d51-37685bf6901a",
+              "text": "Go alone through smoke-filled corridors to look for the fire."
+            },
+            {
+              "id": "ef3afebf-4e85-5af3-9155-48939fa50dad",
+              "text": "Turn off the alarm and continue working."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "88242eff-679d-51e8-82d5-ccd88ce5518b",
+          "text": "worker is not trained in the use of a fire extinguisher and does not see a safe escape route. What to do?",
+          "options": [
+            {
+              "id": "6677c30f-be19-54aa-9e54-d1491e5ae9c1",
+              "text": "Do not start extinguishing, warn people and evacuate by reporting 101/112."
+            },
+            {
+              "id": "57acb836-b417-5e6c-b21e-52eb5594b0dd",
+              "text": "Wait at the fire for the arrival of firefighters."
+            },
+            {
+              "id": "5976fffb-d3f7-5ed9-98f3-2c7b364a655d",
+              "text": "Look for a suitable fire extinguisher in a smoke-filled area."
+            },
+            {
+              "id": "dffaf32f-c44d-5c57-ad11-663b4f77e33b",
+              "text": "Extinguish with any liquid nearby."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "5968ef69-6c0c-52c3-8e4e-191b41ecad41",
+          "text": "Which action in the event of an electrical fire increases safety if it can be done without risk?",
+          "options": [
+            {
+              "id": "d0a3e945-9856-5e7b-8cd8-bfec18b6ab61",
+              "text": "Disassemble the housing of the operating equipment."
+            },
+            {
+              "id": "8b10f9d9-9daf-573b-9c8e-667d83b5e120",
+              "text": "Touch the cable with a metal tool."
+            },
+            {
+              "id": "331911d3-ba4b-5ab8-9c63-37fb32ae1fff",
+              "text": "Fill the distribution board with water."
+            },
+            {
+              "id": "e385cb4c-ed19-5d24-80be-838a38928fa9",
+              "text": "Switch off the power in the prescribed manner and then use a suitable extinguishing agent."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f315bceb-b812-557a-bc44-fcc8e1838589",
+          "text": "There are flammable materials nearby before welding. What should I do?",
+          "options": [
+            {
+              "id": "c602edd9-808b-5b14-be37-1ce5b1a051be",
+              "text": "Start welding at lower current."
+            },
+            {
+              "id": "1e3693c4-10ce-56d9-ab66-7eb4d6f96da2",
+              "text": "Remove or secure materials, prepare extinguishing agents, and comply with permit requirements."
+            },
+            {
+              "id": "7ebd6b77-18fc-525c-95af-01386380fd5b",
+              "text": "Leave the materials and open the window."
+            },
+            {
+              "id": "8102e71a-ff21-5693-baa7-41e2cde77383",
+              "text": "Cover the materials with plain paper."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "af16c829-bf30-59fc-b24e-c6e3b520671c",
+          "text": "Which fire extinguisher should be selected for the specific fire?",
+          "options": [
+            {
+              "id": "d162d8fa-cc90-52aa-8332-3c56a10f821c",
+              "text": "According to the location of the nearest cabinet, without considering the fire."
+            },
+            {
+              "id": "22b887ec-fdbd-53ed-b3c3-4875b41a5ac4",
+              "text": "Only by the color of the foreign template sticker."
+            },
+            {
+              "id": "cbb8e529-7bc8-5032-a208-da2943f7c7ec",
+              "text": "By fire class, extinguishing-agent type, extinguisher marking and safety conditions."
+            },
+            {
+              "id": "69ae70ff-da5a-58fc-8800-36f21b376121",
+              "text": "Only by the mass of the extinguisher body."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f655ca03-94ff-5986-a454-e9e35d9dcd18",
+          "text": "How to install a portable fire extinguisher weighing 15 kg or more?",
+          "options": [
+            {
+              "id": "4a0e08cc-dfff-5ba4-a5e3-ecd2dae464bc",
+              "text": "At a height of exactly 1.5 meters to the bottom of the body."
+            },
+            {
+              "id": "d0c3e49d-42c6-5bd4-bdf9-f9fe278ba8d9",
+              "text": "Directly on the escape route with a narrowed passage."
+            },
+            {
+              "id": "bac4ec02-b1b5-574b-a13e-3b90f92e5c46",
+              "text": "Behind a locked, unmarked door."
+            },
+            {
+              "id": "c3c2199b-74e9-5fff-b9c0-32a1f0f05745",
+              "text": "So that the top of the fire extinguisher is no higher than 1.0 meters from the floor, either in a provided cabinet or on a stand."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "00b1d525-37d3-5b55-93ab-fcb39d5d5770",
+          "text": "Flammable liquids are stored in open, unmarked containers. What should I do?",
+          "options": [
+            {
+              "id": "9ae2ea0a-0795-54bc-90b9-0ffa0d9668b9",
+              "text": "Place the container near the heat source."
+            },
+            {
+              "id": "b1f00a0b-9476-50e6-b790-712fb3190e20",
+              "text": "Stop such storage and place the substances in the provided closed, labeled container and place."
+            },
+            {
+              "id": "3045070e-6293-5117-9601-8617e9d0844e",
+              "text": "Leave the container open to allow evaporation."
+            },
+            {
+              "id": "718a4ffc-2eb0-51df-bf3f-e9805874d168",
+              "text": "Pour liquids into food bottles."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "af967078-e027-5243-8822-c4039f189b62",
+          "text": "What to do after reaching the collection point?",
+          "options": [
+            {
+              "id": "87511e10-bdfb-5576-afef-ce139fff6101",
+              "text": "Check in for roll call, provide known information and do not return without permission from the services."
+            },
+            {
+              "id": "aab1de1a-c5bc-5e19-be9f-c91eeeca3cf1",
+              "text": "Stand at the entrance and interfere with the passage of fire trucks."
+            },
+            {
+              "id": "7c73e76f-8137-51fe-8e63-75a9fa89a61d",
+              "text": "Return independently for documents."
+            },
+            {
+              "id": "ee0d5768-8e72-59eb-8413-67d6bafbdc6d",
+              "text": "Leave the collection point without informing anyone."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "f8dd7505-75e2-55f2-a4e5-69d45aa7c9b1",
+          "text": "Which position is safer when extinguishing the initial fire?",
+          "options": [
+            {
+              "id": "f4af2199-1f95-59e1-bfef-6da444755d0e",
+              "text": "Stand between the fire and the only exit, facing the door."
+            },
+            {
+              "id": "b80e272c-15db-57ea-94a2-9ce8c8e3fce3",
+              "text": "Move close to the flame regardless of the heat."
+            },
+            {
+              "id": "17e3e2fb-6e69-59ef-a5b7-0ae46a75b42e",
+              "text": "Work with your back to the fire so that you can see the exit."
+            },
+            {
+              "id": "bc5ea7a2-dd70-51a1-a079-f01112cf626c",
+              "text": "Maintain a clear escape route behind you and do not enter smoke or heat hazards."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "c4ee66a5-9806-5f91-a6b0-e42205a02858",
+          "text": "What is convection in a fire?",
+          "options": [
+            {
+              "id": "4f05da42-a4c4-54b6-925b-a1d8e45748c7",
+              "text": "Light propagation without heating."
+            },
+            {
+              "id": "bd0ecfe7-cdb2-56ad-b73d-0e3976a6765e",
+              "text": "Combustion stops due to lack of fuel."
+            },
+            {
+              "id": "e945c15b-f5db-5c31-aa3e-1794e0e84baa",
+              "text": "Heat transfer by moving heated gases and smoke."
+            },
+            {
+              "id": "0cb79a6c-dbda-5d31-b7f5-2d5838c46e96",
+              "text": "Heat transfer only through direct contact of solids."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "id": "5a114eca-9129-5c97-aeb1-b5a00a263280",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "19e65d17-2bce-5537-978d-cde623a170fc",
+          "text": "worker was the first to detect a small fire. What should he provide first?",
+          "options": [
+            {
+              "id": "d24e8376-28b9-5e51-8a54-662ef9923893",
+              "text": "Waiting for command after smoke spreads."
+            },
+            {
+              "id": "35654980-f993-5013-a9e2-d5088e080536",
+              "text": "Safety of personal belongings."
+            },
+            {
+              "id": "6bc66aa0-64fc-5203-85e6-461a49ba6834",
+              "text": "Notifying people and the fire service, a safe escape route and evacuation according to the situation."
+            },
+            {
+              "id": "c30b5cec-14f5-5d81-970d-c768d9498f5d",
+              "text": "Closing all emergency exits."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "37bf813c-78f7-5651-bd3d-563b6b9b90a8",
+          "text": "A small fire is accessible, the extinguisher is suitable, and the exit remains clear behind you. When is an extinguishing attempt permitted?",
+          "options": [
+            {
+              "id": "60da55f9-1272-5c96-b17a-e2d47160335d",
+              "text": "Before the alarm, so as not to disturb people."
+            },
+            {
+              "id": "408aab23-c0de-5738-a714-04a954410273",
+              "text": "After notification, training, no threat to life and readiness to immediately retreat."
+            },
+            {
+              "id": "f1117e09-e16d-585f-9469-577f34edd3b3",
+              "text": "Only after closing the only exit."
+            },
+            {
+              "id": "0ceb12cf-da46-5f88-878d-21e03675d218",
+              "text": "For any size of fire, as long as there is fire extinguisher."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "6542fe0a-3c07-54d5-97fb-dfe40f4a7d63",
+          "text": "The fire extinguisher is not clearly marked for use with electrical equipment. What should I do?",
+          "options": [
+            {
+              "id": "ce14b1fa-9622-50db-878b-ee9b7946aede",
+              "text": "Do not use it on live equipment and choose a proven suitable means or evacuate."
+            },
+            {
+              "id": "5c046f36-e7ac-505f-b395-1ad306ef7562",
+              "text": "Mix the charge with water."
+            },
+            {
+              "id": "7091535e-54a6-5576-a40d-46632257bddc",
+              "text": "Check suitability with a short release into the shield."
+            },
+            {
+              "id": "aca0e427-7530-5343-832b-fe78a1e562a0",
+              "text": "Use fire extinguisher, depending on the color of the case."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "7600b23d-bb08-5ffd-821f-a622f4a55cfd",
+          "text": "The fire watch has lost communication with the hot-work operator. What should be done?",
+          "options": [
+            {
+              "id": "55849e56-9bcb-5428-b80a-a2dfd1166dd7",
+              "text": "Replace communication with periodic gestures without coordination."
+            },
+            {
+              "id": "70f500f5-70b4-5791-b342-533d12b818bd",
+              "text": "Continue if no sparks are visible."
+            },
+            {
+              "id": "d0a637c5-ac7e-5311-bd32-089b95fdebce",
+              "text": "Suspend operations until the intended surveillance and communications are restored."
+            },
+            {
+              "id": "b15c1981-5e6f-5d3a-90f0-e56e276c3c2a",
+              "text": "Leave the post without informing the performer."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "1f9c940e-3364-5223-8f6e-2b4cc133d194",
+          "text": "Why is a closed door without locking useful when leaving a burning room?",
+          "options": [
+            {
+              "id": "cb8443d3-4403-5912-93d0-e93aa61bdd2e",
+              "text": "It completely stops combustion in all cases."
+            },
+            {
+              "id": "1f4d9056-9ced-55a0-a1cc-42106336a2de",
+              "text": "It replaces calling the fire department."
+            },
+            {
+              "id": "35b1f577-0ec0-56e5-a078-cdfdb351e9e6",
+              "text": "It allows re-entry without protection."
+            },
+            {
+              "id": "92645e91-8799-590a-9277-636fa80788bc",
+              "text": "It can limit the spread of smoke and fire while maintaining service access."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "0d57c1dc-021b-50ae-95b5-a3c6adb316d1",
+          "text": "What is checked during an external inspection of a fire extinguisher?",
+          "options": [
+            {
+              "id": "d31aee1f-d3b4-5c30-af62-79cf7108e01d",
+              "text": "Only the mass of adjacent equipment."
+            },
+            {
+              "id": "97861680-dd23-5bcc-bffe-d3ec45ef8530",
+              "text": "Accessibility, seal and indicator if present, absence of damage, legibility of markings and service life."
+            },
+            {
+              "id": "6b93e381-fa30-5334-b3e4-7ba1daae6064",
+              "text": "Only the presence of a free window nearby."
+            },
+            {
+              "id": "e24d7ed8-7669-5d1d-a2e4-c90b7478275b",
+              "text": "Case color only."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "431f5f26-c949-58df-bfc7-410c1e3eebd2",
+          "text": "Where is smoking allowed on the organization’s premises?",
+          "options": [
+            {
+              "id": "1378a8ac-773d-5510-b8dc-b8eab88563d2",
+              "text": "Only in specially designated and designated places in compliance with established measures."
+            },
+            {
+              "id": "7cfb40a2-dda7-53a2-b60c-6202f413a4e0",
+              "text": "Near a flammable materials warehouse in the absence of wind."
+            },
+            {
+              "id": "b1c00370-ad6a-581b-95ab-f1c7fefd8079",
+              "text": "Anywhere outdoors."
+            },
+            {
+              "id": "f2144ab1-b419-54ee-bee1-6c3a02868d3b",
+              "text": "In a room next to a fire extinguisher."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "a0451b68-5acc-5e9e-9d5b-394812006217",
+          "text": "How to proceed when evacuating through a smoky area if the route remains permissible according to the plan?",
+          "options": [
+            {
+              "id": "537f3590-e4c8-52b1-9e80-d690cd350517",
+              "text": "Run in the opposite direction without orientation."
+            },
+            {
+              "id": "0f3fce79-cd61-5f9a-92f7-c631918fd78c",
+              "text": "Open all doors and leave them wide open."
+            },
+            {
+              "id": "701a1c8f-4e8e-5b62-b1c4-9f6331bf3b6b",
+              "text": "Move in an orderly manner towards a safe exit, stay below the smoke layer and do not use the elevator."
+            },
+            {
+              "id": "8030d0ae-9aab-5a41-850f-d71962e7d0ef",
+              "text": "Return for personal protective equipment from another area."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "42d9770c-68c4-5068-8ef1-dc7ad608b3fd",
+          "text": "When should you stop using a fire extinguisher?",
+          "options": [
+            {
+              "id": "8ce3046e-7a06-5a89-8dce-8a19e6687e3a",
+              "text": "Only after the arrival of the head of the organization."
+            },
+            {
+              "id": "5fcf8d39-aeda-5b3b-a89f-af0aed279f3b",
+              "text": "Only if the fire spreads to the floor."
+            },
+            {
+              "id": "ee77159d-9a80-5c37-9a5d-8fe36c364ba7",
+              "text": "Only after the case is completely empty."
+            },
+            {
+              "id": "911ac334-4242-5263-971e-cd5a08713913",
+              "text": "If the fire grows, smoke increases, the product is ineffective, or safe disposal is compromised."
+            }
+          ],
+          "explanation": ""
+        },
+        {
+          "id": "3e8a1c3b-9133-5f5e-8120-467082b33b00",
+          "text": "What is the ignition source called?",
+          "options": [
+            {
+              "id": "81e99df7-0692-5fa5-ac84-481e9d89bf6c",
+              "text": "An energy source capable of initiating combustion of a flammable mixture or material."
+            },
+            {
+              "id": "02d2c294-d56e-55cc-aa02-677be96d0f03",
+              "text": "Only non-combustible building structure."
+            },
+            {
+              "id": "afcb4009-d5a7-52f9-bbf7-b14d6214694a",
+              "text": "Any evacuation sign."
+            },
+            {
+              "id": "6062791e-b3a7-5c56-8e7e-ba714d6f717d",
+              "text": "Any extinguishing agent."
+            }
+          ],
+          "explanation": ""
+        }
+      ]
+    }
+  ]
+}

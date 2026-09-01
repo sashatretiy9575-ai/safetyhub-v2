@@ -29,9 +29,10 @@ test('auth context is one actor-bound RPC with no browser SDK or MFA branch', as
   assert.doesNotMatch(auth, /auth\.getUser|createAdminClient|\.from\(|requiresMfa/);
 });
 
-test('profile dashboard returns draft, approved identity, legal state, and one best row per revision', async () => {
-  const [baseline, loader, page] = await Promise.all([
+test('profile dashboard returns locale-bound draft, approved identity, legal state, and one best row per revision', async () => {
+  const [baseline, localeReads, loader, page] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
+    read('supabase/migrations/20260901102000_localized_course_publication_reads.sql'),
     read('features/profile/server.ts'),
     read('app/(account)/profile/page.tsx'),
   ]);
@@ -43,9 +44,16 @@ test('profile dashboard returns draft, approved identity, legal state, and one b
   assert.match(baseline, /'legalAcceptances'/);
   assert.match(baseline, /from public\.attestations attestation/);
   assert.doesNotMatch(baseline, /row_number\(\)[\s\S]*test_attempts[\s\S]*get_profile_dashboard/);
+  assert.match(localeReads, /create function public\.get_profile_dashboard_locale\(/);
+  assert.match(localeReads, /p_locale public\.app_locale/);
+  assert.match(localeReads, /public\.get_profile_dashboard\(\)/);
+  assert.match(localeReads, /public\.test_revision_localizations/);
+  assert.match(localeReads, /revoke all on function public\.get_profile_dashboard_locale/);
+  assert.match(localeReads, /grant execute on function public\.get_profile_dashboard_locale/);
 
-  assert.match(loader, /export const getProfileDashboard = cache\(async/);
-  assert.match(loader, /rpc\('get_profile_dashboard'\)/);
+  assert.match(loader, /export const getProfileDashboard = cache\(\s*async/);
+  assert.match(loader, /rpc\('get_profile_dashboard_locale', \{/);
+  assert.match(loader, /p_locale: locale/);
   assert.equal((loader.match(/\.from\(/g) ?? []).length, 1);
   assert.match(loader, /rpc\('get_my_profile_avatar_manifest'\)/);
   assert.match(loader, /isOwnedAvatarObjectKey\(/);

@@ -1,0 +1,782 @@
+{
+  "schemaVersion": 1,
+  "scope": "SafetyHub Stage 6 localized presentation artifacts (KK/EN)",
+  "productionPublished": false,
+  "automatedReviewOnly": true,
+  "locales": [
+    "kk",
+    "en"
+  ],
+  "localeCount": 2,
+  "sourceDeckCount": 5,
+  "presentationCount": 10,
+  "sourceSlideCount": 396,
+  "pptxRenderedSlideCount": 396,
+  "pdfRenderedPageCount": 396,
+  "canonicalArtifactContract": {
+    "pptxPerDeckLocale": 1,
+    "pdfPerDeckLocale": 1,
+    "contentAddressedParentsVerified": true,
+    "hashesAndByteSizesVerified": true,
+    "sourceRenderPageCountsEqual": true,
+    "sourceGeometryExactExceptApprovedLayoutOverrides": true,
+    "neighborGeometryUnchanged": true,
+    "newlyIntersectedNeighborCount": 0,
+    "approvedLayoutOverrideCount": 16
+  },
+  "presentations": [
+    {
+      "locale": "kk",
+      "slug": "plotnik",
+      "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+      "sourceSlideCount": 25,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/assets/pptx/a9c05a91e1fa2759382c68d32787591fb6077e634872c1b0b2ea59e60defe2f9/presentation.pptx",
+        "sha256": "a9c05a91e1fa2759382c68d32787591fb6077e634872c1b0b2ea59e60defe2f9",
+        "byteSize": 1935632,
+        "slideCount": 25
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/assets/pdf/8fcbb77fbfbd6abc6005be7e99335e0e9234da4e37afb2b7bf3d9f67ee716656/presentation.pdf",
+        "sha256": "8fcbb77fbfbd6abc6005be7e99335e0e9234da4e37afb2b7bf3d9f67ee716656",
+        "byteSize": 1433853,
+        "pageCount": 25,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 25,
+      "renderedPageCount": 25,
+      "approvedLayoutOverrideCount": 1,
+      "layoutOverrideReceipt": {
+        "path": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/qa/layout-only-override-receipt.json",
+        "sha256": "5c48e14b350b32e444164f56ed2c99275e6c0ce087e218e7f4941c530c8f12ec",
+        "byteSize": 1335,
+        "schemaVersion": 1,
+        "locale": "kk",
+        "slug": "plotnik",
+        "productionPublished": false,
+        "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+        "overrideCount": 1,
+        "allOtherElementGeometryUnchanged": true,
+        "neighborContentMoved": false,
+        "newlyIntersectedNeighborCount": 0,
+        "semanticsChanged": false,
+        "overrides": [
+          {
+            "locale": "kk",
+            "slug": "plotnik",
+            "slide": 25,
+            "shapeId": "16",
+            "name": "Прямоугольник 15",
+            "translatedText": "Ақаулық, жағдайлардың өзгеруі немесе қауіп төнген жағдайда жұмыс тоқтатылады.",
+            "sourceBbox": [
+              152,
+              502,
+              1000,
+              54
+            ],
+            "finalBbox": [
+              152,
+              502,
+              1000,
+              66
+            ],
+            "reason": "Height-only correction clears a 7 pt PowerPoint TextFrame2 vertical overflow; the next template element remains outside the expanded box.",
+            "textMapSha256": "6581b118ffe6592be8c6c1f12aee8930e6395540c513cdc49fc4e2163fd8d24f",
+            "sourceTextSha256": "eeab0fda0154c79de410ec22233f3b343c57a1103c6ee50c7663860f75e70bf9",
+            "translatedTextSha256": "0292f91142ea5c7fc117dee1900552ad292ae7f35df41f25ffd730cbdc777dfa",
+            "newlyIntersectedNeighborCount": 0
+          }
+        ]
+      },
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/plotnik/kk/artifact-receipt.json",
+      "artifactReceiptSha256": "35a51ce0c804987c43d78bebf2aebfa497565005ca76f693b18bc4e79a30e3de"
+    },
+    {
+      "locale": "kk",
+      "slug": "armaturshchik",
+      "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+      "sourceSlideCount": 31,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/kk/assets/pptx/037d7b1ff2cff893204f78f76e50b8984157605597752b60f98f063f53004d37/presentation.pptx",
+        "sha256": "037d7b1ff2cff893204f78f76e50b8984157605597752b60f98f063f53004d37",
+        "byteSize": 2807354,
+        "slideCount": 31
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/kk/assets/pdf/38cf7a91d9e0eb591c9788afc77bc0ddfa25363900b86d272b789273972417f9/presentation.pdf",
+        "sha256": "38cf7a91d9e0eb591c9788afc77bc0ddfa25363900b86d272b789273972417f9",
+        "byteSize": 2179184,
+        "pageCount": 31,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 31,
+      "renderedPageCount": 31,
+      "approvedLayoutOverrideCount": 2,
+      "layoutOverrideReceipt": {
+        "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/kk/qa/layout-only-override-receipt.json",
+        "sha256": "f4fee4e1faa6fb36b6435d57384cc92716406a11856c6c7715844c1e7f927f96",
+        "byteSize": 2347,
+        "schemaVersion": 1,
+        "locale": "kk",
+        "slug": "armaturshchik",
+        "productionPublished": false,
+        "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+        "overrideCount": 2,
+        "allOtherElementGeometryUnchanged": true,
+        "neighborContentMoved": false,
+        "newlyIntersectedNeighborCount": 0,
+        "semanticsChanged": false,
+        "overrides": [
+          {
+            "locale": "kk",
+            "slug": "armaturshchik",
+            "slide": 23,
+            "shapeId": "12",
+            "translatedText": "Арматураны байлау, дәнекерлеу немесе муфталы қосылыс технологиясы бұзылған",
+            "sourceBbox": [
+              368,
+              310,
+              304,
+              72
+            ],
+            "finalBbox": [
+              368,
+              310,
+              330,
+              72
+            ],
+            "reason": "Width-only correction preserves the 20 px body typography and removes the extra wrapped line without entering the adjacent control column.",
+            "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+            "sourceTextSha256": "9e442635ec5f2a00624bda3cac47e3177892abee449b93dcdc433e6c5b307a37",
+            "translatedTextSha256": "c26d911fa0da40e05a0467dc7c120b9db1700800ba7f06a084ce81f3b9040707",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "armaturshchik",
+            "slide": 26,
+            "shapeId": "5",
+            "name": "IMAGE_CAPTION",
+            "translatedText": "Пайдалануға жарамдылық сынақ тәуекелімен емес, тексеру және белгіленген тексеру арқылы расталады.",
+            "sourceBbox": [
+              824,
+              548,
+              396,
+              88
+            ],
+            "finalBbox": [
+              824,
+              548,
+              396,
+              88
+            ],
+            "finalFontSizePx": 18,
+            "minimumReadableFontSizePx": 18,
+            "reason": "Bounded 18 px caption typography clears the PowerPoint vertical overflow without entering the immutable visible-source/footer zone.",
+            "textMapSha256": "0e67500a5a31b19b3c972404d89bd2e206764009aed5ded91c48cfc2beac361d",
+            "sourceTextSha256": "2722fde2d93e1506835f42c2c12a2c66e1bb5f2a73a36d87c12910217c8e49c4",
+            "translatedTextSha256": "a3ccf6d98b3844d8ece624fd5ec4f7a7a30201fafe35051f8420ad859a5035b5",
+            "newlyIntersectedNeighborCount": 0
+          }
+        ]
+      },
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/armaturshchik/kk/artifact-receipt.json",
+      "artifactReceiptSha256": "0a428ebfff57e5b6e2ed2cb5191a42ba1c9ff0170ac0ee2621fef957d08accad"
+    },
+    {
+      "locale": "kk",
+      "slug": "lesomontazhnye-raboty",
+      "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+      "sourceSlideCount": 42,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/kk/assets/pptx/be6064535ee6826f7fde69d46c94b80e14a42deb7e6c45f3a9deef976ddc58d0/presentation.pptx",
+        "sha256": "be6064535ee6826f7fde69d46c94b80e14a42deb7e6c45f3a9deef976ddc58d0",
+        "byteSize": 2499576,
+        "slideCount": 42
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/kk/assets/pdf/3e2817af30b3422b6e027d8660d21a6f9ed9fa5d1c0641c7b4609e2d47b00afc/presentation.pdf",
+        "sha256": "3e2817af30b3422b6e027d8660d21a6f9ed9fa5d1c0641c7b4609e2d47b00afc",
+        "byteSize": 1628071,
+        "pageCount": 42,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 42,
+      "renderedPageCount": 42,
+      "approvedLayoutOverrideCount": 9,
+      "layoutOverrideReceipt": {
+        "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/kk/qa/layout-only-override-receipt.json",
+        "sha256": "18393bce7ff5dd54666b31556ec732fe54d7bce6c79a7221baf5684e6b5be7bb",
+        "byteSize": 9660,
+        "schemaVersion": 1,
+        "locale": "kk",
+        "slug": "lesomontazhnye-raboty",
+        "productionPublished": false,
+        "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+        "overrideCount": 9,
+        "allOtherElementGeometryUnchanged": true,
+        "neighborContentMoved": false,
+        "newlyIntersectedNeighborCount": 0,
+        "semanticsChanged": false,
+        "overrides": [
+          {
+            "locale": "kk",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 1,
+            "shapeId": "5",
+            "name": "DECK_TITLE",
+            "translatedText": "Құрылыс мінбелерін монтаждау жұмыстары",
+            "sourceBbox": [
+              72,
+              212,
+              650,
+              190
+            ],
+            "finalBbox": [
+              72,
+              212,
+              650,
+              190
+            ],
+            "finalFontSizePx": 48,
+            "minimumReadableFontSizePx": 44,
+            "reason": "Bounded cover-title typography correction preserves the complete accepted title while fitting above the unchanged divider and subtitle; 48 px remains above the 44 px cover-title readability floor.",
+            "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+            "sourceTextSha256": "85ccca735a2cd7ffe9ea0d93c45151003770fe208b20d4eebdf6b9616a810260",
+            "translatedTextSha256": "b30dd67bbd264cd6fd8b583fda01188e8dc482afc994457ebacf53d23a514fa3",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 2,
+            "shapeId": "8",
+            "name": "LIST_ITEM_2",
+            "translatedText": "Құрылыс мінбелерінің негізгі элементтерін және байланыстардың, төсемдердің әрі қоршаулардың мақсатын ажырату.",
+            "sourceBbox": [
+              210,
+              282,
+              620,
+              84
+            ],
+            "finalBbox": [
+              210,
+              282,
+              620,
+              84
+            ],
+            "finalFontSizePx": 22,
+            "minimumReadableFontSizePx": 20,
+            "reason": "Bounded 22 px list typography clears the PowerPoint vertical overflow without changing geometry or moving the next list row.",
+            "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+            "sourceTextSha256": "106de87ac206b91898f8c7c332262cb10b03869a042f48c8ab229e383900bd0e",
+            "translatedTextSha256": "d970db95feace2b065e28984e031c2be1c11977ef51415f4bc0a5e6c6421eba4",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 2,
+            "shapeId": "11",
+            "name": "LIST_ITEM_3",
+            "translatedText": "Құрылыс мінбелерін қауіпсіз пайдалану және оларды пайдалануға рұқсат беру мәртебесін түсіну.",
+            "sourceBbox": [
+              210,
+              378,
+              620,
+              84
+            ],
+            "finalBbox": [
+              210,
+              378,
+              620,
+              84
+            ],
+            "finalFontSizePx": 22,
+            "minimumReadableFontSizePx": 20,
+            "reason": "Bounded 22 px list typography clears the PowerPoint vertical overflow without changing geometry or moving the next list row.",
+            "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+            "sourceTextSha256": "1a9425bd2923d0cbda429270510c8291d04d25ba99345c6db81996faf98533a0",
+            "translatedTextSha256": "cb7dc441ea9fc284a34a4e95b1ae97230691248fa4fac52ca304882b5ed5cd28",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 8,
+            "shapeId": "7",
+            "name": "STEP_BODY_1",
+            "translatedText": "Жобаны, жүйенің техникалық паспортын, монтаждау сұлбасын, наряд-рұқсатты және шектеулерді.",
+            "sourceBbox": [
+              34,
+              422,
+              260,
+              110
+            ],
+            "finalBbox": [
+              34,
+              422,
+              260,
+              128
+            ],
+            "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+            "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+            "sourceTextSha256": "070a3246cffa93674b4100bc5bab58662115a52e0b607e235f5f37716a3be202",
+            "translatedTextSha256": "542f80c8390ba464b8f3de6e666d9c9d42aece9f6e801e526b4c80f4a06b5bdb",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 10,
+            "shapeId": "4",
+            "name": "SECTION_TITLE",
+            "translatedText": "Құрылыс мінбесі: жүйе, орнықтылық",
+            "sourceBbox": [
+              72,
+              334,
+              1080,
+              152
+            ],
+            "finalBbox": [
+              72,
+              334,
+              1128,
+              152
+            ],
+            "reason": "Width-only correction keeps the independently accepted wording on one line at the unchanged 58 pt source typography. Left, top and height stay fixed; the title ends at x=1200 on a 1280 px slide and does not intersect neighboring content.",
+            "rejectedPass5Gate": {
+              "gateSha256": "41d38da02f6fcdfceb22a325f141b9d4860baa120bb0b9248f162aa70f288197",
+              "gateFileSha256": "55438c6e37dad34aa0f4b36388409c9869f0c6241baf0281043868a2c4c1f900",
+              "emptyApprovedFileSha256": "c9f0f78b9b2967157118e1e13c6d4443420eeb5de49ba081b5c408a79af3c288",
+              "rejectedCandidateApplied": false
+            },
+            "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+            "sourceTextSha256": "86951cb7ec4b48941d196e4799cce5dc094a9cdbbbf5130d3bae6ba5851d5ea9",
+            "translatedTextSha256": "3c1b1651699b7ad8c83dc200cb5a1a98c808e5522c4062369772f76d4e08555c",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 38,
+            "shapeId": "7",
+            "name": "STEP_BODY_1",
+            "translatedText": "Адамдарды, материалдарды, қоқыстарды және бөгде құрылғыларды алып тастаңыз.",
+            "sourceBbox": [
+              34,
+              422,
+              260,
+              110
+            ],
+            "finalBbox": [
+              34,
+              422,
+              260,
+              128
+            ],
+            "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+            "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+            "sourceTextSha256": "4f323fe717993c08b40ec78f733630fb0226ffb99bfd7e61d033f5b5bc1e823e",
+            "translatedTextSha256": "03ddc553949c8cecbe0f5def2ca19564f2247fc75ed23710166be1f2717b3476",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 38,
+            "shapeId": "15",
+            "name": "STEP_BODY_3",
+            "translatedText": "Рұқсат етілген кезеңге дейін қосылымдар мен анкерлерді сақтай отырып, жоғарыдан төменге қарай алып тастаңыз.",
+            "sourceBbox": [
+              634,
+              422,
+              260,
+              110
+            ],
+            "finalBbox": [
+              634,
+              422,
+              260,
+              128
+            ],
+            "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+            "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+            "sourceTextSha256": "57c584d548698fea361753e445e80665df973829e56d6191f9a9ddc0610fa6da",
+            "translatedTextSha256": "3a5cfa1ec6e74e2c4dff06cddacbd9a2064807c0fa7b9ddc01b02c4bfd506853",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 42,
+            "shapeId": "4",
+            "translatedText": "Жоба, жүйенің техникалық паспорты, тағайындалған рөлдер және қауіпсіз аймақ бар.",
+            "sourceBbox": [
+              152,
+              214,
+              1000,
+              54
+            ],
+            "finalBbox": [
+              152,
+              214,
+              1000,
+              66
+            ],
+            "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+            "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+            "sourceTextSha256": "24670a774d9f339942a62f854bb1f98804ee8fe4d13b7c37b18e878b10b9d44a",
+            "translatedTextSha256": "709be53417aa3362bb344f03266d6c06c4747f6ae0aeff14ad485ec05ba739e8",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 42,
+            "shapeId": "7",
+            "translatedText": "Негіз, негіздер, геометрия, қосылыстар және бекітулер диаграммаға сәйкес келеді.",
+            "sourceBbox": [
+              152,
+              286,
+              1000,
+              54
+            ],
+            "finalBbox": [
+              152,
+              286,
+              1000,
+              66
+            ],
+            "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+            "textMapSha256": "e1bc2518e3a3881d859f6b1bd4ab4989f76b55c2b24ee19b722a6c613922dfee",
+            "sourceTextSha256": "7094e5e533460f583d2871dcde86b101c0fe0e82e5312dcb20149ec9bdc22dd1",
+            "translatedTextSha256": "acb9c581aac6ddbbbf90f1ffee33a60c75d9e448441bf061c686dbe5de1058a4",
+            "newlyIntersectedNeighborCount": 0
+          }
+        ]
+      },
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/kk/artifact-receipt.json",
+      "artifactReceiptSha256": "85391648b47e2ea6b80611b65d602b851cc449ecefe54038e3e61b95b6d4f8fd"
+    },
+    {
+      "locale": "kk",
+      "slug": "biot",
+      "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+      "sourceSlideCount": 59,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/biot/kk/assets/pptx/5d72761df15221f20c202d49c38927aa4b034d299ba47400a6112b8277066947/presentation.pptx",
+        "sha256": "5d72761df15221f20c202d49c38927aa4b034d299ba47400a6112b8277066947",
+        "byteSize": 2381056,
+        "slideCount": 59
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/biot/kk/assets/pdf/18218ce1d12e3c935891560007f51c662d76aea442b4ec0571ce157f1236af36/presentation.pdf",
+        "sha256": "18218ce1d12e3c935891560007f51c662d76aea442b4ec0571ce157f1236af36",
+        "byteSize": 1172260,
+        "pageCount": 59,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 59,
+      "renderedPageCount": 59,
+      "approvedLayoutOverrideCount": 3,
+      "layoutOverrideReceipt": {
+        "path": "content/localizations/staged-2026-09-01/presentations/biot/kk/qa/layout-only-override-receipt.json",
+        "sha256": "b38bb90a57d325c09562dfdcaa68faff2ecc670fdf2baf98765c355ebde34584",
+        "byteSize": 3236,
+        "schemaVersion": 1,
+        "locale": "kk",
+        "slug": "biot",
+        "productionPublished": false,
+        "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+        "overrideCount": 3,
+        "allOtherElementGeometryUnchanged": true,
+        "neighborContentMoved": false,
+        "newlyIntersectedNeighborCount": 0,
+        "semanticsChanged": false,
+        "overrides": [
+          {
+            "locale": "kk",
+            "slug": "biot",
+            "slide": 22,
+            "shapeId": "19",
+            "name": "STEP_BODY_4",
+            "translatedText": "Өлшемдерді таңдап, басқару элементтерін тағайындаңыз және өзгерістер орын алса, қайта тексеріңіз.",
+            "sourceBbox": [
+              934,
+              422,
+              260,
+              110
+            ],
+            "finalBbox": [
+              934,
+              422,
+              260,
+              128
+            ],
+            "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+            "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+            "sourceTextSha256": "f82f5605f144e6b57f1bc68a2dfebaf3f4afdae9bedc1e7c75f49d3354767373",
+            "translatedTextSha256": "5a90d211105635c0322b2e234cdfa1fb7bb327b45f8c6f144052cec81acb8197",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "biot",
+            "slide": 36,
+            "shapeId": "19",
+            "name": "STEP_BODY_4",
+            "translatedText": "Адамдарды құтқарудан және оқиғалардың дамуына жол бермеуден басқа жағдайды өзгертпеңіз.",
+            "sourceBbox": [
+              934,
+              422,
+              260,
+              110
+            ],
+            "finalBbox": [
+              934,
+              422,
+              260,
+              128
+            ],
+            "reason": "Height-only correction clears an 11 pt PowerPoint vertical overflow while preserving the 20 px step typography and lower callout clearance.",
+            "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+            "sourceTextSha256": "83f6dc2345e6ea3ca7870e0d7037c63a80eecafbc8dee2230ed3aa2f4ac18a71",
+            "translatedTextSha256": "ccc7f53bcbbb279de2e3c6f6dae7cd67ec5b9688a2633b4554f5388eed1c5187",
+            "newlyIntersectedNeighborCount": 0
+          },
+          {
+            "locale": "kk",
+            "slug": "biot",
+            "slide": 59,
+            "shapeId": "7",
+            "translatedText": "жұмыскер оқытылған, тазартылған және миссия мен төтенше жағдай процедураларын түсінеді.",
+            "sourceBbox": [
+              152,
+              286,
+              1000,
+              54
+            ],
+            "finalBbox": [
+              152,
+              286,
+              1000,
+              66
+            ],
+            "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+            "textMapSha256": "4f273bf95fedd52b1139fa0d6fdc3329a95d94076203f74d2519207df676757e",
+            "sourceTextSha256": "e26c2d2a31c19fe63b6c12e63df4fc2f0e11cebfaa6b8bb43ab8b3690fbab576",
+            "translatedTextSha256": "1088ac0415ac0223dcf7dcb9c1e41ddb7849c6d78fbf12bffa357f9eba1f28a0",
+            "newlyIntersectedNeighborCount": 0
+          }
+        ]
+      },
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/biot/kk/artifact-receipt.json",
+      "artifactReceiptSha256": "60022407c76054c033c51411ddc573887a04fa4407d7f614efdf4bd9df3dc1d7"
+    },
+    {
+      "locale": "kk",
+      "slug": "pozharnaya-bezopasnost",
+      "textMapSha256": "d12a1e65edc83511678354c8943234d4e6da3ff6de89d261311e09d60101103d",
+      "sourceSlideCount": 41,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/kk/assets/pptx/37374afd69bd03eb9408a68b08d3709d0ddc3eabc43c489865fb6115dfea2c22/presentation.pptx",
+        "sha256": "37374afd69bd03eb9408a68b08d3709d0ddc3eabc43c489865fb6115dfea2c22",
+        "byteSize": 1441499,
+        "slideCount": 41
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/kk/assets/pdf/87d105fc0c0a40cd04d4028178ea58fe75e3fe60aa0e025a7b68cda5c2ad8815/presentation.pdf",
+        "sha256": "87d105fc0c0a40cd04d4028178ea58fe75e3fe60aa0e025a7b68cda5c2ad8815",
+        "byteSize": 638461,
+        "pageCount": 41,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 41,
+      "renderedPageCount": 41,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/kk/artifact-receipt.json",
+      "artifactReceiptSha256": "f27ad779a2eb2595fe27d447d7c2043f20870dc69905ba83d18a51b25d12a72a"
+    },
+    {
+      "locale": "en",
+      "slug": "plotnik",
+      "textMapSha256": "4ec763727f9db624572dc75a3599439dee89422925363c28b926ca4882c4f583",
+      "sourceSlideCount": 25,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/plotnik/en/assets/pptx/c5aa6f8bd04300c57e92e200eba3ec7fa56b30c6fb68d67cf0fece77b9decc4d/presentation.pptx",
+        "sha256": "c5aa6f8bd04300c57e92e200eba3ec7fa56b30c6fb68d67cf0fece77b9decc4d",
+        "byteSize": 1930441,
+        "slideCount": 25
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/plotnik/en/assets/pdf/b1b2f47b2b226afac72f7648a702e5ecfe1baf26340261e63709d25d9303ea31/presentation.pdf",
+        "sha256": "b1b2f47b2b226afac72f7648a702e5ecfe1baf26340261e63709d25d9303ea31",
+        "byteSize": 1426775,
+        "pageCount": 25,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 25,
+      "renderedPageCount": 25,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/plotnik/en/artifact-receipt.json",
+      "artifactReceiptSha256": "e4abd45a4e9f6dd89c7b66234d997fc23fbd15743e91449bce73b735f5dda18c"
+    },
+    {
+      "locale": "en",
+      "slug": "armaturshchik",
+      "textMapSha256": "f55fbdd741f58879f656afced42fcaba5dfd6e0e4366c2d35ce31d8a43e232b2",
+      "sourceSlideCount": 31,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/en/assets/pptx/db95211c418a56b31d09669d7687dde21b576a182dea7a458cf81fafb3c130b1/presentation.pptx",
+        "sha256": "db95211c418a56b31d09669d7687dde21b576a182dea7a458cf81fafb3c130b1",
+        "byteSize": 2799915,
+        "slideCount": 31
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/armaturshchik/en/assets/pdf/dd7d9f44fd399a645bc0098f15502c3cbe8c4efd933471464feeb24b9009e275/presentation.pdf",
+        "sha256": "dd7d9f44fd399a645bc0098f15502c3cbe8c4efd933471464feeb24b9009e275",
+        "byteSize": 2171096,
+        "pageCount": 31,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 31,
+      "renderedPageCount": 31,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/armaturshchik/en/artifact-receipt.json",
+      "artifactReceiptSha256": "56b1617277a3b62a06f47f70883da270b9304e674a01a2c56b420f32dec786a9"
+    },
+    {
+      "locale": "en",
+      "slug": "lesomontazhnye-raboty",
+      "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+      "sourceSlideCount": 42,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/en/assets/pptx/5c72a7d5efad877129b3cf0c21786cb914fd299297c14ce6fb39c29185bb0d45/presentation.pptx",
+        "sha256": "5c72a7d5efad877129b3cf0c21786cb914fd299297c14ce6fb39c29185bb0d45",
+        "byteSize": 2488355,
+        "slideCount": 42
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/en/assets/pdf/af7f28d25b1988a13ab886d839a7cac3d968077f3701cbec083d6951992aa624/presentation.pdf",
+        "sha256": "af7f28d25b1988a13ab886d839a7cac3d968077f3701cbec083d6951992aa624",
+        "byteSize": 1614386,
+        "pageCount": 42,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 42,
+      "renderedPageCount": 42,
+      "approvedLayoutOverrideCount": 1,
+      "layoutOverrideReceipt": {
+        "path": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/en/qa/layout-only-override-receipt.json",
+        "sha256": "24eea9e037cb43eb26e2eaadbb23ec3dd8d3d66bc2c63531b9876853ac3ec227",
+        "byteSize": 1253,
+        "schemaVersion": 1,
+        "locale": "en",
+        "slug": "lesomontazhnye-raboty",
+        "productionPublished": false,
+        "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+        "overrideCount": 1,
+        "allOtherElementGeometryUnchanged": true,
+        "neighborContentMoved": false,
+        "newlyIntersectedNeighborCount": 0,
+        "semanticsChanged": false,
+        "overrides": [
+          {
+            "locale": "en",
+            "slug": "lesomontazhnye-raboty",
+            "slide": 42,
+            "shapeId": "4",
+            "translatedText": "Design documentation, the system technical manual, assigned roles and a safe zone are in place.",
+            "sourceBbox": [
+              152,
+              214,
+              1000,
+              54
+            ],
+            "finalBbox": [
+              152,
+              214,
+              1000,
+              66
+            ],
+            "reason": "Height-only correction clears a 7 pt PowerPoint vertical overflow and keeps the next checklist row outside the expanded box.",
+            "textMapSha256": "51f573579349a147fd8a0e79a265300a5dfb442d0a129fa1e1e8c0cbb5914590",
+            "sourceTextSha256": "24670a774d9f339942a62f854bb1f98804ee8fe4d13b7c37b18e878b10b9d44a",
+            "translatedTextSha256": "225c318f1c21718a0fbd92f9a811599a274f4364f80d0dcb0ab1949f5c9f67ed",
+            "newlyIntersectedNeighborCount": 0
+          }
+        ]
+      },
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/lesomontazhnye-raboty/en/artifact-receipt.json",
+      "artifactReceiptSha256": "1d5f9421f234c8bc23bae2d5ec191333e4432306f2f4f9107d3d2ccd41581dea"
+    },
+    {
+      "locale": "en",
+      "slug": "biot",
+      "textMapSha256": "27e8be2009aa9ecd08136c1c4ee80b7c53c18fc8592f4c94dd64a53d439d2231",
+      "sourceSlideCount": 59,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/biot/en/assets/pptx/64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3/presentation.pptx",
+        "sha256": "64d7b2c1cc074bbbd0b19db16054b406ba00d977bd05e899252e3dcd926243e3",
+        "byteSize": 2365275,
+        "slideCount": 59
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/biot/en/assets/pdf/cead2abf1efaf41c7cecd5f306161a3b4eb433ba19157aba0ba62af7a1866e80/presentation.pdf",
+        "sha256": "cead2abf1efaf41c7cecd5f306161a3b4eb433ba19157aba0ba62af7a1866e80",
+        "byteSize": 1146679,
+        "pageCount": 59,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 59,
+      "renderedPageCount": 59,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/biot/en/artifact-receipt.json",
+      "artifactReceiptSha256": "1368cc59a1272eaa9dc4267a53e5e82400ea5d8712bbf077f842fa55c4f6e8b3"
+    },
+    {
+      "locale": "en",
+      "slug": "pozharnaya-bezopasnost",
+      "textMapSha256": "6bac3a78a49622ca90609901e8677e5fe2805e2fc77ed1d15b82c4cde8148e05",
+      "sourceSlideCount": 41,
+      "pptx": {
+        "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/en/assets/pptx/dd65e1668cb4573f91822b7437e50e937b90e3dbed19fe4c11f417e4baa8d7a8/presentation.pptx",
+        "sha256": "dd65e1668cb4573f91822b7437e50e937b90e3dbed19fe4c11f417e4baa8d7a8",
+        "byteSize": 1431083,
+        "slideCount": 41
+      },
+      "pdf": {
+        "path": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/en/assets/pdf/9c7ab00a693999bd693755b8315b3549515f5e2942079ed6eee52b4f4b64c180/presentation.pdf",
+        "sha256": "9c7ab00a693999bd693755b8315b3549515f5e2942079ed6eee52b4f4b64c180",
+        "byteSize": 624634,
+        "pageCount": 41,
+        "aspectRatio": "16:9",
+        "mimeType": "application/pdf"
+      },
+      "renderedSlideCount": 41,
+      "renderedPageCount": 41,
+      "approvedLayoutOverrideCount": 0,
+      "layoutOverrideReceipt": null,
+      "artifactReceipt": "content/localizations/staged-2026-09-01/presentations/pozharnaya-bezopasnost/en/artifact-receipt.json",
+      "artifactReceiptSha256": "87867ecab16d042ca081d0d1f163365e87380bb75b52ea7fee09d166cc3fa03b"
+    }
+  ],
+  "residualRisk": [
+    "Translation and visual review are automated-only and have not received human linguistic, legal or design approval.",
+    "Production upload/publication and hosted parity remain deferred to the controlled release stage."
+  ]
+}

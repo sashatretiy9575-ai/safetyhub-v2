@@ -3,12 +3,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, UserCircleCheck } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { AvatarUploader } from '@/features/profile/avatar-uploader';
 import { PhoneInput } from '@/features/profile/phone-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
+import { clientRequest, readClientResponseJson } from '@/lib/client-request';
+import { localizedClientRequestMessage } from '@/i18n/client-errors';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 import {
   normalizeProfileSubmissionValues,
   PROFILE_FIELD_LIMITS,
@@ -16,10 +19,12 @@ import {
   type ProfileField,
   type ProfileSubmissionField,
   type ProfileSubmissionValues as OnboardingProfileValues,
+  type ProfileValidationError,
 } from '@/features/profile/fields';
 import type { PhoneCountryOption } from '@/lib/phone';
 
-type FieldErrors = Partial<Record<ProfileSubmissionField | 'avatar', string>>;
+type FieldError = ProfileValidationError | Readonly<{ code: 'AVATAR_REQUIRED' }>;
+type FieldErrors = Partial<Record<ProfileSubmissionField | 'avatar', FieldError>>;
 
 type OrganizationResponse = {
   organizations?: string[];
@@ -39,6 +44,9 @@ export function OnboardingForm({
   countryOptions: readonly PhoneCountryOption[];
 }) {
   const router = useRouter();
+  const locale = useLocale() as AppLocale;
+  const t = useTranslations('Profile');
+  const tErrors = useTranslations('Common.errors');
   const [form, setForm] = useState(initial);
   const [avatarReady, setAvatarReady] = useState(Boolean(initialAvatarUrl));
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -95,16 +103,16 @@ export function OnboardingForm({
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     const errors: FieldErrors = validateProfileSubmissionValues(form);
-    if (!avatarReady) errors.avatar = 'Добавьте фотографию перед продолжением.';
+    if (!avatarReady) errors.avatar = { code: 'AVATAR_REQUIRED' };
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      setMessage('Заполните обязательные поля.');
+      setMessage(t('required'));
       focusFirstInvalid(errors);
       return;
     }
 
     setBusy(true);
-    setMessage('Сохраняем профиль…');
+    setMessage(t('submitting'));
     try {
       const result = await clientRequest('/api/profile/onboarding', {
         method: 'POST',
@@ -115,17 +123,20 @@ export function OnboardingForm({
         const payload = await readClientResponseJson<ErrorResponse>(result.response);
         if (payload?.error === 'AVATAR_REQUIRED') {
           setAvatarReady(false);
-          setFieldErrors((current) => ({ ...current, avatar: 'Добавьте фотографию.' }));
-          setMessage('Фотография не найдена. Загрузите её ещё раз.');
+          setFieldErrors((current) => ({
+            ...current,
+            avatar: { code: 'AVATAR_REQUIRED' },
+          }));
+          setMessage(t('avatarMissing'));
           return;
         }
-        setMessage(clientRequestMessage(result.error, 'Не удалось завершить заполнение профиля.'));
+        setMessage(localizedClientRequestMessage(result.error, t('saveFailed'), tErrors));
         return;
       }
-      router.replace('/profile');
+      router.replace(localizePathname('/profile', locale));
       router.refresh();
     } catch (error) {
-      setMessage(clientRequestMessage(error, 'Не удалось завершить заполнение профиля.'));
+      setMessage(localizedClientRequestMessage(error, t('saveFailed'), tErrors));
     } finally {
       setBusy(false);
     }
@@ -133,11 +144,21 @@ export function OnboardingForm({
 
   const initials = `${form.name.slice(0, 1)}${form.surname.slice(0, 1)}`.toUpperCase() || 'SH';
 
+  const validationMessage = (error: FieldError | undefined) => {
+    if (!error) return '';
+    if (error.code === 'AVATAR_REQUIRED') return t('avatarRequired');
+    if (error.code === 'REQUIRED') return t('validation.required');
+    if (error.code === 'CONTROL_CHARACTERS') return t('validation.controlCharacters');
+    if (error.code === 'TOO_LONG') return t('validation.tooLong', { max: error.maxLength });
+    if (error.code === 'PHONE_COUNTRY_REQUIRED') return t('validation.phoneCountry');
+    return t('validation.phoneInvalid');
+  };
+
   return (
     <form onSubmit={submit} className="space-y-7" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="onboarding-name">Имя</Label>
+          <Label htmlFor="onboarding-name">{t('name')}</Label>
           <Input
             ref={nameRef}
             id="onboarding-name"
@@ -155,12 +176,12 @@ export function OnboardingForm({
               role="alert"
               className="text-xs text-[var(--color-danger)]"
             >
-              {fieldErrors.name}
+              {validationMessage(fieldErrors.name)}
             </p>
           ) : null}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="onboarding-surname">Фамилия</Label>
+          <Label htmlFor="onboarding-surname">{t('surname')}</Label>
           <Input
             ref={surnameRef}
             id="onboarding-surname"
@@ -178,12 +199,12 @@ export function OnboardingForm({
               role="alert"
               className="text-xs text-[var(--color-danger)]"
             >
-              {fieldErrors.surname}
+              {validationMessage(fieldErrors.surname)}
             </p>
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="onboarding-job">Должность</Label>
+          <Label htmlFor="onboarding-job">{t('job')}</Label>
           <Input
             ref={jobRef}
             id="onboarding-job"
@@ -201,12 +222,12 @@ export function OnboardingForm({
               role="alert"
               className="text-xs text-[var(--color-danger)]"
             >
-              {fieldErrors.job}
+              {validationMessage(fieldErrors.job)}
             </p>
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="onboarding-organization">Название компании</Label>
+          <Label htmlFor="onboarding-organization">{t('organization')}</Label>
           <Input
             ref={organizationRef}
             id="onboarding-organization"
@@ -229,7 +250,7 @@ export function OnboardingForm({
             ))}
           </datalist>
           <p id="onboarding-organization-help" className="text-xs text-[var(--color-text-muted)]">
-            Выберите найденный вариант или введите название самостоятельно.
+            {t('organizationHint')}
           </p>
           {fieldErrors.organization ? (
             <p
@@ -237,12 +258,12 @@ export function OnboardingForm({
               role="alert"
               className="text-xs text-[var(--color-danger)]"
             >
-              {fieldErrors.organization}
+              {validationMessage(fieldErrors.organization)}
             </p>
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="onboarding-phone">Номер телефона</Label>
+          <Label htmlFor="onboarding-phone">{t('phone')}</Label>
           <PhoneInput
             id="onboarding-phone"
             countryOptions={countryOptions}
@@ -256,11 +277,11 @@ export function OnboardingForm({
             disabled={busy}
           />
           <p id="onboarding-phone-help" className="text-xs text-[var(--color-text-muted)]">
-            Номер нужен только для связи по заявке. SMS-коды на него не отправляются.
+            {t('phoneHint')}
           </p>
           {fieldErrors.phone ? (
             <p id="onboarding-phone-error" role="alert" className="text-xs text-[var(--color-danger)]">
-              {fieldErrors.phone}
+              {validationMessage(fieldErrors.phone)}
             </p>
           ) : null}
         </div>
@@ -272,10 +293,10 @@ export function OnboardingForm({
       >
         <div className="text-center">
           <h2 id="onboarding-photo-title" className="font-display text-lg font-bold">
-            Фотография профиля
+            {t('avatar')}
           </h2>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Сделайте снимок камерой или выберите готовую фотографию.
+            {t('avatarHint')}
           </p>
         </div>
         <AvatarUploader
@@ -289,7 +310,7 @@ export function OnboardingForm({
         />
         {fieldErrors.avatar ? (
           <p role="alert" className="text-center text-xs text-[var(--color-danger)]">
-            {fieldErrors.avatar}
+            {validationMessage(fieldErrors.avatar)}
           </p>
         ) : null}
       </section>
@@ -297,7 +318,7 @@ export function OnboardingForm({
       <div className="space-y-3">
         <Button type="submit" className="w-full" disabled={busy}>
           <UserCircleCheck size={19} />
-          {busy ? 'Сохраняем…' : 'Отправить заявку на проверку'}
+          {busy ? t('submitting') : t('submit')}
           {!busy ? <ArrowRight size={18} /> : null}
         </Button>
         {message ? (

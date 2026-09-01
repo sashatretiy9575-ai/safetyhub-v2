@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "documentType": "terms",
+  "title": "Terms of Use",
+  "version": "2.2",
+  "bodyRevision": "terms-2.2",
+  "effectiveDate": "2026-08-31",
+  "sourceComponent": "components/legal/terms-policy-v2-2.tsx",
+  "sections": [
+    {
+      "id": "terms-acceptance",
+      "heading": "Acceptance and subject to conditions",
+      "paragraphs": [
+        "These terms govern the use of the site and PWA SafetyHub.kz materials, account, tests, certificates and their verification functions. After logging in using the email code, the user separately accepts the current Terms and the associated Privacy Policy version 1.2; only this explicit action records consent.",
+        "If the user does not agree, they should not register or continue to work with private features. The current implementation does not contain payment; When paid services appear, prices, returns and separate commercial terms must be published before payment."
+      ],
+      "items": [],
+      "links": []
+    },
+    {
+      "id": "terms-account",
+      "heading": "Account, profile and manual verification",
+      "paragraphs": [],
+      "items": [
+        "The user specifies a valid email. Login is performed using a one-time code from the letter (email OTP); Password and SMS login are not provided. You cannot transfer the code, session or account to another person.",
+        "Before accessing the course materials, questions, test and certificate, your first name, last name, position, organization, your own current photograph and a contact number with the selected country code are required. The number is used only to communicate with the user, and not for authentication or sending SMS.",
+        "The completed profile is sent to the administrator for manual verification. The usual benchmark for a decision is up to 24 hours from the date of dispatch; This is not automatic approval or a guaranteed period of access. While your application is pending or rejected, private learning features are not available.",
+        "If rejected, the user can see the specified reason, correct the data and resubmit the profile. To clarify the status, you can call or write to the administrator through the contacts at the bottom of the document.",
+        "The displayed profile does not replace the verified certificate data. The name, title, and organization for the certificate are separately validated and stored as a version.",
+        "If compromise, abuse or violation of the terms is suspected, access may be temporarily limited while maintaining legal recourse."
+      ],
+      "links": []
+    },
+    {
+      "id": "terms-learning",
+      "heading": "Training, tests and attempts",
+      "paragraphs": [
+        "After the profile is approved, the user gains access to the course materials and test. Each test option contains 10 questions with four answer options; For a successful result, you need to answer at least 7 questions correctly, that is, score 70%. You have 15 minutes to try. A maximum of 8 new attempts per calendar day are allowed per course in the Asia/Oral time zone. Answers, time, status and result of the attempt are recorded; the interface shows one best result.",
+        "It is prohibited to use bots, extract or distribute answer keys, interfere with the operation of the service, circumvent restrictions, or take the test for another person. Errors in the material should be submitted through the document contacts."
+      ],
+      "items": [],
+      "links": [
+        {
+          "label": "contacts according to the document",
+          "url": "#legal-contacts"
+        }
+      ]
+    },
+    {
+      "id": "terms-certificates",
+      "heading": "Certificates and their verification",
+      "paragraphs": [
+        "An electronic certificate confirms the passing best result of a specific version of the online test for confirmed user data. The first issue is performed explicitly by the administrator. If the result is strictly higher, the certificate is automatically replaced with a new one; correction of confirmed data may also cause a reissue. The administrator has the right to revoke the document indicating the reason. QR shows the status “Effective”, “Revoked” or “Document Not Found”.",
+        "PDF and ZIP are created only during downloading and are not permanently stored in the database or Storage. The administrator can transfer the general report and certificates of its participants to the authorized representative of the company. The user downloads only his own valid PDF.",
+        "The certificate itself is not declared to be a government license, hazardous work permit, or a substitute for mandatory training, instruction, medical examination, or employer certification. The applicability of the document to a specific industry and regulatory requirement must be separately confirmed by employer or a competent person."
+      ],
+      "items": [],
+      "links": []
+    },
+    {
+      "id": "terms-content",
+      "heading": "Materials and permitted uses",
+      "paragraphs": [
+        "Materials are intended for informational training. They can be read and used for personal preparation; Bulk copying, resale, removal of attribution, malicious scanning and creation of false certificates are prohibited.",
+        "Regulatory information subject to change. The date of review and sources of material, when indicated, are helpful in assessing relevance but are not a substitute for official wording and professional advice for a specific work situation."
+      ],
+      "items": [],
+      "links": []
+    },
+    {
+      "id": "terms-availability",
+      "heading": "Availability and responsibility",
+      "paragraphs": [
+        "Service depends on Supabase, Vercel, user network and, when enabled, Cloudflare Turnstile. The operator strives to maintain functionality and security, but does not promise continuous availability or the absence of all errors. Planned changes and emergency protective restrictions are possible.",
+        "Nothing in the terms limits the user's rights or the operator's liability where such limitation is prohibited by law. The scope of liability and the claims procedure should be finally verified by a local lawyer after filling in the operator's details."
+      ],
+      "items": [],
+      "links": []
+    },
+    {
+      "id": "terms-termination",
+      "heading": "Termination of Use and Data",
+      "paragraphs": [
+        "The user can stop using and permanently delete the account. This deletes the profile, photo, attempts, certificates and associated audits, and the QR-check of the previous document stops. An external PDF that has already been downloaded cannot be physically recalled from the device. Categories, providers and removal procedures are described in Privacy Policy version 1.2."
+      ],
+      "items": [],
+      "links": [
+        {
+          "label": "Privacy Policy version 1.2",
+          "url": "/privacy?version=1.2"
+        }
+      ]
+    },
+    {
+      "id": "terms-changes",
+      "heading": "Changes and communication",
+      "paragraphs": [
+        "Significant changes receive a new number and date. The accepted version remains available via the versioned link in the profile, and for the new version the interface requests separate acceptance. Send questions and complaints through the contacts on the document."
+      ],
+      "items": [],
+      "links": [
+        {
+          "label": "contacts according to the document",
+          "url": "#legal-contacts"
+        }
+      ]
+    },
+    {
+      "id": "legal-contacts",
+      "heading": "Contacts according to the document",
+      "paragraphs": [
+        "Call or write to WhatsApp. For written requests, save the chat correspondence."
+      ],
+      "items": [
+        "Phone",
+        "WhatsApp",
+        "Write"
+      ],
+      "links": []
+    }
+  ],
+  "locale": "en",
+  "bodyHash": "378c9715c6d345cf4494d635be75566073e1d1bd758b941bc61a93d2dc1f308a"
+}

@@ -2,6 +2,8 @@ import { ArrowUpRight, Clock, ListChecks } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image';
 import Link from 'next/link';
 import { resolveCourseIcon } from '@/lib/course-icons';
+import { useLocale, useTranslations } from 'next-intl';
+import { localizePathname } from '@/i18n/config';
 
 type CourseCardProps = {
   slug: string;
@@ -24,12 +26,14 @@ export function CourseCard({
   pageCount,
   priority = false,
 }: CourseCardProps) {
+  const locale = useLocale();
+  const t = useTranslations('Course');
   const courseIcon = resolveCourseIcon(icon);
   const CourseIcon = courseIcon.component;
   return (
     <Link
       data-course-card
-      href={`/topics/${slug}`}
+      href={localizePathname(`/topics/${slug}`, locale)}
       prefetch={false}
       className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/90 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl transition hover:border-[var(--color-primary)]/40 hover:shadow-[var(--shadow-card)] focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)] motion-safe:hover:-translate-y-0.5"
     >
@@ -59,14 +63,14 @@ export function CourseCard({
           className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/30 to-transparent"
         />
         <span className="absolute top-3 left-3 rounded-full border border-white/55 bg-white/80 px-2.5 py-1 text-[10px] font-bold tracking-[0.12em] text-slate-700 uppercase shadow-sm backdrop-blur-md">
-          Онлайн-курс
+          {t('online')}
         </span>
         <span
           className="absolute top-3 right-3 grid size-9 place-items-center rounded-xl border border-white/55 bg-white/85 text-slate-700 shadow-sm backdrop-blur-md"
-          title={courseIcon.label}
+          title={title}
         >
           <CourseIcon size={20} weight="duotone" aria-hidden="true" />
-          <span className="sr-only">{courseIcon.label}</span>
+          <span className="sr-only">{title}</span>
         </span>
       </div>
 
@@ -80,7 +84,7 @@ export function CourseCard({
           className="mt-auto grid grid-cols-2 gap-1.5 pt-4 text-[10px] font-semibold text-[var(--color-text-muted)] min-[340px]:gap-2 min-[340px]:text-[11px] sm:text-xs"
         >
           <span
-            aria-label={`${questionCount} вопросов`}
+            aria-label={t('questions', { count: questionCount })}
             className="inline-flex min-h-11 min-w-0 items-center justify-center gap-1 rounded-[12px] bg-[var(--color-surface-muted)] px-1.5 min-[340px]:gap-1.5 min-[340px]:px-2"
           >
             <ListChecks
@@ -93,11 +97,11 @@ export function CourseCard({
               {questionCount}
             </span>
             <span className="hidden min-[280px]:inline" aria-hidden="true">
-              {questionCount} вопросов
+              {t('questions', { count: questionCount })}
             </span>
           </span>
           <span
-            aria-label={`${durationMinutes} минут${pageCount ? `, ${pageCount} страниц` : ''}`}
+            aria-label={`${t('minutes', { count: durationMinutes })}${pageCount ? `, ${t('pages', { count: pageCount })}` : ''}`}
             className="inline-flex min-h-11 min-w-0 items-center justify-center gap-1 rounded-[12px] bg-[var(--color-surface-muted)] px-1.5 min-[340px]:gap-1.5 min-[340px]:px-2"
           >
             <Clock
@@ -107,15 +111,16 @@ export function CourseCard({
               aria-hidden="true"
             />
             <span aria-hidden="true">
-              {durationMinutes} мин{pageCount ? ` · ${pageCount} стр.` : ''}
+              {t('minutesShort', { count: durationMinutes })}
+              {pageCount ? ` · ${t('pagesShort', { count: pageCount })}` : ''}
             </span>
           </span>
           <span
             data-course-card-cta
-            aria-label="Открыть курс"
+            aria-label={t('open')}
             className="col-span-2 mt-1 inline-flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-[14px] bg-[var(--color-primary)] px-4 text-sm font-bold whitespace-nowrap text-[var(--color-primary-foreground)] shadow-[0_10px_24px_-16px_var(--color-primary)] transition-colors group-hover:bg-[var(--color-primary-hover)]"
           >
-            <span aria-hidden="true">Открыть курс</span>
+            <span aria-hidden="true">{t('open')}</span>
             <ArrowUpRight
               size={16}
               weight="bold"

@@ -3,9 +3,10 @@ import { ContactActions } from '@/components/shared/contact-actions';
 import { Container } from '@/components/ui/container';
 import { CONTACT_DETAILS } from '@/lib/constants';
 import { getSiteContacts } from '@/lib/site-contacts';
+import { getTranslations } from 'next-intl/server';
 
 export async function ContactCta() {
-  const contacts = await getSiteContacts();
+  const [contacts, t] = await Promise.all([getSiteContacts(), getTranslations('Home.contact')]);
   return (
     <section
       id="contacts"
@@ -20,16 +21,16 @@ export async function ContactCta() {
                 aria-hidden="true"
                 className="size-1.5 rounded-full bg-[var(--color-primary)]"
               />
-              Контакты
+              {t('eyebrow')}
             </p>
             <h2
               id="contacts-heading"
               className="mt-2.5 text-[24px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[30px] lg:text-[36px]"
             >
-              Обсудим вашу задачу
+              {t('title')}
             </h2>
             <p className="mt-2.5 text-[14px] leading-[1.5] text-[var(--color-text-muted)] sm:text-[15px] sm:leading-6">
-              Подскажем программу и ответим на вопросы об обучении.
+              {t('description')}
             </p>
           </div>
 
