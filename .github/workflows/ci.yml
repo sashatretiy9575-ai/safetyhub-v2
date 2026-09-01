@@ -73,7 +73,13 @@ jobs:
         shell: bash
         run: |
           npx --no-install supabase start
-          npx --no-install supabase db reset
+          # A freshly provisioned GitHub runner can briefly lose the reset
+          # container immediately after the initial image pulls. Retry once
+          # with diagnostics; SQL failures remain fatal on both attempts.
+          if ! npx --no-install supabase db reset; then
+            echo "Initial database reset failed; retrying once with debug output." >&2
+            npx --no-install supabase db reset --debug
+          fi
           npx --no-install supabase status -o env > "$RUNNER_TEMP/supabase.env"
           source "$RUNNER_TEMP/supabase.env"
           if [[ -z "${API_URL:-}" || -z "${ANON_KEY:-}" || -z "${SERVICE_ROLE_KEY:-}" ]]; then
