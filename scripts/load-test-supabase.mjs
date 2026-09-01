@@ -223,6 +223,27 @@ function isRetryableStorageError(error) {
   );
 }
 
+function boundedAuthErrorEvidence(error) {
+  const status = Number(error?.status);
+  const statusCategory =
+    Number.isInteger(status) && status >= 400 && status <= 599 ? String(status) : 'UNKNOWN';
+  const rawCode = typeof error?.code === 'string' ? error.code.toLowerCase() : '';
+  const codeCategory = /^[a-z0-9_]{1,64}$/u.test(rawCode) ? rawCode.toUpperCase() : 'UNKNOWN';
+  const message = typeof error?.message === 'string' ? error.message.toLowerCase() : '';
+  const failureCategory = /passkey_required/u.test(message)
+    ? 'PASSKEY_REQUIRED'
+    : /access token hook|auth hook|hook/u.test(message)
+      ? 'ACCESS_TOKEN_HOOK'
+      : /rate|too many/u.test(message)
+        ? 'RATE_LIMIT'
+        : /expired|invalid.*(?:token|link)|token.*invalid/u.test(message)
+          ? 'TOKEN_REJECTED'
+          : /database/u.test(message)
+            ? 'DATABASE'
+            : 'OTHER';
+  return `HTTP_${statusCategory}_CODE_${codeCategory}_CATEGORY_${failureCategory}`;
+}
+
 async function uploadZhLoadTestAvatar(admin, objectKey, avatar, avatarSha256, index) {
   for (let attempt = 1; attempt <= PREPARATION_RETRY_LIMIT; attempt += 1) {
     const uploaded = await admin.storage.from('profile-avatars').upload(objectKey, avatar, {
@@ -557,7 +578,9 @@ async function createAuthenticatedClient(admin, url, publishableKey, user) {
     const retryable =
       signedIn.error.status === 429 || TRANSIENT_NETWORK_ERROR.test(signedIn.error.message);
     if (!retryable || attempt === 8) {
-      throw new Error('verify passwordless test link: AUTH_VERIFY_FAILED');
+      throw new Error(
+        `verify passwordless test link: AUTH_VERIFY_FAILED_${boundedAuthErrorEvidence(signedIn.error)}`,
+      );
     }
     await wait(attempt * 1_000);
   }

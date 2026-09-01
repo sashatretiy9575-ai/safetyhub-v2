@@ -420,6 +420,12 @@ test('load harness completes every safety preflight before its first seed write'
   assert.match(harness, /upsert: false/u);
   assert.match(harness, /admin\.auth\.admin\.generateLink\(/u);
   assert.match(harness, /client\.auth\.verifyOtp\(/u);
+  assert.match(harness, /AUTH_VERIFY_FAILED_\$\{boundedAuthErrorEvidence\(signedIn\.error\)\}/u);
+  assert.match(
+    harness,
+    /HTTP_\$\{statusCategory\}_CODE_\$\{codeCategory\}_CATEGORY_\$\{failureCategory\}/u,
+  );
+  assert.doesNotMatch(harness, /signedIn\.error\.message\}\)/u);
   assert.match(harness, /list_published_courses_locale/u);
   assert.match(harness, /get_published_course_locale/u);
   assert.match(harness, /get_approved_course_presentation_locale/u);
