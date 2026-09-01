@@ -971,6 +971,11 @@ async function main() {
   const clients = [];
   for (let index = 0; index < sessionUsers.length; index += 1) {
     const user = sessionUsers[index];
+    // Session grants expire after exactly two minutes. The measured assertion
+    // waves intentionally finish before this sequential session setup, so a
+    // grant from those waves cannot safely authorize all 100 exchanges. Run
+    // the real assertion ceremony immediately before each Auth exchange.
+    await runZhAssertion(admin, user);
     clients.push(await createAuthenticatedClient(admin, url, publishableKey, user));
     if ((index + 1) % 10 === 0 || index + 1 === sessionUsers.length) {
       process.stdout.write(`LOAD_SESSIONS_READY=${index + 1}/${sessionUsers.length}\n`);

@@ -416,6 +416,10 @@ test('load harness completes every safety preflight before its first seed write'
   assert.match(harness, /verifyAuthenticationResponse/u);
   assert.match(harness, /createSoftwareCredential/u);
   assert.match(harness, /runZhAssertion/u);
+  assert.match(
+    harness,
+    /for \(let index = 0; index < sessionUsers\.length; index \+= 1\)[\s\S]*?await runZhAssertion\(admin, user\);[\s\S]*?createAuthenticatedClient\(admin, url, publishableKey, user\)/u,
+  );
   assert.match(harness, /const objectKey = `\$\{id\}\/objects\/\$\{operationId\}\.webp`/u);
   assert.match(harness, /upsert: false/u);
   assert.match(harness, /admin\.auth\.admin\.generateLink\(/u);
