@@ -1021,6 +1021,65 @@ begin
 end;
 $$;
 
+-- Preserve the established bounded profile projection while replacing every
+-- course title from the immutable localization receipt selected by the route.
+-- A missing localization fails closed instead of silently falling back to RU
+-- or dropping an attestation from the learner's history.
+create function public.get_profile_dashboard_locale(
+  p_locale public.app_locale
+)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  v_dashboard jsonb;
+  v_attestations jsonb;
+  v_expected integer;
+  v_actual integer;
+begin
+  if p_locale is null then
+    raise exception using errcode = 'invalid_parameter_value',
+      message = 'LOCALE_REQUIRED';
+  end if;
+
+  v_dashboard := public.get_profile_dashboard();
+  v_expected := jsonb_array_length(
+    coalesce(v_dashboard -> 'attestations', '[]'::jsonb)
+  );
+
+  select
+    coalesce(jsonb_agg(
+      attestation.item || jsonb_build_object(
+        'courseTitle', localization.title
+      )
+      order by localization.title,
+        (attestation.item ->> 'testVersion')::integer desc
+    ), '[]'::jsonb),
+    count(*)::integer
+  into v_attestations, v_actual
+  from jsonb_array_elements(
+    coalesce(v_dashboard -> 'attestations', '[]'::jsonb)
+  ) attestation(item)
+  join public.tests test
+    on test.id = (attestation.item ->> 'testId')::uuid
+  join public.test_revisions revision
+    on revision.id = test.current_revision_id
+  join public.test_revision_localizations localization
+    on localization.revision_id = revision.id
+   and localization.locale = p_locale;
+
+  if v_actual is distinct from v_expected then
+    raise exception using errcode = 'no_data_found',
+      message = 'COURSE_LOCALIZATION_NOT_FOUND';
+  end if;
+
+  return jsonb_set(v_dashboard, '{attestations}', v_attestations, false);
+end;
+$$;
+
 create function public.get_published_course_locale(
   p_slug text,
   p_locale public.app_locale
@@ -1313,6 +1372,10 @@ grant execute on function public.get_course_editor_localizations(uuid,uuid)
   to authenticated;
 grant execute on function public.list_published_courses_locale(public.app_locale)
   to anon, authenticated;
+revoke all on function public.get_profile_dashboard_locale(public.app_locale)
+  from public, anon, authenticated, service_role;
+grant execute on function public.get_profile_dashboard_locale(public.app_locale)
+  to authenticated;
 grant execute on function public.get_published_course_locale(text,public.app_locale)
   to anon, authenticated;
 grant execute on function public.get_approved_course_presentation_locale(

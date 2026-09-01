@@ -65,6 +65,12 @@ begin
     'anon', 'public.list_published_courses_locale(public.app_locale)', 'execute'
   ) or not has_function_privilege(
     'authenticated', 'public.list_published_courses_locale(public.app_locale)', 'execute'
+  ) or has_function_privilege(
+    'anon', 'public.get_profile_dashboard_locale(public.app_locale)', 'execute'
+  ) or not has_function_privilege(
+    'authenticated', 'public.get_profile_dashboard_locale(public.app_locale)', 'execute'
+  ) or has_function_privilege(
+    'service_role', 'public.get_profile_dashboard_locale(public.app_locale)', 'execute'
   ) or not has_function_privilege(
     'anon', 'public.get_published_article_locale(text,public.app_locale)', 'execute'
   ) or has_function_privilege(
@@ -83,6 +89,16 @@ begin
     'service_role', 'public.import_course_assessment_localization(uuid,uuid,public.app_locale,bigint,jsonb)', 'execute'
   ) then
     raise exception 'localized assessment import RPC grants are unsafe';
+  end if;
+
+  select lower(pg_get_functiondef(
+    'public.get_profile_dashboard_locale(public.app_locale)'::regprocedure
+  )) into v_definition;
+  if position('test_revision_localizations' in v_definition) = 0
+    or position('course_localization_not_found' in v_definition) = 0
+    or position('jsonb_set' in v_definition) = 0
+    or position('revision.title' in v_definition) > 0 then
+    raise exception 'localized profile dashboard can fall back or omit titles';
   end if;
 
   select lower(pg_get_functiondef(
