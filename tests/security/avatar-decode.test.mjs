@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import sharp from 'sharp';
 import { isDecodableAvatarWebp } from '../../lib/security/avatar-decode.ts';
@@ -7,6 +8,15 @@ import {
   normalizeAvatarWebp,
 } from '../../lib/security/avatar-decode.ts';
 import { validatedStaticWebpDimensions } from '../../lib/security/avatar-webp.ts';
+
+test('production avatar route traces the Linux sharp runtime into its function', async () => {
+  const config = await readFile(new URL('../../next.config.ts', import.meta.url), 'utf8');
+
+  assert.match(config, /outputFileTracingIncludes/u);
+  assert.match(config, /'\/api\/profile\/avatar'/u);
+  assert.match(config, /\.\/node_modules\/@img\/sharp-linux-x64\/\*\*\/\*/u);
+  assert.match(config, /\.\/node_modules\/@img\/sharp-libvips-linux-x64\/\*\*\/\*/u);
+});
 
 test('avatar decoder accepts a complete 360px WebP and rejects truncated header-only data', async () => {
   const valid = await sharp({

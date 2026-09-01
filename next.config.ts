@@ -43,6 +43,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
   serverExternalPackages: ['@napi-rs/canvas'],
+  // Sharp discovers its platform binding and libvips payload dynamically.
+  // Next's file tracer can otherwise keep the binding while dropping the
+  // shared library from this route's Vercel function.
+  outputFileTracingIncludes: {
+    '/api/profile/avatar': [
+      './node_modules/@img/sharp-linux-x64/**/*',
+      './node_modules/@img/sharp-libvips-linux-x64/**/*',
+    ],
+  },
   async redirects() {
     return [
       {
