@@ -7,12 +7,17 @@ import { emailOtpVerifySchema } from '@/lib/validation/auth';
 import { readJsonBody } from '@/lib/security/request-body';
 import { requestSecurityMetadata, requestSubjectHash } from '@/lib/security/request-metadata';
 import { consumeCoarseQuota } from '@/lib/security/rate-limit';
+import { authProviderRetryAfter } from '@/features/auth/otp-rate-limit';
 
-type AuthProviderError = { status?: number } | null;
+type AuthProviderError = { code?: string; status?: number } | null;
 
 function verificationFailure(error: AuthProviderError) {
   if (error?.status === 429) {
-    return NextResponse.json({ error: 'RATE_LIMITED' }, { status: 429 });
+    const retryAfter = authProviderRetryAfter(error);
+    return NextResponse.json(
+      { error: 'RATE_LIMITED', retryAfter },
+      { status: 429, headers: { 'Retry-After': String(retryAfter) } },
+    );
   }
   if (!error?.status || error.status >= 500) {
     return NextResponse.json({ error: 'OTP_UNAVAILABLE' }, { status: 503 });

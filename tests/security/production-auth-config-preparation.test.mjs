@@ -68,6 +68,7 @@ test('production Auth config preparation is isolated, exact, and does not push',
     assert.equal(preparedConfig, createProductionConfiguration(sourceBefore));
     assert.equal(preparedConfig.includes('http://localhost:3000'), false);
     assert.equal(preparedConfig.includes(productionSiteUrl), true);
+    assert.match(preparedConfig, /\[auth\.rate_limit\][\s\S]*?email_sent = 30/u);
     assert.equal(await readFile(sourceConfigPath, 'utf8'), sourceBefore);
     assert.equal(Object.keys(prepared.templateSha256).length, 4);
     assert.deepEqual(prepared.templateSha256, expectedTemplateSha256);
@@ -81,14 +82,14 @@ test('production Auth config preparation is isolated, exact, and does not push',
     assert.match(prepared.nextCommand, / config push --project-ref /u);
     assert.match(prepared.nextCommand, /\} finally \{ Pop-Location \}$/u);
     assert.doesNotMatch(prepared.nextCommand, /--workdir|\bnpx\b/u);
-    assert.match(prepared.nextCommand, /REPLACE_WITH_NEW_PROJECT_REF/u);
+    assert.match(prepared.nextCommand, /REPLACE_WITH_TARGET_PROJECT_REF/u);
     assert.doesNotMatch(prepared.nextCommand, /(?:password|secret|token|key)=/iu);
   } finally {
     await rm(prepared.temporaryRoot, { recursive: true, force: true });
   }
 });
 
-test('production config hashes and the two-line allowlist stay source-controlled', async () => {
+test('production config hashes, email quota, and the two-line allowlist stay source-controlled', async () => {
   const sourceConfiguration = await readFile(
     path.join(repositoryRoot, 'supabase', 'config.toml'),
     'utf8',
@@ -96,6 +97,9 @@ test('production config hashes and the two-line allowlist stay source-controlled
   const productionConfiguration = createProductionConfiguration(sourceConfiguration);
   assert.equal(configurationSha256(sourceConfiguration), expectedSourceConfigurationSha256);
   assert.equal(configurationSha256(productionConfiguration), expectedProductionConfigurationSha256);
+  for (const configuration of [sourceConfiguration, productionConfiguration]) {
+    assert.match(configuration, /\[auth\.rate_limit\][\s\S]*?email_sent = 30/u);
+  }
 
   const crlfSource = sourceConfiguration.replaceAll('\r\n', '\n').replaceAll('\n', '\r\n');
   assert.equal(configurationSha256(crlfSource), expectedSourceConfigurationSha256);
@@ -126,7 +130,7 @@ test('the tool refuses to create its temporary workdir inside the repository', a
 
 test('the printed command has a harmless explicit project-ref placeholder', () => {
   const command = safeConfigPushCommand(path.resolve('C:/safe-temporary-workdir'));
-  assert.match(command, /--project-ref 'REPLACE_WITH_NEW_PROJECT_REF' \} finally/u);
+  assert.match(command, /--project-ref 'REPLACE_WITH_TARGET_PROJECT_REF' \} finally/u);
   assert.equal(path.isAbsolute(localSupabaseCliPath), true);
   assert.equal(command.indexOf('Push-Location'), 0);
   assert.equal(command.indexOf(localSupabaseCliPath) > command.indexOf('try {'), true);

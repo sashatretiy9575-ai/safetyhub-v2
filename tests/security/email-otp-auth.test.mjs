@@ -13,12 +13,15 @@ test('email OTP validation normalizes email and accepts exactly six ASCII digits
     }),
     { email: 'learner@example.com', intent: 'register' },
   );
-  assert.deepEqual(emailOtpVerifySchema.parse({
-    email: ' Learner@Example.COM ',
-    code: '123456',
-    intent: 'login',
-    legalAccepted: true,
-  }), { email: 'learner@example.com', code: '123456' });
+  assert.deepEqual(
+    emailOtpVerifySchema.parse({
+      email: ' Learner@Example.COM ',
+      code: '123456',
+      intent: 'login',
+      legalAccepted: true,
+    }),
+    { email: 'learner@example.com', code: '123456' },
+  );
 
   for (const code of ['12345', '1234567', '12 3456', 'abcdef', '１２３４５６', '١٢٣٤٥٦']) {
     assert.equal(
@@ -33,14 +36,15 @@ test('email OTP validation normalizes email and accepts exactly six ASCII digits
 });
 
 test('email OTP request is origin-bound, native, enumeration-neutral, and rate-limited twice', async () => {
-  const [route, rateLimit, migration, config, loginTemplate, confirmationTemplate] = await Promise.all([
-    read('app/api/auth/email-otp/request/route.ts'),
-    read('lib/security/rate-limit.ts'),
-    read('supabase/migrations/20260831100000_email_otp_rate_limits.sql'),
-    read('supabase/config.toml'),
-    read('supabase/templates/magic-link.html'),
-    read('supabase/templates/confirmation.html'),
-  ]);
+  const [route, rateLimit, migration, config, loginTemplate, confirmationTemplate] =
+    await Promise.all([
+      read('app/api/auth/email-otp/request/route.ts'),
+      read('lib/security/rate-limit.ts'),
+      read('supabase/migrations/20260831100000_email_otp_rate_limits.sql'),
+      read('supabase/config.toml'),
+      read('supabase/templates/magic-link.html'),
+      read('supabase/templates/confirmation.html'),
+    ]);
 
   assert.match(route, /isSameOriginRequest\(request\)/u);
   assert.match(route, /readJsonBody\(request\)/u);
@@ -54,6 +58,9 @@ test('email OTP request is origin-bound, native, enumeration-neutral, and rate-l
   assert.match(route, /shouldCreateUser: true/u);
   assert.doesNotMatch(route, /shouldCreateUser: parsed\.data\.intent/u);
   assert.match(route, /captchaToken: parsed\.data\.captchaToken/u);
+  assert.match(route, /authProviderRetryAfter\(error\)/u);
+  assert.match(route, /\{ error: 'RATE_LIMITED', retryAfter \}/u);
+  assert.match(route, /'Retry-After': String\(retryAfter\)/u);
   assert.match(route, /return NextResponse\.json\(\{ sent: true \}, \{ status: 202 \}\)/u);
   assert.doesNotMatch(
     route,
@@ -63,8 +70,12 @@ test('email OTP request is origin-bound, native, enumeration-neutral, and rate-l
   assert.match(rateLimit, /'auth\.otp\.start\.email'/u);
   assert.match(migration, /when 'auth\.otp\.start' then 20/u);
   assert.match(migration, /when 'auth\.otp\.start\.email' then 5/u);
-  assert.match(migration, /when p_action in \('auth\.otp\.start', 'auth\.otp\.start\.email'\) then 900/u);
+  assert.match(
+    migration,
+    /when p_action in \('auth\.otp\.start', 'auth\.otp\.start\.email'\) then 900/u,
+  );
   assert.match(config, /\[auth\][\s\S]*?enable_signup = true/u);
+  assert.match(config, /\[auth\.rate_limit\][\s\S]*?email_sent = 30/u);
   assert.match(config, /\[auth\.email\][\s\S]*?enable_signup = true/u);
   assert.match(config, /\[auth\.email\][\s\S]*?enable_confirmations = true/u);
   assert.match(config, /\[auth\.email\.template\.magic_link\]/u);
@@ -95,10 +106,19 @@ test('email OTP verification proves the exact Auth identity before persisting a 
     /verifyOtp\(\{[\s\S]*email: parsed\.data\.email,[\s\S]*token: parsed\.data\.code,[\s\S]*type: 'email'/u,
   );
   assert.match(route, /user\.email\.trim\(\)\.toLowerCase\(\) !== parsed\.data\.email/u);
-  assert.match(route, /auth\.setSession\(\{[\s\S]*access_token: session\.access_token,[\s\S]*refresh_token: session\.refresh_token/u);
+  assert.match(
+    route,
+    /auth\.setSession\(\{[\s\S]*access_token: session\.access_token,[\s\S]*refresh_token: session\.refresh_token/u,
+  );
   assert.match(route, /persisted\.data\.user\?\.id !== user\.id/u);
-  assert.match(route, /if \(context\.has_current_legal_acceptance !== true\) return '\/auth\/legal'/u);
+  assert.match(
+    route,
+    /if \(context\.has_current_legal_acceptance !== true\) return '\/auth\/legal'/u,
+  );
   assert.match(route, /supabase\.auth\.signOut\(\{ scope: 'local' \}\)/u);
+  assert.match(route, /authProviderRetryAfter\(error\)/u);
+  assert.match(route, /\{ error: 'RATE_LIMITED', retryAfter \}/u);
+  assert.match(route, /'Retry-After': String\(retryAfter\)/u);
   assert.doesNotMatch(
     route,
     /signInWithPassword|passwordContext|password_ticket|createAdminClient|finalizeSignupLegalOperation|accept_current_legal_documents|legalAccepted|parsed\.data\.intent/u,
@@ -111,7 +131,7 @@ test('email OTP verification proves the exact Auth identity before persisting a 
   assert.match(migration, /when 'auth\.otp\.verify\.email' then 6/u);
 });
 
-test('passwordless browser form stores only a bounded email attempt, never a code or consent claim', async () => {
+test('passwordless browser form shares a bounded cooldown without storing a code or consent claim', async () => {
   const [flow, login, register] = await Promise.all([
     read('features/auth/email-otp-flow.tsx'),
     read('app/(account)/auth/login/page.tsx'),
@@ -121,9 +141,24 @@ test('passwordless browser form stores only a bounded email attempt, never a cod
     flow.indexOf('function storeAttempt'),
     flow.indexOf('function clearStoredAttempt'),
   );
+  const storedCooldown = flow.slice(
+    flow.indexOf('function storeSendCooldown'),
+    flow.indexOf('function clearStoredSendCooldown'),
+  );
 
-  assert.match(storedAttempt, /JSON\.stringify\(\{[\s\S]*?email,[\s\S]*?intent,[\s\S]*?sentAt,/u);
-  assert.doesNotMatch(storedAttempt, /\bcode\s*:|token|password|legalAccepted/u);
+  assert.match(storedAttempt, /JSON\.stringify\(\{[\s\S]*?email,[\s\S]*?sentAt,/u);
+  assert.doesNotMatch(storedAttempt, /\bintent\s*:|\bcode\s*:|token|password|legalAccepted/u);
+  assert.match(storedCooldown, /JSON\.stringify\(\{[\s\S]*?email,[\s\S]*?retryAt,/u);
+  assert.doesNotMatch(storedCooldown, /\bintent\s*:|\bcode\s*:|token|password|legalAccepted/u);
+  assert.match(flow, /ATTEMPT_STORAGE_KEY = 'safetyhub-email-otp:attempt'/u);
+  assert.match(flow, /SEND_COOLDOWN_STORAGE_KEY = 'safetyhub-email-otp:send-cooldown'/u);
+  assert.match(flow, /payload\?\.retryAfter/u);
+  assert.match(flow, /headers\.get\('Retry-After'\)/u);
+  assert.match(flow, /isOtpRateLimited\(errorCode, result\.response\?\.status\)/u);
+  assert.match(flow, /retrySecondsUntil\(sendRetryAt, retryClock\)/u);
+  assert.match(flow, /visibilitychange/u);
+  assert.match(flow, /pageshow/u);
+  assert.match(flow, /inFlightActionRef\.current/u);
   assert.match(flow, /autoComplete="one-time-code"/u);
   assert.match(flow, /inputMode="numeric"/u);
   assert.match(flow, /replace\(\/\\D\/gu, ''\)\.slice\(0, 6\)/u);

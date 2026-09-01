@@ -49,9 +49,9 @@ const expectedConfigurationLineChanges = Object.freeze([
 // Updating either value is an intentional release-review step. These hashes pin
 // exactly the committed localhost source and the only permitted production copy.
 export const expectedSourceConfigurationSha256 =
-  '8ac8d08309a92aac2c09a9d60e762b27bbed396978fb3b688b255b3671ca6db7';
+  '2e17fa5984321d1713caec61a7b0c54276b96e757d604adf0dee08a2168f4962';
 export const expectedProductionConfigurationSha256 =
-  '6276d00815e81af5d8c6fc6ab6a52fbec17feeed0c85ebc82f12af5ab98fac1a';
+  '4a99a15e864ae823b715466e7025a59761b0c0769046370c22657ccbf62769d5';
 export const expectedTemplateSha256 = Object.freeze({
   'supabase/templates/magic-link.html':
     'efcea98cd3cc116a6e4d1bd68d1a36d13618ab0583427df0994014b1d4598c89',
@@ -170,7 +170,7 @@ export function safeConfigPushCommand(temporaryRoot) {
     `Push-Location ${quotePowerShell(temporaryRoot)};`,
     'try {',
     `& ${quotePowerShell(process.execPath)} ${quotePowerShell(localSupabaseCliPath)}`,
-    "config push --project-ref 'REPLACE_WITH_NEW_PROJECT_REF'",
+    "config push --project-ref 'REPLACE_WITH_TARGET_PROJECT_REF'",
     '} finally { Pop-Location }',
   ].join(' ');
 }
@@ -213,9 +213,7 @@ export async function prepareProductionAuthConfig({
   }
 
   const productionConfiguration = createProductionConfiguration(sourceConfiguration);
-  if (
-    configurationSha256(productionConfiguration) !== expectedProductionConfigurationSha256
-  ) {
+  if (configurationSha256(productionConfiguration) !== expectedProductionConfigurationSha256) {
     fail('CONFIGURATION_PRODUCTION_HASH_MISMATCH');
   }
 
@@ -260,9 +258,7 @@ export async function prepareProductionAuthConfig({
     }
 
     const preparedConfiguration = await readFile(preparedConfigurationPath, 'utf8');
-    if (
-      configurationSha256(preparedConfiguration) !== expectedProductionConfigurationSha256
-    ) {
+    if (configurationSha256(preparedConfiguration) !== expectedProductionConfigurationSha256) {
       fail('PREPARED_CONFIGURATION_HASH_MISMATCH');
     }
     for (const relativePath of templateRelativePaths) {

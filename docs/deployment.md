@@ -17,12 +17,17 @@
 - Supabase Site URL: `https://safetyhub.kz`.
 - Login и registration OTP: 6 цифр, срок действия 3600 секунд, повторная
   отправка не чаще одного раза в 60 секунд.
+- Общий Supabase Auth-лимит отправки email: `30` писем в час. Ключ
+  `email_sent = 30` явно задан в секции `[auth.rate_limit]` и оставляет запас
+  относительно ограничения Plesk `50` писем в час; не возвращайте provider
+  default `2` письма в час.
 - SMTP sender: `SafetyHub <no-reply@safetyhub.kz>` через
   `srv-plesk28.ps.kz:465`; не заменяйте provider-host на apex или `mail.safetyhub.kz`.
-- Перенесите из `supabase/config.toml` в новый hosted Supabase точные subjects и
-  тела всех четырёх шаблонов. Только `magic_link` и `confirmation` содержат
-  `{{ .Token }}`. `recovery` и `invite` — статические retirement notices без
-  token, hash или redirect URL; не заменяйте их временно password-шаблоном.
+- Перенесите из `supabase/config.toml` в целевой hosted Supabase лимит отправки,
+  точные subjects и тела всех четырёх шаблонов. Только `magic_link` и
+  `confirmation` содержат `{{ .Token }}`. `recovery` и `invite` — статические
+  retirement notices без token, hash или redirect URL; не заменяйте их временно
+  password-шаблоном.
 - Supabase технически создаёт внутренний случайный hash и для первого native
   email-OTP signup; не проверяйте и не ограничивайте
   `auth.users.encrypted_password`. После применения

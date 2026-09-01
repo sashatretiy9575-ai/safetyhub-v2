@@ -5,6 +5,12 @@ import { SignIn, UserPlus } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FieldError } from '@/features/auth/form-controls';
+import {
+  formatRetryDelay,
+  isOtpRateLimited,
+  normalizeOtpRetryAfter,
+  retrySecondsUntil,
+} from '@/features/auth/otp-rate-limit';
 import { Turnstile, type TurnstileHandle } from '@/features/auth/turnstile';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { emailOtpStartSchema, emailOtpVerifySchema } from '@/lib/validation/auth';
@@ -17,36 +23,37 @@ type EmailOtpStage = 'email' | 'code';
 type BusyAction = 'send' | 'verify' | null;
 type StoredAttempt = {
   email: string;
-  intent: EmailOtpIntent;
   sentAt: number;
+};
+type StoredCooldown = {
+  email: string;
+  retryAt: number;
 };
 type FieldErrors = Partial<Record<'email' | 'code' | 'captcha', string>>;
 
 const ATTEMPT_TTL_MS = 60 * 60 * 1000;
 const RESEND_DELAY_SECONDS = 60;
+const ATTEMPT_STORAGE_KEY = 'safetyhub-email-otp:attempt';
+const SEND_COOLDOWN_STORAGE_KEY = 'safetyhub-email-otp:send-cooldown';
+const SEND_RATE_LIMITED_ERROR = 'SEND_RATE_LIMITED';
+const VERIFY_RATE_LIMITED_ERROR = 'VERIFY_RATE_LIMITED';
 
 const sendErrorMessages: Record<string, string> = {
   CAPTCHA_FAILED: 'Проверка безопасности истекла. Пройдите её снова.',
-  RATE_LIMITED: 'Слишком много запросов. Попробуйте немного позже.',
   INVALID_REQUEST: 'Проверьте введённый email.',
   OTP_UNAVAILABLE: 'Не удалось отправить код. Повторите позже.',
 };
 
 const verifyErrorMessages: Record<string, string> = {
   OTP_CODE_INVALID: 'Код неверен, истёк или уже использован. Проверьте его либо запросите новый.',
-  RATE_LIMITED: 'Слишком много попыток. Попробуйте немного позже.',
   INVALID_REQUEST: 'Введите email и шестизначный код.',
   OTP_UNAVAILABLE: 'Не удалось проверить код. Повторите позже.',
   AUTH_CONTEXT_UNAVAILABLE: 'Сессия подтверждена, но профиль пока недоступен. Повторите позже.',
 };
 
-function storageKey(intent: EmailOtpIntent) {
-  return `safetyhub-email-otp:${intent}`;
-}
-
 function readStoredAttempt(intent: EmailOtpIntent): StoredAttempt | null {
   try {
-    const value = JSON.parse(sessionStorage.getItem(storageKey(intent)) ?? 'null') as unknown;
+    const value = JSON.parse(sessionStorage.getItem(ATTEMPT_STORAGE_KEY) ?? 'null') as unknown;
     if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
     const candidate = value as Partial<StoredAttempt>;
     const parsedEmail = emailOtpStartSchema.safeParse({
@@ -55,16 +62,15 @@ function readStoredAttempt(intent: EmailOtpIntent): StoredAttempt | null {
     });
     if (
       !parsedEmail.success ||
-      candidate.intent !== intent ||
       typeof candidate.sentAt !== 'number' ||
+      candidate.sentAt > Date.now() ||
       Date.now() - candidate.sentAt > ATTEMPT_TTL_MS
     ) {
-      sessionStorage.removeItem(storageKey(intent));
+      sessionStorage.removeItem(ATTEMPT_STORAGE_KEY);
       return null;
     }
     return {
       email: parsedEmail.data.email,
-      intent,
       sentAt: candidate.sentAt,
     };
   } catch {
@@ -72,13 +78,12 @@ function readStoredAttempt(intent: EmailOtpIntent): StoredAttempt | null {
   }
 }
 
-function storeAttempt(intent: EmailOtpIntent, email: string, sentAt: number) {
+function storeAttempt(email: string, sentAt: number) {
   try {
     sessionStorage.setItem(
-      storageKey(intent),
+      ATTEMPT_STORAGE_KEY,
       JSON.stringify({
         email,
-        intent,
         sentAt,
       } satisfies StoredAttempt),
     );
@@ -87,9 +92,54 @@ function storeAttempt(intent: EmailOtpIntent, email: string, sentAt: number) {
   }
 }
 
-function clearStoredAttempt(intent: EmailOtpIntent) {
+function clearStoredAttempt() {
   try {
-    sessionStorage.removeItem(storageKey(intent));
+    sessionStorage.removeItem(ATTEMPT_STORAGE_KEY);
+  } catch {
+    // Nothing client-side is authoritative for an OTP session.
+  }
+}
+
+function readStoredSendCooldown(intent: EmailOtpIntent): StoredCooldown | null {
+  try {
+    const value = JSON.parse(
+      sessionStorage.getItem(SEND_COOLDOWN_STORAGE_KEY) ?? 'null',
+    ) as unknown;
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+    const candidate = value as Partial<StoredCooldown>;
+    const parsedEmail = emailOtpStartSchema.safeParse({ email: candidate.email, intent });
+    if (
+      !parsedEmail.success ||
+      typeof candidate.retryAt !== 'number' ||
+      candidate.retryAt <= Date.now() ||
+      candidate.retryAt - Date.now() > ATTEMPT_TTL_MS
+    ) {
+      sessionStorage.removeItem(SEND_COOLDOWN_STORAGE_KEY);
+      return null;
+    }
+    return { email: parsedEmail.data.email, retryAt: candidate.retryAt };
+  } catch {
+    return null;
+  }
+}
+
+function storeSendCooldown(email: string, retryAt: number) {
+  try {
+    sessionStorage.setItem(
+      SEND_COOLDOWN_STORAGE_KEY,
+      JSON.stringify({
+        email,
+        retryAt,
+      } satisfies StoredCooldown),
+    );
+  } catch {
+    // A storage-denied browser still keeps the in-memory countdown.
+  }
+}
+
+function clearStoredSendCooldown() {
+  try {
+    sessionStorage.removeItem(SEND_COOLDOWN_STORAGE_KEY);
   } catch {
     // Nothing client-side is authoritative for an OTP session.
   }
@@ -110,7 +160,9 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [sentAt, setSentAt] = useState(0);
-  const [retrySeconds, setRetrySeconds] = useState(0);
+  const [sendRetryAt, setSendRetryAt] = useState(0);
+  const [verifyRetryAt, setVerifyRetryAt] = useState(0);
+  const [retryClock, setRetryClock] = useState(0);
   const [busy, setBusy] = useState<BusyAction>(null);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
@@ -120,26 +172,44 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
   const codeRef = useRef<HTMLInputElement>(null);
   const turnstileRef = useRef<TurnstileHandle>(null);
   const pendingCaptchaSubmitRef = useRef<((token: string) => void) | null>(null);
+  const inFlightActionRef = useRef<BusyAction>(null);
   const captchaRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
   const isRegister = intent === 'register';
+  const latestRetryAt = Math.max(sendRetryAt, verifyRetryAt);
+  const sendRetrySeconds = retrySecondsUntil(sendRetryAt, retryClock);
+  const verifyRetrySeconds = retrySecondsUntil(verifyRetryAt, retryClock);
+  const retryActive = latestRetryAt > retryClock;
 
   useEffect(() => {
-    const stored = readStoredAttempt(intent);
-    if (!stored) return;
-    setEmail(stored.email);
-    setSentAt(stored.sentAt);
-    setRetrySeconds(
-      Math.max(0, Math.ceil((stored.sentAt + RESEND_DELAY_SECONDS * 1000 - Date.now()) / 1000)),
-    );
-    setStage('code');
-    setStatus('Введите код из письма. Если письмо не пришло, запросите новый код.');
+    const storedAttempt = readStoredAttempt(intent);
+    const storedCooldown = readStoredSendCooldown(intent);
+    if (!storedAttempt && !storedCooldown) return;
+
+    setEmail(storedAttempt?.email ?? storedCooldown!.email);
+    const attemptRetryAt = storedAttempt ? storedAttempt.sentAt + RESEND_DELAY_SECONDS * 1000 : 0;
+    const retryAt = Math.max(attemptRetryAt, storedCooldown?.retryAt ?? 0);
+    setSendRetryAt(retryAt);
+    setRetryClock(Date.now());
+    if (storedAttempt) {
+      setSentAt(storedAttempt.sentAt);
+      setStage('code');
+      setStatus('Введите код из письма. Если письмо не пришло, запросите новый код.');
+    }
   }, [intent]);
 
   useEffect(() => {
-    if (retrySeconds <= 0) return;
-    const timer = window.setInterval(() => setRetrySeconds((value) => Math.max(0, value - 1)), 1000);
-    return () => window.clearInterval(timer);
-  }, [retrySeconds]);
+    if (!retryActive) return;
+    const syncClock = () => setRetryClock(Date.now());
+    syncClock();
+    const timer = window.setInterval(syncClock, 1000);
+    document.addEventListener('visibilitychange', syncClock);
+    window.addEventListener('pageshow', syncClock);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', syncClock);
+      window.removeEventListener('pageshow', syncClock);
+    };
+  }, [latestRetryAt, retryActive]);
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -154,6 +224,8 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
   };
 
   const sendCode = async (normalizedEmail: string, captchaToken?: string) => {
+    if (inFlightActionRef.current) return;
+    inFlightActionRef.current = 'send';
     setBusy('send');
     setError('');
     setFieldErrors({});
@@ -167,37 +239,61 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
           captchaToken,
         }),
       });
-      const payload = await readClientResponseJson<{ sent?: unknown; error?: unknown }>(result.response);
+      const payload = await readClientResponseJson<{
+        sent?: unknown;
+        error?: unknown;
+        retryAfter?: unknown;
+      }>(result.response);
       if (!result.ok || payload?.sent !== true) {
         const errorCode = typeof payload?.error === 'string' ? payload.error : null;
+        if (isOtpRateLimited(errorCode, result.response?.status)) {
+          const retryAfter = normalizeOtpRetryAfter(
+            payload?.retryAfter,
+            result.response?.headers.get('Retry-After') ?? null,
+          );
+          const retryAt = Date.now() + retryAfter * 1000;
+          setSendRetryAt(retryAt);
+          setRetryClock(Date.now());
+          storeSendCooldown(normalizedEmail, retryAt);
+          setError(SEND_RATE_LIMITED_ERROR);
+          return;
+        }
         const fallbackMessage = result.ok
           ? 'Не удалось отправить код. Повторите позже.'
           : clientRequestMessage(result.error, 'Не удалось отправить код. Повторите позже.');
-        setError(
-          (errorCode && sendErrorMessages[errorCode]) || fallbackMessage,
-        );
+        setError((errorCode && sendErrorMessages[errorCode]) || fallbackMessage);
         return;
       }
 
       const nextSentAt = Date.now();
+      const nextRetryAt = nextSentAt + RESEND_DELAY_SECONDS * 1000;
       setEmail(normalizedEmail);
       setCode('');
       setSentAt(nextSentAt);
-      setRetrySeconds(RESEND_DELAY_SECONDS);
+      setSendRetryAt(nextRetryAt);
+      setRetryClock(nextSentAt);
       setStage('code');
       setStatus('Если этот адрес можно использовать, код отправлен. Введите шесть цифр из письма.');
-      storeAttempt(intent, normalizedEmail, nextSentAt);
+      storeAttempt(normalizedEmail, nextSentAt);
+      storeSendCooldown(normalizedEmail, nextRetryAt);
     } catch (requestError) {
       setError(clientRequestMessage(requestError, 'Не удалось отправить код. Повторите позже.'));
     } finally {
       resetCaptcha();
+      inFlightActionRef.current = null;
       setBusy(null);
     }
   };
 
   const requestCode = (event?: React.FormEvent | React.MouseEvent) => {
     event?.preventDefault();
-    if (busy || (stage === 'code' && retrySeconds > 0)) return;
+    if (
+      busy ||
+      inFlightActionRef.current ||
+      pendingCaptchaSubmitRef.current ||
+      sendRetrySeconds > 0
+    )
+      return;
     const parsed = emailOtpStartSchema.safeParse({
       email,
       intent,
@@ -224,7 +320,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
 
   const verifyCode = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (busy) return;
+    if (busy || inFlightActionRef.current || verifyRetrySeconds > 0) return;
     const parsed = emailOtpVerifySchema.safeParse({
       email,
       code,
@@ -240,6 +336,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       return;
     }
 
+    inFlightActionRef.current = 'verify';
     setBusy('verify');
     setError('');
     setFieldErrors({});
@@ -249,17 +346,29 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(parsed.data),
       });
-      const payload = await readClientResponseJson<{ verified?: unknown; redirectTo?: unknown; error?: unknown }>(
-        result.response,
-      );
+      const payload = await readClientResponseJson<{
+        verified?: unknown;
+        redirectTo?: unknown;
+        error?: unknown;
+        retryAfter?: unknown;
+      }>(result.response);
       if (!result.ok || payload?.verified !== true) {
         const errorCode = typeof payload?.error === 'string' ? payload.error : null;
+        if (isOtpRateLimited(errorCode, result.response?.status)) {
+          const retryAfter = normalizeOtpRetryAfter(
+            payload?.retryAfter,
+            result.response?.headers.get('Retry-After') ?? null,
+          );
+          const retryAt = Date.now() + retryAfter * 1000;
+          setVerifyRetryAt(retryAt);
+          setRetryClock(Date.now());
+          setError(VERIFY_RATE_LIMITED_ERROR);
+          return;
+        }
         const fallbackMessage = result.ok
           ? 'Не удалось проверить код. Повторите позже.'
           : clientRequestMessage(result.error, 'Не удалось проверить код. Повторите позже.');
-        setError(
-          (errorCode && verifyErrorMessages[errorCode]) || fallbackMessage,
-        );
+        setError((errorCode && verifyErrorMessages[errorCode]) || fallbackMessage);
         if (errorCode === 'OTP_CODE_INVALID') {
           setCode('');
           requestAnimationFrame(() => codeRef.current?.focus());
@@ -267,22 +376,24 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
         return;
       }
 
-      clearStoredAttempt(intent);
+      clearStoredAttempt();
+      clearStoredSendCooldown();
       router.replace(safeLanding(payload?.redirectTo));
       router.refresh();
     } catch (requestError) {
       setError(clientRequestMessage(requestError, 'Не удалось проверить код. Повторите позже.'));
     } finally {
+      inFlightActionRef.current = null;
       setBusy(null);
     }
   };
 
   const changeEmail = () => {
-    clearStoredAttempt(intent);
+    clearStoredAttempt();
     setStage('email');
     setCode('');
     setSentAt(0);
-    setRetrySeconds(0);
+    setVerifyRetryAt(0);
     setError('');
     setStatus('');
     setFieldErrors({});
@@ -290,6 +401,16 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
 
   const Icon = isRegister ? UserPlus : SignIn;
   const title = isRegister ? 'Создать аккаунт' : 'Вход или регистрация';
+  const visibleError =
+    error === SEND_RATE_LIMITED_ERROR
+      ? sendRetrySeconds > 0
+        ? `Лимит отправки кода исчерпан. Повторите через ${formatRetryDelay(sendRetrySeconds)}.`
+        : 'Время ожидания истекло. Теперь можно запросить новый код.'
+      : error === VERIFY_RATE_LIMITED_ERROR
+        ? verifyRetrySeconds > 0
+          ? `Слишком много попыток проверки. Повторите через ${formatRetryDelay(verifyRetrySeconds)}.`
+          : 'Время ожидания истекло. Теперь можно снова проверить код.'
+        : error;
 
   return (
     <>
@@ -332,8 +453,16 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
             <FieldError id={`${intent}-email-error`} message={fieldErrors.email} />
           </div>
 
-          <Button type="submit" className="min-h-11 w-full" disabled={busy !== null}>
-            {busy === 'send' ? 'Отправляем...' : 'Получить код'}
+          <Button
+            type="submit"
+            className="min-h-11 w-full"
+            disabled={busy !== null || sendRetrySeconds > 0}
+          >
+            {busy === 'send'
+              ? 'Отправляем...'
+              : sendRetrySeconds > 0
+                ? `Повторить через ${formatRetryDelay(sendRetrySeconds)}`
+                : 'Получить код'}
           </Button>
           <Button
             type="button"
@@ -368,7 +497,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
                   email: nextEmail,
                   intent,
                 });
-                if (sentAt > 0 && parsed.success) storeAttempt(intent, parsed.data.email, sentAt);
+                if (sentAt > 0 && parsed.success) storeAttempt(parsed.data.email, sentAt);
                 setFieldErrors((value) => ({ ...value, email: undefined }));
               }}
               invalid={Boolean(fieldErrors.email)}
@@ -399,18 +528,28 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
             />
             <FieldError id={`${intent}-code-error`} message={fieldErrors.code} />
           </div>
-          <Button type="submit" className="min-h-11 w-full" disabled={busy !== null}>
-            {busy === 'verify' ? 'Проверяем...' : 'Подтвердить код'}
+          <Button
+            type="submit"
+            className="min-h-11 w-full"
+            disabled={busy !== null || verifyRetrySeconds > 0}
+          >
+            {busy === 'verify'
+              ? 'Проверяем...'
+              : verifyRetrySeconds > 0
+                ? `Повторить через ${formatRetryDelay(verifyRetrySeconds)}`
+                : 'Подтвердить код'}
           </Button>
           <div className="grid gap-2 sm:grid-cols-2">
             <Button
               type="button"
               variant="outline"
               className="min-h-11 w-full whitespace-normal"
-              disabled={busy !== null || retrySeconds > 0}
+              disabled={busy !== null || sendRetrySeconds > 0}
               onClick={requestCode}
             >
-              {retrySeconds > 0 ? `Отправить ещё раз через ${retrySeconds} с` : 'Отправить ещё раз'}
+              {sendRetrySeconds > 0
+                ? `Отправить ещё раз через ${formatRetryDelay(sendRetrySeconds)}`
+                : 'Отправить ещё раз'}
             </Button>
             <Button
               type="button"
@@ -437,15 +576,18 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       />
       <FieldError id={`${intent}-captcha-error`} message={fieldErrors.captcha} />
 
-      {error && (
+      {visibleError && (
         <p role="alert" className="text-sm text-[var(--color-danger)]">
-          {error}
+          {visibleError}
         </p>
       )}
 
       <p className="text-center text-sm text-[var(--color-text-muted)]">
         {isRegister ? 'Уже есть аккаунт? ' : 'Нет аккаунта? '}
-        <Link href={isRegister ? '/auth/login' : '/auth/register'} className="font-medium text-[var(--color-primary)] hover:underline">
+        <Link
+          href={isRegister ? '/auth/login' : '/auth/register'}
+          className="font-medium text-[var(--color-primary)] hover:underline"
+        >
           {isRegister ? 'Войти' : 'Регистрация'}
         </Link>
       </p>

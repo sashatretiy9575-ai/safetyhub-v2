@@ -6,12 +6,17 @@ import { emailOtpStartSchema } from '@/lib/validation/auth';
 import { readJsonBody } from '@/lib/security/request-body';
 import { requestSecurityMetadata, requestSubjectHash } from '@/lib/security/request-metadata';
 import { consumeCoarseQuota } from '@/lib/security/rate-limit';
+import { authProviderRetryAfter } from '@/features/auth/otp-rate-limit';
 
 type AuthProviderError = { code?: string; status?: number } | null;
 
 function providerFailure(error: AuthProviderError) {
   if (error?.status === 429) {
-    return NextResponse.json({ error: 'RATE_LIMITED' }, { status: 429 });
+    const retryAfter = authProviderRetryAfter(error);
+    return NextResponse.json(
+      { error: 'RATE_LIMITED', retryAfter },
+      { status: 429, headers: { 'Retry-After': String(retryAfter) } },
+    );
   }
   if (error?.code === 'captcha_failed') {
     return NextResponse.json({ error: 'CAPTCHA_FAILED' }, { status: 400 });
