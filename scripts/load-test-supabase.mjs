@@ -9,6 +9,7 @@ import { Client as PostgresClient } from 'pg';
 import {
   assertCleanLoadTestBaseline,
   assertDisposableProjectMarker,
+  assertLocalCiCleanLoadTestBaseline,
   assertLocalCiLoadTestTarget,
   assertLoadTestTarget,
 } from './load-test-safety.mjs';
@@ -776,7 +777,11 @@ async function main() {
   const admin = createClient(url, secretKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
-  await assertCleanLoadTestBaseline(admin);
+  if (targetMode === 'local-ci') {
+    await assertLocalCiCleanLoadTestBaseline(admin);
+  } else {
+    await assertCleanLoadTestBaseline(admin);
+  }
   if (targetMode === 'local-ci') {
     await prepareLocalCiLocaleFixture(process.env.SAFETYHUB_LOCAL_DATABASE_URL);
   }

@@ -6,11 +6,13 @@ import {
   DISPOSABLE_PROJECT_MARKER,
   LOCAL_CI_DATABASE_URL,
   LOCAL_CI_LOAD_TEST_MARKER,
+  LOCAL_CI_SEED_AUDIT_ROW_COUNT,
   LOCAL_CI_SUPABASE_URL,
   PRODUCTION_PROJECT_REF,
   PROTECTED_PROJECT_REFS,
   assertCleanLoadTestBaseline,
   assertDisposableProjectMarker,
+  assertLocalCiCleanLoadTestBaseline,
   assertLocalCiLoadTestTarget,
   assertLoadTestTarget,
   projectRefFromSupabaseUrl,
@@ -302,6 +304,29 @@ test('clean preflight uses exact head counts for Auth and every mutable user-dat
   );
 });
 
+test('local CI accepts only the exact deterministic seed audit receipt count', async () => {
+  const counts = await assertLocalCiCleanLoadTestBaseline(
+    baselineAdmin({ counts: { admin_audit_log: LOCAL_CI_SEED_AUDIT_ROW_COUNT } }),
+  );
+  assert.equal(counts.admin_audit_log, LOCAL_CI_SEED_AUDIT_ROW_COUNT);
+
+  for (const count of [LOCAL_CI_SEED_AUDIT_ROW_COUNT - 1, LOCAL_CI_SEED_AUDIT_ROW_COUNT + 1]) {
+    await assert.rejects(
+      assertLocalCiCleanLoadTestBaseline(baselineAdmin({ counts: { admin_audit_log: count } })),
+      new RegExp(`admin_audit_log=${count},expected=${LOCAL_CI_SEED_AUDIT_ROW_COUNT}`, 'u'),
+    );
+  }
+
+  await assert.rejects(
+    assertLocalCiCleanLoadTestBaseline(
+      baselineAdmin({
+        counts: { admin_audit_log: LOCAL_CI_SEED_AUDIT_ROW_COUNT, profiles: 1 },
+      }),
+    ),
+    /profiles=1,expected=0/u,
+  );
+});
+
 test('Auth baseline rejects both a reported total and a returned first-page user', async () => {
   await assert.rejects(
     assertCleanLoadTestBaseline(baselineAdmin({ total: 2 })),
@@ -336,7 +361,7 @@ test('Auth and data baseline errors, unknown counts, and nonzero rows all fail c
     assertCleanLoadTestBaseline(
       baselineAdmin({ counts: { profiles: 1, test_attempts: 3, admin_audit_log: 2 } }),
     ),
-    /profiles=1, test_attempts=3, admin_audit_log=2/u,
+    /profiles=1,expected=0, test_attempts=3,expected=0, admin_audit_log=2,expected=0/u,
   );
 });
 
@@ -349,6 +374,7 @@ test('load harness completes every safety preflight before its first seed write'
 
   const targetGuard = harness.indexOf('assertLoadTestTarget({');
   const markerGuard = harness.indexOf('await assertDisposableProjectMarker({');
+  const localBaselineGuard = harness.indexOf('await assertLocalCiCleanLoadTestBaseline(admin);');
   const baselineGuard = harness.indexOf('await assertCleanLoadTestBaseline(admin);');
   const localFixtureGuard = harness.indexOf(
     'await prepareLocalCiLocaleFixture(process.env.SAFETYHUB_LOCAL_DATABASE_URL);',
@@ -358,6 +384,7 @@ test('load harness completes every safety preflight before its first seed write'
 
   assert.ok(targetGuard >= 0);
   assert.ok(markerGuard > targetGuard);
+  assert.ok(localBaselineGuard > markerGuard);
   assert.ok(baselineGuard > markerGuard);
   assert.ok(localFixtureGuard > baselineGuard);
   assert.ok(firstSeedDispatch > localFixtureGuard);

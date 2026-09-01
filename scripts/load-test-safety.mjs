@@ -10,6 +10,7 @@ export const DISPOSABLE_PROJECT_MARKER = 'DISPOSABLE SECURITY TEST';
 export const LOCAL_CI_LOAD_TEST_MARKER = 'LOCAL DISPOSABLE SUPABASE ONLY';
 export const LOCAL_CI_SUPABASE_URL = 'http://127.0.0.1:54321';
 export const LOCAL_CI_DATABASE_URL = 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+export const LOCAL_CI_SEED_AUDIT_ROW_COUNT = 7;
 
 export const CLEAN_LOAD_TEST_TABLES = Object.freeze([
   'profiles',
@@ -186,8 +187,9 @@ function assertNonnegativeInteger(value, label) {
   return value;
 }
 
-export async function assertCleanLoadTestBaseline(
+async function assertLoadTestBaseline(
   admin,
+  expectedCounts,
   { call = (operation) => operation() } = {},
 ) {
   let authResult;
@@ -230,14 +232,22 @@ export async function assertCleanLoadTestBaseline(
     counts.push([table, assertNonnegativeInteger(result?.count, `${table} baseline`)]);
   }
 
-  const dirty = counts.filter(([, count]) => count !== 0);
+  const dirty = counts.filter(([table, count]) => count !== (expectedCounts[table] ?? 0));
   if (dirty.length > 0) {
     refuse(
       `clean data baseline required (${dirty
-        .map(([table, count]) => `${table}=${count}`)
+        .map(([table, count]) => `${table}=${count},expected=${expectedCounts[table] ?? 0}`)
         .join(', ')})`,
     );
   }
 
   return Object.fromEntries([['auth.users', total], ...counts]);
+}
+
+export async function assertCleanLoadTestBaseline(admin, options = {}) {
+  return assertLoadTestBaseline(admin, {}, options);
+}
+
+export async function assertLocalCiCleanLoadTestBaseline(admin, options = {}) {
+  return assertLoadTestBaseline(admin, { admin_audit_log: LOCAL_CI_SEED_AUDIT_ROW_COUNT }, options);
 }
