@@ -15,6 +15,11 @@ import { createClient } from '@supabase/supabase-js';
 import pg from 'pg';
 import { validateAndRenderPresentation } from './course-content/presentation-pdf-qa.mjs';
 import {
+  buildLocalizedPublishedSnapshot,
+  validateLocalizedPublishedSnapshot,
+} from './content-localization/localized-published-snapshot.mjs';
+import { loadStage6PublicationBatch } from './content-localization/stage6-publication-contract.mjs';
+import {
   clearLinkedPostgresConnection,
   linkedPostgresClientOptions,
   loadPostgresSslRootCertificate,
@@ -31,6 +36,7 @@ const ROOT = process.cwd();
 const COURSE_ROOT = path.join(ROOT, 'content', 'snapshots', 'courses');
 const ARTICLE_ROOT = path.join(ROOT, 'content', 'articles');
 const MEDIA_ROOT = path.join(ROOT, 'content', 'snapshots', 'media');
+const LOCALIZATION_ROOT = path.join(ROOT, 'content', 'snapshots', 'localizations');
 const SEED_PATH = path.join(ROOT, 'supabase', 'seed.sql');
 const checkOnly = process.argv.includes('--check');
 const pull = process.argv.includes('--pull');
@@ -83,7 +89,7 @@ function canonicalHash(value) {
   return sha256(Buffer.from(JSON.stringify(sortJson(value)), 'utf8'));
 }
 
-function generateSeed({ articlesRoot, coursesRoot, mediaRoot, outputPath }) {
+function generateSeed({ articlesRoot, coursesRoot, mediaRoot, localizationsRoot, outputPath }) {
   const script = path.join(ROOT, 'scripts', 'generate-content-seed.mjs');
   const result = spawnSync(
     process.execPath,
@@ -95,6 +101,8 @@ function generateSeed({ articlesRoot, coursesRoot, mediaRoot, outputPath }) {
       coursesRoot,
       '--media-root',
       mediaRoot,
+      '--localizations-root',
+      localizationsRoot,
       '--output',
       outputPath,
     ],
@@ -114,7 +122,7 @@ function generateSeed({ articlesRoot, coursesRoot, mediaRoot, outputPath }) {
   }
 }
 
-function validateStagedSnapshot({ articlesRoot, coursesRoot, mediaRoot }) {
+async function validateStagedSnapshot({ articlesRoot, coursesRoot, mediaRoot, localizationsRoot }) {
   const script = path.join(ROOT, 'scripts', 'course-content', 'validate-snapshot.mjs');
   const result = spawnSync(
     process.execPath,
@@ -139,6 +147,11 @@ function validateStagedSnapshot({ articlesRoot, coursesRoot, mediaRoot }) {
     const detail = `${result.stderr ?? result.stdout ?? ''}`.trim();
     throw new Error(`The staged snapshot failed validation.${detail ? ` ${detail}` : ''}`);
   }
+  await validateLocalizedPublishedSnapshot({
+    root: ROOT,
+    snapshotRoot: localizationsRoot,
+    required: true,
+  });
 }
 
 function reusablePresentationManifest(manifest, row, thumbnailSha256) {
@@ -296,6 +309,11 @@ let courseRows;
 let variantRows;
 let articleRows;
 let articleAssetRows;
+let courseLocalizationRows;
+let variantLocalizationRows;
+let articleLocalizationRows;
+let legalVersionRows;
+let legalLocalizationRows;
 try {
   await client.connect();
   await client.query('begin isolation level repeatable read read only');
@@ -411,6 +429,130 @@ try {
       order by asset.storage_key
     `)
   ).rows;
+  courseLocalizationRows = (
+    await client.query(`
+      select
+        test.id as course_id,
+        revision.id as revision_id,
+        revision.slug,
+        localization.locale::text as locale,
+        localization.title,
+        localization.description,
+        localization.content,
+        localization.seo,
+        localization.sources,
+        localization.content_hash as localization_content_hash,
+        presentation.id as presentation_id,
+        presentation.locale::text as presentation_locale,
+        presentation.storage_bucket,
+        presentation.storage_path,
+        presentation.thumbnail_path,
+        presentation.source_filename,
+        presentation.mime_type,
+        presentation.byte_size as presentation_byte_size,
+        presentation.sha256 as presentation_sha256,
+        presentation.page_count as presentation_page_count,
+        presentation.aspect_ratio,
+        presentation.status as presentation_status
+      from public.tests test
+      join public.test_revisions revision
+        on revision.id = test.current_revision_id
+      join public.test_revision_localizations localization
+        on localization.revision_id = revision.id
+      join public.test_revision_presentations mapping
+        on mapping.revision_id = revision.id
+       and mapping.locale = localization.locale
+      join public.course_presentations presentation
+        on presentation.id = mapping.presentation_id
+      where test.status = 'published'
+      order by
+        revision.display_order,
+        revision.slug,
+        array_position(enum_range(null::public.app_locale), localization.locale)
+    `)
+  ).rows;
+  variantLocalizationRows = (
+    await client.query(`
+      select
+        revision.id as revision_id,
+        revision.slug,
+        variant.stable_id,
+        variant.variant_number,
+        localization.locale::text as locale,
+        localization.questions,
+        localization.explanations,
+        localization.question_count,
+        localization.structure_hash,
+        localization.content_hash as variant_content_hash
+      from public.tests test
+      join public.test_revisions revision
+        on revision.id = test.current_revision_id
+      join public.test_revision_variants variant
+        on variant.revision_id = revision.id
+      join public.test_revision_variant_localizations localization
+        on localization.revision_id = revision.id
+       and localization.variant_id = variant.id
+      where test.status = 'published'
+      order by
+        revision.display_order,
+        revision.slug,
+        variant.variant_number,
+        array_position(enum_range(null::public.app_locale), localization.locale)
+    `)
+  ).rows;
+  articleLocalizationRows = (
+    await client.query(`
+      select
+        article.id as article_id,
+        revision.id as revision_id,
+        revision.slug,
+        localization.locale::text as locale,
+        localization.title,
+        localization.description,
+        localization.blocks,
+        localization.seo,
+        localization.sources,
+        localization.content_hash as localization_content_hash
+      from public.articles article
+      join public.article_revisions revision
+        on revision.id = article.current_revision_id
+      join public.article_revision_localizations localization
+        on localization.revision_id = revision.id
+      where article.status = 'published' and article.is_published
+      order by
+        revision.slug,
+        array_position(enum_range(null::public.app_locale), localization.locale)
+    `)
+  ).rows;
+  legalVersionRows = (
+    await client.query(`
+      select
+        legal.document_type::text as document_type,
+        legal.version,
+        legal.body_revision,
+        legal.effective_at,
+        legal.is_current
+      from public.legal_document_versions legal
+      order by legal.document_type, legal.version
+    `)
+  ).rows;
+  legalLocalizationRows = (
+    await client.query(`
+      select
+        localization.document_type::text as document_type,
+        localization.version,
+        localization.locale::text as locale,
+        localization.title,
+        localization.body,
+        localization.body_hash,
+        localization.status
+      from public.legal_document_localizations localization
+      order by
+        localization.document_type,
+        localization.version,
+        array_position(enum_range(null::public.app_locale), localization.locale)
+    `)
+  ).rows;
   await client.query('commit');
 } catch (error) {
   await client.query('rollback').catch(() => undefined);
@@ -481,6 +623,45 @@ const publishedPresentationAssets = new Map(
     }),
   ),
 );
+const stage6Batch = await loadStage6PublicationBatch({ root: ROOT, validateRelease: true });
+const targetPresentationRows = courseLocalizationRows.filter((row) => row.locale !== 'ru');
+if (targetPresentationRows.length !== 15) {
+  throw new Error(
+    'Hosted localized catalog must expose exactly 15 target-locale presentation rows.',
+  );
+}
+const localizedPresentationAssets = new Map(
+  await Promise.all(
+    targetPresentationRows.map(async (row) => {
+      if (
+        row.storage_bucket !== 'course-presentations' ||
+        row.presentation_status !== 'ready' ||
+        row.presentation_locale !== row.locale ||
+        typeof row.storage_path !== 'string' ||
+        typeof row.thumbnail_path !== 'string'
+      ) {
+        throw new Error('Hosted localized presentation metadata is invalid.');
+      }
+      const [pdf, thumbnail] = await Promise.all([
+        downloadPublishedPresentationAsset(storage, row.storage_bucket, row.storage_path),
+        downloadPublishedPresentationAsset(storage, row.storage_bucket, row.thumbnail_path),
+      ]);
+      return [row.presentation_id, { pdf, thumbnail }];
+    }),
+  ),
+);
+const localizedSnapshot = buildLocalizedPublishedSnapshot({
+  batch: stage6Batch,
+  courseLocalizationRows,
+  variantLocalizationRows,
+  articleLocalizationRows,
+  legalVersionRows,
+  legalLocalizationRows,
+  presentationAssets: localizedPresentationAssets,
+});
+for (const [relativePath, bytes] of localizedSnapshot.files) {
+  desiredFiles.set(path.join(LOCALIZATION_ROOT, ...relativePath.split('/')), bytes);
+}
 const qaRunId = sha256(
   Buffer.from(
     JSON.stringify(
@@ -797,6 +978,27 @@ for (const [filePath, desired] of desiredFiles) {
   }
 }
 
+async function listFilesRecursively(directory) {
+  const files = [];
+  const visit = async (current) => {
+    let entries;
+    try {
+      entries = await readdir(current, { withFileTypes: true });
+    } catch (error) {
+      if (error && typeof error === 'object' && error.code === 'ENOENT') return;
+      throw error;
+    }
+    for (const entry of entries) {
+      const absolute = path.join(current, entry.name);
+      if (entry.isDirectory()) await visit(absolute);
+      else if (entry.isFile()) files.push(absolute);
+      else throw new Error('Localized snapshot contains an unsupported special file.');
+    }
+  };
+  await visit(directory);
+  return files;
+}
+
 const hostedSlugs = new Set(hostedCourses.map((course) => course.slug));
 const staleCourseDirectories = (await readdir(COURSE_ROOT, { withFileTypes: true }))
   .filter((entry) => entry.isDirectory() && !hostedSlugs.has(entry.name))
@@ -811,7 +1013,20 @@ const desiredMediaFiles = new Set(
 const staleMediaFiles = (await readdir(MEDIA_ROOT, { withFileTypes: true }))
   .filter((entry) => entry.isFile() && !desiredMediaFiles.has(entry.name))
   .map((entry) => path.join(MEDIA_ROOT, entry.name));
-for (const stale of [...staleCourseDirectories, ...staleArticleFiles, ...staleMediaFiles]) {
+const desiredLocalizedFiles = new Set(
+  [...localizedSnapshot.files.keys()].map((relativePath) =>
+    path.join(LOCALIZATION_ROOT, ...relativePath.split('/')),
+  ),
+);
+const staleLocalizedFiles = (await listFilesRecursively(LOCALIZATION_ROOT)).filter(
+  (filePath) => !desiredLocalizedFiles.has(filePath),
+);
+for (const stale of [
+  ...staleCourseDirectories,
+  ...staleArticleFiles,
+  ...staleMediaFiles,
+  ...staleLocalizedFiles,
+]) {
   differences.push({
     path: path.relative(ROOT, stale).replaceAll('\\', '/'),
     before: 'present',
@@ -823,6 +1038,7 @@ const stageRoot = path.join(ROOT, 'tmp', 'content-sync-stage', randomUUID());
 const stagedCourseRoot = path.join(stageRoot, 'courses');
 const stagedArticleRoot = path.join(stageRoot, 'articles');
 const stagedMediaRoot = path.join(stageRoot, 'media');
+const stagedLocalizationRoot = path.join(stageRoot, 'localizations');
 const stagedSeedPath = path.join(stageRoot, 'seed.sql');
 
 function stagedPathFor(canonicalPath) {
@@ -830,6 +1046,7 @@ function stagedPathFor(canonicalPath) {
     [COURSE_ROOT, stagedCourseRoot],
     [ARTICLE_ROOT, stagedArticleRoot],
     [MEDIA_ROOT, stagedMediaRoot],
+    [LOCALIZATION_ROOT, stagedLocalizationRoot],
   ]) {
     const relative = path.relative(canonicalRoot, canonicalPath);
     if (relative && !relative.startsWith('..') && !path.isAbsolute(relative)) {
@@ -868,6 +1085,11 @@ async function replaceCanonicalSnapshot() {
     { name: 'courses', current: COURSE_ROOT, staged: stagedCourseRoot },
     { name: 'articles', current: ARTICLE_ROOT, staged: stagedArticleRoot },
     { name: 'media', current: MEDIA_ROOT, staged: stagedMediaRoot },
+    {
+      name: 'localizations',
+      current: LOCALIZATION_ROOT,
+      staged: stagedLocalizationRoot,
+    },
     { name: 'seed.sql', current: SEED_PATH, staged: stagedSeedPath },
   ].map((swap) => ({ ...swap, backup: path.join(backupRoot, swap.name) }));
   const movedCurrent = [];
@@ -952,6 +1174,7 @@ async function applyWithExclusiveLock() {
 await mkdir(stagedCourseRoot, { recursive: true });
 await mkdir(stagedArticleRoot, { recursive: true });
 await mkdir(stagedMediaRoot, { recursive: true });
+await mkdir(stagedLocalizationRoot, { recursive: true });
 for (const [filePath, desired] of desiredFiles) {
   const stagedPath = stagedPathFor(filePath);
   await mkdir(path.dirname(stagedPath), { recursive: true });
@@ -961,6 +1184,7 @@ generateSeed({
   articlesRoot: stagedArticleRoot,
   coursesRoot: stagedCourseRoot,
   mediaRoot: stagedMediaRoot,
+  localizationsRoot: stagedLocalizationRoot,
   outputPath: stagedSeedPath,
 });
 
@@ -984,10 +1208,11 @@ const approvalRequired =
   qaRequiredSlugs.length > 0 &&
   (!visualQaApproved || approvalMissingSlugs.length > 0);
 if (!approvalRequired) {
-  validateStagedSnapshot({
+  await validateStagedSnapshot({
     articlesRoot: stagedArticleRoot,
     coursesRoot: stagedCourseRoot,
     mediaRoot: stagedMediaRoot,
+    localizationsRoot: stagedLocalizationRoot,
   });
 }
 
@@ -998,6 +1223,11 @@ if (checkOnly) {
       mode: 'check',
       catalogChecksum,
       totals,
+      localizedSnapshot: {
+        manifestHash: localizedSnapshot.manifest.manifestHash,
+        reviewedBatchSha256: localizedSnapshot.manifest.reviewedBatchSha256,
+        counts: localizedSnapshot.manifest.counts,
+      },
       differences,
       presentationQa: {
         requiredCourses: qaRequiredSlugs,
@@ -1014,6 +1244,11 @@ if (checkOnly) {
       mode: 'preview',
       catalogChecksum,
       totals,
+      localizedSnapshot: {
+        manifestHash: localizedSnapshot.manifest.manifestHash,
+        reviewedBatchSha256: localizedSnapshot.manifest.reviewedBatchSha256,
+        counts: localizedSnapshot.manifest.counts,
+      },
       differences,
       presentationQa: {
         requiredCourses: qaRequiredSlugs,
@@ -1039,13 +1274,27 @@ if (checkOnly) {
   } else if (differences.length === 0) {
     await rm(stageRoot, { recursive: true, force: true });
     console.log(
-      JSON.stringify({ ok: true, mode: 'pull', applied: false, catalogChecksum, totals }),
+      JSON.stringify({
+        ok: true,
+        mode: 'pull',
+        applied: false,
+        catalogChecksum,
+        totals,
+        localizedManifestHash: localizedSnapshot.manifest.manifestHash,
+      }),
     );
   } else {
     await applyWithExclusiveLock();
     await rm(stageRoot, { recursive: true, force: true });
     console.log(
-      JSON.stringify({ ok: true, mode: 'pull', applied: true, catalogChecksum, totals }),
+      JSON.stringify({
+        ok: true,
+        mode: 'pull',
+        applied: true,
+        catalogChecksum,
+        totals,
+        localizedManifestHash: localizedSnapshot.manifest.manifestHash,
+      }),
     );
   }
 }

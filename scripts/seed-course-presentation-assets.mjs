@@ -5,8 +5,11 @@ import path from 'node:path';
 import process from 'node:process';
 import { createClient } from '@supabase/supabase-js';
 
+import { validateLocalizedPublishedSnapshot } from './content-localization/localized-published-snapshot.mjs';
+
 const SNAPSHOT_ROOT = path.resolve('content', 'snapshots', 'courses');
 const MEDIA_SNAPSHOT_ROOT = path.resolve('content', 'snapshots', 'media');
+const LOCALIZATION_SNAPSHOT_ROOT = path.resolve('content', 'snapshots', 'localizations');
 const PRESENTATION_BUCKET = 'course-presentations';
 
 function decodeShellValue(rawValue) {
@@ -56,7 +59,20 @@ const supabase = createClient(url, secret, {
 });
 const catalog = await readJson(path.join(SNAPSHOT_ROOT, 'catalog.json'));
 const mediaManifest = await readJson(path.join(MEDIA_SNAPSHOT_ROOT, 'manifest.json'));
+let localizationManifest = null;
+try {
+  localizationManifest = await readJson(
+    path.join(LOCALIZATION_SNAPSHOT_ROOT, 'manifest.json'),
+  );
+  await validateLocalizedPublishedSnapshot({
+    snapshotRoot: LOCALIZATION_SNAPSHOT_ROOT,
+    required: true,
+  });
+} catch (error) {
+  if (!(error && typeof error === 'object' && error.code === 'ENOENT')) throw error;
+}
 const results = [];
+const localizedResults = [];
 const mediaResults = [];
 
 async function ensureObject(bucket, storagePath, bytes, contentType, expectedHash) {
@@ -109,6 +125,44 @@ for (const item of catalog.courses) {
   results.push({ slug: course.slug, pdf: pdfStatus, thumbnail: thumbnailStatus });
 }
 
+for (const course of localizationManifest?.courses ?? []) {
+  for (const localization of course.localizations) {
+    if (localization.locale === 'ru') continue;
+    const { presentation } = localization;
+    const [pdf, thumbnail] = await Promise.all([
+      readFile(path.join(LOCALIZATION_SNAPSHOT_ROOT, ...presentation.asset.pdfFile.split('/'))),
+      readFile(
+        path.join(
+          LOCALIZATION_SNAPSHOT_ROOT,
+          ...presentation.asset.thumbnailFile.split('/'),
+        ),
+      ),
+    ]);
+    const [pdfStatus, thumbnailStatus] = await Promise.all([
+      ensureObject(
+        PRESENTATION_BUCKET,
+        presentation.storagePath,
+        pdf,
+        'application/pdf',
+        presentation.sha256,
+      ),
+      ensureObject(
+        PRESENTATION_BUCKET,
+        presentation.thumbnailPath,
+        thumbnail,
+        'image/webp',
+        presentation.asset.thumbnailSha256,
+      ),
+    ]);
+    localizedResults.push({
+      slugHash: sha256(Buffer.from(course.slug, 'utf8')),
+      locale: localization.locale,
+      pdf: pdfStatus,
+      thumbnail: thumbnailStatus,
+    });
+  }
+}
+
 if (mediaManifest.schemaVersion !== 1 || mediaManifest.bucket !== 'content-media') {
   throw new Error('The content media snapshot manifest is invalid.');
 }
@@ -131,5 +185,6 @@ console.log(JSON.stringify({
   ok: true,
   target: 'local',
   presentations: { bucket: PRESENTATION_BUCKET, results },
+  localizedPresentations: { bucket: PRESENTATION_BUCKET, results: localizedResults },
   media: { bucket: mediaManifest.bucket, results: mediaResults },
 }));

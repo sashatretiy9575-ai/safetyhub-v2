@@ -69,16 +69,93 @@ Every final PPTX must pass template-plan validation, template fidelity, placehol
 
 ## Controlled publication sequence
 
-Publication is deliberately deferred to the release stage:
+Publication is deliberately deferred to the release stage. The checked-in batch
+publisher validates the final independent-review receipt before reading credentials:
+
+```powershell
+npm run content:localizations:publish:plan
+```
+
+`--plan` is read-only and prints the reviewed batch SHA-256, artifact-manifest
+SHA-256 and bounded counts. It does not contact linked Supabase. The mutating form
+requires all of the following in a command-scoped secret context:
+
+- `NEXT_PUBLIC_SUPABASE_URL`, whose host is exactly the confirmed production project;
+- `SUPABASE_SECRET_KEY` (or the legacy `SUPABASE_SERVICE_ROLE_KEY`) for Storage,
+  metadata finalization and the service-only assessment import;
+- `SAFETYHUB_CONTENT_OPERATOR_ACCESS_TOKEN`, an unexpired session belonging to the
+  same `--actor-id` and bearing both `test.manage` and `content.manage`;
+- a locally linked Supabase project that resolves to the same explicitly supplied
+  current production project ref;
+- the exact batch hash printed by `--plan` and a literal confirmation containing
+  both that project ref and hash.
+
+The controlled command is:
+
+```powershell
+$projectRef = '<current-production-project-ref>'
+$actorId = '<admin-user-uuid>'
+$batchHash = '0c8e8f1d05a924609da057f43465c8b289219b4cd229fdf97df97a4df57a67b8'
+
+npm run content:localizations:publish -- `
+  --project-ref $projectRef `
+  --actor-id $actorId `
+  --batch-hash $batchHash `
+  --confirm "STAGE6-PUBLISH:${projectRef}:${batchHash}" `
+  --receipt "tmp/stage6-publication/${projectRef}-${batchHash}.json"
+```
+
+This command is resumable and idempotent. It derives every hosted draft version,
+reuses only byte-identical ready presentation objects and already matching current
+revisions, and uses deterministic presentation IDs for interrupted uploads. A
+published immutable row with different content is a hard conflict. It never logs
+the operator token, service credential, learner text, stable assessment IDs or
+answer-key data; its durable receipt contains only the project/batch binding,
+counts and aggregate hashes.
+
+Internally the release sequence is:
 
 1. deploy a backward-compatible application/database read path;
-2. stage Privacy 1.3 and Terms 2.3, save all four complete immutable localizations, verify their distinct hashes and equal topology, then rotate each current version transactionally; never activate application current pointers ahead of this gate;
-3. upload each localized presentation as a new immutable Storage object and record its ID;
-4. save the corresponding localized course draft through the Russian admin application;
-5. run the service-only assessment localization importer for the same course/locale;
-6. complete the admin draft with the immutable presentation reference;
-7. publish the complete four-locale revision atomically only after the `4 × 3 × 10 × 4` validator succeeds;
-8. run `npm run content:pull:linked`, review the deterministic diff, then run `npm run content:parity:check`;
-9. commit the refreshed snapshot receipt without operational personal data.
+2. create current encrypted database and all-bucket Storage backups and verify their
+   restore receipts;
+3. upload each localized PDF and generated bounded WebP thumbnail through the
+   existing staging/finalize contract to a new content-addressed path;
+4. save the corresponding localized course draft through the authenticated admin
+   RPC, deriving the current `draft_version` instead of assuming version `1`;
+5. run the service-only assessment localization RPC for the same course/locale;
+6. mark the draft complete with the PostgreSQL-computed content hash and publish
+   one four-locale revision only after the `4 × 3 × 10 × 4` validator succeeds;
+7. repeat the derived-version save/complete/publish contract for all ten articles;
+8. complete and publish historical Privacy 1.2/Terms 2.2 translations before
+   staging Privacy 1.3/Terms 2.3, then rotate each current version transactionally;
+9. pull the exact hosted four-locale rows and 15 immutable assets, review the
+   deterministic diff, validate the localized snapshot and rerun linked parity;
+10. commit the refreshed snapshot receipt without operational personal data.
+
+The post-publication pull requires an explicit current project ref and a pinned
+Supabase PostgreSQL CA file; credentials and CA material are never committed:
+
+```powershell
+npm run content:pull:linked -- `
+  --expected-project-ref $projectRef `
+  --ssl-root-cert C:\secure\supabase-ca.pem `
+  --ssl-root-cert-sha256 <lowercase-ca-sha256>
+
+npm run content:localizations:snapshot:validate
+npm run content:snapshot:validate
+npm run content:parity:check -- `
+  --expected-project-ref $projectRef `
+  --ssl-root-cert C:\secure\supabase-ca.pem `
+  --ssl-root-cert-sha256 <lowercase-ca-sha256>
+```
+
+The pull writes `content/snapshots/localizations/manifest.json` plus exactly 15
+localized PDFs and 15 localized WebP thumbnails. The manifest includes every
+current RU/KK/EN/ZH course, variant and article localization, every legal version
+and localization, immutable presentation metadata and content hashes. It excludes
+users, profiles, attempts, certificates, acceptances, sessions, identities,
+audit rows, credentials and assessment answer keys. `supabase/seed.sql` and the
+local Storage seeder consume this validated snapshot so a clean reset reproduces
+the four-locale catalog.
 
 The automated-only receipt explicitly records that there was no human linguistic or legal approval. That residual semantic/legal risk is accepted by the owner for this release, but it must remain visible in the release record.

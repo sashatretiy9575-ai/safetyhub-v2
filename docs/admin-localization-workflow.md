@@ -74,6 +74,17 @@ UUID и credentials в stdout не выводятся. Файл импорта �
 или browser upload. После импорта администратор обновляет страницу, проверяет counts
 и завершает текстовую локализацию.
 
+Для проверенной Stage 6 партии не нужно вручную копировать `expectedVersion` 45 раз.
+`npm run content:localizations:publish:plan` проверяет финальный hash-only receipt, а
+контролируемая `content:localizations:publish` перед каждым save/import заново читает
+hosted `draft_version`. Она использует тот же authenticated admin RPC для текста и
+публикации и тот же service-only RPC для assessment, затем повторно читает immutable
+revision и сравнивает каждую локаль со staged manifest. Команда требует точный
+production project ref, UUID той же admin-сессии, reviewed batch hash и буквальное
+подтверждение; её полный операторский вызов описан в
+`docs/content-localization-batch.md`. Повторный запуск после сетевого сбоя либо
+продолжает незавершённую фазу, либо доказывает exact replay без новой revision.
+
 ## Презентации
 
 Загрузка использует существующий staging/finalize процесс. Staging keys остаются
@@ -110,11 +121,14 @@ response содержит bounded presentation receipt, но не Storage bucket
 затем сохраняются четыре structured JSON copies. Publication активирует четыре
 immutable copies одной транзакцией; опубликованный текст нельзя редактировать.
 
-Перед изменением production content обязательно выполнить
-`npm run content:pull:linked -- --check`. Публикация выполняется только через admin
-application. После неё выполняются linked pull, просмотр deterministic diff и
-`npm run content:parity:check`. Тестовая разработка этого интерфейса сама по себе не
-публикует и не изменяет production content.
+Перед изменением production content обязательно выполнить linked check с явно
+подтверждённым текущим project ref и pinned PostgreSQL CA (точная команда приведена
+в `docs/content-localization-batch.md`). Интерактивные изменения выполняются через
+admin application; утверждённая Stage 6 партия может быть оркестрирована только
+service-side batch-командой, которая вызывает те же admin publication contracts.
+После неё выполняются linked pull, просмотр deterministic diff, localized snapshot
+validator и linked parity. Тестовая разработка интерфейса и `--plan` сами по себе
+не публикуют и не изменяют production content.
 
 ## ZH synthetic identity
 

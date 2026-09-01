@@ -3,6 +3,9 @@ import { access, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
+import { validateLocalizedPublishedSnapshot } from './content-localization/localized-published-snapshot.mjs';
+import { loadStage6PublicationBatch } from './content-localization/stage6-publication-contract.mjs';
+
 const root = process.cwd();
 
 function argumentValue(name, fallback) {
@@ -24,6 +27,10 @@ const courseSnapshotsDirectory = argumentValue(
 const mediaSnapshotsDirectory = argumentValue(
   '--media-root',
   path.join(root, 'content', 'snapshots', 'media'),
+);
+const localizationSnapshotsDirectory = argumentValue(
+  '--localizations-root',
+  path.join(root, 'content', 'snapshots', 'localizations'),
 );
 const outputPath = argumentValue('--output', path.join(root, 'supabase', 'seed.sql'));
 const checkOnly = process.argv.includes('--check');
@@ -67,6 +74,22 @@ const rawArticles = await readJsonDirectory(articlesDirectory);
 const mediaManifest = JSON.parse(
   await readFile(path.join(mediaSnapshotsDirectory, 'manifest.json'), 'utf8'),
 );
+let localizationManifest = null;
+let localizationBatch = null;
+try {
+  await access(path.join(localizationSnapshotsDirectory, 'manifest.json'));
+  await validateLocalizedPublishedSnapshot({
+    root,
+    snapshotRoot: localizationSnapshotsDirectory,
+    required: true,
+  });
+  localizationManifest = JSON.parse(
+    await readFile(path.join(localizationSnapshotsDirectory, 'manifest.json'), 'utf8'),
+  );
+  localizationBatch = await loadStage6PublicationBatch({ root, validateRelease: false });
+} catch (error) {
+  if (!(error && typeof error === 'object' && error.code === 'ENOENT')) throw error;
+}
 
 function sortJson(value) {
   if (Array.isArray(value)) return value.map(sortJson);
@@ -254,6 +277,508 @@ const articles = await Promise.all(
 const coursesPayload = JSON.stringify(courses);
 const articlesPayload = JSON.stringify(articles);
 const mediaAssetsPayload = JSON.stringify(mediaManifest.assets);
+const localizedSeedPayload = localizationManifest
+  ? {
+      batchId: localizationManifest.batchId,
+      reviewedBatchSha256: localizationManifest.reviewedBatchSha256,
+      courses: localizationManifest.courses.map((course) => ({
+        courseId: course.courseId,
+        slug: course.slug,
+        localizations: course.localizations
+          .filter((localization) => localization.locale !== 'ru')
+          .map((localization) => ({
+            ...localization,
+            variants: course.variants.map((variant) => {
+              const localized = variant.localizations.find(
+                (item) => item.locale === localization.locale,
+              );
+              const staged = localizationBatch.courses.find(
+                (item) =>
+                  item.slug === course.slug && item.locale === localization.locale,
+              );
+              const stagedVariant = staged?.assessment.questionVariants.find(
+                (item) => item.id === variant.stableId,
+              );
+              if (
+                !localized ||
+                !stagedVariant ||
+                stagedVariant.variantNumber !== variant.variantNumber
+              ) {
+                throw new Error('LOCALIZED_SEED_VARIANT_BINDING_INVALID');
+              }
+              return {
+                ...stagedVariant,
+                structureHash: localized.structureHash,
+                contentHash: localized.contentHash,
+              };
+            }),
+          })),
+      })),
+      articles: localizationManifest.articles.map((article) => ({
+        slug: article.slug,
+        localizations: article.localizations.filter(
+          (localization) => localization.locale !== 'ru',
+        ),
+      })),
+      legalVersions: localizationManifest.legalVersions,
+    }
+  : null;
+const localizedSeedSql = localizedSeedPayload
+  ? `
+-- Published RU/KK/EN/ZH snapshot. This projection contains no answer keys or
+-- operational user data and is generated only after linked four-locale parity.
+do $localized_seed$
+declare
+  v_payload jsonb := $localized$${JSON.stringify(localizedSeedPayload)}$localized$::jsonb;
+  v_course jsonb;
+  v_localization jsonb;
+  v_variant jsonb;
+  v_question_variants jsonb;
+  v_test_id uuid;
+  v_revision_id uuid;
+  v_variant_id uuid;
+  v_presentation_id uuid;
+  v_locale public.app_locale;
+begin
+  for v_course in
+    select value from jsonb_array_elements(v_payload -> 'courses')
+  loop
+    select test.id, test.current_revision_id
+    into v_test_id, v_revision_id
+    from public.tests test
+    where test.slug = v_course ->> 'slug';
+    if v_test_id is null or v_revision_id is null
+      or v_test_id is distinct from (v_course ->> 'courseId')::uuid then
+      raise exception 'LOCALIZED_COURSE_SEED_IDENTITY_CONFLICT:%', v_course ->> 'slug';
+    end if;
+
+    for v_localization in
+      select value from jsonb_array_elements(v_course -> 'localizations')
+    loop
+      v_locale := (v_localization ->> 'locale')::public.app_locale;
+      v_presentation_id := (v_localization -> 'presentation' ->> 'id')::uuid;
+      v_question_variants := v_localization -> 'variants';
+
+      if private.localized_course_content_hash(
+        v_localization ->> 'title',
+        v_localization ->> 'description',
+        v_localization -> 'content',
+        v_question_variants,
+        v_localization -> 'seo',
+        v_localization -> 'sources',
+        v_localization -> 'presentation' ->> 'sha256'
+      ) is distinct from v_localization ->> 'contentHash' then
+        raise exception 'LOCALIZED_COURSE_SEED_HASH_MISMATCH:%:%',
+          v_course ->> 'slug', v_locale::text;
+      end if;
+
+      insert into public.course_presentations (
+        id, course_id, locale, storage_bucket, storage_path, thumbnail_path,
+        source_filename, mime_type, byte_size, sha256, page_count,
+        aspect_ratio, status, validated_at
+      ) values (
+        v_presentation_id,
+        v_test_id,
+        v_locale,
+        v_localization -> 'presentation' ->> 'storageBucket',
+        v_localization -> 'presentation' ->> 'storagePath',
+        v_localization -> 'presentation' ->> 'thumbnailPath',
+        v_localization -> 'presentation' ->> 'sourceFilename',
+        v_localization -> 'presentation' ->> 'mimeType',
+        (v_localization -> 'presentation' ->> 'byteSize')::bigint,
+        v_localization -> 'presentation' ->> 'sha256',
+        (v_localization -> 'presentation' ->> 'pageCount')::integer,
+        v_localization -> 'presentation' ->> 'aspectRatio',
+        'ready',
+        timestamptz '2026-09-02T00:00:00Z'
+      ) on conflict (id) do nothing;
+
+      if not exists (
+        select 1 from public.course_presentations presentation
+        where presentation.id = v_presentation_id
+          and presentation.course_id = v_test_id
+          and presentation.locale = v_locale
+          and presentation.storage_bucket = v_localization -> 'presentation' ->> 'storageBucket'
+          and presentation.storage_path = v_localization -> 'presentation' ->> 'storagePath'
+          and presentation.thumbnail_path = v_localization -> 'presentation' ->> 'thumbnailPath'
+          and presentation.sha256 = v_localization -> 'presentation' ->> 'sha256'
+          and presentation.byte_size = (v_localization -> 'presentation' ->> 'byteSize')::bigint
+          and presentation.page_count = (v_localization -> 'presentation' ->> 'pageCount')::integer
+          and presentation.status = 'ready'
+      ) then
+        raise exception 'LOCALIZED_PRESENTATION_SEED_CONFLICT:%:%',
+          v_course ->> 'slug', v_locale::text;
+      end if;
+
+      insert into public.course_draft_localizations (
+        test_id, locale, title, description, content, question_variants,
+        seo, sources, content_hash, reviewed_content_hash, translation_qa,
+        status, draft_version
+      ) values (
+        v_test_id,
+        v_locale,
+        v_localization ->> 'title',
+        v_localization ->> 'description',
+        v_localization -> 'content',
+        v_question_variants,
+        v_localization -> 'seo',
+        v_localization -> 'sources',
+        v_localization ->> 'contentHash',
+        v_localization ->> 'contentHash',
+        jsonb_build_object(
+          'status', 'passed',
+          'mode', 'published-snapshot',
+          'batchId', v_payload ->> 'batchId',
+          'batchSha256', v_payload ->> 'reviewedBatchSha256',
+          'assessmentImported', true
+        ),
+        'complete',
+        1
+      ) on conflict (test_id, locale) do update
+      set title = excluded.title,
+          description = excluded.description,
+          content = excluded.content,
+          question_variants = excluded.question_variants,
+          seo = excluded.seo,
+          sources = excluded.sources,
+          content_hash = excluded.content_hash,
+          reviewed_content_hash = excluded.reviewed_content_hash,
+          translation_qa = excluded.translation_qa,
+          status = excluded.status;
+
+      insert into public.course_draft_presentations(test_id, locale, presentation_id)
+      values (v_test_id, v_locale, v_presentation_id)
+      on conflict (test_id, locale) do update
+      set presentation_id = excluded.presentation_id;
+
+      insert into public.test_revision_localizations (
+        revision_id, locale, title, description, content, seo, sources,
+        content_hash, translation_qa
+      ) values (
+        v_revision_id,
+        v_locale,
+        v_localization ->> 'title',
+        v_localization ->> 'description',
+        v_localization -> 'content',
+        v_localization -> 'seo',
+        v_localization -> 'sources',
+        v_localization ->> 'contentHash',
+        jsonb_build_object(
+          'status', 'passed',
+          'mode', 'published-snapshot',
+          'batchId', v_payload ->> 'batchId',
+          'batchSha256', v_payload ->> 'reviewedBatchSha256',
+          'assessmentImported', true
+        )
+      ) on conflict (revision_id, locale) do nothing;
+
+      if not exists (
+        select 1 from public.test_revision_localizations localization
+        where localization.revision_id = v_revision_id
+          and localization.locale = v_locale
+          and localization.title = v_localization ->> 'title'
+          and localization.description = v_localization ->> 'description'
+          and localization.content = v_localization -> 'content'
+          and localization.seo = v_localization -> 'seo'
+          and localization.sources = v_localization -> 'sources'
+          and localization.content_hash = v_localization ->> 'contentHash'
+          and localization.translation_qa ->> 'batchSha256'
+            = v_payload ->> 'reviewedBatchSha256'
+      ) then
+        raise exception 'LOCALIZED_COURSE_REVISION_SEED_CONFLICT:%:%',
+          v_course ->> 'slug', v_locale::text;
+      end if;
+
+      insert into public.test_revision_presentations(revision_id, locale, presentation_id)
+      values (v_revision_id, v_locale, v_presentation_id)
+      on conflict (revision_id, locale) do nothing;
+
+      if not exists (
+        select 1 from public.test_revision_presentations mapping
+        where mapping.revision_id = v_revision_id
+          and mapping.locale = v_locale
+          and mapping.presentation_id = v_presentation_id
+      ) then
+        raise exception 'LOCALIZED_COURSE_PRESENTATION_SEED_CONFLICT:%:%',
+          v_course ->> 'slug', v_locale::text;
+      end if;
+
+      for v_variant in
+        select value from jsonb_array_elements(v_question_variants)
+      loop
+        select variant.id into v_variant_id
+        from public.test_revision_variants variant
+        where variant.revision_id = v_revision_id
+          and variant.stable_id = (v_variant ->> 'id')::uuid
+          and variant.variant_number = (v_variant ->> 'variantNumber')::smallint;
+        if v_variant_id is null then
+          raise exception 'LOCALIZED_VARIANT_SEED_IDENTITY_CONFLICT:%:%',
+            v_course ->> 'slug', v_variant ->> 'variantNumber';
+        end if;
+        if private.assessment_structure_hash(
+          private.localized_public_questions(v_variant -> 'questions')
+        ) is distinct from v_variant ->> 'structureHash' or encode(
+          extensions.digest(
+            convert_to(
+              jsonb_build_object(
+                'questions', private.localized_public_questions(v_variant -> 'questions'),
+                'explanations', private.localized_explanations(v_variant -> 'questions')
+              )::text,
+              'UTF8'
+            ),
+            'sha256'
+          ),
+          'hex'
+        ) is distinct from v_variant ->> 'contentHash' then
+          raise exception 'LOCALIZED_VARIANT_SEED_HASH_MISMATCH:%:%:%',
+            v_course ->> 'slug', v_locale::text, v_variant ->> 'variantNumber';
+        end if;
+        insert into public.test_revision_variant_localizations (
+          revision_id, variant_id, locale, questions, explanations,
+          question_count, structure_hash, content_hash
+        ) values (
+          v_revision_id,
+          v_variant_id,
+          v_locale,
+          private.localized_public_questions(v_variant -> 'questions'),
+          private.localized_explanations(v_variant -> 'questions'),
+          10,
+          v_variant ->> 'structureHash',
+          v_variant ->> 'contentHash'
+        ) on conflict (variant_id, locale) do nothing;
+        if not exists (
+          select 1 from public.test_revision_variant_localizations localization
+          where localization.revision_id = v_revision_id
+            and localization.variant_id = v_variant_id
+            and localization.locale = v_locale
+            and localization.questions
+              = private.localized_public_questions(v_variant -> 'questions')
+            and localization.explanations
+              = private.localized_explanations(v_variant -> 'questions')
+            and localization.question_count = 10
+            and localization.structure_hash = v_variant ->> 'structureHash'
+            and localization.content_hash = v_variant ->> 'contentHash'
+        ) then
+          raise exception 'LOCALIZED_VARIANT_REVISION_SEED_CONFLICT:%:%:%',
+            v_course ->> 'slug', v_locale::text, v_variant ->> 'variantNumber';
+        end if;
+      end loop;
+    end loop;
+  end loop;
+end;
+$localized_seed$;
+
+do $localized_seed$
+declare
+  v_payload jsonb := $localized$${JSON.stringify(localizedSeedPayload)}$localized$::jsonb;
+  v_article jsonb;
+  v_localization jsonb;
+  v_article_id uuid;
+  v_revision_id uuid;
+  v_locale public.app_locale;
+begin
+  for v_article in
+    select value from jsonb_array_elements(v_payload -> 'articles')
+  loop
+    select article.id, article.current_revision_id
+    into v_article_id, v_revision_id
+    from public.articles article
+    where article.slug = v_article ->> 'slug';
+    if v_article_id is null or v_revision_id is null then
+      raise exception 'LOCALIZED_ARTICLE_SEED_IDENTITY_CONFLICT:%', v_article ->> 'slug';
+    end if;
+    for v_localization in
+      select value from jsonb_array_elements(v_article -> 'localizations')
+    loop
+      v_locale := (v_localization ->> 'locale')::public.app_locale;
+      if (
+        select private.localized_article_content_hash(
+          draft.slug,
+          v_localization ->> 'title',
+          v_localization ->> 'description',
+          draft.cover_image,
+          v_localization -> 'blocks',
+          v_localization -> 'seo',
+          draft.jurisdiction,
+          draft.effective_date,
+          v_localization -> 'sources'
+        )
+        from public.article_drafts draft
+        where draft.article_id = v_article_id
+      ) is distinct from v_localization ->> 'contentHash' then
+        raise exception 'LOCALIZED_ARTICLE_SEED_HASH_MISMATCH:%:%',
+          v_article ->> 'slug', v_locale::text;
+      end if;
+      insert into public.article_draft_localizations (
+        article_id, locale, title, description, blocks, seo, sources,
+        content_hash, reviewed_content_hash, translation_qa, status, draft_version
+      ) values (
+        v_article_id,
+        v_locale,
+        v_localization ->> 'title',
+        v_localization ->> 'description',
+        v_localization -> 'blocks',
+        v_localization -> 'seo',
+        v_localization -> 'sources',
+        v_localization ->> 'contentHash',
+        v_localization ->> 'contentHash',
+        jsonb_build_object(
+          'status', 'passed',
+          'mode', 'published-snapshot',
+          'batchId', v_payload ->> 'batchId',
+          'batchSha256', v_payload ->> 'reviewedBatchSha256'
+        ),
+        'complete',
+        1
+      ) on conflict (article_id, locale) do update
+      set title = excluded.title,
+          description = excluded.description,
+          blocks = excluded.blocks,
+          seo = excluded.seo,
+          sources = excluded.sources,
+          content_hash = excluded.content_hash,
+          reviewed_content_hash = excluded.reviewed_content_hash,
+          translation_qa = excluded.translation_qa,
+          status = excluded.status;
+
+      insert into public.article_revision_localizations (
+        revision_id, locale, title, description, blocks, seo, sources,
+        content_hash, translation_qa
+      ) values (
+        v_revision_id,
+        v_locale,
+        v_localization ->> 'title',
+        v_localization ->> 'description',
+        v_localization -> 'blocks',
+        v_localization -> 'seo',
+        v_localization -> 'sources',
+        v_localization ->> 'contentHash',
+        jsonb_build_object(
+          'status', 'passed',
+          'mode', 'published-snapshot',
+          'batchId', v_payload ->> 'batchId',
+          'batchSha256', v_payload ->> 'reviewedBatchSha256'
+        )
+      ) on conflict (revision_id, locale) do nothing;
+      if not exists (
+        select 1 from public.article_revision_localizations localization
+        where localization.revision_id = v_revision_id
+          and localization.locale = v_locale
+          and localization.title = v_localization ->> 'title'
+          and localization.description = v_localization ->> 'description'
+          and localization.blocks = v_localization -> 'blocks'
+          and localization.seo = v_localization -> 'seo'
+          and localization.sources = v_localization -> 'sources'
+          and localization.content_hash = v_localization ->> 'contentHash'
+          and localization.translation_qa ->> 'batchSha256'
+            = v_payload ->> 'reviewedBatchSha256'
+      ) then
+        raise exception 'LOCALIZED_ARTICLE_REVISION_SEED_CONFLICT:%:%',
+          v_article ->> 'slug', v_locale::text;
+      end if;
+    end loop;
+  end loop;
+end;
+$localized_seed$;
+
+do $localized_seed$
+declare
+  v_payload jsonb := $localized$${JSON.stringify(localizedSeedPayload)}$localized$::jsonb;
+  v_version jsonb;
+  v_localization jsonb;
+begin
+  for v_version in
+    select value from jsonb_array_elements(v_payload -> 'legalVersions')
+  loop
+    insert into public.legal_document_versions (
+      document_type, version, body_revision, effective_at, is_current
+    ) values (
+      (v_version ->> 'documentType')::public.legal_document_type,
+      v_version ->> 'version',
+      v_version ->> 'bodyRevision',
+      (v_version ->> 'effectiveAt')::timestamptz,
+      false
+    ) on conflict (document_type, version) do nothing;
+
+    if not exists (
+      select 1 from public.legal_document_versions legal
+      where legal.document_type
+          = (v_version ->> 'documentType')::public.legal_document_type
+        and legal.version = v_version ->> 'version'
+        and legal.body_revision = v_version ->> 'bodyRevision'
+        and legal.effective_at = (v_version ->> 'effectiveAt')::timestamptz
+    ) then
+      raise exception 'LOCALIZED_LEGAL_VERSION_SEED_CONFLICT:%:%',
+        v_version ->> 'documentType', v_version ->> 'version';
+    end if;
+
+    for v_localization in
+      select value from jsonb_array_elements(v_version -> 'localizations')
+    loop
+      insert into public.legal_document_localizations (
+        document_type, version, locale, title, body, body_hash,
+        status, published_at
+      ) values (
+        (v_version ->> 'documentType')::public.legal_document_type,
+        v_version ->> 'version',
+        (v_localization ->> 'locale')::public.app_locale,
+        v_localization ->> 'title',
+        v_localization -> 'body',
+        v_localization ->> 'bodyHash',
+        v_localization ->> 'status',
+        case when v_localization ->> 'status' = 'published'
+          then (v_version ->> 'effectiveAt')::timestamptz else null end
+      ) on conflict (document_type, version, locale) do nothing;
+      if not exists (
+        select 1 from public.legal_document_localizations localization
+        where localization.document_type
+            = (v_version ->> 'documentType')::public.legal_document_type
+          and localization.version = v_version ->> 'version'
+          and localization.locale
+            = (v_localization ->> 'locale')::public.app_locale
+          and localization.title = v_localization ->> 'title'
+          and localization.body = v_localization -> 'body'
+          and localization.body_hash = v_localization ->> 'bodyHash'
+          and localization.body_hash = encode(
+            extensions.digest(
+              convert_to((v_localization -> 'body')::text, 'UTF8'),
+              'sha256'
+            ),
+            'hex'
+          )
+          and localization.status::text = v_localization ->> 'status'
+      ) then
+        raise exception 'LOCALIZED_LEGAL_LOCALIZATION_SEED_CONFLICT:%:%:%',
+          v_version ->> 'documentType', v_version ->> 'version',
+          v_localization ->> 'locale';
+      end if;
+    end loop;
+  end loop;
+
+  perform set_config('safetyhub.legal_rotation', '1', true);
+  update public.legal_document_versions set is_current = false where is_current;
+  update public.legal_document_versions legal
+  set is_current = true
+  from jsonb_array_elements(v_payload -> 'legalVersions') item(value)
+  where (item.value ->> 'isCurrent')::boolean
+    and legal.document_type = (item.value ->> 'documentType')::public.legal_document_type
+    and legal.version = item.value ->> 'version';
+
+  if exists (
+    select 1
+    from jsonb_array_elements(v_payload -> 'legalVersions') item(value)
+    join public.legal_document_versions legal
+      on legal.document_type
+        = (item.value ->> 'documentType')::public.legal_document_type
+     and legal.version = item.value ->> 'version'
+    where legal.is_current is distinct from (item.value ->> 'isCurrent')::boolean
+  ) then
+    raise exception 'LOCALIZED_LEGAL_CURRENT_POINTER_SEED_CONFLICT';
+  end if;
+end;
+$localized_seed$;
+`
+  : '';
 
 const sql = `-- Canonical, idempotent development seed generated from content snapshots.
 -- Run npm run content:seed:generate after changing bundled courses or articles.
@@ -600,7 +1125,7 @@ insert into public.legal_document_versions (
   ('terms', '2.1', 'terms-2.1', false, timestamptz '2026-08-13T00:00:00Z'),
   ('terms', '2.2', 'terms-2.2', true, timestamptz '2026-08-31T00:00:00Z')
 on conflict (document_type, version) do nothing;
-
+${localizedSeedSql}
 insert into public.site_settings (
   singleton, phone_e164, phone_display, whatsapp_e164,
   whatsapp_same_as_phone, version

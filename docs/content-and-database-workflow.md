@@ -10,6 +10,7 @@
 | Generated TypeScript-схема базы         | Supabase CLI                        | `lib/supabase/database.generated.ts`  |
 | Прикладные алиасы и JSON/RPC-контракты  | Код приложения                      | `lib/supabase/types.ts`               |
 | Опубликованные курсы и статьи           | Admin application / hosted Supabase | `content/snapshots/`                  |
+| Опубликованные локализации RU/KK/EN/ZH  | Admin application / hosted Supabase | `content/snapshots/localizations/`    |
 | PDF, миниатюры и публичные медиа статей | Supabase Storage                    | assets в snapshot + SHA-256 manifests |
 | Пользователи и история                  | Hosted operational database         | не экспортируются                     |
 
@@ -60,21 +61,27 @@ Storage API и загружает пять content-addressed PDF/миниатю�
 
 ## Изменение курса, теста или статьи
 
-1. Проверить синхронность: `npm run content:pull:linked -- --check`.
+1. Проверить синхронность read-only командой с явно указанными текущим project ref
+   и pinned PostgreSQL CA:
+   `npm run content:parity:check -- --expected-project-ref <ref> --ssl-root-cert <absolute-ca.pem> --ssl-root-cert-sha256 <sha256>`.
 2. Внести изменение через административный интерфейс.
 3. Опубликовать новую immutable revision.
-4. Выполнить `npm run content:pull:linked`. Команда сначала собирает полный
+4. Выполнить
+   `npm run content:pull:linked -- --expected-project-ref <ref> --ssl-root-cert <absolute-ca.pem> --ssl-root-cert-sha256 <sha256>`.
+   Команда сначала собирает полный
    снимок и seed во временной директории и печатает diff, не изменяя канонический
    snapshot до этого момента.
 5. Если опубликован новый PDF или новая миниатюра, команда завершится в режиме
    `approval-required` и выведет `qaRoot`. Просмотреть все PNG страниц и все
    контактные листы в этой директории.
 6. Для тех же неизменившихся hosted-хешей повторить
-   `npm run content:pull:linked -- --visual-qa-approved`. Флаг принимается только
+   `npm run content:pull:linked -- --visual-qa-approved --expected-project-ref <ref> --ssl-root-cert <absolute-ca.pem> --ssl-root-cert-sha256 <sha256>`.
+   Флаг принимается только
    при наличии созданной предыдущим запуском pending QA-квитанции для точного
    набора PDF и миниатюр.
 7. Проверить напечатанный diff и diff Git после атомарной замены snapshot.
-8. Запустить `npm run content:snapshot:validate` и `npm run content:parity:check`.
+8. Запустить `npm run content:snapshot:validate`, затем повторить точную linked
+   parity-команду из шага 1.
 9. Закоммитить snapshot вместе с ожидаемыми hashes.
 
 Для исходного импорта 25 августа 2026 года дополнительно запускается
@@ -186,7 +193,9 @@ manifest; в нём нет списка пяти slug или page counts, заш
 
 ## Проверка parity
 
-`npm run content:parity:check` сравнивает локальный catalog hash с hosted read model.
+`npm run content:parity:check` сравнивает локальные базовый и four-locale snapshot
+с hosted read model. Команда требует явные `--expected-project-ref` и
+`--ssl-root-cert`; необязательный `--ssl-root-cert-sha256` фиксирует точный CA-файл.
 `npm run content:pull:linked` скачивает hosted-объекты только во временную область,
 сверяет SHA-256 и строит безопасный список diff до записи в канонические пути.
 Новый или изменённый PDF автоматически проверяется на опасные actions и вложения,
@@ -195,16 +204,23 @@ receipt и динамические контактные листы. Публи�
 ограниченный 16:9 WebP. До ручного просмотра всех страниц и повторного запуска с
 `--visual-qa-approved` файлы snapshot и `supabase/seed.sql` не изменяются.
 
-Перед применением команда строит полный staged snapshot курсов, статей и только
-тех WebP из `content-media`, на которые ссылаются опубликованные статьи,
+Перед применением команда строит полный staged snapshot курсов, статей, всех
+current RU/KK/EN/ZH course/article/variant localizations, полного legal ledger,
+15 target-locale PDF/WebP presentation pairs и только тех WebP из `content-media`,
+на которые ссылаются опубликованные статьи,
 генерирует staged seed и запускает динамический snapshot validator. После preview
 готовые директории и seed заменяются одной rollback-safe операцией; ошибка любого
-шага возвращает прежние пути. `content/snapshots/media/manifest.json` входит в
-детерминированный снимок. Режим `--check` ничего не пишет в канонический snapshot
+шага возвращает прежние пути. `content/snapshots/media/manifest.json` и
+`content/snapshots/localizations/manifest.json` входят в детерминированный снимок.
+Localized manifest связан с финальным independent-review batch hash, проверяет
+ровно четыре локали каждой current сущности, stable question/option topology и
+content-addressed hashes/bytes всех 15 assets. Режим `--check` ничего не пишет в канонический snapshot
 и завершается ненулевым кодом при любом расхождении.
 Команда читает только текущие опубликованные ревизии
-курсов и статей, presentation metadata, варианты, приватные ключи ответов и
-метаданные используемых публичных assets; таблицы пользователей, профилей,
+курсов и статей, локализации presentation/вариантов/articles/legal, presentation
+metadata, базовые private answer mappings для существующего RU seed и метаданные
+используемых публичных assets. Localized projection и manifest никогда не включают
+answer mappings; таблицы пользователей, профилей,
 попыток, сертификатов, согласий и аудита не запрашиваются.
 
 Ожидаемый текущий контракт каталога:
@@ -220,13 +236,17 @@ receipt и динамические контактные листы. Публи�
 ## Seed и восстановление
 
 `npm run content:seed:generate` строит детерминированный локальный SQL seed из
-snapshot, включая метаданные опубликованных WebP статей. Число будущих курсов и
-статей берётся из snapshot и не зафиксировано текущими значениями 5 и 10.
-`npm run content:assets:seed:local` идемпотентно загружает PDF, миниатюры и
-публичные WebP статей, а при существующем immutable path сначала сверяет
-фактический SHA-256. Production никогда не обновляется запуском seed; hosted
-content публикуется через админку или явно проверенную catalog activation
-operation.
+snapshot, включая метаданные опубликованных WebP статей. После controlled Stage 6
+publication он также воспроизводит current course/article/variant localizations,
+полный legal ledger и current legal pointers из валидированного localized
+manifest; конфликт immutable revision/hash завершает seed ошибкой. Число будущих
+курсов и статей берётся из базового snapshot и не зафиксировано текущими значениями
+5 и 10, а Stage 6 receipt отдельно фиксирует границу первой партии.
+`npm run content:assets:seed:local` идемпотентно загружает пять RU и 15
+target-locale presentation PDF/thumbnail pairs и публичные WebP статей, а при
+существующем immutable path сначала сверяет фактический SHA-256. Production никогда
+не обновляется запуском seed; hosted content публикуется через админку или явно
+подтверждённую server-side batch/catalog activation operation.
 
 ## Destructive catalog cutover
 
