@@ -22,7 +22,10 @@ function Convert-ToRepoPath([string]$Path) {
 }
 
 function Write-DeterministicJson([string]$Path, [object]$Value) {
-  $json = $Value | ConvertTo-Json -Depth 12
+  # ConvertTo-Json follows the host platform's newline convention. Normalize
+  # before hashing/committing receipts so Windows generation and Linux CI read
+  # the exact same bytes.
+  $json = ($Value | ConvertTo-Json -Depth 12).Replace("`r`n", "`n").Replace("`r", "`n")
   [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($Path)) | Out-Null
   [IO.File]::WriteAllText($Path, "$json`n", [Text.UTF8Encoding]::new($false))
 }

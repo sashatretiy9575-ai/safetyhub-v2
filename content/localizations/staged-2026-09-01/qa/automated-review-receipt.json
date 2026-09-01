@@ -567,8 +567,8 @@
     },
     {
       "path": "presentations/armaturshchik/en/pdf-receipt.json",
-      "bytes": 923,
-      "sha256": "6a54fa46cefde2aa8607e0e58f37d4bf91bf5430bef18e7228da46be1ff4c107"
+      "bytes": 901,
+      "sha256": "6098847dd4185610bd33d92b1860c168fca3af9b39ecd2822877a2eb7a730911"
     },
     {
       "path": "presentations/armaturshchik/en/pptx-receipt.json",
@@ -597,8 +597,8 @@
     },
     {
       "path": "presentations/armaturshchik/kk/pdf-receipt.json",
-      "bytes": 923,
-      "sha256": "949495d1dac9cc2eaad8817355839652eb8ca02e129776016b71e1e63d776bb5"
+      "bytes": 901,
+      "sha256": "3357de26b3872bf742bb57d1f5f76c690652a448d94b986900b6f54db4a45006"
     },
     {
       "path": "presentations/armaturshchik/kk/pptx-receipt.json",
@@ -632,8 +632,8 @@
     },
     {
       "path": "presentations/armaturshchik/zh/pdf-receipt.json",
-      "bytes": 923,
-      "sha256": "834a375af1983a5148b9ea12d53ff37ab4084fb876ceaa0c0f7eddd2847d97cd"
+      "bytes": 901,
+      "sha256": "e2ca4e3849dabf538a01a93a2ed85e54945037626663b274cdf5ab734f448d1b"
     },
     {
       "path": "presentations/armaturshchik/zh/pptx-receipt.json",
@@ -662,8 +662,8 @@
     },
     {
       "path": "presentations/biot/en/pdf-receipt.json",
-      "bytes": 896,
-      "sha256": "1e135c4dde593dc7244fba4c4f14b02f4ae2ba63266d1238603e6854ae8d1c7b"
+      "bytes": 874,
+      "sha256": "208a5682f1c967f1435c1cb415ff5139e8349239eef231e3a9d9cd4b9ea2d529"
     },
     {
       "path": "presentations/biot/en/pptx-receipt.json",
@@ -692,8 +692,8 @@
     },
     {
       "path": "presentations/biot/kk/pdf-receipt.json",
-      "bytes": 896,
-      "sha256": "a44a3429a8dcecdc3933116810c3c4d119ab96e8d0d7ee7e93a64fcad0b5de8f"
+      "bytes": 874,
+      "sha256": "1e4887b7ff969aebfa3d883ed726a6ee02c9749f2fde60c5fd08e885ddedf05a"
     },
     {
       "path": "presentations/biot/kk/pptx-receipt.json",
@@ -727,8 +727,8 @@
     },
     {
       "path": "presentations/biot/zh/pdf-receipt.json",
-      "bytes": 896,
-      "sha256": "7f9792906e0c3c5c41251e44337160894ac2d3856f98a5db48fab74807c68402"
+      "bytes": 874,
+      "sha256": "056b23224666cf7042c6ef57fb7858a7dacc1841ced45c14a8a502ff3accbabf"
     },
     {
       "path": "presentations/biot/zh/pptx-receipt.json",
@@ -757,8 +757,8 @@
     },
     {
       "path": "presentations/lesomontazhnye-raboty/en/pdf-receipt.json",
-      "bytes": 947,
-      "sha256": "20bd4906a00cb2d0ba3accf4a7aa7b0c74ef4fc6600ada80c0aabc5e3073a92b"
+      "bytes": 925,
+      "sha256": "649fe557897eb22267c0ea2484f42463f57413ce40b54523b1e92f3b2cec9843"
     },
     {
       "path": "presentations/lesomontazhnye-raboty/en/pptx-receipt.json",
@@ -792,8 +792,8 @@
     },
     {
       "path": "presentations/lesomontazhnye-raboty/kk/pdf-receipt.json",
-      "bytes": 947,
-      "sha256": "96906194a01c92b51737c97474d3b1d985eee89664df987e8c2bfeac8c987c67"
+      "bytes": 925,
+      "sha256": "f183efc2481ea8dc9e2c723e2023af93f3ae8f1175e1dc73a6827f24683bcd7c"
     },
     {
       "path": "presentations/lesomontazhnye-raboty/kk/pptx-receipt.json",
@@ -827,8 +827,8 @@
     },
     {
       "path": "presentations/lesomontazhnye-raboty/zh/pdf-receipt.json",
-      "bytes": 947,
-      "sha256": "6735012945c7f2bdfb2f806a844b97c8a0d3fab960b13f268ddf18e15d51e838"
+      "bytes": 925,
+      "sha256": "9117107ab236f4390d60ba139fa5ab15d5e453f9eb992f1d681223f1461752f9"
     },
     {
       "path": "presentations/lesomontazhnye-raboty/zh/pptx-receipt.json",
@@ -857,8 +857,8 @@
     },
     {
       "path": "presentations/plotnik/en/pdf-receipt.json",
-      "bytes": 905,
-      "sha256": "d9a66193660fe5f4a97dba413212959e0d1d4a101be6f6ca69212d5c9a76821b"
+      "bytes": 883,
+      "sha256": "1f1d1ce46a461fe549a017d58c607e2f7197841d9eadb6901e41d7da01add63e"
     },
     {
       "path": "presentations/plotnik/en/pptx-receipt.json",
@@ -887,8 +887,8 @@
     },
     {
       "path": "presentations/plotnik/kk/pdf-receipt.json",
-      "bytes": 905,
-      "sha256": "bdba2527aa9f992fb0ec750ee86c418990c692f02d543a501e53483efa70aee0"
+      "bytes": 883,
+      "sha256": "f8808da3f66b9fa0140f83f2e0b7da28ddeeff26d3e66a635446cf350bb21d42"
     },
     {
       "path": "presentations/plotnik/kk/pptx-receipt.json",
@@ -922,8 +922,8 @@
     },
     {
       "path": "presentations/plotnik/zh/pdf-receipt.json",
-      "bytes": 905,
-      "sha256": "60f79dd2232506959e07c1a5b4c15dfb27df5115c90dc0accc3c9d434106d5d6"
+      "bytes": 883,
+      "sha256": "08e883cabd537a4750be6a9deb45a72bfae244925d8bffa5bd199a4f98ad85bd"
     },
     {
       "path": "presentations/plotnik/zh/pptx-receipt.json",
@@ -952,8 +952,8 @@
     },
     {
       "path": "presentations/pozharnaya-bezopasnost/en/pdf-receipt.json",
-      "bytes": 949,
-      "sha256": "ca5068054b5426d4d05f66b982054267c74ff494fdcd4d107f3f17dccf59ac95"
+      "bytes": 927,
+      "sha256": "8bf70a9b5d5c26b3e84f2c2f4c808fc4226c780f0f93481dcf80c8b263bf9b94"
     },
     {
       "path": "presentations/pozharnaya-bezopasnost/en/pptx-receipt.json",
@@ -982,8 +982,8 @@
     },
     {
       "path": "presentations/pozharnaya-bezopasnost/kk/pdf-receipt.json",
-      "bytes": 949,
-      "sha256": "98e4ede5169c583fba21751bc04a9d6582b25a114e570c70a468b72d7be7ee03"
+      "bytes": 927,
+      "sha256": "06ecc8369bc6f2713b3da1f11721d8dd920e7d58219f34d7541d8bf51f3ce991"
     },
     {
       "path": "presentations/pozharnaya-bezopasnost/kk/pptx-receipt.json",
@@ -1012,8 +1012,8 @@
     },
     {
       "path": "presentations/pozharnaya-bezopasnost/zh/pdf-receipt.json",
-      "bytes": 950,
-      "sha256": "0000b93f8c751586035fdb8dd8490820fb5a9957f206277e97697226d3f685a6"
+      "bytes": 928,
+      "sha256": "923385e091e3eb07d1adbdfe3257efd4aa66573e4172c6ca3a359df885cd87e1"
     },
     {
       "path": "presentations/pozharnaya-bezopasnost/zh/pptx-receipt.json",
