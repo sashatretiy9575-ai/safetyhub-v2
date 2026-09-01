@@ -12,11 +12,23 @@
 
 ## Database backup
 
-1. Дважды сверьте linked Supabase project ref и окружение.
+1. Задайте ожидаемый current production ref, дважды сверьте его с Dashboard и
+   локальным link. Скачайте для этого проекта `Server root certificate` из
+   Dashboard, сохраните PEM в защищённом operator-каталоге и отдельно запишите
+   его SHA-256. Скрипт принимает только обычный, не symlink, действующий CA PEM.
 2. Создайте новый путь вне репозитория и выполните автоматический gate:
 
    ```powershell
+   $ProjectRef = '<CURRENT_PRODUCTION_PROJECT_REF>'
+   $SslRootCert = 'C:\secure-operator\supabase-server-root-ca.crt'
+   $SslRootCertSha256 = '<EXPECTED_LOWERCASE_CA_SHA256>'
+   if ((Get-Content -LiteralPath 'supabase/.temp/project-ref' -Raw).Trim() -cne $ProjectRef) {
+     throw 'Linked Supabase project does not match the reviewed production ref.'
+   }
    npm run db:backup:linked -- `
+     --expected-project-ref $ProjectRef `
+     --ssl-root-cert $SslRootCert `
+     --ssl-root-cert-sha256 $SslRootCertSha256 `
      --output 'C:\secure-backups\safetyhub-YYYYMMDD-HHMMSS' `
      --pg-bin 'C:\tools\postgresql-17\bin' `
      --recovery-key-output 'E:\offline-keys\safetyhub-YYYYMMDD-HHMMSS.recovery-key.txt'
@@ -29,12 +41,15 @@
    Затем команда поднимает одноразовый локальный PostgreSQL 17, восстанавливает
    прикладные схемы `public/private`, сверяет число строк каждой таблицы и только
    после этого создаёт `verification.json`.
-   Все linked PostgreSQL-соединения аутентифицируют сервер: Node.js 24 использует
-   системное хранилище доверенных CA, `rejectUnauthorized: true` и проверку имени
-   хоста, а PostgreSQL 17/libpq запускается с принудительными
-   `PGSSLMODE=verify-full` и `PGSSLROOTCERT=system`. Унаследованные `PG*`
-   переменные процесса отбрасываются и не могут ослабить эти параметры.
-4. Проверьте `ok`, размеры, counts, encrypted receipt SHA-256 и агрегированный
+   Все linked PostgreSQL-соединения аутентифицируют сервер одним и тем же явно
+   указанным CA: Node.js использует `rejectUnauthorized: true`, SNI и проверку
+   имени хоста, а PostgreSQL 17/libpq запускается с принудительными
+   `PGSSLMODE=verify-full` и `PGSSLROOTCERT=<validated physical PEM path>`.
+   Bundled/system trust fallback отсутствует. Унаследованные `PG*` переменные
+   процесса отбрасываются и не могут ослабить эти параметры.
+4. Проверьте `ok`, точный `projectRef`, размеры, counts, encrypted receipt
+   SHA-256, `postgresSslRootCertificate.sha256`/fingerprint/validity и
+   агрегированный
    Storage manifest (`objects`, bucket counts/bytes и `objectSetSha256`). Полные
    Storage paths остаются только внутри зашифрованного `data.dump`.
 5. В переносимой EDB-сборке без contrib локальная rehearsal использует безопасные
@@ -117,23 +132,53 @@ staging bucket или добавить непроверенный bucket без 
    автоматически и не может лежать внутри output-каталога.
 3. Выполните export **из чистого checkout**
    `C:\Users\oatmeal\Desktop\SAFETYHUB-v2`, где находится этот инструмент.
-   В `--env-file` передайте абсолютный путь к защищённому локальному файлу со
-   старым `SUPABASE_SECRET_KEY` (например, к уже существующему, неотслеживаемому
-   `C:\Users\oatmeal\Desktop\SAFETYHUB\.env.local`). Копировать секрет в новый
-   checkout или в командную строку не нужно. Ключ читается только из указанного
-   env-file и не попадает в stdout, receipt или manifest.
+   В `--env-file` передайте абсолютный путь к защищённому локальному файлу с
+   current production `SUPABASE_SECRET_KEY`. Копировать секрет в checkout или в
+   командную строку не нужно. Ключ читается только из указанного env-file и не
+   попадает в stdout, receipt или manifest.
 
    ```powershell
+   $ProjectRef = '<CURRENT_PRODUCTION_PROJECT_REF>'
    npm run storage:backup:linked -- `
-     --expected-project-ref vezgxdooijznpjqrpvcv `
+     --expected-project-ref $ProjectRef `
      --allow-bucket content-media `
      --allow-bucket course-presentations `
      --allow-bucket course-presentations-staging `
      --allow-bucket profile-avatars `
      --output-dir 'C:\secure-backups\storage' `
-     --env-file 'C:\Users\oatmeal\Desktop\SAFETYHUB\.env.local' `
+     --env-file 'C:\secure-operator\storage-backup.env' `
      --recovery-key-output 'E:\offline-keys\storage-YYYYMMDD-HHMMSS.recovery-key.txt'
    ```
+
+   Если ключ доступен только через текущую Supabase Management API session,
+   используйте вместо `--env-file` взаимоисключающий `--secret-stdin`. Команда
+   ниже оставляет раскрытый current key только в памяти PowerShell, требует
+   ровно один `type=secret`/`sb_secret_...` и передаёт в backup только raw value:
+
+   ```powershell
+   $ProjectRef = '<CURRENT_PRODUCTION_PROJECT_REF>'
+   $ApiKeys = npx --no-install supabase projects api-keys `
+     --project-ref $ProjectRef --reveal --output json | ConvertFrom-Json
+   if ($LASTEXITCODE -ne 0) { throw 'Supabase API-key lookup failed.' }
+   $SecretKeys = @($ApiKeys | Where-Object {
+     $_.type -ceq 'secret' -and $_.api_key -cmatch '^sb_secret_[^\r\n]{22,}$'
+   })
+   if ($SecretKeys.Count -ne 1) { throw 'Expected exactly one current secret API key.' }
+   $SecretKeys[0].api_key | npm run storage:backup:linked -- `
+     --expected-project-ref $ProjectRef `
+     --allow-bucket content-media `
+     --allow-bucket course-presentations `
+     --allow-bucket course-presentations-staging `
+     --allow-bucket profile-avatars `
+     --output-dir 'C:\secure-backups\storage' `
+     --secret-stdin `
+     --recovery-key-output 'E:\offline-keys\storage-YYYYMMDD-HHMMSS.recovery-key.txt'
+   Remove-Variable ApiKeys, SecretKeys -ErrorAction SilentlyContinue
+   ```
+
+   Не запускайте lookup отдельно без pipeline и не сохраняйте его JSON в файл,
+   transcript или shell history. `--secret-stdin` принимает не более 8 KiB,
+   запрещает TTY/multiline input и никогда не выводит значение.
 
 4. Команда создаёт новый `safetyhub-storage-byte-backup-...` под output-каталогом.
    В нём остаются только encrypted archive, encrypted manifest, локальная
@@ -145,7 +190,7 @@ staging bucket или добавить непроверенный bucket без 
    ```powershell
    npm run storage:backup:verify -- `
      --backup 'C:\secure-backups\storage\<run-directory>' `
-     --expected-project-ref vezgxdooijznpjqrpvcv `
+     --expected-project-ref '<CURRENT_PRODUCTION_PROJECT_REF>' `
      --allow-bucket content-media `
      --allow-bucket course-presentations `
      --allow-bucket course-presentations-staging `
@@ -154,7 +199,6 @@ staging bucket или добавить непроверенный bucket без 
    ```
 
 6. Перед destructive action сравните:
-
    - `archivedObjects`, `archivedBytes` и per-bucket totals;
    - `objectSetSha256`: это SHA-256 от sorted `[bucket, key, listed size, ETag]`,
      поэтому при закрытом окне записи он должен совпасть с
@@ -186,6 +230,44 @@ all-bucket export для обычного восстановления.
 7. Сверьте Storage manifest и байты, не делая приватный bucket публичным.
 8. Сохраните обезличенный receipt вне репозитория, затем удалите plaintext и
    disposable project.
+
+All-bucket byte restore проверяется встроенным rehearsal harness. Он **никогда**
+не предназначен для production: current и previous production refs жёстко
+запрещены, target ref подтверждается второй раз, а Supabase Management API должна
+вернуть для target точное имя `DISPOSABLE SECURITY TEST`. До первой загрузки
+target обязан содержать ровно четыре ожидаемых bucket'а с совпадающей
+конфигурацией и ноль видимых объектов.
+
+В access-restricted target env-file должны быть ровно
+`SUPABASE_SECRET_KEY` disposable-проекта и `SUPABASE_ACCESS_TOKEN` оператора:
+
+```powershell
+$ProjectRef = '<CURRENT_PRODUCTION_PROJECT_REF>'
+$DisposableRef = '<DISPOSABLE_PROJECT_REF>'
+npm run storage:restore:rehearse -- `
+  --backup 'C:\secure-backups\storage\<run-directory>' `
+  --expected-source-project-ref $ProjectRef `
+  --allow-bucket content-media `
+  --allow-bucket course-presentations `
+  --allow-bucket course-presentations-staging `
+  --allow-bucket profile-avatars `
+  --target-project-ref $DisposableRef `
+  --confirm-target-project-ref $DisposableRef `
+  --confirm-disposable-project 'DISPOSABLE SECURITY TEST' `
+  --env-file 'C:\secure-operator\disposable-storage-restore.env' `
+  --recovery-key-file 'E:\offline-keys\storage-YYYYMMDD-HHMMSS.recovery-key.txt'
+```
+
+Harness сначала повторно аутентифицирует encrypted manifest/archive и SHA-256
+каждого tar entry, затем извлекает их в новый OS temp-каталог. Только после этого
+он дважды проверяет disposable marker, загружает с `upsert=false`, скачивает и
+хэширует каждый объект, сверяет полный финальный inventory и удаляет весь
+plaintext temp-каталог. При частичном сбое он намеренно не делает cloud delete:
+пометьте весь disposable project скомпрометированным rehearsal и удалите его
+через утверждённый owner workflow. Harness не восстанавливает database rows,
+Storage metadata IDs/timestamps/ETag/cache policy и не является production
+restore-процедурой; эти свойства проверяются отдельным database rehearsal и
+application smoke.
 
 ## Restore/rollback цели
 

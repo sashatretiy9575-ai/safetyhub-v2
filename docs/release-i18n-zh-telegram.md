@@ -53,21 +53,40 @@ as CI evidence; never reuse its credentials or synthetic rows.
 Immediately before production writes, run the read-only linked gates:
 
 ```powershell
+$ProjectRef = '<CURRENT_PRODUCTION_PROJECT_REF>'
+$SslRootCert = 'C:\secure-operator\supabase-server-root-ca.crt'
+$SslRootCertSha256 = '<EXPECTED_LOWERCASE_CA_SHA256>'
+if ((Get-Content -LiteralPath 'supabase/.temp/project-ref' -Raw).Trim() -cne $ProjectRef) {
+  throw 'Linked Supabase project does not match the reviewed production ref.'
+}
 npm run db:migrations:check-linked
 npm run db:types:check
 npm run storage:buckets:check:linked
-npm run content:pull:linked -- --check
-npm run content:parity:check
+npm run content:pull:linked -- `
+  --check `
+  --expected-project-ref $ProjectRef `
+  --ssl-root-cert $SslRootCert `
+  --ssl-root-cert-sha256 $SslRootCertSha256
+npm run content:parity:check -- `
+  --expected-project-ref $ProjectRef `
+  --ssl-root-cert $SslRootCert `
+  --ssl-root-cert-sha256 $SslRootCertSha256
 ```
 
 Any unexpected migration, type, bucket or content drift stops the release until
-the hosted state is pulled and reviewed.
+the hosted state is pulled and reviewed. The PostgreSQL gates have no system or
+bundled-root fallback: the operator-provided current-project Server root CA,
+hostname/SNI verification and optional reviewed SHA-256 pin are mandatory.
 
 ## Backup gate
 
 1. Create a fresh encrypted custom-format PostgreSQL backup using
-   `npm run db:backup:linked` and a fresh all-bucket byte backup using the
-   documented Storage procedure.
+   `npm run db:backup:linked -- --expected-project-ref $ProjectRef
+--ssl-root-cert $SslRootCert --ssl-root-cert-sha256
+$SslRootCertSha256 ...` and a fresh all-bucket byte backup using the
+   documented Storage procedure. Both receipts must contain the exact reviewed
+   current project ref; the database receipt also records the CA hash and
+   certificate fingerprint.
 2. Keep database ciphertext, Storage ciphertext and recovery material in
    physically separate access-controlled paths.
 3. Verify both receipts and rehearse restoration into a disposable environment.
@@ -81,8 +100,23 @@ No migration or content publication begins without verified restore evidence.
 
 Execute these phases one at a time and record post-counts after every phase.
 
-1. Apply only the reviewed unapplied additive migrations. Confirm the hosted
-   migration list and regenerate/check the exact linked CLI type output.
+1. Preview, review, apply and re-check only the unapplied additive migrations:
+
+   ```powershell
+   if ((Get-Content -LiteralPath 'supabase/.temp/project-ref' -Raw).Trim() -cne $ProjectRef) {
+     throw 'Linked Supabase project does not match the reviewed production ref.'
+   }
+   npx --no-install supabase db push --linked --dry-run
+   # Stop here unless the printed migration set exactly matches the reviewed set.
+   npx --no-install supabase db push --linked
+   npm run db:migrations:check-linked
+   npm run db:types:check
+   ```
+
+   Do not use `--include-all`, `--include-seed`, a dashboard SQL editor or an
+   unreviewed database URL. Save the dry-run, applied migration list and exact
+   linked type check as nonsecret release evidence.
+
 2. Push the reviewed Supabase Auth configuration only after supplying the real
    Turnstile secret through the protected local secret context. The public
    always-pass test secret is rejected by the preparation script.
@@ -104,10 +138,35 @@ Execute these phases one at a time and record post-counts after every phase.
    authentication, approval, rejection, recovery and reasoned admin reset.
 9. Enable the database `notification_events` flag, then the application admin
    inbox flag. Verify the inbox while Telegram remains unavailable.
-10. Create/configure the private Telegram group and bot, deploy the dispatcher,
-    set Function/Vault secrets, and only then enable the database
+10. Create/configure the private Telegram group and bot. Put
+    `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_DISPATCHER_SECRET` and
+    `SAFETYHUB_SITE_URL` in a dedicated ignored/access-restricted Function env
+    file; put `SUPABASE_SECRET_KEY` and the exact same
+    `TELEGRAM_DISPATCHER_SECRET` in a separate operator env file. Then run:
+
+    ```powershell
+    npx --no-install supabase secrets set `
+      --project-ref $ProjectRef `
+      --env-file 'C:\secure-operator\telegram-function.env'
+    npx --no-install supabase secrets list --project-ref $ProjectRef
+    npx --no-install supabase functions deploy telegram-dispatcher `
+      --project-ref $ProjectRef `
+      --no-verify-jwt
+    npm run notifications:vault:configure -- `
+      --expected-project-ref $ProjectRef `
+      --confirm-project-ref $ProjectRef `
+      --reason 'Configure Telegram dispatcher Vault values for release' `
+      --idempotency-key '<NEW_UUID>' `
+      --env-file 'C:\secure-operator\telegram-vault.env'
+    ```
+
+    `secrets list` must show names only; never use `NAME=VALUE` arguments. The
+    Vault CLI derives the one allowed current-project Function URL, calls the
+    service-only reasoned/idempotent RPC and emits only the two Vault names.
+    Only after the dispatcher smoke succeeds enable the database
     `telegram_delivery` flag. Telegram remains informational and cannot mutate
     approval state.
+
 11. Verify browser-only certificate rendering for all four locales and the
     500-item export path. Keep the previous server code unavailable through the
     stable `CERTIFICATE_PDF_CLIENT_ONLY` tombstone; QR verification stays live.
@@ -116,7 +175,29 @@ Execute these phases one at a time and record post-counts after every phase.
 
 Database runtime flags are changed only through the reasoned, idempotent
 service-only `set_runtime_feature_flag` RPC. Enable events before Telegram;
-disable them in the reverse order.
+disable them in the reverse order. The operator file contains only
+`SUPABASE_SECRET_KEY`; use a new UUID for each logical change and reuse that UUID
+only when retrying the exact same request:
+
+```powershell
+npm run runtime:flag:set -- `
+  --expected-project-ref $ProjectRef `
+  --confirm-project-ref $ProjectRef `
+  --feature notification_events `
+  --enabled true `
+  --reason 'Enable notification events after release migration' `
+  --idempotency-key '<NEW_UUID>' `
+  --env-file 'C:\secure-operator\production-service.env'
+
+npm run runtime:flag:set -- `
+  --expected-project-ref $ProjectRef `
+  --confirm-project-ref $ProjectRef `
+  --feature telegram_delivery `
+  --enabled true `
+  --reason 'Enable Telegram after dispatcher smoke' `
+  --idempotency-key '<ANOTHER_NEW_UUID>' `
+  --env-file 'C:\secure-operator\production-service.env'
+```
 
 ## Production smoke matrix
 
@@ -172,3 +253,12 @@ The release is complete only when the green CI evidence, linked checks,
 backup/restore receipts, content parity receipt, smoke results, pre/post counts
 and rollback identifiers are stored without secrets or operational personal
 data.
+
+The repository does not pin a Vercel CLI or contain a production Vercel project
+binding. Application flag changes, promotion and rollback therefore remain a
+release blocker until an owner records the exact Vercel project/team and the
+immutable previous Ready deployment ID in the protected deployment system.
+Use that reviewed UI/CI path; do not download a floating CLI during cutover and
+do not guess a deployment alias. Database rollback is the same CLI above with
+fresh UUIDs, first `telegram_delivery=false`, then
+`notification_events=false`; schema corrections remain forward-only.

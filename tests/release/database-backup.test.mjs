@@ -4,18 +4,26 @@ import { access, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:f
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { getCACertificates } from 'node:tls';
 import {
   assertPhysicalPathRelationship,
   clearLinkedPostgresConnection,
   linkedPostgresClientOptions,
   linkedPostgresEnvironment,
+  loadPostgresSslRootCertificate,
   parseLinkedPostgresConnection,
   validateDatabaseBackupReceipt,
 } from '../../scripts/database-backup-security.mjs';
+import {
+  CURRENT_PRODUCTION_PROJECT_REF,
+  assertLinkedProductionProjectRef,
+} from '../../scripts/production-operator-safety.mjs';
 
 const ARTIFACT_OVERHEAD = Buffer.byteLength('SAFETYHUB-DB-BACKUP-V1\0') + 12 + 16;
 
-function backupReceipt(artifactNames = ['tenant-schema.sql.aes256gcm', 'tenant-data.dump.aes256gcm']) {
+function backupReceipt(
+  artifactNames = ['tenant-schema.sql.aes256gcm', 'tenant-data.dump.aes256gcm'],
+) {
   return {
     kind: 'safetyhub-database-backup-v1',
     createdAt: '2026-09-01T00:00:00.000Z',
@@ -92,7 +100,10 @@ test('database backup encrypts, verifies, and restores exact dump bytes', async 
       { cwd: process.cwd(), encoding: 'utf8', windowsHide: true },
     );
     assert.equal(recovered.status, 0, recovered.stderr);
-    assert.deepEqual(await readFile(path.join(restoredWithDpapi, 'tenant-schema.sql')), schemaBytes);
+    assert.deepEqual(
+      await readFile(path.join(restoredWithDpapi, 'tenant-schema.sql')),
+      schemaBytes,
+    );
     assert.deepEqual(await readFile(path.join(restoredWithDpapi, 'tenant-data.dump')), dataBytes);
 
     const recoveredPortably = spawnSync(
@@ -146,6 +157,9 @@ test('linked backup uses a read-only snapshot and never persists temporary crede
   assert.match(source, /portableRecoveryVerification: 'passed'/u);
   assert.match(source, /--recovery-key-output/u);
   assert.match(source, /--recovery-key-file/u);
+  assert.match(source, /--expected-project-ref/u);
+  assert.match(source, /assertLinkedProductionProjectRef\(expectedProjectRef\)/u);
+  assert.match(source, /projectRef: expectedProjectRef/u);
   assert.match(source, /storageObjectSetSha256/u);
   assert.match(source, /rawObjectMetadata: 'encrypted:data\.dump'/u);
   for (const linkedScript of [source, contentSync, legacyDump]) {
@@ -153,14 +167,50 @@ test('linked backup uses a read-only snapshot and never persists temporary crede
     assert.doesNotMatch(linkedScript, /rejectUnauthorized:\s*false/u);
     assert.doesNotMatch(linkedScript, /PGSSLMODE:\s*'require'/u);
   }
-  assert.match(securityHelper, /getCACertificates\('system'\)/u);
+  assert.match(securityHelper, /new X509Certificate/u);
+  assert.match(securityHelper, /certificate\.ca !== true/u);
+  assert.match(securityHelper, /expectedSha256/u);
   assert.match(securityHelper, /checkServerIdentity/u);
   assert.match(securityHelper, /rejectUnauthorized:\s*true/u);
   assert.match(securityHelper, /PGSSLMODE:\s*'verify-full'/u);
-  assert.match(securityHelper, /PGSSLROOTCERT:\s*'system'/u);
+  assert.match(securityHelper, /PGSSLROOTCERT: certificate\.physicalPath/u);
 });
 
-test('linked PostgreSQL helper pins system trust and ignores inherited libpq weakening', () => {
+test('linked database backup binds the explicit current production ref to the local link', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'safetyhub-linked-ref-test-'));
+  try {
+    const linkedRefFile = path.join(root, 'project-ref');
+    await writeFile(linkedRefFile, `${CURRENT_PRODUCTION_PROJECT_REF}\n`);
+    assert.equal(
+      await assertLinkedProductionProjectRef(CURRENT_PRODUCTION_PROJECT_REF, {
+        projectRefFile: linkedRefFile,
+      }),
+      CURRENT_PRODUCTION_PROJECT_REF,
+    );
+
+    await writeFile(linkedRefFile, 'aaaaaaaaaaaaaaaaaaaa\n');
+    await assert.rejects(
+      assertLinkedProductionProjectRef(CURRENT_PRODUCTION_PROJECT_REF, {
+        projectRefFile: linkedRefFile,
+      }),
+      /OPERATOR_LINKED_PROJECT_REF_MISMATCH/u,
+    );
+    await assert.rejects(
+      assertLinkedProductionProjectRef('bbbbbbbbbbbbbbbbbbbb', {
+        projectRefFile: linkedRefFile,
+      }),
+      /OPERATOR_PROJECT_REF_NOT_CURRENT_PRODUCTION/u,
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('linked PostgreSQL helper requires an explicit validated CA and ignores inherited libpq weakening', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'safetyhub-postgres-ca-test-'));
+  const certificatePath = path.join(root, 'root-ca.pem');
+  await writeFile(certificatePath, getCACertificates('bundled')[0]);
+  const sslRootCertificate = await loadPostgresSslRootCertificate(certificatePath);
   const connection = parseLinkedPostgresConnection(
     [
       'PGHOST=aws-0-eu-central-1.pooler.supabase.com',
@@ -173,15 +223,15 @@ test('linked PostgreSQL helper pins system trust and ignores inherited libpq wea
   const clientOptions = linkedPostgresClientOptions(connection, {
     application_name: 'safetyhub-test',
     ssl: { rejectUnauthorized: false },
+    sslRootCertificate,
   });
   assert.equal(clientOptions.host, connection.PGHOST);
   assert.equal(clientOptions.ssl.rejectUnauthorized, true);
   assert.equal(clientOptions.ssl.servername, connection.PGHOST);
   assert.equal(typeof clientOptions.ssl.checkServerIdentity, 'function');
-  assert.ok(Array.isArray(clientOptions.ssl.ca));
-  assert.ok(clientOptions.ssl.ca.length > 0);
+  assert.match(clientOptions.ssl.ca, /BEGIN CERTIFICATE/u);
 
-  const environment = linkedPostgresEnvironment(connection, {
+  const environment = linkedPostgresEnvironment(connection, sslRootCertificate, {
     Path: 'C:\\Windows',
     PGSSLMODE: 'disable',
     pgsslrootcert: 'attacker.pem',
@@ -190,7 +240,7 @@ test('linked PostgreSQL helper pins system trust and ignores inherited libpq wea
   });
   assert.equal(environment.Path, 'C:\\Windows');
   assert.equal(environment.PGSSLMODE, 'verify-full');
-  assert.equal(environment.PGSSLROOTCERT, 'system');
+  assert.equal(environment.PGSSLROOTCERT, sslRootCertificate.physicalPath);
   assert.equal(environment.PGSERVICE, undefined);
   assert.equal(environment.PGPASSFILE, undefined);
   assert.equal(environment.pgsslrootcert, undefined);
@@ -203,6 +253,39 @@ test('linked PostgreSQL helper pins system trust and ignores inherited libpq wea
     PGPASSWORD: '',
     PGDATABASE: '',
   });
+  await rm(root, { recursive: true, force: true });
+});
+
+test('PostgreSQL CA loader enforces regular CA PEM, validity, and optional SHA-256 pin', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'safetyhub-postgres-ca-pin-test-'));
+  try {
+    const certificatePath = path.join(root, 'root-ca.pem');
+    await writeFile(certificatePath, getCACertificates('bundled')[0]);
+    const loaded = await loadPostgresSslRootCertificate(certificatePath);
+    assert.match(loaded.sha256, /^[0-9a-f]{64}$/u);
+    assert.match(loaded.fingerprint256, /^(?:[0-9A-F]{2}:){31}[0-9A-F]{2}$/u);
+    assert.equal(
+      (await loadPostgresSslRootCertificate(certificatePath, { expectedSha256: loaded.sha256 }))
+        .sha256,
+      loaded.sha256,
+    );
+    await assert.rejects(
+      loadPostgresSslRootCertificate(certificatePath, { expectedSha256: '0'.repeat(64) }),
+      /SHA-256 pin mismatch/u,
+    );
+    await assert.rejects(
+      loadPostgresSslRootCertificate(certificatePath, {
+        now: () => new Date('2100-01-01T00:00:00.000Z'),
+      }),
+      /outside its validity period/u,
+    );
+    await assert.rejects(
+      loadPostgresSslRootCertificate(path.join(root, 'missing.pem')),
+      /certificate is unavailable/u,
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });
 
 test('linked PostgreSQL helper validates host, user, and URI credentials without disclosing secrets', () => {
@@ -279,9 +362,7 @@ test('V1 receipt validation rejects path syntax and Windows filename aliases', (
 
 test('V1 receipt validation rejects collisions, malformed fields, and unsafe wrapped-key names', () => {
   assert.throws(() =>
-    validateDatabaseBackupReceipt(
-      backupReceipt(['Region.sql.aes256gcm', 'region.SQL.aes256gcm']),
-    ),
+    validateDatabaseBackupReceipt(backupReceipt(['Region.sql.aes256gcm', 'region.SQL.aes256gcm'])),
   );
 
   const mutations = [
@@ -498,7 +579,11 @@ test('physical path guard resolves a junction before containment checks when ava
     try {
       await symlink(physicalParent, aliasParent, process.platform === 'win32' ? 'junction' : 'dir');
     } catch (error) {
-      if (error && typeof error === 'object' && ['EPERM', 'EACCES', 'UNKNOWN'].includes(error.code)) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        ['EPERM', 'EACCES', 'UNKNOWN'].includes(error.code)
+      ) {
         context.skip('This workstation does not permit creating a test junction.');
         return;
       }

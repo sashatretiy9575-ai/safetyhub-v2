@@ -1,8 +1,9 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { chmod, mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { chmod, lstat, mkdir, readFile, realpath, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { assertPhysicalPathRelationship } from './database-backup-security.mjs';
 import {
   EncryptedTarWriter,
   OperatorToolError,
@@ -32,6 +33,7 @@ const MAX_VISIBLE_DIRECTORIES_PER_BUCKET = 1_000_000;
 const MAX_STORAGE_LIST_REQUESTS_PER_BUCKET = 10_000_000;
 const MAX_TAR_ENTRY_BYTES = 8 * 1024 * 1024 * 1024 - 1;
 const MAX_MANIFEST_BYTES = 64 * 1024 * 1024;
+const MAX_RECEIPT_BYTES = 64 * 1024;
 const GENERIC_SERVICE_KEY_CONFIG = Object.freeze({ serviceRoleKeyEnv: 'SUPABASE_SECRET_KEY' });
 
 function fail(code) {
@@ -109,14 +111,6 @@ function compareUtf8(left, right) {
   return Buffer.compare(Buffer.from(left, 'utf8'), Buffer.from(right, 'utf8'));
 }
 
-function insideOrEqual(parent, candidate) {
-  const relative = path.relative(parent, candidate);
-  return (
-    relative === '' ||
-    (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative))
-  );
-}
-
 function sortedUniqueBuckets(buckets) {
   requireCondition(Array.isArray(buckets) && buckets.length > 0, 'STORAGE_BACKUP_BUCKETS_REQUIRED');
   const allowed = new Set(SAFETYHUB_STORAGE_BUCKET_ALLOWLIST);
@@ -149,8 +143,14 @@ export function validateStorageBackupRequest({ expectedProjectRef, buckets }) {
 
 function normalizeBucketConfiguration(bucket, data) {
   requireCondition(isPlainObject(data), 'STORAGE_BACKUP_BUCKET_CONFIGURATION_MALFORMED');
-  requireCondition(data.id === bucket && data.name === bucket, 'STORAGE_BACKUP_BUCKET_CONFIGURATION_MISMATCH');
-  requireCondition(typeof data.public === 'boolean', 'STORAGE_BACKUP_BUCKET_CONFIGURATION_MALFORMED');
+  requireCondition(
+    data.id === bucket && data.name === bucket,
+    'STORAGE_BACKUP_BUCKET_CONFIGURATION_MISMATCH',
+  );
+  requireCondition(
+    typeof data.public === 'boolean',
+    'STORAGE_BACKUP_BUCKET_CONFIGURATION_MALFORMED',
+  );
   requireCondition(
     data.file_size_limit === null ||
       (Number.isSafeInteger(data.file_size_limit) && data.file_size_limit >= 0),
@@ -223,7 +223,10 @@ function isStorageFolder(item) {
     requireCondition(item.metadata === null, 'STORAGE_BACKUP_FOLDER_ENTRY_MALFORMED');
     return true;
   }
-  requireCondition(typeof item.id === 'string' && item.id.length > 0, 'STORAGE_BACKUP_FILE_ENTRY_MALFORMED');
+  requireCondition(
+    typeof item.id === 'string' && item.id.length > 0,
+    'STORAGE_BACKUP_FILE_ENTRY_MALFORMED',
+  );
   requireCondition(isPlainObject(item.metadata), 'STORAGE_BACKUP_FILE_ENTRY_MALFORMED');
   return false;
 }
@@ -301,7 +304,10 @@ async function listBucketObjects(client, bucket, pageSize) {
       if (response.data.length < pageSize) break;
       offset += pageSize;
     }
-    requireCondition(pages < MAX_STORAGE_LIST_REQUESTS_PER_BUCKET, 'STORAGE_BACKUP_PAGINATION_LIMIT');
+    requireCondition(
+      pages < MAX_STORAGE_LIST_REQUESTS_PER_BUCKET,
+      'STORAGE_BACKUP_PAGINATION_LIMIT',
+    );
   }
 
   objects.sort((left, right) => compareUtf8(left.objectKey, right.objectKey));
@@ -337,12 +343,7 @@ function objectSetSha256(entries) {
   return createHash('sha256')
     .update(
       JSON.stringify(
-        entries.map((entry) => [
-          entry.bucket,
-          entry.objectKey,
-          entry.listedByteLength,
-          entry.etag,
-        ]),
+        entries.map((entry) => [entry.bucket, entry.objectKey, entry.listedByteLength, entry.etag]),
       ),
     )
     .digest('hex');
@@ -414,7 +415,10 @@ export async function runStorageByteBackup({
     'STORAGE_BACKUP_PASSPHRASE_TOO_SHORT',
   );
   const request = validateStorageBackupRequest({ expectedProjectRef, buckets });
-  const resolvedOutputDirectory = await validatePrivateOutputDirectory(outputDirectory, repositoryRoot);
+  const resolvedOutputDirectory = await validatePrivateOutputDirectory(
+    outputDirectory,
+    repositoryRoot,
+  );
   requireCondition(
     Number.isInteger(pageSize) && pageSize >= 1 && pageSize <= 1_000,
     'STORAGE_BACKUP_PAGE_SIZE_INVALID',
@@ -527,7 +531,10 @@ export async function runStorageByteBackup({
       ],
     };
     manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
-    requireCondition(manifestBytes.byteLength <= MAX_MANIFEST_BYTES, 'STORAGE_BACKUP_MANIFEST_TOO_LARGE');
+    requireCondition(
+      manifestBytes.byteLength <= MAX_MANIFEST_BYTES,
+      'STORAGE_BACKUP_MANIFEST_TOO_LARGE',
+    );
     await archiveWriter.addFile('manifest.json', manifestBytes);
     expectedArchiveEntries.push({
       name: 'manifest.json',
@@ -556,7 +563,10 @@ export async function runStorageByteBackup({
       MAX_MANIFEST_BYTES,
     );
     try {
-      requireCondition(verifiedManifest.equals(manifestBytes), 'STORAGE_BACKUP_MANIFEST_VERIFICATION_FAILED');
+      requireCondition(
+        verifiedManifest.equals(manifestBytes),
+        'STORAGE_BACKUP_MANIFEST_VERIFICATION_FAILED',
+      );
     } finally {
       verifiedManifest.fill(0);
     }
@@ -592,7 +602,8 @@ export async function runStorageByteBackup({
     return { ...receipt, runDirectory };
   } catch (error) {
     await archiveWriter?.abort().catch(() => {});
-    if (runDirectoryCreated) await rm(runDirectory, { recursive: true, force: true }).catch(() => {});
+    if (runDirectoryCreated)
+      await rm(runDirectory, { recursive: true, force: true }).catch(() => {});
     if (error instanceof OperatorToolError) throw error;
     fail('STORAGE_BACKUP_FAILED');
   } finally {
@@ -608,6 +619,32 @@ function exactBucketSet(actual, expected) {
   );
 }
 
+async function resolveBackupInputFile(backupDirectory, name, maximumBytes) {
+  const candidate = path.join(backupDirectory, name);
+  let stats;
+  let physical;
+  try {
+    stats = await lstat(candidate);
+    requireCondition(
+      stats.isFile() && !stats.isSymbolicLink(),
+      'STORAGE_BACKUP_INPUT_FILE_INVALID',
+    );
+    requireCondition(stats.size > 0, 'STORAGE_BACKUP_INPUT_FILE_INVALID');
+    if (maximumBytes !== undefined) {
+      requireCondition(stats.size <= maximumBytes, 'STORAGE_BACKUP_INPUT_FILE_INVALID');
+    }
+    physical = await realpath(candidate);
+  } catch (error) {
+    if (error instanceof OperatorToolError) throw error;
+    fail('STORAGE_BACKUP_INPUT_FILE_INVALID');
+  }
+  requireCondition(
+    path.relative(backupDirectory, physical) === name,
+    'STORAGE_BACKUP_INPUT_FILE_INVALID',
+  );
+  return physical;
+}
+
 function validateBucketTotals(value, buckets, entries) {
   requireCondition(isPlainObject(value), 'STORAGE_BACKUP_RECEIPT_INVALID');
   const calculated = bucketTotals(entries, buckets);
@@ -618,6 +655,60 @@ function validateBucketTotals(value, buckets, entries) {
   return calculated;
 }
 
+function validateManifestBucketConfigurations(value, buckets) {
+  requireCondition(isPlainObject(value), 'STORAGE_BACKUP_MANIFEST_INVALID');
+  requireCondition(
+    Object.keys(value)
+      .sort(compareUtf8)
+      .every((bucket, index) => bucket === buckets[index]) &&
+      Object.keys(value).length === buckets.length,
+    'STORAGE_BACKUP_MANIFEST_INVALID',
+  );
+  return Object.freeze(
+    Object.fromEntries(
+      buckets.map((bucket) => {
+        const configuration = value[bucket];
+        requireCondition(isPlainObject(configuration), 'STORAGE_BACKUP_MANIFEST_INVALID');
+        requireCondition(
+          Object.keys(configuration).sort(compareUtf8).join('\0') ===
+            ['allowedMimeTypes', 'fileSizeLimitBytes', 'id', 'public']
+              .sort(compareUtf8)
+              .join('\0') &&
+            configuration.id === bucket &&
+            typeof configuration.public === 'boolean' &&
+            (configuration.fileSizeLimitBytes === null ||
+              (Number.isSafeInteger(configuration.fileSizeLimitBytes) &&
+                configuration.fileSizeLimitBytes >= 0)) &&
+            (configuration.allowedMimeTypes === null ||
+              (Array.isArray(configuration.allowedMimeTypes) &&
+                new Set(configuration.allowedMimeTypes).size ===
+                  configuration.allowedMimeTypes.length &&
+                configuration.allowedMimeTypes.every(
+                  (mimeType) =>
+                    typeof mimeType === 'string' &&
+                    mimeType.length > 0 &&
+                    mimeType.length <= 255 &&
+                    !/[\u0000-\u001f\u007f]/u.test(mimeType),
+                ))),
+          'STORAGE_BACKUP_MANIFEST_INVALID',
+        );
+        return [
+          bucket,
+          Object.freeze({
+            id: bucket,
+            public: configuration.public,
+            fileSizeLimitBytes: configuration.fileSizeLimitBytes,
+            allowedMimeTypes:
+              configuration.allowedMimeTypes === null
+                ? null
+                : Object.freeze([...configuration.allowedMimeTypes]),
+          }),
+        ];
+      }),
+    ),
+  );
+}
+
 function validateManifest(manifest, request) {
   requireCondition(isPlainObject(manifest), 'STORAGE_BACKUP_MANIFEST_INVALID');
   requireCondition(
@@ -625,10 +716,20 @@ function validateManifest(manifest, request) {
       manifest.kind === STORAGE_BYTE_BACKUP_MANIFEST_KIND &&
       manifest.projectRef === request.expectedProjectRef &&
       exactBucketSet(manifest.buckets, request.buckets) &&
+      manifest.coverage?.downloadedEveryListedVisibleObject === true &&
+      manifest.coverage?.verifiedListedByteLengthAndSha256 === true &&
+      manifest.coverage?.exactVisibleBucketInventoryVerified === true &&
       Array.isArray(manifest.entries),
     'STORAGE_BACKUP_MANIFEST_INVALID',
   );
-  requireCondition(manifest.entries.length <= MAX_VISIBLE_OBJECTS_PER_BUCKET * request.buckets.length, 'STORAGE_BACKUP_MANIFEST_INVALID');
+  const bucketConfigurations = validateManifestBucketConfigurations(
+    manifest.bucketConfigurations,
+    request.buckets,
+  );
+  requireCondition(
+    manifest.entries.length <= MAX_VISIBLE_OBJECTS_PER_BUCKET * request.buckets.length,
+    'STORAGE_BACKUP_MANIFEST_INVALID',
+  );
   const seenArchivePaths = new Set();
   const seenObjects = new Set();
   const entries = manifest.entries.map((entry, index) => {
@@ -648,6 +749,11 @@ function validateManifest(manifest, request) {
         entry.listedByteLength <= MAX_TAR_ENTRY_BYTES &&
         entry.downloadedByteLength === entry.listedByteLength &&
         typeof entry.etag === 'string' &&
+        (entry.mimeType === null ||
+          (typeof entry.mimeType === 'string' &&
+            entry.mimeType.length > 0 &&
+            entry.mimeType.length <= 255 &&
+            !/[\u0000-\u001f\u007f]/u.test(entry.mimeType))) &&
         /^[0-9a-f]{64}$/u.test(entry.sha256 ?? ''),
       'STORAGE_BACKUP_MANIFEST_INVALID',
     );
@@ -656,7 +762,7 @@ function validateManifest(manifest, request) {
   const archivedBytes = entries.reduce((sum, entry) => sum + entry.downloadedByteLength, 0);
   requireCondition(Number.isSafeInteger(archivedBytes), 'STORAGE_BACKUP_MANIFEST_INVALID');
   requireCondition(
-      manifest.counts?.archivedObjects === entries.length &&
+    manifest.counts?.archivedObjects === entries.length &&
       manifest.counts?.archivedBytes === archivedBytes &&
       /^[0-9a-f]{64}$/u.test(manifest.objectSetSha256 ?? '') &&
       manifest.objectSetSha256 === objectSetSha256(entries) &&
@@ -665,15 +771,13 @@ function validateManifest(manifest, request) {
     'STORAGE_BACKUP_MANIFEST_INVALID',
   );
   validateBucketTotals(manifest.counts?.buckets, request.buckets, entries);
-  return { entries, archivedBytes };
+  return { bucketConfigurations, entries, archivedBytes };
 }
 
-export async function verifyStorageByteBackup({
-  backupDirectory,
-  expectedProjectRef,
-  buckets,
-  archivePassphrase,
-}) {
+async function verifyStorageByteBackupInternal(
+  { backupDirectory, expectedProjectRef, buckets, archivePassphrase },
+  includeRestoreDetails,
+) {
   requireCondition(
     typeof backupDirectory === 'string' && path.isAbsolute(backupDirectory),
     'STORAGE_BACKUP_VERIFY_PATH_INVALID',
@@ -683,10 +787,27 @@ export async function verifyStorageByteBackup({
     'STORAGE_BACKUP_PASSPHRASE_TOO_SHORT',
   );
   const request = validateStorageBackupRequest({ expectedProjectRef, buckets });
-  const resolvedBackup = path.resolve(backupDirectory);
+  const requestedBackup = path.resolve(backupDirectory);
+  let resolvedBackup;
+  try {
+    const stats = await lstat(requestedBackup);
+    requireCondition(
+      stats.isDirectory() && !stats.isSymbolicLink(),
+      'STORAGE_BACKUP_VERIFY_PATH_INVALID',
+    );
+    resolvedBackup = await realpath(requestedBackup);
+  } catch (error) {
+    if (error instanceof OperatorToolError) throw error;
+    fail('STORAGE_BACKUP_VERIFY_PATH_INVALID');
+  }
+  const receiptFile = await resolveBackupInputFile(
+    resolvedBackup,
+    'receipt.json',
+    MAX_RECEIPT_BYTES,
+  );
   let receipt;
   try {
-    receipt = JSON.parse(await readFile(path.join(resolvedBackup, 'receipt.json'), 'utf8'));
+    receipt = JSON.parse(await readFile(receiptFile, 'utf8'));
   } catch {
     fail('STORAGE_BACKUP_RECEIPT_INVALID');
   }
@@ -707,8 +828,15 @@ export async function verifyStorageByteBackup({
     'STORAGE_BACKUP_RECEIPT_INVALID',
   );
 
+  const archiveFile = await resolveBackupInputFile(resolvedBackup, receipt.files.encryptedArchive);
+  const manifestFile = await resolveBackupInputFile(
+    resolvedBackup,
+    receipt.files.encryptedManifest,
+    MAX_MANIFEST_BYTES + 8_192,
+  );
+
   const manifestBytes = await readEncryptedBuffer(
-    path.join(resolvedBackup, receipt.files.encryptedManifest),
+    manifestFile,
     archivePassphrase,
     STORAGE_BYTE_BACKUP_MANIFEST_CONTENT_TYPE,
     MAX_MANIFEST_BYTES,
@@ -720,10 +848,10 @@ export async function verifyStorageByteBackup({
     } catch {
       fail('STORAGE_BACKUP_MANIFEST_INVALID');
     }
-    const { entries, archivedBytes } = validateManifest(manifest, request);
+    const { bucketConfigurations, entries, archivedBytes } = validateManifest(manifest, request);
     requireCondition(
       receipt.archivedObjects === entries.length &&
-      receipt.archivedBytes === archivedBytes &&
+        receipt.archivedBytes === archivedBytes &&
         receipt.objectSetSha256 === objectSetSha256(entries) &&
         receipt.downloadSetSha256 === downloadSetSha256(entries),
       'STORAGE_BACKUP_RECEIPT_INVALID',
@@ -740,16 +868,16 @@ export async function verifyStorageByteBackup({
       sha256: createHash('sha256').update(manifestBytes).digest('hex'),
     });
     await verifyEncryptedTar(
-      path.join(resolvedBackup, receipt.files.encryptedArchive),
+      archiveFile,
       archivePassphrase,
       expectedEntries,
       STORAGE_BYTE_BACKUP_TAR_CONTENT_TYPE,
     );
     requireCondition(
-      (await sha256File(path.join(resolvedBackup, receipt.files.encryptedArchive))) === receipt.archiveSha256,
+      (await sha256File(archiveFile)) === receipt.archiveSha256,
       'STORAGE_BACKUP_ARCHIVE_HASH_MISMATCH',
     );
-    return {
+    const summary = {
       ok: true,
       projectRef: request.expectedProjectRef,
       buckets: request.buckets,
@@ -759,12 +887,44 @@ export async function verifyStorageByteBackup({
       manifestAuthenticated: true,
       entryHashesVerified: true,
     };
+    return includeRestoreDetails
+      ? {
+          ...summary,
+          restoreDetails: Object.freeze({
+            archiveFile,
+            archiveSha256: receipt.archiveSha256,
+            bucketConfigurations,
+            entries: Object.freeze(entries.map((entry) => Object.freeze({ ...entry }))),
+            embeddedManifest: Object.freeze({
+              name: 'manifest.json',
+              size: manifestBytes.length,
+              sha256: createHash('sha256').update(manifestBytes).digest('hex'),
+            }),
+          }),
+        }
+      : summary;
   } finally {
     manifestBytes.fill(0);
   }
 }
 
-export function assertRecoveryKeyOutsideOutput(recoveryKeyOutput, outputDirectory) {
+export async function verifyStorageByteBackup(options) {
+  return verifyStorageByteBackupInternal(options, false);
+}
+
+export async function readVerifiedStorageByteBackupForRestore(options) {
+  return verifyStorageByteBackupInternal(options, true);
+}
+
+export async function assertRecoveryKeyOutsideOutput(
+  recoveryKeyOutput,
+  outputDirectory,
+  {
+    candidateExpectation = 'absent',
+    expectedOutputPhysicalPath,
+    expectedRecoveryKeyPhysicalPath,
+  } = {},
+) {
   requireCondition(
     typeof recoveryKeyOutput === 'string' && path.isAbsolute(recoveryKeyOutput),
     'STORAGE_BACKUP_RECOVERY_KEY_PATH_INVALID',
@@ -775,11 +935,27 @@ export function assertRecoveryKeyOutsideOutput(recoveryKeyOutput, outputDirector
   );
   const resolvedRecoveryKey = path.resolve(recoveryKeyOutput);
   const resolvedOutput = path.resolve(outputDirectory);
-  requireCondition(
-    !insideOrEqual(resolvedOutput, resolvedRecoveryKey),
-    'STORAGE_BACKUP_RECOVERY_KEY_INSIDE_OUTPUT',
-  );
-  return resolvedRecoveryKey;
+  try {
+    const boundary = await assertPhysicalPathRelationship({
+      directoryPath: resolvedOutput,
+      candidatePath: resolvedRecoveryKey,
+      relationship: 'outside',
+      directoryExpectation: 'directory',
+      candidateExpectation,
+      directoryLabel: 'Storage backup output directory',
+      candidateLabel: 'Storage portable recovery key',
+      expectedDirectoryPhysicalPath: expectedOutputPhysicalPath,
+      expectedCandidatePhysicalPath: expectedRecoveryKeyPhysicalPath,
+      relationshipError: 'The Storage portable recovery key must stay outside the backup output.',
+    });
+    return {
+      recoveryKeyOutput: boundary.candidate.absolutePath,
+      outputPhysicalPath: boundary.directory.physicalPath,
+      recoveryKeyPhysicalPath: boundary.candidate.physicalPath,
+    };
+  } catch {
+    fail('STORAGE_BACKUP_RECOVERY_KEY_INSIDE_OUTPUT');
+  }
 }
 
 export function storageServiceKeyConfig() {

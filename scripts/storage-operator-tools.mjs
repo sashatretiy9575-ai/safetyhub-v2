@@ -871,11 +871,7 @@ export class EncryptedTarWriter {
       typeof contentType === 'string' && contentType.length > 0,
       'ARCHIVE_CONTENT_TYPE_INVALID',
     );
-    const payload = await EncryptedPayloadWriter.create(
-      file,
-      passphrase,
-      contentType,
-    );
+    const payload = await EncryptedPayloadWriter.create(file, passphrase, contentType);
     return new EncryptedTarWriter(payload, modifiedAtSeconds);
   }
 
@@ -1122,6 +1118,16 @@ class TarVerifier {
       checksumHeader.fill(0x20, 148, 156);
       const computedChecksum = checksumHeader.reduce((sum, value) => sum + value, 0);
       requireCondition(storedChecksum === computedChecksum, 'ARCHIVE_TAR_CHECKSUM_MISMATCH');
+      requireCondition(header[156] === '0'.charCodeAt(0), 'ARCHIVE_TAR_ENTRY_TYPE_INVALID');
+      requireCondition(
+        header.subarray(157, 257).every((value) => value === 0),
+        'ARCHIVE_TAR_LINK_TARGET_INVALID',
+      );
+      requireCondition(
+        header.subarray(257, 263).equals(Buffer.from('ustar\0', 'ascii')) &&
+          header.subarray(345, 500).every((value) => value === 0),
+        'ARCHIVE_TAR_HEADER_MALFORMED',
+      );
       const nul = header.indexOf(0, 0);
       const name = header.subarray(0, nul === -1 || nul > 100 ? 100 : nul).toString('utf8');
       const size = parseTarOctal(header.subarray(124, 136));
@@ -1158,10 +1164,7 @@ export async function verifyEncryptedTar(
   expectedContentType = 'application/x-tar; profile=safetyhub-avatar-backup-v1',
 ) {
   const payload = await openEncryptedPayload(file, passphrase);
-  requireCondition(
-    payload.contentType === expectedContentType,
-    'ARCHIVE_CONTENT_TYPE_MISMATCH',
-  );
+  requireCondition(payload.contentType === expectedContentType, 'ARCHIVE_CONTENT_TYPE_MISMATCH');
   const verifier = new TarVerifier(expectedEntries);
   try {
     for await (const chunk of payload.stream) verifier.consume(chunk);
@@ -1189,6 +1192,46 @@ export async function readEncryptedBuffer(file, passphrase, contentType, maxByte
     throw normalizeError(error, 'ARCHIVE_AUTHENTICATION_FAILED');
   }
   return Buffer.concat(chunks, length);
+}
+
+export async function decryptEncryptedPayloadToFile(
+  file,
+  outputFile,
+  passphrase,
+  contentType,
+  expectedByteLength,
+) {
+  requireCondition(
+    typeof outputFile === 'string' && path.isAbsolute(outputFile),
+    'ARCHIVE_OUTPUT_PATH_INVALID',
+  );
+  requireCondition(
+    Number.isSafeInteger(expectedByteLength) && expectedByteLength >= 0,
+    'ARCHIVE_EXPECTED_SIZE_INVALID',
+  );
+  const payload = await openEncryptedPayload(file, passphrase);
+  requireCondition(payload.contentType === contentType, 'ARCHIVE_CONTENT_TYPE_MISMATCH');
+  let output;
+  let length = 0;
+  try {
+    output = await open(outputFile, 'wx', 0o600);
+    for await (const chunk of payload.stream) {
+      length += chunk.length;
+      requireCondition(length <= expectedByteLength, 'ARCHIVE_DECRYPTED_SIZE_MISMATCH');
+      await writeFully(output, chunk);
+    }
+    requireCondition(length === expectedByteLength, 'ARCHIVE_DECRYPTED_SIZE_MISMATCH');
+    await output.sync();
+    await output.close();
+    output = null;
+    await chmod(outputFile, 0o600);
+    return Object.freeze({ byteLength: length });
+  } catch (error) {
+    await output?.close().catch(() => {});
+    await rm(outputFile, { force: true }).catch(() => {});
+    if (error instanceof OperatorToolError) throw error;
+    throw normalizeError(error, 'ARCHIVE_AUTHENTICATION_FAILED');
+  }
 }
 
 async function verifyEncryptedBuffer(file, passphrase, contentType, expected) {

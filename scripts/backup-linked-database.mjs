@@ -11,9 +11,14 @@ import {
   clearLinkedPostgresConnection,
   linkedPostgresClientOptions,
   linkedPostgresEnvironment,
+  loadPostgresSslRootCertificate,
   parseLinkedPostgresConnection,
   redactLinkedPostgresError,
 } from './database-backup-security.mjs';
+import {
+  assertCurrentProductionProjectRef,
+  assertLinkedProductionProjectRef,
+} from './production-operator-safety.mjs';
 
 const { Client } = pg;
 const INCLUDED_SCHEMAS = ['public', 'private', 'auth', 'storage'];
@@ -27,13 +32,27 @@ function argument(name) {
 const outputArgument = argument('--output');
 const postgresBinArgument = argument('--pg-bin') ?? process.env.SAFETYHUB_POSTGRES_BIN;
 const recoveryKeyOutputArgument = argument('--recovery-key-output');
-if (!outputArgument || !postgresBinArgument || !recoveryKeyOutputArgument) {
+const expectedProjectRefArgument = argument('--expected-project-ref');
+const sslRootCertificateArgument = argument('--ssl-root-cert');
+const sslRootCertificateSha256Argument = argument('--ssl-root-cert-sha256');
+if (
+  !outputArgument ||
+  !postgresBinArgument ||
+  !recoveryKeyOutputArgument ||
+  !expectedProjectRefArgument ||
+  !sslRootCertificateArgument
+) {
   console.error(
-    'Usage: node scripts/backup-linked-database.mjs --output <new-directory> --pg-bin <PostgreSQL-17-bin> --recovery-key-output <new-file>',
+    'Usage: node scripts/backup-linked-database.mjs --expected-project-ref <current-production-ref> --ssl-root-cert <absolute-Supabase-CA.pem> [--ssl-root-cert-sha256 <lowercase-sha256>] --output <new-directory> --pg-bin <PostgreSQL-17-bin> --recovery-key-output <new-file>',
   );
   process.exit(1);
 }
 
+const expectedProjectRef = assertCurrentProductionProjectRef(expectedProjectRefArgument);
+await assertLinkedProductionProjectRef(expectedProjectRef);
+const sslRootCertificate = await loadPostgresSslRootCertificate(sslRootCertificateArgument, {
+  expectedSha256: sslRootCertificateSha256Argument,
+});
 const outputDirectory = path.resolve(outputArgument);
 const recoveryKeyOutput = path.resolve(recoveryKeyOutputArgument);
 const postgresBin = path.resolve(postgresBinArgument);
@@ -333,6 +352,7 @@ if (!/PostgreSQL\) 17[.]/u.test(versionOutput)) {
 await stat(path.dirname(outputDirectory));
 await mkdir(workDirectory, { recursive: false });
 
+await assertLinkedProductionProjectRef(expectedProjectRef);
 const supabaseCli = path.resolve('node_modules/supabase/dist/supabase.js');
 const dryRun = spawnSync(process.execPath, [supabaseCli, 'db', 'dump', '--linked', '--dry-run'], {
   cwd: process.cwd(),
@@ -347,12 +367,16 @@ if (dryRun.error || dryRun.status !== 0) {
 
 const connection = parseLinkedPostgresConnection(`${dryRun.stdout}\n${dryRun.stderr}`);
 if (!connection) throw new Error('Temporary linked database credentials were not available.');
+await assertLinkedProductionProjectRef(expectedProjectRef);
 
-const client = new Client(linkedPostgresClientOptions(connection, {
-  application_name: 'safetyhub-pgdump-backup',
-  statement_timeout: 5 * 60 * 1000,
-  query_timeout: 5 * 60 * 1000,
-}));
+const client = new Client(
+  linkedPostgresClientOptions(connection, {
+    application_name: 'safetyhub-pgdump-backup',
+    statement_timeout: 5 * 60 * 1000,
+    query_timeout: 5 * 60 * 1000,
+    sslRootCertificate,
+  }),
+);
 
 try {
   await client.connect();
@@ -405,7 +429,7 @@ try {
     '--encoding=UTF8',
     ...INCLUDED_SCHEMAS.flatMap((schema) => ['--schema', schema]),
   ];
-  const dumpEnvironment = linkedPostgresEnvironment(connection);
+  const dumpEnvironment = linkedPostgresEnvironment(connection, sslRootCertificate);
   runProcess(
     postgresTools.pg_dump,
     [...commonDumpArguments, '--schema-only', '--file', schemaPath],
@@ -490,11 +514,20 @@ try {
   const summary = {
     ok: true,
     kind: 'safetyhub-encrypted-pgdump-backup-v2',
+    projectRef: expectedProjectRef,
     outputDirectory,
     createdAt: new Date().toISOString(),
     snapshotAt: snapshotRows[0]?.snapshot_at,
     serverVersion: snapshotRows[0]?.server_version,
     pgDumpVersion: versionOutput.trim(),
+    sslRootCertificate: {
+      sha256: sslRootCertificate.sha256,
+      fingerprint256: sslRootCertificate.fingerprint256,
+      subject: sslRootCertificate.subject,
+      issuer: sslRootCertificate.issuer,
+      validFrom: sslRootCertificate.validFrom,
+      validTo: sslRootCertificate.validTo,
+    },
     includedSchemas: INCLUDED_SCHEMAS,
     tables: tableRows.length,
     counts,

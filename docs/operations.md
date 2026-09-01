@@ -169,6 +169,38 @@ reason и новым idempotency UUID для каждого логическог
 повторное использование UUID с другими параметрами и включение Telegram раньше
 event emission отклоняются контрактом БД.
 
+RPC вызывается только через fail-closed operator CLI. В отдельном абсолютном,
+не symlink, access-restricted env-file должна быть ровно одна assignment
+`SUPABASE_SECRET_KEY`; значение не передаётся в argv и не выводится. Перед каждым
+вызовом дважды задаётся один и тот же reviewed current production ref:
+
+```powershell
+$ProjectRef = '<CURRENT_PRODUCTION_PROJECT_REF>'
+npm run runtime:flag:set -- `
+  --expected-project-ref $ProjectRef `
+  --confirm-project-ref $ProjectRef `
+  --feature notification_events `
+  --enabled true `
+  --reason 'Enable notification events after release migration' `
+  --idempotency-key '<NEW_UUID>' `
+  --env-file 'C:\secure-operator\production-service.env'
+
+npm run runtime:flag:set -- `
+  --expected-project-ref $ProjectRef `
+  --confirm-project-ref $ProjectRef `
+  --feature telegram_delivery `
+  --enabled true `
+  --reason 'Enable Telegram after dispatcher smoke' `
+  --idempotency-key '<ANOTHER_NEW_UUID>' `
+  --env-file 'C:\secure-operator\production-service.env'
+```
+
+Rollback использует те же команды с новыми UUID: сначала
+`telegram_delivery=false`, затем при необходимости
+`notification_events=false`. UUID повторяется только для retry идентичного
+запроса; receipt содержит ref/feature/state/timestamp/UUID, но не service key и
+не reason.
+
 Операционная подготовка RU/KK/EN/ZH content выполняется по
 `docs/admin-localization-workflow.md`. Localized assessment bundle проверяется и
 импортируется только offline service-командой; browser upload для него отсутствует.

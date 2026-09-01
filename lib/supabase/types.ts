@@ -947,6 +947,15 @@ export type Database = {
       fail_notification_delivery: JsonRpc;
       prune_notification_data: JsonRpc;
       set_runtime_feature_flag: JsonRpc;
+      configure_notification_dispatch_vault: {
+        Args: {
+          p_dispatch_url: string;
+          p_dispatch_secret: string;
+          p_reason: string;
+          p_idempotency_key: string;
+        };
+        Returns: Json;
+      };
       list_organization_cleanup_clusters: { Args: { p_limit?: number }; Returns: Json };
       preview_organization_merge: {
         Args: { p_source_ids: string[]; p_target_id: string };

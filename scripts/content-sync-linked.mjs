@@ -17,9 +17,14 @@ import { validateAndRenderPresentation } from './course-content/presentation-pdf
 import {
   clearLinkedPostgresConnection,
   linkedPostgresClientOptions,
+  loadPostgresSslRootCertificate,
   parseLinkedPostgresConnection,
   redactLinkedPostgresError,
 } from './database-backup-security.mjs';
+import {
+  assertCurrentProductionProjectRef,
+  assertLinkedProductionProjectRef,
+} from './production-operator-safety.mjs';
 
 const { Client } = pg;
 const ROOT = process.cwd();
@@ -31,15 +36,32 @@ const checkOnly = process.argv.includes('--check');
 const pull = process.argv.includes('--pull');
 const visualQaApproved = process.argv.includes('--visual-qa-approved');
 
+function argument(name) {
+  const index = process.argv.indexOf(name);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+const expectedProjectRefArgument = argument('--expected-project-ref');
+const sslRootCertificateArgument = argument('--ssl-root-cert');
+const sslRootCertificateSha256Argument = argument('--ssl-root-cert-sha256');
+
 if (!checkOnly && !pull) {
   console.error(
-    'Usage: content-sync-linked.mjs --pull [--visual-qa-approved] | --check',
+    'Usage: content-sync-linked.mjs (--pull [--visual-qa-approved] | --check) --expected-project-ref <current-production-ref> --ssl-root-cert <absolute-Supabase-CA.pem> [--ssl-root-cert-sha256 <lowercase-sha256>]',
   );
   process.exit(1);
 }
 if (checkOnly && visualQaApproved) {
   throw new Error('--visual-qa-approved is only valid with --pull.');
 }
+if (!expectedProjectRefArgument || !sslRootCertificateArgument) {
+  throw new Error('Explicit linked project ref and PostgreSQL SSL root certificate are required.');
+}
+const expectedProjectRef = assertCurrentProductionProjectRef(expectedProjectRefArgument);
+await assertLinkedProductionProjectRef(expectedProjectRef);
+const sslRootCertificate = await loadPostgresSslRootCertificate(sslRootCertificateArgument, {
+  expectedSha256: sslRootCertificateSha256Argument,
+});
 
 function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
@@ -182,7 +204,8 @@ async function readJsonIfPresent(filePath) {
   }
 }
 
-function linkedConnection() {
+async function linkedConnection() {
+  await assertLinkedProductionProjectRef(expectedProjectRef);
   const cli = path.resolve('node_modules', 'supabase', 'dist', 'supabase.js');
   const result = spawnSync(process.execPath, [cli, 'db', 'dump', '--linked', '--dry-run'], {
     cwd: ROOT,
@@ -198,6 +221,7 @@ function linkedConnection() {
   if (!connection) {
     throw new Error('Temporary linked database credentials were not available.');
   }
+  await assertLinkedProductionProjectRef(expectedProjectRef);
   return connection;
 }
 
@@ -224,7 +248,16 @@ function linkedStorageAdmin() {
     throw new Error('Linked Supabase Storage credentials are required for content parity.');
   }
   const parsed = new URL(url);
-  if (parsed.protocol !== 'https:' || !parsed.hostname.endsWith('.supabase.co')) {
+  if (
+    parsed.protocol !== 'https:' ||
+    parsed.username !== '' ||
+    parsed.password !== '' ||
+    parsed.port !== '' ||
+    parsed.pathname !== '/' ||
+    parsed.search !== '' ||
+    parsed.hash !== '' ||
+    parsed.hostname !== `${expectedProjectRef}.supabase.co`
+  ) {
     throw new Error('Refusing an unexpected linked Storage host.');
   }
   return createClient(url, secret, {
@@ -248,12 +281,15 @@ async function downloadPublishedPresentationAsset(storage, bucket, storagePath) 
   return Buffer.from(await data.arrayBuffer());
 }
 
-const connection = linkedConnection();
-const client = new Client(linkedPostgresClientOptions(connection, {
-  application_name: 'safetyhub-content-parity',
-  statement_timeout: 2 * 60 * 1000,
-  query_timeout: 2 * 60 * 1000,
-}));
+const connection = await linkedConnection();
+const client = new Client(
+  linkedPostgresClientOptions(connection, {
+    application_name: 'safetyhub-content-parity',
+    statement_timeout: 2 * 60 * 1000,
+    query_timeout: 2 * 60 * 1000,
+    sslRootCertificate,
+  }),
+);
 const storage = linkedStorageAdmin();
 
 let courseRows;

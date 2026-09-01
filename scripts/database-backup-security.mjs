@@ -1,9 +1,11 @@
-import { open, lstat, realpath } from 'node:fs/promises';
+import { createHash, X509Certificate } from 'node:crypto';
+import { open, lstat, readFile, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
-import { checkServerIdentity, getCACertificates } from 'node:tls';
+import { checkServerIdentity } from 'node:tls';
 
-const LINKED_DATABASE_HOST = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?[.])+supabase[.](?:com|co)$/iu;
+const LINKED_DATABASE_HOST =
+  /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?[.])+supabase[.](?:com|co)$/iu;
 const LINKED_DATABASE_USER = /^cli_login_/u;
 const DATABASE_BACKUP_KIND = 'safetyhub-database-backup-v1';
 const DATABASE_BACKUP_CIPHER = 'aes-256-gcm';
@@ -19,6 +21,9 @@ const PORTABLE_WRAPPED_KEY_FILE = 'database-backup.key.recovery.aes256gcm';
 const PORTABLE_RECOVERY_KEY_FORMAT = 'SAFETYHUB-RECOVERY-KEY-V1';
 const WINDOWS_DPAPI_KEY_PROTECTION = 'windows-dpapi-current-user';
 const PORTABLE_KEY_PROTECTION = 'portable-recovery-key-aes-256-gcm';
+const POSTGRES_SSL_ROOT_CERT_MAX_BYTES = 64 * 1024;
+const SHA256_HEX = /^[0-9a-f]{64}$/u;
+const loadedSslRootCertificates = new WeakSet();
 
 function decodeShellValue(rawValue) {
   const value = rawValue.trim().replace(/[;]$/u, '');
@@ -105,21 +110,113 @@ export function parseLinkedPostgresConnection(output, { allowUri = false } = {})
   return validateLinkedConnection(candidate);
 }
 
+export async function loadPostgresSslRootCertificate(
+  certificateFile,
+  { expectedSha256, now = () => new Date() } = {},
+) {
+  if (typeof certificateFile !== 'string' || !path.isAbsolute(certificateFile)) {
+    throw new Error('PostgreSQL SSL root certificate path must be absolute.');
+  }
+  if (expectedSha256 !== undefined && !SHA256_HEX.test(expectedSha256)) {
+    throw new Error('PostgreSQL SSL root certificate SHA-256 pin is invalid.');
+  }
+  let stats;
+  let bytes;
+  let physicalPath;
+  try {
+    stats = await lstat(certificateFile);
+    if (!stats.isFile() || stats.isSymbolicLink()) {
+      throw new Error('PostgreSQL SSL root certificate must be a regular file.');
+    }
+    if (stats.size < 256 || stats.size > POSTGRES_SSL_ROOT_CERT_MAX_BYTES) {
+      throw new Error('PostgreSQL SSL root certificate size is invalid.');
+    }
+    [bytes, physicalPath] = await Promise.all([
+      readFile(certificateFile),
+      realpath(certificateFile),
+    ]);
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('PostgreSQL SSL root certificate')) {
+      throw error;
+    }
+    throw new Error('PostgreSQL SSL root certificate is unavailable.');
+  }
+  try {
+    const pem = bytes.toString('utf8');
+    const certificates = pem.match(
+      /-----BEGIN CERTIFICATE-----[\s\S]*?-----END CERTIFICATE-----/gu,
+    );
+    if (
+      !certificates ||
+      certificates.length !== 1 ||
+      pem.replace(certificates[0], '').trim() !== ''
+    ) {
+      throw new Error('PostgreSQL SSL root certificate PEM is invalid.');
+    }
+    let certificate;
+    try {
+      certificate = new X509Certificate(certificates[0]);
+    } catch {
+      throw new Error('PostgreSQL SSL root certificate PEM is invalid.');
+    }
+    if (certificate.ca !== true) {
+      throw new Error('PostgreSQL SSL root certificate is not a CA certificate.');
+    }
+    const checkedAt = now();
+    if (!(checkedAt instanceof Date) || !Number.isFinite(checkedAt.getTime())) {
+      throw new Error('PostgreSQL SSL root certificate validation clock is invalid.');
+    }
+    const validFrom = new Date(certificate.validFrom);
+    const validTo = new Date(certificate.validTo);
+    if (
+      !Number.isFinite(validFrom.getTime()) ||
+      !Number.isFinite(validTo.getTime()) ||
+      checkedAt < validFrom ||
+      checkedAt > validTo
+    ) {
+      throw new Error('PostgreSQL SSL root certificate is outside its validity period.');
+    }
+    const sha256 = createHash('sha256').update(bytes).digest('hex');
+    if (expectedSha256 !== undefined && sha256 !== expectedSha256) {
+      throw new Error('PostgreSQL SSL root certificate SHA-256 pin mismatch.');
+    }
+    const result = Object.freeze({
+      physicalPath,
+      pem: certificates[0],
+      sha256,
+      fingerprint256: certificate.fingerprint256,
+      subject: certificate.subject,
+      issuer: certificate.issuer,
+      validFrom: validFrom.toISOString(),
+      validTo: validTo.toISOString(),
+    });
+    loadedSslRootCertificates.add(result);
+    return result;
+  } finally {
+    bytes.fill(0);
+  }
+}
+
+function requireLoadedSslRootCertificate(value) {
+  if (!value || typeof value !== 'object' || !loadedSslRootCertificates.has(value)) {
+    throw new Error('A validated PostgreSQL SSL root certificate is required.');
+  }
+  return value;
+}
+
 export function linkedPostgresClientOptions(connection, options = {}) {
   validateLinkedConnection(connection);
-  const systemCertificateAuthorities = getCACertificates('system');
-  if (systemCertificateAuthorities.length === 0) {
-    throw new Error('The operating-system TLS trust store is unavailable.');
-  }
+  const { sslRootCertificate, ...clientOptions } = options;
+  const certificate = requireLoadedSslRootCertificate(sslRootCertificate);
   return {
-    ...options,
+    ...clientOptions,
     host: connection.PGHOST,
     port: Number(connection.PGPORT),
     user: connection.PGUSER,
     password: connection.PGPASSWORD,
     database: connection.PGDATABASE,
     ssl: {
-      ca: systemCertificateAuthorities,
+      ca: certificate.pem,
       checkServerIdentity,
       rejectUnauthorized: true,
       servername: connection.PGHOST,
@@ -127,8 +224,13 @@ export function linkedPostgresClientOptions(connection, options = {}) {
   };
 }
 
-export function linkedPostgresEnvironment(connection, inheritedEnvironment = process.env) {
+export function linkedPostgresEnvironment(
+  connection,
+  sslRootCertificate,
+  inheritedEnvironment = process.env,
+) {
   validateLinkedConnection(connection);
+  const certificate = requireLoadedSslRootCertificate(sslRootCertificate);
   const environment = Object.fromEntries(
     Object.entries(inheritedEnvironment).filter(([name]) => !/^PG/iu.test(name)),
   );
@@ -140,7 +242,7 @@ export function linkedPostgresEnvironment(connection, inheritedEnvironment = pro
     PGPASSWORD: connection.PGPASSWORD,
     PGDATABASE: connection.PGDATABASE,
     PGSSLMODE: 'verify-full',
-    PGSSLROOTCERT: 'system',
+    PGSSLROOTCERT: certificate.physicalPath,
   };
 }
 
@@ -169,9 +271,9 @@ function invalidReceipt() {
 function isPlainObject(value) {
   return Boolean(
     value &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      Object.getPrototypeOf(value) === Object.prototype,
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    Object.getPrototypeOf(value) === Object.prototype,
   );
 }
 
@@ -472,7 +574,10 @@ export async function assertPhysicalPathRelationship({
   if ((relationship === 'inside' && !inside) || (relationship === 'outside' && inside)) {
     throw new Error(relationshipError || `${candidateLabel} has an unsafe filesystem location.`);
   }
-  if (relationship === 'inside' && pathComparisonKey(directory.physicalPath) === pathComparisonKey(candidate.physicalPath)) {
+  if (
+    relationship === 'inside' &&
+    pathComparisonKey(directory.physicalPath) === pathComparisonKey(candidate.physicalPath)
+  ) {
     throw new Error(relationshipError || `${candidateLabel} has an unsafe filesystem location.`);
   }
   return { directory, candidate };

@@ -1,15 +1,17 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdtemp, mkdir, readFile, readdir, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, readdir, rm, symlink } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { Readable } from 'node:stream';
 import test from 'node:test';
 
-import {
-  OperatorToolError,
-} from '../../scripts/storage-operator-tools.mjs';
+import { parseArguments as parseStorageBackupArguments } from '../../scripts/backup-linked-storage.mjs';
+import { readRawSecretFromStdin } from '../../scripts/production-operator-safety.mjs';
+import { OperatorToolError } from '../../scripts/storage-operator-tools.mjs';
 import {
   SAFETYHUB_STORAGE_BUCKET_ALLOWLIST,
+  assertRecoveryKeyOutsideOutput,
   runStorageByteBackup,
   validateStorageBackupRequest,
   verifyStorageByteBackup,
@@ -19,6 +21,16 @@ const PROJECT_REF = 'vezgxdooijznpjqrpvcv';
 const FIXED_NOW = new Date('2026-08-31T01:00:00.000Z');
 const PASSPHRASE = 'storage-backup-test-passphrase-with-more-than-32-bytes';
 const BUCKETS = [...SAFETYHUB_STORAGE_BUCKET_ALLOWLIST];
+
+const BASE_BACKUP_ARGUMENTS = [
+  '--expected-project-ref',
+  PROJECT_REF,
+  ...BUCKETS.flatMap((bucket) => ['--allow-bucket', bucket]),
+  '--output-dir',
+  'C:\\secure-backups',
+  '--recovery-key-output',
+  'E:\\offline-keys\\storage.key',
+];
 
 function folder(name) {
   return { name, id: null, metadata: null };
@@ -47,7 +59,12 @@ function storageStream(bytes) {
   });
 }
 
-function mockStorageClient({ bucketConfigs, trees, downloads, listedBucketConfigs = bucketConfigs }) {
+function mockStorageClient({
+  bucketConfigs,
+  trees,
+  downloads,
+  listedBucketConfigs = bucketConfigs,
+}) {
   const calls = { bucketInventories: 0, bucketReads: [], lists: [], downloads: [], mutations: [] };
   const client = {
     storage: {
@@ -58,7 +75,9 @@ function mockStorageClient({ bucketConfigs, trees, downloads, listedBucketConfig
       async getBucket(bucket) {
         calls.bucketReads.push(bucket);
         const data = bucketConfigs.get(bucket);
-        return data ? { data, error: null } : { data: null, error: { message: `not found ${bucket}` } };
+        return data
+          ? { data, error: null }
+          : { data: null, error: { message: `not found ${bucket}` } };
       },
       from(bucket) {
         if (!bucketConfigs.has(bucket)) throw new Error(`unexpected bucket ${bucket}`);
@@ -145,7 +164,10 @@ function fullFixture() {
       objectMapKey('content-media', ''),
       [object('00.webp', '0', { eTag: 'zero-byte-etag' }), folder('nested')],
     ],
-    [objectMapKey('content-media', 'nested'), [object('asset.webp', 5, { mimetype: 'image/webp' })]],
+    [
+      objectMapKey('content-media', 'nested'),
+      [object('asset.webp', 5, { mimetype: 'image/webp' })],
+    ],
     [
       objectMapKey('course-presentations', ''),
       [folder('published'), object('orphan.pdf', 6, { mimetype: 'application/pdf' })],
@@ -180,7 +202,8 @@ test('generic Storage backup requires the exact four-bucket allowlist before any
   const incomplete = BUCKETS.slice(0, -1);
   assert.throws(
     () => validateStorageBackupRequest({ expectedProjectRef: PROJECT_REF, buckets: incomplete }),
-    (error) => error instanceof OperatorToolError && error.code === 'STORAGE_BACKUP_BUCKET_SET_INCOMPLETE',
+    (error) =>
+      error instanceof OperatorToolError && error.code === 'STORAGE_BACKUP_BUCKET_SET_INCOMPLETE',
   );
   assert.throws(
     () =>
@@ -188,11 +211,14 @@ test('generic Storage backup requires the exact four-bucket allowlist before any
         expectedProjectRef: PROJECT_REF,
         buckets: [...BUCKETS, 'unreviewed-bucket'],
       }),
-    (error) => error instanceof OperatorToolError && error.code === 'STORAGE_BACKUP_BUCKET_NOT_ALLOWED',
+    (error) =>
+      error instanceof OperatorToolError && error.code === 'STORAGE_BACKUP_BUCKET_NOT_ALLOWED',
   );
   assert.throws(
-    () => validateStorageBackupRequest({ expectedProjectRef: 'not-a-project-ref', buckets: BUCKETS }),
-    (error) => error instanceof OperatorToolError && error.code === 'STORAGE_BACKUP_PROJECT_REF_INVALID',
+    () =>
+      validateStorageBackupRequest({ expectedProjectRef: 'not-a-project-ref', buckets: BUCKETS }),
+    (error) =>
+      error instanceof OperatorToolError && error.code === 'STORAGE_BACKUP_PROJECT_REF_INVALID',
   );
 
   const sandbox = await mkdtemp(path.join(os.tmpdir(), 'safetyhub-storage-preflight-'));
@@ -291,7 +317,10 @@ test('generic Storage backup recursively encrypts every visible object across pu
     });
 
     assert.equal(receipt.archivedObjects, rawKeys.length);
-    assert.equal(receipt.archivedBytes, rawBytes.reduce((sum, bytes) => sum + bytes.length, 0));
+    assert.equal(
+      receipt.archivedBytes,
+      rawBytes.reduce((sum, bytes) => sum + bytes.length, 0),
+    );
     assert.deepEqual(receipt.buckets, BUCKETS);
     const expectedDatabaseCompatibleObjectSet = [
       ['content-media', '00.webp', 0, 'zero-byte-etag'],
@@ -315,7 +344,11 @@ test('generic Storage backup recursively encrypts every visible object across pu
     assert.deepEqual(mocked.calls.mutations, []);
 
     const runFiles = (await readdir(receipt.runDirectory)).sort();
-    assert.deepEqual(runFiles, ['manifest.json.aes256gcm', 'receipt.json', 'storage.tar.aes256gcm']);
+    assert.deepEqual(runFiles, [
+      'manifest.json.aes256gcm',
+      'receipt.json',
+      'storage.tar.aes256gcm',
+    ]);
     const [archive, manifest, diskReceipt] = await Promise.all([
       readFile(path.join(receipt.runDirectory, 'storage.tar.aes256gcm')),
       readFile(path.join(receipt.runDirectory, 'manifest.json.aes256gcm')),
@@ -375,7 +408,8 @@ test('generic Storage backup rejects a mismatched stream and removes every incom
         repositoryRoot,
         now: () => FIXED_NOW,
       }),
-      (error) => error instanceof OperatorToolError && error.code === 'STORAGE_DOWNLOAD_SIZE_MISMATCH',
+      (error) =>
+        error instanceof OperatorToolError && error.code === 'STORAGE_DOWNLOAD_SIZE_MISMATCH',
     );
     assert.deepEqual(await readdir(outputDirectory), []);
     assert.deepEqual(mocked.calls.mutations, []);
@@ -403,4 +437,91 @@ test('generic Storage backup source has no cloud mutation, identity, or database
   assert.match(source, /sourceConsistencyOrWriteDrainVerifiedByTool:\s*false/u);
   assert.match(source, /physicalBackendOrVersionInventoryPerformed:\s*false/u);
   assert.match(source, /exactVisibleBucketInventoryVerified:\s*true/u);
+});
+
+test('Storage recovery key separation resolves junction aliases before every write', async (context) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'safetyhub-storage-key-boundary-'));
+  try {
+    const physicalParent = path.join(root, 'physical-parent');
+    const outputDirectory = path.join(physicalParent, 'backup-output');
+    const aliasParent = path.join(root, 'junction-parent');
+    const separateParent = path.join(root, 'separate-keys');
+    await Promise.all([
+      mkdir(outputDirectory, { recursive: true }),
+      mkdir(separateParent, { recursive: true }),
+    ]);
+    try {
+      await symlink(physicalParent, aliasParent, process.platform === 'win32' ? 'junction' : 'dir');
+    } catch (error) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        ['EPERM', 'EACCES', 'UNKNOWN'].includes(error.code)
+      ) {
+        context.skip('This workstation does not permit creating a test junction.');
+        return;
+      }
+      throw error;
+    }
+
+    await assert.rejects(
+      assertRecoveryKeyOutsideOutput(
+        path.join(aliasParent, 'backup-output', 'portable-key.txt'),
+        outputDirectory,
+      ),
+      (error) =>
+        error instanceof OperatorToolError &&
+        error.code === 'STORAGE_BACKUP_RECOVERY_KEY_INSIDE_OUTPUT',
+    );
+
+    const separateKey = path.join(separateParent, 'portable-key.txt');
+    const boundary = await assertRecoveryKeyOutsideOutput(separateKey, outputDirectory);
+    assert.equal(boundary.recoveryKeyOutput, separateKey);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('Storage backup accepts one bounded stdin secret source without weakening env-file isolation', async () => {
+  const parsedStdin = parseStorageBackupArguments([...BASE_BACKUP_ARGUMENTS, '--secret-stdin']);
+  assert.equal(parsedStdin.secretStdin, true);
+  assert.equal(parsedStdin.environmentFile, undefined);
+
+  const parsedFile = parseStorageBackupArguments([
+    ...BASE_BACKUP_ARGUMENTS,
+    '--env-file',
+    'C:\\private\\storage.env',
+  ]);
+  assert.equal(parsedFile.secretStdin, false);
+  assert.equal(parsedFile.environmentFile, 'C:\\private\\storage.env');
+
+  assert.throws(
+    () =>
+      parseStorageBackupArguments([
+        ...BASE_BACKUP_ARGUMENTS,
+        '--secret-stdin',
+        '--env-file',
+        'C:\\private\\storage.env',
+      ]),
+    (error) =>
+      error instanceof OperatorToolError &&
+      error.code === 'STORAGE_BACKUP_CREDENTIAL_SOURCE_INVALID',
+  );
+  assert.throws(
+    () => parseStorageBackupArguments(BASE_BACKUP_ARGUMENTS),
+    (error) =>
+      error instanceof OperatorToolError &&
+      error.code === 'STORAGE_BACKUP_CREDENTIAL_SOURCE_INVALID',
+  );
+
+  const secret = `sb_secret_${'a'.repeat(48)}`;
+  assert.equal(await readRawSecretFromStdin(Readable.from([`${secret}\r\n`])), secret);
+  await assert.rejects(
+    readRawSecretFromStdin(Readable.from([`${secret}\nsecond-line`])),
+    /OPERATOR_STDIN_SECRET_INVALID/u,
+  );
+  await assert.rejects(
+    readRawSecretFromStdin(Readable.from([Buffer.alloc(8 * 1024 + 1, 0x61)])),
+    /OPERATOR_STDIN_SECRET_TOO_LARGE/u,
+  );
 });

@@ -12,6 +12,7 @@ import {
   createBoundedFetch,
   readServiceCredential,
 } from './storage-operator-tools.mjs';
+import { ProductionOperatorError, readRawSecretFromStdin } from './production-operator-safety.mjs';
 import {
   assertRecoveryKeyOutsideOutput,
   runStorageByteBackup,
@@ -20,7 +21,7 @@ import {
 } from './storage-byte-backup-tools.mjs';
 
 const USAGE =
-  'Usage: --expected-project-ref <ref> --allow-bucket <bucket> [--allow-bucket <bucket>] --output-dir <existing-private-directory> --env-file <env-file> --recovery-key-output <new-file> [--page-size <1-1000>] [--request-timeout-ms <1000-120000>]';
+  'Usage: --expected-project-ref <ref> --allow-bucket <bucket> [--allow-bucket <bucket>] --output-dir <existing-private-directory> (--env-file <env-file> | --secret-stdin) --recovery-key-output <new-file> [--page-size <1-1000>] [--request-timeout-ms <1000-120000>]';
 
 function fail(code) {
   throw new OperatorToolError(code);
@@ -37,44 +38,62 @@ function parseInteger(value, minimum, maximum, code) {
   return parsed;
 }
 
-function parseArguments(argv) {
+export function parseArguments(argv) {
   const allowed = new Set([
     '--expected-project-ref',
     '--allow-bucket',
     '--output-dir',
     '--env-file',
+    '--secret-stdin',
     '--recovery-key-output',
     '--page-size',
     '--request-timeout-ms',
   ]);
   const values = Object.create(null);
   values['--allow-bucket'] = [];
-  for (let index = 0; index < argv.length; index += 2) {
+  for (let index = 0; index < argv.length; ) {
     const name = argv[index];
-    const value = argv[index + 1];
     requireCondition(allowed.has(name), 'STORAGE_BACKUP_CLI_UNKNOWN_ARGUMENT');
-    requireCondition(typeof value === 'string' && value.length > 0 && !value.startsWith('--'), 'STORAGE_BACKUP_CLI_ARGUMENT_VALUE_REQUIRED');
+    if (name === '--secret-stdin') {
+      requireCondition(values[name] === undefined, 'STORAGE_BACKUP_CLI_DUPLICATE_ARGUMENT');
+      values[name] = true;
+      index += 1;
+      continue;
+    }
+    const value = argv[index + 1];
+    requireCondition(
+      typeof value === 'string' && value.length > 0 && !value.startsWith('--'),
+      'STORAGE_BACKUP_CLI_ARGUMENT_VALUE_REQUIRED',
+    );
     if (name === '--allow-bucket') {
       values[name].push(value);
+      index += 2;
       continue;
     }
     requireCondition(values[name] === undefined, 'STORAGE_BACKUP_CLI_DUPLICATE_ARGUMENT');
     values[name] = value;
+    index += 2;
   }
-  for (const required of [
-    '--expected-project-ref',
-    '--output-dir',
-    '--env-file',
-    '--recovery-key-output',
-  ]) {
-    requireCondition(typeof values[required] === 'string', 'STORAGE_BACKUP_CLI_REQUIRED_ARGUMENT_MISSING');
+  for (const required of ['--expected-project-ref', '--output-dir', '--recovery-key-output']) {
+    requireCondition(
+      typeof values[required] === 'string',
+      'STORAGE_BACKUP_CLI_REQUIRED_ARGUMENT_MISSING',
+    );
   }
-  requireCondition(values['--allow-bucket'].length > 0, 'STORAGE_BACKUP_CLI_REQUIRED_ARGUMENT_MISSING');
+  requireCondition(
+    values['--allow-bucket'].length > 0,
+    'STORAGE_BACKUP_CLI_REQUIRED_ARGUMENT_MISSING',
+  );
+  requireCondition(
+    (typeof values['--env-file'] === 'string') !== (values['--secret-stdin'] === true),
+    'STORAGE_BACKUP_CREDENTIAL_SOURCE_INVALID',
+  );
   return {
     expectedProjectRef: values['--expected-project-ref'],
     buckets: values['--allow-bucket'],
     outputDirectory: values['--output-dir'],
     environmentFile: values['--env-file'],
+    secretStdin: values['--secret-stdin'] === true,
     recoveryKeyOutput: values['--recovery-key-output'],
     pageSize:
       values['--page-size'] === undefined
@@ -92,6 +111,21 @@ function parseArguments(argv) {
   };
 }
 
+async function loadServiceCredential(args, input) {
+  if (!args.secretStdin) return loadServiceCredentialFromEnvironmentFile(args.environmentFile);
+  let rawSecret = '';
+  try {
+    rawSecret = await readRawSecretFromStdin(input);
+    return readServiceCredential(storageServiceKeyConfig(), { SUPABASE_SECRET_KEY: rawSecret });
+  } catch (error) {
+    if (error instanceof OperatorToolError) throw error;
+    if (error instanceof ProductionOperatorError) throw new OperatorToolError(error.code);
+    fail('STORAGE_BACKUP_STDIN_CREDENTIAL_INVALID');
+  } finally {
+    rawSecret = '';
+  }
+}
+
 async function requireExistingRecoveryKeyParent(file) {
   let stats;
   try {
@@ -99,7 +133,10 @@ async function requireExistingRecoveryKeyParent(file) {
   } catch {
     fail('STORAGE_BACKUP_RECOVERY_KEY_PARENT_UNAVAILABLE');
   }
-  requireCondition(stats.isDirectory() && !stats.isSymbolicLink(), 'STORAGE_BACKUP_RECOVERY_KEY_PARENT_UNAVAILABLE');
+  requireCondition(
+    stats.isDirectory() && !stats.isSymbolicLink(),
+    'STORAGE_BACKUP_RECOVERY_KEY_PARENT_UNAVAILABLE',
+  );
 }
 
 function loadServiceCredentialFromEnvironmentFile(environmentFile) {
@@ -148,7 +185,7 @@ function protectPassphraseWithDpapi(passphrase) {
   return protectedResult.stdout.trim();
 }
 
-export async function main(argv = process.argv.slice(2)) {
+export async function main(argv = process.argv.slice(2), { input = process.stdin } = {}) {
   const args = parseArguments(argv);
   if (process.platform !== 'win32') fail('STORAGE_BACKUP_DPAPI_WINDOWS_REQUIRED');
 
@@ -157,7 +194,11 @@ export async function main(argv = process.argv.slice(2)) {
     buckets: args.buckets,
   });
   const outputDirectory = path.resolve(args.outputDirectory);
-  const recoveryKeyOutput = assertRecoveryKeyOutsideOutput(args.recoveryKeyOutput, outputDirectory);
+  const recoveryKeyBoundary = await assertRecoveryKeyOutsideOutput(
+    args.recoveryKeyOutput,
+    outputDirectory,
+  );
+  const recoveryKeyOutput = recoveryKeyBoundary.recoveryKeyOutput;
   await requireExistingRecoveryKeyParent(recoveryKeyOutput);
   try {
     await lstat(recoveryKeyOutput);
@@ -167,7 +208,7 @@ export async function main(argv = process.argv.slice(2)) {
     if (error?.code !== 'ENOENT') fail('STORAGE_BACKUP_RECOVERY_KEY_PATH_INVALID');
   }
 
-  const serviceCredential = loadServiceCredentialFromEnvironmentFile(args.environmentFile);
+  const serviceCredential = await loadServiceCredential(args, input);
   const passphraseBytes = randomBytes(48);
   const archivePassphrase = passphraseBytes.toString('base64');
   let runDirectory;
@@ -206,12 +247,20 @@ export async function main(argv = process.argv.slice(2)) {
       )}\n`,
       { flag: 'wx', mode: 0o600 },
     );
-    await writeFile(
-      recoveryKeyOutput,
-      `SAFETYHUB-STORAGE-RECOVERY-KEY-V1:${archivePassphrase}\n`,
-      { flag: 'wx', mode: 0o600 },
-    );
+    await assertRecoveryKeyOutsideOutput(recoveryKeyOutput, outputDirectory, {
+      expectedOutputPhysicalPath: recoveryKeyBoundary.outputPhysicalPath,
+      expectedRecoveryKeyPhysicalPath: recoveryKeyBoundary.recoveryKeyPhysicalPath,
+    });
+    await writeFile(recoveryKeyOutput, `SAFETYHUB-STORAGE-RECOVERY-KEY-V1:${archivePassphrase}\n`, {
+      flag: 'wx',
+      mode: 0o600,
+    });
     recoveryKeyWritten = true;
+    await assertRecoveryKeyOutsideOutput(recoveryKeyOutput, outputDirectory, {
+      candidateExpectation: 'file',
+      expectedOutputPhysicalPath: recoveryKeyBoundary.outputPhysicalPath,
+      expectedRecoveryKeyPhysicalPath: recoveryKeyBoundary.recoveryKeyPhysicalPath,
+    });
     process.stdout.write(
       `${JSON.stringify({
         ok: true,
@@ -226,7 +275,18 @@ export async function main(argv = process.argv.slice(2)) {
     );
   } catch (error) {
     if (runDirectory) await rm(runDirectory, { recursive: true, force: true }).catch(() => {});
-    if (recoveryKeyWritten) await unlink(recoveryKeyOutput).catch(() => {});
+    if (recoveryKeyWritten) {
+      try {
+        await assertRecoveryKeyOutsideOutput(recoveryKeyOutput, outputDirectory, {
+          candidateExpectation: 'file',
+          expectedOutputPhysicalPath: recoveryKeyBoundary.outputPhysicalPath,
+          expectedRecoveryKeyPhysicalPath: recoveryKeyBoundary.recoveryKeyPhysicalPath,
+        });
+        await unlink(recoveryKeyOutput);
+      } catch {
+        // Do not unlink a recovery-key path whose physical identity changed.
+      }
+    }
     if (error instanceof OperatorToolError) throw error;
     fail('STORAGE_BACKUP_FAILED');
   } finally {

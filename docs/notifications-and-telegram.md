@@ -52,23 +52,61 @@ Vault entries used by the database wake-up function:
 Prepare secrets in an ignored, access-restricted environment file and use the
 Supabase CLI `secrets set --env-file` path. Do not place values directly on a
 shared command line. Create or rotate the two Vault entries through the
-controlled production secret procedure after the function URL exists.
+controlled production secret procedure after the function URL exists. Use two
+separate files:
+
+- Function file: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`,
+  `TELEGRAM_DISPATCHER_SECRET`, `SAFETYHUB_SITE_URL`;
+- Vault operator file: `SUPABASE_SECRET_KEY`,
+  `TELEGRAM_DISPATCHER_SECRET` (the exact same dispatcher value).
+
+The platform injects `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`; do not put
+either in the Function file.
 
 ## Release sequence
 
 1. Create the private group and bot through the owner's authenticated Telegram
    session, add the bot, and obtain the numeric group ID. Account confirmation,
    CAPTCHA, SMS, or 2FA remains an owner action.
-2. Set Function secrets without echoing them.
-3. Deploy `telegram-dispatcher`; its `verify_jwt = false` setting is safe only
-   because the function enforces the independent dispatcher bearer.
-4. Store the deployed function URL and dispatcher secret under the two Vault
-   names above.
-5. Apply the reviewed additive notification migration. It creates the
-   after-insert wake-up and the one-minute recovery schedule.
-6. Submit one pending application and verify one inbox event and one Telegram
+2. After the reviewed additive migrations and exact linked-ref preflight have
+   been applied, set Function secrets and deploy without echoing values:
+
+   ```powershell
+   $ProjectRef = '<CURRENT_PRODUCTION_PROJECT_REF>'
+   if ((Get-Content -LiteralPath 'supabase/.temp/project-ref' -Raw).Trim() -cne $ProjectRef) {
+     throw 'Linked Supabase project does not match the reviewed production ref.'
+   }
+   npx --no-install supabase secrets set `
+     --project-ref $ProjectRef `
+     --env-file 'C:\secure-operator\telegram-function.env'
+   npx --no-install supabase secrets list --project-ref $ProjectRef
+   npx --no-install supabase functions deploy telegram-dispatcher `
+     --project-ref $ProjectRef `
+     --no-verify-jwt
+   ```
+
+   `verify_jwt = false` is safe only because the function enforces the
+   independent dispatcher bearer. `secrets list` verifies names, not values.
+
+3. Store the derived current-project function URL and dispatcher bearer through
+   the service-only Vault RPC. The CLI requires an exact ref confirmation,
+   reason and retry-safe UUID and never logs either configured value:
+
+   ```powershell
+   npm run notifications:vault:configure -- `
+     --expected-project-ref $ProjectRef `
+     --confirm-project-ref $ProjectRef `
+     --reason 'Configure Telegram dispatcher Vault values for release' `
+     --idempotency-key '<NEW_UUID>' `
+     --env-file 'C:\secure-operator\telegram-vault.env'
+   ```
+
+4. Enable event creation and, only after inbox/dispatcher smoke, Telegram
+   delivery through `npm run runtime:flag:set` as documented in
+   `docs/operations.md`.
+5. Submit one pending application and verify one inbox event and one Telegram
    message. Then verify a passed/failed completion and a synthetic system alert.
-7. Exercise duplicate wake-ups, a request timeout, Telegram `429`, `5xx`, an
+6. Exercise duplicate wake-ups, a request timeout, Telegram `429`, `5xx`, an
    invalid chat ID, and a rotated token. Confirm retries/dead-letter state in
    the Russian admin inbox while the business records remain committed.
 
@@ -97,12 +135,15 @@ and event timestamps when investigating a possible duplicate.
 
 ## Rollback and rotation
 
-- Disable delivery by removing/rotating `notification_dispatch_secret` or by
-  pausing the scheduled job; inbox events remain available.
+- Disable delivery first through the reasoned runtime-flag CLI with
+  `telegram_delivery=false`; if needed, use dispatcher-secret rotation as a
+  second kill switch. Inbox events remain available.
 - Revoking the bot token affects only Telegram delivery. Registration and
   course completion continue normally.
 - Restore delivery by rotating both copies of the dispatcher secret together,
-  deploying the function, then manually retrying dead rows in the inbox.
+  deploying the function, rerunning the idempotent Vault CLI with a fresh UUID,
+  performing smoke, and only then setting `telegram_delivery=true`; manually
+  retry dead rows in the inbox afterward.
 - Do not delete event or delivery rows manually. The service-only prune RPC
   retains delivered delivery rows for 30 days and inbox events for 90 days;
   audit history remains governed separately.
