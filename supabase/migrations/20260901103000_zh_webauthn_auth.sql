@@ -30,8 +30,10 @@ create table private.zh_webauthn_credentials (
   last_used_at timestamptz,
   revoked_at timestamptz,
   revoked_reason text,
-  constraint zh_webauthn_credentials_id_shape
-    check (credential_id ~ '^[A-Za-z0-9_-]{16,1024}$'),
+  constraint zh_webauthn_credentials_id_shape check (
+    char_length(credential_id) between 16 and 1024
+    and credential_id ~ '^[A-Za-z0-9_-]+$'
+  ),
   constraint zh_webauthn_credentials_public_key_size
     check (octet_length(public_key) between 32 and 4096),
   constraint zh_webauthn_credentials_transports
@@ -658,7 +660,8 @@ begin
     or v_challenge.expires_at <= statement_timestamp() then
     raise exception using errcode = '55000', message = 'ZH_REGISTRATION_EXPIRED';
   end if;
-  if p_credential_id !~ '^[A-Za-z0-9_-]{16,1024}$'
+  if char_length(coalesce(p_credential_id, '')) not between 16 and 1024
+    or p_credential_id !~ '^[A-Za-z0-9_-]+$'
     or p_public_key_base64 !~ '^[A-Za-z0-9+/]+={0,2}$'
     or p_signature_counter < 0
     or p_transports is null
@@ -1084,7 +1087,8 @@ begin
     or p_next_locator is null or p_next_locator = p_locator
     or p_next_salt !~ '^[0-9a-f]{32}$'
     or p_next_digest !~ '^[0-9a-f]{64}$'
-    or p_credential_id !~ '^[A-Za-z0-9_-]{16,1024}$'
+    or char_length(coalesce(p_credential_id, '')) not between 16 and 1024
+    or p_credential_id !~ '^[A-Za-z0-9_-]+$'
     or p_signature_counter < 0
     or p_transports is null
     or not p_transports <@ array['ble','cable','hybrid','internal','nfc','smart-card','usb']::text[]

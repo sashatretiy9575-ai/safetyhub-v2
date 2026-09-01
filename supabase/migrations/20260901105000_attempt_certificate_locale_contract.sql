@@ -26,12 +26,23 @@ begin
     join public.test_revision_variant_localizations variant_localization
       on variant_localization.revision_id = localization.revision_id
      and variant_localization.variant_id = new.variant_id
-     and variant_localization.locale = localization.locale
+      and variant_localization.locale = localization.locale
     where localization.revision_id = new.revision_id
       and localization.locale = new.locale
   ) then
-    raise exception using errcode = 'object_not_in_prerequisite_state',
-      message = 'ATTEMPT_LOCALIZATION_NOT_FOUND';
+    -- Properly localized revisions fail closed when the requested locale is
+    -- absent. A revision with no locale receipts at all can only come from a
+    -- legacy/direct writer, so keep that rolling-deployment insert contract
+    -- by pinning it to RU.
+    if exists (
+      select 1
+      from public.test_revision_localizations localization
+      where localization.revision_id = new.revision_id
+    ) then
+      raise exception using errcode = 'object_not_in_prerequisite_state',
+        message = 'ATTEMPT_LOCALIZATION_NOT_FOUND';
+    end if;
+    new.locale := 'ru'::public.app_locale;
   end if;
   return new;
 end;
