@@ -138,6 +138,8 @@ test('runtime boundary rejects unauthenticated calls before creating a service c
         'prune_account_storage_cleanup_tombstones',
         'prune_coarse_ip_rate_limits',
         'prune_learning_history_delete_receipts',
+        'prune_certificate_export_jobs',
+        'collect_capacity_monitor_snapshot',
       ],
     );
   } finally {

@@ -20,7 +20,7 @@ async function readYaml(path) {
 const exampleEnvironment = await readFile('.env.example', 'utf8');
 for (const flag of [
   'SAFETYHUB_LOCALE_ROUTES_ENABLED',
-  'SAFETYHUB_ZH_PASSKEY_ENABLED',
+  'SAFETYHUB_ZH_USERNAME_PASSWORD_ENABLED',
   'SAFETYHUB_ADMIN_INBOX_ENABLED',
 ]) {
   assert(
@@ -28,6 +28,10 @@ for (const flag of [
     `${flag} must be documented with a fail-closed production example.`,
   );
 }
+assert(
+  /^SAFETYHUB_TURNSTILE_SECRET_KEY=1x0{31}AA$/mu.test(exampleEnvironment),
+  'SAFETYHUB_TURNSTILE_SECRET_KEY must be documented with the local-only test value.',
+);
 
 const dependabot = await readYaml('.github/dependabot.yml');
 assert(dependabot?.version === 2, 'Dependabot config must use version 2.');
@@ -100,6 +104,11 @@ assert(
 assert(
   workflow?.jobs?.database?.env?.E2E_REQUIRE_AUTH === '1',
   'CI must require authenticated E2E credentials.',
+);
+assert(
+  workflow?.jobs?.database?.env?.SAFETYHUB_TURNSTILE_SECRET_KEY ===
+    '1x0000000000000000000000000000000AA',
+  'CI database job must supply the Vercel-only local Turnstile verifier secret.',
 );
 for (const [jobName, steps] of [
   ['application', applicationSteps],

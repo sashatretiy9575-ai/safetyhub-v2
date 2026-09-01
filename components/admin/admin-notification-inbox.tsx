@@ -47,6 +47,8 @@ function canPoll() {
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const MACHINE_CODE_PATTERN = /^[A-Z][A-Z0-9_]{2,79}$/u;
+const PHONE_COUNTRY_PATTERN = /^[A-Z]{2}$/u;
+const PHONE_E164_PATTERN = /^\+[1-9][0-9]{1,14}$/u;
 const DELIVERY_STATES = new Set(['pending', 'leased', 'retry', 'delivered', 'dead']);
 const LOCALES = new Set(['ru', 'kk', 'en', 'zh']);
 
@@ -118,22 +120,46 @@ function parseEvent(value: unknown): AdminNotificationEvent | null {
   const payload = value.payload;
 
   if (value.type === 'account.approval_requested') {
+    const minimalKeys = [
+      'name',
+      'surname',
+      'locale',
+      'requestedAt',
+      'adminPath',
+    ];
+    const applicationKeys = [
+      'name',
+      'surname',
+      'job',
+      'organization',
+      'phoneCountryIso2',
+      'phoneE164',
+    ];
+    const hasApplicationDetails = hasExactKeys(payload, applicationKeys);
+    if (!(hasExactKeys(payload, minimalKeys) || hasApplicationDetails)) {
+      return null;
+    }
     if (
-      !hasExactKeys(payload, [
-        'userId',
-        'name',
-        'surname',
-        'locale',
-        'requestedAt',
-        'adminPath',
-      ]) ||
-      !isUuid(payload.userId) ||
-      !isSingleLine(payload.name) ||
-      !isSingleLine(payload.surname) ||
-      typeof payload.locale !== 'string' ||
-      !LOCALES.has(payload.locale) ||
-      !isTimestamp(payload.requestedAt) ||
-      !isAdminPath(payload.adminPath)
+      hasApplicationDetails &&
+      (!isSingleLine(payload.name) ||
+        !isSingleLine(payload.surname) ||
+        !isSingleLine(payload.job, 160) ||
+        !isSingleLine(payload.organization, 160) ||
+        typeof payload.phoneCountryIso2 !== 'string' ||
+        !PHONE_COUNTRY_PATTERN.test(payload.phoneCountryIso2) ||
+        typeof payload.phoneE164 !== 'string' ||
+        !PHONE_E164_PATTERN.test(payload.phoneE164))
+    ) {
+      return null;
+    }
+    if (
+      !hasApplicationDetails &&
+      (!isSingleLine(payload.name) ||
+        !isSingleLine(payload.surname) ||
+        typeof payload.locale !== 'string' ||
+        !LOCALES.has(payload.locale) ||
+        !isTimestamp(payload.requestedAt) ||
+        !isAdminPath(payload.adminPath))
     ) {
       return null;
     }
@@ -457,12 +483,17 @@ function dateTime(value: string) {
 
 function eventPresentation(event: AdminNotificationEvent) {
   switch (event.type) {
-    case 'account.approval_requested':
+    case 'account.approval_requested': {
+      const applicationSummary =
+        'job' in event.payload
+          ? ` · ${event.payload.job} · ${event.payload.organization} · ${event.payload.phoneE164}`
+          : '';
       return {
         icon: Bell,
         title: 'Новая заявка на обучение',
-        description: `${event.payload.surname} ${event.payload.name}`,
+        description: `${event.payload.surname} ${event.payload.name}${applicationSummary}`,
       };
+    }
     case 'course.completed':
       return {
         icon: event.payload.result === 'passed' ? CheckCircle : XCircle,
@@ -476,6 +507,10 @@ function eventPresentation(event: AdminNotificationEvent) {
         description: event.payload.machineCode,
       };
   }
+}
+
+function eventAdminPath(event: AdminNotificationEvent) {
+  return 'adminPath' in event.payload ? event.payload.adminPath : '/admin/approvals';
 }
 
 const deliveryLabels = {
@@ -621,7 +656,7 @@ export function AdminNotificationInboxButton({
                         </span>
                         <div className="min-w-0">
                           <Link
-                            href={event.payload.adminPath}
+                            href={eventAdminPath(event)}
                             prefetch={false}
                             className="block rounded-sm focus-visible:outline-[3px] focus-visible:outline-[var(--color-focus)]"
                             onClick={() => {

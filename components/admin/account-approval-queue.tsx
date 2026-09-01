@@ -121,7 +121,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
               <div className="min-w-0 sm:hidden">
                 <h2 className="font-display text-lg font-bold break-words">{label}</h2>
                 <p className="text-sm break-all text-[var(--color-text-muted)]">
-                  {item.email ?? 'Вход по ключу доступа'}
+                  {item.email ?? 'Вход по логину и паролю'}
                 </p>
               </div>
             </div>
@@ -130,7 +130,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
               <div className="hidden sm:block">
                 <h2 className="font-display text-lg font-bold break-words">{label}</h2>
                 <p className="text-sm break-all text-[var(--color-text-muted)]">
-                  {item.email ?? 'Вход по ключу доступа'}
+                  {item.email ?? 'Вход по логину и паролю'}
                 </p>
               </div>
 

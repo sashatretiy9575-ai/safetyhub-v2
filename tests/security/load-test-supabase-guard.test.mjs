@@ -380,6 +380,7 @@ test('load harness completes every safety preflight before its first seed write'
     'await prepareLocalCiLocaleFixture(process.env.SAFETYHUB_LOCAL_DATABASE_URL);',
     baselineGuard,
   );
+  const zhRolloutEnable = harness.indexOf("p_feature_name: 'zh_username_password'", baselineGuard);
   const firstSeedDispatch = harness.indexOf('createZhLoadTestUser(admin, index', baselineGuard);
 
   assert.ok(targetGuard >= 0);
@@ -387,7 +388,9 @@ test('load harness completes every safety preflight before its first seed write'
   assert.ok(localBaselineGuard > markerGuard);
   assert.ok(baselineGuard > markerGuard);
   assert.ok(localFixtureGuard > baselineGuard);
+  assert.ok(zhRolloutEnable > localFixtureGuard);
   assert.ok(firstSeedDispatch > localFixtureGuard);
+  assert.ok(firstSeedDispatch > zhRolloutEnable);
   assert.ok(firstSeedDispatch > baselineGuard);
   assert.match(harness, /process\.env\.GITHUB_ACTIONS === 'true' && targetMode !== 'local-ci'/u);
   assert.match(harness, /SUPABASE_ACCESS_TOKEN must not be present in local-ci load mode/u);
@@ -408,28 +411,30 @@ test('load harness completes every safety preflight before its first seed write'
   assert.match(safety, /databaseUrl !== LOCAL_CI_DATABASE_URL/u);
   assert.match(safety, /runnerEnvironment !== 'github-hosted'/u);
   assert.doesNotMatch(harness, /\$\{user\.id\}\/avatar\.webp/u);
-  assert.match(harness, /prepare_zh_registration_operation/u);
-  assert.match(harness, /attach_zh_registration_auth_user/u);
-  assert.match(harness, /mark_zh_registration_storage_written/u);
-  assert.match(harness, /finalize_zh_registration/u);
-  assert.match(harness, /verifyRegistrationResponse/u);
-  assert.match(harness, /verifyAuthenticationResponse/u);
-  assert.match(harness, /createSoftwareCredential/u);
-  assert.match(harness, /runZhAssertion/u);
+  assert.match(harness, /complete_zh_username_registration/u);
+  assert.match(harness, /get_zh_username_login_mapping/u);
+  assert.match(harness, /get_zh_username_password_rollout_enabled/u);
+  assert.match(harness, /safetyhub_auth_kind: 'zh_username_password'/u);
+  assert.match(harness, /client\.auth\.signInWithPassword\(/u);
+  assert.match(harness, /options: captchaToken \? \{ captchaToken \} : undefined/u);
   assert.match(
     harness,
-    /for \(let index = 0; index < sessionUsers\.length; index \+= 1\)[\s\S]*?await runZhAssertion\(admin, user\);[\s\S]*?createAuthenticatedClient\(admin, url, publishableKey, user\)/u,
+    /const LOCAL_CI_TURNSTILE_DUMMY_TOKEN = 'XXXX\.DUMMY\.TOKEN\.XXXX'/u,
   );
-  assert.match(harness, /const objectKey = `\$\{id\}\/objects\/\$\{operationId\}\.webp`/u);
-  assert.match(harness, /upsert: false/u);
-  assert.match(harness, /admin\.auth\.admin\.generateLink\(/u);
-  assert.match(harness, /client\.auth\.verifyOtp\(/u);
-  assert.match(harness, /AUTH_VERIFY_FAILED_\$\{boundedAuthErrorEvidence\(signedIn\.error\)\}/u);
+  assert.match(
+    harness,
+    /targetMode === 'local-ci' \? LOCAL_CI_TURNSTILE_DUMMY_TOKEN : undefined/u,
+  );
+  assert.match(harness, /ZH_PASSWORD_SIGN_IN_FAILED_\$\{boundedAuthErrorEvidence\(signedIn\.error\)\}/u);
   assert.match(
     harness,
     /HTTP_\$\{statusCategory\}_CODE_\$\{codeCategory\}_CATEGORY_\$\{failureCategory\}/u,
   );
   assert.doesNotMatch(harness, /signedIn\.error\.message\}\)/u);
+  assert.doesNotMatch(
+    harness,
+    /prepare_zh_registration_operation|attach_zh_registration_auth_user|mark_zh_registration_storage_written|finalize_zh_registration|prepare_zh_authentication_challenge|get_zh_authentication_context|complete_zh_authentication|verifyRegistrationResponse|verifyAuthenticationResponse|createSoftwareCredential|runZhAssertion|generateLink|verifyOtp|software-webauthn|simplewebauthn/u,
+  );
   assert.match(harness, /list_published_courses_locale/u);
   assert.match(harness, /get_published_course_locale/u);
   assert.match(harness, /get_approved_course_presentation_locale/u);
@@ -439,10 +444,10 @@ test('load harness completes every safety preflight before its first seed write'
   assert.match(harness, /list_admin_notification_inbox/u);
   assert.match(harness, /claim_notification_deliveries/u);
   assert.match(harness, /get_certificate_download_payload/u);
-  assert.match(harness, /zhRegistration:/u);
-  assert.match(harness, /zhAssertionWaveResults/u);
+  assert.match(harness, /zhUsernamePasswordRegistration:/u);
+  assert.match(harness, /zhPasswordLoginWaveResults/u);
   assert.doesNotMatch(harness, /throw new Error\([^\n]*\$\{email\}/u);
-  assert.doesNotMatch(harness, /signInWithPassword|updateUserById\([^)]*password/u);
+  assert.doesNotMatch(harness, /updateUserById\([^)]*password/u);
 
   const localJob = workflow.slice(workflow.indexOf('  local-capacity-load:'));
   assert.match(localJob, /node-version: 24/u);

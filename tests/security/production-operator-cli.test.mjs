@@ -7,7 +7,10 @@ import test from 'node:test';
 
 import { main as configureVault } from '../../scripts/configure-notification-dispatch-vault.mjs';
 import { CURRENT_PRODUCTION_PROJECT_REF } from '../../scripts/production-operator-safety.mjs';
-import { main as setRuntimeFlag } from '../../scripts/set-runtime-feature-flag.mjs';
+import {
+  main as setRuntimeFlag,
+  parseArguments as parseRuntimeFlagArguments,
+} from '../../scripts/set-runtime-feature-flag.mjs';
 
 const SERVICE_KEY = `sb_secret_${'s'.repeat(48)}`;
 const DISPATCHER_SECRET = `dispatcher-${'d'.repeat(40)}`;
@@ -88,6 +91,26 @@ test('runtime flag CLI binds current production, uses service RPC, and emits a n
     assert.deepEqual(JSON.parse(output), result);
   } finally {
     await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('runtime flag CLI permits independent Telegram and ZH release gates in either direction', () => {
+  for (const featureName of ['telegram_application_details', 'zh_username_password']) {
+    for (const [enabled, expected] of [
+      ['true', true],
+      ['false', false],
+    ]) {
+      const parsed = parseRuntimeFlagArguments([
+        ...mutationArguments('9b000000-0000-4000-8000-000000000012'),
+        '--feature',
+        featureName,
+        '--enabled',
+        enabled,
+        '--secret-stdin',
+      ]);
+      assert.equal(parsed.featureName, featureName);
+      assert.equal(parsed.enabled, expected);
+    }
   }
 });
 

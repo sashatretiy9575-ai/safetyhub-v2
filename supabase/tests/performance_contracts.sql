@@ -229,7 +229,9 @@ begin
   );
 
   -- Username-less assertions select a single opaque credential id. The active
-  -- state check must remain a filter on the primary-key lookup, never a scan.
+  -- state check must remain index-backed, never a scan. PostgreSQL 17 may use
+  -- the active partial index via a btree skip scan instead of the primary key;
+  -- both plans preserve the selective credential lookup contract.
   perform pg_temp.assert_function_matches(
     'public.get_zh_authentication_context(uuid,text)'::regprocedure,
     'ZH credential lookup shape',
@@ -243,6 +245,10 @@ begin
     'private.zh_webauthn_credentials_pkey'::regclass,
     'ZH credential lookup'
   );
+  perform pg_temp.assert_index_ready(
+    'private.zh_webauthn_credentials_user_active_idx'::regclass,
+    'ZH active credential lookup'
+  );
   perform pg_temp.assert_plan_uses_index(
     'ZH credential lookup',
     $query$
@@ -252,7 +258,10 @@ begin
       where credential.credential_id = repeat('a', 43)
         and credential.state = 'active'
     $query$,
-    array['zh_webauthn_credentials_pkey']
+    array[
+      'zh_webauthn_credentials_pkey',
+      'zh_webauthn_credentials_user_active_idx'
+    ]
   );
 
   -- Presentation relay capacity uses both expiry cleanup and actor-scoped

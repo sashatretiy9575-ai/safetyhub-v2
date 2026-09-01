@@ -41,7 +41,8 @@ test('locale, ZH auth, and admin inbox entry points are wired to independent gat
     proxy,
     login,
     register,
-    zhServer,
+    zhLoginRoute,
+    zhRegisterRoute,
     adminLayout,
     inboxRoute,
     inboxReadRoute,
@@ -56,7 +57,8 @@ test('locale, ZH auth, and admin inbox entry points are wired to independent gat
     read('proxy.ts'),
     read('app/(account)/auth/login/page.tsx'),
     read('app/(account)/auth/register/page.tsx'),
-    read('features/auth/zh-webauthn-server.ts'),
+    read('app/api/auth/zh/login/route.ts'),
+    read('app/api/auth/zh/register/route.ts'),
     read('app/(admin)/admin/layout.tsx'),
     read('app/api/admin/notifications/route.ts'),
     read('app/api/admin/notifications/read/route.ts'),
@@ -72,8 +74,8 @@ test('locale, ZH auth, and admin inbox entry points are wired to independent gat
   for (const source of [proxy, sitemap, manifest, offline, seo, topics, articles]) {
     assert.match(source, /rolloutFeatureEnabled\('localeRoutes'\)/u);
   }
-  for (const source of [login, register, zhServer]) {
-    assert.match(source, /rolloutFeatureEnabled\('zhPasskey'\)/u);
+  for (const source of [login, register, zhLoginRoute, zhRegisterRoute]) {
+    assert.match(source, /rolloutFeatureEnabled\('zhUsernamePassword'\)/u);
   }
   for (const source of [adminLayout, inboxRoute, inboxReadRoute, inboxRetryRoute]) {
     assert.match(source, /rolloutFeatureEnabled\('adminInbox'\)/u);
@@ -81,6 +83,5 @@ test('locale, ZH auth, and admin inbox entry points are wired to independent gat
   assert.match(proxy, /!localeRoutesEnabled && localizedPath\.hasLocalePrefix/u);
   assert.match(topics, /rolloutFeatureEnabled\('localeRoutes'\)[\s\S]*getLegacyTopics\(\)/u);
   assert.match(articles, /rolloutFeatureEnabled\('localeRoutes'\)[\s\S]*getLegacyArticles\(\)/u);
-  assert.match(zhServer, /function requireZhPasskeyRollout\(\)/u);
-  assert.equal((zhServer.match(/requireZhPasskeyRollout\(\);/gu) ?? []).length, 6);
+  assert.equal(ROLLOUT_FEATURE_ENV.zhUsernamePassword, 'SAFETYHUB_ZH_USERNAME_PASSWORD_ENABLED');
 });

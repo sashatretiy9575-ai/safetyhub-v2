@@ -548,6 +548,43 @@ export type Database = {
     Functions: {
       get_my_capabilities: { Args: Record<PropertyKey, never>; Returns: string[] };
       get_auth_context: { Args: Record<PropertyKey, never>; Returns: AuthContextRpcRow[] };
+      complete_zh_username_registration: {
+        Args: {
+          p_user_id: string;
+          p_username: string;
+          p_synthetic_email: string;
+          p_privacy_version: string;
+          p_privacy_body_revision: string;
+          p_terms_version: string;
+          p_terms_body_revision: string;
+        };
+        Returns: Json;
+      };
+      get_zh_username_login_mapping: { Args: { p_username: string }; Returns: Json | null };
+      get_zh_username_password_rollout_enabled: {
+        Args: Record<PropertyKey, never>;
+        Returns: boolean;
+      };
+      get_zh_username_provision_target: {
+        Args: { p_user_id: string };
+        Returns: Json | null;
+      };
+      provision_zh_username_password: {
+        Args: { p_target_user_id: string; p_username: string; p_reason: string };
+        Returns: Json;
+      };
+      begin_zh_username_password_reset: {
+        Args: { p_target_user_id: string; p_reason: string };
+        Returns: Json;
+      };
+      complete_zh_username_password_reset: {
+        Args: { p_target_user_id: string; p_reason: string };
+        Returns: Json;
+      };
+      prune_zh_username_authorized_sessions: {
+        Args: { p_limit?: number };
+        Returns: Json;
+      };
       set_preferred_locale: { Args: { p_locale: AppLocale }; Returns: Json };
       update_profile: {
         Args: { p_name: string; p_surname: string; p_job: string; p_organization: string };
@@ -983,6 +1020,18 @@ export type Database = {
         Returns: Json;
       };
       get_capacity_metrics: { Args: Record<PropertyKey, never>; Returns: Json };
+      collect_capacity_monitor_snapshot: {
+        Args: { p_force?: boolean };
+        Returns: Json;
+      };
+      set_capacity_monitor_monthly_active_learner_budget: {
+        Args: {
+          p_monthly_active_learner_limit: number;
+          p_reason: string;
+          p_idempotency_key: string;
+        };
+        Returns: Json;
+      };
       consume_business_quota_for_actor: {
         Args: { p_actor_id: string; p_action: string };
         Returns: Json;

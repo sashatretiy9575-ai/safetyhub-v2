@@ -1,4 +1,4 @@
-# RU/KK/EN/ZH, passkey, notifications and client certificates release
+# RU/KK/EN/ZH, username/password, notifications and client certificates release
 
 This runbook is the production cutover contract for the additive multilingual
 release. It supplements `docs/deployment.md`; it does not authorize replaying
@@ -59,8 +59,7 @@ $SslRootCertSha256 = '<EXPECTED_LOWERCASE_CA_SHA256>'
 if ((Get-Content -LiteralPath 'supabase/.temp/project-ref' -Raw).Trim() -cne $ProjectRef) {
   throw 'Linked Supabase project does not match the reviewed production ref.'
 }
-npm run db:migrations:check-linked
-npm run db:types:check
+npm run db:migrations:check-preflight -- --expected-project-ref $ProjectRef
 npm run storage:buckets:check:linked
 npm run content:pull:linked -- `
   --check `
@@ -73,10 +72,30 @@ npm run content:parity:check -- `
   --ssl-root-cert-sha256 $SslRootCertSha256
 ```
 
-Any unexpected migration, type, bucket or content drift stops the release until
-the hosted state is pulled and reviewed. The PostgreSQL gates have no system or
-bundled-root fallback: the operator-provided current-project Server root CA,
-hostname/SNI verification and optional reviewed SHA-256 pin are mandatory.
+The pre-migration migration gate accepts exactly the 39-migration hosted prefix
+and the reviewed 17-file pending tail. It pins every pending filename and
+normalized SHA-256; a partially applied tail, remote-only version, renamed file
+or changed migration fails closed. While the hosted database is still on that
+legacy prefix, the two content commands switch only in `--check` mode to a
+pinned-CA, repeatable-read RU fallback. That fallback verifies the approved RU
+catalog checksum, exact `5 / 5 / 198 / 15 / 150 / 600 / 10` contract and every
+canonical course/article/media byte hash. It ignores the repository-only,
+unpublished localization receipt and refuses a normal pull or a partially
+applied localization schema.
+
+`npm run db:types:check` remains the exact post-migration hosted-schema gate and
+must pass после применения migrations together with
+`npm run db:migrations:check-linked`. Any unexpected migration, bucket or
+content drift stops the release until the hosted state is pulled and reviewed.
+The PostgreSQL gates have no system or bundled-root fallback: the
+operator-provided current-project Server root CA, hostname/SNI verification and
+optional reviewed SHA-256 pin are mandatory.
+
+The `39 + 17` manifest is deliberately specific to this unapplied release. If a
+reviewed forward migration is added before the linked apply, update the pinned
+`REVIEWED_PENDING_MIGRATIONS` filename/hash manifest and its exact-count test in
+the same reviewed change, then obtain a fresh preflight receipt. Do not change
+the gate to tolerate an arbitrary extra local migration.
 
 ## Backup gate
 
@@ -118,11 +137,13 @@ Execute these phases one at a time and record post-counts after every phase.
    linked type check as nonsecret release evidence.
 
 2. Push the reviewed Supabase Auth configuration only after supplying the real
-   Turnstile secret through the protected local secret context. The public
-   always-pass test secret is rejected by the preparation script.
+   Turnstile secret through the protected local secret context. Separately set
+   the matching Vercel-only `SAFETYHUB_TURNSTILE_SECRET_KEY` for ZH registration
+   Siteverify; it is not read from Supabase config. The public always-pass test
+   secret is rejected by the preparation script and by the deployed verifier.
 3. Deploy the compatible Vercel build with:
    `SAFETYHUB_LOCALE_ROUTES_ENABLED=false`,
-   `SAFETYHUB_ZH_PASSKEY_ENABLED=false`, and
+   `SAFETYHUB_ZH_USERNAME_PASSWORD_ENABLED=false`, and
    `SAFETYHUB_ADMIN_INBOX_ENABLED=false`.
 4. Upload the 15 localized learner PDFs as new immutable, content-addressed
    objects. Keep the 15 canonical PPTX sources in the reviewed release artifact
@@ -134,8 +155,11 @@ Execute these phases one at a time and record post-counts after every phase.
    and archive the automated-only translation/visual QA receipt.
 7. Enable locale routing, then verify RU unprefixed URLs and `/kk`, `/en`, `/zh`
    before continuing.
-8. Enable ZH passkey registration and verify registration, pending access,
-   authentication, approval, rejection, recovery and reasoned admin reset.
+8. Enable the database `zh_username_password` receipt, then ZH
+   username/password registration. Verify first-token registration creates no
+   session, redirects to login, and a fresh Turnstile token completes password
+   authentication; then verify pending access, approval, rejection and
+   admin-only password recovery.
 9. Enable the database `notification_events` flag, then the application admin
    inbox flag. Verify the inbox while Telegram remains unavailable.
 10. Create/configure the private Telegram group and bot. Put
@@ -214,9 +238,9 @@ npm run runtime:flag:set -- `
   and offline behavior match the selected locale. `/admin` remains Russian.
 - Existing PS.KZ test mailboxes complete RU/KK/EN six-digit OTP end to end. No
   mailbox credential is logged, committed or included in a receipt.
-- ZH contains no email/SMS/password/username field. A real discoverable passkey
-  completes registration and later authentication; wrong RP/origin/challenge,
-  replay, counter regression and reused recovery codes fail generically.
+- ZH registration and login accept only a Latin username and password. Email,
+  SMS and telephone are absent from the authentication and recovery flow;
+  recovery is administrator-only.
 - Pending and rejected accounts cannot fetch either presentation, create/resume
   an attempt or obtain a certificate through browser or direct RPC. Approval in
   the Russian admin UI opens the same gates immediately after session refresh.

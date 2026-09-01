@@ -47,7 +47,17 @@ Storage API и загружает пять content-addressed PDF/миниатю�
 
 ## Изменение схемы
 
-1. Сверить linked-цепочку: `npm run db:migrations:check-linked`.
+1. До backup/apply доказать точный reviewed delta командой
+   `npm run db:migrations:check-preflight -- --expected-project-ref <ref>`.
+   Для релиза RU/KK/EN/ZH команда принимает только существующий hosted-prefix
+   из 39 migrations и точный закреплённый хвост из 17 файлов с проверенными
+   SHA-256. Обычный `db:migrations:check-linked` и exact
+   `npm run db:types:check` обязательны после применения migrations.
+   Это release-specific approval record, а не открытое правило для всех будущих
+   migrations: если до apply добавлена ещё одна reviewed migration, до нового
+   запуска preflight нужно явно обновить `REVIEWED_PENDING_MIGRATIONS` (filename
+   и normalized SHA-256), exact count/test и release review. Нельзя ослаблять
+   gate так, чтобы он принимал произвольный дополнительный хвост.
 2. Создать новую timestamped forward-only migration.
 3. Добавить constraints, RLS, grants и SQL contract/security tests.
 4. Выполнить локальный reset.
@@ -64,6 +74,12 @@ Storage API и загружает пять content-addressed PDF/миниатю�
 1. Проверить синхронность read-only командой с явно указанными текущим project ref
    и pinned PostgreSQL CA:
    `npm run content:parity:check -- --expected-project-ref <ref> --ssl-root-cert <absolute-ca.pem> --ssl-root-cert-sha256 <sha256>`.
+   Если reviewed multilingual migrations ещё не применены и локализационные
+   таблицы отсутствуют полностью, `--check` автоматически выполняет legacy RU
+   preflight: сверяет закреплённый `catalogChecksum`, точные totals
+   `5/5/198/15/150/600/10`, структуру `3 × 10 × 4`, policy `7/15/8/Asia/Oral`
+   и байты канонических course/article/media snapshots. Частично применённая
+   схема и любой обычный `--pull` в legacy-режиме отклоняются.
 2. Внести изменение через административный интерфейс.
 3. Опубликовать новую immutable revision.
 4. Выполнить

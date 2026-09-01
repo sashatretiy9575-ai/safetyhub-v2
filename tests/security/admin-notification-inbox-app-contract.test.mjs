@@ -34,9 +34,11 @@ test('admin inbox stays behind a same-origin capability-gated API', async () => 
     assert.match(contract, new RegExp(`z\\.literal\\('${type.replace('.', '\\.')}\\'\\)`));
   }
   assert.match(contract, /\.strict\(\)/u);
+  assert.match(contract, /phoneCountryIso2/u);
+  assert.match(contract, /phoneE164/u);
   assert.doesNotMatch(
     contract,
-    /\b(?:email|phone|job|organization|document|answer|credential|recovery|synthetic)\b/iu,
+    /\b(?:email|username|document|answer|credential|recovery|synthetic)\b/iu,
   );
   assert.doesNotMatch(server, /createAdminClient|createBrowserClient/u);
 });

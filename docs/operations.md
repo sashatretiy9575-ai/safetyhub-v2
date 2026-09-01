@@ -99,22 +99,18 @@ candidate, и повторно сверяет Storage. Ключ аватара �
 current и старый previous, разверните приложение и проверьте старые и новые QR.
 После переходного окна удалите previous отдельной выкладкой.
 
-`ZH_RECOVERY_PEPPER` хранится только в server runtime Vercel и должен содержать
-не менее 32 случайных байт. Его нельзя менять как обычный deploy: существующие
-initial recovery codes и admin re-enrollment codes после ротации перестанут
-проверяться. Плановая ротация требует сначала выдать новые codes через reasoned
-admin reset; аварийная ротация намеренно отзывает все ещё не использованные
-codes. Значение нельзя помещать в `NEXT_PUBLIC_*`, логи, analytics или Supabase
-таблицы.
-
-Для WebAuthn production trust root неизменяем: RP ID `safetyhub.kz`, origin
-`https://safetyhub.kz`. Preview deployment fail-closed; localhost разрешён
-только не-production процессу на `localhost:3000` или `127.0.0.1:3000`.
-`cleanup_required` и просроченный `cleanup_claimed` безопасно подхватываются
-следующей ZH auth-операцией; для гарантированного обслуживания также вызывайте
-service-only `claim_zh_registration_cleanup`/`finish_...` из планового bounded
-maintenance job. Строки операций, Auth users и avatar objects вручную не
-удаляйте.
+Для ZH используется только латинский username и пароль. Email, SMS и телефон
+не являются фактором входа или восстановления. Пароль отправляется только в
+Supabase Auth: приложение не хранит password, hash или recovery code. Восстановление
+выполняет администратор через `identity.manage`; операция сначала отзывает
+действующие ZH-сессии и fail-closed блокирует аккаунт до успешной смены пароля.
+До provisioning ZH registration Vercel server отдельно проверяет первый
+Turnstile token через `SAFETYHUB_TURNSTILE_SECRET_KEY`; failed/unavailable
+verification не создаёт Auth user или mapping. Registration не использует token
+для session: learner получает login redirect и предъявляет новый token GoTrue.
+В Vercel production/preview secret не может быть public always-pass test value,
+а verifier сверяет hostname ответа с configured deployment origin.
+Подробный контракт: `docs/zh-username-password-auth.md`.
 
 При утечке Storage bearer одновременно обновите Function secret и Vault value,
 затем проверьте, что старое значение получает отказ. Никогда не печатайте database
@@ -146,16 +142,18 @@ lease удерживается до EOF, cancel, timeout или ошибки, з
 
 - `SAFETYHUB_LOCALE_ROUTES_ENABLED` — префиксы `/kk`, `/en`, `/zh`, switcher,
   localized sitemap/SEO/PWA;
-- `SAFETYHUB_ZH_PASSKEY_ENABLED` — ZH registration/login/recovery и admin reset;
+- `SAFETYHUB_ZH_USERNAME_PASSWORD_ENABLED` — ZH registration/login с латинским
+  username/password; восстановление доступно только администратору;
 - `SAFETYHUB_ADMIN_INBOX_ENABLED` — UI и no-store API административного inbox.
 
 В production/preview отсутствие значения и любое значение кроме точного `true`
 оставляет поверхность закрытой. Включение выполняется отдельной reviewed
 конфигурацией deployment в указанном порядке; секреты в эти значения не входят.
 Перед включением локалей публикационный validator и parity обязаны быть зелёными.
-Перед ZH gate должны совпадать WebAuthn RP/origin и текущие legal versions. Перед
-inbox gate сначала разворачивается DB event contract, затем включается DB emission,
-а Telegram delivery активируется отдельным последующим шагом.
+Перед ZH gate сначала включается DB receipt `zh_username_password`, затем
+application flag; выключение любого из них закрывает ZH вход. Перед inbox gate
+сначала разворачивается DB event contract, затем включается DB emission, а
+Telegram delivery активируется отдельным последующим шагом.
 
 DB-порядок задаётся service-only RPC `set_runtime_feature_flag` с обязательными
 reason и новым idempotency UUID для каждого логического изменения:
@@ -163,7 +161,11 @@ reason и новым idempotency UUID для каждого логическог
 1. `notification_events = true`;
 2. smoke административного inbox;
 3. `telegram_delivery = true`;
-4. smoke приватной группы.
+4. smoke приватной группы с минимизированным событием;
+5. `telegram_application_details = true` только для private owner group, если
+   в Telegram нужна полная заявка (ФИО, должность, организация, контактный
+   country/phone);
+6. smoke новой полной заявки.
 
 Отключение выполняется в обратном порядке. Прямые изменения private-таблицы,
 повторное использование UUID с другими параметрами и включение Telegram раньше
@@ -215,10 +217,29 @@ Remove-Variable ServiceKey -ErrorAction SilentlyContinue
 ```
 
 Rollback использует те же команды с новыми UUID: сначала
-`telegram_delivery=false`, затем при необходимости
-`notification_events=false`. UUID повторяется только для retry идентичного
+`telegram_application_details=false`, затем `telegram_delivery=false`, затем
+при необходимости `notification_events=false`. UUID повторяется только для retry идентичного
 запроса; receipt содержит ref/feature/state/timestamp/UUID, но не service key и
 не reason.
+
+## Capacity monitor for the prototype
+
+`private.capacity_monitor_snapshots` stores one aggregate-only receipt per
+`Asia/Oral` calendar day. It measures account and approved-account totals,
+monthly active learners (a learner who started at least one attempt that month),
+monthly attempt starts, PostgreSQL bytes and Storage object bytes. No user-level
+rows, phone numbers, answers or identities enter these receipts.
+
+The default is an alerting budget of 100 monthly active learners, with one
+escalating `system.alert` per calendar month at 70%, 85% and 95%. It is not a
+signup, approval or learning-access cap. The database schedules a cheap hourly
+check; it creates at most one daily snapshot and the deployed storage reconciler
+also invokes the same idempotent function. Alert delivery follows the normal
+inbox/Telegram gates, so an unavailable Telegram group never affects users.
+
+Change the budget only through the service-only,
+reasoned, idempotent RPC `set_capacity_monitor_monthly_active_learner_budget`.
+The operation must be tested locally before any linked-project change.
 
 Операционная подготовка RU/KK/EN/ZH content выполняется по
 `docs/admin-localization-workflow.md`. Localized assessment bundle проверяется и

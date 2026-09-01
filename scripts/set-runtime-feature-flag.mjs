@@ -16,9 +16,14 @@ import {
   readProductionServiceCredential,
 } from './production-rpc-operator.mjs';
 
-const FEATURES = new Set(['notification_events', 'telegram_delivery']);
+const FEATURES = new Set([
+  'notification_events',
+  'telegram_delivery',
+  'telegram_application_details',
+  'zh_username_password',
+]);
 const USAGE =
-  'Usage: --expected-project-ref <current-production-ref> --confirm-project-ref <same-ref> --feature <notification_events|telegram_delivery> --enabled <true|false> --reason <8-500 chars> --idempotency-key <new-or-retried-uuid> (--env-file <absolute-secret-env-file> | --secret-stdin)';
+  'Usage: --expected-project-ref <current-production-ref> --confirm-project-ref <same-ref> --feature <notification_events|telegram_delivery|telegram_application_details|zh_username_password> --enabled <true|false> --reason <8-500 chars> --idempotency-key <new-or-retried-uuid> (--env-file <absolute-secret-env-file> | --secret-stdin)';
 
 function fail(code) {
   throw new ProductionOperatorError(code);

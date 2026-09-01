@@ -23,11 +23,14 @@ registration, course completion, or system operation.
   contract explicitly accepts it.
 - The dispatcher accepts only `POST` with a constant-time checked bearer. It
   uses a service-role Supabase client only inside the Edge Function.
-- Telegram messages contain only the participant name, locale, event time,
-  course/result summary when applicable, stable system code/correlation ID,
-  and an admin deep link. They exclude contact and employment details,
-  documents, assessment answers, authentication identities, credentials, and
-  recovery data.
+- Minimal and non-application events use their own bounded operational envelope.
+  When the separately disabled `telegram_application_details` database flag is
+  enabled, a *new application* uses a replacement strict message with exactly
+  `name`, `surname`, `job`, `organization`, `phoneCountryIso2`, and
+  `phoneE164`. It contains no locale, event time, correlation ID, admin deep
+  link, email, username, technical Auth identifier, avatar bytes, documents,
+  assessment answers, credentials, or recovery data. The full-message fields
+  are not retroactively appended to already-created event rows.
 - Telegram is informational. It has no commands, callbacks, or state-changing
   approval controls.
 
@@ -123,9 +126,12 @@ either in the Function file.
 
 4. Enable event creation and, only after inbox/dispatcher smoke, Telegram
    delivery through `npm run runtime:flag:set` as documented in
-   `docs/operations.md`.
-5. Submit one pending application and verify one inbox event and one Telegram
-   message. Then verify a passed/failed completion and a synthetic system alert.
+   `docs/operations.md`. The optional full-application gate remains false.
+5. Verify one minimized pending-application event, then enable
+   `telegram_application_details` with a new reason and UUID and submit a new
+    complete application. Verify that its Telegram message contains exactly name,
+    surname, role, organization, contact country and contact number.
+   Then verify a passed/failed completion and a synthetic system alert.
 6. Exercise duplicate wake-ups, a request timeout, Telegram `429`, `5xx`, an
    invalid chat ID, and a rotated token. Confirm retries/dead-letter state in
    the Russian admin inbox while the business records remain committed.
@@ -155,9 +161,10 @@ and event timestamps when investigating a possible duplicate.
 
 ## Rollback and rotation
 
-- Disable delivery first through the reasoned runtime-flag CLI with
-  `telegram_delivery=false`; if needed, use dispatcher-secret rotation as a
-  second kill switch. Inbox events remain available.
+- Disable `telegram_application_details` first, then delivery through the
+  reasoned runtime-flag CLI with `telegram_delivery=false`; if needed, use
+  dispatcher-secret rotation as a second kill switch. Inbox events remain
+  available.
 - Revoking the bot token affects only Telegram delivery. Registration and
   course completion continue normally.
 - Restore delivery by rotating both copies of the dispatcher secret together,

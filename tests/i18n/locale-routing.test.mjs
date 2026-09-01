@@ -7,6 +7,7 @@ import {
   isLocaleRoutablePath,
   localeAlternates,
   localeFromAcceptLanguage,
+  localesForLanguageSwitcher,
   localizePathname,
   resolvePreferredLocale,
   splitLocalePathname,
@@ -64,6 +65,53 @@ test('admin, API, metadata and immutable assets never gain locale aliases', () =
   }
   assert.equal(isLocaleRoutablePath('/topics'), true);
   assert.equal(isLocaleRoutablePath('/auth/login'), true);
+});
+
+test('language switcher exposes only locale routes enabled for the active page', async () => {
+  assert.deepEqual(
+    localesForLanguageSwitcher({
+      pathname: '/topics',
+      localeRoutesEnabled: false,
+      zhUsernamePasswordEnabled: false,
+    }),
+    ['ru'],
+  );
+  assert.deepEqual(
+    localesForLanguageSwitcher({
+      pathname: '/zh/auth/login',
+      localeRoutesEnabled: true,
+      zhUsernamePasswordEnabled: false,
+    }),
+    ['ru', 'kk', 'en'],
+  );
+  assert.deepEqual(
+    localesForLanguageSwitcher({
+      pathname: '/auth/register',
+      localeRoutesEnabled: true,
+      zhUsernamePasswordEnabled: true,
+    }),
+    APP_LOCALES,
+  );
+  assert.deepEqual(
+    localesForLanguageSwitcher({
+      pathname: '/topics',
+      localeRoutesEnabled: true,
+      zhUsernamePasswordEnabled: false,
+    }),
+    APP_LOCALES,
+  );
+
+  const [header, switcher] = await Promise.all([
+    read('components/layout/header.tsx'),
+    read('components/layout/language-switcher.tsx'),
+  ]);
+  assert.match(header, /REQUEST_PATHNAME_HEADER_NAME/u);
+  assert.match(header, /localesForLanguageSwitcher\(\{[\s\S]*?localeRoutesEnabled[\s\S]*?zhUsernamePasswordEnabled/u);
+  assert.match(header, /<LanguageSwitcher locales=\{switcherLocales\} \/>/u);
+  assert.match(switcher, /locales:\s*readonly AppLocale\[\]/u);
+  assert.match(switcher, /!locales\.includes\(nextLocale\)/u);
+  assert.match(switcher, /\{locales\.map\(/u);
+  assert.doesNotMatch(switcher, /\{APP_LOCALES\.map\(/u);
 });
 
 test('explicit URL, cookie and weighted Accept-Language detection are deterministic', () => {

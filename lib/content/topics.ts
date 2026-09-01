@@ -3,7 +3,11 @@ import fs from 'fs';
 import path from 'path';
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
-import { ContentSourceError, fallbackAfterContentFailure } from '@/lib/content/fallback-policy';
+import {
+  ContentSourceError,
+  fallbackAfterContentFailure,
+  fallbackForUnavailableLocalizedContent,
+} from '@/lib/content/fallback-policy';
 import {
   CONTENT_CACHE_REVALIDATE_SECONDS,
   CONTENT_CACHE_TAG,
@@ -401,7 +405,9 @@ function localizedTopicFromList(value: LocalizedCourseListItem): Topic {
   };
 }
 
-function localizedTopicFromRecord(value: LocalizedCourseRecord, locale: AppLocale): Topic {
+function localizedTopicFromRecord(value: LocalizedCourseRecord, locale: AppLocale): Topic | null {
+  if (value.locale !== locale) return null;
+
   return {
     id: value.id,
     slug: value.slug,
@@ -423,7 +429,9 @@ function localizedTopicFromRecord(value: LocalizedCourseRecord, locale: AppLocal
 
 async function getLocalizedTopicsFromSource(locale: AppLocale): Promise<Topic[]> {
   const supabase = createPublicClient();
-  if (!supabase) return getLegacyTopics();
+  if (!supabase) {
+    return fallbackForUnavailableLocalizedContent(locale, getLegacyTopics, () => Promise.resolve([]));
+  }
   try {
     const { data, error, status } = await (supabase as unknown as LocalizedCourseRpcClient).rpc(
       'list_published_courses_locale',
@@ -486,7 +494,13 @@ export const getTopics = cache((locale: AppLocale = DEFAULT_LOCALE) =>
 
 async function getLocalizedTopicBySlugFromSource(slug: string, locale: AppLocale) {
   const supabase = createPublicClient();
-  if (!supabase) return getLegacyTopicBySlug(slug);
+  if (!supabase) {
+    return fallbackForUnavailableLocalizedContent(
+      locale,
+      () => getLegacyTopicBySlug(slug),
+      () => Promise.resolve(null),
+    );
+  }
   const key = localizedTopicKey(locale, slug);
   try {
     const { data, error, status } = await (supabase as unknown as LocalizedCourseRpcClient).rpc(
@@ -504,6 +518,7 @@ async function getLocalizedTopicBySlugFromSource(slug: string, locale: AppLocale
     }
     if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
     const topic = localizedTopicFromRecord(data as unknown as LocalizedCourseRecord, locale);
+    if (!topic) return null;
     lastKnownLocalizedTopicsBySlug.set(key, topic);
     return topic;
   } catch (error) {

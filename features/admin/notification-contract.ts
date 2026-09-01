@@ -48,16 +48,30 @@ const eventEnvelopeSchema = z.object({
   delivery: deliverySchema,
 });
 
-const approvalRequestedPayloadSchema = z
-  .object({
-    userId: uuidSchema,
-    name: singleLineTextSchema,
-    surname: singleLineTextSchema,
-    locale: z.enum(['ru', 'kk', 'en', 'zh']),
-    requestedAt: timestampSchema,
-    adminPath: adminPathSchema,
+const approvalRequestedBaseShape = {
+  name: singleLineTextSchema,
+  surname: singleLineTextSchema,
+  locale: z.enum(['ru', 'kk', 'en', 'zh']),
+  requestedAt: timestampSchema,
+  adminPath: adminPathSchema,
+};
+
+const approvalRequestedPayloadSchema = z.union([
+  z.object({
+    ...approvalRequestedBaseShape,
   })
-  .strict();
+  .strict(),
+  z
+    .object({
+      name: singleLineTextSchema,
+      surname: singleLineTextSchema,
+      job: singleLineTextSchema.max(160),
+      organization: singleLineTextSchema.max(160),
+      phoneCountryIso2: z.string().regex(/^[A-Z]{2}$/u),
+      phoneE164: z.string().regex(/^\+[1-9][0-9]{1,14}$/u),
+    })
+    .strict(),
+]);
 
 const courseCompletedPayloadSchema = z
   .object({

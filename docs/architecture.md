@@ -196,26 +196,26 @@ boundary: browser editor видит только публичный текст �
 ## Auth, согласия и ручное одобрение
 
 RU/KK/EN используют шестизначный одноразовый код из email (email OTP). ZH
-использует отдельный discoverable WebAuthn passkey с обязательной проверкой
-пользователя устройством; email, SMS, password и username в китайском flow нет.
-Номер в профиле во всех локалях остаётся только контактным полем. Нативный
-Supabase email OTP технически создаёт для нового пользователя
-внутренний случайный password hash, поэтому `auth.users.encrypted_password` не
-является корректным признаком passwordless и не блокируется database trigger.
-Вместо этого `enforce_email_otp_access_token` работает как Supabase Custom
-Access Token Hook. Для обычных аккаунтов access token выдаётся только для
-`email/signup`, `otp`, `magiclink` и продолжения уже разрешённой сессии
-`token_refresh`. Для synthetic ZH identity допускается только server-generated
-`magiclink`, связанный с одноразовым двухминутным grant после проверенной
-WebAuthn-операции. Hook привязывает полученный `session_id` к текущему
-`auth_epoch`, а refresh разрешается только для этой точной пары; reset passkey
-удаляет разрешённые сессии, увеличивает epoch и инвалидирует старые refresh
-tokens. Дополнительный request-time gate сверяет epoch и `session_id`
-для каждого application authorization, поэтому уже выданный access token также
-перестаёт работать сразу после reset. Provider-only `@auth.invalid` адрес
-в обязательном JWT email claim заменяется пустой строкой и не входит в browser
-или admin projections. Password, recovery, invite, OAuth, phone и anonymous
-methods получают отказ до выдачи JWT.
+использует отдельный flow с латинским username и паролем; email, SMS и телефон
+не являются фактором входа или восстановления. Номер в профиле во всех локалях
+остаётся только контактным полем. Нативный Supabase email OTP технически создаёт
+для нового пользователя внутренний случайный password hash, поэтому
+`auth.users.encrypted_password` не является корректным признаком passwordless и
+не блокируется database trigger.
+
+`enforce_email_otp_access_token` работает как Supabase Custom Access Token Hook.
+Для обычных аккаунтов access token выдаётся только для `email/signup`, `otp`,
+`magiclink` и продолжения уже разрешённой сессии `token_refresh`. Для
+server-mapped ZH identity он допускает только `password` и `token_refresh`,
+когда включён DB receipt `zh_username_password`, аккаунт не заблокирован и
+точный GoTrue `session_id` привязан к private ZH session record. Для ZH
+провайдерский `@auth.invalid` адрес заменяется пустой строкой в обязательных
+JWT email/phone claims и не входит в browser или admin projections. Request-time
+gate повторно проверяет этот exact session binding; admin password reset сначала
+отзывает все ZH sessions и блокирует mapping до успешного завершения смены
+пароля. Legacy ZH WebAuthn mapping получает немедленный отказ, включая
+уже выданные JWT. Любые неразрешённые password, recovery, invite, OAuth, phone
+и anonymous методы получают отказ до выдачи JWT.
 Код отправляется через Supabase Auth после same-origin и coarse IP quota;
 переданный приложением Turnstile token проверяет сам Supabase Auth provider, без
 второй попытки Siteverify одноразового токена. Login и registration используют единый
@@ -229,30 +229,36 @@ HMAC receipt и HMAC нормализованного email, expiry не бол�
 Успешная проверка кода атомарно удаляет receipt до сохранения обычной
 Supabase-сессии.
 
-ZH challenge хранится только как SHA-256 receipt, живёт не более пяти минут и
-потребляется ровно один раз. Private-таблицы держат credential ID, public key,
-monotonic counter, user handle и salted/peppered recovery digest; browser grants
-на эти данные отсутствуют. Создание Auth user и immutable avatar связано durable
-registration operation: orphan Auth или Storage объект переводится в cleanup
-state и удаляется bounded lease-worker. Запись immutable avatar в Storage
-разрешена только server-side `service_role` для точной операции в состоянии
-`auth_created`, совпадающих user/object key и ещё живого неприменённого
-registration challenge; обычный authenticated avatar upload по-прежнему требует
-отдельную `avatar_upload_operations` lease. После успешной регистрации профиль
-сразу получает `preferred_locale = 'zh'` и `pending`; существующие approval/RLS
-gates продолжают закрывать обучение.
+ZH registration создаёт provider account с server-generated `@auth.invalid`
+identifier и сохраняет username-to-provider mapping только в private schema.
+До username lookup, legal/Auth/profile write она проверяет отдельный первый
+Turnstile token через server-only Cloudflare `Siteverify` с Vercel-only
+`SAFETYHUB_TURNSTILE_SECRET_KEY`. Успешная регистрация не создаёт password
+session и переводит на login для нового одноразового token; login передаёт этот
+новый token в GoTrue `signInWithPassword`. Неуспешный или недоступный verifier
+не выделяет provider identity или mapping. В production/preview ответ
+`Siteverify` дополнительно должен совпадать с hostname configured deployment.
+Synthetic email, пароль, password hash, credentials и recovery data не входят в
+browser payload, admin projections, Telegram, export, audit payload или analytics.
+Публичный username принимается только в ZH auth request и не передаётся в
+Telegram, admin projections, export или audit payload. Регистрация фиксирует
+`preferred_locale = 'zh'`;
+затем участник проходит обычное заполнение профиля и контактного телефона до
+ручного approval. Existing approval/RLS gates продолжают закрывать обучение.
+Исторические WebAuthn tables и routes остаются только для forward migration,
+redaction и явного `410 ZH_AUTH_METHOD_RETIRED`; это не активный auth surface.
 
 Шаблоны email для password recovery и legacy invite — статические уведомления
 без token, hash, redirect URL или password reset promise. Они остаются явной
 защитой на случай случайного обращения к стандартным Auth endpoints; единственные
 шаблоны, которым разрешён `{{ .Token }}`, — login и registration OTP.
 
-После первой OTP-сессии пользователь отдельно принимает текущие Политику и
-Условия. Принятие записывается только в `legal_acceptances` через
-`accept_current_legal_documents`; клиентский intent из OTP-запроса не считается
-согласием. `legal_document_versions` содержит только immutable copies: новые
-материальные тексты публикуются новой forward-only migration, а уже принятые
-версии остаются доступны по versioned URL.
+После первой OTP-сессии RU/KK/EN пользователь отдельно принимает текущие Политику
+и Условия. ZH фиксирует текущие версии при завершении username/password
+регистрации. Принятие записывается только в `legal_acceptances`; клиентский
+intent из OTP-запроса не считается согласием. `legal_document_versions` содержит
+только immutable copies: новые материальные тексты публикуются новой forward-only
+migration, а уже принятые версии остаются доступны по versioned URL.
 
 После заполнения профиля сервер переводит участника в `pending` и фиксирует
 24-часовой ориентир ответа. До `approved` серверно закрыты PDF, learner payload,
@@ -275,11 +281,15 @@ receipt; корректность не зависит от периодичес�
 Cloudflare Turnstile загружается только после submit защищённой формы. Используется
 один нативный Managed widget с `execution: execute`; токен продолжает ровно один
 отложенный submit и сбрасывается после ошибки, истечения или использования.
-Supabase Auth выполняет единственную Siteverify-проверку через server-only
-`SUPABASE_AUTH_CAPTCHA_SECRET`; приложение проверяет наличие токена и передаёт его
-в `signInWithOtp`, но не пытается повторно использовать одноразовый token.
-Production widget ограничивается canonical hostname в Cloudflare, а coarse IP
-rate limit применяется до вызова provider.
+Для email OTP и ZH password login Supabase Auth выполняет Siteverify через
+server-only `SUPABASE_AUTH_CAPTCHA_SECRET`; приложение проверяет наличие token
+и передаёт его в `signInWithOtp` или `signInWithPassword`, но не пытается
+повторно использовать одноразовый token. Отдельный ZH registration preflight
+использует Cloudflare `Siteverify` в Vercel с
+`SAFETYHUB_TURNSTILE_SECRET_KEY` до provisioning; это не Supabase config secret.
+Production widget ограничивается canonical hostname в Cloudflare, server
+preflight в production/preview сверяет hostname response с configured origin,
+а coarse IP rate limit применяется до вызова provider.
 
 Тема управляется одной runtime-функцией: класс, `color-scheme`, `theme-color` и
 фон `html/body` переключаются согласованно. Цвета оболочки — `#f7f8fa` для светлой

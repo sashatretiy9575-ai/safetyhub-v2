@@ -90,7 +90,7 @@ export default async function EmployeeDirectoryPage({
                 <div className="min-w-0">
                   <p className="truncate font-bold">{user.label}</p>
                   <p className="truncate text-sm text-[var(--color-text-muted)]">
-                    {user.email ?? 'Вход по ключу доступа'}
+                    {user.email ?? 'Вход по логину и паролю'}
                   </p>
                   <p className="mt-1 text-xs text-[var(--color-text-subtle)]">
                     Участник · {user.status === 'active' ? 'активен' : 'приостановлен'}

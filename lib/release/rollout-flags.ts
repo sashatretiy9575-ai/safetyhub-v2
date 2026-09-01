@@ -1,6 +1,6 @@
 export const ROLLOUT_FEATURE_ENV = {
   localeRoutes: 'SAFETYHUB_LOCALE_ROUTES_ENABLED',
-  zhPasskey: 'SAFETYHUB_ZH_PASSKEY_ENABLED',
+  zhUsernamePassword: 'SAFETYHUB_ZH_USERNAME_PASSWORD_ENABLED',
   adminInbox: 'SAFETYHUB_ADMIN_INBOX_ENABLED',
 } as const;
 

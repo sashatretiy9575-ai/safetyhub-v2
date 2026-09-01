@@ -134,6 +134,7 @@ validator и linked parity. Тестовая разработка интерфе
 
 Approval queue, employee directory, learning history и export используют
 редактированные admin projections: synthetic `@auth.invalid` identity остаётся
-`null`, а интерфейс показывает нейтральную подпись «Вход по ключу доступа». Synthetic
-email и WebAuthn credential metadata нельзя добавлять в HTML, JSON, CSV/PDF export,
-Telegram, audit payload или analytics.
+`null`, а интерфейс показывает нейтральную подпись «Вход по логину и паролю».
+Synthetic email, username, пароль, password hash, credentials и recovery data
+нельзя добавлять в HTML, JSON, CSV/PDF export, Telegram, audit payload или
+analytics. Исторические WebAuthn credential metadata подчиняются тому же запрету.

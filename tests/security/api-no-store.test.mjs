@@ -26,7 +26,7 @@ test('every API route uses an explicit cache-policy response boundary', async ()
     const relative = path.relative(root, file);
     assert.match(
       source,
-      /@\/lib\/security\/api-response|apiError\(|invalidOriginResponse\(|export \{ (?:POST|PATCH|DELETE|GET)(?:, (?:POST|PATCH|DELETE|GET))* \} from '@\/app\/api\//,
+      /@\/lib\/security\/api-response|@\/features\/auth\/zh-passkey-retired|apiError\(|invalidOriginResponse\(|export \{ (?:POST|PATCH|DELETE|GET)(?:, (?:POST|PATCH|DELETE|GET))* \} from '@\/app\/api\//,
       `${relative} must return through the shared response boundary`,
     );
     assert.doesNotMatch(
@@ -63,13 +63,16 @@ test('API response facade disables browser and CDN storage', async () => {
   assert.match(source, /Expires: ['"]0/);
 });
 
-test('retired Auth callback redirects remain behind the no-store response facade', async () => {
-  const [callback, retiredHelper] = await Promise.all([
+test('retired Auth callbacks and ZH WebAuthn tombstones remain behind the no-store response facade', async () => {
+  const [callback, retiredHelper, zhRetiredHelper] = await Promise.all([
     readFile(path.join(root, 'app/(account)/callback/route.ts'), 'utf8'),
     readFile(path.join(root, 'features/auth/password-auth-retired.tsx'), 'utf8'),
+    readFile(path.join(root, 'features/auth/zh-passkey-retired.ts'), 'utf8'),
   ]);
   assert.match(callback, /redirectFromRetiredPasswordLink\(\)/u);
   assert.match(retiredHelper, /@\/lib\/security\/api-response/u);
   assert.match(retiredHelper, /'Cache-Control', 'no-store'/u);
+  assert.match(zhRetiredHelper, /@\/lib\/security\/api-response/u);
+  assert.match(zhRetiredHelper, /status: 410/u);
   assert.doesNotMatch(callback, /from ['"]next\/server['"]/);
 });

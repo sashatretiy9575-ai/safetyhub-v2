@@ -7,6 +7,7 @@ import {
   ContentSourceError,
   classifyContentFailure,
   fallbackAfterContentFailure,
+  fallbackForUnavailableLocalizedContent,
   isContentFallbackEnabled,
   isContentTransportError,
 } from '../../lib/content/fallback-policy.ts';
@@ -129,4 +130,40 @@ test('content readers preserve empty and not-found remote results', async () => 
     assert.match(source, /\(data \?\? \[\]\)\.map/);
     assert.match(source, /if \(!data\)\s*\{[\s\S]{0,160}?return null;/);
   }
+});
+
+test('localized public content never relabels the bundled Russian snapshot', async () => {
+  assert.equal(
+    fallbackForUnavailableLocalizedContent('ru', () => 'russian snapshot', () => 'unavailable'),
+    'russian snapshot',
+  );
+  for (const locale of ['kk', 'en', 'zh']) {
+    let russianFallbackCalls = 0;
+    assert.equal(
+      fallbackForUnavailableLocalizedContent(
+        locale,
+        () => {
+          russianFallbackCalls += 1;
+          return 'russian snapshot';
+        },
+        () => 'unavailable',
+      ),
+      'unavailable',
+      locale,
+    );
+    assert.equal(russianFallbackCalls, 0, locale);
+  }
+
+  const [articles, topics] = await Promise.all([
+    read('lib/content/articles.ts'),
+    read('lib/content/topics.ts'),
+  ]);
+  for (const source of [articles, topics]) {
+    assert.equal(
+      (source.match(/fallbackForUnavailableLocalizedContent\(\s*locale/gu) ?? []).length,
+      2,
+    );
+  }
+  assert.match(articles, /value\.locale !== locale/u);
+  assert.match(topics, /if \(value\.locale !== locale\) return null;/u);
 });

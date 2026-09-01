@@ -4,19 +4,22 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('registration asks for email only and defers explicit legal consent until after verified identity', async () => {
-  const [register, flow, requestRoute, verifyRoute, legalPage, legalGate, validation] = await Promise.all([
-    read('app/(account)/auth/register/page.tsx'),
-    read('features/auth/email-otp-flow.tsx'),
-    read('app/api/auth/email-otp/request/route.ts'),
-    read('app/api/auth/email-otp/verify/route.ts'),
-    read('app/(account)/auth/legal/page.tsx'),
-    read('features/auth/legal-acceptance-gate.tsx'),
-    read('lib/validation/auth.ts'),
-  ]);
+test('RU/KK/EN registration stays email-code while ZH exposes its separate accessible username/password form', async () => {
+  const [register, flow, zhFlow, requestRoute, verifyRoute, legalPage, legalGate, validation] =
+    await Promise.all([
+      read('app/(account)/auth/register/page.tsx'),
+      read('features/auth/email-otp-flow.tsx'),
+      read('features/auth/zh-username-password-flow.tsx'),
+      read('app/api/auth/email-otp/request/route.ts'),
+      read('app/api/auth/email-otp/verify/route.ts'),
+      read('app/(account)/auth/legal/page.tsx'),
+      read('features/auth/legal-acceptance-gate.tsx'),
+      read('lib/validation/auth.ts'),
+    ]);
 
   assert.match(register, /<EmailOtpFlow intent="register"/u);
-  assert.doesNotMatch(register, /firstName|lastName|profile-job|PasswordInput|type="password"/u);
+  assert.match(register, /<ZhUsernamePasswordFlow mode="register"/u);
+  assert.doesNotMatch(register, /firstName|lastName|profile-job|PasswordInput/u);
   assert.match(flow, /emailOtpStartSchema\.safeParse/u);
   assert.match(flow, /clientRequest\('\/api\/auth\/email-otp\/request'/u);
   assert.match(requestRoute, /createEphemeralAuthClient\(\)\.auth\.signInWithOtp/u);
@@ -26,15 +29,29 @@ test('registration asks for email only and defers explicit legal consent until a
     /prepareSignupLegalOperation|createAdminClient|auth\.admin\.createUser|email_confirm|raw_user_meta_data|\.identities\b|deleteUser\(/u,
   );
   assert.match(verifyRoute, /localizedAccountPath\('\/auth\/legal', locale\)/u);
-  assert.doesNotMatch(verifyRoute, /accept_current_legal_documents|legalAccepted|parsed\.data\.intent/u);
+  assert.doesNotMatch(
+    verifyRoute,
+    /accept_current_legal_documents|legalAccepted|parsed\.data\.intent/u,
+  );
   assert.match(legalPage, /requireUser\(\{ enforceLegal: false \}\)/u);
   assert.match(legalPage, /<LegalAcceptanceGate/u);
   assert.match(legalGate, /<LegalAcceptancePanel/u);
   assert.match(legalGate, /router\.replace\(continueTo\)/u);
   assert.match(validation, /export const emailOtpStartSchema = z[\s\S]*intent/u);
-  const verificationSchema = validation.slice(validation.indexOf('export const emailOtpVerifySchema'));
+  const verificationSchema = validation.slice(
+    validation.indexOf('export const emailOtpVerifySchema'),
+  );
   assert.doesNotMatch(verificationSchema, /intent|legalAccepted/u);
   assert.doesNotMatch(validation, /firstName|lastName/u);
+  assert.match(zhFlow, /noValidate/u);
+  assert.match(zhFlow, /FieldError/u);
+  assert.match(zhFlow, /autoComplete="username"/u);
+  assert.match(zhFlow, /type="password"/u);
+  assert.match(zhFlow, /aria-describedby/u);
+  assert.doesNotMatch(
+    zhFlow,
+    /type="email"|one-time-code|localStorage|sessionStorage|simplewebauthn/iu,
+  );
 });
 
 test('registration start is neutral about whether the email already has an account', async () => {

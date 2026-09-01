@@ -18,6 +18,10 @@ import {
   buildLocalizedPublishedSnapshot,
   validateLocalizedPublishedSnapshot,
 } from './content-localization/localized-published-snapshot.mjs';
+import {
+  assertLegacyRuContentContract,
+  classifyLocalizedSchema,
+} from './content-localization/linked-preflight-contract.mjs';
 import { loadStage6PublicationBatch } from './content-localization/stage6-publication-contract.mjs';
 import {
   clearLinkedPostgresConnection,
@@ -158,17 +162,17 @@ function reusablePresentationManifest(manifest, row, thumbnailSha256) {
   const pageCount = Number(row.page_count);
   return Boolean(
     manifest &&
-      manifest.sha256 === row.sha256 &&
-      manifest.thumbnailSha256 === thumbnailSha256 &&
-      manifest.byteSize === Number(row.byte_size) &&
-      manifest.pageCount === pageCount &&
-      manifest.renderedPageCount === pageCount &&
-      Array.isArray(manifest.pages) &&
-      manifest.pages.length === pageCount &&
-      manifest.validation?.automated?.status === 'passed' &&
-      manifest.validation?.safety?.status === 'passed' &&
-      manifest.validation?.visual?.status === 'passed' &&
-      manifest.validation?.visual?.reviewedPageCount === pageCount,
+    manifest.sha256 === row.sha256 &&
+    manifest.thumbnailSha256 === thumbnailSha256 &&
+    manifest.byteSize === Number(row.byte_size) &&
+    manifest.pageCount === pageCount &&
+    manifest.renderedPageCount === pageCount &&
+    Array.isArray(manifest.pages) &&
+    manifest.pages.length === pageCount &&
+    manifest.validation?.automated?.status === 'passed' &&
+    manifest.validation?.safety?.status === 'passed' &&
+    manifest.validation?.visual?.status === 'passed' &&
+    manifest.validation?.visual?.reviewedPageCount === pageCount,
   );
 }
 
@@ -309,6 +313,7 @@ let courseRows;
 let variantRows;
 let articleRows;
 let articleAssetRows;
+let localizationSchemaMode;
 let courseLocalizationRows;
 let variantLocalizationRows;
 let articleLocalizationRows;
@@ -318,6 +323,26 @@ try {
   await client.connect();
   await client.query('begin isolation level repeatable read read only');
   await client.query('set local role postgres');
+  const localizationSchemaState = (
+    await client.query(`
+      select
+        to_regtype('public.app_locale') is not null as "appLocale",
+        to_regclass('public.legal_document_localizations') is not null
+          as "legalDocumentLocalizations",
+        to_regclass('public.test_revision_localizations') is not null
+          as "testRevisionLocalizations",
+        to_regclass('public.test_revision_presentations') is not null
+          as "testRevisionPresentations",
+        to_regclass('public.test_revision_variant_localizations') is not null
+          as "testRevisionVariantLocalizations",
+        to_regclass('public.article_revision_localizations') is not null
+          as "articleRevisionLocalizations"
+    `)
+  ).rows[0];
+  localizationSchemaMode = classifyLocalizedSchema(localizationSchemaState);
+  if (localizationSchemaMode === 'legacy-ru' && !checkOnly) {
+    throw new Error('LEGACY_RU_CONTENT_PULL_REQUIRES_CHECK_ONLY');
+  }
   courseRows = (
     await client.query(`
       select
@@ -429,8 +454,9 @@ try {
       order by asset.storage_key
     `)
   ).rows;
-  courseLocalizationRows = (
-    await client.query(`
+  if (localizationSchemaMode === 'localized') {
+    courseLocalizationRows = (
+      await client.query(`
       select
         test.id as course_id,
         revision.id as revision_id,
@@ -469,10 +495,10 @@ try {
         revision.display_order,
         revision.slug,
         array_position(enum_range(null::public.app_locale), localization.locale)
-    `)
-  ).rows;
-  variantLocalizationRows = (
-    await client.query(`
+      `)
+    ).rows;
+    variantLocalizationRows = (
+      await client.query(`
       select
         revision.id as revision_id,
         revision.slug,
@@ -498,10 +524,10 @@ try {
         revision.slug,
         variant.variant_number,
         array_position(enum_range(null::public.app_locale), localization.locale)
-    `)
-  ).rows;
-  articleLocalizationRows = (
-    await client.query(`
+      `)
+    ).rows;
+    articleLocalizationRows = (
+      await client.query(`
       select
         article.id as article_id,
         revision.id as revision_id,
@@ -522,10 +548,10 @@ try {
       order by
         revision.slug,
         array_position(enum_range(null::public.app_locale), localization.locale)
-    `)
-  ).rows;
-  legalVersionRows = (
-    await client.query(`
+      `)
+    ).rows;
+    legalVersionRows = (
+      await client.query(`
       select
         legal.document_type::text as document_type,
         legal.version,
@@ -534,10 +560,10 @@ try {
         legal.is_current
       from public.legal_document_versions legal
       order by legal.document_type, legal.version
-    `)
-  ).rows;
-  legalLocalizationRows = (
-    await client.query(`
+      `)
+    ).rows;
+    legalLocalizationRows = (
+      await client.query(`
       select
         localization.document_type::text as document_type,
         localization.version,
@@ -551,8 +577,9 @@ try {
         localization.document_type,
         localization.version,
         array_position(enum_range(null::public.app_locale), localization.locale)
-    `)
-  ).rows;
+      `)
+    ).rows;
+  }
   await client.query('commit');
 } catch (error) {
   await client.query('rollback').catch(() => undefined);
@@ -623,44 +650,47 @@ const publishedPresentationAssets = new Map(
     }),
   ),
 );
-const stage6Batch = await loadStage6PublicationBatch({ root: ROOT, validateRelease: true });
-const targetPresentationRows = courseLocalizationRows.filter((row) => row.locale !== 'ru');
-if (targetPresentationRows.length !== 15) {
-  throw new Error(
-    'Hosted localized catalog must expose exactly 15 target-locale presentation rows.',
+let localizedSnapshot = null;
+if (localizationSchemaMode === 'localized') {
+  const stage6Batch = await loadStage6PublicationBatch({ root: ROOT, validateRelease: true });
+  const targetPresentationRows = courseLocalizationRows.filter((row) => row.locale !== 'ru');
+  if (targetPresentationRows.length !== 15) {
+    throw new Error(
+      'Hosted localized catalog must expose exactly 15 target-locale presentation rows.',
+    );
+  }
+  const localizedPresentationAssets = new Map(
+    await Promise.all(
+      targetPresentationRows.map(async (row) => {
+        if (
+          row.storage_bucket !== 'course-presentations' ||
+          row.presentation_status !== 'ready' ||
+          row.presentation_locale !== row.locale ||
+          typeof row.storage_path !== 'string' ||
+          typeof row.thumbnail_path !== 'string'
+        ) {
+          throw new Error('Hosted localized presentation metadata is invalid.');
+        }
+        const [pdf, thumbnail] = await Promise.all([
+          downloadPublishedPresentationAsset(storage, row.storage_bucket, row.storage_path),
+          downloadPublishedPresentationAsset(storage, row.storage_bucket, row.thumbnail_path),
+        ]);
+        return [row.presentation_id, { pdf, thumbnail }];
+      }),
+    ),
   );
-}
-const localizedPresentationAssets = new Map(
-  await Promise.all(
-    targetPresentationRows.map(async (row) => {
-      if (
-        row.storage_bucket !== 'course-presentations' ||
-        row.presentation_status !== 'ready' ||
-        row.presentation_locale !== row.locale ||
-        typeof row.storage_path !== 'string' ||
-        typeof row.thumbnail_path !== 'string'
-      ) {
-        throw new Error('Hosted localized presentation metadata is invalid.');
-      }
-      const [pdf, thumbnail] = await Promise.all([
-        downloadPublishedPresentationAsset(storage, row.storage_bucket, row.storage_path),
-        downloadPublishedPresentationAsset(storage, row.storage_bucket, row.thumbnail_path),
-      ]);
-      return [row.presentation_id, { pdf, thumbnail }];
-    }),
-  ),
-);
-const localizedSnapshot = buildLocalizedPublishedSnapshot({
-  batch: stage6Batch,
-  courseLocalizationRows,
-  variantLocalizationRows,
-  articleLocalizationRows,
-  legalVersionRows,
-  legalLocalizationRows,
-  presentationAssets: localizedPresentationAssets,
-});
-for (const [relativePath, bytes] of localizedSnapshot.files) {
-  desiredFiles.set(path.join(LOCALIZATION_ROOT, ...relativePath.split('/')), bytes);
+  localizedSnapshot = buildLocalizedPublishedSnapshot({
+    batch: stage6Batch,
+    courseLocalizationRows,
+    variantLocalizationRows,
+    articleLocalizationRows,
+    legalVersionRows,
+    legalLocalizationRows,
+    presentationAssets: localizedPresentationAssets,
+  });
+  for (const [relativePath, bytes] of localizedSnapshot.files) {
+    desiredFiles.set(path.join(LOCALIZATION_ROOT, ...relativePath.split('/')), bytes);
+  }
 }
 const qaRunId = sha256(
   Buffer.from(
@@ -755,13 +785,13 @@ for (const row of courseRows) {
     );
     const priorQaMatches = Boolean(
       priorQaManifest &&
-        priorQaManifest.sha256 === row.sha256 &&
-        priorQaManifest.thumbnailSha256 === thumbnailHash &&
-        priorQaManifest.pageCount === Number(row.page_count) &&
-        priorQaManifest.renderedPageCount === Number(row.page_count) &&
-        priorQaManifest.validation?.automated?.status === 'passed' &&
-        priorQaManifest.validation?.safety?.status === 'passed' &&
-        priorQaManifest.validation?.visual?.status === 'pending',
+      priorQaManifest.sha256 === row.sha256 &&
+      priorQaManifest.thumbnailSha256 === thumbnailHash &&
+      priorQaManifest.pageCount === Number(row.page_count) &&
+      priorQaManifest.renderedPageCount === Number(row.page_count) &&
+      priorQaManifest.validation?.automated?.status === 'passed' &&
+      priorQaManifest.validation?.safety?.status === 'passed' &&
+      priorQaManifest.validation?.visual?.status === 'pending',
     );
     const approveThisPresentation = visualQaApproved && priorQaMatches;
     if (visualQaApproved && !priorQaMatches) approvalMissingSlugs.push(row.slug);
@@ -992,7 +1022,7 @@ async function listFilesRecursively(directory) {
       const absolute = path.join(current, entry.name);
       if (entry.isDirectory()) await visit(absolute);
       else if (entry.isFile()) files.push(absolute);
-      else throw new Error('Localized snapshot contains an unsupported special file.');
+      else throw new Error('Canonical snapshot contains an unsupported special file.');
     }
   };
   await visit(directory);
@@ -1014,19 +1044,39 @@ const staleMediaFiles = (await readdir(MEDIA_ROOT, { withFileTypes: true }))
   .filter((entry) => entry.isFile() && !desiredMediaFiles.has(entry.name))
   .map((entry) => path.join(MEDIA_ROOT, entry.name));
 const desiredLocalizedFiles = new Set(
-  [...localizedSnapshot.files.keys()].map((relativePath) =>
-    path.join(LOCALIZATION_ROOT, ...relativePath.split('/')),
+  localizedSnapshot
+    ? [...localizedSnapshot.files.keys()].map((relativePath) =>
+        path.join(LOCALIZATION_ROOT, ...relativePath.split('/')),
+      )
+    : [],
+);
+const staleLocalizedFiles = localizedSnapshot
+  ? (await listFilesRecursively(LOCALIZATION_ROOT)).filter(
+      (filePath) => !desiredLocalizedFiles.has(filePath),
+    )
+  : [];
+const canonicalRoots = [COURSE_ROOT, ARTICLE_ROOT, MEDIA_ROOT];
+const desiredCanonicalFiles = new Set(
+  [...desiredFiles.keys()].filter((filePath) =>
+    canonicalRoots.some((root) => {
+      const relative = path.relative(root, filePath);
+      return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative);
+    }),
   ),
 );
-const staleLocalizedFiles = (await listFilesRecursively(LOCALIZATION_ROOT)).filter(
-  (filePath) => !desiredLocalizedFiles.has(filePath),
-);
-for (const stale of [
+const legacyUnexpectedCanonicalFiles =
+  localizationSchemaMode === 'legacy-ru'
+    ? (await Promise.all(canonicalRoots.map((root) => listFilesRecursively(root))))
+        .flat()
+        .filter((filePath) => !desiredCanonicalFiles.has(filePath))
+    : [];
+for (const stale of new Set([
   ...staleCourseDirectories,
   ...staleArticleFiles,
   ...staleMediaFiles,
   ...staleLocalizedFiles,
-]) {
+  ...legacyUnexpectedCanonicalFiles,
+])) {
   differences.push({
     path: path.relative(ROOT, stale).replaceAll('\\', '/'),
     before: 'present',
@@ -1034,6 +1084,41 @@ for (const stale of [
   });
 }
 
+if (localizationSchemaMode === 'legacy-ru') {
+  differences.sort((left, right) => left.path.localeCompare(right.path, 'en'));
+  const legacyContract = assertLegacyRuContentContract({
+    catalogChecksum,
+    localCatalogChecksum: existingCatalog?.catalogChecksum,
+    totals,
+    articleCount: articleRows.length,
+    courses: hostedCourses.map((course) => ({
+      durationMinutes: course.policy.durationMinutes,
+      passScore: course.policy.passScore,
+      attemptsPerCalendarDay: course.policy.attemptsPerCalendarDay,
+      resetTimezone: course.policy.resetTimezone,
+      variants: course.variants.map((variant) =>
+        variant.questions.map((question) => question.options.length),
+      ),
+    })),
+  });
+  console.log(
+    JSON.stringify({
+      ok: differences.length === 0,
+      mode: 'legacy-preflight',
+      schemaMode: localizationSchemaMode,
+      catalogChecksum,
+      totals: { ...totals, articleCount: articleRows.length },
+      contract: legacyContract,
+      verifiedRoots: ['content/snapshots/courses', 'content/articles', 'content/snapshots/media'],
+      differences,
+      presentationQa: {
+        requiredCourses: qaRequiredSlugs,
+        qaRoot: qaRequiredSlugs.length > 0 ? qaRoot : null,
+      },
+    }),
+  );
+  if (differences.length > 0) process.exitCode = 1;
+} else {
 const stageRoot = path.join(ROOT, 'tmp', 'content-sync-stage', randomUUID());
 const stagedCourseRoot = path.join(stageRoot, 'courses');
 const stagedArticleRoot = path.join(stageRoot, 'articles');
@@ -1297,4 +1382,5 @@ if (checkOnly) {
       }),
     );
   }
+}
 }

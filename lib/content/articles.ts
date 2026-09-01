@@ -3,7 +3,11 @@ import fs from 'fs';
 import path from 'path';
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
-import { ContentSourceError, fallbackAfterContentFailure } from '@/lib/content/fallback-policy';
+import {
+  ContentSourceError,
+  fallbackAfterContentFailure,
+  fallbackForUnavailableLocalizedContent,
+} from '@/lib/content/fallback-policy';
 import {
   ARTICLES_CACHE_TAG,
   CONTENT_CACHE_REVALIDATE_SECONDS,
@@ -305,8 +309,12 @@ function localizedArticleKey(locale: AppLocale, slug: string) {
   return `${locale}:${slug}`;
 }
 
-function localizedArticleSummary(value: Record<string, unknown>): Omit<Article, 'blocks'> | null {
+function localizedArticleSummary(
+  value: Record<string, unknown>,
+  locale: AppLocale,
+): Omit<Article, 'blocks'> | null {
   if (
+    value.locale !== locale ||
     typeof value.slug !== 'string' ||
     !isContentSlug(value.slug) ||
     typeof value.title !== 'string' ||
@@ -332,7 +340,9 @@ function localizedArticleSummary(value: Record<string, unknown>): Omit<Article, 
 
 async function getLocalizedArticlesFromSource(locale: AppLocale) {
   const supabase = createPublicClient();
-  if (!supabase) return getLegacyArticles();
+  if (!supabase) {
+    return fallbackForUnavailableLocalizedContent(locale, getLegacyArticles, () => Promise.resolve([]));
+  }
   try {
     const { data, error, status } = await (supabase as unknown as LocalizedArticleRpcClient).rpc(
       'list_published_articles_locale',
@@ -351,7 +361,7 @@ async function getLocalizedArticlesFromSource(locale: AppLocale) {
     const items = raw && 'items' in raw && Array.isArray(raw.items) ? raw.items : [];
     const articles = items.flatMap((item) => {
       if (!item || typeof item !== 'object' || Array.isArray(item)) return [];
-      const article = localizedArticleSummary(item as Record<string, unknown>);
+      const article = localizedArticleSummary(item as Record<string, unknown>, locale);
       return article ? [article] : [];
     });
     lastKnownLocalizedArticles.set(locale, articles);
@@ -382,7 +392,13 @@ export const getArticles = cache((locale: AppLocale = DEFAULT_LOCALE) =>
 
 async function getLocalizedArticleBySlugFromSource(slug: string, locale: AppLocale) {
   const supabase = createPublicClient();
-  if (!supabase) return getLegacyArticleBySlug(slug);
+  if (!supabase) {
+    return fallbackForUnavailableLocalizedContent(
+      locale,
+      () => getLegacyArticleBySlug(slug),
+      () => Promise.resolve(null),
+    );
+  }
   const key = localizedArticleKey(locale, slug);
   try {
     const { data, error, status } = await (supabase as unknown as LocalizedArticleRpcClient).rpc(
@@ -400,7 +416,7 @@ async function getLocalizedArticleBySlugFromSource(slug: string, locale: AppLoca
     }
     if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
     const raw = data as Record<string, unknown>;
-    const summary = localizedArticleSummary(raw);
+    const summary = localizedArticleSummary(raw, locale);
     if (!summary || !articleBlocksSchema.safeParse(raw.blocks).success) return null;
     const article: Article = { ...summary, blocks: raw.blocks };
     lastKnownLocalizedArticlesBySlug.set(key, article);

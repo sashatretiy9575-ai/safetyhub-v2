@@ -616,6 +616,8 @@ Deno.serve(async (request: Request) => {
       rpc(client, 'prune_account_storage_cleanup_tombstones', { p_limit: 100 }),
       rpc(client, 'prune_coarse_ip_rate_limits', { p_limit: 500 }),
       rpc(client, 'prune_learning_history_delete_receipts', { p_limit: 500 }),
+      rpc(client, 'prune_certificate_export_jobs', { p_limit: 500 }),
+      rpc(client, 'collect_capacity_monitor_snapshot', { p_force: false }),
     ]);
     return Response.json(
       {

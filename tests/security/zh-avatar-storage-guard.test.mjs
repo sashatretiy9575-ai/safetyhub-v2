@@ -5,10 +5,9 @@ import test from 'node:test';
 const MIGRATION = 'supabase/migrations/20260901109100_zh_avatar_storage_write_guard.sql';
 
 test('ZH avatar writes require the exact live server-only registration operation', async () => {
-  const [migration, sqlContract, loadHarness] = await Promise.all([
+  const [migration, sqlContract] = await Promise.all([
     readFile(MIGRATION, 'utf8'),
     readFile('supabase/tests/zh_avatar_storage_guard.sql', 'utf8'),
-    readFile('scripts/load-test-supabase.mjs', 'utf8'),
   ]);
 
   assert.match(
@@ -38,7 +37,4 @@ test('ZH avatar writes require the exact live server-only registration operation
   assert.match(sqlContract, /service role wrote an avatar without an exact ZH operation/u);
   assert.match(sqlContract, /storage_written ZH operation replayed its avatar write/u);
   assert.match(sqlContract, /expired ZH registration challenge authorized an avatar write/u);
-
-  assert.match(loadHarness, /\.storage\.from\('profile-avatars'\)\.upload/u);
-  assert.doesNotMatch(loadHarness, /insert into storage\.objects/iu);
 });

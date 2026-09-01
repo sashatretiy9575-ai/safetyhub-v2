@@ -281,6 +281,111 @@ export type Database = {
         }
         Relationships: []
       }
+      capacity_monitor_alert_state: {
+        Row: {
+          first_reached_at: string
+          highest_threshold_percent: number
+          limit_value: number
+          metric_key: string
+          month_start: string
+          observed_value: number
+          updated_at: string
+        }
+        Insert: {
+          first_reached_at?: string
+          highest_threshold_percent: number
+          limit_value: number
+          metric_key?: string
+          month_start: string
+          observed_value: number
+          updated_at?: string
+        }
+        Update: {
+          first_reached_at?: string
+          highest_threshold_percent?: number
+          limit_value?: number
+          metric_key?: string
+          month_start?: string
+          observed_value?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      capacity_monitor_budget_receipts: {
+        Row: {
+          created_at: string
+          idempotency_key: string
+          reason: string
+          requested_limit: number
+          result: Json
+        }
+        Insert: {
+          created_at?: string
+          idempotency_key: string
+          reason: string
+          requested_limit: number
+          result: Json
+        }
+        Update: {
+          created_at?: string
+          idempotency_key?: string
+          reason?: string
+          requested_limit?: number
+          result?: Json
+        }
+        Relationships: []
+      }
+      capacity_monitor_configuration: {
+        Row: {
+          action_percent: number
+          critical_percent: number
+          monthly_active_learner_limit: number
+          singleton: boolean
+          updated_at: string
+          updated_by: string | null
+          warning_percent: number
+        }
+        Insert: {
+          action_percent?: number
+          critical_percent?: number
+          monthly_active_learner_limit?: number
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          warning_percent?: number
+        }
+        Update: {
+          action_percent?: number
+          critical_percent?: number
+          monthly_active_learner_limit?: number
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          warning_percent?: number
+        }
+        Relationships: []
+      }
+      capacity_monitor_snapshots: {
+        Row: {
+          captured_at: string
+          captured_day: string
+          metrics: Json
+          month_start: string
+        }
+        Insert: {
+          captured_at?: string
+          captured_day: string
+          metrics: Json
+          month_start: string
+        }
+        Update: {
+          captured_at?: string
+          captured_day?: string
+          metrics?: Json
+          month_start?: string
+        }
+        Relationships: []
+      }
       certificate_export_jobs: {
         Row: {
           actor_user_id: string
@@ -960,6 +1065,59 @@ export type Database = {
           },
         ]
       }
+      zh_username_accounts: {
+        Row: {
+          created_at: string
+          password_change_pending: boolean
+          synthetic_email: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          password_change_pending?: boolean
+          synthetic_email: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          password_change_pending?: boolean
+          synthetic_email?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      zh_username_authorized_sessions: {
+        Row: {
+          authorized_at: string
+          last_seen_at: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          authorized_at?: string
+          last_seen_at?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          authorized_at?: string
+          last_seen_at?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zh_username_authorized_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "zh_username_accounts"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       zh_webauthn_accounts: {
         Row: {
           auth_epoch: number
@@ -1215,6 +1373,10 @@ export type Database = {
         Args: { p_attempt_id: string; p_retry_at?: string }
         Returns: Json
       }
+      authorize_zh_username_password_session: {
+        Args: { p_session_id: string; p_user_id: string }
+        Returns: boolean
+      }
       bulk_update_participants_unmetered: {
         Args: { p_field: string; p_user_ids: string[]; p_value: string }
         Returns: Json
@@ -1242,6 +1404,10 @@ export type Database = {
           p_limit?: number
           p_worker_id: string
         }
+        Returns: Json
+      }
+      collect_capacity_monitor_snapshot_unmetered: {
+        Args: { p_force?: boolean }
         Returns: Json
       }
       complete_test_attempt_unmetered: {
@@ -1566,6 +1732,10 @@ export type Database = {
       refresh_zh_authorized_session: {
         Args: { p_session_id: string; p_user_id: string }
         Returns: number
+      }
+      refresh_zh_username_password_session: {
+        Args: { p_session_id: string; p_user_id: string }
+        Returns: boolean
       }
       request_account_suspension_confirmed_unmetered: {
         Args: {
@@ -3698,6 +3868,10 @@ export type Database = {
         Returns: Json
       }
       begin_user_account_purge: { Args: { p_target_id: string }; Returns: Json }
+      begin_zh_username_password_reset: {
+        Args: { p_reason: string; p_target_user_id: string }
+        Returns: Json
+      }
       bootstrap_email_otp_admin: {
         Args: { p_user_id: string }
         Returns: string
@@ -3756,6 +3930,10 @@ export type Database = {
         Returns: Json
       }
       claim_zh_registration_cleanup: { Args: never; Returns: Json }
+      collect_capacity_monitor_snapshot: {
+        Args: { p_force?: boolean }
+        Returns: Json
+      }
       complete_course_presentation_cleanup: {
         Args: { p_presentation_ids: string[] }
         Returns: Json
@@ -3821,6 +3999,22 @@ export type Database = {
           p_request_id: string
           p_signature_counter: number
           p_transports: string[]
+        }
+        Returns: Json
+      }
+      complete_zh_username_password_reset: {
+        Args: { p_reason: string; p_target_user_id: string }
+        Returns: Json
+      }
+      complete_zh_username_registration: {
+        Args: {
+          p_privacy_body_revision: string
+          p_privacy_version: string
+          p_synthetic_email: string
+          p_terms_body_revision: string
+          p_terms_version: string
+          p_user_id: string
+          p_username: string
         }
         Returns: Json
       }
@@ -4138,6 +4332,18 @@ export type Database = {
         Args: { p_operation_id: string }
         Returns: Json
       }
+      get_zh_username_login_mapping: {
+        Args: { p_username: string }
+        Returns: Json
+      }
+      get_zh_username_password_rollout_enabled: {
+        Args: never
+        Returns: boolean
+      }
+      get_zh_username_provision_target: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       import_course_assessment_localization: {
         Args: {
           p_actor_id: string
@@ -4385,6 +4591,10 @@ export type Database = {
         Returns: boolean
       }
       provision_admin_by_email: { Args: { p_email: string }; Returns: string }
+      provision_zh_username_password: {
+        Args: { p_reason: string; p_target_user_id: string; p_username: string }
+        Returns: Json
+      }
       prune_account_approval_decision_receipts: {
         Args: { p_limit?: number }
         Returns: number
@@ -4417,6 +4627,10 @@ export type Database = {
         Returns: Json
       }
       prune_terminal_avatar_upload_operations: {
+        Args: { p_limit?: number }
+        Returns: Json
+      }
+      prune_zh_username_authorized_sessions: {
         Args: { p_limit?: number }
         Returns: Json
       }
@@ -4749,6 +4963,14 @@ export type Database = {
           p_article_id: string
           p_expected_content_hash?: string
           p_status: Database["public"]["Enums"]["article_status"]
+        }
+        Returns: Json
+      }
+      set_capacity_monitor_monthly_active_learner_budget: {
+        Args: {
+          p_idempotency_key: string
+          p_monthly_active_learner_limit: number
+          p_reason: string
         }
         Returns: Json
       }

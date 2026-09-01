@@ -14,6 +14,8 @@ export const LOCALE_PREFIXES = ['kk', 'en', 'zh'] as const satisfies readonly Ex
   'ru'
 >[];
 
+const ZH_USERNAME_PASSWORD_ENTRY_PATH = /^\/auth\/(?:login|register)\/?$/u;
+
 export const HTML_LANGUAGE_BY_LOCALE = {
   ru: 'ru-KZ',
   kk: 'kk-KZ',
@@ -87,6 +89,30 @@ export function splitLocalePathname(pathname: string): {
   }
 
   return { locale: DEFAULT_LOCALE, pathname: normalized, hasLocalePrefix: false };
+}
+
+/**
+ * Returns only locale routes that the current rollout can actually serve from
+ * the current page. In particular, do not offer the ZH auth entry routes
+ * until their username/password flow is enabled.
+ */
+export function localesForLanguageSwitcher({
+  pathname,
+  localeRoutesEnabled,
+  zhUsernamePasswordEnabled,
+}: {
+  pathname: string;
+  localeRoutesEnabled: boolean;
+  zhUsernamePasswordEnabled: boolean;
+}): readonly AppLocale[] {
+  if (!localeRoutesEnabled) return [DEFAULT_LOCALE];
+
+  const routePathname = splitLocalePathname(pathname).pathname;
+  if (!zhUsernamePasswordEnabled && ZH_USERNAME_PASSWORD_ENTRY_PATH.test(routePathname)) {
+    return APP_LOCALES.filter((locale) => locale !== 'zh');
+  }
+
+  return APP_LOCALES;
 }
 
 export function isLocaleRoutablePath(pathname: string) {

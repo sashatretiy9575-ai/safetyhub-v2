@@ -36,6 +36,19 @@ export function isContentFallbackEnabled(
   return value?.trim().toLowerCase() === 'true';
 }
 
+/**
+ * Bundled content snapshots are Russian source material. A localized route
+ * must fail closed instead of presenting that Russian fallback as another
+ * language when the public content source is unavailable.
+ */
+export function fallbackForUnavailableLocalizedContent<T>(
+  locale: string,
+  ruFallback: () => T,
+  unavailable: () => T,
+): T {
+  return locale === 'ru' ? ruFallback() : unavailable();
+}
+
 function errorRecord(error: unknown): Record<string, unknown> | null {
   return typeof error === 'object' && error !== null ? (error as Record<string, unknown>) : null;
 }

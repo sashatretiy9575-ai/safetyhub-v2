@@ -38,6 +38,7 @@
     "db:types:check": "node scripts/generate-supabase-types.mjs --linked --check",
     "db:types:check:local": "node scripts/generate-supabase-types.mjs --local --check",
     "db:migrations:check-linked": "supabase migration list --linked",
+    "db:migrations:check-preflight": "node scripts/check-linked-release-migrations.mjs",
     "db:backup:linked": "node scripts/backup-linked-database.mjs",
     "runtime:flag:set": "node scripts/set-runtime-feature-flag.mjs",
     "notifications:vault:configure": "node scripts/configure-notification-dispatch-vault.mjs",

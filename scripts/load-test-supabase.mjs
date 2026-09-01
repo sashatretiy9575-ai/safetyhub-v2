@@ -2,9 +2,7 @@ import crypto from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { performance } from 'node:perf_hooks';
 import process from 'node:process';
-import sharp from 'sharp';
 import { createClient } from '@supabase/supabase-js';
-import { verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server';
 import { Client as PostgresClient } from 'pg';
 import {
   assertCleanLoadTestBaseline,
@@ -13,12 +11,6 @@ import {
   assertLocalCiLoadTestTarget,
   assertLoadTestTarget,
 } from './load-test-safety.mjs';
-import {
-  createAuthenticationResponse,
-  createRegistrationResponse,
-  createSoftwareCredential,
-  sha256HexText,
-} from './software-webauthn.mjs';
 
 const MAX_MAU_PROFILE = 100;
 const DEFAULT_USER_COUNT = MAX_MAU_PROFILE;
@@ -28,10 +20,12 @@ const APP_LOCALES = ['ru', 'kk', 'en', 'zh'];
 const ROW_CHUNK = 400;
 const PREPARATION_RETRY_LIMIT = 5;
 const PREPARATION_CONCURRENCY = 4;
+// Cloudflare's documented public dummy response is accepted only by the
+// disposable local CI Auth container, whose secret is the matching test key.
+// It is never used for hosted load targets or application requests.
+const LOCAL_CI_TURNSTILE_DUMMY_TOKEN = 'XXXX.DUMMY.TOKEN.XXXX';
 const TRANSIENT_NETWORK_ERROR =
   /fetch failed|network|econnreset|etimedout|socket hang up|und_err|http 50[234]|temporarily unavailable|connection (?:terminated|reset)/iu;
-const ZH_RP_ID = 'safetyhub.kz';
-const ZH_ORIGIN = 'https://safetyhub.kz';
 
 function parseEnvFile(source) {
   return Object.fromEntries(
@@ -200,27 +194,10 @@ function buildProfile(user, index, timestamp) {
     surname: `Тестовый ${String((index % 200) + 1).padStart(3, '0')}`,
     job: index % 3 === 0 ? 'Инженер по безопасности' : 'Специалист',
     organization: `ТОО Нагрузочная компания ${String(organizationIndex).padStart(2, '0')}`,
+    phone_country_iso2: 'KZ',
+    phone_e164: `+7701${String(index + 1).padStart(7, '0')}`,
     onboarding_completed_at: timestamp,
   };
-}
-
-async function avatarObjectMatches(admin, objectKey, avatar, avatarSha256) {
-  const downloaded = await admin.storage
-    .from('profile-avatars')
-    .download(objectKey, {}, { cache: 'no-store' });
-  if (downloaded.error || !downloaded.data || downloaded.data.size !== avatar.length) return false;
-  const bytes = Buffer.from(await downloaded.data.arrayBuffer());
-  return crypto.createHash('sha256').update(bytes).digest('hex') === avatarSha256;
-}
-
-function isRetryableStorageError(error) {
-  const status = Number(error?.statusCode ?? error?.status);
-  return (
-    status === 408 ||
-    status === 429 ||
-    status >= 500 ||
-    TRANSIENT_NETWORK_ERROR.test(error?.message ?? String(error))
-  );
 }
 
 function boundedAuthErrorEvidence(error) {
@@ -230,8 +207,8 @@ function boundedAuthErrorEvidence(error) {
   const rawCode = typeof error?.code === 'string' ? error.code.toLowerCase() : '';
   const codeCategory = /^[a-z0-9_]{1,64}$/u.test(rawCode) ? rawCode.toUpperCase() : 'UNKNOWN';
   const message = typeof error?.message === 'string' ? error.message.toLowerCase() : '';
-  const failureCategory = /passkey_required/u.test(message)
-    ? 'PASSKEY_REQUIRED'
+  const failureCategory = /zh_username_password_required|username_password_required/u.test(message)
+    ? 'ZH_USERNAME_PASSWORD_REQUIRED'
     : /access token hook|auth hook|hook/u.test(message)
       ? 'ACCESS_TOKEN_HOOK'
       : /rate|too many/u.test(message)
@@ -244,57 +221,31 @@ function boundedAuthErrorEvidence(error) {
   return `HTTP_${statusCategory}_CODE_${codeCategory}_CATEGORY_${failureCategory}`;
 }
 
-async function uploadZhLoadTestAvatar(admin, objectKey, avatar, avatarSha256, index) {
-  for (let attempt = 1; attempt <= PREPARATION_RETRY_LIMIT; attempt += 1) {
-    const uploaded = await admin.storage.from('profile-avatars').upload(objectKey, avatar, {
-      contentType: 'image/webp',
-      cacheControl: '600',
-      upsert: false,
-    });
-    if (!uploaded.error) {
-      if (uploaded.data?.path !== objectKey) {
-        throw new Error(`zh registration ${index + 1}: AVATAR_UPLOAD_CONTRACT_MISMATCH`);
-      }
-      return;
-    }
-
-    // Storage may commit the object and lose the HTTP response. Mirror the
-    // production registration path and prove exact bytes before retrying.
-    if (await avatarObjectMatches(admin, objectKey, avatar, avatarSha256)) return;
-    if (!isRetryableStorageError(uploaded.error) || attempt === PREPARATION_RETRY_LIMIT) {
-      const status = Number(uploaded.error?.statusCode ?? uploaded.error?.status);
-      const category =
-        Number.isInteger(status) && status >= 400 && status <= 599 ? status : 'UNKNOWN';
-      throw new Error(`zh registration ${index + 1}: AVATAR_UPLOAD_FAILED_HTTP_${category}`);
-    }
-    await wait(250 * 2 ** (attempt - 1));
-  }
+function createZhLoadTestUsername() {
+  return `loadzh${crypto.randomBytes(12).toString('hex')}`;
 }
 
-async function createZhLoadTestUser(admin, index, avatar, avatarSha256, legal) {
+function createZhLoadTestPassword() {
+  // The password is process-local, goes only to GoTrue, and is intentionally
+  // absent from all progress, report, and failure output.
+  return `LoadTest9-${crypto.randomBytes(24).toString('hex')}`;
+}
+
+async function createZhLoadTestUser(admin, index, legal) {
   const id = crypto.randomUUID();
-  const operationId = crypto.randomUUID();
   const email = `${crypto.randomBytes(16).toString('hex')}@auth.invalid`;
-  const credential = createSoftwareCredential();
-  const challenge = crypto.randomBytes(32).toString('base64url');
-  const requestHash = crypto.randomBytes(32).toString('hex');
-  const prepared = await timedRpc(admin, 'prepare_zh_registration_operation', {
-    p_operation_id: operationId,
-    p_challenge_sha256: sha256HexText(challenge),
-    p_request_hash: requestHash,
-    p_user_handle: credential.userHandle,
-    p_synthetic_email: email,
-  });
+  const username = createZhLoadTestUsername();
+  const password = createZhLoadTestPassword();
 
   const user = await createLoadTestUser(
     () =>
       admin.auth.admin.createUser({
         id,
         email,
+        password,
         email_confirm: true,
         app_metadata: {
-          safetyhub_auth_kind: 'zh_passkey',
-          safetyhub_registration_operation_id: operationId,
+          safetyhub_auth_kind: 'zh_username_password',
         },
         user_metadata: { preferred_locale: 'zh', safetyhub_load_test: true },
       }),
@@ -302,155 +253,35 @@ async function createZhLoadTestUser(admin, index, avatar, avatarSha256, legal) {
     { id, email },
     index,
   );
-  await rpcData(admin, 'attach_zh_registration_auth_user', {
-    p_operation_id: operationId,
-    p_user_id: id,
-  });
-
-  const objectKey = `${id}/objects/${operationId}.webp`;
-  await uploadZhLoadTestAvatar(admin, objectKey, avatar, avatarSha256, index);
-  await rpcData(admin, 'mark_zh_registration_storage_written', {
-    p_operation_id: operationId,
-    p_user_id: id,
-    p_object_key: objectKey,
-    p_sha256: avatarSha256,
-    p_bytes: avatar.length,
-  });
-
-  const verificationStarted = performance.now();
-  const registration = await verifyRegistrationResponse({
-    response: createRegistrationResponse({
-      credential,
-      challenge,
-      origin: ZH_ORIGIN,
-      rpID: ZH_RP_ID,
-    }),
-    expectedChallenge: challenge,
-    expectedOrigin: ZH_ORIGIN,
-    expectedRPID: ZH_RP_ID,
-    expectedType: 'webauthn.create',
-    requireUserPresence: true,
-    requireUserVerification: true,
-  });
-  const registrationVerificationMs = performance.now() - verificationStarted;
-  if (
-    !registration.verified ||
-    !registration.registrationInfo?.userVerified ||
-    registration.registrationInfo.credential.id !== credential.credentialId
-  ) {
-    throw new Error(`zh registration ${index + 1}: ATTESTATION_VERIFY_FAILED`);
-  }
-
-  const profile = buildProfile(user, index, new Date().toISOString());
-  const finalized = await timedRpc(admin, 'finalize_zh_registration', {
-    p_operation_id: operationId,
-    p_request_hash: requestHash,
-    p_credential_id: registration.registrationInfo.credential.id,
-    p_public_key_base64: Buffer.from(registration.registrationInfo.credential.publicKey).toString(
-      'base64',
-    ),
-    p_signature_counter: registration.registrationInfo.credential.counter,
-    p_transports: ['internal'],
-    p_device_type: registration.registrationInfo.credentialDeviceType,
-    p_backed_up: registration.registrationInfo.credentialBackedUp,
-    p_name: profile.name,
-    p_surname: profile.surname,
-    p_job: profile.job,
-    p_organization: profile.organization,
-    p_phone_country_iso2: 'KZ',
-    p_phone_e164: `+7701${String(index + 1).padStart(7, '0')}`,
+  const completed = await timedRpc(admin, 'complete_zh_username_registration', {
+    p_user_id: user.id,
+    p_username: username,
+    p_synthetic_email: email,
     p_privacy_version: legal.privacy.version,
     p_privacy_body_revision: legal.privacy.bodyRevision,
     p_terms_version: legal.terms.version,
     p_terms_body_revision: legal.terms.bodyRevision,
-    p_recovery_locator: crypto.randomUUID(),
-    p_recovery_salt: crypto.randomBytes(16).toString('hex'),
-    p_recovery_digest: crypto.randomBytes(32).toString('hex'),
   });
-  if (finalized.data?.userId !== id || finalized.data?.approvalState !== 'pending') {
-    throw new Error(`zh registration ${index + 1}: FINALIZE_CONTRACT_MISMATCH`);
+  if (completed.data?.userId !== user.id || completed.data?.approvalState !== 'profile_incomplete') {
+    throw new Error(`zh username registration ${index + 1}: COMPLETION_CONTRACT_MISMATCH`);
   }
+
+  const mapping = await timedRpc(admin, 'get_zh_username_login_mapping', {
+    p_username: username,
+  });
+  if (mapping.data?.userId !== user.id || mapping.data?.syntheticEmail !== email) {
+    throw new Error(`zh username registration ${index + 1}: LOGIN_MAPPING_CONTRACT_MISMATCH`);
+  }
+
   return {
     ...user,
-    profile,
-    credential,
+    username,
+    password,
+    profile: buildProfile(user, index, new Date().toISOString()),
     registrationMetrics: {
-      prepareMs: prepared.duration,
-      verifyMs: registrationVerificationMs,
-      finalizeMs: finalized.duration,
+      completeMs: completed.duration,
+      mappingMs: mapping.duration,
     },
-  };
-}
-
-async function runZhAssertion(admin, user) {
-  const requestId = crypto.randomUUID();
-  const challenge = crypto.randomBytes(32).toString('base64url');
-  const prepared = await timedRpc(admin, 'prepare_zh_authentication_challenge', {
-    p_request_id: requestId,
-    p_challenge_sha256: sha256HexText(challenge),
-  });
-  const context = await timedRpc(admin, 'get_zh_authentication_context', {
-    p_request_id: requestId,
-    p_credential_id: user.credential.credentialId,
-  });
-  const storedCounter = Number(context.data?.signatureCounter);
-  if (
-    context.data?.userId !== user.id ||
-    context.data?.credentialId !== user.credential.credentialId ||
-    context.data?.userHandle !== user.credential.userHandle ||
-    !Number.isSafeInteger(storedCounter) ||
-    storedCounter !== user.credential.counter
-  ) {
-    throw new Error('zh authentication context mismatch');
-  }
-
-  const nextCounter = user.credential.counter + 1;
-  const response = createAuthenticationResponse({
-    credential: user.credential,
-    challenge,
-    origin: ZH_ORIGIN,
-    rpID: ZH_RP_ID,
-    nextCounter,
-  });
-  const verificationStarted = performance.now();
-  const verification = await verifyAuthenticationResponse({
-    response,
-    expectedChallenge: challenge,
-    expectedOrigin: ZH_ORIGIN,
-    expectedRPID: ZH_RP_ID,
-    expectedType: 'webauthn.get',
-    requireUserVerification: true,
-    credential: {
-      id: context.data.credentialId,
-      publicKey: new Uint8Array(Buffer.from(context.data.publicKeyBase64, 'base64')),
-      counter: storedCounter,
-      transports: context.data.transports,
-    },
-  });
-  const verificationMs = performance.now() - verificationStarted;
-  if (
-    !verification.verified ||
-    !verification.authenticationInfo.userVerified ||
-    verification.authenticationInfo.newCounter !== nextCounter
-  ) {
-    throw new Error('zh authentication assertion verification failed');
-  }
-  const completed = await timedRpc(admin, 'complete_zh_authentication', {
-    p_request_id: requestId,
-    p_credential_id: user.credential.credentialId,
-    p_expected_counter: user.credential.counter,
-    p_new_counter: nextCounter,
-    p_backed_up: false,
-  });
-  if (completed.data?.userId !== user.id) {
-    throw new Error('zh authentication completion mismatch');
-  }
-  user.credential.counter = nextCounter;
-  return {
-    prepareMs: prepared.duration,
-    contextMs: context.duration,
-    verifyMs: verificationMs,
-    completeMs: completed.duration,
   };
 }
 
@@ -544,47 +375,43 @@ async function timedRpc(client, name, args) {
   return { data: result.data, duration };
 }
 
-async function createAuthenticatedClient(admin, url, publishableKey, user) {
+async function createAuthenticatedClient(url, publishableKey, user, captchaToken) {
   const client = createClient(url, publishableKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
   for (let attempt = 1; attempt <= 8; attempt += 1) {
-    // A disposable test session must exercise the same passwordless Auth
-    // provider boundary as production. The service-only link is never sent or
-    // logged; its single-use hash is verified in this process only.
-    const generated = await admin.auth.admin.generateLink({
-      type: 'magiclink',
-      email: user.email,
-    });
-    if (generated.error) {
-      const retryable =
-        generated.error.status === 429 || TRANSIENT_NETWORK_ERROR.test(generated.error.message);
-      if (!retryable || attempt === 8) {
-        throw new Error('generate passwordless test link: AUTH_ADMIN_LINK_FAILED');
+    const started = performance.now();
+    let signedIn;
+    try {
+      signedIn = await client.auth.signInWithPassword({
+        email: user.email,
+        password: user.password,
+        options: captchaToken ? { captchaToken } : undefined,
+      });
+    } catch (error) {
+      if (!TRANSIENT_NETWORK_ERROR.test(error?.message ?? String(error)) || attempt === 8) {
+        throw new Error(`ZH_PASSWORD_SIGN_IN_FAILED_${boundedAuthErrorEvidence(error)}`);
       }
       await wait(attempt * 1_000);
       continue;
     }
-    const tokenHash = generated.data?.properties?.hashed_token;
-    if (typeof tokenHash !== 'string' || tokenHash.length < 16) {
-      throw new Error('generate passwordless test link: missing token hash');
+    const duration = performance.now() - started;
+    if (!signedIn.error) {
+      if (!signedIn.data.session || signedIn.data.user?.id !== user.id) {
+        throw new Error('ZH_PASSWORD_SIGN_IN_SESSION_CONTRACT_MISMATCH');
+      }
+      return { client, duration };
     }
-
-    const signedIn = await client.auth.verifyOtp({
-      token_hash: tokenHash,
-      type: 'magiclink',
-    });
-    if (!signedIn.error) return client;
     const retryable =
       signedIn.error.status === 429 || TRANSIENT_NETWORK_ERROR.test(signedIn.error.message);
     if (!retryable || attempt === 8) {
       throw new Error(
-        `verify passwordless test link: AUTH_VERIFY_FAILED_${boundedAuthErrorEvidence(signedIn.error)}`,
+        `ZH_PASSWORD_SIGN_IN_FAILED_${boundedAuthErrorEvidence(signedIn.error)}`,
       );
     }
     await wait(attempt * 1_000);
   }
-  throw new Error('passwordless test-session creation exhausted its retry budget');
+  throw new Error('ZH_PASSWORD_SIGN_IN_RETRY_EXHAUSTED');
 }
 
 async function prepareLocalCiLocaleFixture(databaseUrl) {
@@ -849,16 +676,6 @@ async function main() {
     await prepareLocalCiLocaleFixture(process.env.SAFETYHUB_LOCAL_DATABASE_URL);
   }
 
-  const noise = crypto.randomBytes(360 * 360 * 3);
-  const avatar = await sharp(noise, { raw: { width: 360, height: 360, channels: 3 } })
-    .blur(1)
-    .webp({ quality: 60 })
-    .toBuffer();
-  if (avatar.length > 100 * 1_024 || avatar.length < 20 * 1_024) {
-    throw new Error(`Representative avatar size is outside 20–100 KiB: ${avatar.length}`);
-  }
-  const avatarSha256 = crypto.createHash('sha256').update(avatar).digest('hex');
-
   const legalVersions = await admin
     .from('legal_document_versions')
     .select('document_type,version,body_revision')
@@ -874,14 +691,26 @@ async function main() {
     terms: { version: terms.version, bodyRevision: terms.body_revision },
   };
 
+  await rpcData(admin, 'set_runtime_feature_flag', {
+    p_feature_name: 'zh_username_password',
+    p_enabled: true,
+    p_reason: 'Disposable load test: enable ZH username/password authentication',
+    p_idempotency_key: crypto.randomUUID(),
+  });
+  const zhRolloutEnabled = await rpcData(admin, 'get_zh_username_password_rollout_enabled');
+  if (zhRolloutEnabled !== true) {
+    throw new Error('ZH_USERNAME_PASSWORD_ROLLOUT_CONTRACT_MISMATCH');
+  }
+
   const indexes = Array.from({ length: userCount }, (_, index) => index);
   const createdUsers = await mapLimit(indexes, PREPARATION_CONCURRENCY, (index) =>
-    createZhLoadTestUser(admin, index, avatar, avatarSha256, currentLegal),
+    createZhLoadTestUser(admin, index, currentLegal),
   );
   process.stdout.write(`LOAD_PREP_USERS=${createdUsers.length}\n`);
 
   const now = new Date().toISOString();
   const profiles = createdUsers.map((user) => user.profile);
+  await insertChunks(admin, 'profiles', profiles, { upsert: true, onConflict: 'id' });
   await insertChunks(
     admin,
     'verified_identities',
@@ -936,52 +765,32 @@ async function main() {
     `LOAD_PREP_DOMAIN=attempts:${synthetic.attempts.length},attestations:${synthetic.attestations.length}\n`,
   );
 
-  process.stdout.write(`LOAD_PREP_AVATARS=${createdUsers.length}\n`);
-
   const adminAccess = await admin.rpc('restore_admin_access', { p_user_id: createdUsers[0].id });
   if (adminAccess.error) throw adminAccess.error;
 
-  const zhAssertionWaveResults = [];
+  const zhPasswordLoginWaveResults = [];
+  const localCiCaptchaToken =
+    targetMode === 'local-ci' ? LOCAL_CI_TURNSTILE_DUMMY_TOKEN : undefined;
   for (const concurrency of LOAD_WAVES.filter((count) => count <= createdUsers.length)) {
-    const assertions = await Promise.all(
-      createdUsers.slice(0, concurrency).map((user) => runZhAssertion(admin, user)),
+    const sessions = await Promise.all(
+      createdUsers
+        .slice(0, concurrency)
+        .map((user) => createAuthenticatedClient(url, publishableKey, user, localCiCaptchaToken)),
     );
-    zhAssertionWaveResults.push({
+    zhPasswordLoginWaveResults.push({
       concurrency,
-      prepareP95Ms: percentile(
-        assertions.map((item) => item.prepareMs),
-        95,
-      ),
-      contextP95Ms: percentile(
-        assertions.map((item) => item.contextMs),
-        95,
-      ),
-      verifyP95Ms: percentile(
-        assertions.map((item) => item.verifyMs),
-        95,
-      ),
-      completeP95Ms: percentile(
-        assertions.map((item) => item.completeMs),
-        95,
-      ),
+      signInP95Ms: percentile(sessions.map((item) => item.duration), 95),
     });
-    process.stdout.write(`LOAD_ZH_ASSERTION_WAVE_COMPLETE=${concurrency}\n`);
+    process.stdout.write(`LOAD_ZH_PASSWORD_LOGIN_WAVE_COMPLETE=${concurrency}\n`);
   }
   const sessionUsers = createdUsers.slice(0, sessionCount);
-  const clients = [];
-  for (let index = 0; index < sessionUsers.length; index += 1) {
-    const user = sessionUsers[index];
-    // Session grants expire after exactly two minutes. The measured assertion
-    // waves intentionally finish before this sequential session setup, so a
-    // grant from those waves cannot safely authorize all 100 exchanges. Run
-    // the real assertion ceremony immediately before each Auth exchange.
-    await runZhAssertion(admin, user);
-    clients.push(await createAuthenticatedClient(admin, url, publishableKey, user));
-    if ((index + 1) % 10 === 0 || index + 1 === sessionUsers.length) {
-      process.stdout.write(`LOAD_SESSIONS_READY=${index + 1}/${sessionUsers.length}\n`);
-    }
-    await wait(2_100);
-  }
+  const clientSessions = await mapLimit(
+    sessionUsers,
+    PREPARATION_CONCURRENCY,
+    (user) => createAuthenticatedClient(url, publishableKey, user, localCiCaptchaToken),
+  );
+  const clients = clientSessions.map((session) => session.client);
+  process.stdout.write(`LOAD_SESSIONS_READY=${clients.length}/${sessionUsers.length}\n`);
 
   await rpcData(admin, 'set_runtime_feature_flag', {
     p_feature_name: 'notification_events',
@@ -1249,24 +1058,12 @@ async function main() {
     users: createdUsers.length,
     attemptsSeeded: synthetic.attempts.length,
     attestationsSeeded: synthetic.attestations.length,
-    avatars: createdUsers.length,
-    avatarBytesEach: avatar.length,
-    zhRegistration: {
+    zhUsernamePasswordRegistration: {
       count: createdUsers.length,
-      prepareP95Ms: percentile(
-        createdUsers.map((user) => user.registrationMetrics.prepareMs),
-        95,
-      ),
-      verifyP95Ms: percentile(
-        createdUsers.map((user) => user.registrationMetrics.verifyMs),
-        95,
-      ),
-      finalizeP95Ms: percentile(
-        createdUsers.map((user) => user.registrationMetrics.finalizeMs),
-        95,
-      ),
+      completeP95Ms: percentile(createdUsers.map((user) => user.registrationMetrics.completeMs), 95),
+      mappingP95Ms: percentile(createdUsers.map((user) => user.registrationMetrics.mappingMs), 95),
     },
-    zhAssertionWaveResults,
+    zhPasswordLoginWaveResults,
     waveResults,
     adminInboxP95Ms: percentile(
       inboxReads.map((item) => item.duration),

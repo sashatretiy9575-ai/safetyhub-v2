@@ -74,7 +74,7 @@ test('local Auth configuration activates the email-OTP access-token hook after m
   );
 });
 
-test('operator, hosted-security, and load-test scripts never restore a password credential path', async () => {
+test('only the isolated ZH load harness uses the post-cutover password credential path', async () => {
   const [operatorSeed, hostedGate, loadHarness] = await Promise.all([
     read('scripts/seed-operator-workspace.mjs'),
     read('scripts/hosted-security-gates.mjs'),
@@ -82,9 +82,13 @@ test('operator, hosted-security, and load-test scripts never restore a password 
   ]);
 
   assert.doesNotMatch(operatorSeed, /SAFETYHUB_SEED_PASSWORD|password\s*:/u);
-  for (const source of [hostedGate, loadHarness]) {
+  for (const source of [hostedGate]) {
     assert.match(source, /auth\.admin\.generateLink\(/u);
     assert.match(source, /auth\.verifyOtp\(/u);
     assert.doesNotMatch(source, /signInWithPassword|password\s*:/u);
   }
+  assert.match(loadHarness, /safetyhub_auth_kind: 'zh_username_password'/u);
+  assert.match(loadHarness, /auth\.signInWithPassword\(/u);
+  assert.match(loadHarness, /password:\s*user\.password/u);
+  assert.doesNotMatch(loadHarness, /generateLink|verifyOtp|webauthn/iu);
 });

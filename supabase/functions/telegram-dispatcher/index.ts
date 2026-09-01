@@ -14,6 +14,8 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3
 const BOT_TOKEN_PATTERN = /^\d{6,12}:[A-Za-z0-9_-]{30,80}$/u;
 const PRIVATE_CHAT_ID_PATTERN = /^-\d{6,20}$/u;
 const MACHINE_CODE_PATTERN = /^[A-Z][A-Z0-9_]{2,79}$/u;
+const PHONE_COUNTRY_PATTERN = /^[A-Z]{2}$/u;
+const PHONE_E164_PATTERN = /^\+[1-9][0-9]{1,14}$/u;
 const ALLOWED_EVENT_TYPES = new Set([
   'account.approval_requested',
   'course.completed',
@@ -107,16 +109,59 @@ function requiredInteger(value: unknown, min: number, max: number) {
   return Number(value);
 }
 
+function requiredPhoneCountry(value: unknown) {
+  if (typeof value !== 'string' || !PHONE_COUNTRY_PATTERN.test(value)) {
+    fail('NOTIFICATION_PAYLOAD_INVALID');
+  }
+  return value;
+}
+
+function requiredPhoneE164(value: unknown) {
+  if (typeof value !== 'string' || !PHONE_E164_PATTERN.test(value)) {
+    fail('NOTIFICATION_PAYLOAD_INVALID');
+  }
+  return value;
+}
+
 function parsePayload(eventType: string, value: unknown) {
   if (!isRecord(value)) fail('NOTIFICATION_PAYLOAD_INVALID');
   if (eventType === 'account.approval_requested') {
+    const hasApplicationDetails = Object.hasOwn(value, 'job');
+    if (hasApplicationDetails) {
+      exactKeys(
+        value,
+        [
+          'name',
+          'surname',
+          'job',
+          'organization',
+          'phoneCountryIso2',
+          'phoneE164',
+        ],
+        'NOTIFICATION_PAYLOAD_INVALID',
+      );
+      return {
+        name: requiredText(value.name, 120),
+        surname: requiredText(value.surname, 120),
+        job: requiredText(value.job, 160),
+        organization: requiredText(value.organization, 160),
+        phoneCountryIso2: requiredPhoneCountry(value.phoneCountryIso2),
+        phoneE164: requiredPhoneE164(value.phoneE164),
+      };
+    }
+
     exactKeys(
       value,
-      ['userId', 'name', 'surname', 'locale', 'requestedAt', 'adminPath'],
+      [
+        'name',
+        'surname',
+        'locale',
+        'requestedAt',
+        'adminPath',
+      ],
       'NOTIFICATION_PAYLOAD_INVALID',
     );
     return {
-      userId: requiredUuid(value.userId),
       name: requiredText(value.name, 120),
       surname: requiredText(value.surname, 120),
       locale: requiredLocale(value.locale),
@@ -251,8 +296,19 @@ function localeLabel(value: string) {
 
 function eventMessage(claim: ReturnType<typeof parseClaim>[number], siteOrigin: string) {
   const payload = claim.payload;
-  const deepLink = new URL(payload.adminPath, siteOrigin).toString();
   if (claim.eventType === 'account.approval_requested') {
+    if ('job' in payload) {
+      return [
+        '🔔 Новая заявка на обучение',
+        `Имя: ${payload.name}`,
+        `Фамилия: ${payload.surname}`,
+        `Должность: ${payload.job}`,
+        `Организация: ${payload.organization}`,
+        `Страна: ${payload.phoneCountryIso2}`,
+        `Контактный телефон: ${payload.phoneE164}`,
+      ].join('\n');
+    }
+    const deepLink = new URL(payload.adminPath, siteOrigin).toString();
     return [
       '🔔 Новая заявка на обучение',
       `Участник: ${payload.surname} ${payload.name}`,
@@ -261,6 +317,8 @@ function eventMessage(claim: ReturnType<typeof parseClaim>[number], siteOrigin: 
       deepLink,
     ].join('\n');
   }
+  if (!('adminPath' in payload)) fail('NOTIFICATION_PAYLOAD_INVALID');
+  const deepLink = new URL(payload.adminPath, siteOrigin).toString();
   if (claim.eventType === 'course.completed') {
     return [
       payload.result === 'passed' ? '✅ Курс пройден' : '❌ Курс не пройден',

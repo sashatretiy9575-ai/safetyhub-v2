@@ -37,7 +37,7 @@ test('Telegram dispatcher is bearer-protected, bounded, leased, and service-only
   assert.match(config, /\[functions\.telegram-dispatcher\]\s*\r?\nverify_jwt = false/u);
 });
 
-test('Telegram templates allow exactly three minimized informational events', async () => {
+test('Telegram templates allow exactly three informational events and gate full applications by payload shape', async () => {
   const source = await read('supabase/functions/telegram-dispatcher/index.ts');
   const typeBlock =
     source.match(/const ALLOWED_EVENT_TYPES = new Set\(\[([\s\S]*?)\]\);/u)?.[1] ?? '';
@@ -48,10 +48,18 @@ test('Telegram templates allow exactly three minimized informational events', as
   assert.match(source, /Курс не пройден/u);
   assert.match(source, /Системное уведомление/u);
   assert.match(source, /Корреляция/u);
+  assert.match(source, /hasApplicationDetails/u);
+  assert.match(source, /PHONE_E164_PATTERN/u);
+  assert.match(source, /Имя:/u);
+  assert.match(source, /Фамилия:/u);
+  assert.match(source, /Должность:/u);
+  assert.match(source, /Организация:/u);
+  assert.match(source, /Страна:/u);
+  assert.match(source, /Контактный телефон:/u);
   assert.match(source, /link_preview_options: \{ is_disabled: true \}/u);
   assert.doesNotMatch(
     source,
-    /\b(?:email|phone|job|organization|document|answer|credential|recovery|synthetic)\b/iu,
+    /\b(?:email|document|answer|credential|recovery|synthetic)\b/iu,
   );
   assert.doesNotMatch(source, /reply_markup|callback_query|bot_command/iu);
   assert.doesNotMatch(source, /console\.log/u);

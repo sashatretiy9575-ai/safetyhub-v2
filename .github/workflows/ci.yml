@@ -60,6 +60,9 @@ jobs:
       # Cloudflare's public always-pass Turnstile secret is valid only for this
       # disposable local Supabase instance; production uses its own secret.
       SUPABASE_AUTH_CAPTCHA_SECRET: 1x0000000000000000000000000000000AA
+      # The app's ZH registration Siteverify call uses the matching local-only
+      # test secret independently of the Supabase Auth container.
+      SAFETYHUB_TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0

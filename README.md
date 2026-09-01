@@ -28,7 +28,9 @@ npm run dev
 - Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
   `SUPABASE_SECRET_KEY`;
 - публичный origin: `NEXT_PUBLIC_SITE_URL`;
-- Turnstile: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`;
+- Turnstile: публичный `NEXT_PUBLIC_TURNSTILE_SITE_KEY`; для ZH registration
+  Vercel server-only `SAFETYHUB_TURNSTILE_SECRET_KEY`, совпадающий с secret
+  widget, но без префикса `NEXT_PUBLIC_`;
 - серверные секреты: `RATE_LIMIT_HMAC_SECRET`, `CERTIFICATE_VERIFICATION_SECRET`;
 - `CONTENT_REVALIDATE_SECRET` — минимум 32 криптографически случайных байта;
 - content runtime: `CONTENT_UPSTREAM_TIMEOUT_MS`, `CONTENT_FALLBACK_ENABLED`;

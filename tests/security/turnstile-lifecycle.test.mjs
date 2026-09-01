@@ -44,13 +44,17 @@ test('Turnstile failures invalidate the token and a retry executes the native wi
 
   assert.match(failureHandler, /pendingExecutionRef\.current = false/u);
   assert.match(failureHandler, /onTokenRef\.current\(null\)/u);
+  assert.match(failureHandler, /onFailureRef\.current\?\.\(nextFailure\)/u);
   assert.match(source, /onClick=\{execute\}/u);
   assert.match(source, /window\.turnstile\.remove\(widgetRef\.current\)/u);
   assert.doesNotMatch(source, /console\./u);
 });
 
 test('auth callers defer one pending submit and continue it once after token delivery', async () => {
-  const callers = [await read('features/auth/email-otp-flow.tsx')];
+  const callers = await Promise.all([
+    read('features/auth/email-otp-flow.tsx'),
+    read('features/auth/zh-username-password-flow.tsx'),
+  ]);
 
   for (const source of callers) {
     assert.match(source, /useRef<TurnstileHandle>\(null\)/u);
@@ -66,4 +70,13 @@ test('auth callers defer one pending submit and continue it once after token del
     assert.match(source, /<Turnstile[\s\S]*?key=\{captchaVersion\}[\s\S]*?ref=\{turnstileRef\}/u);
     assert.doesNotMatch(source, /onPointerDown|onFocus|onKeyDown/u);
   }
+});
+
+test('Chinese username/password retries after a genuine Turnstile failure', async () => {
+  const source = await read('features/auth/zh-username-password-flow.tsx');
+
+  assert.match(
+    source,
+    /onFailure=\{\(\) => \{[\s\S]*pendingCaptchaSubmitRef\.current = null;[\s\S]*setMessage\(CAPTCHA_RETRY\);[\s\S]*setCaptchaVersion/u,
+  );
 });

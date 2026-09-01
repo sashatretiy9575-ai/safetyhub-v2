@@ -25,8 +25,14 @@ declare global {
   }
 }
 
-export const Turnstile = forwardRef<TurnstileHandle, { onToken: (token: string | null) => void }>(
-  function Turnstile({ onToken }, ref) {
+export const Turnstile = forwardRef<
+  TurnstileHandle,
+  {
+    onToken: (token: string | null) => void;
+    onFailure?: (failure: TurnstileFailure) => void;
+  }
+>(
+  function Turnstile({ onToken, onFailure }, ref) {
     const locale = useLocale();
     const t = useTranslations('AuthOtp');
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -35,6 +41,7 @@ export const Turnstile = forwardRef<TurnstileHandle, { onToken: (token: string |
     const widgetRef = useRef<string | null>(null);
     const sizeRef = useRef<TurnstileSize>('compact');
     const onTokenRef = useRef(onToken);
+    const onFailureRef = useRef(onFailure);
     const pendingExecutionRef = useRef(false);
     const completedRef = useRef(false);
     const resetRequiredRef = useRef(false);
@@ -46,6 +53,10 @@ export const Turnstile = forwardRef<TurnstileHandle, { onToken: (token: string |
       onTokenRef.current = onToken;
     }, [onToken]);
 
+    useEffect(() => {
+      onFailureRef.current = onFailure;
+    }, [onFailure]);
+
     const failVerification = useCallback((nextFailure: TurnstileFailure) => {
       pendingExecutionRef.current = false;
       completedRef.current = false;
@@ -53,6 +64,7 @@ export const Turnstile = forwardRef<TurnstileHandle, { onToken: (token: string |
       setBusy(false);
       setFailure(nextFailure);
       onTokenRef.current(null);
+      onFailureRef.current?.(nextFailure);
     }, []);
 
     const executeNativeWidget = useCallback(

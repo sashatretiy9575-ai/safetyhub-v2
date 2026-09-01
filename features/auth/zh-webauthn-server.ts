@@ -39,7 +39,6 @@ import type {
   ZhRegistrationVerifyRequest,
 } from '@/features/auth/zh-webauthn-validation';
 import type { ZhWebAuthnRelyingParty } from '@/features/auth/zh-webauthn-config';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const SYNTHETIC_EMAIL_PATTERN = /^[0-9a-f]{32}@auth[.]invalid$/u;
@@ -118,12 +117,6 @@ export class ZhWebAuthnError extends Error {
   ) {
     super(code);
     this.name = 'ZhWebAuthnError';
-  }
-}
-
-function requireZhPasskeyRollout() {
-  if (!rolloutFeatureEnabled('zhPasskey')) {
-    throw new ZhWebAuthnError(AUTH_UNAVAILABLE, 503);
   }
 }
 
@@ -486,7 +479,6 @@ export async function prepareZhRegistration(
   value: ZhRegistrationProfile,
   relyingParty: ZhWebAuthnRelyingParty,
 ) {
-  requireZhPasskeyRollout();
   await reconcileOneZhRegistrationCleanup();
   const currentLegal = await getCurrentLegalPolicies();
   const profile = normalizeRegistrationProfile(value, currentLegal);
@@ -531,7 +523,6 @@ export async function verifyZhRegistration(
   value: ZhRegistrationVerifyRequest,
   relyingParty: ZhWebAuthnRelyingParty,
 ) {
-  requireZhPasskeyRollout();
   const currentLegal = await getCurrentLegalPolicies();
   const [profile, operation, avatar] = await Promise.all([
     Promise.resolve(normalizeRegistrationProfile(value, currentLegal)),
@@ -657,7 +648,6 @@ export async function verifyZhRegistration(
 }
 
 export async function prepareZhAuthentication(relyingParty: ZhWebAuthnRelyingParty) {
-  requireZhPasskeyRollout();
   await reconcileOneZhRegistrationCleanup();
   const requestId = randomUUID();
   const options = await generateAuthenticationOptions({
@@ -682,7 +672,6 @@ export async function verifyZhAuthentication(
   value: ZhAuthenticationVerifyRequest,
   relyingParty: ZhWebAuthnRelyingParty,
 ) {
-  requireZhPasskeyRollout();
   if (!sameBase64url(value.response.id, value.response.rawId)) {
     throw new ZhWebAuthnError(AUTHENTICATION_FAILURE, 400);
   }
@@ -771,7 +760,6 @@ export async function processZhRecovery(
   value: ZhRecoveryRequest,
   relyingParty: ZhWebAuthnRelyingParty,
 ) {
-  requireZhPasskeyRollout();
   const { parsed, context } = await verifiedRecoveryContext(value.recoveryCode);
   if (value.action === 'options') {
     const requestId = randomUUID();
@@ -890,7 +878,6 @@ export async function resetZhCredential(
   idempotencyKey: string,
   metadata: AdminRequestMetadata,
 ) {
-  requireZhPasskeyRollout();
   const actor = await requireCapability('identity.manage');
   await consumeCoarseQuota('admin.zh_credential.reset', metadata.ipHash);
   const material = deriveAdminReenrollmentMaterial({

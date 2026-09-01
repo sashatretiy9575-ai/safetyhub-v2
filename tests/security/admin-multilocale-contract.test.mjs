@@ -237,7 +237,7 @@ test('admin user projections render synthetic ZH identities without exposing res
   assert.match(data, /email:\s*z\.string\(\)(?:\.email\(\))?\.nullable\(\)/u);
   assert.match(types, /email:\s*string \| null/u);
   for (const view of [approvals, directory, history]) {
-    assert.match(view, /Вход по ключу доступа/u);
+    assert.match(view, /Вход по логину и паролю/u);
     assert.doesNotMatch(view, /@auth\.invalid/u);
   }
 });

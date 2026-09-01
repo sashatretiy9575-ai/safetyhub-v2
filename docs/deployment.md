@@ -1,6 +1,6 @@
 # Deployment и домен SafetyHub
 
-Пошаговый cutover для мультиязычности, ZH passkey, admin inbox, Telegram и
+Пошаговый cutover для мультиязычности, ZH username/password, admin inbox, Telegram и
 client-only сертификатов зафиксирован отдельно в
 `docs/release-i18n-zh-telegram.md`; нижележащая историческая процедура каталога
 не заменяет новый fail-closed порядок включения.
@@ -26,14 +26,21 @@ client-only сертификатов зафиксирован отдельно �
   `email_sent = 30` явно задан в секции `[auth.rate_limit]` и оставляет запас
   относительно ограничения Plesk `50` писем в час; не возвращайте provider
   default `2` письма в час.
-- `[auth.captcha]` всегда включён с provider `turnstile`; Supabase Auth является
-  единственным verifier токена, переданного в `signInWithOtp`. Secret поступает
-  только через `SUPABASE_AUTH_CAPTCHA_SECRET`. Публичная пара Cloudflare
-  `1x000...AA` из `.env.example` и CI предназначена только для localhost и
-  disposable DB. Перед production `config push` задайте реальный secret:
-  подготовленная команда намеренно отказывается работать при пустом значении или
-  публичном always-pass test secret. Реальный secret не коммитится и не имеет
-  `NEXT_PUBLIC_`-копии.
+- `[auth.captcha]` всегда включён с provider `turnstile`. Для email OTP и ZH
+  password login Supabase Auth проверяет token, переданный соответственно в
+  `signInWithOtp` и `signInWithPassword`, через
+  `SUPABASE_AUTH_CAPTCHA_SECRET`. ZH registration до любого username lookup,
+  legal/Auth/profile write делает отдельный server-only Cloudflare `Siteverify`
+  в Vercel с `SAFETYHUB_TURNSTILE_SECRET_KEY`, затем возвращает только
+  registration completion и переводит пользователя на login для нового token.
+  Это отдельная Vercel env variable, а не замена Supabase config secret.
+  В production/preview Vercel verifier требует hostname configured deployment.
+  Публичная пара Cloudflare `1x000...AA` из `.env.example` и CI предназначена
+  только для localhost и disposable DB. Перед production `config push` и Vercel
+  deploy задайте matching реальный secret в обоих защищённых окружениях:
+  Supabase preparation отказывается от пустого значения или публичного
+  always-pass test secret, а application verifier также fail-closed. Реальные
+  secrets не коммитятся и не имеют `NEXT_PUBLIC_`-копии.
 - После provider-accepted отправки приложение кладёт браузеру только 32 случайных
   байта в `HttpOnly`, `SameSite=Lax`, production-`Secure` cookie. База хранит
   только раздельные HMAC challenge/email, не более часа и шести попыток. Ошибка
@@ -54,9 +61,12 @@ client-only сертификатов зафиксирован отдельно �
   Auth config из `supabase/config.toml`: второй migration даёт
   `supabase_auth_admin` только `USAGE` на схему `public`, необходимый для
   разрешения hook-функции (не доступ к таблицам или другим функциям). Custom
-  Access Token Hook `public.enforce_email_otp_access_token` выдаёт JWT только для
-  `email/signup`, `otp`, `magiclink` и `token_refresh`, а password/recovery/
-  invite/OAuth/phone/anonymous session issuance получает `EMAIL_OTP_REQUIRED`.
+  Access Token Hook `public.enforce_email_otp_access_token` выдаёт JWT обычным
+  аккаунтам только для `email/signup`, `otp`, `magiclink` и `token_refresh`.
+  Исключение — server-mapped ZH username/password account: для него разрешены
+  только `password` и привязанный к exact ZH session `token_refresh`, пока
+  включён DB receipt. Recovery/invite/OAuth/phone/anonymous и все прочие
+  session issuance получают отказ.
 
 ## Выкладка схемы и каталога
 
@@ -159,16 +169,19 @@ type-contract и SQL regression проверок.
   идентификатор варианта и правильные ответы;
 - возобновление сохраняет вопросы и deadline, а девятая новая попытка по одному
   курсу до следующего 00:00 `Asia/Oral` получает `ATTEMPT_DAILY_LIMIT`;
-- registration/login запускают один deferred Turnstile после submit, используют
-  единый auto-create native OTP flow и отправляют только шестизначный email OTP;
-  recovery/invite templates не содержат секрета;
+- RU/KK/EN registration/login запускают один deferred Turnstile после submit,
+  используют единый auto-create native OTP flow и отправляют только
+  шестизначный email OTP; recovery/invite templates не содержат секрета;
+  ZH registration подтверждает первый token server-side до provisioning и
+  перенаправляет на ZH login, где новый token сопровождает password sign-in;
 - invalid CAPTCHA и неверные коды с чужим email не расходуют victim-wide quota;
   седьмая проверка одного challenge получает 429, успешная проверка удаляет
   challenge и очищает opaque cookie;
 - native email OTP создаёт/подтверждает пользователя и получает сессию;
   внутренняя provider-запись password hash не считается пользовательским
-  паролем; прямой password login, recovery и invite не получают SafetyHub JWT
-  из-за Custom Access Token Hook;
+  паролем; прямой password login для RU/KK/EN, recovery и invite не получают
+  SafetyHub JWT из-за Custom Access Token Hook. Отдельно проверить ZH login
+  только по латинскому username/password, без email/SMS/telephone auth;
 - черновик курса сохраняется до загрузки PDF, upload/finalize/preview/replace и
   публикация работают, не ломая прежнюю опубликованную ревизию;
 - при открытии существующего курса браузер администратора не получает
@@ -187,8 +200,9 @@ type-contract и SQL regression проверок.
 - До catalog cutover при ошибке приложения переназначьте production alias на
   предыдущий Ready deployment и не активируйте batch.
 - Не откатывайте Auth email templates к password recovery/invite ссылкам и не
-  отключайте email-OTP Custom Access Token Hook: возврат к паролям требует отдельного
-  согласованного security change, а не application rollback.
+  отключайте email-OTP Custom Access Token Hook: возврат к password flow для
+  RU/KK/EN или расширение ZH password flow требует отдельного согласованного
+  security change, а не application rollback.
 - Если additive migration не прошла, приложение и каталог не переключайте.
 - После catalog cutover включите maintenance, сохраните аварийную копию новых
   попыток и восстанавливайте только проверенный backup в отдельном окружении.

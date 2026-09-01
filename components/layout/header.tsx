@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { headers } from 'next/headers';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { PhoneCall } from '@phosphor-icons/react/dist/ssr/PhoneCall';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/ssr/WhatsappLogo';
@@ -12,7 +13,11 @@ import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants';
 import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
-import { localizePathname } from '@/i18n/config';
+import {
+  localesForLanguageSwitcher,
+  localizePathname,
+  REQUEST_PATHNAME_HEADER_NAME,
+} from '@/i18n/config';
 import type { SiteContactSettings } from '@/lib/site-contacts-shared';
 
 const contactActionClass =
@@ -30,9 +35,19 @@ export async function Header({
   accountMenu?: ReactNode;
   contacts: SiteContactSettings;
 }) {
-  const [locale, translations] = await Promise.all([getLocale(), getTranslations('Shell')]);
+  const [locale, translations, requestHeaders] = await Promise.all([
+    getLocale(),
+    getTranslations('Shell'),
+    headers(),
+  ]);
   const accountItem = ACCOUNT_NAV_ITEMS[accountMode];
   const localeRoutesEnabled = rolloutFeatureEnabled('localeRoutes');
+  const zhUsernamePasswordEnabled = rolloutFeatureEnabled('zhUsernamePassword');
+  const switcherLocales = localesForLanguageSwitcher({
+    pathname: requestHeaders.get(REQUEST_PATHNAME_HEADER_NAME) ?? '/',
+    localeRoutesEnabled,
+    zhUsernamePasswordEnabled,
+  });
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--color-bg)]/96 pt-[var(--safe-area-top)] pr-[max(.5rem,var(--safe-area-right))] pb-2 pl-[max(.5rem,var(--safe-area-left))] backdrop-blur-xl min-[1120px]:pr-[max(1.5rem,var(--safe-area-right))] min-[1120px]:pb-0 min-[1120px]:pl-[max(1.5rem,var(--safe-area-left))] min-[1280px]:pr-[max(2rem,var(--safe-area-right))] min-[1280px]:pl-[max(2rem,var(--safe-area-left))]">
@@ -50,7 +65,7 @@ export async function Header({
 
         <div className="flex-1" />
 
-        {localeRoutesEnabled ? <LanguageSwitcher /> : null}
+        {switcherLocales.length > 1 ? <LanguageSwitcher locales={switcherLocales} /> : null}
 
         <div className="hidden items-center gap-2 min-[1120px]:flex">
           <div

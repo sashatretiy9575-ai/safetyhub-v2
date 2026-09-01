@@ -3,7 +3,6 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import {
-  APP_LOCALES,
   LOCALE_COOKIE_MAX_AGE,
   LOCALE_COOKIE_NAME,
   localizePathname,
@@ -17,13 +16,13 @@ const COMPACT_LOCALE_LABELS = {
   zh: '中文',
 } as const satisfies Record<AppLocale, string>;
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] }) {
   const locale = useLocale();
   const pathname = usePathname();
   const translations = useTranslations('Shell.language');
 
   const changeLocale = async (nextLocale: AppLocale) => {
-    if (nextLocale === locale) return;
+    if (!locales.includes(nextLocale) || nextLocale === locale) return;
     const secure = window.location.protocol === 'https:' ? '; Secure' : '';
     document.cookie = `${LOCALE_COOKIE_NAME}=${nextLocale}; Path=/; Max-Age=${LOCALE_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
     const localizedPathname = localizePathname(pathname, nextLocale);
@@ -48,7 +47,7 @@ export function LanguageSwitcher() {
         onChange={(event) => void changeLocale(event.target.value as AppLocale)}
         className="h-9 w-14 cursor-pointer appearance-none rounded-lg bg-transparent px-1.5 text-center text-xs font-bold text-[var(--color-text)] outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--color-focus)]/35 min-[1120px]:w-auto min-[1120px]:px-2 min-[1120px]:pr-5 min-[1120px]:text-left"
       >
-        {APP_LOCALES.map((candidate) => (
+        {locales.map((candidate) => (
           <option
             key={candidate}
             value={candidate}
