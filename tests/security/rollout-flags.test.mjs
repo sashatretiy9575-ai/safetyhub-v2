@@ -50,6 +50,8 @@ test('locale, ZH auth, and admin inbox entry points are wired to independent gat
     manifest,
     offline,
     seo,
+    topics,
+    articles,
   ] = await Promise.all([
     read('proxy.ts'),
     read('app/(account)/auth/login/page.tsx'),
@@ -63,9 +65,11 @@ test('locale, ZH auth, and admin inbox entry points are wired to independent gat
     read('app/manifest/[locale]/route.ts'),
     read('app/offline/[locale]/route.ts'),
     read('lib/seo.ts'),
+    read('lib/content/topics.ts'),
+    read('lib/content/articles.ts'),
   ]);
 
-  for (const source of [proxy, sitemap, manifest, offline, seo]) {
+  for (const source of [proxy, sitemap, manifest, offline, seo, topics, articles]) {
     assert.match(source, /rolloutFeatureEnabled\('localeRoutes'\)/u);
   }
   for (const source of [login, register, zhServer]) {
@@ -75,6 +79,8 @@ test('locale, ZH auth, and admin inbox entry points are wired to independent gat
     assert.match(source, /rolloutFeatureEnabled\('adminInbox'\)/u);
   }
   assert.match(proxy, /!localeRoutesEnabled && localizedPath\.hasLocalePrefix/u);
+  assert.match(topics, /rolloutFeatureEnabled\('localeRoutes'\)[\s\S]*getLegacyTopics\(\)/u);
+  assert.match(articles, /rolloutFeatureEnabled\('localeRoutes'\)[\s\S]*getLegacyArticles\(\)/u);
   assert.match(zhServer, /function requireZhPasskeyRollout\(\)/u);
   assert.equal((zhServer.match(/requireZhPasskeyRollout\(\);/gu) ?? []).length, 6);
 });

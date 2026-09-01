@@ -16,6 +16,7 @@ import { contentSeoSchema, defaultContentSeo, type ContentSeo } from '@/lib/vali
 import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
 import { QUIZ_POLICY } from '@/lib/constants';
 import type { Json } from '@/lib/supabase/types';
+import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
 
 export interface CoursePresentation {
   id: string;
@@ -480,7 +481,7 @@ const getCachedLocalizedTopics = unstable_cache(
 );
 
 export const getTopics = cache((locale: AppLocale = DEFAULT_LOCALE) =>
-  getCachedLocalizedTopics(locale),
+  rolloutFeatureEnabled('localeRoutes') ? getCachedLocalizedTopics(locale) : getLegacyTopics(),
 );
 
 async function getLocalizedTopicBySlugFromSource(slug: string, locale: AppLocale) {
@@ -525,9 +526,12 @@ const getCachedLocalizedTopicBySlug = unstable_cache(
   },
 );
 
-export const getTopicBySlug = cache((slug: string, locale: AppLocale = DEFAULT_LOCALE) =>
-  isContentSlug(slug) ? getCachedLocalizedTopicBySlug(slug, locale) : Promise.resolve(null),
-);
+export const getTopicBySlug = cache((slug: string, locale: AppLocale = DEFAULT_LOCALE) => {
+  if (!isContentSlug(slug)) return Promise.resolve(null);
+  return rolloutFeatureEnabled('localeRoutes')
+    ? getCachedLocalizedTopicBySlug(slug, locale)
+    : getLegacyTopicBySlug(slug);
+});
 
 export async function getTopicSlugs(): Promise<string[]> {
   return (await getTopics()).map((topic) => topic.slug).filter(isContentSlug);

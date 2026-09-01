@@ -24,6 +24,7 @@ import {
 import { contentSeoSchema, defaultContentSeo, type ContentSeo } from '@/lib/validation/content-seo';
 import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
 import type { Json } from '@/lib/supabase/types';
+import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
 
 export type ArticleBlock = ArticleBlockInput;
 export type ArticlePublicationState =
@@ -376,7 +377,7 @@ const getCachedLocalizedArticles = unstable_cache(
 );
 
 export const getArticles = cache((locale: AppLocale = DEFAULT_LOCALE) =>
-  getCachedLocalizedArticles(locale),
+  rolloutFeatureEnabled('localeRoutes') ? getCachedLocalizedArticles(locale) : getLegacyArticles(),
 );
 
 async function getLocalizedArticleBySlugFromSource(slug: string, locale: AppLocale) {
@@ -424,11 +425,12 @@ const getCachedLocalizedArticleBySlug = unstable_cache(
   },
 );
 
-export const getArticleBySlug = cache((slug: string, locale: AppLocale = DEFAULT_LOCALE) =>
-  isContentSlug(slug)
+export const getArticleBySlug = cache((slug: string, locale: AppLocale = DEFAULT_LOCALE) => {
+  if (!isContentSlug(slug)) return Promise.resolve(null);
+  return rolloutFeatureEnabled('localeRoutes')
     ? getCachedLocalizedArticleBySlug(slug, locale)
-    : Promise.resolve(null),
-);
+    : getLegacyArticleBySlug(slug);
+});
 
 type ArticleRedirectClient = {
   rpc(
