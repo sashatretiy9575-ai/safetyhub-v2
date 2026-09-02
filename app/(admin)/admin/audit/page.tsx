@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import Link from 'next/link';
 import { requireCapability } from '@/features/auth/server';
 import {
   getAdminAuditPage,
@@ -85,7 +86,51 @@ function detailStatus(details: Record<string, unknown>) {
   return null;
 }
 
+type EventCategory = 'user' | 'test' | 'certificate' | 'technical';
 
+function eventCategory(action: string, details: Record<string, unknown>): EventCategory {
+  if (action.startsWith('certificate')) return 'certificate';
+  if (action.includes('test') || action.includes('attempt') || 'score' in details) return 'test';
+  if (
+    action.includes('invite') ||
+    action.startsWith('identity') ||
+    action.includes('register') ||
+    action.startsWith('user') ||
+    action.includes('approval')
+  ) {
+    return 'user';
+  }
+  return 'technical';
+}
+
+function categoryBadge(category: EventCategory) {
+  switch (category) {
+    case 'certificate':
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-on-primary-soft)]">
+          🎓 Сертификат
+        </span>
+      );
+    case 'test':
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-on-primary-soft)]">
+          📝 Тестирование
+        </span>
+      );
+    case 'user':
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-surface-muted)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-text)]">
+          👤 Пользователь
+        </span>
+      );
+    case 'technical':
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-surface-muted)] px-2 py-0.5 text-xs font-medium text-[var(--color-text-muted)]">
+          ⚙️ Системный лог
+        </span>
+      );
+  }
+}
 
 function auditPageHref(
   query: ReturnType<typeof parseAdminAuditQuery>,
@@ -139,26 +184,95 @@ export default async function AuditPage({
         ) : null}
       </div>
 
+      <div className="flex flex-wrap items-center gap-2 border-b border-[var(--color-border)] pb-4 text-xs">
+        <span className="font-semibold text-[var(--color-text-muted)]">Быстрый фильтр:</span>
+        <Link
+          href="/admin/settings/history"
+          className={`rounded-lg px-3 py-1.5 font-bold transition-colors ${
+            !query.action
+              ? 'bg-[var(--color-primary)] text-white'
+              : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
+          }`}
+        >
+          Все события
+        </Link>
+        <Link
+          href="/admin/settings/history?action=identity"
+          className={`rounded-lg px-3 py-1.5 font-bold transition-colors ${
+            query.action === 'identity'
+              ? 'bg-[var(--color-primary)] text-white'
+              : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
+          }`}
+        >
+          👤 Регистрации и доступ
+        </Link>
+        <Link
+          href="/admin/settings/history?action=test"
+          className={`rounded-lg px-3 py-1.5 font-bold transition-colors ${
+            query.action === 'test'
+              ? 'bg-[var(--color-primary)] text-white'
+              : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
+          }`}
+        >
+          📝 Тесты и баллы
+        </Link>
+        <Link
+          href="/admin/settings/history?action=certificate"
+          className={`rounded-lg px-3 py-1.5 font-bold transition-colors ${
+            query.action === 'certificate'
+              ? 'bg-[var(--color-primary)] text-white'
+              : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
+          }`}
+        >
+          🎓 Сертификаты
+        </Link>
+      </div>
+
       {auditResult.state === 'failed' ? (
         <AdminLoadFailure correlationId={auditResult.correlationId} />
       ) : auditResult.data.items.length === 0 ? (
         <AdminEmptyState>События по выбранным фильтрам не найдены.</AdminEmptyState>
       ) : (
         <div className="space-y-3">
-          {auditResult.data.items.map((event) => (
-            <Card key={event.id}>
-              <CardContent className="space-y-3 p-4 text-sm">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h2 className="font-semibold">{readableAction(event.action)}</h2>
-                    <p className="text-sm text-[var(--color-text-muted)]">
-                      {event.actorLabel} → {event.targetLabel}
-                    </p>
+          {auditResult.data.items.map((event) => {
+            const category = eventCategory(event.action, event.details);
+            const score = typeof event.details.score === 'number' ? event.details.score : undefined;
+            const total = typeof event.details.total === 'number' ? event.details.total : undefined;
+            const certNum =
+              typeof event.details.certificateNumber === 'string'
+                ? event.details.certificateNumber
+                : undefined;
+
+            return (
+              <Card
+                key={event.id}
+                className={category !== 'technical' ? 'border-l-4 border-l-[var(--color-primary)]' : ''}
+              >
+                <CardContent className="space-y-3 p-4 text-sm">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {categoryBadge(category)}
+                        <h2 className="font-semibold">{readableAction(event.action)}</h2>
+                      </div>
+                      <p className="text-sm text-[var(--color-text-muted)]">
+                        {event.actorLabel} → {event.targetLabel}
+                      </p>
+                      {score !== undefined && total !== undefined ? (
+                        <div className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs font-bold text-[var(--color-text)]">
+                          🎯 Результат: {score} из {total} баллов {score >= 7 ? '· 🟢 Сдан' : '· 🔴 Не сдан'}
+                        </div>
+                      ) : null}
+                      {certNum ? (
+                        <div className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-on-primary-soft)]">
+                          🎓 Сертификат: № {certNum}
+                        </div>
+                      ) : null}
+                    </div>
+                    <time className="text-xs text-[var(--color-text-muted)]">
+                      {new Date(event.createdAt).toLocaleString('ru-RU')}
+                    </time>
                   </div>
-                  <time className="text-xs text-[var(--color-text-muted)]">
-                    {new Date(event.createdAt).toLocaleString('ru-RU')}
-                  </time>
-                </div>
                 <AdminDetailDialog
                   title={readableAction(event.action)}
                   description={`${event.actorLabel} → ${event.targetLabel}`}
@@ -220,7 +334,8 @@ export default async function AuditPage({
                 </AdminDetailDialog>
               </CardContent>
             </Card>
-          ))}
+          );
+        })}
         </div>
       )}
 

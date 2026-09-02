@@ -7,7 +7,7 @@ import {
 } from './certificate-client-contract.ts';
 import { certificateFilename } from './certificate.ts';
 import { createStreamingZipArchive, type ArchiveEntry } from './certificate-archive.ts';
-import { generateCertificateInBrowser, loadCertificateFontBytes } from './certificate-renderer.ts';
+import { generateCertificateInBrowser, loadCertificateFontBytes, resolveAssetUrl } from './certificate-renderer.ts';
 import { certificateReportRows, generateCertificateReportInBrowser } from './certificate-report.ts';
 import type {
   CertificateWorkerRequest,
@@ -67,7 +67,11 @@ async function* certificateArchiveEntries(
   taskId: string,
   signal: AbortSignal,
 ): AsyncGenerator<ArchiveEntry> {
-  const reportFont = await loadCertificateFontBytes(metadata.reportFontUrl, signal);
+  const sampleVerification = metadata.items[0]?.verificationUrl;
+  const reportFont = await loadCertificateFontBytes(
+    resolveAssetUrl(metadata.reportFontUrl, sampleVerification),
+    signal,
+  );
   const report = await generateCertificateReportInBrowser(
     certificateReportRows(metadata.items),
     new Date(metadata.generatedAt),

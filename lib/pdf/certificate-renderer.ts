@@ -123,6 +123,24 @@ async function fetchBoundedAsset(
   }
 }
 
+export function resolveAssetUrl(url: string, verificationUrl?: string): string {
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (typeof window !== 'undefined') return url;
+  if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts?: unknown }).importScripts === 'function') {
+    if (self.location && self.location.origin && !self.location.origin.startsWith('blob:') && self.location.origin !== 'null') {
+      return new URL(url, self.location.origin).href;
+    }
+    if (verificationUrl) {
+      try {
+        return new URL(url, new URL(verificationUrl).origin).href;
+      } catch {
+        // ignore
+      }
+    }
+  }
+  return url;
+}
+
 export function loadCertificateFontBytes(url: string, signal?: AbortSignal) {
   return fetchBoundedAsset(url, MAX_FONT_BYTES, signal);
 }
@@ -241,13 +259,15 @@ export async function generateCertificateInBrowser(
 ): Promise<Uint8Array> {
   assertCertificateRenderMetadata(metadata);
   if (signal?.aborted) throw abortError();
+  const resolvedTemplateUrl = resolveAssetUrl(metadata.templateUrl, metadata.verificationUrl);
+  const resolvedFontUrl = resolveAssetUrl(metadata.fontUrl, metadata.verificationUrl);
   const [{ PDFDocument, rgb }, fontkitModule, qrCodeModule, templateBytes, fontBytes] =
     await Promise.all([
       import('pdf-lib'),
       import('@pdf-lib/fontkit'),
       import('qrcode'),
-      fetchBoundedAsset(metadata.templateUrl, MAX_TEMPLATE_BYTES, signal),
-      loadCertificateFontBytes(metadata.fontUrl, signal),
+      fetchBoundedAsset(resolvedTemplateUrl, MAX_TEMPLATE_BYTES, signal),
+      loadCertificateFontBytes(resolvedFontUrl, signal),
     ]);
   if (signal?.aborted) throw abortError();
   const fontkit = fontkitModule.default;

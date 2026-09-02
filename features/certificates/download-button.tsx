@@ -57,9 +57,9 @@ export function CertificateDownloadButton({
       const { downloadCertificateInBrowser } = await import('@/lib/pdf/certificate-client');
       await downloadCertificateInBrowser(metadata, { signal: controller.signal });
       setMessage(t('generated'));
-    } catch (error) {
+    } catch {
       if (controller.signal.aborted) setMessage(t('cancelled'));
-      else setMessage(localizedClientRequestMessage(error, t('downloadFailed'), errorT));
+      else setMessage(t('downloadFailed'));
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
       setBusy(false);

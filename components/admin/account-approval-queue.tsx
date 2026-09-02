@@ -174,7 +174,14 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
                 alt={`Фото профиля: ${label}`}
                 className="size-14 rounded-[var(--radius-control)] border border-[var(--color-border)] object-cover sm:size-16"
               />
-            ) : null}
+            ) : (
+              <div
+                aria-hidden="true"
+                className="grid size-14 place-items-center rounded-[var(--radius-control)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] text-xl font-black text-[var(--color-primary)] sm:size-16"
+              >
+                {label.charAt(0).toUpperCase()}
+              </div>
+            )}
 
             <div className="min-w-0 space-y-3">
               <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
