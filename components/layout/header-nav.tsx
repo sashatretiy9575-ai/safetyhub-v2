@@ -29,7 +29,6 @@ export async function HeaderNav({ locale: explicitLocale }: { locale?: AppLocale
           <Link
             key={item.href}
             href={href}
-            prefetch={false}
             className="relative inline-flex h-full min-w-11 items-center px-2.5 text-sm font-semibold text-[var(--color-text-muted)] transition-colors duration-150 hover:text-[var(--color-text)]"
           >
             {translations(item.messageKey)}

@@ -246,38 +246,50 @@ export default async function AuditPage({
             return (
               <Card
                 key={event.id}
-                className={category !== 'technical' ? 'border-l-4 border-l-[var(--color-primary)]' : ''}
+                className="overflow-hidden transition-all hover:border-[var(--color-primary)]/40 hover:shadow-[var(--shadow-card)]"
               >
-                <CardContent className="space-y-3 p-4 text-sm">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0 space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        {categoryBadge(category)}
-                        <h2 className="font-semibold">{readableAction(event.action)}</h2>
+                <CardContent className="p-4 text-sm">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--color-surface-muted)] text-base">
+                        {category === 'certificate' ? '🎓' : category === 'test' ? '📝' : category === 'user' ? '👤' : '⚙️'}
                       </div>
-                      <p className="text-sm text-[var(--color-text-muted)]">
-                        {event.actorLabel} → {event.targetLabel}
-                      </p>
-                      {score !== undefined && total !== undefined ? (
-                        <div className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs font-bold text-[var(--color-text)]">
-                          🎯 Результат: {score} из {total} баллов {score >= 7 ? '· 🟢 Сдан' : '· 🔴 Не сдан'}
+                      <div className="min-w-0 space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {categoryBadge(category)}
+                          <h2 className="font-semibold text-[var(--color-text)]">{readableAction(event.action)}</h2>
                         </div>
-                      ) : null}
-                      {certNum ? (
-                        <div className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-on-primary-soft)]">
-                          🎓 Сертификат: № {certNum}
+                        <p className="text-xs text-[var(--color-text-muted)] truncate">
+                          {event.actorLabel} → {event.targetLabel}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                          {score !== undefined && total !== undefined ? (
+                            <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--color-surface-muted)] px-2 py-0.5 text-xs font-bold text-[var(--color-text)]">
+                              🎯 Результат: {score} из {total} {score >= 7 ? '· 🟢 Сдан' : '· 🔴 Не сдан'}
+                            </span>
+                          ) : null}
+                          {certNum ? (
+                            <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--color-primary-soft)] px-2 py-0.5 text-xs font-bold text-[var(--color-on-primary-soft)]">
+                              🎓 Сертификат: № {certNum}
+                            </span>
+                          ) : null}
                         </div>
-                      ) : null}
+                      </div>
                     </div>
-                    <time className="text-xs text-[var(--color-text-muted)]">
-                      {new Date(event.createdAt).toLocaleString('ru-RU')}
-                    </time>
-                  </div>
-                <AdminDetailDialog
-                  title={readableAction(event.action)}
-                  description={`${event.actorLabel} → ${event.targetLabel}`}
-                  triggerLabel="Открыть событие"
-                >
+                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 shrink-0 border-t sm:border-t-0 border-[var(--color-border)] pt-2 sm:pt-0">
+                      <time className="text-xs text-[var(--color-text-muted)]">
+                        {new Date(event.createdAt).toLocaleString('ru-RU', {
+                          day: 'numeric',
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </time>
+                      <AdminDetailDialog
+                        title={readableAction(event.action)}
+                        description={`${event.actorLabel} → ${event.targetLabel}`}
+                        triggerLabel="Детали"
+                      >
                   <div className="space-y-5 text-sm">
                     <dl className="grid gap-3 sm:grid-cols-2">
                       <div>
@@ -332,8 +344,10 @@ export default async function AuditPage({
                     </div>
                   </div>
                 </AdminDetailDialog>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
           );
         })}
         </div>

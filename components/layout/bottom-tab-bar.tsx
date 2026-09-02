@@ -67,7 +67,6 @@ export function BottomTabBar({ accountMode }: { accountMode: AccountMode }) {
             <Link
               key={href}
               href={localizedHref}
-              prefetch={false}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
                 'group relative flex min-h-14 min-w-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-[18px] px-0 py-1 text-[10.5px] leading-none font-semibold tracking-normal transition-[color,background-color] duration-150',

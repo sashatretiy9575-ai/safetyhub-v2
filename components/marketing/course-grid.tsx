@@ -53,7 +53,6 @@ export async function CourseGrid() {
             action={
               <Link
                 href={localizePathname(ROUTES.topics, locale)}
-                prefetch={false}
                 className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 px-4 text-sm font-semibold text-[var(--color-text)] backdrop-blur-xl transition hover:border-[var(--color-primary)]/45 hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-on-primary-soft)]"
               >
                 {t('all')}

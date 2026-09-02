@@ -20,7 +20,7 @@ export default async function AdminSettingsPage() {
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
         <Card>
           <CardContent className="flex min-h-32 flex-col items-start justify-between gap-3 p-5">
             <div>
@@ -57,19 +57,6 @@ export default async function AdminSettingsPage() {
             </div>
             <Button asChild size="sm" variant="outline">
               <Link href="/admin/settings/history">Открыть историю</Link>
-            </Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex min-h-32 flex-col items-start justify-between gap-3 p-5">
-            <div>
-              <h2 className="font-bold">Юридические документы</h2>
-              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                RU, KK, EN и ZH-копии условий и политики конфиденциальности.
-              </p>
-            </div>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/admin/settings/legal">Открыть локализации</Link>
             </Button>
           </CardContent>
         </Card>

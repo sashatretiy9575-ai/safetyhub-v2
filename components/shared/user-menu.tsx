@@ -46,7 +46,14 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (open) {
+          router.prefetch(isAdmin ? ROUTES.adminAccount : localizePathname(ROUTES.profile, locale));
+          if (isAdmin) router.prefetch(ROUTES.admin);
+        }
+      }}
+    >
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"

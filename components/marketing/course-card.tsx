@@ -34,7 +34,6 @@ export function CourseCard({
     <Link
       data-course-card
       href={localizePathname(`/topics/${slug}`, locale)}
-      prefetch={false}
       className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/90 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl transition hover:border-[var(--color-primary)]/40 hover:shadow-[var(--shadow-card)] focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)] motion-safe:hover:-translate-y-0.5"
     >
       <div
