@@ -7,11 +7,13 @@ const errorSource = await readFile('app/error.tsx', 'utf8');
 const globalErrorSource = await readFile('app/global-error.tsx', 'utf8');
 const sharedStateSource = await readFile('components/shared/app-state.tsx', 'utf8');
 
-test('route loading and error states share a reusable app-state surface', () => {
-  assert.match(loadingSource, /AppPageLoading/);
-  assert.match(errorSource, /AppErrorState/);
+test('root boundaries stay provider-free while the global error keeps its reusable state surface', () => {
+  // With independent public/private root layouts, these root special files run
+  // before a locale provider exists and therefore cannot import/call locale
+  // hooks. The explanatory comment itself may safely mention the package.
+  assert.doesNotMatch(loadingSource, /AppPageLoading|from ['"]next-intl|useTranslations\(/u);
+  assert.doesNotMatch(errorSource, /AppErrorState|useTranslations/u);
   assert.match(globalErrorSource, /AppErrorState/);
-  assert.match(sharedStateSource, /export function AppPageLoading/);
   assert.match(sharedStateSource, /export function AppErrorState/);
 });
 

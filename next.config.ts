@@ -83,6 +83,17 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        // This is a content-addressed UI font. It is safe to cache indefinitely;
+        // publishing a changed font must use a new filename.
+        source: '/fonts/noto-sans-sc-ui.f113fe63.woff2',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       { source: '/', headers: [...securityHeaders, restrictedPermissions] },
       { source: '/onboarding/:path*', headers: [...securityHeaders, profilePermissions] },
       { source: '/profile/:path*', headers: [...securityHeaders, profilePermissions] },

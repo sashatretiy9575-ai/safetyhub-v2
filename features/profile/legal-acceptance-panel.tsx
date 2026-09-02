@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
-import { CheckCircle, FileText, WarningCircle } from '@phosphor-icons/react';
+import { CheckCircle, WarningCircle } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
@@ -67,9 +67,10 @@ function mergeAcceptances(current: Acceptance[], incoming: Acceptance[]) {
 
 function localizedDocumentHref(type: LegalDocumentType, version: string, locale: AppLocale) {
   const href = legalDocumentHref(type, version);
-  const [pathname, query] = href.split('?');
+  const [pathnameAndQuery, fragment] = href.split('#', 2);
+  const [pathname, query] = pathnameAndQuery?.split('?', 2) ?? [];
   const localized = localizePathname(pathname ?? '/', locale);
-  return query ? `${localized}?${query}` : localized;
+  return `${localized}${query ? `?${query}` : ''}${fragment ? `#${fragment}` : ''}`;
 }
 
 export function LegalAcceptancePanel({
@@ -83,7 +84,7 @@ export function LegalAcceptancePanel({
   const format = useFormatter();
   const [acceptances, setAcceptances] = useState(initialAcceptances);
   const [historyUnavailable, setHistoryUnavailable] = useState(initiallyUnavailable);
-  const [confirmed, setConfirmed] = useState(false);
+  const [confirmed, setConfirmed] = useState(true);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const currentDocuments = useMemo(
@@ -128,7 +129,7 @@ export function LegalAcceptancePanel({
       }
       setAcceptances((current) => mergeAcceptances(current, recorded));
       setHistoryUnavailable(false);
-      setConfirmed(false);
+      setConfirmed(true);
       setMessage(t('saved'));
       onAccepted?.();
     } catch {
@@ -139,72 +140,48 @@ export function LegalAcceptancePanel({
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-start gap-3">
-        <FileText className="mt-0.5 shrink-0 text-[var(--color-primary)]" size={22} />
-        <div className="space-y-1">
-          <h2 className="font-display text-xl font-bold">{t('title')}</h2>
-          <p className="text-sm text-[var(--color-text-muted)]">{t('description')}</p>
-        </div>
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <h2 className="font-display text-xl font-bold">{t('title')}</h2>
+        <p className="text-sm text-[var(--color-text-muted)]">{t('description')}</p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {currentDocuments.map((document) => {
-          const accepted = acceptedKeys.has(`${document.type}:${document.version}`);
-          return (
-            <div
-              key={document.type}
-              className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3"
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[var(--color-text-muted)]">
+        <span className="font-medium text-[var(--color-text)]">{t('documentsEyebrow')}:</span>
+        {currentDocuments.map((document, index) => (
+          <span key={document.type} className="inline-flex items-center gap-1">
+            {index > 0 ? <span aria-hidden="true">·</span> : null}
+            <Link
+              href={localizedDocumentHref(document.type, document.version, locale)}
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-[var(--color-primary)] underline underline-offset-2"
             >
-              <p className="text-sm font-semibold text-[var(--color-text)]">{t(document.type)}</p>
-              <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-                {t('currentVersion', { version: document.version })}
-              </p>
-              <Link
-                href={localizedDocumentHref(document.type, document.version, locale)}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-2 inline-flex min-h-11 items-center font-semibold text-[var(--color-primary)] underline underline-offset-2"
-              >
-                {t('open')}
-              </Link>
-              <p className="flex items-center gap-1 text-xs">
-                {accepted ? (
-                  <>
-                    <CheckCircle
-                      aria-hidden="true"
-                      size={16}
-                      className="text-[var(--color-primary)]"
-                    />
-                    {t('accepted')}
-                  </>
-                ) : (
-                  t('notAccepted')
-                )}
-              </p>
-            </div>
-          );
-        })}
-      </div>
+              {t(document.type)}
+            </Link>
+            <span className="text-xs">{document.version}</span>
+          </span>
+        ))}
+      </p>
 
       {historyUnavailable ? (
         <p
           role="alert"
-          className="flex gap-2 rounded-xl border border-dashed border-[var(--color-warning)] p-3 text-sm text-[var(--color-text-muted)]"
+          className="flex gap-2 rounded-[var(--radius-control)] bg-[var(--color-surface-muted)] px-3 py-2 text-sm text-[var(--color-text-muted)]"
         >
-          <WarningCircle aria-hidden="true" className="mt-0.5 shrink-0" size={18} />
+          <WarningCircle aria-hidden="true" className="mt-0.5 shrink-0" size={17} />
           {t('historyUnavailable')}
         </p>
       ) : null}
 
       {!currentAccepted ? (
-        <form onSubmit={acceptCurrent} className="space-y-3 rounded-xl border p-4">
-          <label className="flex cursor-pointer items-start gap-3 text-sm leading-5">
+        <form onSubmit={acceptCurrent} className="flex flex-wrap items-center gap-3">
+          <label className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 text-xs leading-5 text-[var(--color-text-muted)]">
             <input
               type="checkbox"
               checked={confirmed}
               onChange={(event) => setConfirmed(event.target.checked)}
-              className="mt-0.5 size-5 shrink-0 accent-[var(--color-primary)]"
+              className="mt-0.5 size-4 shrink-0 accent-[var(--color-primary)]"
               required
             />
             <span>
@@ -219,7 +196,7 @@ export function LegalAcceptancePanel({
           </Button>
         </form>
       ) : (
-        <p className="flex items-center gap-2 rounded-xl bg-[var(--color-primary-soft)] p-3 text-sm font-semibold text-[var(--color-primary)]">
+        <p className="flex items-center gap-2 text-sm font-medium text-[var(--color-primary)]">
           <CheckCircle aria-hidden="true" size={18} weight="fill" />
           {t('acceptedCurrent')}
         </p>
@@ -232,13 +209,15 @@ export function LegalAcceptancePanel({
       ) : null}
 
       {acceptances.length > 0 ? (
-        <div className="space-y-2">
-          <h3 className="text-sm font-bold">{t('history')}</h3>
-          <ul className="divide-y divide-[var(--color-border)] rounded-xl border border-[var(--color-border)] px-3">
+        <details className="text-sm">
+          <summary className="cursor-pointer font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
+            {t('history')}
+          </summary>
+          <ul className="mt-2 divide-y divide-[var(--color-border)]">
             {acceptances.map((acceptance) => (
               <li
                 key={acceptanceKey(acceptance)}
-                className="flex flex-col gap-1 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
               >
                 <span>
                   <strong className="text-[var(--color-text)]">
@@ -261,14 +240,14 @@ export function LegalAcceptancePanel({
                   href={localizedDocumentHref(acceptance.document_type, acceptance.version, locale)}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex min-h-11 shrink-0 items-center font-semibold text-[var(--color-primary)] underline underline-offset-2"
+                  className="inline-flex min-h-9 shrink-0 items-center font-medium text-[var(--color-primary)] underline underline-offset-2"
                 >
                   {t('openAccepted')}
                 </Link>
               </li>
             ))}
           </ul>
-        </div>
+        </details>
       ) : null}
     </div>
   );

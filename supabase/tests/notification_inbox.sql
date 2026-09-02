@@ -85,9 +85,13 @@ begin
   where event.event_type = 'account.approval_requested'
     and event.aggregate_id = v_user_id;
   if v_event_id is null
+    or v_payload ->> 'schemaVersion' <> '2'
+    or (select count(*) from jsonb_object_keys(v_payload)) <> 4
     or v_payload ->> 'locale' <> 'kk'
     or v_payload ->> 'adminPath' <> '/admin/approvals'
-    or v_payload::text ~* 'email|phone|job|organization|credential|answer' then
+    or v_payload ? 'name'
+    or v_payload ? 'surname'
+    or v_payload::text ~* 'email|phone|job|organization|credential|answer|username' then
     raise exception 'approval event is missing or contains prohibited PII: %', v_payload;
   end if;
   if (select count(*) from private.notification_deliveries delivery

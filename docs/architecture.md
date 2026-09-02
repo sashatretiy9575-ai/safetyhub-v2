@@ -20,20 +20,60 @@ SQL-тесты и Edge Functions, `content` — локальный development f
 `/api`, Next internals, metadata endpoints и неизменяемые assets не получают
 locale aliases; `/admin` всегда получает русский request context.
 
-Существующее дерево App Router не дублируется. `proxy.ts` разбирает внешний URL,
-записывает проверенные `x-safetyhub-locale` и `x-safetyhub-pathname`, затем
-переписывает локализованный URL на существующий внутренний route. До rewrite
-вычисляются protected-path и CSP nonce, поэтому `/zh/profile` и
-`/en/topics/{slug}/test` проходят тот же Supabase cookie refresh и те же
-authorization gates, что и непрефиксные маршруты. Locale-prefixed API/admin/asset
-URL не переписываются и завершаются 404.
+Публичные страницы имеют физические App Router сегменты: `/` — RU, а `/kk`,
+`/en` и `/zh` — отдельные статические деревья, которые делегируют общий content
+UI. `setRequestLocale` получает locale из route params, а не из `headers()`,
+cookie или `Accept-Language`. Поэтому public HTML может быть ISR/CDN-объектом с
+`revalidate = 300`; второй запрос не зависит от браузерной сессии. `proxy.ts`
+сохраняет внешний pathname для этих страниц, выставляет CDN cache policy и не
+вызывает Supabase `getUser()` на public GET.
 
-Порядок определения языка для первого непрефиксного запроса: locale-cookie,
-взвешенный `Accept-Language`, затем RU. Явный `/kk`, `/en` или `/zh` всегда имеет
-приоритет и обновляет годовую `SameSite=Lax` cookie. Переключатель языка сначала
-обновляет cookie, затем открывает тот же нормализованный pathname и сохраняет
-query string. Синхронизация `profiles.preferred_locale` добавляется поверх этого
-контракта после аутентификации и не меняет URL-правила.
+Текущие Privacy/Terms и исторические адреса `/privacy/{version}`,
+`/terms/{version}` (с теми же physical locale prefixes) — такие же статические
+ISR-документы. Они читают только committed immutable receipt из `content/legal`
+и `content/snapshots/localizations/manifest.json`, а не Supabase, `cookies()`,
+`headers()` или `searchParams`. Старые ссылки `?version=` proxy сначала
+перенаправляет на versioned URL с `private, no-store`; поэтому CDN никогда не
+получает cookie- или query-зависимую legal HTML copy. Для версии без локального
+receipt генерируется 404, кроме явно сохранённых ранних RU React renderers.
+
+Для private/auth-entry URL `proxy.ts` по-прежнему разбирает префикс и передаёт
+проверенные `x-safetyhub-locale` и `x-safetyhub-pathname` во внутреннее private
+дерево. Поэтому `/zh/profile` и `/en/topics/{slug}/test` проходят тот же cookie
+refresh, CSP nonce и authorization gate, что и непрефиксные private маршруты.
+Locale-prefixed API/admin/asset URL не переписываются и завершаются 404.
+
+Язык меняется только явным выбором из доступного dropdown: гость просто
+переходит на соответствующий физический URL; client cookie
+`safetyhub-locale` — неавторитетное удобство и не входит в server render/cache
+key. Для сессии normal realm RU↔KK↔EN выполняется один server-authorized update
+`profiles.preferred_locale`; смена между normal и ZH realm завершает локальную
+сессию вместо переписывания профиля в другой realm.
+
+Dropdown всегда показывает локальный SVG-флаг и полное имя языка, сохраняет
+keyboard/focus/selected semantics Radix и не использует emoji как флаг. Assets
+поставляет локальная зависимость `flag-icons` v7.5.0 (MIT, Flag Icons by Lipis);
+её license остаётся в dependency package, а рядом с флагом всегда есть текстовая
+доступная метка.
+
+### Realm-bound locale transition
+
+`preferred_locale` — только предпочтение отображения внутри уже разрешённого
+credential realm, а не способ поменять метод входа. Контракт имеет два значения:
+`email_otp` для `ru`/`kk`/`en` и `zh_username_password` только для `zh`.
+Серверный источник истины для ZH — одновременно private
+`zh_username_accounts` mapping и подписанный `safetyhub_auth_kind` в Auth
+metadata; одно `preferred_locale` не делает обычный аккаунт китайским.
+
+`private.assert_locale_matches_auth_realm` вызывается из смены preference,
+locale-aware profile/presentation/attempt RPC и чтения/завершения уже созданной
+попытки по её immutable locale. Он закрывает ручной PostgREST вызов даже если
+клиентский URL или старая вкладка ошибочно сохранили cookie. При RU↔KK↔EN
+остается одна сессия и один server-authorized update. При переходе между
+normal и ZH realm приложение очищает только локальную сессию/устройство и
+открывает нужный login; серверный аккаунт, обучение и сертификаты не удаляются.
+`proxy.ts` повторяет эту проверку только на protected/auth-entry routes, не на
+public GET, чтобы public cache не зависел от auth cookie.
 
 `next-intl` загружает один из четырёх каталогов `messages/*.json`; типы ключей
 выводятся из RU-каталога, а тест требует точного совпадения ключей и ICU-параметров
@@ -46,7 +86,9 @@ Manifest и offline shell имеют отдельные locale endpoints `/manif
 offline fallback по префиксу исходной навигации и по-прежнему полностью обходит
 auth/profile/test/callback маршруты. Китайская оболочка использует локальный
 subset Noto Sans SC только при `data-locale="zh"`; остальные маршруты не
-загружают CJK asset.
+загружают CJK asset. У документа есть корректный `lang`, `Content-Language`,
+`translate="no"`, класс `notranslate` и Google `notranslate` meta: это подавляет
+стандартный auto-translate, но не отменяет вручную включённый перевод браузера.
 
 ## Данные и доверительные границы
 
@@ -233,17 +275,20 @@ ZH registration создаёт provider account с server-generated `@auth.inval
 identifier и сохраняет username-to-provider mapping только в private schema.
 До username lookup, legal/Auth/profile write она проверяет отдельный первый
 Turnstile token через server-only Cloudflare `Siteverify` с Vercel-only
-`SAFETYHUB_TURNSTILE_SECRET_KEY`. Успешная регистрация не создаёт password
-session и переводит на login для нового одноразового token; login передаёт этот
-новый token в GoTrue `signInWithPassword`. Неуспешный или недоступный verifier
-не выделяет provider identity или mapping. В production/preview ответ
+`SAFETYHUB_TURNSTILE_SECRET_KEY`. Сама registration не переиспользует первый
+одноразовый proof и не считает его session: клиент сразу получает новый
+Turnstile proof и вызывает обычный GoTrue `signInWithPassword`, поэтому после
+успеха открывается pending-approval state без ручного повторного ввода пароля.
+Если новый proof недоступен, UI возвращает пользователя к обычному видимому
+экрану входа. Неуспешный или недоступный verifier не выделяет provider identity
+или mapping. В production/preview ответ
 `Siteverify` дополнительно должен совпадать с hostname configured deployment.
 Synthetic email, пароль, password hash, credentials и recovery data не входят в
 browser payload, admin projections, Telegram, export, audit payload или analytics.
 Публичный username принимается только в ZH auth request и не передаётся в
 Telegram, admin projections, export или audit payload. Регистрация фиксирует
-`preferred_locale = 'zh'`;
-затем участник проходит обычное заполнение профиля и контактного телефона до
+`preferred_locale = 'zh'` и переводит минимальный ZH profile прямо в pending:
+email, телефон, имя, фамилия, avatar и обычный onboarding не требуются до
 ручного approval. Existing approval/RLS gates продолжают закрывать обучение.
 Исторические WebAuthn tables и routes остаются только для forward migration,
 redaction и явного `410 ZH_AUTH_METHOD_RETIRED`; это не активный auth surface.
@@ -253,18 +298,21 @@ redaction и явного `410 ZH_AUTH_METHOD_RETIRED`; это не активн
 защитой на случай случайного обращения к стандартным Auth endpoints; единственные
 шаблоны, которым разрешён `{{ .Token }}`, — login и registration OTP.
 
-После первой OTP-сессии RU/KK/EN пользователь отдельно принимает текущие Политику
-и Условия. ZH фиксирует текущие версии при завершении username/password
-регистрации. Принятие записывается только в `legal_acceptances`; клиентский
-intent из OTP-запроса не считается согласием. `legal_document_versions` содержит
+После первой OTP-сессии RU/KK/EN сервер фиксирует текущие Политику и Условия,
+а ZH — при завершении username/password регистрации. Во входном UX это короткая
+предвключённая строка со ссылками, а не отдельная тяжёлая legal-card; снятый
+checkbox блокирует основное действие. Принятие записывается только в
+`legal_acceptances`; клиентский intent из OTP-запроса не считается согласием.
+`legal_document_versions` содержит
 только immutable copies: новые материальные тексты публикуются новой forward-only
 migration, а уже принятые версии остаются доступны по versioned URL.
 
-После заполнения профиля сервер переводит участника в `pending` и фиксирует
-24-часовой ориентир ответа. До `approved` серверно закрыты PDF, learner payload,
+Обычный email-OTP профиль после заполнения переводится в `pending` и получает
+24-часовой ориентир ответа; минимальный ZH profile уже pending без обычного
+onboarding. До `approved` серверно закрыты PDF, learner payload,
 создание/возобновление/оценивание попытки и выдача сертификата. Администратор
-принимает решение в capability-gated очереди; номер телефона доступен ему только
-для ручной связи и никогда не отправляется в SMS-провайдера.
+принимает решение в capability-gated очереди; контактные поля normal profile
+доступны только для ручной связи и никогда не отправляются в SMS-провайдера.
 
 Очередь сортируется по `(approval_due_at, user_id)` и возвращает cursor последней
 видимой строки, а не look-ahead строки: следующий запрос не пропускает заявку на

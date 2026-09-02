@@ -5,18 +5,30 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { ContactLink } from '@/components/shared/contact-link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import type { SiteContactSettings } from '@/lib/site-contacts-shared';
-import { localizePathname, type AppLocale } from '@/i18n/config';
+import {
+  BUSINESS_TIME_ZONE,
+  HTML_LANGUAGE_BY_LOCALE,
+  localizePathname,
+  type AppLocale,
+} from '@/i18n/config';
 
 type ApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
 
 function formatRemaining(milliseconds: number) {
-  const seconds = Math.max(0, Math.ceil(milliseconds / 1000));
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainder = seconds % 60;
-  return [hours, minutes, remainder].map((part) => String(part).padStart(2, '0')).join(':');
+  const minutes = Math.max(0, Math.ceil(milliseconds / 60_000));
+  const hours = Math.floor(minutes / 60);
+  return [hours, minutes % 60].map((part) => String(part).padStart(2, '0')).join(':');
+}
+
+function formatDueAt(value: string, locale: AppLocale) {
+  return new Intl.DateTimeFormat(HTML_LANGUAGE_BY_LOCALE[locale], {
+    day: 'numeric',
+    month: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: BUSINESS_TIME_ZONE,
+  }).format(new Date(value));
 }
 
 function ReviewContacts({ contacts }: { contacts: SiteContactSettings }) {
@@ -33,7 +45,7 @@ function ReviewContacts({ contacts }: { contacts: SiteContactSettings }) {
       <ContactLink
         kind="whatsapp"
         contacts={contacts}
-        className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[#128c4a]/45 px-3 text-sm font-semibold text-[#128c4a] transition hover:bg-[#128c4a]/10 focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)] dark:text-[#39dc7a]"
+        className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-primary)]/45 bg-[var(--color-primary-soft)]/45 px-3 text-sm font-semibold text-[var(--color-primary)] transition hover:bg-[var(--color-primary-soft)] focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
       >
         {t('whatsapp')}
       </ContactLink>
@@ -63,21 +75,42 @@ export function AccountApprovalStatus({
 
   useEffect(() => {
     if (state !== 'pending' || dueTimestamp === null) return undefined;
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
+    let timer: number | undefined;
+
+    const syncAtMinuteBoundary = () => {
+      const current = Date.now();
+      setNow(current);
+
+      const remaining = dueTimestamp - current;
+      if (remaining <= 0) return;
+
+      // The visible clock is HH:MM, so it only needs to update when that value changes.
+      const untilNextMinute = remaining % 60_000 || 1;
+      timer = window.setTimeout(syncAtMinuteBoundary, Math.max(100, untilNextMinute + 16));
+    };
+
+    syncAtMinuteBoundary();
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
   }, [dueTimestamp, state]);
 
   if (state === 'approved') return null;
 
   if (state === 'profile_incomplete') {
     return (
-      <Card className="border-[var(--color-warning)]">
-        <CardContent className="space-y-3 p-4 sm:p-5">
+      <section
+        aria-labelledby="approval-profile-title"
+        className="border-y border-[var(--color-warning)]/55 bg-[var(--color-accent-amber-soft)]/35 px-4 py-4 sm:px-5"
+      >
+        <div className="space-y-3">
           <div>
             <p className="text-xs font-bold tracking-wide text-[var(--color-warning)] uppercase">
               {t('accessEyebrow')}
             </p>
-            <h2 className="font-display mt-1 text-xl font-bold">{t('profileTitle')}</h2>
+            <h2 id="approval-profile-title" className="font-display mt-1 text-xl font-bold">
+              {t('profileTitle')}
+            </h2>
             <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
               {t('profileDescription')}
             </p>
@@ -85,73 +118,97 @@ export function AccountApprovalStatus({
           <Button asChild size="sm">
             <Link href={localizePathname('/onboarding', locale)}>{t('profileAction')}</Link>
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     );
   }
 
   if (state === 'rejected') {
     return (
-      <Card className="border-[var(--color-danger)]">
-        <CardContent className="space-y-3 p-4 sm:p-5">
+      <section
+        aria-labelledby="approval-rejected-title"
+        className="border-y border-[var(--color-danger)]/55 bg-[var(--color-danger-soft)]/35 px-4 py-4 sm:px-5"
+      >
+        <div className="space-y-3">
           <div>
             <p className="text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase">
               {t('rejectedEyebrow')}
             </p>
-            <h2 className="font-display mt-1 text-xl font-bold">{t('rejectedTitle')}</h2>
+            <h2 id="approval-rejected-title" className="font-display mt-1 text-xl font-bold">
+              {t('rejectedTitle')}
+            </h2>
             <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
               {t('rejectedDescription')}
             </p>
           </div>
           {rejectionReason ? (
-            <p className="rounded-xl bg-[var(--color-danger)]/10 p-3 text-sm leading-6">
+            <p className="border-l-2 border-[var(--color-danger)]/60 pl-3 text-sm leading-6">
               <strong>{t('adminComment')}</strong> {rejectionReason}
             </p>
           ) : null}
           <ReviewContacts contacts={contacts} />
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     );
   }
 
   const remaining = dueTimestamp === null ? null : dueTimestamp - now;
   const expired = remaining !== null && remaining <= 0;
+  const dueLabel = dueAt && dueTimestamp !== null ? formatDueAt(dueAt, locale) : null;
 
   return (
-    <Card className="border-[var(--color-primary)]">
-      <CardContent className="space-y-4 p-4 sm:p-5">
+    <section
+      aria-labelledby="approval-pending-title"
+      className="border-y border-[var(--color-primary)]/55 bg-[var(--color-primary-soft)]/30 px-4 py-4 sm:px-5"
+    >
+      <div className="space-y-4">
         <div>
           <p className="text-xs font-bold tracking-wide text-[var(--color-primary)] uppercase">
             {t('pendingEyebrow')}
           </p>
-          <h2 className="font-display mt-1 text-xl font-bold">{t('pendingTitle')}</h2>
+          <h2 id="approval-pending-title" className="font-display mt-1 text-xl font-bold">
+            {t('pendingTitle')}
+          </h2>
           <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
             {t('pendingDescription')}
           </p>
         </div>
         {remaining === null ? (
-          <p className="rounded-xl bg-[var(--color-surface-muted)] p-3 text-sm">
+          <p className="border-l-2 border-[var(--color-border-strong)] pl-3 text-sm">
             {t('pendingNoDue')}
           </p>
         ) : expired ? (
-          <p className="rounded-xl bg-[var(--color-accent-amber-soft)] p-3 text-sm leading-6">
+          <p
+            role="status"
+            className="border-l-2 border-[var(--color-warning)] pl-3 text-sm leading-6"
+          >
             {t('overdue')}
           </p>
         ) : (
-          <div className="rounded-xl bg-[var(--color-primary-soft)] p-3">
-            <p className="text-xs font-semibold text-[var(--color-text-muted)]">
-              {t('remaining')}
-            </p>
-            <p aria-live="polite" className="mt-1 font-mono text-2xl font-bold tracking-wide text-[var(--color-primary)]">
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-y border-[var(--color-primary)]/20 py-3">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-[var(--color-text-muted)]">
+                {t('remaining')}
+              </p>
+              {dueLabel ? (
+                <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                  {t('deadline', { deadline: dueLabel })}
+                </p>
+              ) : null}
+              <p className="mt-1 text-xs text-[var(--color-text-subtle)]">{t('countdownHint')}</p>
+            </div>
+            <time
+              dateTime={dueAt ?? undefined}
+              role="timer"
+              aria-label={t('remaining')}
+              className="min-w-[6.5rem] text-right font-mono text-2xl font-bold tracking-wide text-[var(--color-primary)] tabular-nums"
+            >
               {formatRemaining(remaining)}
-            </p>
-            <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-              {t('countdownHint')}
-            </p>
+            </time>
           </div>
         )}
         <ReviewContacts contacts={contacts} />
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

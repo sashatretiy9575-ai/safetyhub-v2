@@ -5,10 +5,10 @@ import { emailOtpStartSchema, emailOtpVerifySchema } from '../../lib/validation/
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('passwordless verification accepts only the email and six-digit code, not browser mode or consent claims', () => {
+test('passwordless verification rejects browser mode and requires the compact legal acknowledgement', () => {
   assert.deepEqual(
     emailOtpStartSchema.parse({ email: 'learner@example.com', intent: 'register' }),
-    { email: 'learner@example.com', intent: 'register' },
+    { email: 'learner@example.com' },
   );
   assert.deepEqual(
     emailOtpVerifySchema.parse({
@@ -17,7 +17,15 @@ test('passwordless verification accepts only the email and six-digit code, not b
       intent: 'register',
       legalAccepted: true,
     }),
-    { email: 'learner@example.com', code: '123456' },
+    { email: 'learner@example.com', code: '123456', legalAccepted: true },
+  );
+  assert.equal(
+    emailOtpVerifySchema.safeParse({
+      email: 'learner@example.com',
+      code: '123456',
+      legalAccepted: false,
+    }).success,
+    false,
   );
 });
 
@@ -32,8 +40,10 @@ test('browser-facing entry pages have no password fields and route through the e
   for (const source of [login, registration, flow]) {
     assert.doesNotMatch(source, /PasswordInput|type="password"|reset-password|change-password/u);
   }
-  assert.match(login, /<EmailOtpFlow intent="login"/u);
-  assert.match(registration, /<EmailOtpFlow intent="register"/u);
+  assert.match(login, /<EmailOtpFlow \/>/u);
+  assert.doesNotMatch(login, /intent=/u);
+  assert.match(registration, /redirect\(localizePathname\('\/auth\/login', locale\)\)/u);
+  assert.doesNotMatch(registration, /<EmailOtpFlow|intent=/u);
   assert.match(requestRoute, /signInWithOtp/u);
   assert.doesNotMatch(requestRoute, /signInWithPassword|auth\.signUp\(/u);
   assert.match(verifyRoute, /verifyOtp/u);

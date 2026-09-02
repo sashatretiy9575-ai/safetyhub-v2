@@ -7,10 +7,12 @@ import { Container } from '@/components/ui/container';
 import { Card, CardContent } from '@/components/ui/card';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { htmlLanguage } from '@/i18n/config';
+import { absoluteUrl } from '@/lib/utils';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Certificate');
   return {
+    metadataBase: new URL(absoluteUrl('/')),
     title: t('verifyMetadataTitle'),
     description: t('verifyMetadataDescription'),
     robots: { index: false, follow: false },

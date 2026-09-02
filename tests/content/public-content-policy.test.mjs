@@ -16,12 +16,21 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
 
 test('public navigation uses one clear neutral account link on every surface', async () => {
-  const layout = await read('app/(public)/layout.tsx');
+  const [layout, publicAccountControl] = await Promise.all([
+    read('app/(public)/layout.tsx'),
+    read('components/shared/public-account-control.tsx'),
+  ]);
   const header = await read('components/layout/header.tsx');
   const bottom = await read('components/layout/bottom-tab-bar.tsx');
   const navigationItems = await read('components/layout/navigation-items.ts');
 
-  assert.match(layout, /<AppShell accountMode="neutral">/);
+  assert.match(
+    layout,
+    /<AppShell\s+accountMode="neutral"\s+accountControl=\{<PublicAccountControl\s*\/>\}/u,
+  );
+  assert.match(publicAccountControl, /safetyhub-session-hint=1/u);
+  assert.doesNotMatch(publicAccountControl, /fetch\(|supabase|createClient|getAuthContext/iu);
+  assert.match(publicAccountControl, /DeferredSignOutAction/u);
   assert.match(
     navigationItems,
     /neutral: \{ href: ROUTES\.profile, messageKey: 'account\.neutral' \}/,
@@ -134,7 +143,11 @@ test('content readers preserve empty and not-found remote results', async () => 
 
 test('localized public content never relabels the bundled Russian snapshot', async () => {
   assert.equal(
-    fallbackForUnavailableLocalizedContent('ru', () => 'russian snapshot', () => 'unavailable'),
+    fallbackForUnavailableLocalizedContent(
+      'ru',
+      () => 'russian snapshot',
+      () => 'unavailable',
+    ),
     'russian snapshot',
   );
   for (const locale of ['kk', 'en', 'zh']) {

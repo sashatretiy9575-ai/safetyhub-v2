@@ -5,6 +5,7 @@ import {
   CONTENT_CACHE_TAG,
   CONTENT_REVALIDATE_PATHS,
   TOPICS_CACHE_TAG,
+  localizedContentPaths,
 } from '@/lib/content/cache-policy';
 import { readJsonBody } from '@/lib/security/request-body';
 import { matchesBearerSecret } from '@/lib/security/bearer-secret';
@@ -45,8 +46,8 @@ export async function POST(request: Request) {
   }
   for (const path of CONTENT_REVALIDATE_PATHS) revalidatePath(path);
   if (slug) {
-    revalidatePath(`/blog/${slug}`);
-    revalidatePath(`/topics/${slug}`);
+    for (const path of localizedContentPaths(`/blog/${slug}`)) revalidatePath(path);
+    for (const path of localizedContentPaths(`/topics/${slug}`)) revalidatePath(path);
   }
 
   return NextResponse.json({ revalidated: true });

@@ -6,6 +6,7 @@ import { getProfileAvatarUrl } from '@/features/profile/server';
 import { ProfileForm } from '@/features/auth/profile-form';
 import { requireRole } from '@/features/auth/server';
 import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
+import { SignOutAction } from '@/components/shared/sign-out-action';
 import { Card, CardContent } from '@/components/ui/card';
 import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
 
@@ -69,6 +70,7 @@ export default async function AdminAccountPage() {
             </p>
           </div>
           <PwaManualInstall />
+          <SignOutAction />
           <AccountDeletion />
         </CardContent>
       </Card>

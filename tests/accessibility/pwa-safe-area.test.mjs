@@ -21,16 +21,20 @@ test('shared safe-area tokens drive the header and mobile tab reserve', async ()
   assert.match(tabs, /min-\[1120px\]:hidden/);
 });
 
-test('install banner stays compact above the mobile bar and reserves temporary space', async () => {
-  const [rootLayout, publicLayout, overlay] = await Promise.all([
-    read('app/layout.tsx'),
+test('deferred install banner stays compact above the mobile bar and reserves temporary space', async () => {
+  const [rootDocument, publicLayout, deferredInstall, installSurface, overlay] = await Promise.all([
+    read('components/layout/root-document.tsx'),
     read('app/(public)/layout.tsx'),
+    read('components/shared/deferred-pwa-install.tsx'),
+    read('components/shared/pwa-install-surface.tsx'),
     read('components/shared/pwa-install-overlay.tsx'),
   ]);
 
-  assert.doesNotMatch(rootLayout, /PWAInstallOverlay|PWAProvider/);
-  assert.match(publicLayout, /<PWAProvider>/);
-  assert.match(publicLayout, /<PWAInstallOverlay \/>/);
+  assert.doesNotMatch(rootDocument, /PWAInstallOverlay|PWAProvider/);
+  assert.match(publicLayout, /<DeferredPwaInstall \/>/);
+  assert.match(deferredInstall, /ssr: false/);
+  assert.match(installSurface, /<PWAProvider>/);
+  assert.match(installSurface, /<PWAInstallOverlay \/>/);
   assert.match(overlay, /bottom-\[calc\(var\(--mobile-fixed-bottom-space\)\+\.5rem\)\]/);
   assert.match(overlay, /--pwa-banner-space/);
   assert.match(overlay, /PROMPT_DELAY_MS = 15_000/);
@@ -42,14 +46,14 @@ test('install banner stays compact above the mobile bar and reserves temporary s
   assert.match(overlay, /var\(--safe-area-left\)/);
 });
 
-test('only the public shell reserves space for its fixed mobile navigation', async () => {
-  const [layout, appShell, footer] = await Promise.all([
-    read('app/layout.tsx'),
+test('root documents stay free of mobile navigation space while the shared app shell reserves it', async () => {
+  const [rootDocument, appShell, footer] = await Promise.all([
+    read('components/layout/root-document.tsx'),
     read('components/layout/app-shell.tsx'),
     read('components/layout/footer.tsx'),
   ]);
 
-  assert.doesNotMatch(layout, /mobile-fixed-bottom-space/);
+  assert.doesNotMatch(rootDocument, /mobile-fixed-bottom-space/);
   assert.match(appShell, /mobile-fixed-bottom-space/);
   assert.doesNotMatch(footer, /pb-20/);
 });

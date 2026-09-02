@@ -82,7 +82,7 @@ begin
   );
   perform public.set_runtime_feature_flag(
     'telegram_application_details', true,
-    'Enable full application details for contract',
+    'Exercise legacy details flag without expanding new payloads',
     '7d000000-0000-4000-8000-000000000013'
   );
 
@@ -143,19 +143,23 @@ begin
     from private.notification_events event
     where event.aggregate_id = v_user_id
       and event.event_type = 'account.approval_requested'
+      and event.payload ->> 'schemaVersion' = '2'
+      and (select count(*) from jsonb_object_keys(event.payload)) = 4
       and event.payload ?& array[
-        'name', 'surname', 'job', 'organization', 'phoneCountryIso2',
-        'phoneE164'
+        'schemaVersion', 'locale', 'requestedAt', 'adminPath'
       ]
       and not event.payload ? 'email'
       and not event.payload ? 'userId'
+      and not event.payload ? 'name'
+      and not event.payload ? 'surname'
       and not event.payload ? 'username'
       and not event.payload ? 'credential'
-      and not event.payload ? 'locale'
-      and not event.payload ? 'requestedAt'
-      and not event.payload ? 'adminPath'
+      and not event.payload ? 'job'
+      and not event.payload ? 'organization'
+      and not event.payload ? 'phoneCountryIso2'
+      and not event.payload ? 'phoneE164'
   ) then
-    raise exception 'full Telegram application event payload is incomplete or unsafe';
+    raise exception 'new Telegram approval payload is not generic no-PII v2';
   end if;
 
   select

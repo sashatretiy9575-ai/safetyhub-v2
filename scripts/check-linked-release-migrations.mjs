@@ -19,7 +19,7 @@ const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 // reviewed release; keep that historical receipt pinned and accept only the
 // newly reviewed two-file tail. An open-ended local tail would defeat this
 // preflight.
-export const REVIEWED_BASE_MIGRATION_COUNT = 56;
+export const REVIEWED_BASE_MIGRATION_COUNT = 58;
 export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260901100000_locale_profile_legal_contracts.sql',
@@ -89,8 +89,6 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
     filename: '20260902140000_runtime_feature_flag_serialization.sql',
     sha256: '8f557b7e219bd631934d70bf8a3173a2caccb74b1f37db1b580cae987cd7d3dd',
   }),
-]);
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260902150000_zh_minimal_pending_approval.sql',
     sha256: '2713f7a95550821b8d0319b8d6b3cd979bd3ef1c82e253611dec9ea09e473e29',
@@ -98,6 +96,16 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260902160000_atomic_legal_bundle_publication.sql',
     sha256: '51a34bf7d01e504dc1fa47a3c5ff71cd152d17c5eedc37352bc0245c3341034c',
+  }),
+]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+  Object.freeze({
+    filename: '20260902170000_auth_realm_locale_boundary.sql',
+    sha256: '75c6af9450886b4be4abb0cf97b3baf68516a7c92e94df9a0f38a204b6fb53a5',
+  }),
+  Object.freeze({
+    filename: '20260902180000_generic_approval_notifications.sql',
+    sha256: 'dfe58bf11bad8c60c41b08a19b085a0b5ce2af5bb053a0717a14199a292be4d3',
   }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =

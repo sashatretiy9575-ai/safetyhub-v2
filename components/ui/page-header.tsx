@@ -21,7 +21,7 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        'relative overflow-hidden border-b border-[var(--color-border)]',
+        'border-b border-[var(--color-border)]',
         variant === 'contact'
           ? 'py-5 sm:py-7 lg:py-10'
           : variant === 'compact'
@@ -30,8 +30,6 @@ export function PageHeader({
         className,
       )}
     >
-      <div className="mesh-bg absolute inset-0 -z-10 opacity-60" aria-hidden />
-      <div className="grain-overlay -z-10" aria-hidden />
       <Container size="wide" className="space-y-4">
         {eyebrow && (
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-subtle)] sm:text-[11px]">

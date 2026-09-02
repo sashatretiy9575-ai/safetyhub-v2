@@ -61,22 +61,29 @@ test('global error ships a minimal four-locale catalog instead of every learner 
 });
 
 test('locale-aware PWA resources are precached and Chinese font loading is route-scoped', async () => {
-  const [worker, layout, styles, manifestRoute, offlineRoute] = await Promise.all([
-    read('public/sw.js'),
-    read('app/layout.tsx'),
-    read('app/globals.css'),
-    read('app/manifest/[locale]/route.ts'),
-    read('app/offline/[locale]/route.ts'),
-  ]);
-  const font = await stat(new URL('../../public/fonts/noto-sans-sc-ui.ttf', import.meta.url));
+  const [worker, rootDocument, styles, manifestRoute, offlineRoute, subsetScript] =
+    await Promise.all([
+      read('public/sw.js'),
+      read('components/layout/root-document.tsx'),
+      read('app/globals.css'),
+      read('app/manifest/[locale]/route.ts'),
+      read('app/offline/[locale]/route.ts'),
+      read('scripts/subset-cjk-ui-font.py'),
+    ]);
+  const font = await stat(
+    new URL('../../public/fonts/noto-sans-sc-ui.f113fe63.woff2', import.meta.url),
+  );
 
   assert.match(worker, /OFFLINE_URLS/u);
   assert.match(worker, /offlineUrlForPathname/u);
   assert.match(worker, /Object\.keys\(OFFLINE_URLS\).*`\/manifest\/\$\{locale\}`/su);
   assert.match(worker, /CACHE_PREFIX\}v7/u);
-  assert.match(layout, /locale === 'zh'/u);
-  assert.match(layout, /\/fonts\/noto-sans-sc-ui\.ttf/u);
+  assert.match(rootDocument, /locale === 'zh'/u);
+  assert.match(rootDocument, /\/fonts\/noto-sans-sc-ui\.f113fe63\.woff2/u);
   assert.match(styles, /html\[data-locale='zh'\]/u);
+  assert.match(styles, /format\('woff2'\)/u);
+  assert.match(subsetScript, /--flavor=woff2/u);
+  assert.match(subsetScript, /hashlib\.sha256/u);
   assert.match(manifestRoute, /application\/manifest\+json/u);
   assert.match(offlineRoute, /text\/html; charset=utf-8/u);
   assert.ok(font.size > 20_000 && font.size < 500_000, `unexpected CJK UI font size: ${font.size}`);

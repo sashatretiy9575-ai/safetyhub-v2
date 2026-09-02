@@ -36,6 +36,8 @@ test('admin inbox stays behind a same-origin capability-gated API', async () => 
   assert.match(contract, /\.strict\(\)/u);
   assert.match(contract, /phoneCountryIso2/u);
   assert.match(contract, /phoneE164/u);
+  assert.match(contract, /schemaVersion: z\.literal\(2\)/u);
+  assert.match(contract, /name: z\.literal\(''\)/u);
   assert.doesNotMatch(
     contract,
     /\b(?:email|username|document|answer|credential|recovery|synthetic)\b/iu,
@@ -63,6 +65,7 @@ test('one provider polls the two responsive inbox controls without amplification
   assert.match(component, /window\.addEventListener\(ADMIN_NOTIFICATION_REFRESH_EVENT/u);
   assert.match(component, /window\.addEventListener\('online'/u);
   assert.match(component, /window\.addEventListener\('offline'/u);
+  assert.match(component, /Новая заявка ·/u);
   assert.doesNotMatch(component, /createBrowserClient|@\/lib\/supabase\/client/u);
 
   assert.equal((layout.match(/<AdminNotificationInboxProvider/u) ?? []).length, 1);

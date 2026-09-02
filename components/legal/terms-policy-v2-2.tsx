@@ -1,4 +1,5 @@
 import { LegalContacts } from '@/components/legal/legal-contacts';
+import Link from 'next/link';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
 import { formatLegalDate, type LegalDocumentVersion } from '@/lib/legal';
@@ -191,9 +192,9 @@ export function TermsPolicyV22({ policy }: TermsPolicyV22Props) {
               удаляются профиль, фотография, попытки, сертификаты и связанный аудит, а QR-проверка
               прежнего документа прекращается. Уже скачанный внешний PDF физически отозвать с
               устройства нельзя. Категории, поставщики и порядок удаления описаны в{' '}
-              <a className={linkClass} href="/privacy?version=1.2">
+              <Link className={linkClass} href="/privacy/1.2">
                 Политике конфиденциальности версии 1.2
-              </a>
+              </Link>
               .
             </p>
           </section>

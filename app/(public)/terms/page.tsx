@@ -1,54 +1,36 @@
 import { notFound } from 'next/navigation';
-import { getLocale, getTranslations } from 'next-intl/server';
-import { TermsPolicyV22 } from '@/components/legal/terms-policy-v2-2';
-import { TermsPolicyV23 } from '@/components/legal/terms-policy-v2-3';
-import { TermsPolicyV24 } from '@/components/legal/terms-policy-v2-4';
+import { getTranslations } from 'next-intl/server';
 import { LegalContacts } from '@/components/legal/legal-contacts';
+import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-document';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
-import { formatLegalDate, PRIVACY_POLICY_V1_1 } from '@/lib/legal';
-import { resolveActivatedLegalPolicy } from '@/lib/legal-current';
+import { getStaticLegalDocument } from '@/lib/content/legal-documents';
+import { DEFAULT_LOCALE } from '@/i18n/config';
+import {
+  formatLegalDate,
+  PRIVACY_POLICY_V1_1,
+  TERMS_POLICY,
+  type LegalDocumentVersion,
+} from '@/lib/legal';
 import { buildMetadata } from '@/lib/seo';
-import { getLocalizedLegalDocument } from '@/lib/content/legal-documents';
-import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-document';
-import type { AppLocale } from '@/i18n/config';
+
+export const revalidate = 300;
 
 export async function generateMetadata() {
-  const [locale, t] = await Promise.all([
-    getLocale() as Promise<AppLocale>,
-    getTranslations('LegalFlow'),
-  ]);
+  const t = await getTranslations('LegalFlow');
   return buildMetadata({
     title: t('terms'),
     description: t('termsMetadataDescription'),
     path: '/terms',
-    locale,
+    locale: DEFAULT_LOCALE,
   });
 }
-
-type TermsPageProps = {
-  searchParams: Promise<{ version?: string | string[] }>;
-};
 
 const linkClass =
   'font-semibold text-[var(--color-primary)] underline underline-offset-2 hover:no-underline';
 
-export default async function TermsPage({ searchParams }: TermsPageProps) {
-  const requested = (await searchParams).version;
-  const requestedVersion = Array.isArray(requested) ? requested[0] : requested;
-  const locale = (await getLocale()) as AppLocale;
-  if (locale !== 'ru') {
-    const localized = await getLocalizedLegalDocument('terms', requestedVersion, locale);
-    if (!localized) notFound();
-    return <LocalizedLegalDocumentView document={localized} />;
-  }
-  const policy = await resolveActivatedLegalPolicy('terms', requestedVersion);
-  if (!policy) notFound();
-  if (policy.bodyRevision === 'terms-2.4') return <TermsPolicyV24 policy={policy} />;
-  if (policy.bodyRevision === 'terms-2.3') return <TermsPolicyV23 policy={policy} />;
-  if (policy.bodyRevision === 'terms-2.2') return <TermsPolicyV22 policy={policy} />;
-  if (policy.bodyRevision !== 'terms-2.1') notFound();
-
+/** Immutable renderer for the only pre-structured Russian terms copy. */
+export function TermsPolicyV21({ policy }: { policy: LegalDocumentVersion }) {
   const effectiveDate = formatLegalDate(policy.effectiveDate);
 
   return (
@@ -77,7 +59,7 @@ export default async function TermsPage({ searchParams }: TermsPageProps) {
               Версия {policy.version}. Действует с {effectiveDate}
             </p>
             <p className="text-xs font-semibold tracking-wide text-[var(--color-text-subtle)] uppercase">
-              {requestedVersion ? 'Архивная редакция' : 'Текущая редакция'}
+              Архивная редакция
             </p>
           </header>
 
@@ -241,4 +223,11 @@ export default async function TermsPage({ searchParams }: TermsPageProps) {
       </article>
     </>
   );
+}
+
+/** See the privacy route for why current legal copies are static local reads. */
+export default function TermsPage() {
+  const document = getStaticLegalDocument('terms', TERMS_POLICY.version, DEFAULT_LOCALE);
+  if (!document) notFound();
+  return <LocalizedLegalDocumentView document={document} />;
 }

@@ -4,21 +4,33 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('RU/KK/EN registration stays email-code while ZH exposes its separate accessible username/password form', async () => {
-  const [register, flow, zhFlow, requestRoute, verifyRoute, legalPage, legalGate, validation] =
-    await Promise.all([
-      read('app/(account)/auth/register/page.tsx'),
-      read('features/auth/email-otp-flow.tsx'),
-      read('features/auth/zh-username-password-flow.tsx'),
-      read('app/api/auth/email-otp/request/route.ts'),
-      read('app/api/auth/email-otp/verify/route.ts'),
-      read('app/(account)/auth/legal/page.tsx'),
-      read('features/auth/legal-acceptance-gate.tsx'),
-      read('lib/validation/auth.ts'),
-    ]);
+test('canonical access uses neutral email-code while ZH exposes one accessible username/password screen', async () => {
+  const [
+    login,
+    register,
+    flow,
+    zhFlow,
+    requestRoute,
+    verifyRoute,
+    legalPage,
+    legalGate,
+    validation,
+  ] = await Promise.all([
+    read('app/(account)/auth/login/page.tsx'),
+    read('app/(account)/auth/register/page.tsx'),
+    read('features/auth/email-otp-flow.tsx'),
+    read('features/auth/zh-username-password-flow.tsx'),
+    read('app/api/auth/email-otp/request/route.ts'),
+    read('app/api/auth/email-otp/verify/route.ts'),
+    read('app/(account)/auth/legal/page.tsx'),
+    read('features/auth/legal-acceptance-gate.tsx'),
+    read('lib/validation/auth.ts'),
+  ]);
 
-  assert.match(register, /<EmailOtpFlow intent="register"/u);
-  assert.match(register, /<ZhUsernamePasswordFlow mode="register"/u);
+  assert.match(login, /<EmailOtpFlow \/>/u);
+  assert.match(login, /<ZhUsernamePasswordFlow \/>/u);
+  assert.match(register, /redirect\(localizePathname\('\/auth\/login', locale\)\)/u);
+  assert.doesNotMatch(register, /<EmailOtpFlow|<ZhUsernamePasswordFlow|intent=/u);
   assert.doesNotMatch(register, /firstName|lastName|profile-job|PasswordInput/u);
   assert.match(flow, /emailOtpStartSchema\.safeParse/u);
   assert.match(flow, /clientRequest\('\/api\/auth\/email-otp\/request'/u);
@@ -28,20 +40,26 @@ test('RU/KK/EN registration stays email-code while ZH exposes its separate acces
     requestRoute,
     /prepareSignupLegalOperation|createAdminClient|auth\.admin\.createUser|email_confirm|raw_user_meta_data|\.identities\b|deleteUser\(/u,
   );
-  assert.match(verifyRoute, /localizedAccountPath\('\/auth\/legal', locale\)/u);
-  assert.doesNotMatch(
-    verifyRoute,
-    /accept_current_legal_documents|legalAccepted|parsed\.data\.intent/u,
-  );
+  assert.match(verifyRoute, /rpc\('accept_current_legal_documents'/u);
+  assert.match(verifyRoute, /hasCurrentLegalReceipts/u);
+  assert.match(verifyRoute, /clearSafetyHubLocalSession/u);
+  assert.match(flow, /id="email-otp-legal"/u);
+  assert.match(flow, /checked=\{legalAccepted\}/u);
+  assert.match(flow, /legalRequired/u);
   assert.match(legalPage, /requireUser\(\{ enforceLegal: false \}\)/u);
   assert.match(legalPage, /<LegalAcceptanceGate/u);
   assert.match(legalGate, /<LegalAcceptancePanel/u);
   assert.match(legalGate, /router\.replace\(continueTo\)/u);
-  assert.match(validation, /export const emailOtpStartSchema = z[\s\S]*intent/u);
+  const startSchema = validation.slice(
+    validation.indexOf('export const emailOtpStartSchema'),
+    validation.indexOf('export const emailOtpVerifySchema'),
+  );
+  assert.doesNotMatch(startSchema, /intent/u);
   const verificationSchema = validation.slice(
     validation.indexOf('export const emailOtpVerifySchema'),
   );
-  assert.doesNotMatch(verificationSchema, /intent|legalAccepted/u);
+  assert.doesNotMatch(verificationSchema, /intent/u);
+  assert.match(verificationSchema, /legalAccepted: z\.literal\(true\)/u);
   assert.doesNotMatch(validation, /firstName|lastName/u);
   assert.match(zhFlow, /noValidate/u);
   assert.match(zhFlow, /FieldError/u);

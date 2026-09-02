@@ -107,7 +107,7 @@ export function resolveLegalDocumentVersion(
 
 export function legalDocumentHref(type: LegalDocumentType, version: string) {
   const path = type === 'privacy' ? PRIVACY_POLICY.path : TERMS_POLICY.path;
-  return `${path}?version=${encodeURIComponent(version)}#document-version`;
+  return `${path}/${encodeURIComponent(version)}#document-version`;
 }
 
 export function formatLegalDate(value: string) {

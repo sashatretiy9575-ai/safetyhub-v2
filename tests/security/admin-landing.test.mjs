@@ -13,7 +13,9 @@ test('email-code verification uses the server-authorized role landing instead of
 
   assert.match(route, /rpc\('get_auth_context'\)/u);
   assert.match(route, /redirectTo: landingPath\(authContext, locale\)/u);
-  assert.match(route, /localizedAccountPath\('\/auth\/legal', locale\)/u);
+  assert.match(route, /rpc\('accept_current_legal_documents'/u);
+  assert.match(route, /authContext\.has_current_legal_acceptance !== true/u);
+  assert.doesNotMatch(route, /localizedAccountPath\('\/auth\/legal', locale\)/u);
   assert.match(route, /localizedAccountPath\([\s\S]*?'\/onboarding'[\s\S]*?'\/profile'[\s\S]*?locale/u);
   assert.match(flow, /value === '\/admin'[\s\S]*localizePathname\('\/auth\/legal', locale\)[\s\S]*localizePathname\('\/onboarding', locale\)[\s\S]*localizePathname\('\/profile', locale\)/u);
   assert.match(flow, /router\.replace\(safeLanding\(payload\?\.redirectTo, locale\)\)/u);

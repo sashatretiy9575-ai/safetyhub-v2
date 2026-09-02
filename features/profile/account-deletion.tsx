@@ -6,11 +6,16 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { clientRequest } from '@/lib/client-request';
+import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
 import { localizePathname, type AppLocale } from '@/i18n/config';
+import { clearSafetyHubDeviceData } from '@/lib/safetyhub-device-data';
 
 const API_CONFIRMATION = 'DELETE_ACCOUNT';
+type PendingDeletionReceipt = {
+  pending?: unknown;
+  cleanupNotBefore?: unknown;
+};
 
 export function AccountDeletion() {
   const locale = useLocale() as AppLocale;
@@ -33,11 +38,17 @@ export function AccountDeletion() {
         body: JSON.stringify({ confirmation: API_CONFIRMATION }),
         cache: 'no-store',
       });
+      const receipt = await readClientResponseJson<PendingDeletionReceipt>(result.response);
       if (!result.ok) {
         setMessage(localizedClientRequestMessage(result.error, t('failed'), tErrors));
         return;
       }
-      window.location.assign(`${localizePathname('/auth/login', locale)}?deleted=1`);
+      if (receipt?.pending !== true || typeof receipt.cleanupNotBefore !== 'string') {
+        setMessage(t('failed'));
+        return;
+      }
+      await clearSafetyHubDeviceData();
+      window.location.assign(`${localizePathname('/auth/login', locale)}?deletionRequested=1`);
     } catch (error) {
       setMessage(localizedClientRequestMessage(error, t('failed'), tErrors));
     } finally {
@@ -54,12 +65,10 @@ export function AccountDeletion() {
   }
 
   return (
-    <div className="space-y-4 rounded-2xl border border-[var(--color-danger)] p-4">
+    <div className="space-y-4 border-t border-[var(--color-danger)] pt-4">
       <div>
         <h2 className="font-display text-lg font-bold">{t('title')}</h2>
-        <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-          {t('description')}
-        </p>
+        <p className="mt-2 text-sm text-[var(--color-text-muted)]">{t('description')}</p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="account-deletion-confirmation">

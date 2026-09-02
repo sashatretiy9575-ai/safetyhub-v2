@@ -13,6 +13,7 @@ test('bundle accounting deduplicates shared chunks and isolates the leaf route e
   const payload = {
     entryJSFiles: {
       '[project]/app/layout': ['root.js', 'layout.js'],
+      '[project]/app/opengraph-image--metadata': ['metadata-worker.js'],
       '[project]/app/(public)/layout': ['layout.js', 'public.js'],
       '[project]/app/(public)/page': ['public.js', 'home.js'],
     },
@@ -39,6 +40,7 @@ test('bundle accounting deduplicates shared chunks and isolates the leaf route e
     'root.js',
     'runtime.js',
   ]);
+  assert.equal(assets.initial.has('metadata-worker.js'), false);
   assert.deepEqual([...assets.route], ['home.js']);
   assert.deepEqual([...assets.css].sort(), ['global.css', 'home.css']);
 });
@@ -46,9 +48,9 @@ test('bundle accounting deduplicates shared chunks and isolates the leaf route e
 test('approved production budgets fail closed at the first byte over a limit', () => {
   assert.deepEqual(
     BUNDLE_BUDGETS.map(({ label }) => label),
-    ['home', 'admin employees', 'profile', 'onboarding', 'course detail'],
+    ['home', 'localized home', 'admin employees', 'profile', 'onboarding', 'course detail'],
   );
-  assert.equal(CSS_BUDGET, 20 * 1_024);
+  assert.equal(CSS_BUDGET, 18 * 1_024);
   for (const budget of BUNDLE_BUDGETS) {
     assert.deepEqual(
       budgetViolations({ initial: budget.initial, route: budget.route, css: CSS_BUDGET }, budget),

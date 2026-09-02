@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
+import { Moon, Sun } from '@phosphor-icons/react';
 import { applyDocumentTheme } from '@/lib/theme';
 
 const THEME_CHANGE_EVENT = 'safetyhub:theme-change';
@@ -48,35 +49,10 @@ export function ThemeToggle() {
       aria-checked={isDark}
       aria-label={isDark ? translations('switchToLight') : translations('switchToDark')}
       onClick={toggleTheme}
-      className="glass group inline-flex size-11 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] px-0 whitespace-nowrap text-[var(--color-text)] transition-[color,background-color,border-color] duration-150 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-elevated)] min-[1120px]:h-11 min-[1120px]:w-auto min-[1120px]:min-w-[6.25rem] min-[1120px]:px-2.5"
+      className="group inline-flex size-11 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-transparent px-0 whitespace-nowrap text-[var(--color-text)] transition-[color,background-color] duration-150 hover:bg-[var(--color-surface-muted)] min-[1120px]:h-11 min-[1120px]:w-auto min-[1120px]:min-w-[6.25rem] min-[1120px]:px-2.5"
     >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        className="size-[18px] shrink-0 dark:hidden"
-        fill="none"
-      >
-        <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
-        <path
-          d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-      </svg>
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        className="hidden size-[18px] shrink-0 dark:block"
-        fill="none"
-      >
-        <path
-          d="M20.3 15.7A8.5 8.5 0 0 1 8.3 3.7 8.5 8.5 0 1 0 20.3 15.7Z"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <Sun aria-hidden="true" size={18} weight="regular" className="size-[18px] shrink-0 dark:hidden" />
+      <Moon aria-hidden="true" size={18} weight="regular" className="hidden size-[18px] shrink-0 dark:block" />
       <span
         aria-hidden="true"
         className="hidden text-xs leading-none font-semibold min-[1120px]:inline"

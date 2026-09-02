@@ -4,19 +4,22 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('email-OTP registration enters required onboarding without a password callback', async () => {
-  const [register, requestRoute, verifyRoute, callback, constants, page, form, route] = await Promise.all([
-    read('app/(account)/auth/register/page.tsx'),
-    read('app/api/auth/email-otp/request/route.ts'),
-    read('app/api/auth/email-otp/verify/route.ts'),
-    read('app/(account)/callback/route.ts'),
-    read('lib/constants.ts'),
-    read('app/(account)/onboarding/page.tsx'),
-    read('features/profile/onboarding-form.tsx'),
-    read('app/api/profile/onboarding/route.ts'),
-  ]);
+test('canonical email-OTP access enters required onboarding without a password callback', async () => {
+  const [login, register, requestRoute, verifyRoute, callback, constants, page, form, route] =
+    await Promise.all([
+      read('app/(account)/auth/login/page.tsx'),
+      read('app/(account)/auth/register/page.tsx'),
+      read('app/api/auth/email-otp/request/route.ts'),
+      read('app/api/auth/email-otp/verify/route.ts'),
+      read('app/(account)/callback/route.ts'),
+      read('lib/constants.ts'),
+      read('app/(account)/onboarding/page.tsx'),
+      read('features/profile/onboarding-form.tsx'),
+      read('app/api/profile/onboarding/route.ts'),
+    ]);
 
-  assert.match(register, /<EmailOtpFlow intent="register"/u);
+  assert.match(login, /<EmailOtpFlow \/>/u);
+  assert.match(register, /redirect\(localizePathname\('\/auth\/login', locale\)\)/u);
   assert.match(requestRoute, /auth\.signInWithOtp/u);
   assert.match(requestRoute, /shouldCreateUser: true/u);
   assert.match(verifyRoute, /verifyOtp/u);
@@ -93,14 +96,15 @@ test('avatar flow supports camera, system fallback, crop controls, and mandatory
 });
 
 test('a missing committed avatar sends an already-onboarded learner back to photo setup', async () => {
-  const [page, profileServer, baselineMigration, approvalMigration, policy, quiz] = await Promise.all([
-    read('app/(account)/onboarding/page.tsx'),
-    read('features/profile/server.ts'),
-    read('supabase/migrations/20260813070000_persistent_actor_quota.sql'),
-    read('supabase/migrations/20260831110000_profile_approval_submission.sql'),
-    read('features/learning/policy-error.ts'),
-    read('components/quiz/quiz-client.tsx'),
-  ]);
+  const [page, profileServer, baselineMigration, approvalMigration, policy, quiz] =
+    await Promise.all([
+      read('app/(account)/onboarding/page.tsx'),
+      read('features/profile/server.ts'),
+      read('supabase/migrations/20260813070000_persistent_actor_quota.sql'),
+      read('supabase/migrations/20260831110000_profile_approval_submission.sql'),
+      read('features/learning/policy-error.ts'),
+      read('components/quiz/quiz-client.tsx'),
+    ]);
   assert.match(page, /getProfileAvatarUrl\(context\.user\.id\)/);
   assert.doesNotMatch(page, /profile\.onboarding_completed_at && profile\.avatar_updated_at/);
   assert.match(page, /profile\.onboarding_completed_at && avatarUrl/);

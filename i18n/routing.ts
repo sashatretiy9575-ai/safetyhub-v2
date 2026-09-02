@@ -1,24 +1,16 @@
 import { defineRouting } from 'next-intl/routing';
-import {
-  APP_LOCALES,
-  DEFAULT_LOCALE,
-  LOCALE_COOKIE_MAX_AGE,
-  LOCALE_COOKIE_NAME,
-} from '@/i18n/config';
+import { APP_LOCALES, DEFAULT_LOCALE } from '@/i18n/config';
 
 /**
- * Shared next-intl contract. The application keeps its existing route tree;
- * proxy.ts applies the equivalent `as-needed` external URL policy before the
- * App Router resolves a page.
+ * Shared next-intl navigation contract. Public locale is encoded in the
+ * physical URL, so its server/cache behavior must never consult a locale
+ * cookie or Accept-Language. The client language menu owns its explicit
+ * preference cookie solely as a convenience before navigating to that URL.
  */
 export const routing = defineRouting({
   locales: APP_LOCALES,
   defaultLocale: DEFAULT_LOCALE,
   localePrefix: 'as-needed',
-  localeDetection: true,
-  localeCookie: {
-    name: LOCALE_COOKIE_NAME,
-    maxAge: LOCALE_COOKIE_MAX_AGE,
-    sameSite: 'lax',
-  },
+  localeDetection: false,
+  localeCookie: false,
 });

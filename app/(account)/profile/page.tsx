@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { ArrowRight, Buildings, CaretDown } from '@phosphor-icons/react/dist/ssr';
 import { AuthenticationError, requireUser } from '@/features/auth/server';
 import { ProfileForm } from '@/features/auth/profile-form';
@@ -22,11 +22,13 @@ import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DataLoadFailure } from '@/components/shared/data-load-failure';
 import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
+import { SignOutAction } from '@/components/shared/sign-out-action';
 import { CertificateDownloadButton } from '@/features/certificates/download-button';
 import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
 import { getSiteContacts } from '@/lib/site-contacts';
 import { localizePathname, type AppLocale } from '@/i18n/config';
 import { getCurrentLegalPolicies } from '@/lib/legal-current';
+import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 
 type ProfileTranslator = Awaited<ReturnType<typeof getTranslations>>;
 
@@ -303,10 +305,8 @@ function LearningDashboard({
 }
 
 export default async function ProfilePage() {
-  const [locale, t] = await Promise.all([
-    getLocale() as Promise<AppLocale>,
-    getTranslations('Profile'),
-  ]);
+  const locale = (await getPrivateRequestLocale()) as AppLocale;
+  const t = await getTranslations({ locale, namespace: 'Profile' });
   let context: Awaited<ReturnType<typeof requireUser>>;
   try {
     context = await requireUser({ enforceLegal: false });
@@ -368,15 +368,13 @@ export default async function ProfilePage() {
         </div>
 
         {!context.hasCurrentLegalAcceptance ? (
-          <Card className="border-[var(--color-warning)]">
-            <CardContent className="p-4 md:p-5">
-              <LegalAcceptancePanel
-                initialAcceptances={dashboard?.legalAcceptances ?? []}
-                initiallyUnavailable={!dashboard}
-                currentPolicies={currentPolicies!}
-              />
-            </CardContent>
-          </Card>
+          <section className="border-y border-[var(--color-border)] py-4 md:py-5">
+            <LegalAcceptancePanel
+              initialAcceptances={dashboard?.legalAcceptances ?? []}
+              initiallyUnavailable={!dashboard}
+              currentPolicies={currentPolicies!}
+            />
+          </section>
         ) : null}
 
         <AccountApprovalStatus
@@ -475,6 +473,7 @@ export default async function ProfilePage() {
               <div className="space-y-4 border-t p-4 md:p-6">
                 <p className="text-sm text-[var(--color-text-muted)]">{t('passwordlessHint')}</p>
                 <PwaManualInstall />
+                <SignOutAction />
                 <AccountDeletion />
               </div>
             </details>

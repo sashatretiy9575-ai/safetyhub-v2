@@ -30,10 +30,11 @@ test('contact normalization accepts local formatting and produces canonical link
   assert.equal(contactWhatsappHref(contacts), 'https://wa.me/77017290349');
 });
 
-test('public contacts are server cached and rendered into contact and SEO components', async () => {
-  const [contacts, layout, seo, shell, adminRoute] = await Promise.all([
+test('public contacts are server cached and rendered into all locale SEO shells', async () => {
+  const [contacts, layout, localizedLayout, seo, shell, adminRoute] = await Promise.all([
     read('lib/site-contacts.ts'),
     read('app/(public)/layout.tsx'),
+    read('app/[locale]/(public)/layout.tsx'),
     read('lib/seo.ts'),
     read('components/layout/app-shell.tsx'),
     read('app/api/admin/settings/contacts/route.ts'),
@@ -42,10 +43,12 @@ test('public contacts are server cached and rendered into contact and SEO compon
   assert.match(contacts, /unstable_cache/);
   assert.match(contacts, /SITE_CONTACTS_REVALIDATE_SECONDS = 60 \* 60/);
   assert.match(contacts, /get_site_settings/);
-  assert.match(layout, /organizationJsonLd\(contacts, locale, \{/);
+  assert.match(layout, /organizationJsonLd\(contacts, DEFAULT_LOCALE, \{/);
   assert.match(layout, /description: metadata\('description'\)/);
   assert.match(layout, /city: footer\('city'\)/);
-  assert.match(layout, /localBusinessJsonLd\(contacts, locale, footer\('city'\)\)/);
+  assert.match(layout, /localBusinessJsonLd\(contacts, DEFAULT_LOCALE, footer\('city'\)\)/);
+  assert.match(localizedLayout, /organizationJsonLd\(contacts, locale, \{/);
+  assert.match(localizedLayout, /localBusinessJsonLd\(contacts, locale, footer\('city'\)\)/);
   assert.match(seo, /telephone: contacts\.phoneDisplay/);
   assert.match(shell, /getSiteContacts/);
   assert.match(adminRoute, /invalidOriginResponse/);

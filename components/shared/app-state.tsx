@@ -7,35 +7,6 @@ import { Button } from '@/components/ui/button';
 import { reportAppError } from '@/lib/observability';
 import { localizePathname, type AppLocale } from '@/i18n/config';
 
-export function AppPageLoading() {
-  const t = useTranslations('AppState');
-  return (
-    <div
-      className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-soft)]"
-      role="status"
-      aria-live="polite"
-      aria-label={t('loadingAria')}
-    >
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <div className="h-5 w-32 rounded-full bg-[var(--color-surface-muted)]" />
-          <div className="h-10 w-3/4 rounded-2xl bg-[var(--color-surface-muted)]" />
-          <div className="h-4 w-1/2 rounded-full bg-[var(--color-surface-muted)]" />
-        </div>
-        <div className="grid gap-3 md:grid-cols-3">
-          <div className="h-32 rounded-2xl bg-[var(--color-surface-muted)]" />
-          <div className="h-32 rounded-2xl bg-[var(--color-surface-muted)]" />
-          <div className="h-32 rounded-2xl bg-[var(--color-surface-muted)]" />
-        </div>
-        <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
-          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-[var(--color-primary)]" />
-          {t('loading')}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 type AppDiagnostic = ReturnType<typeof reportAppError>;
 
 type AppErrorStateProps = {
@@ -63,7 +34,8 @@ export function AppErrorState({
 }: AppErrorStateProps) {
   const locale = useLocale() as AppLocale;
   const common = useTranslations('Common');
-  const diagnostic = providedDiagnostic ?? (error ? reportAppError(error, { source: 'app-error-state' }) : null);
+  const diagnostic =
+    providedDiagnostic ?? (error ? reportAppError(error, { source: 'app-error-state' }) : null);
   const resolvedRetryLabel = retryLabel ?? common('retry');
   const resolvedHomeLabel = homeLabel ?? common('home');
 
@@ -79,7 +51,7 @@ export function AppErrorState({
         <h1 className="font-display text-2xl font-semibold">{title}</h1>
         <p className="text-sm text-[var(--color-text-muted)]">{description}</p>
         {diagnostic ? (
-          <p className="break-all font-mono text-xs text-[var(--color-text-subtle)]">
+          <p className="font-mono text-xs break-all text-[var(--color-text-subtle)]">
             {correlationLabel}: {diagnostic.correlationId}
           </p>
         ) : null}

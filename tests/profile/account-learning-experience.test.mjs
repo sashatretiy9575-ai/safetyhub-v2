@@ -45,7 +45,8 @@ test('profile uses one dashboard contract and keeps attempt analytics hidden', a
     read('features/profile/server.ts'),
     read('features/auth/profile-form.tsx'),
   ]);
-  assert.match(profile, /getTranslations\('Profile'\)/);
+  assert.match(profile, /getTranslations\(\{ locale, namespace: 'Profile' \}\)/);
+  assert.match(profile, /getPrivateRequestLocale\(\)/);
   assert.match(profile, /t\('dashboardTitle'\)/);
   assert.match(profile, /t\('nextStep'\)/);
   assert.match(profile, /t\('coursesTitle'\)/);
@@ -65,10 +66,11 @@ test('profile uses one dashboard contract and keeps attempt analytics hidden', a
 });
 
 test('account deletion is explicit, irreversible, and hands off to durable cleanup', async () => {
-  const [control, route, auth] = await Promise.all([
+  const [control, route, auth, cleanup] = await Promise.all([
     read('features/profile/account-deletion.tsx'),
     read('app/api/profile/account/route.ts'),
     read('features/auth/server.ts'),
+    read('lib/supabase/session-cleanup.ts'),
   ]);
   assert.match(control, /confirmation !== confirmationPhrase/);
   assert.match(control, /body: JSON\.stringify\(\{ confirmation: API_CONFIRMATION \}\)/);
@@ -99,5 +101,7 @@ test('account deletion is explicit, irreversible, and hands off to durable clean
   assert.match(route, /NextResponse\.json\(pending, \{ status: 202 \}\)/);
   assert.match(route, /tombstoneId/);
   assert.match(route, /cleanupNotBefore/);
-  assert.match(route, /Clear-Site-Data/);
+  assert.match(route, /clearSafetyHubLocalSession\(request, response\)/);
+  assert.match(cleanup, /safetyhub-session-hint/);
+  assert.match(cleanup, /Clear-Site-Data/);
 });

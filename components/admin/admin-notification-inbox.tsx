@@ -44,8 +44,7 @@ function canPoll() {
   return document.visibilityState === 'visible' && navigator.onLine !== false;
 }
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const MACHINE_CODE_PATTERN = /^[A-Z][A-Z0-9_]{2,79}$/u;
 const PHONE_COUNTRY_PATTERN = /^[A-Z]{2}$/u;
 const PHONE_E164_PATTERN = /^\+[1-9][0-9]{1,14}$/u;
@@ -120,13 +119,8 @@ function parseEvent(value: unknown): AdminNotificationEvent | null {
   const payload = value.payload;
 
   if (value.type === 'account.approval_requested') {
-    const minimalKeys = [
-      'name',
-      'surname',
-      'locale',
-      'requestedAt',
-      'adminPath',
-    ];
+    const genericV2Keys = ['schemaVersion', 'locale', 'requestedAt', 'adminPath'];
+    const legacyGenericKeys = ['name', 'surname', 'locale', 'requestedAt', 'adminPath'];
     const applicationKeys = [
       'name',
       'surname',
@@ -136,7 +130,19 @@ function parseEvent(value: unknown): AdminNotificationEvent | null {
       'phoneE164',
     ];
     const hasApplicationDetails = hasExactKeys(payload, applicationKeys);
-    if (!(hasExactKeys(payload, minimalKeys) || hasApplicationDetails)) {
+    const hasGenericV2 = hasExactKeys(payload, genericV2Keys);
+    const hasLegacyGeneric = hasExactKeys(payload, legacyGenericKeys);
+    if (!(hasGenericV2 || hasLegacyGeneric || hasApplicationDetails)) {
+      return null;
+    }
+    if (
+      hasGenericV2 &&
+      (payload.schemaVersion !== 2 ||
+        typeof payload.locale !== 'string' ||
+        !LOCALES.has(payload.locale) ||
+        !isTimestamp(payload.requestedAt) ||
+        !isAdminPath(payload.adminPath))
+    ) {
       return null;
     }
     if (
@@ -153,13 +159,20 @@ function parseEvent(value: unknown): AdminNotificationEvent | null {
       return null;
     }
     if (
-      !hasApplicationDetails &&
-      (!isSingleLine(payload.name) ||
-        !isSingleLine(payload.surname) ||
-        typeof payload.locale !== 'string' ||
+      hasLegacyGeneric &&
+      (typeof payload.locale !== 'string' ||
         !LOCALES.has(payload.locale) ||
         !isTimestamp(payload.requestedAt) ||
         !isAdminPath(payload.adminPath))
+    ) {
+      return null;
+    }
+    const isExactLegacyBlankZh =
+      hasLegacyGeneric && payload.name === '' && payload.surname === '' && payload.locale === 'zh';
+    if (
+      hasLegacyGeneric &&
+      !isExactLegacyBlankZh &&
+      (!isSingleLine(payload.name) || !isSingleLine(payload.surname))
     ) {
       return null;
     }
@@ -209,7 +222,17 @@ function parseEvent(value: unknown): AdminNotificationEvent | null {
     return null;
   }
 
-  if (!hasExactKeys(value, ['id', 'correlationId', 'occurredAt', 'readAt', 'delivery', 'type', 'payload'])) {
+  if (
+    !hasExactKeys(value, [
+      'id',
+      'correlationId',
+      'occurredAt',
+      'readAt',
+      'delivery',
+      'type',
+      'payload',
+    ])
+  ) {
     return null;
   }
   return value as AdminNotificationEvent;
@@ -484,10 +507,24 @@ function dateTime(value: string) {
 function eventPresentation(event: AdminNotificationEvent) {
   switch (event.type) {
     case 'account.approval_requested': {
+      if ('schemaVersion' in event.payload) {
+        return {
+          icon: Bell,
+          title: 'Новая заявка на обучение',
+          description: `Новая заявка · ${event.payload.locale.toUpperCase()}`,
+        };
+      }
       const applicationSummary =
         'job' in event.payload
           ? ` · ${event.payload.job} · ${event.payload.organization} · ${event.payload.phoneE164}`
           : '';
+      if ('locale' in event.payload && event.payload.name === '' && event.payload.surname === '') {
+        return {
+          icon: Bell,
+          title: 'Новая заявка на обучение',
+          description: `Новая заявка · ${event.payload.locale.toUpperCase()}`,
+        };
+      }
       return {
         icon: Bell,
         title: 'Новая заявка на обучение',

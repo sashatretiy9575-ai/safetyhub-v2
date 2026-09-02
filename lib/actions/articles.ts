@@ -6,6 +6,7 @@ import {
   ARTICLES_CACHE_TAG,
   CONTENT_CACHE_TAG,
   CONTENT_REVALIDATE_PATHS,
+  localizedContentPaths,
 } from '@/lib/content/cache-policy';
 import { getArticleBySlug } from '@/lib/content/articles';
 import { createClient } from '@/lib/supabase/server';
@@ -76,8 +77,10 @@ function revalidateArticlePaths(slug: string, previousSlug?: string | null) {
   updateTag(CONTENT_CACHE_TAG);
   updateTag(ARTICLES_CACHE_TAG);
   for (const path of CONTENT_REVALIDATE_PATHS) revalidatePath(path);
-  revalidatePath(`/blog/${slug}`);
-  if (previousSlug && previousSlug !== slug) revalidatePath(`/blog/${previousSlug}`);
+  for (const path of localizedContentPaths(`/blog/${slug}`)) revalidatePath(path);
+  if (previousSlug && previousSlug !== slug) {
+    for (const path of localizedContentPaths(`/blog/${previousSlug}`)) revalidatePath(path);
+  }
 }
 
 export async function saveArticleAction(input: unknown): Promise<ArticleMutationResult> {

@@ -27,18 +27,20 @@ test('legacy password registration and login cannot create, confirm, or recover 
   );
 });
 
-test('browser entry pages delegate exclusively to the email OTP flow', async () => {
+test('the canonical browser access page owns the neutral email OTP flow', async () => {
   const [login, register] = await Promise.all([
     read('app/(account)/auth/login/page.tsx'),
     read('app/(account)/auth/register/page.tsx'),
   ]);
 
-  assert.match(login, /<EmailOtpFlow intent="login"/u);
-  assert.match(register, /<EmailOtpFlow intent="register"/u);
-  for (const source of [login, register]) {
-    assert.doesNotMatch(
-      source,
-      /PasswordInput|type="password"|clientRequest\('\/api\/auth\/(?:login|register)'/u,
-    );
-  }
+  assert.match(login, /<EmailOtpFlow \/>/u);
+  assert.doesNotMatch(
+    login,
+    /intent=|PasswordInput|type="password"|clientRequest\('\/api\/auth\/login'/u,
+  );
+  assert.match(register, /redirect\(localizePathname\('\/auth\/login', locale\)\)/u);
+  assert.doesNotMatch(
+    register,
+    /<EmailOtpFlow|intent=|PasswordInput|type="password"|clientRequest\('\/api\/auth\/register'/u,
+  );
 });

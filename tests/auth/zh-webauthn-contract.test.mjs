@@ -72,7 +72,7 @@ test('Chinese username/password routes are same-origin, bounded, rate-limited, a
   assert.doesNotMatch(server, /console\.(?:log|error)|localStorage|sessionStorage/u);
 });
 
-test('Chinese browser entry uses only Latin username and password without client secret persistence', async () => {
+test('Chinese canonical access uses only Latin username and password without client secret persistence', async () => {
   const [flow, loginPage, registerPage, recoveryPage] = await Promise.all([
     read('features/auth/zh-username-password-flow.tsx'),
     read('app/(account)/auth/login/page.tsx'),
@@ -91,11 +91,11 @@ test('Chinese browser entry uses only Latin username and password without client
     flow,
     /@auth\.invalid|simplewebauthn|localStorage|sessionStorage|one-time-code|type="email"|oauth/iu,
   );
-  for (const page of [loginPage, registerPage]) {
-    assert.match(page, /rolloutFeatureEnabled\('zhUsernamePassword'\)/u);
-    assert.match(page, /ZhUsernamePasswordFlow/u);
-    assert.doesNotMatch(page, /ZhPasskeyFlow|zhPasskey/u);
-  }
+  assert.match(loginPage, /rolloutFeatureEnabled\('zhUsernamePassword'\)/u);
+  assert.match(loginPage, /ZhUsernamePasswordFlow/u);
+  assert.doesNotMatch(loginPage, /ZhPasskeyFlow|zhPasskey/u);
+  assert.match(registerPage, /redirect\(localizePathname\('\/auth\/login', locale\)\)/u);
+  assert.doesNotMatch(registerPage, /ZhUsernamePasswordFlow|ZhPasskeyFlow|zhPasskey/u);
   assert.match(recoveryPage, /没有自助恢复渠道/u);
   assert.doesNotMatch(recoveryPage, /type="email"|one-time-code|simplewebauthn/iu);
 });
@@ -131,15 +131,18 @@ test('server-only mapping redacts the synthetic identifier and never persists pa
   assert.equal(validation.match(/captchaToken: captchaTokenSchema/gu)?.length, 2);
 });
 
-test('Chinese registration verifies its separate Turnstile token before allocation', async () => {
-  const [server, verifier, validation, flow, loginPage, environment] = await Promise.all([
-    read('features/auth/zh-username-password-server.ts'),
-    read('features/auth/turnstile-server.ts'),
-    read('features/auth/zh-username-password-validation.ts'),
-    read('features/auth/zh-username-password-flow.tsx'),
-    read('app/(account)/auth/login/page.tsx'),
-    read('.env.example'),
-  ]);
+test('Chinese registration verifies its separate Turnstile token before allocation and mints a fresh token for auto-login', async () => {
+  const [server, verifier, validation, flow, turnstile, loginPage, environment] = await Promise.all(
+    [
+      read('features/auth/zh-username-password-server.ts'),
+      read('features/auth/turnstile-server.ts'),
+      read('features/auth/zh-username-password-validation.ts'),
+      read('features/auth/zh-username-password-flow.tsx'),
+      read('features/auth/turnstile.tsx'),
+      read('app/(account)/auth/login/page.tsx'),
+      read('.env.example'),
+    ],
+  );
 
   const registration = server.slice(
     server.indexOf('export async function registerZhUsernamePassword'),
@@ -181,12 +184,30 @@ test('Chinese registration verifies its separate Turnstile token before allocati
   assert.match(validation, /ZH_PASSWORD_MAX_BYTES = 72/u);
   assert.match(validation, /new TextEncoder\(\)/u);
   assert.match(flow, /onFailure=\{\(\) => \{[\s\S]*pendingCaptchaSubmitRef\.current = null/u);
-  assert.match(flow, /setMessage\(CAPTCHA_RETRY\)/u);
+  assert.match(flow, /CAPTCHA_RETRY/u);
   assert.match(flow, /maxLength=\{ZH_PASSWORD_MAX_BYTES\}/u);
-  assert.match(flow, /router\.replace\('\/zh\/auth\/login\?registered=1'\)/u);
+  assert.match(
+    flow,
+    /const submitRequest = useCallback\(async \(captchaToken\?: string, requestedMode: Mode = mode\)/u,
+  );
+  assert.match(
+    flow,
+    /useEffect\(\(\) => \{[\s\S]*submitRequestRef\.current = \(captchaToken, requestedMode\)/u,
+  );
+  assert.match(flow, /automaticLoginStarted = true/u);
+  assert.match(flow, /useEffect\(\(\) => \{[\s\S]*if \(!autoLoginPending\) return;/u);
+  assert.match(
+    flow,
+    /pendingCaptchaSubmitRef\.current = \(freshToken\) => \{[\s\S]*submitRequestRef\.current\(freshToken, 'login'\)/u,
+  );
+  assert.match(flow, /window\.setTimeout\([\s\S]*submitRequestRef\.current\(undefined, 'login'\)/u);
+  assert.match(flow, /AUTO_LOGIN_FALLBACK/u);
+  assert.match(turnstile, /resetRequiredRef\.current \|\| completedRef\.current/u);
+  assert.match(turnstile, /window\.turnstile\.reset\(widgetId\)/u);
   assert.doesNotMatch(flow, /useSearchParams/u);
   assert.match(loginPage, /searchParams: Promise/u);
-  assert.match(loginPage, /registrationComplete=\{registrationComplete\}/u);
+  assert.match(loginPage, /deletionRequested/u);
+  assert.doesNotMatch(loginPage, /registrationComplete/u);
   assert.match(environment, /SAFETYHUB_TURNSTILE_SECRET_KEY=1x0{31}AA/u);
 });
 
@@ -233,11 +254,17 @@ test('Chinese username/password registration reaches manual review without profi
   assert.match(migration, /control\.approval_state = 'approved'::public\.account_approval_state/u);
   assert.match(migration, /auth_user\.deleted_at is null/u);
   assert.match(migration, /auth_user\.banned_until is null/u);
-  assert.match(migration, /auth_user\.raw_app_meta_data ->> 'safetyhub_auth_kind' = 'zh_username_password'/u);
+  assert.match(
+    migration,
+    /auth_user\.raw_app_meta_data ->> 'safetyhub_auth_kind' = 'zh_username_password'/u,
+  );
   assert.match(migration, /lower\(auth_user\.email::text\) = account\.synthetic_email/u);
   assert.match(migration, /create or replace function private\.start_test_attempt_unmetered/u);
   assert.match(migration, /not v_is_approved_zh_username_learner and \(/u);
-  assert.match(migration, /not v_is_approved_zh_username_learner\s+and v_profile\.avatar_updated_at is null/u);
+  assert.match(
+    migration,
+    /not v_is_approved_zh_username_learner\s+and v_profile\.avatar_updated_at is null/u,
+  );
   assert.match(migration, /private\.add_zh_username_to_pending_approval_items/u);
   assert.match(migration, /private\.redact_zh_email_items/u);
   assert.match(migration, /private\.list_pending_account_approval_page_provider_internal/u);

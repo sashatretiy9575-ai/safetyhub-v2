@@ -1,42 +1,9 @@
-import type { NextRequest, NextResponse as FrameworkNextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from '@/lib/security/api-response';
 import { isSameOriginRequest } from '@/features/auth/request-origin';
 import { createClient } from '@/lib/supabase/server';
-import {
-  isSupabaseAuthCookieName,
-  supabaseAuthCookieOptions,
-} from '@/lib/supabase/auth-cookie-options';
+import { clearSafetyHubLocalSession } from '@/lib/supabase/session-cleanup';
 import { readJsonBody } from '@/lib/security/request-body';
-
-function clearLocalSession(
-  request: NextRequest,
-  response: FrameworkNextResponse,
-) {
-  const cookieOptions = supabaseAuthCookieOptions();
-  for (const cookie of request.cookies.getAll()) {
-    if (!isSupabaseAuthCookieName(cookie.name)) continue;
-    response.cookies.set(cookie.name, '', {
-      ...cookieOptions,
-      expires: new Date(0),
-      maxAge: 0,
-    });
-  }
-  // Versions before the passwordless cutover could leave this cookie behind.
-  // It no longer represents an active server-side context, but clear it so a
-  // shared-device logout remains compatible with those browser sessions.
-  response.cookies.set('safetyhub-password-context', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 0,
-  });
-  // Quiz drafts are intentionally stored on-device. A shared-device logout
-  // must remove them (and private HTTP/Cache Storage entries) before another
-  // person uses the same browser profile.
-  response.headers.set('Clear-Site-Data', '"cache", "storage"');
-  return response;
-}
 
 export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
@@ -57,5 +24,5 @@ export async function POST(request: NextRequest) {
     scope === 'global' && signOutFailed
       ? NextResponse.json({ error: 'AUTH_UNAVAILABLE' }, { status: 503 })
       : NextResponse.json({ signedOut: true });
-  return clearLocalSession(request, response);
+  return clearSafetyHubLocalSession(request, response);
 }

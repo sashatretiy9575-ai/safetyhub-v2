@@ -101,17 +101,34 @@ test('language switcher exposes only locale routes enabled for the active page',
     APP_LOCALES,
   );
 
-  const [header, switcher] = await Promise.all([
+  const [header, switcher, flags, deferredSwitcher] = await Promise.all([
     read('components/layout/header.tsx'),
     read('components/layout/language-switcher.tsx'),
+    read('components/layout/locale-flag.tsx'),
+    read('components/layout/deferred-language-switcher.tsx'),
   ]);
-  assert.match(header, /REQUEST_PATHNAME_HEADER_NAME/u);
-  assert.match(header, /localesForLanguageSwitcher\(\{[\s\S]*?localeRoutesEnabled[\s\S]*?zhUsernamePasswordEnabled/u);
-  assert.match(header, /<LanguageSwitcher locales=\{switcherLocales\} \/>/u);
+  assert.match(header, /localePathname/u);
+  assert.match(
+    header,
+    /localesForLanguageSwitcher\(\{[\s\S]*?localeRoutesEnabled[\s\S]*?zhUsernamePasswordEnabled/u,
+  );
+  assert.match(header, /<DeferredLanguageSwitcher/u);
   assert.match(switcher, /locales:\s*readonly AppLocale\[\]/u);
   assert.match(switcher, /!locales\.includes\(nextLocale\)/u);
   assert.match(switcher, /\{locales\.map\(/u);
   assert.doesNotMatch(switcher, /\{APP_LOCALES\.map\(/u);
+  assert.doesNotMatch(switcher, /<select\b/iu);
+  assert.match(switcher, /DropdownMenuRadioGroup/u);
+  assert.match(switcher, /DropdownMenuRadioItem/u);
+  assert.match(switcher, /<LocaleFlag locale=\{candidate\}/u);
+  assert.match(flags, /flag-icons\/flags\/4x3\/ru\.svg/u);
+  assert.match(flags, /flag-icons\/flags\/4x3\/kz\.svg/u);
+  assert.match(flags, /flag-icons\/flags\/4x3\/gb\.svg/u);
+  assert.match(flags, /flag-icons\/flags\/4x3\/cn\.svg/u);
+  assert.match(flags, /typeof asset === 'string' \? asset : asset\.src/u);
+  assert.match(flags, /src=\{flagSource\(FLAG_ASSET\[locale\]\)\}/u);
+  assert.match(deferredSwitcher, /LanguageSwitcherFallback/u);
+  assert.match(deferredSwitcher, /<LocaleFlag locale=\{locale\}/u);
 });
 
 test('explicit URL, cookie and weighted Accept-Language detection are deterministic', () => {
@@ -155,21 +172,74 @@ test('metadata helpers emit localized canonical, hreflang and Open Graph contrac
 });
 
 test('proxy composes locale routing ahead of the existing Supabase/CSP gate', async () => {
-  const [proxy, switcher] = await Promise.all([
-    read('proxy.ts'),
-    read('components/layout/language-switcher.tsx'),
-  ]);
-  const publicFastPath = proxy.indexOf('if (!isProtected)');
+  const [
+    proxy,
+    switcher,
+    requestConfig,
+    publicLayout,
+    localizedLayout,
+    rootDocument,
+    seo,
+    privateLocale,
+    accountLayout,
+    loginPage,
+  ] =
+    await Promise.all([
+      read('proxy.ts'),
+      read('components/layout/language-switcher.tsx'),
+      read('i18n/request.ts'),
+      read('app/(public)/layout.tsx'),
+      read('app/[locale]/layout.tsx'),
+      read('components/layout/root-document.tsx'),
+      read('lib/seo.ts'),
+      read('i18n/private-request-locale.ts'),
+      read('app/(account)/layout.tsx'),
+      read('app/(account)/auth/login/page.tsx'),
+    ]);
+  const publicFastPath = proxy.indexOf('if (!isProtected && !isAuthEntry)');
   const refresh = proxy.indexOf('await updateSession');
   assert.ok(publicFastPath > 0 && refresh > publicFastPath);
   assert.match(proxy, /splitLocalePathname\(externalPathname\)/u);
+  assert.match(proxy, /function isPhysicalLocaleRoute\(pathname: string\)/u);
+  assert.match(proxy, /const physicalLocaleRoute =/u);
+  assert.match(proxy, /renderPathname = physicalLocaleRoute \? externalPathname : pathname/u);
+  assert.match(proxy, /s-maxage=300, stale-while-revalidate=86400/u);
   assert.match(proxy, /requestHeaders\.set\(LOCALE_HEADER_NAME, locale\)/u);
   assert.match(proxy, /NextResponse\.rewrite\(destination/u);
   assert.match(proxy, /localizedPath\.hasLocalePrefix && !localeRoutable/u);
   assert.match(proxy, /localizedPath\.locale === DEFAULT_LOCALE/u);
   assert.equal((proxy.match(/updateSession\(/gu) ?? []).length, 1);
-  assert.match(switcher, /document\.cookie = `\$\{LOCALE_COOKIE_NAME\}/u);
-  assert.match(switcher, /localizePathname\(pathname, nextLocale\)/u);
-  assert.match(switcher, /window\.location\.search\.slice\(1\)/u);
+  assert.match(proxy, /const isAuthEntry =[\s\S]*pathname === '\/auth'/u);
+  assert.match(proxy, /request\.nextUrl\.pathname !== url\.pathname/u);
+  assert.match(proxy, /authRealmForSessionUser\(user\) !== authRealmForLocale\(locale\)/u);
+  assert.match(switcher, /function setLocalePreference\(locale: AppLocale\)/u);
+  assert.match(switcher, /LOCALE_COOKIE_NAME/u);
+  assert.match(switcher, /localizePathname\(pathname, locale\)/u);
+  assert.match(switcher, /window\.location\.search/u);
   assert.match(switcher, /SameSite=Lax/u);
+  assert.match(switcher, /DropdownMenuRadioGroup/u);
+  assert.match(switcher, /!hasSessionHint\(\)/u);
+  assert.match(switcher, /window\.location\.assign\(navigationTarget\(pathname, nextLocale\)\)/u);
+  assert.ok(
+    switcher.indexOf('if (!hasSessionHint())') < switcher.indexOf("fetch('/api/profile/locale'"),
+    'guest locale navigation must precede and avoid the profile API request',
+  );
+
+  assert.doesNotMatch(requestConfig, /headers\(/u);
+  assert.doesNotMatch(requestConfig, /LOCALE_HEADER_NAME/u);
+  assert.match(privateLocale, /LOCALE_HEADER_NAME/u);
+  assert.match(privateLocale, /getPrivateRequestLocale/u);
+  assert.match(accountLayout, /loadMessages\(locale\)/u);
+  assert.match(accountLayout, /locale=\{locale\}/u);
+  assert.match(loginPage, /getPrivateRequestLocale\(\)/u);
+  assert.match(loginPage, /locale === 'zh' \? <ZhUsernamePasswordFlow/u);
+  assert.match(publicLayout, /export const revalidate = 300/u);
+  assert.match(publicLayout, /setRequestLocale\(DEFAULT_LOCALE\)/u);
+  assert.match(localizedLayout, /export const dynamicParams = false/u);
+  assert.match(localizedLayout, /generateStaticParams/u);
+  assert.match(localizedLayout, /setRequestLocale\(locale\)/u);
+  assert.match(rootDocument, /translate="no"/u);
+  assert.match(rootDocument, /className="notranslate"/u);
+  assert.match(seo, /google:\s*'notranslate'/u);
+  assert.match(rootDocument, /noto-sans-sc-ui\.f113fe63\.woff2/u);
 });

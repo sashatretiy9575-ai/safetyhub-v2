@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { SignIn, UserPlus } from '@phosphor-icons/react';
-import Link from 'next/link';
+import { SignIn } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { FieldError } from '@/features/auth/form-controls';
@@ -21,7 +20,6 @@ import { Label } from '@/components/ui/label';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
 import { localizePathname, type AppLocale } from '@/i18n/config';
 
-type EmailOtpIntent = 'login' | 'register';
 type EmailOtpStage = 'email' | 'code';
 type BusyAction = 'send' | 'verify' | null;
 type StoredAttempt = {
@@ -32,7 +30,7 @@ type StoredCooldown = {
   email: string;
   retryAt: number;
 };
-type FieldErrors = Partial<Record<'email' | 'code' | 'captcha', string>>;
+type FieldErrors = Partial<Record<'email' | 'code' | 'captcha' | 'legal', string>>;
 
 const ATTEMPT_TTL_MS = 60 * 60 * 1000;
 const RESEND_DELAY_SECONDS = 60;
@@ -41,15 +39,12 @@ const SEND_COOLDOWN_STORAGE_KEY = 'safetyhub-email-otp:send-cooldown';
 const SEND_RATE_LIMITED_ERROR = 'SEND_RATE_LIMITED';
 const VERIFY_RATE_LIMITED_ERROR = 'VERIFY_RATE_LIMITED';
 
-function readStoredAttempt(intent: EmailOtpIntent): StoredAttempt | null {
+function readStoredAttempt(): StoredAttempt | null {
   try {
     const value = JSON.parse(sessionStorage.getItem(ATTEMPT_STORAGE_KEY) ?? 'null') as unknown;
     if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
     const candidate = value as Partial<StoredAttempt>;
-    const parsedEmail = emailOtpStartSchema.safeParse({
-      email: candidate.email,
-      intent,
-    });
+    const parsedEmail = emailOtpStartSchema.safeParse({ email: candidate.email });
     if (
       !parsedEmail.success ||
       typeof candidate.sentAt !== 'number' ||
@@ -90,14 +85,14 @@ function clearStoredAttempt() {
   }
 }
 
-function readStoredSendCooldown(intent: EmailOtpIntent): StoredCooldown | null {
+function readStoredSendCooldown(): StoredCooldown | null {
   try {
     const value = JSON.parse(
       sessionStorage.getItem(SEND_COOLDOWN_STORAGE_KEY) ?? 'null',
     ) as unknown;
     if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
     const candidate = value as Partial<StoredCooldown>;
-    const parsedEmail = emailOtpStartSchema.safeParse({ email: candidate.email, intent });
+    const parsedEmail = emailOtpStartSchema.safeParse({ email: candidate.email });
     if (
       !parsedEmail.success ||
       typeof candidate.retryAt !== 'number' ||
@@ -144,10 +139,11 @@ function safeLanding(value: unknown, locale: AppLocale) {
     : localizePathname('/profile', locale);
 }
 
-export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
+export function EmailOtpFlow() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('AuthOtp');
+  const legalT = useTranslations('LegalFlow');
   const errorT = useTranslations('Common.errors');
   const [stage, setStage] = useState<EmailOtpStage>('email');
   const [email, setEmail] = useState('');
@@ -161,21 +157,21 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
   const [status, setStatus] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [captchaVersion, setCaptchaVersion] = useState(0);
+  const [legalAccepted, setLegalAccepted] = useState(true);
   const emailRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
   const turnstileRef = useRef<TurnstileHandle>(null);
   const pendingCaptchaSubmitRef = useRef<((token: string) => void) | null>(null);
   const inFlightActionRef = useRef<BusyAction>(null);
   const captchaRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
-  const isRegister = intent === 'register';
   const latestRetryAt = Math.max(sendRetryAt, verifyRetryAt);
   const sendRetrySeconds = retrySecondsUntil(sendRetryAt, retryClock);
   const verifyRetrySeconds = retrySecondsUntil(verifyRetryAt, retryClock);
   const retryActive = latestRetryAt > retryClock;
 
   useEffect(() => {
-    const storedAttempt = readStoredAttempt(intent);
-    const storedCooldown = readStoredSendCooldown(intent);
+    const storedAttempt = readStoredAttempt();
+    const storedCooldown = readStoredSendCooldown();
     if (!storedAttempt && !storedCooldown) return;
 
     setEmail(storedAttempt?.email ?? storedCooldown!.email);
@@ -188,7 +184,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       setStage('code');
       setStatus(t('storedStatus'));
     }
-  }, [intent, t]);
+  }, [t]);
 
   useEffect(() => {
     if (!retryActive) return;
@@ -228,7 +224,6 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: normalizedEmail,
-          intent,
           captchaToken,
           locale,
         }),
@@ -298,7 +293,6 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       return;
     const parsed = emailOtpStartSchema.safeParse({
       email,
-      intent,
     });
     if (!parsed.success) {
       const nextErrors: FieldErrors = {};
@@ -327,12 +321,14 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       email,
       code,
       locale,
+      legalAccepted,
     });
     if (!parsed.success) {
       const nextErrors: FieldErrors = {};
       const flattened = parsed.error.flatten().fieldErrors;
       if (flattened.email?.length) nextErrors.email = t('emailInvalid');
       if (flattened.code?.length) nextErrors.code = t('codeInvalid');
+      if (flattened.legalAccepted?.length) nextErrors.legal = t('legalRequired');
       setFieldErrors(nextErrors);
       setError('');
       requestAnimationFrame(() => (nextErrors.email ? emailRef.current : codeRef.current)?.focus());
@@ -412,8 +408,8 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
     setFieldErrors({});
   };
 
-  const Icon = isRegister ? UserPlus : SignIn;
-  const title = isRegister ? t('registerTitle') : t('loginTitle');
+  const Icon = SignIn;
+  const title = t('loginTitle');
   const visibleError =
     error === SEND_RATE_LIMITED_ERROR
       ? sendRetrySeconds > 0
@@ -433,9 +429,7 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
         </span>
         <h1 className="font-display text-2xl font-bold">{title}</h1>
         <p className="text-sm text-[var(--color-text-muted)]">
-          {stage === 'email'
-            ? t('emailDescription')
-            : t('codeDescription')}
+          {stage === 'email' ? t('emailDescription') : t('codeDescription')}
         </p>
       </div>
 
@@ -448,9 +442,9 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       {stage === 'email' && (
         <form onSubmit={requestCode} className="space-y-4" noValidate>
           <div className="space-y-2">
-            <Label htmlFor={`${intent}-email`}>{t('emailLabel')}</Label>
+            <Label htmlFor="email-otp-email">{t('emailLabel')}</Label>
             <Input
-              id={`${intent}-email`}
+              id="email-otp-email"
               ref={emailRef}
               type="email"
               autoComplete="email"
@@ -460,10 +454,10 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
                 setFieldErrors((value) => ({ ...value, email: undefined }));
               }}
               invalid={Boolean(fieldErrors.email)}
-              aria-describedby={fieldErrors.email ? `${intent}-email-error` : undefined}
+              aria-describedby={fieldErrors.email ? 'email-otp-email-error' : undefined}
               required
             />
-            <FieldError id={`${intent}-email-error`} message={fieldErrors.email} />
+            <FieldError id="email-otp-email-error" message={fieldErrors.email} />
           </div>
 
           <Button
@@ -496,9 +490,9 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
       {stage === 'code' && (
         <form onSubmit={verifyCode} className="space-y-4" noValidate>
           <div className="space-y-2">
-            <Label htmlFor={`${intent}-code-email`}>{t('emailLabel')}</Label>
+            <Label htmlFor="email-otp-code-email">{t('emailLabel')}</Label>
             <Input
-              id={`${intent}-code-email`}
+              id="email-otp-code-email"
               ref={emailRef}
               type="email"
               autoComplete="email"
@@ -506,23 +500,20 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
               onChange={(event) => {
                 const nextEmail = event.target.value;
                 setEmail(nextEmail);
-                const parsed = emailOtpStartSchema.safeParse({
-                  email: nextEmail,
-                  intent,
-                });
+                const parsed = emailOtpStartSchema.safeParse({ email: nextEmail });
                 if (sentAt > 0 && parsed.success) storeAttempt(parsed.data.email, sentAt);
                 setFieldErrors((value) => ({ ...value, email: undefined }));
               }}
               invalid={Boolean(fieldErrors.email)}
-              aria-describedby={fieldErrors.email ? `${intent}-code-email-error` : undefined}
+              aria-describedby={fieldErrors.email ? 'email-otp-code-email-error' : undefined}
               required
             />
-            <FieldError id={`${intent}-code-email-error`} message={fieldErrors.email} />
+            <FieldError id="email-otp-code-email-error" message={fieldErrors.email} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`${intent}-code`}>{t('codeLabel')}</Label>
+            <Label htmlFor="email-otp-code">{t('codeLabel')}</Label>
             <Input
-              id={`${intent}-code`}
+              id="email-otp-code"
               ref={codeRef}
               type="text"
               inputMode="numeric"
@@ -536,15 +527,15 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
               }}
               className="text-center font-mono text-xl tracking-[0.3em] sm:text-xl"
               invalid={Boolean(fieldErrors.code)}
-              aria-describedby={fieldErrors.code ? `${intent}-code-error` : undefined}
+              aria-describedby={fieldErrors.code ? 'email-otp-code-error' : undefined}
               required
             />
-            <FieldError id={`${intent}-code-error`} message={fieldErrors.code} />
+            <FieldError id="email-otp-code-error" message={fieldErrors.code} />
           </div>
           <Button
             type="submit"
             className="min-h-11 w-full"
-            disabled={busy !== null || verifyRetrySeconds > 0}
+            disabled={busy !== null || verifyRetrySeconds > 0 || !legalAccepted}
           >
             {busy === 'verify'
               ? t('verifying')
@@ -552,6 +543,51 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
                 ? t('retryIn', { delay: formatRetryDelay(verifyRetrySeconds, locale) })
                 : t('verify')}
           </Button>
+          <div className="space-y-1">
+            <label
+              className="flex items-start gap-2 text-xs leading-5 text-[var(--color-text-muted)]"
+              htmlFor="email-otp-legal"
+            >
+              <input
+                id="email-otp-legal"
+                type="checkbox"
+                className="mt-0.5 size-4 shrink-0 rounded border-[var(--color-border-strong)] accent-[var(--color-primary)]"
+                checked={legalAccepted}
+                onChange={(event) => {
+                  setLegalAccepted(event.target.checked);
+                  setFieldErrors((current) => ({ ...current, legal: undefined }));
+                }}
+                disabled={busy !== null}
+                aria-describedby={fieldErrors.legal ? 'email-otp-legal-error' : undefined}
+              />
+              <span>
+                {t('legalPrefix')}{' '}
+                <a
+                  className="underline underline-offset-4"
+                  href={localizePathname('/terms', locale)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {legalT('terms')}
+                </a>{' '}
+                {t('legalAnd')}{' '}
+                <a
+                  className="underline underline-offset-4"
+                  href={localizePathname('/privacy', locale)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {legalT('privacy')}
+                </a>
+                .
+              </span>
+            </label>
+            {!legalAccepted || fieldErrors.legal ? (
+              <p id="email-otp-legal-error" role="alert" className="text-xs text-[var(--color-danger)]">
+                {t('legalRequired')}
+              </p>
+            ) : null}
+          </div>
           <div className="grid gap-2 sm:grid-cols-2">
             <Button
               type="button"
@@ -587,23 +623,13 @@ export function EmailOtpFlow({ intent }: { intent: EmailOtpIntent }) {
           pending?.(token);
         }}
       />
-      <FieldError id={`${intent}-captcha-error`} message={fieldErrors.captcha} />
+      <FieldError id="email-otp-captcha-error" message={fieldErrors.captcha} />
 
       {visibleError && (
         <p role="alert" className="text-sm text-[var(--color-danger)]">
           {visibleError}
         </p>
       )}
-
-      <p className="text-center text-sm text-[var(--color-text-muted)]">
-        {isRegister ? `${t('registerLinkLead')} ` : `${t('loginLinkLead')} `}
-        <Link
-          href={localizePathname(isRegister ? '/auth/login' : '/auth/register', locale)}
-          className="font-medium text-[var(--color-primary)] hover:underline"
-        >
-          {isRegister ? t('loginLink') : t('registerLink')}
-        </Link>
-      </p>
     </>
   );
 }

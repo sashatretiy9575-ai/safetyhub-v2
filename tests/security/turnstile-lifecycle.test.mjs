@@ -27,10 +27,18 @@ test('Turnstile uses one deferred native Cloudflare widget', async () => {
   assert.match(source, /'refresh-expired': 'manual'/u);
   assert.match(source, /'refresh-timeout': 'manual'/u);
   assert.match(source, /window\.turnstile\.execute\(widgetId\)/u);
+  assert.match(source, /if \(!siteKey \|\| pendingExecutionRef\.current\) return/u);
+  assert.match(source, /resetRequiredRef\.current \|\| completedRef\.current/u);
+  assert.match(source, /window\.turnstile\.reset\(widgetId\)/u);
+  assert.match(source, /failVerification\('error'\);[\s\S]*return;/u);
+  assert.match(source, /completedRef\.current = false/u);
+  assert.match(source, /const discardStaleWidget = useCallback/u);
+  assert.match(source, /widgetRef\.current = null;[\s\S]*window\.turnstile\?\.remove\(widgetId\)/u);
   assert.match(
     source,
-    /if \(!siteKey \|\| pendingExecutionRef\.current \|\| completedRef\.current\) return/u,
+    /catch \{[\s\S]*discardStaleWidget\(widgetId\);[\s\S]*failVerification\('error'\);[\s\S]*return;/u,
   );
+  assert.match(source, /if \(!widgetId\) \{[\s\S]*if \(activated\)[\s\S]*renderWidget\(\);/u);
   assert.equal(source.match(/<Script/gu)?.length, 1);
   assert.doesNotMatch(source, /Проверка пройдена|ShieldCheck|role="checkbox"/u);
 });
@@ -77,6 +85,6 @@ test('Chinese username/password retries after a genuine Turnstile failure', asyn
 
   assert.match(
     source,
-    /onFailure=\{\(\) => \{[\s\S]*pendingCaptchaSubmitRef\.current = null;[\s\S]*setMessage\(CAPTCHA_RETRY\);[\s\S]*setCaptchaVersion/u,
+    /onFailure=\{\(\) => \{[\s\S]*pendingCaptchaSubmitRef\.current = null;[\s\S]*setAutomaticLoginPending\(false\);[\s\S]*CAPTCHA_RETRY[\s\S]*setCaptchaVersion/u,
   );
 });

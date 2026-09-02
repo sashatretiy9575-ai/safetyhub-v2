@@ -80,6 +80,9 @@ test('manual account approval uses a narrow, idempotent, capability-gated queue'
   assert.match(data, /getPendingAccountApprovalPage/);
   assert.match(page, /<AccountApprovalQueue/);
   assert.match(queue, /crypto\.randomUUID\(\)/);
+  assert.match(queue, /resolvedIdsRef\.current\.has\(item\.id\)/u);
+  assert.match(queue, /resolvedIdsRef\.current\.add\(item\.id\)/u);
+  assert.match(queue, /Решение сохранено\. Обновляем очередь/u);
   assert.match(queue, /Вернуть на уточнение/);
   assert.match(queue, /Подтвердить доступ/);
 });
@@ -91,12 +94,22 @@ test('learner-facing course and profile UI block material until approval', async
     read('features/profile/account-approval-status.tsx'),
   ]);
 
-  assert.match(topicPage, /getAuthContext/);
-  assert.match(topicPage, /auth\.approval\.state/);
+  // Public course pages deliberately render a generic blocked CTA instead of
+  // reading an auth cookie. This keeps the material gate intact while letting
+  // the page participate in the public CDN/ISR cache.
+  assert.doesNotMatch(topicPage, /getAuthContext/);
+  assert.doesNotMatch(topicPage, /auth\.approval\.state/);
+  assert.match(topicPage, /<CourseMaterialActions course=\{topic\} access="anonymous"/);
+  assert.match(topicPage, /export const revalidate = 300/);
   assert.match(actions, /pending: \{ title: t\('access\.pendingTitle'\)/);
   assert.match(actions, /description: t\('access\.pendingDescription'\)/);
   assert.match(actions, /access === 'approved'/);
-  assert.match(status, /window\.setInterval/);
+  assert.match(status, /window\.setTimeout\(syncAtMinuteBoundary/u);
+  assert.match(status, /window\.clearTimeout\(timer\)/u);
+  assert.doesNotMatch(status, /window\.setInterval/u);
+  assert.match(status, /const untilNextMinute = remaining % 60_000 \|\| 1/u);
+  assert.match(status, /Math\.max\(100, untilNextMinute \+ 16\)/u);
+  assert.match(status, /if \(remaining <= 0\) return;/u);
   assert.match(status, /<ContactLink\s+kind="phone"\s+contacts=\{contacts\}/);
   assert.match(status, /<ContactLink\s+kind="whatsapp"\s+contacts=\{contacts\}/);
 });

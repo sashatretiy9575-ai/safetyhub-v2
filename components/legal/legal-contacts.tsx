@@ -7,10 +7,7 @@ const contactClass =
   'flex min-h-14 items-center gap-3 px-1 py-3 transition-colors hover:text-[var(--color-primary)] focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]';
 
 export async function LegalContacts() {
-  const [contacts, t] = await Promise.all([
-    getSiteContacts(),
-    getTranslations('LegalFlow'),
-  ]);
+  const [contacts, t] = await Promise.all([getSiteContacts(), getTranslations('LegalFlow')]);
   return (
     <section
       id="legal-contacts"
@@ -21,9 +18,7 @@ export async function LegalContacts() {
         <h2 id="legal-contacts-title" className="text-xl font-semibold text-[var(--color-text)]">
           {t('contactsTitle')}
         </h2>
-        <p className="mt-2 text-sm">
-          {t('contactsDescription')}
-        </p>
+        <p className="mt-2 text-sm">{t('contactsDescription')}</p>
       </div>
       <div className="divide-y divide-[var(--color-border)] border-y border-[var(--color-border)] sm:grid sm:grid-cols-2 sm:divide-x sm:divide-y-0">
         <ContactLink kind="phone" contacts={contacts} className={contactClass}>
@@ -46,7 +41,7 @@ export async function LegalContacts() {
           <WhatsappLogo
             size={23}
             weight="fill"
-            className="shrink-0 text-[#16883e]"
+            className="shrink-0 text-[var(--color-primary)]"
             aria-hidden="true"
           />
           <span className="min-w-0">

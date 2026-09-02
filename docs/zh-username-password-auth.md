@@ -20,9 +20,12 @@ RU/KK/EN email-code flow:
   Cloudflare `Siteverify` call. It verifies before username lookup, legal
   acceptance, provider-user creation, or mapping. A failed or unavailable
   verification creates neither an Auth identity nor a mapping.
-- Registration returns a completion/login redirect without a session. Login
-  obtains a fresh Turnstile token and passes it to Supabase Auth
-  `signInWithPassword`; a one-time registration token is never reused.
+- Registration itself never reuses its one-time proof as a session. After a
+  successful registration, the same screen obtains a fresh Turnstile token and
+  automatically calls the ordinary Supabase Auth `signInWithPassword` flow, so
+  the learner reaches the pending-approval state without manually re-entering
+  the password. If fresh proof cannot be obtained, the UI returns to a visible
+  normal login state; the registration token is never reused.
 - `SAFETYHUB_TURNSTILE_SECRET_KEY` is a Vercel-only secret distinct from
   `SUPABASE_AUTH_CAPTCHA_SECRET`. In production/preview the verifier rejects the
   public test secret and binds a successful response to the configured deployment
@@ -68,9 +71,10 @@ The synthetic provider email remains redacted. The capability-gated
 `identity.manage` pending-review queue exposes the canonical ZH username only
 for the corresponding application, so an administrator can make a manual
 decision without receiving the provider email, password, contact fields, or
-username through Telegram. With the production
-`telegram_application_details=false` gate, the existing generic approval event
-continues to be emitted and does not block the minimal application.
+username through Telegram. Every new schema-v2 generic approval event contains
+only locale, request time, and a safe admin path; it does not block the minimal
+application. The legacy `telegram_application_details` flag remains false and
+cannot expand newly-created approval payloads.
 
 There is no Chinese self-service recovery endpoint. An administrator with
 `identity.manage` may use the internal ZH password recovery API only after

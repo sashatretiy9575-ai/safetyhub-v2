@@ -74,9 +74,10 @@ test('locale, ZH auth, and admin inbox entry points are wired to independent gat
   for (const source of [proxy, sitemap, manifest, offline, seo, topics, articles]) {
     assert.match(source, /rolloutFeatureEnabled\('localeRoutes'\)/u);
   }
-  for (const source of [login, register, zhLoginRoute, zhRegisterRoute]) {
+  for (const source of [login, zhLoginRoute, zhRegisterRoute]) {
     assert.match(source, /rolloutFeatureEnabled\('zhUsernamePassword'\)/u);
   }
+  assert.match(register, /redirect\(localizePathname\('\/auth\/login', locale\)\)/u);
   for (const source of [adminLayout, inboxRoute, inboxReadRoute, inboxRetryRoute]) {
     assert.match(source, /rolloutFeatureEnabled\('adminInbox'\)/u);
   }
