@@ -12,6 +12,7 @@ node_modules
 coverage
 playwright-report/
 test-results/
+blob-report/
 
 # next.js
 .next/
@@ -40,7 +41,6 @@ tmp/
 artifacts/
 *.local-notes.md
 *.progress.md
-playwright-report/
 
 # typescript
 *.tsbuildinfo

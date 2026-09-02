@@ -4,6 +4,7 @@ import {
   assertCertificateExportMetadata,
   assertCertificateRenderMetadata,
   CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS,
+  CERTIFICATE_RENDER_CONCURRENCY,
   type CertificateExportMetadata,
   type CertificateRenderMetadata,
   type CertificateWorkerProgress,
@@ -180,6 +181,96 @@ function archivePartFilename(filename: string, part: number, count: number) {
   return `${stem}-part-${part}-of-${count}.zip`;
 }
 
+async function renderArchiveInMainThread(
+  metadata: CertificateExportMetadata,
+  options: WorkerOptions & { destination?: WritableDestination },
+): Promise<Uint8Array | null> {
+  const { createStreamingZipArchive } = await import('./certificate-archive.ts');
+  const { generateCertificateInBrowser, loadCertificateFontBytes, resolveAssetUrl } = await import(
+    './certificate-renderer.ts'
+  );
+  const { certificateReportRows, generateCertificateReportInBrowser } = await import(
+    './certificate-report.ts'
+  );
+  const { certificateFilename } = await import('./certificate.ts');
+
+  async function* entriesGenerator(): AsyncGenerator<{ name: string; bytes: Uint8Array }> {
+    const sampleVerification = metadata.items[0]?.verificationUrl;
+    const reportFont = await loadCertificateFontBytes(
+      resolveAssetUrl(metadata.reportFontUrl, sampleVerification),
+      options.signal,
+    );
+    const report = await generateCertificateReportInBrowser(
+      certificateReportRows(metadata.items),
+      new Date(metadata.generatedAt),
+      reportFont,
+      metadata.reportFontUrl.includes('locale=zh'),
+    );
+    yield { name: 'report.pdf', bytes: report };
+
+    let completed = 0;
+    for (let offset = 0; offset < metadata.items.length; offset += CERTIFICATE_RENDER_CONCURRENCY) {
+      if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
+      const batch = metadata.items.slice(offset, offset + CERTIFICATE_RENDER_CONCURRENCY);
+      const generated = await Promise.all(
+        batch.map(async (item) => ({
+          item,
+          bytes: await generateCertificateInBrowser(item, options.signal),
+        })),
+      );
+      for (const { item, bytes } of generated) {
+        completed += 1;
+        options.onProgress?.({ completed, total: metadata.items.length });
+        yield {
+          name: `certificates/${certificateFilename(item.certificateNumber, item.fullName)}`,
+          bytes,
+        };
+      }
+    }
+  }
+
+  const stream = await createStreamingZipArchive(entriesGenerator());
+  const reader = stream.getReader();
+  if (options.destination) {
+    try {
+      while (true) {
+        if (options.signal?.aborted) {
+          await reader.cancel();
+          throw new DOMException('Cancelled', 'AbortError');
+        }
+        const { value, done } = await reader.read();
+        if (done) break;
+        await options.destination.write(value.slice().buffer);
+      }
+      await options.destination.close();
+    } catch (error) {
+      await options.destination.abort(error).catch(() => undefined);
+      throw error;
+    }
+    return null;
+  }
+
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  while (true) {
+    if (options.signal?.aborted) {
+      await reader.cancel();
+      throw new DOMException('Cancelled', 'AbortError');
+    }
+    const { value, done } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    totalBytes += value.byteLength;
+  }
+  const resultBytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    resultBytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return resultBytes;
+}
+
 export async function downloadCertificateExportInBrowser(
   metadata: CertificateExportMetadata,
   options: WorkerOptions & { fileHandle?: CertificateArchiveFileHandle | null } = {},
@@ -194,9 +285,17 @@ export async function downloadCertificateExportInBrowser(
         { type: 'render-archive', taskId, metadata, stream: true },
         { ...options, destination },
       );
-    } catch (error) {
-      await destination.abort(error).catch(() => undefined);
-      throw error;
+    } catch (workerError) {
+      if (options.signal?.aborted) {
+        await destination.abort(workerError).catch(() => undefined);
+        throw workerError;
+      }
+      try {
+        await renderArchiveInMainThread(metadata, { ...options, destination });
+      } catch (fallbackError) {
+        await destination.abort(fallbackError).catch(() => undefined);
+        throw fallbackError;
+      }
     }
     return { archives: 1, streamed: true } as const;
   }
@@ -221,21 +320,35 @@ export async function downloadCertificateExportInBrowser(
       items,
     };
     const taskId = crypto.randomUUID();
-    const result = await runWorker(
-      { type: 'render-archive', taskId, metadata: partMetadata, stream: false },
-      {
+    let archiveBytes: Uint8Array | null = null;
+    try {
+      const result = await runWorker(
+        { type: 'render-archive', taskId, metadata: partMetadata, stream: false },
+        {
+          signal: options.signal,
+          onProgress: (progress) =>
+            options.onProgress?.({
+              completed: partIndex * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS + progress.completed,
+              total: metadata.items.length,
+            }),
+        },
+      );
+      archiveBytes = result.bytes ? new Uint8Array(result.bytes) : null;
+    } catch (workerError) {
+      if (options.signal?.aborted) throw workerError;
+      archiveBytes = await renderArchiveInMainThread(partMetadata, {
         signal: options.signal,
         onProgress: (progress) =>
           options.onProgress?.({
             completed: partIndex * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS + progress.completed,
             total: metadata.items.length,
           }),
-      },
-    );
-    if (!result.bytes) throw workerError('CERTIFICATE_ARCHIVE_EMPTY');
+      });
+    }
+    if (!archiveBytes) throw workerError('CERTIFICATE_ARCHIVE_EMPTY');
     downloadBlob(
-      new Blob([result.bytes.slice().buffer], { type: 'application/zip' }),
-      result.filename,
+      new Blob([archiveBytes.slice().buffer], { type: 'application/zip' }),
+      partMetadata.filename,
     );
   }
   return { archives: partCount, streamed: false } as const;

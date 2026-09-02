@@ -82,12 +82,15 @@ test('bulk mutation reasons accept only bounded machine tokens', async () => {
 });
 
 test('attestation screen is responsive and exposes selection, filters, and confirmed bulk actions', async () => {
-  const [page, filters, manager, dialog] = await Promise.all([
+  const [page, filters, manager, dialog, rowComponent, bannerComponent] = await Promise.all([
     read('app/(admin)/admin/employees/page.tsx'),
     read('components/admin/attestations-filter-form.tsx'),
     read('components/admin/attestations-manager.tsx'),
     read('components/admin/attestations-action-dialog.tsx'),
+    read('components/admin/attestation-table-row.tsx'),
+    read('components/admin/attestation-selection-banner.tsx'),
   ]);
+  const fullManager = `${manager}\n${rowComponent}\n${bannerComponent}`;
   assert.equal(page.match(/<h1(?:\s|>)/g)?.length, 1);
   assert.match(page, /key=\{employeeHref\(query, query\.cursor\)\}/);
   for (const name of [
@@ -107,9 +110,9 @@ test('attestation screen is responsive and exposes selection, filters, and confi
   assert.match(filters, /@min-\[960px\]:absolute/);
   assert.match(filters, /@min-\[960px\]:right-3/);
   assert.equal((manager.match(/page\.items\.map\(\(row, index\)/g) ?? []).length, 1);
-  assert.match(manager, /@min-\[960px\]:grid/);
-  assert.match(manager, /@min-\[960px\]:min-h-\[56px\]/);
-  assert.match(manager, /Выбрать все \$\{page\.total\} по фильтру/);
+  assert.match(fullManager, /@min-\[960px\]:grid/);
+  assert.match(fullManager, /@min-\[960px\]:min-h-\[56px\]/);
+  assert.match(fullManager, /Выбрать все \$\{totalFiltered\} по фильтру/);
   assert.match(manager, /organizationHref\(filters, row\.organization\)/);
   assert.match(manager, /resolvedSelection\.uniquePeople/);
   assert.match(manager, /resolvedSelection\.pendingIdentity/);
@@ -133,14 +136,15 @@ test('attestation screen is responsive and exposes selection, filters, and confi
 });
 
 test('attestation list keeps personal details compact and loads the avatar only on demand', async () => {
-  const [page, manager, panels, avatarRoute, historyRoute] = await Promise.all([
+  const [page, manager, panels, rowComponent, avatarRoute, historyRoute] = await Promise.all([
     read('app/(admin)/admin/employees/page.tsx'),
     read('components/admin/attestations-manager.tsx'),
     read('components/admin/attestations-manager-panels.tsx'),
+    read('components/admin/attestation-table-row.tsx'),
     read('app/api/admin/attestations/avatar/[userId]/route.ts'),
     read('app/api/admin/attestations/history/[userId]/route.ts'),
   ]);
-  const managerSurface = `${manager}\n${panels}`;
+  const managerSurface = `${manager}\n${panels}\n${rowComponent}`;
   assert.doesNotMatch(page, /createSignedUrls/);
   assert.match(page, /Найдено: \{result\.data\.total\}/u);
   assert.doesNotMatch(page, /\{result\.data\.total\} записей/u);

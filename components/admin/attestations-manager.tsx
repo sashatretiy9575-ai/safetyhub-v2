@@ -21,7 +21,6 @@ import {
   downloadCertificateExportInBrowser,
   requestCertificateArchiveFileHandle,
 } from '@/lib/pdf/certificate-client';
-import { formatDateTime } from '@/lib/utils';
 import {
   AttestationsActionDialog,
   type AttestationDialogConfig,
@@ -33,12 +32,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { AttestationSelectionBanner } from './attestation-selection-banner';
+import { AttestationTableRow } from './attestation-table-row';
 import { useAttestationsModalFocus } from './use-attestations-modal-focus';
 import {
   AttestationBulkActionButtons,
   AttestationDetailDrawer,
-  AttestationRowActions,
-  AttestationWorkflowBadge,
   attestationFieldLabels,
   type AttestationIdentityFields,
   type AttestationPendingAction,
@@ -148,8 +147,6 @@ export function AttestationsManager({
     () => page.items.filter((row) => selected.has(row.recordId)),
     [page.items, selected],
   );
-  const pageSelected =
-    page.items.length > 0 && page.items.every((row) => selected.has(row.recordId));
   const selectedCount = resolvedSelection?.total ?? selected.size;
   const userIds =
     resolvedSelection?.userIds ??
@@ -202,11 +199,6 @@ export function AttestationsManager({
       else next.delete(row.recordId);
       return next;
     });
-  };
-
-  const setPageSelected = (checked: boolean) => {
-    setResolvedSelection(null);
-    setSelected(checked ? new Set(page.items.map((row) => row.recordId)) : new Set());
   };
 
   const resolveFilteredSelection = async (
@@ -525,14 +517,15 @@ export function AttestationsManager({
       data-client-ready={clientReady ? 'true' : 'false'}
       className={selectedCount > 0 ? 'space-y-3 pb-28 @min-[960px]:pb-36' : 'space-y-3'}
     >
-      {pageSelected && !resolvedSelection && page.total > page.items.length ? (
-        <div className="flex flex-wrap items-center justify-center gap-2 rounded-xl border border-[var(--color-primary)] bg-[var(--color-primary-soft)] p-3 text-sm">
-          <span>Выбрана текущая страница: {page.items.length}.</span>
-          <Button size="sm" variant="outline" disabled={selectingAll} onClick={selectAllFiltered}>
-            {selectingAll ? 'Выбираем…' : `Выбрать все ${page.total} по фильтру`}
-          </Button>
-        </div>
-      ) : null}
+      <AttestationSelectionBanner
+        selectedCount={selectedCount}
+        totalFiltered={page.total}
+        pageSize={page.items.length}
+        isAllFilteredSelected={Boolean(resolvedSelection)}
+        selectingAll={selectingAll}
+        onSelectAllFiltered={selectAllFiltered}
+        onClearSelection={clearSelection}
+      />
 
       {message ? (
         <p role="status" className="rounded-xl bg-[var(--color-primary-soft)] px-4 py-3 text-sm">
@@ -558,23 +551,14 @@ export function AttestationsManager({
       >
         <div
           role="row"
-          className="sticky top-0 z-20 hidden min-h-11 items-center gap-x-2 bg-[var(--color-surface)] px-2 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] @min-[960px]:grid @min-[960px]:grid-cols-[44px_minmax(0,1.25fr)_minmax(0,.9fr)_minmax(0,1.25fr)_64px_minmax(0,.75fr)_44px]"
+          className="sticky top-0 z-20 hidden min-h-11 items-center gap-x-2 bg-[var(--color-surface)] px-2 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] @min-[960px]:grid @min-[960px]:grid-cols-[40px_minmax(0,1.4fr)_minmax(0,1.4fr)_64px_minmax(0,0.8fr)_40px]"
         >
-          <span role="columnheader" className="grid place-items-center">
-            <label className="grid size-11 cursor-pointer place-items-center">
-              <input
-                type="checkbox"
-                checked={pageSelected}
-                onChange={(event) => setPageSelected(event.target.checked)}
-                className="size-5 accent-[var(--color-primary)]"
-              />
-              <span className="sr-only">Выбрать текущую страницу</span>
-            </label>
+          <span role="columnheader" className="sr-only">
+            Выбор
           </span>
           <span role="columnheader">Сотрудник</span>
-          <span role="columnheader">Компания</span>
           <span role="columnheader">Курс</span>
-          <span role="columnheader">Результат</span>
+          <span role="columnheader">Балл</span>
           <span role="columnheader">Статус</span>
           <span role="columnheader" className="sr-only">
             Действия
@@ -591,14 +575,6 @@ export function AttestationsManager({
               filters.sort === 'organization_asc' &&
               (index === 0 ||
                 groupKey !== organizationGroupKey(page.items[index - 1]?.organization ?? ''));
-            const groupRows = showGroup
-              ? page.items.filter(
-                  (candidate) => organizationGroupKey(candidate.organization) === groupKey,
-                )
-              : [];
-            const groupSelected =
-              groupRows.length > 0 &&
-              groupRows.every((candidate) => selected.has(candidate.recordId));
             const groupCollapsed = collapsedGroups.has(groupKey);
 
             return (
@@ -612,27 +588,10 @@ export function AttestationsManager({
                       role="cell"
                       className="flex min-h-11 items-center gap-2 px-2 py-1 text-xs font-bold"
                     >
-                      <label className="grid size-11 shrink-0 cursor-pointer place-items-center">
-                        <input
-                          type="checkbox"
-                          checked={groupSelected}
-                          onChange={(event) =>
-                            void setOrganizationGroupSelected(
-                              row.organization,
-                              event.target.checked,
-                            )
-                          }
-                          disabled={selectingAll}
-                          className="size-5 accent-[var(--color-primary)]"
-                        />
-                        <span className="sr-only">
-                          Выбрать компанию: {row.organization || 'не указана'}
-                        </span>
-                      </label>
                       <button
                         type="button"
                         aria-expanded={!groupCollapsed}
-                        aria-label={`${groupCollapsed ? 'Развернуть' : 'Свернуть'} компанию ${row.organization || 'не указана'}`}
+                        aria-label={`${groupCollapsed ? 'Развернуть' : 'Свернуть'} компанию ${row.organization || '—'}`}
                         onClick={() =>
                           setCollapsedGroups((current) => {
                             const next = new Set(current);
@@ -656,7 +615,7 @@ export function AttestationsManager({
                         href={organizationHref(filters, row.organization)}
                         className="min-h-11 min-w-0 flex-1 content-center break-words text-[var(--color-primary)] underline-offset-4 hover:underline"
                       >
-                        {row.organization || 'Компания не указана'} · {row.organizationGroupCount}{' '}
+                        {row.organization || '—'} · {row.organizationGroupCount}{' '}
                         строк
                       </Link>
                       <DropdownMenu>
@@ -689,108 +648,15 @@ export function AttestationsManager({
                 ) : null}
 
                 {!groupCollapsed ? (
-                  <article
-                    role="row"
-                    className="grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] gap-x-2 gap-y-1 rounded-xl border bg-[var(--color-surface)] p-3 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[960px]:min-h-[56px] @min-[960px]:grid-cols-[44px_minmax(0,1.25fr)_minmax(0,.9fr)_minmax(0,1.25fr)_64px_minmax(0,.75fr)_44px] @min-[960px]:items-center @min-[960px]:gap-x-2 @min-[960px]:rounded-none @min-[960px]:border-0 @min-[960px]:border-t @min-[960px]:p-2 @min-[960px]:shadow-none"
-                    onClick={(event) => {
-                      const target = event.target as HTMLElement;
-                      if (!target.closest('button, input, a, [role="menuitem"]')) setDetail(row);
-                    }}
-                  >
-                    <div
-                      role="cell"
-                      className="col-start-1 row-start-1 @min-[960px]:col-start-1 @min-[960px]:row-start-1 @min-[960px]:grid @min-[960px]:place-items-center"
-                    >
-                      <label className="grid size-11 cursor-pointer place-items-center">
-                        <input
-                          type="checkbox"
-                          checked={selected.has(row.recordId)}
-                          onChange={(event) => setRowSelected(row, event.target.checked)}
-                          className="size-5 accent-[var(--color-primary)]"
-                        />
-                        <span className="sr-only">
-                          Выбрать: {row.fullName}, {row.courseTitle}
-                        </span>
-                      </label>
-                    </div>
-
-                    <div
-                      role="cell"
-                      className="col-start-2 row-start-1 min-w-0 @min-[960px]:col-start-2 @min-[960px]:row-start-1"
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setDetail(row)}
-                        aria-label={`Открыть сведения: ${row.fullName}`}
-                        className="flex min-h-10 min-w-0 items-center gap-2 text-left hover:underline"
-                      >
-                        <span className="min-w-0">
-                          <span className="block font-bold break-words">{row.fullName}</span>
-                          <span className="block text-xs text-[var(--color-text-muted)] @min-[960px]:line-clamp-1">
-                            {row.job || 'Должность не указана'}
-                          </span>
-                        </span>
-                      </button>
-                    </div>
-
-                    <div
-                      role="cell"
-                      className="col-start-2 col-end-3 row-start-2 min-w-0 @min-[960px]:col-start-3 @min-[960px]:col-end-4 @min-[960px]:row-start-1"
-                    >
-                      {row.organization ? (
-                        <Link
-                          href={organizationHref(filters, row.organization)}
-                          className="inline-flex min-h-9 max-w-full items-center truncate text-[var(--color-primary)] underline-offset-4 hover:underline"
-                          title="Показать только эту компанию"
-                        >
-                          {row.organization}
-                        </Link>
-                      ) : (
-                        <span className="text-[var(--color-text-muted)]">Компания не указана</span>
-                      )}
-                    </div>
-
-                    <div
-                      role="cell"
-                      className="col-start-1 col-end-3 row-start-3 min-w-0 border-t pt-2 @min-[960px]:col-start-4 @min-[960px]:col-end-5 @min-[960px]:row-start-1 @min-[960px]:border-0 @min-[960px]:pt-0"
-                    >
-                      <p className="font-semibold break-words">{row.courseTitle}</p>
-                      <p className="text-[11px] text-[var(--color-text-subtle)]">
-                        {formatDateTime(row.completedAt)}
-                      </p>
-                    </div>
-
-                    <div
-                      role="cell"
-                      className="col-start-3 row-start-3 border-t pt-2 text-right @min-[960px]:col-start-5 @min-[960px]:row-start-1 @min-[960px]:border-0 @min-[960px]:pt-0 @min-[960px]:text-left"
-                    >
-                      <span className="text-base font-black tabular-nums">
-                        {row.score}/{row.total}
-                      </span>
-                      <span className="block text-xs text-[var(--color-text-subtle)]">
-                        порог {row.passScore}
-                      </span>
-                    </div>
-
-                    <div
-                      role="cell"
-                      className="col-start-3 row-start-2 flex justify-end @min-[960px]:col-start-6 @min-[960px]:col-end-7 @min-[960px]:row-start-1 @min-[960px]:justify-start"
-                    >
-                      <AttestationWorkflowBadge row={row} />
-                    </div>
-
-                    <div
-                      role="cell"
-                      className="col-start-3 row-start-1 @min-[960px]:col-start-7 @min-[960px]:row-start-1"
-                    >
-                      <AttestationRowActions
-                        row={row}
-                        permissions={permissions}
-                        openDetails={() => setDetail(row)}
-                        openAction={(action) => openSingleAction(row, action)}
-                      />
-                    </div>
-                  </article>
+                  <AttestationTableRow
+                    row={row}
+                    selected={selected.has(row.recordId)}
+                    onSelectChange={(checked) => setRowSelected(row, checked)}
+                    onOpenDetails={() => setDetail(row)}
+                    permissions={permissions}
+                    onSingleAction={(action) => openSingleAction(row, action)}
+                    organizationHref={(org) => organizationHref(filters, org)}
+                  />
                 ) : null}
               </Fragment>
             );

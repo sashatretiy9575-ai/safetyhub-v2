@@ -636,8 +636,8 @@
       "correctPercent": "正确率 {percent}%",
       "pendingVerification": "成绩正在等待资料审核",
       "readyForCertificate": "成绩已可签发证书",
-      "certificateAdminIssue": "首次签发由管理员明确执行。成绩已经保存，您可以再次测试以提高分数。",
-      "savedNoAnswers": "成绩已保存在个人中心。系统不会显示正确选项或答案密钥；下次测试前请复习课程内容。",
+      "certificateAdminIssue": "管理员正在准备证书 — 邮件将发送给您。",
+      "savedNoAnswers": "正确答案不会显示。请复习课程内容后再次测试。",
       "expiredServer": "服务器已结束本次测试",
       "expiredDescription": "规定的 {minutes} 分钟已结束。系统未计算分数，也未披露正确选项。",
       "failedDescription": "最佳成绩已保存在个人中心。再次测试前请复习课程内容。"
@@ -667,6 +667,8 @@
   },
   "Certificate": {
     "downloadPdf": "下载 PDF",
+    "generating": "正在准备 PDF…",
+    "downloaded": "已下载",
     "cancel": "取消",
     "downloadFailed": "无法下载 PDF。",
     "generated": "PDF 已在浏览器中生成并开始下载。",

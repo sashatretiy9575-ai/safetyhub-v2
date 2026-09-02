@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { DownloadSimple, SpinnerGap } from '@phosphor-icons/react';
+import { Check, DownloadSimple, SpinnerGap } from '@phosphor-icons/react';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import {
   clientRequest,
@@ -29,18 +29,18 @@ export function CertificateDownloadButton({
 }) {
   const t = useTranslations('Certificate');
   const errorT = useTranslations('Common.errors');
-  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'busy' | 'downloaded'>('idle');
   const [message, setMessage] = useState('');
   const abortRef = useRef<AbortController | null>(null);
 
   const download = async () => {
-    if (busy) {
+    if (status === 'busy') {
       abortRef.current?.abort();
       return;
     }
     const controller = new AbortController();
     abortRef.current = controller;
-    setBusy(true);
+    setStatus('busy');
     setMessage('');
     try {
       const result = await clientRequest(
@@ -50,13 +50,15 @@ export function CertificateDownloadButton({
       );
       if (!result.ok) {
         setMessage(localizedClientRequestMessage(result.error, t('downloadFailed'), errorT));
+        setStatus('idle');
         return;
       }
       const metadata = await readClientResponseJson<CertificateRenderMetadata>(result.response);
       assertCertificateRenderMetadata(metadata);
       const { downloadCertificateInBrowser } = await import('@/lib/pdf/certificate-client');
       await downloadCertificateInBrowser(metadata, { signal: controller.signal });
-      setMessage(t('generated'));
+      setStatus('downloaded');
+      setTimeout(() => setStatus('idle'), 4000);
     } catch (error) {
       if (controller.signal.aborted) {
         setMessage(t('cancelled'));
@@ -64,9 +66,9 @@ export function CertificateDownloadButton({
         console.error('[CertificateDownload]', error);
         setMessage(t('downloadFailed'));
       }
+      setStatus('idle');
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
-      setBusy(false);
     }
   };
 
@@ -74,23 +76,27 @@ export function CertificateDownloadButton({
     <span className="inline-flex max-w-full flex-col gap-1">
       <Button
         type="button"
-        variant={variant}
+        variant={status === 'downloaded' ? 'outline' : variant}
         size={size}
         className={className}
         onClick={() => void download()}
+        disabled={status === 'busy'}
       >
-        {busy ? <SpinnerGap className="animate-spin" /> : <DownloadSimple />}
-        {busy ? t('cancel') : (children ?? t('downloadPdf'))}
+        {status === 'busy' ? (
+          <SpinnerGap className="animate-spin" />
+        ) : status === 'downloaded' ? (
+          <Check weight="bold" className="text-[var(--color-primary)]" />
+        ) : (
+          <DownloadSimple />
+        )}
+        {status === 'busy'
+          ? t('generating')
+          : status === 'downloaded'
+            ? t('downloaded')
+            : (children ?? t('downloadPdf'))}
       </Button>
       {message ? (
-        <span
-          role={message === t('generated') ? 'status' : 'alert'}
-          className={
-            message === t('generated')
-              ? 'sr-only'
-              : 'text-xs text-[var(--color-danger)]'
-          }
-        >
+        <span role="alert" className="text-xs text-[var(--color-danger)]">
           {message}
         </span>
       ) : null}

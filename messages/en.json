@@ -636,8 +636,8 @@
       "correctPercent": "{percent}% correct answers",
       "pendingVerification": "Result awaiting identity review",
       "readyForCertificate": "Result ready for certificate issuance",
-      "certificateAdminIssue": "An administrator explicitly performs the first issuance. Your result is already saved, and another attempt can improve your score.",
-      "savedNoAnswers": "The result is saved in your account. Correct choices and answer keys are not shown; review the course before your next attempt.",
+      "certificateAdminIssue": "The administrator is preparing your certificate — you will receive an email.",
+      "savedNoAnswers": "Correct answers are hidden. Review the material and try again.",
       "expiredServer": "Attempt closed by the server",
       "expiredDescription": "The allotted {minutes} minutes ended. A score and correct choices were not calculated or disclosed.",
       "failedDescription": "Your best score is saved in your account. Review the course before another attempt."
@@ -667,6 +667,8 @@
   },
   "Certificate": {
     "downloadPdf": "Download PDF",
+    "generating": "Preparing PDF…",
+    "downloaded": "Downloaded",
     "cancel": "Cancel",
     "downloadFailed": "The PDF could not be downloaded.",
     "generated": "The PDF was created in your browser and sent for download.",

@@ -264,15 +264,6 @@ function drawCenteredText(
   });
 }
 
-function pngBytesFromDataUrl(dataUrl: string) {
-  const encoded = dataUrl.split(',', 2)[1];
-  if (!encoded) throw new Error('CERTIFICATE_QR_INVALID');
-  const binary = atob(encoded);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-  return bytes;
-}
-
 export async function generateCertificateInBrowser(
   metadata: CertificateRenderMetadata,
   signal?: AbortSignal,
@@ -302,15 +293,9 @@ export async function generateCertificateInBrowser(
     certificateNumber: normalizePdfText(metadata.certificateNumber),
     titleSnapshot: normalizePdfText(metadata.titleSnapshot),
   };
-  const qrCodeBytes = pngBytesFromDataUrl(
-    await QRCode.toDataURL(metadata.verificationUrl, {
-      type: 'image/png',
-      errorCorrectionLevel: 'M',
-      margin: 1,
-      width: 256,
-      color: { dark: '#0F172AFF', light: '#FFFFFFFF' },
-    }),
-  );
+  const qrMatrix = (QRCode as unknown as { create: (text: string, options?: unknown) => { modules: { size: number; data: Uint8Array | number[] } } }).create(metadata.verificationUrl, {
+    errorCorrectionLevel: 'M',
+  });
   if (signal?.aborted) throw abortError();
 
   const pdfDoc = await PDFDocument.load(templateBytes);
@@ -323,7 +308,6 @@ export async function generateCertificateInBrowser(
   pdfDoc.setModificationDate(issuedAt);
   pdfDoc.registerFontkit(fontkit);
   const font = await pdfDoc.embedFont(fontBytes, { subset: metadata.locale === 'zh' });
-  const qrCode = await pdfDoc.embedPng(qrCodeBytes);
   const page = pdfDoc.getPages()[0];
   if (!page) throw new Error('EMPTY_CERTIFICATE_TEMPLATE');
   const { width } = page.getSize();
@@ -409,7 +393,21 @@ export async function generateCertificateInBrowser(
     borderColor: rgb(0.79, 0.84, 0.8),
     borderWidth: 0.7,
   });
-  page.drawImage(qrCode, { x: qrX, y: qrY, width: qrSize, height: qrSize });
+  const qrModules = qrMatrix.modules.size;
+  const qrCell = qrSize / (qrModules + 2);
+  for (let row = 0; row < qrModules; row += 1) {
+    for (let col = 0; col < qrModules; col += 1) {
+      if (qrMatrix.modules.data[row * qrModules + col]) {
+        page.drawRectangle({
+          x: qrX + (col + 1) * qrCell,
+          y: qrY + qrSize - (row + 2) * qrCell,
+          width: qrCell,
+          height: qrCell,
+          color: rgb(0.06, 0.09, 0.16),
+        });
+      }
+    }
+  }
   page.drawText(labels.verify, {
     x: qrX + (qrSize - font.widthOfTextAtSize(labels.verify, qrLabelSize)) / 2,
     y: qrY + qrSize + 7,

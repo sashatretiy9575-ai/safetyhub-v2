@@ -19,6 +19,7 @@ function isExcluded(relativePath) {
   return (
     relativePath.startsWith('app/(admin)/') ||
     relativePath.startsWith('app/api/') ||
+    relativePath.startsWith('app/zip-harness/') ||
     relativePath.startsWith('components/admin/') ||
     relativePath.startsWith('features/admin/') ||
     CANONICAL_RU_CONTENT_SOURCES.has(relativePath)

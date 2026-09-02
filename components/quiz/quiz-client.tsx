@@ -9,6 +9,7 @@ import {
   ArrowRight,
   CaretLeft,
   CheckCircle,
+  Clock,
   ListChecks,
   WarningCircle,
   XCircle,
@@ -532,93 +533,136 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
     const percent =
       attempt.score === null ? null : Math.round((attempt.score / attempt.total) * 100);
     return (
-      <section className="py-10 md:py-20">
+      <section className="py-10 md:py-16">
         <Container size="narrow">
-          <Card className="overflow-hidden border-2">
-            <CardContent className="space-y-6 p-5 text-center md:p-10">
+          <Card className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-soft)]">
+            <CardContent className="space-y-5 p-6 text-center md:p-8">
               <span
-                className={`mx-auto grid size-20 place-items-center rounded-full ${passed ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : expired ? 'bg-[var(--color-accent-amber-soft)] text-[var(--color-accent-amber)]' : 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]'}`}
+                className={`mx-auto grid size-14 place-items-center rounded-full ${passed ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : expired ? 'bg-[var(--color-accent-amber-soft)] text-[var(--color-accent-amber)]' : 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]'}`}
               >
                 {passed ? (
-                  <CheckCircle size={44} weight="fill" />
+                  <CheckCircle size={32} weight="fill" />
                 ) : (
-                  <XCircle size={44} weight="fill" />
+                  <XCircle size={32} weight="fill" />
                 )}
               </span>
+
               <div>
-                <h1 className="font-display text-3xl font-black">
+                <h1 className="font-display text-2xl font-bold">
                   {passed
                     ? t('result.passedTitle')
                     : expired
                       ? t('result.expiredTitle')
                       : t('result.failedTitle')}
                 </h1>
-                <p className="mt-2 text-[var(--color-text-muted)]">{title}</p>
+                <p className="mt-1 text-sm text-[var(--color-text-muted)]">{title}</p>
               </div>
+
               {passed ? (
                 <>
-                  <div className="border-y border-dashed border-[var(--color-border)] py-5">
-                    <strong className="text-5xl tabular-nums">
-                      {attempt.score}/{attempt.total}
+                  <div className="py-2">
+                    <strong className="text-5xl font-black tabular-nums tracking-tight">
+                      {attempt.score ?? 0} / {attempt.total}
                     </strong>
-                    <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-                      {t('result.correctPercent', { percent: percent ?? 0 })}
+                    <p className="mt-1.5 text-sm font-medium text-[var(--color-text-muted)]">
+                      {t('result.passedTitle')} · {percent ?? 0}%
                     </p>
                   </div>
-                  <Progress value={percent ?? 0} className="h-3" />
+
                   {!attempt.certificateId ? (
-                    <div className="rounded-xl border border-[var(--color-warning)] bg-[var(--color-accent-amber-soft)] p-4 text-left">
-                      <p className="font-bold">
-                        {attempt.certificatePendingVerification
-                          ? t('result.pendingVerification')
-                          : t('result.readyForCertificate')}
-                      </p>
-                      <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                        {t('result.certificateAdminIssue')}
-                      </p>
+                    <div className="mx-auto flex max-w-md items-center justify-center gap-2 rounded-xl bg-[var(--color-accent-amber-soft)] px-3.5 py-2.5 text-xs font-medium text-[var(--color-text)]">
+                      <Clock size={16} className="shrink-0 text-[var(--color-accent-amber)]" />
+                      <span>{t('result.certificateAdminIssue')}</span>
                     </div>
                   ) : null}
-                  <p className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4 text-left text-sm leading-6 text-[var(--color-text-muted)]">
-                    {t('result.savedNoAnswers')}
-                  </p>
                 </>
               ) : expired ? (
-                <div className="space-y-2 border-y border-dashed border-[var(--color-border)] py-5">
-                  <strong className="text-lg">{t('result.expiredServer')}</strong>
+                <div className="space-y-1 py-2">
+                  <strong className="text-lg font-bold">{t('result.expiredServer')}</strong>
                   <p className="text-sm text-[var(--color-text-muted)]">
                     {t('result.expiredDescription', { minutes: attempt.durationMinutes })}
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3 border-y border-dashed border-[var(--color-border)] py-5">
-                  <strong className="text-5xl tabular-nums">
+                <div className="space-y-2 py-2">
+                  <strong className="text-5xl font-black tabular-nums tracking-tight">
                     {attempt.score ?? 0}/{attempt.total}
                   </strong>
-                  <p className="text-sm text-[var(--color-text-muted)]">
-                    {t('result.failedDescription')}
+                  <p className="mt-1 text-sm font-medium text-[var(--color-text-muted)]">
+                    {t('result.failedTitle')} · {percent ?? 0}%
                   </p>
-                  <Progress value={percent ?? 0} className="h-3" />
+                  <p className="mx-auto max-w-md rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2 text-xs text-[var(--color-text-muted)]">
+                    {t('result.savedNoAnswers')}
+                  </p>
                 </div>
               )}
+
               {error && (
                 <p role="alert" className="text-sm text-[var(--color-danger)]">
                   {error}
                 </p>
               )}
-              <div className="flex flex-col justify-center gap-3 min-[360px]:flex-row">
-                <Button variant="outline" onClick={() => void loadAttempt(true)}>
-                  <ArrowCounterClockwise size={18} />
-                  {expired ? t('newAttempt') : passed ? t('improveResult') : t('retake')}
-                </Button>
-                {attempt.certificateId ? (
-                  <CertificateDownloadButton certificateId={attempt.certificateId} size="md">
-                    {t('certificate')}
-                  </CertificateDownloadButton>
-                ) : null}
-                <Button onClick={() => router.push(localizePathname('/profile', locale))}>
-                  {t('openAccount')}
-                </Button>
-              </div>
+
+              {passed ? (
+                <div className="flex flex-col items-center gap-3 pt-2">
+                  {attempt.certificateId ? (
+                    <CertificateDownloadButton
+                      certificateId={attempt.certificateId}
+                      size="lg"
+                      className="w-full max-w-xs font-bold"
+                    >
+                      {t('certificate')}
+                    </CertificateDownloadButton>
+                  ) : (
+                    <Button
+                      size="lg"
+                      className="w-full max-w-xs font-bold"
+                      onClick={() => router.push(localizePathname('/profile', locale))}
+                    >
+                      {t('openAccount')}
+                    </Button>
+                  )}
+                  <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-[var(--color-text-muted)]">
+                    <button
+                      type="button"
+                      onClick={() => void loadAttempt(true)}
+                      className="hover:text-[var(--color-text)] hover:underline"
+                    >
+                      {t('improveResult')}
+                    </button>
+                    {attempt.certificateId ? (
+                      <>
+                        <span>·</span>
+                        <button
+                          type="button"
+                          onClick={() => router.push(localizePathname('/profile', locale))}
+                          className="hover:text-[var(--color-text)] hover:underline"
+                        >
+                          {t('openAccount')}
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-3 pt-2">
+                  <Button
+                    size="lg"
+                    className="w-full max-w-xs font-bold"
+                    onClick={() => void loadAttempt(true)}
+                  >
+                    <ArrowCounterClockwise size={18} />
+                    {expired ? t('newAttempt') : t('retake')}
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => router.push(localizePathname('/profile', locale))}
+                    className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:underline"
+                  >
+                    {t('openAccount')}
+                  </button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </Container>

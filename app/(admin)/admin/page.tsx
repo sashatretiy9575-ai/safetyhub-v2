@@ -65,36 +65,10 @@ export default async function AdminWorkPage() {
   ];
 
   return (
-    <section className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-display text-3xl font-bold">В работе</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Очереди показывают только задачи, требующие следующего действия.
-          </p>
-        </div>
+    <section className="space-y-4">
+      <div>
+        <h1 className="font-display text-2xl font-bold">В работе</h1>
       </div>
-
-      {queue.state === 'ready' && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-            <span className="text-xs text-[var(--color-text-muted)]">Активных сертификатов</span>
-            <p className="mt-1 text-2xl font-black tabular-nums">{queue.data.activeCertificates}</p>
-          </div>
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-            <span className="text-xs text-[var(--color-text-muted)]">Ожидают проверки</span>
-            <p className="mt-1 text-2xl font-black tabular-nums text-[var(--color-accent-amber)]">
-              {(approvals?.state === 'ready' ? approvals.data.total : 0) + queue.data.pendingIdentity}
-            </p>
-          </div>
-          <div className="col-span-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 sm:col-span-1">
-            <span className="text-xs text-[var(--color-text-muted)]">Готовы к выдаче</span>
-            <p className="mt-1 text-2xl font-black tabular-nums text-[var(--color-primary)]">
-              {queue.data.readyToIssue}
-            </p>
-          </div>
-        </div>
-      )}
 
       {queue.state === 'failed' ? (
         <AdminLoadFailure
@@ -104,27 +78,25 @@ export default async function AdminWorkPage() {
       ) : (
         <nav
           aria-label="Рабочие очереди"
-          className="grid overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] sm:grid-cols-2 lg:grid-cols-4"
+          className="grid overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] sm:grid-cols-2 lg:grid-cols-4"
         >
           {queueItems.map(({ key, label, description, href, count, icon: Icon }) => (
             <Link
               key={key}
               href={href}
-              className="group grid min-h-16 min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto_auto] items-center gap-3 border-b px-3 py-2 transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:border-r sm:border-b-0 sm:last:border-r-0"
+              title={description}
+              className="group grid min-h-14 min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto_auto] items-center gap-3 border-b px-3 py-2 transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:border-r sm:border-b-0 sm:last:border-r-0"
             >
-              <span className="grid size-10 place-items-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                <Icon size={20} />
+              <span className="grid size-9 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                <Icon size={18} />
               </span>
               <span className="min-w-0">
-                <span className="block truncate text-sm font-bold">{label}</span>
-                <span className="hidden truncate text-xs text-[var(--color-text-muted)] md:block">
-                  {description}
-                </span>
+                <span className="block truncate text-sm font-semibold">{label}</span>
               </span>
               <strong className="text-xl font-black tabular-nums">{count}</strong>
               <CaretRight
                 aria-hidden
-                size={17}
+                size={16}
                 className="text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
               />
             </Link>

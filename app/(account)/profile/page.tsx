@@ -192,40 +192,49 @@ function CourseRow({
   t: ProfileTranslator;
 }) {
   const isIssued = item.certificateState === 'issued' && item.certificateId;
+  const isSpecialCertState =
+    item.certificateState === 'pending_identity' ||
+    item.certificateState === 'ready';
+
   return (
-    <article className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-4 py-3.5 first:border-t-0 min-[760px]:min-h-[68px] min-[760px]:grid-cols-[minmax(0,2fr)_7rem_10rem_8rem] min-[760px]:items-center">
+    <article className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-4 py-3 first:border-t-0 md:min-h-[58px] md:grid-cols-[minmax(0,1fr)_11rem_8.5rem] md:items-center">
       <div className="min-w-0">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="font-semibold break-words">{item.courseTitle}</h3>
-          {!isIssued ? (
-            <Link
-              href={localizePathname(`/topics/${item.testSlug}`, locale)}
-              className="text-[var(--color-primary)] min-[760px]:hidden"
-              aria-label={item.resultState === 'not_started' ? t('start') : t('details')}
-            >
-              <ArrowRight size={18} />
-            </Link>
-          ) : null}
-        </div>
-        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)] min-[760px]:hidden">
-          <span>{resultLabel(item, t)}</span>
-          <span>·</span>
-          <span>{certificateLabel(item.certificateState, t)}</span>
+        <h3 className="font-semibold break-words leading-tight">{item.courseTitle}</h3>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--color-text-muted)] md:hidden">
+          <Badge
+            variant={
+              isSpecialCertState
+                ? certificateVariant(item.certificateState)
+                : resultVariant(item.resultState)
+            }
+          >
+            {isSpecialCertState ? certificateLabel(item.certificateState, t) : resultLabel(item, t)}
+          </Badge>
           {!item.isCurrent ? <span>· {t('archive')}</span> : null}
         </div>
         {!item.isCurrent ? (
-          <p className="hidden text-xs text-[var(--color-text-muted)] min-[760px]:block">{t('archive')}</p>
+          <p className="hidden text-xs text-[var(--color-text-muted)] md:block">{t('archive')}</p>
         ) : null}
       </div>
-      <div className="hidden min-[760px]:block">
-        <Badge variant={resultVariant(item.resultState)}>{resultLabel(item, t)}</Badge>
-      </div>
-      <div className="hidden min-[760px]:block">
-        <Badge variant={certificateVariant(item.certificateState)}>
-          {certificateLabel(item.certificateState, t)}
+
+      <div className="hidden md:flex md:items-center md:gap-1.5">
+        <Badge
+          variant={
+            isSpecialCertState
+              ? certificateVariant(item.certificateState)
+              : resultVariant(item.resultState)
+          }
+        >
+          {isSpecialCertState ? certificateLabel(item.certificateState, t) : resultLabel(item, t)}
         </Badge>
+        {isSpecialCertState && item.resultState === 'passed' ? (
+          <Badge variant="outline" className="text-[11px] text-[var(--color-text-muted)]">
+            {resultLabel(item, t)}
+          </Badge>
+        ) : null}
       </div>
-      <div className={isIssued ? 'block' : 'hidden min-[760px]:block'}>
+
+      <div className="w-full">
         {isIssued ? (
           <CertificateDownloadButton certificateId={item.certificateId!} className="w-full">
             {t('download')}
@@ -295,11 +304,10 @@ function LearningDashboard({
           </Button>
         </div>
         <div className="overflow-hidden rounded-2xl border bg-[var(--color-surface)]">
-          <div className="hidden min-h-11 grid-cols-[minmax(0,2fr)_7rem_10rem_8rem] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] min-[760px]:grid">
+          <div className="hidden min-h-10 grid-cols-[minmax(0,1fr)_11rem_8.5rem] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] md:grid">
             <span>{t('course')}</span>
             <span>{t('result')}</span>
-            <span>{t('certificate')}</span>
-            <span>{t('action')}</span>
+            <span className="sr-only">{t('action')}</span>
           </div>
           {rows.length ? (
             rows.map((item) => (

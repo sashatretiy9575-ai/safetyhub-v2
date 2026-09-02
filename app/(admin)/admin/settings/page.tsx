@@ -2,8 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { SiteContactsForm } from '@/components/admin/site-contacts-form';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Buildings, CaretRight, ClockCounterClockwise, User } from '@phosphor-icons/react/dist/ssr';
 import { requireCapability } from '@/features/auth/server';
 import { readSiteContactsUncached } from '@/lib/site-contacts';
 
@@ -12,67 +11,66 @@ export default async function AdminSettingsPage() {
   const settings = await readSiteContactsUncached();
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-4xl space-y-4">
       <div>
-        <h1 className="text-3xl font-black tracking-tight">Настройки</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Контакты сайта, справочники и история действий.
-        </p>
+        <h1 className="text-2xl font-bold tracking-tight">Настройки</h1>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Card>
-          <CardContent className="flex min-h-32 flex-col items-start justify-between gap-3 p-5">
-            <div>
-              <h2 className="font-bold">Мой аккаунт</h2>
-              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                Фотография, имя, компания и параметры входа администратора.
-              </p>
-            </div>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/admin/account">Открыть аккаунт</Link>
-            </Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex min-h-32 flex-col items-start justify-between gap-3 p-5">
-            <div>
-              <h2 className="font-bold">Компании</h2>
-              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                Найти дубли, проверить последствия и объединить записи.
-              </p>
-            </div>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/admin/organizations/cleanup">Открыть справочник</Link>
-            </Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex min-h-32 flex-col items-start justify-between gap-3 p-5">
-            <div>
-              <h2 className="font-bold">История действий</h2>
-              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                Кто, когда и над какими данными выполнил операцию.
-              </p>
-            </div>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/admin/settings/history">Открыть историю</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardContent className="space-y-4 p-5 sm:p-6">
-          <div>
-            <h2 className="text-xl font-bold">Контакты сайта</h2>
-            <p className="text-sm text-[var(--color-text-muted)]">
-              Публичные реквизиты и каналы связи.
-            </p>
+      <nav
+        aria-label="Разделы настроек"
+        className="divide-y divide-[var(--color-border)] overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]"
+      >
+        <Link
+          href="/admin/account"
+          className="group flex min-h-12 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-surface-muted)]"
+        >
+          <div className="flex items-center gap-3">
+            <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+              <User size={18} />
+            </span>
+            <span className="font-semibold text-sm">Мой аккаунт</span>
           </div>
-          <SiteContactsForm initialSettings={settings} />
-        </CardContent>
-      </Card>
+          <CaretRight
+            size={16}
+            className="text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
+          />
+        </Link>
+        <Link
+          href="/admin/organizations/cleanup"
+          className="group flex min-h-12 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-surface-muted)]"
+        >
+          <div className="flex items-center gap-3">
+            <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+              <Buildings size={18} />
+            </span>
+            <span className="font-semibold text-sm">Компании</span>
+          </div>
+          <CaretRight
+            size={16}
+            className="text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
+          />
+        </Link>
+        <Link
+          href="/admin/settings/history"
+          className="group flex min-h-12 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-surface-muted)]"
+        >
+          <div className="flex items-center gap-3">
+            <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+              <ClockCounterClockwise size={18} />
+            </span>
+            <span className="font-semibold text-sm">История действий</span>
+          </div>
+          <CaretRight
+            size={16}
+            className="text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
+          />
+        </Link>
+      </nav>
+
+      <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 space-y-4">
+        <h2 className="text-lg font-bold">Контакты сайта</h2>
+        <SiteContactsForm initialSettings={settings} />
+      </section>
     </div>
   );
 }
