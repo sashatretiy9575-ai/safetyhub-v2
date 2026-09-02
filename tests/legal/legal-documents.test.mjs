@@ -232,7 +232,11 @@ test('profile reads immutable acceptance history and records consent through a s
     panel,
     /localizedDocumentHref\([\s\S]*acceptance\.document_type,[\s\S]*acceptance\.version,[\s\S]*locale/,
   );
-  assert.match(panel, /recordedKeys\.has/);
+  assert.match(
+    panel,
+    /currentDocuments\.every\([\s\S]*recordedKeys\.has\(`\$\{document\.type\}:\$\{document\.version\}`\)/u,
+  );
+  assert.doesNotMatch(panel, /recorded\.length\s*!==\s*currentDocuments\.length/u);
   assert.match(panel, /onAccepted\?\.\(\)/u);
   assert.match(legalPage, /requireUser\(\{ enforceLegal: false \}\)/u);
   assert.match(legalPage, /<LegalAcceptanceGate/u);
@@ -258,6 +262,10 @@ test('profile reads immutable acceptance history and records consent through a s
   assert.match(baselineMigration, /LEGAL_VERSION_OUTDATED/);
   assert.match(baselineMigration, /primary key \(user_id, document_type, version\)/i);
   assert.match(baselineMigration, /jsonb_agg[\s\S]*acceptedAt[\s\S]*acceptance\.source/i);
+  assert.match(
+    baselineMigration,
+    /from public\.legal_acceptances acceptance\s+where acceptance\.user_id = v_user_id/u,
+  );
   assert.match(legalRotationMigration, /public\.publish_legal_document_version/);
   assert.match(legalRotationMigration, /'privacy',\s*'1\.2',\s*'privacy-1\.2'/u);
   assert.match(legalRotationMigration, /'terms',\s*'2\.2',\s*'terms-2\.2'/u);

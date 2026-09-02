@@ -115,8 +115,10 @@ export function LegalAcceptancePanel({
       }
       const recorded = parseAcceptancePayload(data);
       const recordedKeys = new Set(recorded.map((acceptance) => acceptanceKey(acceptance)));
+      // The RPC returns the immutable acceptance history, not only the pair
+      // written by this request. Existing users can therefore legitimately
+      // receive older accepted versions in addition to the current pair.
       if (
-        recorded.length !== currentDocuments.length ||
         !currentDocuments.every((document) =>
           recordedKeys.has(`${document.type}:${document.version}`),
         )
