@@ -286,15 +286,13 @@ const localizedSeedPayload = localizationManifest
         slug: course.slug,
         localizations: course.localizations
           .filter((localization) => localization.locale !== 'ru')
-          .map((localization) => ({
-            ...localization,
-            variants: course.variants.map((variant) => {
+          .map((localization) => {
+            const staged = localizationBatch.courses.find(
+              (item) => item.slug === course.slug && item.locale === localization.locale,
+            );
+            const variants = course.variants.map((variant) => {
               const localized = variant.localizations.find(
                 (item) => item.locale === localization.locale,
-              );
-              const staged = localizationBatch.courses.find(
-                (item) =>
-                  item.slug === course.slug && item.locale === localization.locale,
               );
               const stagedVariant = staged?.assessment.questionVariants.find(
                 (item) => item.id === variant.stableId,
@@ -307,12 +305,24 @@ const localizedSeedPayload = localizationManifest
                 throw new Error('LOCALIZED_SEED_VARIANT_BINDING_INVALID');
               }
               return {
-                ...stagedVariant,
-                structureHash: localized.structureHash,
-                contentHash: localized.contentHash,
+                stagedVariant,
+                receipt: {
+                  id: stagedVariant.id,
+                  variantNumber: stagedVariant.variantNumber,
+                  structureHash: localized.structureHash,
+                  contentHash: localized.contentHash,
+                },
               };
-            }),
-          })),
+            });
+            return {
+              ...localization,
+              // The course receipt was calculated from the exact staged
+              // assessment payload. Per-variant receipts must never alter that
+              // hash input or the stored course-draft question variants.
+              variants: variants.map(({ stagedVariant }) => stagedVariant),
+              variantReceipts: variants.map(({ receipt }) => receipt),
+            };
+          }),
       })),
       articles: localizationManifest.articles.map((article) => ({
         slug: article.slug,
@@ -333,6 +343,7 @@ declare
   v_course jsonb;
   v_localization jsonb;
   v_variant jsonb;
+  v_variant_receipt jsonb;
   v_question_variants jsonb;
   v_test_id uuid;
   v_revision_id uuid;
@@ -358,6 +369,11 @@ begin
       v_locale := (v_localization ->> 'locale')::public.app_locale;
       v_presentation_id := (v_localization -> 'presentation' ->> 'id')::uuid;
       v_question_variants := v_localization -> 'variants';
+      if jsonb_array_length(coalesce(v_localization -> 'variantReceipts', '[]'::jsonb))
+        <> jsonb_array_length(v_question_variants) then
+        raise exception 'LOCALIZED_VARIANT_SEED_RECEIPT_COUNT_MISMATCH:%:%',
+          v_course ->> 'slug', v_locale::text;
+      end if;
 
       if private.localized_course_content_hash(
         v_localization ->> 'title',
@@ -506,6 +522,26 @@ begin
       for v_variant in
         select value from jsonb_array_elements(v_question_variants)
       loop
+        if (
+          select count(*)
+          from jsonb_array_elements(v_localization -> 'variantReceipts') receipt(value)
+          where receipt.value ->> 'id' = v_variant ->> 'id'
+            and (receipt.value ->> 'variantNumber')::smallint
+              = (v_variant ->> 'variantNumber')::smallint
+        ) <> 1 then
+          raise exception 'LOCALIZED_VARIANT_SEED_RECEIPT_BINDING_INVALID:%:%:%',
+            v_course ->> 'slug', v_locale::text, v_variant ->> 'variantNumber';
+        end if;
+        v_variant_receipt := null;
+        select receipt.value into v_variant_receipt
+        from jsonb_array_elements(v_localization -> 'variantReceipts') receipt(value)
+        where receipt.value ->> 'id' = v_variant ->> 'id'
+          and (receipt.value ->> 'variantNumber')::smallint
+            = (v_variant ->> 'variantNumber')::smallint;
+        if v_variant_receipt is null then
+          raise exception 'LOCALIZED_VARIANT_SEED_RECEIPT_MISSING:%:%:%',
+            v_course ->> 'slug', v_locale::text, v_variant ->> 'variantNumber';
+        end if;
         select variant.id into v_variant_id
         from public.test_revision_variants variant
         where variant.revision_id = v_revision_id
@@ -517,7 +553,7 @@ begin
         end if;
         if private.assessment_structure_hash(
           private.localized_public_questions(v_variant -> 'questions')
-        ) is distinct from v_variant ->> 'structureHash' or encode(
+        ) is distinct from v_variant_receipt ->> 'structureHash' or encode(
           extensions.digest(
             convert_to(
               jsonb_build_object(
@@ -529,7 +565,7 @@ begin
             'sha256'
           ),
           'hex'
-        ) is distinct from v_variant ->> 'contentHash' then
+        ) is distinct from v_variant_receipt ->> 'contentHash' then
           raise exception 'LOCALIZED_VARIANT_SEED_HASH_MISMATCH:%:%:%',
             v_course ->> 'slug', v_locale::text, v_variant ->> 'variantNumber';
         end if;
@@ -543,8 +579,8 @@ begin
           private.localized_public_questions(v_variant -> 'questions'),
           private.localized_explanations(v_variant -> 'questions'),
           10,
-          v_variant ->> 'structureHash',
-          v_variant ->> 'contentHash'
+          v_variant_receipt ->> 'structureHash',
+          v_variant_receipt ->> 'contentHash'
         ) on conflict (variant_id, locale) do nothing;
         if not exists (
           select 1 from public.test_revision_variant_localizations localization
@@ -556,8 +592,8 @@ begin
             and localization.explanations
               = private.localized_explanations(v_variant -> 'questions')
             and localization.question_count = 10
-            and localization.structure_hash = v_variant ->> 'structureHash'
-            and localization.content_hash = v_variant ->> 'contentHash'
+            and localization.structure_hash = v_variant_receipt ->> 'structureHash'
+            and localization.content_hash = v_variant_receipt ->> 'contentHash'
         ) then
           raise exception 'LOCALIZED_VARIANT_REVISION_SEED_CONFLICT:%:%:%',
             v_course ->> 'slug', v_locale::text, v_variant ->> 'variantNumber';

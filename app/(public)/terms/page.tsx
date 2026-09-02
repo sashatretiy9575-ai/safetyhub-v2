@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { TermsPolicyV22 } from '@/components/legal/terms-policy-v2-2';
 import { TermsPolicyV23 } from '@/components/legal/terms-policy-v2-3';
+import { TermsPolicyV24 } from '@/components/legal/terms-policy-v2-4';
 import { LegalContacts } from '@/components/legal/legal-contacts';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
@@ -43,6 +44,7 @@ export default async function TermsPage({ searchParams }: TermsPageProps) {
   }
   const policy = await resolveActivatedLegalPolicy('terms', requestedVersion);
   if (!policy) notFound();
+  if (policy.bodyRevision === 'terms-2.4') return <TermsPolicyV24 policy={policy} />;
   if (policy.bodyRevision === 'terms-2.3') return <TermsPolicyV23 policy={policy} />;
   if (policy.bodyRevision === 'terms-2.2') return <TermsPolicyV22 policy={policy} />;
   if (policy.bodyRevision !== 'terms-2.1') notFound();

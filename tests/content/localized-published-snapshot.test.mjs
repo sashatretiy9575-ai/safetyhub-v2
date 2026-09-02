@@ -35,9 +35,15 @@ async function json(filePath) {
 }
 
 function publicQuestions(questions) {
-  return questions.map(({ correctOptionId: _correct, explanation: _explanation, ...question }) => ({
-    ...question,
-    options: question.options.map((option) => ({ ...option })),
+  return questions.map(({ id, text, options }, questionIndex) => ({
+    id,
+    text,
+    displayOrder: questionIndex + 1,
+    options: options.map(({ id: optionId, text: optionText }, optionIndex) => ({
+      id: optionId,
+      text: optionText,
+      displayOrder: optionIndex + 1,
+    })),
   }));
 }
 
@@ -132,9 +138,7 @@ async function fixture() {
         thumbnail: sourceThumbnail,
       });
       for (const variant of entry.assessment.questionVariants) {
-        const questions = variant.questions.map(({ explanation: _unused, ...question }) =>
-          structuredClone(question),
-        );
+        const questions = publicQuestions(variant.questions);
         const explanations = variant.questions.map((question) => question.explanation);
         variantLocalizationRows.push({
           revision_id: revisionId,
@@ -304,10 +308,7 @@ test('published localization snapshot is complete, immutable and contains no ans
         error instanceof LocalizedSnapshotError &&
         error.message === 'LOCALIZED_SNAPSHOT_COURSE_DRIFT',
     );
-    await writeFile(
-      path.join(directory, 'manifest.json'),
-      built.files.get('manifest.json'),
-    );
+    await writeFile(path.join(directory, 'manifest.json'), built.files.get('manifest.json'));
 
     const firstAsset = built.manifest.courses
       .flatMap((course) => course.localizations)
@@ -348,6 +349,113 @@ test('every localized course, article and variant has exactly RU/KK/EN/ZH', asyn
       [...STAGE6_ALL_LOCALES].sort(),
     );
   }
+});
+
+test('a later complete legal revision may become current without mutating the Stage 6 receipt', async () => {
+  const input = await fixture();
+  const newVersions = [
+    { documentType: 'privacy', version: '1.4', bodyRevision: 'privacy-1.4' },
+    { documentType: 'terms', version: '2.4', bodyRevision: 'terms-2.4' },
+  ];
+
+  for (const next of newVersions) {
+    const prior = input.legalVersionRows.find(
+      (row) => row.document_type === next.documentType && row.is_current,
+    );
+    prior.is_current = false;
+    input.legalVersionRows.push({
+      document_type: next.documentType,
+      version: next.version,
+      body_revision: next.bodyRevision,
+      effective_at: new Date('2026-09-02T00:00:00.000Z'),
+      is_current: true,
+    });
+    for (const locale of STAGE6_ALL_LOCALES) {
+      const source = await json(
+        path.join(
+          process.cwd(),
+          'content',
+          'legal',
+          next.documentType,
+          `${next.version}.${locale}.json`,
+        ),
+      );
+      input.legalLocalizationRows.push({
+        document_type: next.documentType,
+        version: next.version,
+        locale,
+        title: source.title,
+        body: source.body,
+        body_hash: digest(source.body),
+        status: 'published',
+      });
+    }
+  }
+
+  const built = buildLocalizedPublishedSnapshot(input);
+  assert.equal(built.manifest.counts.legalLocalizationCount, 24);
+  assert.equal(
+    built.manifest.legalVersions.find((item) => item.documentType === 'privacy' && item.isCurrent)
+      .version,
+    '1.4',
+  );
+  assert.equal(
+    built.manifest.legalVersions.find((item) => item.documentType === 'terms' && item.isCurrent)
+      .version,
+    '2.4',
+  );
+});
+
+test('source-controlled legal revisions fail closed when a published copy drifts', async () => {
+  const input = await fixture();
+  for (const next of [
+    { documentType: 'privacy', version: '1.4', bodyRevision: 'privacy-1.4' },
+    { documentType: 'terms', version: '2.4', bodyRevision: 'terms-2.4' },
+  ]) {
+    const prior = input.legalVersionRows.find(
+      (row) => row.document_type === next.documentType && row.is_current,
+    );
+    prior.is_current = false;
+    input.legalVersionRows.push({
+      document_type: next.documentType,
+      version: next.version,
+      body_revision: next.bodyRevision,
+      effective_at: new Date('2026-09-02T00:00:00.000Z'),
+      is_current: true,
+    });
+    for (const locale of STAGE6_ALL_LOCALES) {
+      const source = await json(
+        path.join(
+          process.cwd(),
+          'content',
+          'legal',
+          next.documentType,
+          `${next.version}.${locale}.json`,
+        ),
+      );
+      input.legalLocalizationRows.push({
+        document_type: next.documentType,
+        version: next.version,
+        locale,
+        title: source.title,
+        body: source.body,
+        body_hash: digest(source.body),
+        status: 'published',
+      });
+    }
+  }
+  const target = input.legalLocalizationRows.find(
+    (row) => row.document_type === 'terms' && row.version === '2.4' && row.locale === 'zh',
+  );
+  target.body = { ...target.body, unexpected: true };
+  target.body_hash = digest(target.body);
+
+  assert.throws(
+    () => buildLocalizedPublishedSnapshot(input),
+    (error) =>
+      error instanceof LocalizedSnapshotError &&
+      error.message === 'LOCALIZED_SNAPSHOT_SOURCE_LEGAL_DRIFT',
+  );
 });
 
 test('content seed deterministically includes the complete published localization snapshot', async () => {

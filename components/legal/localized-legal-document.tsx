@@ -3,6 +3,7 @@ import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
 import { LegalContacts } from '@/components/legal/legal-contacts';
 import type { LocalizedLegalDocument } from '@/lib/content/legal-documents';
+import { LEGAL_EFFECTIVE_TIME_ZONE } from '@/lib/legal';
 
 const externalLinkClass =
   'inline-flex min-h-11 items-center font-semibold text-[var(--color-primary)] underline underline-offset-2 hover:no-underline';
@@ -15,7 +16,7 @@ export async function LocalizedLegalDocumentView({
   const [format, t] = await Promise.all([getFormatter(), getTranslations('LegalFlow')]);
   const effectiveAt = format.dateTime(new Date(document.effectiveAt), {
     dateStyle: 'long',
-    timeZone: 'UTC',
+    timeZone: LEGAL_EFFECTIVE_TIME_ZONE,
   });
 
   return (

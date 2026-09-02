@@ -32,7 +32,14 @@ function dateTime(value: string) {
 }
 
 function fullName(item: AdminAccountApprovalItem) {
-  return `${item.name} ${item.surname}`.trim() || 'Без имени';
+  return (
+    `${item.name} ${item.surname}`.trim() ||
+    (item.username ? `Логин: ${item.username}` : 'Без имени')
+  );
+}
+
+function accountIdentifier(item: AdminAccountApprovalItem) {
+  return item.username ? `Логин: ${item.username}` : (item.email ?? 'Вход по логину и паролю');
 }
 
 export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalItem[] }) {
@@ -121,7 +128,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
               <div className="min-w-0 sm:hidden">
                 <h2 className="font-display text-lg font-bold break-words">{label}</h2>
                 <p className="text-sm break-all text-[var(--color-text-muted)]">
-                  {item.email ?? 'Вход по логину и паролю'}
+                  {accountIdentifier(item)}
                 </p>
               </div>
             </div>
@@ -130,7 +137,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
               <div className="hidden sm:block">
                 <h2 className="font-display text-lg font-bold break-words">{label}</h2>
                 <p className="text-sm break-all text-[var(--color-text-muted)]">
-                  {item.email ?? 'Вход по логину и паролю'}
+                  {accountIdentifier(item)}
                 </p>
               </div>
 

@@ -12,9 +12,10 @@ RU/KK/EN email-code flow:
 - An opaque `@auth.invalid` provider identifier exists only in the private,
   server-only username mapping. It is redacted from JWT claims, the learner
   context, and administrator directory projections.
-- A profile telephone remains normal contact data. It is collected by the
-  standard onboarding form and is not an authentication factor or recovery
-  channel.
+- A fresh ZH username/password application enters administrator review without
+  an email address, SMS, telephone, name, job, organization, avatar, or a
+  completed profile. Those ordinary profile/contact fields are neither an
+  authentication factor nor a recovery channel.
 - Registration first sends a dedicated Turnstile token to a Vercel server-only
   Cloudflare `Siteverify` call. It verifies before username lookup, legal
   acceptance, provider-user creation, or mapping. A failed or unavailable
@@ -45,11 +46,31 @@ is off. Do not enable the browser flag before the database receipt.
 
 ## Approval and recovery
 
-Registration records current legal acceptance but leaves the account in the
-normal `profile_incomplete` state. The learner must complete the standard
-profile and contact-phone onboarding flow before the existing approval
-submission transitions the account to `pending`. Administrator approval remains
-mandatory before protected learner access.
+Registration records current legal acceptance and moves the mapped ZH account
+directly from `profile_incomplete` to `pending` manual review. It does not set
+`onboarding_completed_at` and does not require a profile, contact phone, email,
+or avatar. Administrator approval remains mandatory before protected learner
+access. This exception is restricted to the private ZH username/password
+mapping; the RU/KK/EN email-code flows still use the existing profile/contact
+onboarding and approval submission contract.
+
+After approval, the mapped ZH learner can open protected course material and
+start/complete an assessment without a fabricated onboarding or avatar state.
+The exception is limited to those ordinary learner-admission checks: current
+legal acceptance, active-account status, manual approval, quotas, and all
+normal assessment rules still apply. A passed attempt creates its ordinary
+attestation, but its certificate remains `pending_identity` until a real,
+verified identity is supplied later. The login username is an approval-queue
+identifier only; it is never copied into a certificate name, job, or
+organization snapshot.
+
+The synthetic provider email remains redacted. The capability-gated
+`identity.manage` pending-review queue exposes the canonical ZH username only
+for the corresponding application, so an administrator can make a manual
+decision without receiving the provider email, password, contact fields, or
+username through Telegram. With the production
+`telegram_application_details=false` gate, the existing generic approval event
+continues to be emitted and does not block the minimal application.
 
 There is no Chinese self-service recovery endpoint. An administrator with
 `identity.manage` may use the internal ZH password recovery API only after
@@ -77,6 +98,7 @@ The focused contract coverage is in:
 - `tests/security/zh-session-provider-method.test.mjs`
 - `supabase/tests/zh_session_provider_method.sql`
 - `supabase/tests/zh_webauthn_auth.sql`
+- `supabase/tests/zh_minimal_pending_approval.sql`
 
 After a local database reset, regenerate the CLI schema contract with
 `npm run db:types:generate:local`, then run `npm run check:db-types` and

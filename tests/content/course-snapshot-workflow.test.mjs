@@ -185,6 +185,43 @@ test('presentation QA derives page totals and renders every page without requiri
   }
 });
 
+test('presentation QA accepts a Node Buffer at the pdfjs boundary', async () => {
+  const temporaryRoot = await mkdtemp(path.join(os.tmpdir(), 'safetyhub-pdf-qa-buffer-'));
+  try {
+    const pdf = await PDFDocument.create();
+    const font = await pdf.embedFont(StandardFonts.Helvetica);
+    const page = pdf.addPage([1600, 900]);
+    page.drawRectangle({
+      x: 0,
+      y: 0,
+      width: 1600,
+      height: 900,
+      color: rgb(0.06, 0.2, 0.42),
+    });
+    page.drawText('Node Buffer presentation QA', {
+      x: 120,
+      y: 430,
+      size: 52,
+      font,
+      color: rgb(1, 1, 1),
+    });
+    const pdfBytes = Buffer.from(await pdf.save({ useObjectStreams: false }));
+    const { manifest } = await validateAndRenderPresentation({
+      slug: 'node-buffer-course',
+      pdfBytes,
+      expectedByteSize: pdfBytes.byteLength,
+      expectedPageCount: 1,
+      expectedSha256: createHash('sha256').update(pdfBytes).digest('hex'),
+      qaRoot: temporaryRoot,
+    });
+
+    assert.equal(Buffer.isBuffer(pdfBytes), true);
+    assert.equal(manifest.renderedPageCount, 1);
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
 test('linked pull previews a staged transaction before canonical replacement', async () => {
   const source = await readFile(path.join(root, 'scripts/content-sync-linked.mjs'), 'utf8');
   const previewIndex = source.indexOf("mode: 'preview'");

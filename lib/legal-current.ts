@@ -2,6 +2,7 @@ import 'server-only';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
+  legalEffectiveDateInAppTimezone,
   resolveLegalDocumentVersion,
   type LegalDocumentType,
   type LegalDocumentVersion,
@@ -25,7 +26,7 @@ function validatedCurrentPolicy(row: CurrentLegalRow | undefined, type: LegalDoc
   if (
     !policy ||
     policy.bodyRevision !== row.body_revision ||
-    policy.effectiveDate !== row.effective_at.slice(0, 10)
+    policy.effectiveDate !== legalEffectiveDateInAppTimezone(row.effective_at)
   ) {
     throw new Error('LEGAL_CURRENT_VERSION_UNSUPPORTED');
   }

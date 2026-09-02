@@ -17,6 +17,7 @@ import { getCurrentLegalPolicies } from '@/lib/legal-current';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createEphemeralAuthClient } from '@/lib/supabase/ephemeral-auth';
 import { createClient } from '@/lib/supabase/server';
+import type { ZhUsernamePasswordRegistrationResult } from '@/lib/supabase/types';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
@@ -103,6 +104,26 @@ function parseProvisionTarget(value: unknown): ProvisionTarget | null {
   return { userId: result.userId, state: result.state };
 }
 
+function parsePendingRegistration(value: unknown): ZhUsernamePasswordRegistrationResult {
+  const result = record(value);
+  if (
+    !result ||
+    typeof result.userId !== 'string' ||
+    !UUID_PATTERN.test(result.userId) ||
+    result.approvalState !== 'pending' ||
+    typeof result.approvalRequestedAt !== 'string' ||
+    typeof result.approvalDueAt !== 'string'
+  ) {
+    throw new ZhUsernamePasswordError('ZH_AUTH_UNAVAILABLE', 503);
+  }
+  return {
+    userId: result.userId,
+    approvalState: 'pending',
+    approvalRequestedAt: result.approvalRequestedAt,
+    approvalDueAt: result.approvalDueAt,
+  };
+}
+
 async function getLoginMapping(username: string) {
   return parseLoginMapping(
     await serviceRpc('get_zh_username_login_mapping', { p_username: username }),
@@ -135,11 +156,7 @@ function providerUnavailable(error: unknown) {
   return !status || status >= 500;
 }
 
-function exactSyntheticAuthUser(
-  value: unknown,
-  userId: string,
-  syntheticEmail: string,
-) {
+function exactSyntheticAuthUser(value: unknown, userId: string, syntheticEmail: string) {
   const user = record(value);
   return (
     user?.id === userId &&
@@ -211,6 +228,13 @@ function zhLandingPath(value: unknown) {
   if (!context) return null;
   if (context.has_current_legal_acceptance !== true) return '/zh/auth/legal';
   if (context.role === 'admin') return '/admin';
+  if (
+    context.approval_state === 'pending' ||
+    context.approval_state === 'approved' ||
+    context.approval_state === 'rejected'
+  ) {
+    return '/zh/profile';
+  }
   if (context.profile_onboarding_completed_at === null) return '/zh/onboarding';
   if (typeof context.profile_onboarding_completed_at === 'string') return '/zh/profile';
   return null;
@@ -321,15 +345,20 @@ export async function registerZhUsernamePassword(input: ZhUsernamePasswordRegist
 
   let mapping: LoginMapping | null = null;
   try {
-    await serviceRpc('complete_zh_username_registration', {
-      p_user_id: userId,
-      p_username: input.username,
-      p_synthetic_email: syntheticEmail,
-      p_privacy_version: legal.privacy.version,
-      p_privacy_body_revision: legal.privacy.bodyRevision,
-      p_terms_version: legal.terms.version,
-      p_terms_body_revision: legal.terms.bodyRevision,
-    });
+    const completed = parsePendingRegistration(
+      await serviceRpc('complete_zh_username_registration', {
+        p_user_id: userId,
+        p_username: input.username,
+        p_synthetic_email: syntheticEmail,
+        p_privacy_version: legal.privacy.version,
+        p_privacy_body_revision: legal.privacy.bodyRevision,
+        p_terms_version: legal.terms.version,
+        p_terms_body_revision: legal.terms.bodyRevision,
+      }),
+    );
+    if (completed.userId !== userId) {
+      throw new ZhUsernamePasswordError('ZH_AUTH_UNAVAILABLE', 503);
+    }
     mapping = { userId, syntheticEmail };
   } catch {
     let recovered: LoginMapping | null;

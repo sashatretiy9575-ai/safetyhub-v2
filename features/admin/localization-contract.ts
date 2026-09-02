@@ -152,10 +152,10 @@ export const legalVersionStageSchema = z
   })
   .strict();
 
-export const legalPublicationSchema = z
+export const legalBundlePublicationSchema = z
   .object({
-    documentType: z.enum(['privacy', 'terms']),
-    version: z.string().trim().min(1).max(32),
+    privacyVersion: z.string().trim().min(1).max(32),
+    termsVersion: z.string().trim().min(1).max(32),
   })
   .strict();
 
@@ -163,3 +163,4 @@ export type CourseLocalizationDraftInput = z.infer<typeof courseLocalizationDraf
 export type ArticleLocalizationDraftInput = z.infer<typeof articleLocalizationDraftSchema>;
 export type LegalLocalizationDraftInput = z.infer<typeof legalLocalizationDraftSchema>;
 export type LegalVersionStageInput = z.infer<typeof legalVersionStageSchema>;
+export type LegalBundlePublicationInput = z.infer<typeof legalBundlePublicationSchema>;

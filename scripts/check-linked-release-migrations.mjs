@@ -14,12 +14,13 @@ const MIGRATION_VERSION = /^[0-9]{14}$/u;
 const MIGRATION_FILENAME = /^([0-9]{14})_([a-z0-9_]+)[.]sql$/u;
 const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 
-// This is an explicit approval record for the *unapplied* RU/KK/EN/ZH release
-// delta, not a generic migration policy. A newly reviewed migration must be
-// added here (with its normalized hash and corresponding tests) before it can
-// be applied; accepting an open-ended local tail would defeat this preflight.
-export const REVIEWED_BASE_MIGRATION_COUNT = 39;
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+// This is an explicit approval record for the post-localization forward delta,
+// not a generic migration policy. Production now holds the original 39 + 17
+// reviewed release; keep that historical receipt pinned and accept only the
+// newly reviewed two-file tail. An open-ended local tail would defeat this
+// preflight.
+export const REVIEWED_BASE_MIGRATION_COUNT = 56;
+export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260901100000_locale_profile_legal_contracts.sql',
     sha256: '5b07cd3e7784c6d33993879905e24a012c40397a5e46fed991fb0d7c37da5ce4',
@@ -89,8 +90,20 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
     sha256: '8f557b7e219bd631934d70bf8a3173a2caccb74b1f37db1b580cae987cd7d3dd',
   }),
 ]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+  Object.freeze({
+    filename: '20260902150000_zh_minimal_pending_approval.sql',
+    sha256: '2713f7a95550821b8d0319b8d6b3cd979bd3ef1c82e253611dec9ea09e473e29',
+  }),
+  Object.freeze({
+    filename: '20260902160000_atomic_legal_bundle_publication.sql',
+    sha256: '51a34bf7d01e504dc1fa47a3c5ff71cd152d17c5eedc37352bc0245c3341034c',
+  }),
+]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;
+const REVIEWED_APPLIED_RELEASE_START_INDEX =
+  REVIEWED_BASE_MIGRATION_COUNT - REVIEWED_APPLIED_RELEASE_MIGRATIONS.length;
 
 export class LinkedMigrationPreflightError extends Error {
   constructor(code) {
@@ -237,6 +250,22 @@ export function assertReviewedLocalMigrationInventory(localMigrations) {
   }
   if (localMigrations.length !== REVIEWED_TOTAL_MIGRATION_COUNT) {
     fail('LINKED_PREFLIGHT_PENDING_SET_MISMATCH');
+  }
+  if (REVIEWED_APPLIED_RELEASE_START_INDEX < 0) {
+    fail('LINKED_PREFLIGHT_PENDING_SET_MISMATCH');
+  }
+  const appliedReleaseInventory = localMigrations.slice(
+    REVIEWED_APPLIED_RELEASE_START_INDEX,
+    REVIEWED_BASE_MIGRATION_COUNT,
+  );
+  if (appliedReleaseInventory.length !== REVIEWED_APPLIED_RELEASE_MIGRATIONS.length) {
+    fail('LINKED_PREFLIGHT_PENDING_SET_MISMATCH');
+  }
+  for (const [index, expected] of REVIEWED_APPLIED_RELEASE_MIGRATIONS.entries()) {
+    const actual = appliedReleaseInventory[index];
+    if (actual.filename !== expected.filename || actual.sha256 !== expected.sha256) {
+      fail('LINKED_PREFLIGHT_REVIEWED_MIGRATION_HASH_MISMATCH');
+    }
   }
   const pendingInventory = localMigrations.slice(REVIEWED_BASE_MIGRATION_COUNT);
   if (pendingInventory.length !== REVIEWED_PENDING_MIGRATIONS.length) {

@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "documentType": "terms",
+  "version": "2.4",
+  "bodyRevision": "terms-2.4",
+  "effectiveAt": "2026-09-02T00:00:00Z",
+  "locale": "en",
+  "title": "Terms of Use",
+  "body": {
+    "sections": [
+      {
+        "id": "terms-acceptance",
+        "heading": "Accepting the terms",
+        "paragraphs": [
+          "These terms govern use of the SafetyHub.kz website and PWA, account, learning materials, tests, results, and verification functions. During registration or after signing in, the user separately accepts current Terms version 2.4 and Privacy Policy version 1.4; that action records consent.",
+          "A person who does not agree must not create an account or use restricted functions. The current service version has no payment feature."
+        ],
+        "items": [],
+        "links": [{ "label": "Privacy Policy version 1.4", "url": "/privacy?version=1.4" }]
+      },
+      {
+        "id": "terms-account",
+        "heading": "Account and manual approval",
+        "paragraphs": [],
+        "items": [
+          "In RU, KK, and EN, the user supplies a working email address and signs in with a one-time six-digit code from that email. A phone number is not used for sign-in.",
+          "In ZH, the user chooses a Latin username and password. This path does not require email, SMS, phone number, given name, family name, job title, organisation, photo, passkey, or other profile data.",
+          "A password must not be shared. It is not shown to an administrator and does not enter Telegram, application logs, or notifications. There is no self-service recovery for a minimal ZH account; a person who loses access contacts the operator.",
+          "For technical compatibility a minimal ZH account has an internal synthetic Auth identifier. It is neither an email address nor the user's username and is not shown to the user, administrator, Telegram, or public responses.",
+          "After accepting the documents, a ZH application waits for an administrator's decision. Restricted learning functions are unavailable while the application is pending, rejected, or the account is restricted. Only an authorised web administrator makes that decision.",
+          "An administrator may temporarily restrict access where compromise, abuse, or a breach of these terms is suspected."
+        ],
+        "links": []
+      },
+      {
+        "id": "terms-learning",
+        "heading": "Learning, tests, and attempts",
+        "paragraphs": [
+          "After manual approval, the user can access materials and tests in the chosen locale. Each published variant contains 10 questions, four answer options, and one correct answer. Passing requires at least 7 correct answers (70%); an attempt lasts 15 minutes. A person may start no more than 8 new attempts per course per Asia/Oral calendar day.",
+          "Bots, extracting or distributing answer keys, bypassing limits, and taking a test for another person are prohibited."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-certificates",
+        "heading": "Results and certificates",
+        "paragraphs": [
+          "A passing result of a minimal ZH account is retained as a learning result. It does not itself create a certificate or disclose made-up personal data.",
+          "A certificate is available only after the administrator separately verifies identity. Until that verification has occurred, certificate issue remains blocked. A certificate is not a state licence or a substitute for employer-required training."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-notifications",
+        "heading": "Administrative notifications",
+        "paragraphs": [
+          "Applications, course completions, and system events appear in the internal administrator inbox. For a minimal ZH application, Telegram may receive only a generic notice without username, email, phone number, password, synthetic identifier, or other user data.",
+          "Telegram does not decide, approve, reject, or change an account state."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-content",
+        "heading": "Materials and permitted use",
+        "paragraphs": [
+          "Materials are for informational learning and personal preparation. Bulk copying, resale, malicious scanning, and creation of false certificates are prohibited.",
+          "Regulatory information can change; cited sources and dates do not replace the official text applicable to a particular situation."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-availability",
+        "heading": "Availability",
+        "paragraphs": [
+          "The service depends on Supabase, Vercel, the user's network, Cloudflare Turnstile when enabled, and the Telegram Bot API for optional notifications. Planned changes and protective restrictions are possible."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-termination",
+        "heading": "Ending use and data",
+        "paragraphs": [
+          "A user can stop use and request account deletion. Within the implemented cascade, the account, profile if present, attempts, results, certificates, and related audit records are removed; a file already downloaded cannot be removed from the user's device."
+        ],
+        "items": [],
+        "links": [{ "label": "Privacy Policy version 1.4", "url": "/privacy?version=1.4" }]
+      },
+      {
+        "id": "legal-contacts",
+        "heading": "Document contacts",
+        "paragraphs": ["Call or write on WhatsApp. Keep the chat history for a written request."],
+        "items": ["Phone", "WhatsApp", "Write"],
+        "links": []
+      }
+    ]
+  },
+  "bodySourceSha256": "115615398ac0f4941bef7dba50ba3630f314a976304aeb6ebb304283a5bbed03"
+}

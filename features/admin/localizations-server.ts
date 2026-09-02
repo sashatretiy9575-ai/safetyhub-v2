@@ -534,20 +534,46 @@ export async function saveLegalLocalization(input: LegalLocalizationDraftInput) 
   };
 }
 
-export async function publishLegalLocalizations(
-  documentType: 'privacy' | 'terms',
-  version: string,
-) {
+const legalBundlePublicationResultSchema = z
+  .object({
+    privacy: z
+      .object({
+        version: z.string().min(1).max(32),
+        bodyRevision: z.string().min(3).max(160),
+        effectiveAt: z.string().refine((value) => Number.isFinite(Date.parse(value))),
+      })
+      .strict(),
+    terms: z
+      .object({
+        version: z.string().min(1).max(32),
+        bodyRevision: z.string().min(3).max(160),
+        effectiveAt: z.string().refine((value) => Number.isFinite(Date.parse(value))),
+      })
+      .strict(),
+    locales: z.array(z.enum(ADMIN_CONTENT_LOCALES)).length(4),
+    replayed: z.boolean(),
+  })
+  .strict();
+
+export async function publishLegalLocalizationBundle(privacyVersion: string, termsVersion: string) {
   await requireCapability('content.manage');
-  await authenticatedRpc('publish_legal_document_localizations', {
-    p_document_type: documentType,
-    p_version: version,
-  });
+  const result = legalBundlePublicationResultSchema.parse(
+    await authenticatedRpc('publish_legal_document_bundle', {
+      p_privacy_version: privacyVersion,
+      p_terms_version: termsVersion,
+    }),
+  );
+  revalidatePath('/admin/settings/legal');
   revalidatePath('/privacy');
   revalidatePath('/terms');
   for (const locale of ADMIN_CONTENT_LOCALES.filter((item) => item !== 'ru')) {
     revalidatePath(`/${locale}/privacy`);
     revalidatePath(`/${locale}/terms`);
   }
-  return { documentType, version, locales: [...ADMIN_CONTENT_LOCALES] };
+  return {
+    privacy: result.privacy,
+    terms: result.terms,
+    locales: [...ADMIN_CONTENT_LOCALES],
+    replayed: result.replayed,
+  };
 }

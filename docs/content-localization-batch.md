@@ -105,10 +105,13 @@ npm run content:localizations:publish -- `
   --receipt "tmp/stage6-publication/${projectRef}-${batchHash}.json"
 ```
 
-This command is resumable and idempotent. It derives every hosted draft version,
-reuses only byte-identical ready presentation objects and already matching current
-revisions, and uses deterministic presentation IDs for interrupted uploads. A
-published immutable row with different content is a hard conflict. It never logs
+This command is resumable and idempotent while the reviewed Stage 6 legal pair
+remains the current Privacy/Terms pair. It fails closed if that pair has been
+superseded, rather than certifying an old consent state as production. It derives
+every hosted draft version, reuses only byte-identical ready presentation objects
+and already matching current revisions, and uses deterministic presentation IDs
+for interrupted uploads. A published immutable row with different content is a
+hard conflict. It never logs
 the operator token, service credential, learner text, stable assessment IDs or
 answer-key data; its durable receipt contains only the project/batch binding,
 counts and aggregate hashes.
@@ -126,8 +129,12 @@ Internally the release sequence is:
 6. mark the draft complete with the PostgreSQL-computed content hash and publish
    one four-locale revision only after the `4 × 3 × 10 × 4` validator succeeds;
 7. repeat the derived-version save/complete/publish contract for all ten articles;
-8. complete and publish historical Privacy 1.2/Terms 2.2 translations before
-   staging Privacy 1.3/Terms 2.3, then rotate each current version transactionally;
+8. verify that the frozen historical Privacy 1.2/Terms 2.2 pair is already
+   complete and published in all four locales, stage both Privacy 1.3 and Terms
+   2.3, save all eight complete copies, then activate the consent pair through
+   one atomic bundle transaction. The historical batch publisher fails closed
+   for an old RU-only historical state and never invokes the retired
+   single-document legal publisher;
 9. pull the exact hosted four-locale rows and 15 immutable assets, review the
    deterministic diff, validate the localized snapshot and rerun linked parity;
 10. commit the refreshed snapshot receipt without operational personal data.

@@ -1294,6 +1294,10 @@ export type Database = {
         Args: { p_actor_id: string; p_capability: string }
         Returns: boolean
       }
+      add_zh_username_to_pending_approval_items: {
+        Args: { p_payload: Json }
+        Returns: Json
+      }
       advance_auth_admin_operation_invariant_inner: {
         Args: {
           p_completion_token: string
@@ -1550,6 +1554,10 @@ export type Database = {
           thumbnail_sha256: string
           title: string
         }[]
+      }
+      is_approved_zh_username_learner: {
+        Args: { p_user_id: string }
+        Returns: boolean
       }
       is_zh_synthetic_user: { Args: { p_user_id: string }; Returns: boolean }
       issue_certificate_for_attestation: {
@@ -4673,6 +4681,10 @@ export type Database = {
           p_expected_content_hash: string
           p_test_id: string
         }
+        Returns: Json
+      }
+      publish_legal_document_bundle: {
+        Args: { p_privacy_version: string; p_terms_version: string }
         Returns: Json
       }
       publish_legal_document_localizations: {

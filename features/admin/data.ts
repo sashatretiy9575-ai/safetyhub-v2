@@ -166,12 +166,23 @@ const adminAccessUserSchema = z.object({
 const adminAccountApprovalItemSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email().nullable(),
+  username: z
+    .string()
+    .regex(/^[a-z][a-z0-9._-]{2,31}$/u)
+    .nullable()
+    .optional(),
   name: z.string().max(80),
   surname: z.string().max(80),
   job: z.string().max(160),
   organization: z.string().max(160),
-  phoneCountryIso2: z.string().regex(/^[A-Z]{2}$/u).nullable(),
-  phoneE164: z.string().regex(/^\+[1-9][0-9]{1,14}$/u).nullable(),
+  phoneCountryIso2: z
+    .string()
+    .regex(/^[A-Z]{2}$/u)
+    .nullable(),
+  phoneE164: z
+    .string()
+    .regex(/^\+[1-9][0-9]{1,14}$/u)
+    .nullable(),
   avatarAvailable: z.boolean(),
   requestedAt: isoDateSchema,
   dueAt: isoDateSchema,

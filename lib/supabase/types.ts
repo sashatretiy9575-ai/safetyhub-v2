@@ -12,6 +12,12 @@ export type LegalDocumentType = 'privacy' | 'terms';
 export type LegalAcceptanceSource = 'registration' | 'profile';
 export type AppLocale = 'ru' | 'kk' | 'en' | 'zh';
 export type AccountApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
+export type ZhUsernamePasswordRegistrationResult = Readonly<{
+  userId: string;
+  approvalState: 'pending';
+  approvalRequestedAt: string;
+  approvalDueAt: string;
+}>;
 
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
@@ -705,6 +711,10 @@ export type Database = {
       save_legal_document_localization: JsonRpc;
       stage_legal_document_version: JsonRpc;
       publish_legal_document_localizations: JsonRpc;
+      publish_legal_document_bundle: {
+        Args: { p_privacy_version: string; p_terms_version: string };
+        Returns: Json;
+      };
       accept_current_legal_documents: {
         Args: {
           p_privacy_version: string;

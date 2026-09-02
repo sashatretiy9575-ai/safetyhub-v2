@@ -50,6 +50,21 @@ metadata и неизменяемых assets, а не на сервере.
   внутренним pathname после удаления locale prefix. Нельзя добавлять отдельный
   browser Supabase client или обходить общий `updateSession` ради локали.
 
+## Публикация юридического пакета
+
+- Privacy и Terms образуют единый consent bundle. В админке сначала создайте
+  обе версии с одинаковой датой вступления в силу и подготовьте RU, KK, EN и
+  ZH для каждой; затем выберите обе версии в одном действии публикации пакета.
+- `publish_legal_document_bundle(privacyVersion, termsVersion)` блокирует и
+  проверяет все восемь локализаций, переключает оба current pointer в одной
+  транзакции и сохраняет единый audit receipt. Если хотя бы одна копия не
+  готова, хэш не совпадает или прежняя пара неполна, исправьте источник, а не
+  обходите error повторным запросом.
+- Старые однодокументные activation RPC намеренно возвращают
+  `LEGAL_BUNDLE_PUBLISH_REQUIRED`. Они не являются operational fallback;
+  staging и сохранение draft-копий остаются отдельными capability-gated
+  операциями.
+
 ## Клиентские сертификаты и export
 
 - Ошибка `CERTIFICATE_PDF_CLIENT_ONLY` на старом `/api/certificates/{id}` —
@@ -111,6 +126,23 @@ verification не создаёт Auth user или mapping. Registration не и�
 В Vercel production/preview secret не может быть public always-pass test value,
 а verifier сверяет hostname ответа с configured deployment origin.
 Подробный контракт: `docs/zh-username-password-auth.md`.
+
+Свежая ZH username/password заявка после принятия актуальных legal документов
+сразу получает статус `pending` для ручного решения администратора: email,
+телефон, ФИО, должность, организация, аватар и завершённый профиль для этого
+не требуются. Исключение ограничено private ZH mapping; RU/KK/EN email-OTP
+потоки по-прежнему требуют обычный профиль и контактные данные перед заявкой.
+Синтетический provider email скрыт. В capability-gated очереди
+`identity.manage` администратор видит только канонический ZH username, а
+generic Telegram event при `telegram_application_details=false` не содержит
+username, email, пароль или телефон и не влияет на решение.
+
+После явного `approved` mapped ZH learner может открыть защищённый материал и
+начать/завершить попытку без фиктивного completed profile или avatar. Это не
+ослабляет active/legal/approval/quota gates и не распространяется на RU/KK/EN.
+Пройденная попытка создаёт обычную attestation, но certificate остаётся
+`pending_identity`, пока позднее не будет внесена и проверена реальная identity;
+username не является ФИО для certificate snapshot и не подставляется в него.
 
 При утечке Storage bearer одновременно обновите Function secret и Vault value,
 затем проверьте, что старое значение получает отказ. Никогда не печатайте database

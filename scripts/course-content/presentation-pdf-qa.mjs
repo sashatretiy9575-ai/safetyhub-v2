@@ -138,8 +138,11 @@ export async function validateAndRenderPresentation({
   await writeFile(path.join(courseQaRoot, 'presentation.pdf'), pdfBytes);
 
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  // pdfjs rejects Node's Buffer subclass even though Buffer extends Uint8Array.
+  // Make an ordinary copy so rendering never detaches or mutates the caller's bytes.
+  const pdfData = new Uint8Array(pdfBytes);
   const task = pdfjs.getDocument({
-    data: pdfBytes.slice(),
+    data: pdfData,
     disableWorker: true,
     enableXfa: false,
     isEvalSupported: false,

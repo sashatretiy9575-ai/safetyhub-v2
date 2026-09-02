@@ -36,6 +36,18 @@ begin
     raise exception 'service-only function lacks service_role grant';
   end if;
 
+  if has_function_privilege(
+      'anon', 'public.publish_legal_document_bundle(text,text)', 'EXECUTE'
+    )
+    or not has_function_privilege(
+      'authenticated', 'public.publish_legal_document_bundle(text,text)', 'EXECUTE'
+    )
+    or has_function_privilege(
+      'service_role', 'public.publish_legal_document_bundle(text,text)', 'EXECUTE'
+    ) then
+    raise exception 'legal bundle publisher grant boundary is invalid';
+  end if;
+
   if to_regprocedure('public.mark_profile_avatar_uploaded(uuid,timestamptz)') is not null
     or to_regprocedure('public.mark_signup_legal_acceptance(uuid,text,text)') is not null
     or exists (

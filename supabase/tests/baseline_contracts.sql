@@ -1,6 +1,8 @@
 begin;
 
 do $test$
+declare
+  v_legacy_publisher_blocked boolean := false;
 begin
   if to_regprocedure('public.get_auth_context()') is null
     or to_regprocedure('public.get_profile_dashboard()') is null
@@ -20,6 +22,7 @@ begin
     or to_regprocedure('public.get_capacity_metrics()') is null
     or to_regprocedure('public.resolve_admin_attestation_selection(text,text,uuid,text,text,timestamp with time zone,timestamp with time zone,text)') is null
     or to_regprocedure('public.publish_legal_document_version(public.legal_document_type,text,text,timestamp with time zone)') is null
+    or to_regprocedure('public.publish_legal_document_bundle(text,text)') is null
     or to_regprocedure('public.consume_business_quota_for_actor(uuid,text)') is null
     or to_regprocedure('public.consume_coarse_ip_quota(text,text)') is null
     or to_regprocedure('public.prune_coarse_ip_rate_limits(integer)') is null
@@ -429,6 +432,9 @@ begin
     raise exception 'site contact fallback seed invalid';
   end if;
 
+  -- The stable linked Stage 6 receipt currently makes Privacy 1.3 and Terms
+  -- 2.3 current.  Privacy 1.4 / Terms 2.4 remain a future bundle publication
+  -- until their reviewed production content receipt exists.
   if (select count(*) from public.legal_document_versions where is_current) <> 2
     or not exists (select 1 from public.legal_document_versions
       where document_type = 'privacy' and version = '1.1' and body_revision = 'privacy-1.1'
@@ -438,10 +444,21 @@ begin
         and not is_current)
     or not exists (select 1 from public.legal_document_versions
       where document_type = 'privacy' and version = '1.2' and body_revision = 'privacy-1.2'
-        and is_current)
+        and not is_current)
     or not exists (select 1 from public.legal_document_versions
       where document_type = 'terms' and version = '2.2' and body_revision = 'terms-2.2'
-        and is_current) then
+        and not is_current)
+    or not exists (select 1 from public.legal_document_versions
+      where document_type = 'privacy' and version = '1.3' and body_revision = 'privacy-1.3'
+        and is_current)
+    or not exists (select 1 from public.legal_document_versions
+      where document_type = 'terms' and version = '2.3' and body_revision = 'terms-2.3'
+        and is_current)
+    or (select count(*) from public.legal_document_localizations localization
+        join public.legal_document_versions legal
+          on legal.document_type = localization.document_type
+         and legal.version = localization.version
+        where legal.is_current and localization.status = 'published') <> 8 then
     raise exception 'current legal versions invalid';
   end if;
 
@@ -454,17 +471,29 @@ begin
     raise exception 'legal immutability trigger missing';
   end if;
 
-  perform public.publish_legal_document_version(
-    'privacy', '1.3-test', 'privacy-1.3-test', statement_timestamp()
-  );
-  if not exists (
-    select 1 from public.legal_document_versions
-    where document_type = 'privacy' and version = '1.3-test' and is_current
-  ) or exists (
-    select 1 from public.legal_document_versions
-    where document_type = 'privacy' and version = '1.2' and is_current
-  ) then
-    raise exception 'controlled legal version rotation failed';
+  -- Old one-document activators must never create a mixed current pair.
+  begin
+    perform public.publish_legal_document_version(
+      'privacy', 'legacy-single-document', 'legacy-single-document', statement_timestamp()
+    );
+  exception when object_not_in_prerequisite_state then
+    if sqlerrm = 'LEGAL_BUNDLE_PUBLISH_REQUIRED' then
+      v_legacy_publisher_blocked := true;
+    else
+      raise;
+    end if;
+  end;
+  if not v_legacy_publisher_blocked
+    or (select count(*) from public.legal_document_versions where is_current) <> 2
+    or not exists (
+      select 1 from public.legal_document_versions
+      where document_type = 'privacy' and version = '1.3' and is_current
+    )
+    or not exists (
+      select 1 from public.legal_document_versions
+      where document_type = 'terms' and version = '2.3' and is_current
+    ) then
+    raise exception 'legacy single-document legal activator remained usable';
   end if;
 
   if to_regprocedure('public.list_admin_attempts_page(integer,text,public.attempt_status,timestamp with time zone,timestamp with time zone,timestamp with time zone,uuid)') is not null

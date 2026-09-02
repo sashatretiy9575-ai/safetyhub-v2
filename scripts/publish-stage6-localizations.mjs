@@ -615,8 +615,8 @@ function createSupabaseRepository({ url, serviceSecret, operatorAccessToken, roo
     return rpc(operator, 'save_legal_document_localization', args);
   }
 
-  async function publishLegal(args) {
-    return rpc(operator, 'publish_legal_document_localizations', args);
+  async function publishLegalBundle(args) {
+    return rpc(operator, 'publish_legal_document_bundle', args);
   }
 
   return {
@@ -633,13 +633,24 @@ function createSupabaseRepository({ url, serviceSecret, operatorAccessToken, roo
     readLegal,
     stageLegal,
     saveLegal,
-    publishLegal,
+    publishLegalBundle,
   };
 }
 
 function expectedVariantProjection(variant) {
   return {
-    questions: variant.questions.map(({ explanation: _explanation, ...question }) => question),
+    questions: variant.questions.map(
+      (question, questionIndex) => ({
+        id: question.id,
+        text: question.text,
+        displayOrder: questionIndex + 1,
+        options: question.options.map((option, optionIndex) => ({
+          id: option.id,
+          text: option.text,
+          displayOrder: optionIndex + 1,
+        })),
+      }),
+    ),
     explanations: variant.questions.map((question) => question.explanation ?? ''),
   };
 }
@@ -763,6 +774,68 @@ function exactKeys(value, expected) {
     typeof value === 'object' &&
     !Array.isArray(value) &&
     JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort())
+  );
+}
+
+function legalRowsArePublished(state) {
+  return (
+    state?.localizations?.length === STAGE6_ALL_LOCALES.length &&
+    STAGE6_ALL_LOCALES.every(
+      (locale) => state.localizations.find((row) => row.locale === locale)?.status === 'published',
+    )
+  );
+}
+
+function legalRowsAreComplete(state) {
+  return (
+    state?.localizations?.length === STAGE6_ALL_LOCALES.length &&
+    STAGE6_ALL_LOCALES.every(
+      (locale) => state.localizations.find((row) => row.locale === locale)?.status === 'complete',
+    )
+  );
+}
+
+function legalVersionMatchesStage(document, state) {
+  if (
+    !state?.version ||
+    state.version.body_revision !== document.stageArgs.p_body_revision
+  ) {
+    return false;
+  }
+  const expectedEffectiveAt = new Date(document.stageArgs.p_effective_at);
+  const actualEffectiveAt = new Date(state.version.effective_at);
+  return (
+    !Number.isNaN(expectedEffectiveAt.valueOf()) &&
+    !Number.isNaN(actualEffectiveAt.valueOf()) &&
+    actualEffectiveAt.toISOString() === expectedEffectiveAt.toISOString()
+  );
+}
+
+function historicalLegalMatches(document, state) {
+  return (
+    legalRowsArePublished(state) &&
+    document.historical.every((localization) => {
+      const row = state.localizations.find((item) => item.locale === localization.locale);
+      return (
+        row?.title === localization.title &&
+        jsonEqual(row.body, localization.body)
+      );
+    })
+  );
+}
+
+function currentLegalMatches(document, state, { requireCurrent = false } = {}) {
+  return (
+    legalVersionMatchesStage(document, state) &&
+    (!requireCurrent || state.version.is_current) &&
+    legalRowsArePublished(state) &&
+    document.localizations.every((localization) => {
+      const row = state.localizations.find((item) => item.locale === localization.locale);
+      return (
+        row?.title === localization.args.p_title &&
+        jsonEqual(row.body, localization.args.p_body)
+      );
+    })
   );
 }
 
@@ -1003,100 +1076,136 @@ export async function executeStage6Publication({
     });
   }
 
-  const legalResults = [];
-  for (const document of batch.legal) {
-    let historical = await repo.readLegal(document.documentType, document.historicalVersion);
-    if (!historical.version) fail('STAGE6_HISTORICAL_LEGAL_VERSION_MISSING');
-    const newerAlreadyCurrent = (await repo.readLegal(document.documentType, document.version)).version
-      ?.is_current;
-    for (const localization of document.historical) {
-      const row = historical.localizations.find((item) => item.locale === localization.locale);
-      if (row?.status === 'published') {
-        if (row.title !== localization.title || !jsonEqual(row.body, localization.body)) {
-          fail('STAGE6_HISTORICAL_LEGAL_IMMUTABLE_CONFLICT');
-        }
-        continue;
-      }
-      if (newerAlreadyCurrent) fail('STAGE6_HISTORICAL_LEGAL_RESUME_ORDER_INVALID');
-      await repo.saveLegal({
-        p_document_type: document.documentType,
-        p_version: document.historicalVersion,
-        p_locale: localization.locale,
-        p_title: localization.title,
-        p_body: localization.body,
-        p_body_hash: null,
-        p_complete: true,
-      });
-      historical = await repo.readLegal(document.documentType, document.historicalVersion);
+  // The frozen Stage 6 receipt predates paired legal activation. It may be
+  // replayed only from a coherent four-locale historical pair; an old RU-only
+  // state fails closed instead of invoking the disabled single-document RPC.
+  const historicalLegal = await Promise.all(
+    batch.legal.map(async (document) => ({
+      document,
+      state: await repo.readLegal(document.documentType, document.historicalVersion),
+    })),
+  );
+  for (const { document, state } of historicalLegal) {
+    if (!state.version) fail('STAGE6_HISTORICAL_LEGAL_VERSION_MISSING');
+    if (!historicalLegalMatches(document, state)) {
+      fail('STAGE6_HISTORICAL_LEGAL_BUNDLE_PREREQUISITE_REQUIRED');
     }
-    if (!newerAlreadyCurrent) {
-      const historicalPublished = STAGE6_ALL_LOCALES.every(
-        (locale) =>
-          historical.localizations.find((item) => item.locale === locale)?.status === 'published',
-      );
-      if (!historicalPublished) {
-        await repo.publishLegal({
-          p_document_type: document.documentType,
-          p_version: document.historicalVersion,
-        });
-        historical = await repo.readLegal(document.documentType, document.historicalVersion);
-      }
-    }
+  }
 
-    let current = await repo.readLegal(document.documentType, document.version);
-    if (!current.version) {
-      await repo.stageLegal(document.stageArgs);
-      current = await repo.readLegal(document.documentType, document.version);
+  let currentLegal = await Promise.all(
+    batch.legal.map(async (document) => ({
+      document,
+      state: await repo.readLegal(document.documentType, document.version),
+    })),
+  );
+  if (
+    !currentLegal.every(({ document, state }) =>
+      currentLegalMatches(document, state, { requireCurrent: true }),
+    )
+  ) {
+    if (currentLegal.every(({ document, state }) => currentLegalMatches(document, state))) {
+      fail('STAGE6_CURRENT_LEGAL_BUNDLE_SUPERSEDED');
     }
     if (
-      !current.version ||
-      current.version.body_revision !== document.stageArgs.p_body_revision ||
-      new Date(current.version.effective_at).toISOString() !==
-        new Date(document.stageArgs.p_effective_at).toISOString()
-    ) {
-      fail('STAGE6_CURRENT_LEGAL_VERSION_CONFLICT');
-    }
-    for (const localization of document.localizations) {
-      const row = current.localizations.find((item) => item.locale === localization.locale);
-      if (row?.status === 'published') {
-        if (
-          row.title !== localization.args.p_title ||
-          !jsonEqual(row.body, localization.args.p_body)
-        ) {
-          fail('STAGE6_CURRENT_LEGAL_IMMUTABLE_CONFLICT');
-        }
-        continue;
-      }
-      await repo.saveLegal(localization.args);
-      current = await repo.readLegal(document.documentType, document.version);
-    }
-    if (
-      !current.version.is_current ||
-      !STAGE6_ALL_LOCALES.every(
-        (locale) => current.localizations.find((item) => item.locale === locale)?.status === 'published',
+      currentLegal.some(
+        ({ state }) =>
+          state.version?.is_current ||
+          state.localizations?.some((localization) => localization.status === 'published'),
       )
     ) {
-      await repo.publishLegal(document.publishArgs);
-      current = await repo.readLegal(document.documentType, document.version);
+      fail('STAGE6_CURRENT_LEGAL_BUNDLE_MIXED_STATE');
     }
+    if (!historicalLegal.every(({ state }) => state.version?.is_current)) {
+      fail('STAGE6_HISTORICAL_LEGAL_BUNDLE_PREREQUISITE_REQUIRED');
+    }
+    const privacyVersion = batch.legal.find(
+      (document) => document.documentType === 'privacy',
+    )?.version;
+    const termsVersion = batch.legal.find(
+      (document) => document.documentType === 'terms',
+    )?.version;
     if (
-      !current.version?.is_current ||
-      !STAGE6_ALL_LOCALES.every(
-        (locale) => current.localizations.find((item) => item.locale === locale)?.status === 'published',
+      !privacyVersion ||
+      !termsVersion ||
+      batch.legalBundle?.args?.p_privacy_version !== privacyVersion ||
+      batch.legalBundle?.args?.p_terms_version !== termsVersion
+    ) {
+      fail('STAGE6_CURRENT_LEGAL_BUNDLE_INVALID');
+    }
+
+    const preparedLegal = [];
+    for (const { document, state: initialState } of currentLegal) {
+      let current = initialState;
+      if (!current.version) {
+        await repo.stageLegal(document.stageArgs);
+        current = await repo.readLegal(document.documentType, document.version);
+      }
+      if (!legalVersionMatchesStage(document, current)) {
+        fail('STAGE6_CURRENT_LEGAL_VERSION_CONFLICT');
+      }
+      for (const localization of document.localizations) {
+        const row = current.localizations.find((item) => item.locale === localization.locale);
+        if (row?.status === 'published') {
+          if (
+            row.title !== localization.args.p_title ||
+            !jsonEqual(row.body, localization.args.p_body)
+          ) {
+            fail('STAGE6_CURRENT_LEGAL_IMMUTABLE_CONFLICT');
+          }
+          fail('STAGE6_CURRENT_LEGAL_BUNDLE_MIXED_STATE');
+        }
+        if (
+          !row ||
+          row.title !== localization.args.p_title ||
+          !jsonEqual(row.body, localization.args.p_body) ||
+          row.status !== 'complete'
+        ) {
+          await repo.saveLegal(localization.args);
+          current = await repo.readLegal(document.documentType, document.version);
+        }
+      }
+      if (!legalRowsAreComplete(current)) {
+        fail('STAGE6_CURRENT_LEGAL_LOCALIZATION_NOT_COMPLETE');
+      }
+      preparedLegal.push({ document, state: current });
+    }
+
+    if (preparedLegal.length !== batch.legal.length) {
+      fail('STAGE6_CURRENT_LEGAL_BUNDLE_PREPARE_FAILED');
+    }
+    const publication = await repo.publishLegalBundle(batch.legalBundle.args);
+    if (
+      publication?.privacy?.version !== batch.legalBundle.args.p_privacy_version ||
+      publication?.terms?.version !== batch.legalBundle.args.p_terms_version ||
+      !Array.isArray(publication?.locales) ||
+      publication.locales.length !== STAGE6_ALL_LOCALES.length
+    ) {
+      fail('STAGE6_CURRENT_LEGAL_BUNDLE_RECEIPT_INVALID');
+    }
+    currentLegal = await Promise.all(
+      batch.legal.map(async (document) => ({
+        document,
+        state: await repo.readLegal(document.documentType, document.version),
+      })),
+    );
+    if (
+      !currentLegal.every(({ document, state }) =>
+        currentLegalMatches(document, state, { requireCurrent: true }),
       )
     ) {
       fail('STAGE6_CURRENT_LEGAL_PUBLICATION_FAILED');
     }
-    legalResults.push({
-      keyHash: sha256(
-        Buffer.from(`legal:${document.documentType}:${document.version}`, 'utf8'),
-      ),
-      version: document.version,
-      localeHashes: current.localizations
-        .map((row) => ({ locale: row.locale, bodyHash: row.body_hash }))
-        .sort((left, right) => left.locale.localeCompare(right.locale, 'en')),
-    });
   }
+
+  const legalResults = currentLegal.map(({ document, state }) => ({
+    keyHash: sha256(
+      Buffer.from(`legal:${document.documentType}:${document.version}`, 'utf8'),
+    ),
+    version: document.version,
+    localeHashes: state.localizations
+      .map((row) => ({ locale: row.locale, bodyHash: row.body_hash }))
+      .sort((left, right) => left.locale.localeCompare(right.locale, 'en')),
+  }));
 
   const receipt = {
     schemaVersion: 1,

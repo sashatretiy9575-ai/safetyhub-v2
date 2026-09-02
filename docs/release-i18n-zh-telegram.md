@@ -72,16 +72,14 @@ npm run content:parity:check -- `
   --ssl-root-cert-sha256 $SslRootCertSha256
 ```
 
-The pre-migration migration gate accepts exactly the 39-migration hosted prefix
-and the reviewed 17-file pending tail. It pins every pending filename and
-normalized SHA-256; a partially applied tail, remote-only version, renamed file
-or changed migration fails closed. While the hosted database is still on that
-legacy prefix, the two content commands switch only in `--check` mode to a
-pinned-CA, repeatable-read RU fallback. That fallback verifies the approved RU
-catalog checksum, exact `5 / 5 / 198 / 15 / 150 / 600 / 10` contract and every
-canonical course/article/media byte hash. It ignores the repository-only,
-unpublished localization receipt and refuses a normal pull or a partially
-applied localization schema.
+The pre-migration gate now accepts exactly the 56-migration production prefix
+and the reviewed two-file tail: ZH minimal pending approval plus the atomic
+legal consent-bundle publisher. It retains the normalized SHA-256 receipt for
+the already-applied 17-file localization release and pins both pending
+filename/hash entries; a partially applied tail, remote-only version, renamed
+file or changed migration fails closed. The production schema is already
+localized, so a normal linked content check remains mandatory rather than
+falling back to legacy RU preflight behavior.
 
 `npm run db:types:check` remains the exact post-migration hosted-schema gate and
 must pass после применения migrations together with
@@ -91,11 +89,12 @@ The PostgreSQL gates have no system or bundled-root fallback: the
 operator-provided current-project Server root CA, hostname/SNI verification and
 optional reviewed SHA-256 pin are mandatory.
 
-The `39 + 17` manifest is deliberately specific to this unapplied release. If a
-reviewed forward migration is added before the linked apply, update the pinned
-`REVIEWED_PENDING_MIGRATIONS` filename/hash manifest and its exact-count test in
-the same reviewed change, then obtain a fresh preflight receipt. Do not change
-the gate to tolerate an arbitrary extra local migration.
+The `56 + 2` manifest is deliberately specific to this unapplied forward
+release. It pins the ZH minimal-approval delta and the atomic legal consent
+bundle publisher. If another reviewed migration is added before the linked apply, update
+the pinned `REVIEWED_PENDING_MIGRATIONS` filename/hash manifest and its
+exact-count test in the same reviewed change, then obtain a fresh preflight
+receipt. Do not change the gate to tolerate an arbitrary extra local migration.
 
 ## Backup gate
 
@@ -150,7 +149,9 @@ Execute these phases one at a time and record post-counts after every phase.
    set, outside learner Storage. Never overwrite or delete a published object.
 5. Through the Russian admin application, stage the localized legal versions,
    course/article drafts, assessment translations and presentation references.
-   Publish only complete four-locale transactions.
+   Publish only complete four-locale transactions. Privacy and Terms must be
+   selected and published together through the one atomic legal-bundle action;
+   do not invoke legacy one-document activation RPCs.
 6. Pull the resulting hosted content, review the deterministic diff, run parity,
    and archive the automated-only translation/visual QA receipt.
 7. Enable locale routing, then verify RU unprefixed URLs and `/kk`, `/en`, `/zh`
@@ -158,8 +159,12 @@ Execute these phases one at a time and record post-counts after every phase.
 8. Enable the database `zh_username_password` receipt, then ZH
    username/password registration. Verify first-token registration creates no
    session, redirects to login, and a fresh Turnstile token completes password
-   authentication; then verify pending access, approval, rejection and
-   admin-only password recovery.
+   authentication. The fresh ZH application must transition directly to
+   `pending` without email, telephone, profile/contact fields or avatar; then
+   verify pending access, approval, rejection and admin-only password recovery.
+   After approval, verify the mapped ZH learner can open material and complete
+   an attempt without a fabricated profile/avatar; a pass creates an
+   attestation but remains `pending_identity` until a real identity is verified.
 9. Enable the database `notification_events` flag, then the application admin
    inbox flag. Verify the inbox while Telegram remains unavailable.
 10. Create/configure the private Telegram group and bot. Put
@@ -239,11 +244,17 @@ npm run runtime:flag:set -- `
 - Existing PS.KZ test mailboxes complete RU/KK/EN six-digit OTP end to end. No
   mailbox credential is logged, committed or included in a receipt.
 - ZH registration and login accept only a Latin username and password. Email,
-  SMS and telephone are absent from the authentication and recovery flow;
-  recovery is administrator-only.
+  SMS, telephone, profile/contact fields and avatar are absent from the
+  registration-to-pending approval path and from authentication/recovery;
+  recovery is administrator-only. The Russian `identity.manage` queue displays
+  the canonical username for the minimal application, while the generic
+  Telegram event contains no username, provider email, password or telephone.
 - Pending and rejected accounts cannot fetch either presentation, create/resume
   an attempt or obtain a certificate through browser or direct RPC. Approval in
   the Russian admin UI opens the same gates immediately after session refresh.
+  An approved minimal ZH account may learn and pass without profile/avatar
+  fields, while certificate issuance remains blocked until a verified real
+  identity exists; its username is never used as a certificate name.
 - Every localized course exposes one immutable presentation and exactly three
   hidden variants of ten questions/four options. Learner HTML/JSON contains no
   variant identity, answer key or private Storage locator.

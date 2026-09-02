@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "documentType": "privacy",
+  "version": "1.4",
+  "bodyRevision": "privacy-1.4",
+  "effectiveAt": "2026-09-02T00:00:00Z",
+  "locale": "en",
+  "title": "Privacy Policy",
+  "body": {
+    "sections": [
+      {
+        "id": "privacy-scope",
+        "heading": "What this policy covers",
+        "paragraphs": [
+          "This policy describes processing on the SafetyHub.kz website and PWA: sign-in, manual application approval, learning, tests, results, certificates, and administrative functions.",
+          "Data is processed to provide the service, protect accounts, perform a manual check where needed, and answer a user's request."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "privacy-authentication",
+        "heading": "Sign-in and the minimal ZH account",
+        "paragraphs": [
+          "For RU, KK, and EN, sign-in uses a one-time six-digit code from email. Password, SMS, and phone number are not sign-in factors for that path.",
+          "For ZH, the user creates a Latin username and password. That path does not request email, SMS, phone number, given name, family name, job title, organisation, photo, or passkey.",
+          "The password is handled by the authentication service only to sign in. An administrator cannot read it, and it is not included in Telegram, public responses, analytics, or application logs.",
+          "An internal synthetic Auth identifier is created for technical compatibility. It is not the user's address, is not used for email, and is not shown to the user."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "privacy-profile-learning",
+        "heading": "Application, learning, and identity",
+        "paragraphs": [
+          "For a minimal ZH account, the service keeps the username, selected locale, manual-approval state, and acceptance of documents. A profile, contact number, photo, and other identifying details are not required to submit or approve the application.",
+          "While a ZH application is pending, rejected, or the account is restricted, materials and tests are unavailable. After approval, the user may study materials and take tests; results are retained in the account.",
+          "A result from a minimal ZH account does not issue a certificate automatically. A certificate can be issued only after an administrator separately verifies identity; before that, identifying data is not invented or substituted and no certificate is created."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "privacy-notifications",
+        "heading": "Administrative notifications",
+        "paragraphs": [
+          "A new application, course completion, and system event are written to the internal administrator inbox. For a minimal ZH application, Telegram receives only a generic event without username, email, phone number, password, synthetic identifier, or other user data.",
+          "Telegram does not approve or reject applications, change their state, or contain controls that affect an account."
+        ],
+        "items": [],
+        "links": [{ "label": "Telegram Privacy Policy", "url": "https://telegram.org/privacy" }]
+      },
+      {
+        "id": "privacy-storage",
+        "heading": "Cookies and local storage",
+        "paragraphs": [
+          "Necessary cookies support sign-in, HttpOnly session refresh, email OTP recovery, and protection of restricted routes. Local storage can contain interface preferences and unfinished test answers on the selected device.",
+          "When Cloudflare Turnstile is enabled, Cloudflare processes its technical data to protect against automated requests."
+        ],
+        "items": [],
+        "links": [
+          {
+            "label": "Cloudflare Turnstile Privacy Policy",
+            "url": "https://www.cloudflare.com/turnstile-privacy-policy/"
+          }
+        ]
+      },
+      {
+        "id": "privacy-processors",
+        "heading": "Service providers",
+        "paragraphs": [
+          "Data is operated by the selected infrastructure providers; their region and technical terms depend on the operator's configuration."
+        ],
+        "items": [
+          "Supabase — authentication, PostgreSQL, private storage, and notification delivery queue.",
+          "Vercel — hosting, CDN, server execution, and technical logs.",
+          "Cloudflare — Turnstile when enabled.",
+          "Telegram Bot API — optional delivery of a minimized generic notification to a private group."
+        ],
+        "links": [
+          {
+            "label": "Supabase DPA",
+            "url": "https://supabase.com/legal/customer-resources/data-processing-addendum"
+          },
+          { "label": "Vercel Privacy Policy", "url": "https://vercel.com/legal/privacy-notice" },
+          { "label": "Telegram Privacy Policy", "url": "https://telegram.org/privacy" }
+        ]
+      },
+      {
+        "id": "privacy-retention",
+        "heading": "Retention and deletion",
+        "paragraphs": [
+          "Account data, document acceptance, approval state, attempts, and results are retained while the account exists or the feature needs them. The minimal ZH path does not create a photo, phone number, profile, or passkey credential merely for registration.",
+          "When an account is permanently deleted, the application deletes implemented linked data and stops QR verification for a deleted certificate. A copy already saved on an external device cannot be removed."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "privacy-security-localization",
+        "heading": "Security and changes",
+        "paragraphs": [
+          "The application uses role and capability separation, RLS, operation rate limits, protective browser headers, audit of critical actions, and encrypted transport. No control removes all risk; the password for a minimal ZH account must be kept secret.",
+          "A material new revision receives a new number and date. An accepted version remains available by its versioned link; the interface asks for separate acceptance of a new current version."
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "legal-contacts",
+        "heading": "Document contacts",
+        "paragraphs": ["Call or write on WhatsApp. Keep the chat history for a written request."],
+        "items": ["Phone", "WhatsApp", "Write"],
+        "links": []
+      }
+    ]
+  },
+  "bodySourceSha256": "c6683c8db33e41f08080409d13157f60c364e1f8f6c95d2b7bbe5bad6cb55c26"
+}

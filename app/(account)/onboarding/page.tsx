@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { AuthenticationError, requireUser } from '@/features/auth/server';
+import { isZhUsernamePasswordMinimalApplication } from '@/features/auth/zh-username-password-minimal-application';
 import { OnboardingForm } from '@/features/profile/onboarding-form';
 import { getProfileAvatarUrl } from '@/features/profile/server';
 import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
@@ -26,6 +27,10 @@ export default async function OnboardingPage() {
       redirect(localizePathname('/auth/legal', locale));
     }
     throw error;
+  }
+
+  if (isZhUsernamePasswordMinimalApplication(context)) {
+    redirect(localizePathname('/profile', locale));
   }
 
   const profile = context.profile as typeof context.profile & {

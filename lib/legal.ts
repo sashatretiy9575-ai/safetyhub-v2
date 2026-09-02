@@ -1,5 +1,7 @@
 export type LegalDocumentType = 'privacy' | 'terms';
 
+export const LEGAL_EFFECTIVE_TIME_ZONE = 'Asia/Oral';
+
 export type LegalDocumentVersion = {
   type: LegalDocumentType;
   title: string;
@@ -50,7 +52,7 @@ export const TERMS_POLICY_V2_2 = {
   bodyRevision: 'terms-2.2',
 } as const satisfies LegalDocumentVersion;
 
-export const PRIVACY_POLICY = {
+export const PRIVACY_POLICY_V1_3 = {
   type: 'privacy',
   title: 'Политика конфиденциальности',
   version: '1.3',
@@ -59,7 +61,7 @@ export const PRIVACY_POLICY = {
   bodyRevision: 'privacy-1.3',
 } as const satisfies LegalDocumentVersion;
 
-export const TERMS_POLICY = {
+export const TERMS_POLICY_V2_3 = {
   type: 'terms',
   title: 'Условия использования',
   version: '2.3',
@@ -68,11 +70,29 @@ export const TERMS_POLICY = {
   bodyRevision: 'terms-2.3',
 } as const satisfies LegalDocumentVersion;
 
+export const PRIVACY_POLICY = {
+  type: 'privacy',
+  title: 'Политика конфиденциальности',
+  version: '1.4',
+  effectiveDate: '2026-09-02',
+  path: '/privacy',
+  bodyRevision: 'privacy-1.4',
+} as const satisfies LegalDocumentVersion;
+
+export const TERMS_POLICY = {
+  type: 'terms',
+  title: 'Условия использования',
+  version: '2.4',
+  effectiveDate: '2026-09-02',
+  path: '/terms',
+  bodyRevision: 'terms-2.4',
+} as const satisfies LegalDocumentVersion;
+
 // Accepted versions must remain addressable after a new version becomes current.
 // When adding a version, preserve the corresponding rendered copy on its page.
 export const LEGAL_DOCUMENT_VERSIONS = {
-  privacy: [PRIVACY_POLICY_V1_1, PRIVACY_POLICY_V1_2, PRIVACY_POLICY],
-  terms: [TERMS_POLICY_V2_1, TERMS_POLICY_V2_2, TERMS_POLICY],
+  privacy: [PRIVACY_POLICY_V1_1, PRIVACY_POLICY_V1_2, PRIVACY_POLICY_V1_3, PRIVACY_POLICY],
+  terms: [TERMS_POLICY_V2_1, TERMS_POLICY_V2_2, TERMS_POLICY_V2_3, TERMS_POLICY],
 } as const satisfies Record<LegalDocumentType, readonly LegalDocumentVersion[]>;
 
 export function resolveLegalDocumentVersion(
@@ -93,8 +113,30 @@ export function legalDocumentHref(type: LegalDocumentType, version: string) {
 export function formatLegalDate(value: string) {
   return new Intl.DateTimeFormat('ru-RU', {
     dateStyle: 'long',
-    timeZone: 'UTC',
-  }).format(new Date(`${value}T00:00:00Z`));
+    timeZone: LEGAL_EFFECTIVE_TIME_ZONE,
+  }).format(new Date(`${value}T00:00:00+05:00`));
+}
+
+/**
+ * Legal versions are activated at the beginning of an Asia/Oral calendar day.
+ * Compare the database timestamp in that business timezone instead of slicing
+ * UTC text, which would otherwise turn a local midnight into the prior date.
+ */
+export function legalEffectiveDateInAppTimezone(value: string | Date) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (!Number.isFinite(date.getTime())) throw new Error('LEGAL_EFFECTIVE_DATE_INVALID');
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: LEGAL_EFFECTIVE_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const values = Object.fromEntries(
+    parts
+      .filter((part) => part.type === 'year' || part.type === 'month' || part.type === 'day')
+      .map((part) => [part.type, part.value]),
+  ) as Record<'year' | 'month' | 'day', string>;
+  return `${values.year}-${values.month}-${values.day}`;
 }
 
 export const LEGAL_REFERENCE_LINKS = {

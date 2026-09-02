@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "documentType": "terms",
+  "version": "2.4",
+  "bodyRevision": "terms-2.4",
+  "effectiveAt": "2026-09-02T00:00:00Z",
+  "locale": "zh",
+  "title": "使用条款",
+  "body": {
+    "sections": [
+      {
+        "id": "terms-acceptance",
+        "heading": "接受条款",
+        "paragraphs": [
+          "这些条款适用于 SafetyHub.kz 网站和 PWA、账户、学习材料、测试、结果和验证功能。注册时或登录后，用户分别接受现行的 2.4 版使用条款和 1.4 版隐私政策；该操作会记录同意。",
+          "不同意的人不得创建账户或使用受限功能。当前版本的服务不包含付款功能。"
+        ],
+        "items": [],
+        "links": [{ "label": "隐私政策 1.4 版", "url": "/privacy?version=1.4" }]
+      },
+      {
+        "id": "terms-account",
+        "heading": "账户与人工批准",
+        "paragraphs": [],
+        "items": [
+          "在 RU、KK 和 EN 中，用户提供有效电子邮箱，并使用邮件中的一次性六位验证码登录。电话号码不用于登录。",
+          "在 ZH 中，用户自行创建拉丁字母 username 和密码。此路径不要求电子邮箱、短信、电话、姓名、职位、组织、照片、passkey 或其他资料数据。",
+          "不得向他人透露密码。管理员看不到密码，密码也不会进入 Telegram、应用日志或通知。最简 ZH 账户没有自助找回功能；失去访问权限时，用户应联系运营方。",
+          "为实现技术兼容性，最简 ZH 账户具有内部 synthetic Auth identifier。它既不是邮箱，也不是用户的 username；不会向用户、管理员、Telegram 或公开响应显示。",
+          "接受文件后，ZH 申请将等待管理员决定。申请待处理、被拒绝或账户受限时，受限学习功能不可用。只有授权的网页管理员可以作出该决定。",
+          "怀疑账户泄露、滥用或违反条款时，管理员可以暂时限制访问。"
+        ],
+        "links": []
+      },
+      {
+        "id": "terms-learning",
+        "heading": "学习、测试和尝试",
+        "paragraphs": [
+          "人工批准后，用户可访问所选语言的材料和测试。每个已发布变体包含 10 个问题、四个答案选项和一个正确答案。通过测试需要至少答对 7 题（70%）；每次尝试限时 15 分钟。每门课程在 Asia/Oral 时区的每个日历日最多可开始 8 次新尝试。",
+          "禁止使用机器人、提取或传播答案密钥、绕过限制或代替他人参加测试。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-certificates",
+        "heading": "结果和证书",
+        "paragraphs": [
+          "最简 ZH 账户的及格结果会作为学习结果保存。该结果本身不会创建证书，也不会披露虚构的个人数据。",
+          "只有管理员另行核验身份后才可获得证书。在核验完成前，证书签发始终被阻止。证书不是政府许可证，也不能替代雇主要求的培训。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-notifications",
+        "heading": "管理通知",
+        "paragraphs": [
+          "申请、课程完成和系统事件会显示在管理员内部收件箱中。对于最简 ZH 申请，Telegram 最多只会收到一条通用通知，其中不含 username、邮箱、电话、密码、synthetic identifier 或其他用户数据。",
+          "Telegram 不作决定、不批准或拒绝申请，也不会更改账户状态。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-content",
+        "heading": "材料和允许的使用",
+        "paragraphs": [
+          "材料仅供信息学习和个人准备使用。禁止批量复制、转售、恶意扫描和制作虚假证书。",
+          "法规信息可能变化；材料中列出的来源和日期不能替代适用于具体情形的官方文本。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-availability",
+        "heading": "可用性",
+        "paragraphs": [
+          "服务依赖 Supabase、Vercel、用户网络、启用时的 Cloudflare Turnstile，以及用于可选通知的 Telegram Bot API。可能会有计划变更和保护性限制。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "terms-termination",
+        "heading": "停止使用和数据",
+        "paragraphs": [
+          "用户可以停止使用并请求删除账户。在已实现的级联范围内，会删除账户、存在时的资料、尝试、结果、证书及相关审计记录；已下载的文件无法从用户设备中删除。"
+        ],
+        "items": [],
+        "links": [{ "label": "隐私政策 1.4 版", "url": "/privacy?version=1.4" }]
+      },
+      {
+        "id": "legal-contacts",
+        "heading": "文件联系方式",
+        "paragraphs": ["请致电或通过 WhatsApp 联系。提交书面请求时，请保留聊天记录。"],
+        "items": ["电话", "WhatsApp", "联系"],
+        "links": []
+      }
+    ]
+  },
+  "bodySourceSha256": "b19e2b78b2e8ab6b39cd370df711c8d9edef3eb9d5c5ff0831c34b1a11168856"
+}

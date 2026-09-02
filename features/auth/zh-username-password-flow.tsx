@@ -309,7 +309,7 @@ export function ZhUsernamePasswordFlow({
 
       {isRegistration ? (
         <p className="text-sm leading-6 text-[var(--color-text-muted)]">
-          创建后，请补充个人资料和联系电话以提交管理员审核。联系电话仅作为资料联系方式，不用于登录或找回账号。
+          创建后，账号会直接进入管理员审核。登录和审核不需要电子邮箱或电话号码。
         </p>
       ) : (
         <p className="text-sm leading-6 text-[var(--color-text-muted)]">

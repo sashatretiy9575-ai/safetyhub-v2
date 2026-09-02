@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "documentType": "privacy",
+  "version": "1.4",
+  "bodyRevision": "privacy-1.4",
+  "effectiveAt": "2026-09-02T00:00:00Z",
+  "locale": "zh",
+  "title": "隐私政策",
+  "body": {
+    "sections": [
+      {
+        "id": "privacy-scope",
+        "heading": "本政策涵盖的内容",
+        "paragraphs": [
+          "本政策说明 SafetyHub.kz 网站和 PWA 中的数据处理：登录、人工审核申请、学习、测试、结果、证书和管理功能。",
+          "处理数据是为了提供服务、保护账户、在需要时进行人工审核并答复用户请求。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "privacy-authentication",
+        "heading": "登录和最简 ZH 账户",
+        "paragraphs": [
+          "对于 RU、KK 和 EN，登录使用电子邮件中的一次性六位验证码。该路径不将密码、短信或电话号码作为登录因素。",
+          "对于 ZH，用户创建拉丁字母 username 和密码。该路径不要求电子邮件、短信、电话号码、姓名、职位、组织、照片或 passkey。",
+          "密码仅由认证服务用于登录处理。管理员无法读取密码；密码不会进入 Telegram、公开响应、分析或应用日志。",
+          "为技术兼容性会创建内部 synthetic Auth identifier。它不是用户的地址，不用于电子邮件，也不会向用户显示。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "privacy-profile-learning",
+        "heading": "申请、学习和身份",
+        "paragraphs": [
+          "对于最简 ZH 账户，服务仅保存 username、所选语言、人工批准状态和接受文件的记录。提交或批准申请不要求资料、联系电话、照片或其他身份信息。",
+          "ZH 申请待处理、被拒绝或账户受限时，材料和测试不可用。批准后，用户可以学习材料并参加测试；结果保存在账户中。",
+          "最简 ZH 账户的结果不会自动签发证书。只有管理员另行核验身份后才可签发证书；在此之前不会虚构或替代身份数据，也不会创建证书。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "privacy-notifications",
+        "heading": "管理通知",
+        "paragraphs": [
+          "新申请、课程完成和系统事件会写入管理员内部收件箱。对于最简 ZH 申请，Telegram 仅会收到一条通用事件，其中不含 username、邮箱、电话、密码、synthetic identifier 或其他用户数据。",
+          "Telegram 不批准或拒绝申请，不改变申请状态，也不包含影响账户的控件。"
+        ],
+        "items": [],
+        "links": [{ "label": "Telegram 隐私政策", "url": "https://telegram.org/privacy" }]
+      },
+      {
+        "id": "privacy-storage",
+        "heading": "Cookie 和本地存储",
+        "paragraphs": [
+          "必要的 cookie 支持登录、更新 HttpOnly 会话、恢复 email OTP 以及保护受限路由。本地存储可在所选设备上保存界面偏好和未完成的测试答案。",
+          "启用 Cloudflare Turnstile 时，Cloudflare 会处理其技术数据以防御自动化请求。"
+        ],
+        "items": [],
+        "links": [
+          {
+            "label": "Cloudflare Turnstile 隐私政策",
+            "url": "https://www.cloudflare.com/turnstile-privacy-policy/"
+          }
+        ]
+      },
+      {
+        "id": "privacy-processors",
+        "heading": "服务提供商",
+        "paragraphs": ["数据由选定的基础设施提供商处理；其区域和技术条件取决于运营方配置。"],
+        "items": [
+          "Supabase — 身份验证、PostgreSQL、私有存储和通知投递队列。",
+          "Vercel — 托管、CDN、服务器执行和技术日志。",
+          "Cloudflare — 启用时的 Turnstile。",
+          "Telegram Bot API — 可选地向私人群组投递最小化的通用通知。"
+        ],
+        "links": [
+          {
+            "label": "Supabase DPA",
+            "url": "https://supabase.com/legal/customer-resources/data-processing-addendum"
+          },
+          { "label": "Vercel 隐私政策", "url": "https://vercel.com/legal/privacy-notice" },
+          { "label": "Telegram 隐私政策", "url": "https://telegram.org/privacy" }
+        ]
+      },
+      {
+        "id": "privacy-retention",
+        "heading": "保存和删除",
+        "paragraphs": [
+          "账户数据、接受文件、批准状态、尝试和结果会在账户存在期间或功能需要时保存。最简 ZH 路径不会仅为注册而创建照片、电话号码、资料或 passkey 凭据。",
+          "永久删除账户时，应用会删除已实现的关联数据，并停止对已删除证书的 QR 验证。已保存在外部设备上的副本无法删除。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "privacy-security-localization",
+        "heading": "安全和变更",
+        "paragraphs": [
+          "应用使用角色和权限隔离、RLS、操作频率限制、防护性 browser headers、关键操作审计和加密传输。任何控制都无法消除全部风险；最简 ZH 账户的密码必须保密。",
+          "重要的新版本会使用新的编号和日期。已接受的版本可通过其 versioned 链接访问；界面会要求单独接受新的现行版本。"
+        ],
+        "items": [],
+        "links": []
+      },
+      {
+        "id": "legal-contacts",
+        "heading": "文件联系方式",
+        "paragraphs": ["请致电或通过 WhatsApp 联系。提交书面请求时，请保留聊天记录。"],
+        "items": ["电话", "WhatsApp", "联系"],
+        "links": []
+      }
+    ]
+  },
+  "bodySourceSha256": "815eeeaac0d4ec7447272ed91569779fa0608254f61402943afa32ecdfc84ae2"
+}

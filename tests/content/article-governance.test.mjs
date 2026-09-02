@@ -75,7 +75,19 @@ test('canonical seed creates drafts and immutable published revisions idempotent
   assert.match(seed, /insert into public\.course_drafts/);
   assert.match(seed, /private\.publish_course_revision_v3_unmetered/);
   assert.match(seed, /on conflict \(slug\) do update/);
-  assert.doesNotMatch(seed, /review_course_draft|review_article_draft|reviewed_content_hash/);
+  // The legacy review RPCs are retired. Localized drafts deliberately retain
+  // their reviewed content hashes so a published four-locale seed can be
+  // recreated without a browser-side review step.
+  assert.doesNotMatch(seed, /review_course_draft|review_article_draft/);
+  const localizedSeedStart = seed.indexOf('-- Published RU/KK/EN/ZH snapshot.');
+  const localizedSeedEnd = seed.indexOf('$localized_seed$;', localizedSeedStart);
+  assert.ok(localizedSeedStart >= 0 && localizedSeedEnd > localizedSeedStart);
+  const localizedSeed = seed.slice(localizedSeedStart, localizedSeedEnd);
+  assert.match(localizedSeed, /reviewed_content_hash/);
+  assert.doesNotMatch(
+    localizedSeed,
+    /correct_option|correctOptionId|answer_key|answerKey|auth\.users|auth\.sessions|auth\.identities|public\.profiles|public\.attempts|public\.certificates|public\.legal_acceptances|admin_audit_log/iu,
+  );
   assert.doesNotMatch(seed, /create temporary table|create temp table/iu);
 });
 

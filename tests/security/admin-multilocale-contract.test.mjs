@@ -190,13 +190,22 @@ test('localized presentations bind locale metadata to immutable final object pat
 });
 
 test('course, article and legal publication use four-locale atomic RPCs', async () => {
-  const [testEditor, articleActions, localizationServer, legalEditor, legalRoute, stageRoute] =
+  const [
+    testEditor,
+    articleActions,
+    localizationServer,
+    legalEditor,
+    legalSaveRoute,
+    legalBundleRoute,
+    stageRoute,
+  ] =
     await Promise.all([
       read('components/admin/test-editor.tsx'),
       read('lib/actions/articles.ts'),
       read('features/admin/localizations-server.ts'),
       read('components/admin/legal-localizations-editor.tsx'),
       read('app/api/admin/legal/localizations/route.ts'),
+      read('app/api/admin/legal/bundle/route.ts'),
       read('app/api/admin/legal/versions/route.ts'),
     ]);
 
@@ -213,12 +222,25 @@ test('course, article and legal publication use four-locale atomic RPCs', async 
   assert.match(localizationServer, /authenticatedRpc\('publish_course_revision_v4'/u);
   assert.match(localizationServer, /authenticatedRpc\('publish_article_revision_v3'/u);
   assert.match(localizationServer, /p_body_hash:\s*null/u);
-  assert.match(localizationServer, /authenticatedRpc\('publish_legal_document_localizations'/u);
+  assert.match(localizationServer, /authenticatedRpc\('publish_legal_document_bundle'/u);
+  assert.doesNotMatch(localizationServer, /authenticatedRpc\('publish_legal_document_localizations'/u);
   assert.match(legalEditor, /T00:00:00\+05:00/u);
   assert.match(legalEditor, /version\.current \? <Badge/u);
   assert.match(legalEditor, /updateActive\(\{ bodyHash: null \}\)/u);
   assert.match(legalEditor, /\/api\/admin\/legal\/versions/u);
-  for (const route of [legalRoute, stageRoute]) {
+  assert.match(legalEditor, /data-admin-legal-bundle-publisher/u);
+  assert.match(legalEditor, /\/api\/admin\/legal\/bundle/u);
+  assert.match(legalEditor, /Privacy \+ Terms/u);
+  assert.doesNotMatch(
+    legalEditor,
+    /\/api\/admin\/legal\/localizations[\s\S]{0,180}method:\s*'POST'/u,
+  );
+  assert.doesNotMatch(legalSaveRoute, /export async function POST/u);
+  assert.match(legalBundleRoute, /legalBundlePublicationSchema/u);
+  assert.match(legalBundleRoute, /publishLegalLocalizationBundle/u);
+  assert.match(legalBundleRoute, /parsed\.data\.privacyVersion/u);
+  assert.match(legalBundleRoute, /parsed\.data\.termsVersion/u);
+  for (const route of [legalSaveRoute, legalBundleRoute, stageRoute]) {
     assert.match(route, /invalidOriginResponse\(request\)/u);
     assert.match(route, /requireCapability\('content\.manage'\)/u);
     assert.match(route, /readJsonBody\(request,/u);

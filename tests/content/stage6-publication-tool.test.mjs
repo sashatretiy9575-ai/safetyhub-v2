@@ -27,7 +27,10 @@ function fakeHash(value) {
   return sha256(Buffer.from(JSON.stringify(value), 'utf8'));
 }
 
-function createFakeRepository(batch) {
+function createFakeRepository(
+  batch,
+  { historicalComplete = true, currentSuperseded = false } = {},
+) {
   const courses = new Map();
   const presentations = new Map();
   const articles = new Map();
@@ -41,7 +44,7 @@ function createFakeRepository(batch) {
     articlePublishes: 0,
     legalStages: 0,
     legalSaves: 0,
-    legalPublishes: 0,
+    legalBundlePublishes: 0,
   };
   for (const entry of batch.courses) {
     if (!courses.has(entry.courseId)) {
@@ -79,6 +82,22 @@ function createFakeRepository(batch) {
     }
   }
   for (const document of batch.legal) {
+    const historicalLocalizations = [
+      {
+        locale: 'ru',
+        title: 'RU',
+        body: { bodyRevision: `${document.documentType}-${document.historicalVersion}` },
+        body_hash: 'c'.repeat(64),
+        status: 'published',
+      },
+      ...document.historical.map((localization) => ({
+        locale: localization.locale,
+        title: localization.title,
+        body: structuredClone(localization.body),
+        body_hash: fakeHash(localization.body),
+        status: 'published',
+      })),
+    ];
     legal.set(`${document.documentType}:${document.historicalVersion}`, {
       version: {
         document_type: document.documentType,
@@ -87,16 +106,39 @@ function createFakeRepository(batch) {
         effective_at: '2026-08-31T00:00:00.000Z',
         is_current: true,
       },
-      localizations: [
-        {
-          locale: 'ru',
-          title: 'RU',
-          body: { bodyRevision: `${document.documentType}-${document.historicalVersion}` },
-          body_hash: 'c'.repeat(64),
-          status: 'published',
-        },
-      ],
+      localizations: historicalComplete ? historicalLocalizations : historicalLocalizations.slice(0, 1),
     });
+  }
+  if (currentSuperseded) {
+    for (const document of batch.legal) {
+      legal.get(`${document.documentType}:${document.historicalVersion}`).version.is_current = false;
+      legal.set(`${document.documentType}:${document.version}`, {
+        version: {
+          document_type: document.documentType,
+          version: document.version,
+          body_revision: document.stageArgs.p_body_revision,
+          effective_at: new Date(document.stageArgs.p_effective_at).toISOString(),
+          is_current: false,
+        },
+        localizations: document.localizations.map((localization) => ({
+          locale: localization.locale,
+          title: localization.args.p_title,
+          body: structuredClone(localization.args.p_body),
+          body_hash: fakeHash(localization.args.p_body),
+          status: 'published',
+        })),
+      });
+      legal.set(`${document.documentType}:future`, {
+        version: {
+          document_type: document.documentType,
+          version: 'future',
+          body_revision: `${document.documentType}-future`,
+          effective_at: '2030-01-01T00:00:00.000Z',
+          is_current: true,
+        },
+        localizations: [],
+      });
+    }
   }
 
   function courseClone(course) {
@@ -221,8 +263,20 @@ function createFakeRepository(batch) {
           variantLocalizations.push({
             variant_id: variant.id,
             locale: row.locale,
-            questions: localizedVariant.questions.map(({ explanation: _unused, ...question }) =>
-              structuredClone(question),
+            // Mirror private.localized_public_questions(): the database creates
+            // deterministic displayOrder fields and does not carry optional
+            // source-only position/explanation fields into the public receipt.
+            questions: localizedVariant.questions.map(
+              (question, questionIndex) => ({
+                id: question.id,
+                text: question.text,
+                displayOrder: questionIndex + 1,
+                options: question.options.map((option, optionIndex) => ({
+                  id: option.id,
+                  text: option.text,
+                  displayOrder: optionIndex + 1,
+                })),
+              }),
             ),
             explanations: localizedVariant.questions.map((question) => question.explanation),
           });
@@ -316,15 +370,36 @@ function createFakeRepository(batch) {
       state.localizations.push(row);
       return { locale: row.locale, bodyHash: row.body_hash };
     },
-    async publishLegal(args) {
-      mutations.legalPublishes += 1;
-      for (const [key, state] of legal) {
-        if (key.startsWith(`${args.p_document_type}:`)) state.version.is_current = false;
+    async publishLegalBundle(args) {
+      assert.deepEqual(args, batch.legalBundle.args);
+      mutations.legalBundlePublishes += 1;
+      const targets = [
+        ['privacy', args.p_privacy_version],
+        ['terms', args.p_terms_version],
+      ];
+      for (const [documentType, version] of targets) {
+        const state = legal.get(`${documentType}:${version}`);
+        assert.ok(state, `${documentType}: target version must be staged`);
+        assert.equal(state.localizations.length, 4);
+        assert.ok(state.localizations.every((row) => row.status === 'complete'));
       }
-      const state = legal.get(`${args.p_document_type}:${args.p_version}`);
-      state.version.is_current = true;
-      for (const row of state.localizations) row.status = 'published';
-      return { locales: ['ru', 'kk', 'en', 'zh'] };
+      for (const [key, state] of legal) {
+        const [documentType] = key.split(':');
+        if (targets.some(([targetType]) => targetType === documentType)) {
+          state.version.is_current = false;
+        }
+      }
+      for (const [documentType, version] of targets) {
+        const state = legal.get(`${documentType}:${version}`);
+        state.version.is_current = true;
+        for (const row of state.localizations) row.status = 'published';
+      }
+      return {
+        privacy: { version: args.p_privacy_version },
+        terms: { version: args.p_terms_version },
+        locales: ['ru', 'kk', 'en', 'zh'],
+        replayed: false,
+      };
     },
   };
 }
@@ -335,6 +410,11 @@ test('Stage 6 plan is reviewed, bounded and answer-key free', async () => {
   assert.equal(batch.counts.presentations, 15);
   assert.equal(batch.counts.articleLocalizations, 30);
   assert.equal(batch.counts.currentLegalLocalizations, 8);
+  assert.deepEqual(batch.legalBundle.args, {
+    p_privacy_version: '1.3',
+    p_terms_version: '2.3',
+  });
+  assert.ok(batch.legal.every((document) => !Object.hasOwn(document, 'publishArgs')));
   assert.doesNotThrow(() => assertNoAnswerKeys(batch.courses.map((item) => item.assessment)));
   assert.throws(
     () => assertNoAnswerKeys({ correctOptionId: 'not-public' }),
@@ -342,6 +422,79 @@ test('Stage 6 plan is reviewed, bounded and answer-key free', async () => {
       error instanceof Stage6PublicationContractError &&
       error.message === 'STAGE6_ANSWER_KEY_FIELD_FORBIDDEN',
   );
+});
+
+test('Stage 6 runtime invokes only the paired legal publisher', async () => {
+  const source = await readFile(
+    path.join(process.cwd(), 'scripts', 'publish-stage6-localizations.mjs'),
+    'utf8',
+  );
+  assert.match(source, /publishLegalBundle\(args\)/u);
+  assert.match(source, /'publish_legal_document_bundle'/u);
+  assert.doesNotMatch(source, /publish_legal_document_localizations/u);
+  assert.doesNotMatch(source, /publishLegal\(/u);
+});
+
+test('Stage 6 fails closed when the frozen historical legal pair is incomplete', async () => {
+  const batch = await loadStage6PublicationBatch({ validateRelease: false });
+  const repository = createFakeRepository(batch, { historicalComplete: false });
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'safetyhub-stage6-legal-prerequisite-'));
+  try {
+    await assert.rejects(
+      () =>
+        executeStage6Publication({
+          options: {
+            mode: 'apply',
+            projectRef: CURRENT_PRODUCTION_PROJECT_REF,
+            actorId: ACTOR_ID,
+            batchHash: batch.batchHash,
+            confirmation: `STAGE6-PUBLISH:${CURRENT_PRODUCTION_PROJECT_REF}:${batch.batchHash}`,
+            receiptPath: path.join(directory, 'receipt.json'),
+          },
+          root: process.cwd(),
+          repository,
+          skipLinkedProjectCheck: true,
+          validateRelease: false,
+        }),
+      (error) => error?.code === 'STAGE6_HISTORICAL_LEGAL_BUNDLE_PREREQUISITE_REQUIRED',
+    );
+    assert.equal(repository.mutations.legalStages, 0);
+    assert.equal(repository.mutations.legalSaves, 0);
+    assert.equal(repository.mutations.legalBundlePublishes, 0);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('Stage 6 refuses to certify a superseded legal pair as current production', async () => {
+  const batch = await loadStage6PublicationBatch({ validateRelease: false });
+  const repository = createFakeRepository(batch, { currentSuperseded: true });
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'safetyhub-stage6-legal-superseded-'));
+  try {
+    await assert.rejects(
+      () =>
+        executeStage6Publication({
+          options: {
+            mode: 'apply',
+            projectRef: CURRENT_PRODUCTION_PROJECT_REF,
+            actorId: ACTOR_ID,
+            batchHash: batch.batchHash,
+            confirmation: `STAGE6-PUBLISH:${CURRENT_PRODUCTION_PROJECT_REF}:${batch.batchHash}`,
+            receiptPath: path.join(directory, 'receipt.json'),
+          },
+          root: process.cwd(),
+          repository,
+          skipLinkedProjectCheck: true,
+          validateRelease: false,
+        }),
+      (error) => error?.code === 'STAGE6_CURRENT_LEGAL_BUNDLE_SUPERSEDED',
+    );
+    assert.equal(repository.mutations.legalStages, 0);
+    assert.equal(repository.mutations.legalSaves, 0);
+    assert.equal(repository.mutations.legalBundlePublishes, 0);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 test('apply requires the exact current project, reviewed hash and strong confirmation', async () => {
@@ -399,6 +552,8 @@ test('publication derives draft versions, resumes from hosted state and emits on
     assert.equal(repository.mutations.coursePublishes, 5);
     assert.equal(repository.mutations.articlePublishes, 10);
     assert.equal(repository.mutations.legalStages, 2);
+    assert.equal(repository.mutations.legalSaves, 8);
+    assert.equal(repository.mutations.legalBundlePublishes, 1);
     const afterFirst = structuredClone(repository.mutations);
 
     const second = await executeStage6Publication({

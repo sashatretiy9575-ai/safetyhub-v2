@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { PrivacyPolicyV12 } from '@/components/legal/privacy-policy-v1-2';
 import { PrivacyPolicyV13 } from '@/components/legal/privacy-policy-v1-3';
+import { PrivacyPolicyV14 } from '@/components/legal/privacy-policy-v1-4';
 import { LegalContacts } from '@/components/legal/legal-contacts';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
@@ -43,6 +44,7 @@ export default async function PrivacyPage({ searchParams }: PrivacyPageProps) {
   }
   const policy = await resolveActivatedLegalPolicy('privacy', requestedVersion);
   if (!policy) notFound();
+  if (policy.bodyRevision === 'privacy-1.4') return <PrivacyPolicyV14 policy={policy} />;
   if (policy.bodyRevision === 'privacy-1.3') return <PrivacyPolicyV13 policy={policy} />;
   if (policy.bodyRevision === 'privacy-1.2') return <PrivacyPolicyV12 policy={policy} />;
   if (policy.bodyRevision !== 'privacy-1.1') notFound();

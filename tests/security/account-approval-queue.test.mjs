@@ -100,3 +100,35 @@ test('learner-facing course and profile UI block material until approval', async
   assert.match(status, /<ContactLink\s+kind="phone"\s+contacts=\{contacts\}/);
   assert.match(status, /<ContactLink\s+kind="whatsapp"\s+contacts=\{contacts\}/);
 });
+
+test('minimal ZH applications expose a username only in the existing approval queue', async () => {
+  const [migration, sql, queue, data] = await Promise.all([
+    read('supabase/migrations/20260902150000_zh_minimal_pending_approval.sql'),
+    read('supabase/tests/zh_minimal_pending_approval.sql'),
+    read('components/admin/account-approval-queue.tsx'),
+    read('features/admin/data.ts'),
+  ]);
+
+  assert.match(
+    migration,
+    /create function private\.add_zh_username_to_pending_approval_items\(p_payload jsonb\)/u,
+  );
+  assert.match(
+    migration,
+    /revoke all on function private\.add_zh_username_to_pending_approval_items/u,
+  );
+  assert.match(
+    migration,
+    /private\.add_zh_username_to_pending_approval_items\([\s\S]*?private\.redact_zh_email_items/u,
+  );
+  assert.match(migration, /private\.list_pending_account_approval_page_provider_internal/u);
+  assert.doesNotMatch(
+    migration,
+    /create or replace function private\.emit_approval_requested_notification/u,
+  );
+  assert.match(sql, /v_event_payload \? 'username'/u);
+  assert.match(sql, /v_queue_item ->> 'username' <> 'zhminimal001'/u);
+  assert.match(queue, /accountIdentifier/u);
+  assert.match(queue, /Логин: \$\{item\.username\}/u);
+  assert.match(data, /username: z[\s\S]*?\.regex/u);
+});

@@ -10,8 +10,8 @@ export default async function AdminLegalLocalizationsPage() {
       <div>
         <h1 className="font-display text-3xl font-bold">Юридические документы</h1>
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Четыре неизменяемые локализации одной канонической версии. Публикация выполняется
-          атомарно.
+          Пакет Privacy + Terms публикуется одной атомарной операцией: по четыре неизменяемые
+          локализации каждого документа.
         </p>
       </div>
       <LegalLocalizationsEditor versions={versions} />

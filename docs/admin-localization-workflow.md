@@ -116,10 +116,13 @@ response содержит bounded presentation receipt, но не Storage bucket
 этого создаёт одну неизменяемую revision. Если матрица неполна, RU-черновик остаётся
 сохранён, а текущая опубликованная revision не меняется.
 
-Статьи следуют тому же процессу без assessment/presentation. Для юридического
-документа сначала создаётся новая каноническая версия с датой начала по `Asia/Oral`,
-затем сохраняются четыре structured JSON copies. Publication активирует четыре
-immutable copies одной транзакцией; опубликованный текст нельзя редактировать.
+Статьи следуют тому же процессу без assessment/presentation. Для юридических
+документов сначала создаётся новая каноническая версия Privacy и Terms с одной
+датой начала по `Asia/Oral`, затем сохраняются восемь structured JSON copies.
+Publication активирует обе версии и все RU/KK/EN/ZH immutable copies одной
+транзакцией; опубликованный текст нельзя редактировать. Отдельный publisher
+одного юридического документа намеренно отключён, чтобы не оставить mixed
+current consent pair.
 
 Перед изменением production content обязательно выполнить linked check с явно
 подтверждённым текущим project ref и pinned PostgreSQL CA (точная команда приведена

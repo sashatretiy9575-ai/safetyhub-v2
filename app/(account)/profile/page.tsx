@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { ArrowRight, Buildings, CaretDown } from '@phosphor-icons/react/dist/ssr';
 import { AuthenticationError, requireUser } from '@/features/auth/server';
 import { ProfileForm } from '@/features/auth/profile-form';
+import { isZhUsernamePasswordMinimalApplication } from '@/features/auth/zh-username-password-minimal-application';
 import { AccountDeletion } from '@/features/profile/account-deletion';
 import { AccountApprovalStatus } from '@/features/profile/account-approval-status';
 import { AvatarUploader } from '@/features/profile/avatar-uploader';
@@ -350,17 +351,20 @@ export default async function ProfilePage() {
     .join('');
   const approval = approvalStatus(context.approval.state, t);
   const canAccessLearning = context.approval.state === 'approved';
+  const isMinimalZhApplication = isZhUsernamePasswordMinimalApplication(context);
 
   return (
     <section className="py-7 md:py-12">
       <Container size="content" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-3xl font-black md:text-4xl">{t('dashboardTitle')}</h1>
-          <Button asChild>
-            <Link href={canAccessLearning ? localizePathname('/topics', locale) : '#my-data'}>
-              {canAccessLearning ? t('toCourses') : t('myData')} <ArrowRight />
-            </Link>
-          </Button>
+          {canAccessLearning || !isMinimalZhApplication ? (
+            <Button asChild>
+              <Link href={canAccessLearning ? localizePathname('/topics', locale) : '#my-data'}>
+                {canAccessLearning ? t('toCourses') : t('myData')} <ArrowRight />
+              </Link>
+            </Button>
+          ) : null}
         </div>
 
         {!context.hasCurrentLegalAcceptance ? (
@@ -388,74 +392,78 @@ export default async function ProfilePage() {
             failureId={
               dashboardResult.state === 'failed' ? dashboardResult.correlationId : undefined
             }
-            needsProfileAction={!profile.organization || !context.profile.phone_e164}
+            needsProfileAction={
+              !isMinimalZhApplication && (!profile.organization || !context.profile.phone_e164)
+            }
             locale={locale}
             t={t}
           />
         ) : null}
 
-        <Card id="my-data">
-          <CardContent className="p-0">
-            <details className="group">
-              <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden md:px-6">
-                <span className="min-w-0">
-                  <span className="font-display block text-lg font-bold">{t('myData')}</span>
-                  <span className="block truncate text-sm text-[var(--color-text-muted)]">
-                    {fullName} · {profile.organization || t('companyMissing')}
+        {!isMinimalZhApplication ? (
+          <Card id="my-data">
+            <CardContent className="p-0">
+              <details className="group">
+                <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden md:px-6">
+                  <span className="min-w-0">
+                    <span className="font-display block text-lg font-bold">{t('myData')}</span>
+                    <span className="block truncate text-sm text-[var(--color-text-muted)]">
+                      {fullName} · {profile.organization || t('companyMissing')}
+                    </span>
                   </span>
-                </span>
-                <span className="flex shrink-0 items-center gap-2">
-                  <Badge variant={approval.variant}>{approval.label}</Badge>
-                  <CaretDown className="transition-transform group-open:rotate-180" />
-                </span>
-              </summary>
-              <div className="grid gap-5 border-t p-4 sm:grid-cols-[auto_minmax(0,1fr)] md:p-6">
-                <AvatarUploader
-                  initialUrl={avatarUrl}
-                  initials={initials || 'SH'}
-                  required
-                  compact
-                />
-                <div className="min-w-0 space-y-4">
-                  <div>
-                    <h2 className="font-display text-xl font-bold break-words">{fullName}</h2>
-                    <p className="text-sm text-[var(--color-text-muted)]">
-                      {profile.job || t('jobMissing')}
-                    </p>
-                    <p className="mt-1 flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
-                      <Buildings />
-                      <span className="break-words">
-                        {profile.organization || t('companyMissingCapital')}
-                      </span>
-                    </p>
-                  </div>
-                  <ProfileForm
-                    countryOptions={phoneCountryOptions()}
-                    initial={{
-                      name: profile.name,
-                      surname: profile.surname,
-                      job: profile.job,
-                      organization: profile.organization,
-                      phone: phoneInputValueFromE164(
-                        context.profile.phone_country_iso2,
-                        context.profile.phone_e164,
-                      ),
-                    }}
+                  <span className="flex shrink-0 items-center gap-2">
+                    <Badge variant={approval.variant}>{approval.label}</Badge>
+                    <CaretDown className="transition-transform group-open:rotate-180" />
+                  </span>
+                </summary>
+                <div className="grid gap-5 border-t p-4 sm:grid-cols-[auto_minmax(0,1fr)] md:p-6">
+                  <AvatarUploader
+                    initialUrl={avatarUrl}
+                    initials={initials || 'SH'}
+                    required
+                    compact
                   />
-                  <div className="flex flex-wrap gap-2">
-                    {!profile.onboardingCompletedAt ? (
-                      <Button asChild size="sm">
-                        <Link href={localizePathname('/onboarding', locale)}>
-                          {t('completeProfile')}
-                        </Link>
-                      </Button>
-                    ) : null}
+                  <div className="min-w-0 space-y-4">
+                    <div>
+                      <h2 className="font-display text-xl font-bold break-words">{fullName}</h2>
+                      <p className="text-sm text-[var(--color-text-muted)]">
+                        {profile.job || t('jobMissing')}
+                      </p>
+                      <p className="mt-1 flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
+                        <Buildings />
+                        <span className="break-words">
+                          {profile.organization || t('companyMissingCapital')}
+                        </span>
+                      </p>
+                    </div>
+                    <ProfileForm
+                      countryOptions={phoneCountryOptions()}
+                      initial={{
+                        name: profile.name,
+                        surname: profile.surname,
+                        job: profile.job,
+                        organization: profile.organization,
+                        phone: phoneInputValueFromE164(
+                          context.profile.phone_country_iso2,
+                          context.profile.phone_e164,
+                        ),
+                      }}
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      {!profile.onboardingCompletedAt ? (
+                        <Button asChild size="sm">
+                          <Link href={localizePathname('/onboarding', locale)}>
+                            {t('completeProfile')}
+                          </Link>
+                        </Button>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </details>
-          </CardContent>
-        </Card>
+              </details>
+            </CardContent>
+          </Card>
+        ) : null}
 
         <Card>
           <CardContent className="p-0">

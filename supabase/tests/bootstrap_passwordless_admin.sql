@@ -4,8 +4,12 @@ do $test$
 declare
   v_missing_acceptance_user_id uuid := '5e190000-0000-4000-8000-000000000001';
   v_accepted_user_id uuid := '5e190000-0000-4000-8000-000000000002';
+  v_content_admin_id uuid := '5e190000-0000-4000-8000-000000000003';
   v_blocked boolean := false;
+  v_rotated_privacy_version text := 'bootstrap-privacy-9.9';
   v_rotated_terms_version text := 'bootstrap-terms-9.9';
+  v_effective_at timestamptz := timestamptz '2030-02-01 00:00:00+00';
+  v_locale public.app_locale;
   v_bootstrapped_user_id uuid;
   v_definition text;
 begin
@@ -49,7 +53,17 @@ begin
       'authenticated', 'authenticated', 'bootstrap-accepted@safetyhub.invalid', '',
       statement_timestamp(), '{}'::jsonb, '{}'::jsonb,
       statement_timestamp(), statement_timestamp()
+    ),
+    (
+      '00000000-0000-0000-0000-000000000000', v_content_admin_id,
+      'authenticated', 'authenticated', 'bootstrap-content-admin@safetyhub.invalid', '',
+      statement_timestamp(), '{}'::jsonb, '{}'::jsonb,
+      statement_timestamp(), statement_timestamp()
     );
+
+  update public.user_roles
+  set role = 'admin'
+  where user_id = v_content_admin_id;
 
   begin
     perform public.bootstrap_email_otp_admin(v_missing_acceptance_user_id);
@@ -75,9 +89,53 @@ begin
   from public.legal_document_versions document
   where document.is_current;
 
-  perform public.publish_legal_document_version(
-    'terms', v_rotated_terms_version, 'bootstrap-terms-9.9', statement_timestamp()
+  -- Rotate both documents through the same real atomic publisher used by the
+  -- admin UI. The old acceptances must become stale only as a coherent pair.
+  perform set_config('request.jwt.claim.role', 'authenticated', true);
+  perform set_config('request.jwt.claim.sub', v_content_admin_id::text, true);
+  perform set_config('request.jwt.claims', jsonb_build_object(
+    'role', 'authenticated', 'sub', v_content_admin_id
+  )::text, true);
+  perform public.stage_legal_document_version(
+    'privacy', v_rotated_privacy_version, 'bootstrap-privacy-9.9', v_effective_at
   );
+  perform public.stage_legal_document_version(
+    'terms', v_rotated_terms_version, 'bootstrap-terms-9.9', v_effective_at
+  );
+  foreach v_locale in array array['ru', 'kk', 'en', 'zh']::public.app_locale[] loop
+    perform public.save_legal_document_localization(
+      'privacy',
+      v_rotated_privacy_version,
+      v_locale,
+      'Bootstrap privacy ' || upper(v_locale::text),
+      jsonb_build_object('document', 'privacy', 'locale', v_locale::text),
+      null,
+      true
+    );
+    perform public.save_legal_document_localization(
+      'terms',
+      v_rotated_terms_version,
+      v_locale,
+      'Bootstrap terms ' || upper(v_locale::text),
+      jsonb_build_object('document', 'terms', 'locale', v_locale::text),
+      null,
+      true
+    );
+  end loop;
+  perform public.publish_legal_document_bundle(v_rotated_privacy_version, v_rotated_terms_version);
+
+  if (select count(*) from public.legal_document_versions legal
+      where legal.is_current
+        and (
+          (legal.document_type = 'privacy' and legal.version = v_rotated_privacy_version)
+          or (legal.document_type = 'terms' and legal.version = v_rotated_terms_version)
+        )) <> 2
+    or (select count(*) from public.legal_document_localizations localization
+        where ((localization.document_type = 'privacy' and localization.version = v_rotated_privacy_version)
+            or (localization.document_type = 'terms' and localization.version = v_rotated_terms_version))
+          and localization.status = 'published') <> 8 then
+    raise exception 'bootstrap fixture did not atomically rotate the legal pair';
+  end if;
 
   v_blocked := false;
   begin
@@ -100,7 +158,9 @@ begin
   end if;
 
   insert into public.legal_acceptances (user_id, document_type, version, source)
-  values (v_accepted_user_id, 'terms', v_rotated_terms_version, 'profile');
+  values
+    (v_accepted_user_id, 'privacy', v_rotated_privacy_version, 'profile'),
+    (v_accepted_user_id, 'terms', v_rotated_terms_version, 'profile');
 
   -- Execute the mutating RPC before inspecting its effects. PostgreSQL may
   -- reorder boolean subexpressions, so combining the call with EXISTS would

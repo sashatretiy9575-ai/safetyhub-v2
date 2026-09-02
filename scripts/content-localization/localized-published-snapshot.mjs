@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   assertNoAnswerKeys,
@@ -10,8 +12,7 @@ import {
 } from './stage6-publication-contract.mjs';
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 
 export class LocalizedSnapshotError extends Error {
   constructor(code) {
@@ -20,6 +21,33 @@ export class LocalizedSnapshotError extends Error {
     this.code = code;
   }
 }
+
+const REPOSITORY_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+  '..',
+);
+const SOURCE_CONTROLLED_CURRENT_LEGAL = new Map(
+  [
+    ['privacy', '1.4'],
+    ['terms', '2.4'],
+  ].map(([documentType, version]) => {
+    const byLocale = new Map(
+      STAGE6_ALL_LOCALES.map((locale) => {
+        const filePath = path.join(
+          REPOSITORY_ROOT,
+          'content',
+          'legal',
+          documentType,
+          `${version}.${locale}.json`,
+        );
+        const document = JSON.parse(readFileSync(filePath, 'utf8'));
+        return [locale, document];
+      }),
+    );
+    return [documentType, { version, byLocale }];
+  }),
+);
 
 function fail(code) {
   throw new LocalizedSnapshotError(code);
@@ -37,7 +65,16 @@ function isoTimestamp(value) {
 
 function expectedVariantProjection(variant) {
   return {
-    questions: variant.questions.map(({ explanation: _explanation, ...question }) => question),
+    questions: variant.questions.map(({ id, text, options }, questionIndex) => ({
+      id,
+      text,
+      displayOrder: questionIndex + 1,
+      options: options.map(({ id: optionId, text: optionText }, optionIndex) => ({
+        id: optionId,
+        text: optionText,
+        displayOrder: optionIndex + 1,
+      })),
+    })),
     explanations: variant.questions.map((question) => question.explanation ?? ''),
   };
 }
@@ -90,7 +127,7 @@ function stagedArticleEntry(batch, slug, locale) {
   return matches[0];
 }
 
-function compareKnownLegal(batch, row) {
+function compareStage6Legal(batch, row) {
   const descriptor = batch.legal.find((item) => item.documentType === row.document_type);
   if (!descriptor) return;
   if (row.version === descriptor.version) {
@@ -101,7 +138,7 @@ function compareKnownLegal(batch, row) {
       !jsonEqual(row.body, expected.args.p_body) ||
       row.status !== 'published'
     ) {
-      fail('LOCALIZED_SNAPSHOT_CURRENT_LEGAL_DRIFT');
+      fail('LOCALIZED_SNAPSHOT_STAGE6_LEGAL_DRIFT');
     }
   } else if (row.version === descriptor.historicalVersion && row.locale !== 'ru') {
     const expected = descriptor.historical.find((item) => item.locale === row.locale);
@@ -113,6 +150,20 @@ function compareKnownLegal(batch, row) {
     ) {
       fail('LOCALIZED_SNAPSHOT_HISTORICAL_LEGAL_DRIFT');
     }
+  }
+}
+
+function compareSourceControlledCurrentLegal(row) {
+  const source = SOURCE_CONTROLLED_CURRENT_LEGAL.get(row.document_type);
+  if (!source || row.version !== source.version) return;
+  const expected = source.byLocale.get(row.locale);
+  if (
+    !expected ||
+    row.title !== expected.title ||
+    !jsonEqual(row.body, expected.body) ||
+    row.status !== 'published'
+  ) {
+    fail('LOCALIZED_SNAPSHOT_SOURCE_LEGAL_DRIFT');
   }
 }
 
@@ -263,8 +314,7 @@ export function buildLocalizedPublishedSnapshot({
         }
         const pdfFile = `presentations/${slug}/${row.locale}/${row.presentation_sha256}.pdf`;
         const thumbnailHash = sha256(hosted.thumbnail);
-        const thumbnailFile =
-          `presentations/${slug}/${row.locale}/${row.presentation_sha256}-${thumbnailHash}.webp`;
+        const thumbnailFile = `presentations/${slug}/${row.locale}/${row.presentation_sha256}-${thumbnailHash}.webp`;
         files.set(pdfFile, hosted.pdf);
         files.set(thumbnailFile, hosted.thumbnail);
         asset = {
@@ -372,9 +422,7 @@ export function buildLocalizedPublishedSnapshot({
     legalVersionRows.map((version) => `${version.document_type}:${version.version}`),
   );
   const legalLocalizationKeys = new Set(
-    legalLocalizationRows.map(
-      (row) => `${row.document_type}:${row.version}:${row.locale}`,
-    ),
+    legalLocalizationRows.map((row) => `${row.document_type}:${row.version}:${row.locale}`),
   );
   if (
     legalVersionKeys.size !== legalVersionRows.length ||
@@ -389,8 +437,7 @@ export function buildLocalizedPublishedSnapshot({
     .map((version) => {
       const localizations = legalLocalizationRows
         .filter(
-          (row) =>
-            row.document_type === version.document_type && row.version === version.version,
+          (row) => row.document_type === version.document_type && row.version === version.version,
         )
         .sort((left, right) => left.locale.localeCompare(right.locale, 'en'));
       for (const row of localizations) {
@@ -401,7 +448,11 @@ export function buildLocalizedPublishedSnapshot({
         ) {
           fail('LOCALIZED_SNAPSHOT_LEGAL_ROW_INVALID');
         }
-        compareKnownLegal(batch, row);
+        // The Stage 6 receipt remains an immutable historical source after a
+        // later legal revision becomes current. It must still match exactly,
+        // but it no longer owns the database's current-version pointer.
+        compareStage6Legal(batch, row);
+        compareSourceControlledCurrentLegal(row);
       }
       return {
         documentType: version.document_type,
@@ -429,7 +480,7 @@ export function buildLocalizedPublishedSnapshot({
     legalLocalizationRows.length < 16 ||
     legalVersions.filter((version) => version.isCurrent).length !== 2 ||
     batch.legal.some((expected) => {
-      const current = legalVersions.find(
+      const stage6 = legalVersions.find(
         (item) => item.documentType === expected.documentType && item.version === expected.version,
       );
       const historical = legalVersions.find(
@@ -438,10 +489,34 @@ export function buildLocalizedPublishedSnapshot({
           item.version === expected.historicalVersion,
       );
       return (
-        !current?.isCurrent ||
-        current.localizations.length !== 4 ||
+        stage6?.localizations.length !== 4 ||
+        stage6.localizations.some((localization) => localization.status !== 'published') ||
         historical?.isCurrent ||
-        historical?.localizations.length !== 4
+        historical?.localizations.length !== 4 ||
+        historical.localizations.some((localization) => localization.status !== 'published')
+      );
+    }) ||
+    ['privacy', 'terms'].some((documentType) => {
+      const current = legalVersions.find(
+        (item) => item.documentType === documentType && item.isCurrent,
+      );
+      const source = SOURCE_CONTROLLED_CURRENT_LEGAL.get(documentType);
+      const sourceVersion = legalVersions.find(
+        (item) => item.documentType === documentType && item.version === source.version,
+      );
+      const sourceIsFullyPublished =
+        sourceVersion?.localizations.length === 4 &&
+        sourceVersion.localizations.every(
+          (localization) => localization.status === 'published',
+        );
+      const expectedVersion = sourceIsFullyPublished
+        ? source.version
+        : batch.legal.find((item) => item.documentType === documentType)?.version;
+      return (
+        !current ||
+        current.version !== expectedVersion ||
+        current.localizations.length !== 4 ||
+        current.localizations.some((localization) => localization.status !== 'published')
       );
     })
   ) {

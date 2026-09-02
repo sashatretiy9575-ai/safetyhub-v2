@@ -59,8 +59,11 @@ test('first-admin bootstrap verifies all current legal documents inside a servic
   );
   assert.match(
     sqlContract,
-    /public\.publish_legal_document_version\(/u,
+    /public\.publish_legal_document_bundle\(v_rotated_privacy_version, v_rotated_terms_version\)/u,
   );
+  assert.match(sqlContract, /v_rotated_privacy_version/u);
+  assert.match(sqlContract, /v_rotated_terms_version/u);
+  assert.doesNotMatch(sqlContract, /public\.publish_legal_document_version\(/u);
   assert.match(
     sqlContract,
     /v_bootstrapped_user_id := public\.bootstrap_email_otp_admin\(v_accepted_user_id\)/u,

@@ -21,6 +21,8 @@ export type AdminUserListItem = {
 export type AdminAccountApprovalItem = {
   id: string;
   email: string | null;
+  /** Present only for a private ZH username/password mapping in this queue. */
+  username?: string | null;
   name: string;
   surname: string;
   job: string;

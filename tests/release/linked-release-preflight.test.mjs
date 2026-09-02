@@ -9,6 +9,7 @@ import {
   classifyLocalizedSchema,
 } from '../../scripts/content-localization/linked-preflight-contract.mjs';
 import {
+  REVIEWED_APPLIED_RELEASE_MIGRATIONS,
   REVIEWED_BASE_MIGRATION_COUNT,
   REVIEWED_PENDING_MIGRATIONS,
   REVIEWED_TOTAL_MIGRATION_COUNT,
@@ -111,20 +112,21 @@ test('legacy RU fallback pins checksum, exact totals and every 3 x 10 x 4 policy
   );
 });
 
-test('reviewed migration gate accepts only the exact hosted prefix and pinned 17-file tail', async () => {
+test('reviewed migration gate accepts only the exact hosted prefix and pinned reviewed tail', async () => {
   const inventory = await loadLocalMigrationInventory();
   const localMigrations = inventory;
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 17);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 56);
+  assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 17);
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 2);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 58);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 39);
-  assert.equal(receipt.pendingCount, 17);
-  assert.equal(receipt.expectedBaseCount, 39);
-  assert.equal(receipt.expectedPendingCount, 17);
-  assert.equal(receipt.expectedTotalCount, 56);
+  assert.equal(receipt.matchedCount, 56);
+  assert.equal(receipt.pendingCount, 2);
+  assert.equal(receipt.expectedBaseCount, 56);
+  assert.equal(receipt.expectedPendingCount, 2);
+  assert.equal(receipt.expectedTotalCount, 58);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),
@@ -139,7 +141,7 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned 17
   );
 
   const renamedTail = structuredClone(localMigrations);
-  renamedTail.at(-1).filename = '20260902140000_renamed_reviewed_migration.sql';
+  renamedTail.at(-1).filename = '20260902160000_renamed_reviewed_migration.sql';
   assert.throws(
     () => assertReviewedMigrationDelta({ migrationRows: rows, localMigrations: renamedTail }),
     /LINKED_PREFLIGHT_REVIEWED_MIGRATION_HASH_MISMATCH/u,

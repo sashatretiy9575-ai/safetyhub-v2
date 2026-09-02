@@ -63,10 +63,7 @@ test('Chinese username/password routes are same-origin, bounded, rate-limited, a
   assert.match(server, /begin_zh_username_password_reset/u);
   assert.match(server, /complete_zh_username_password_reset/u);
   assert.match(server, /options: \{ captchaToken \}/u);
-  assert.match(
-    server,
-    /performDecoyPasswordAttempt\(input\.password, input\.captchaToken\)/u,
-  );
+  assert.match(server, /performDecoyPasswordAttempt\(input\.password, input\.captchaToken\)/u);
   assert.equal(
     server.match(/persistPasswordSession\(mapping, input\.password, input\.captchaToken\)/gu)
       ?.length,
@@ -118,10 +115,7 @@ test('server-only mapping redacts the synthetic identifier and never persists pa
   assert.match(migration, /v_authentication_method = 'password'/u);
   assert.match(migration, /v_authentication_method = 'token_refresh'/u);
   assert.match(migration, /ZH_AUTH_METHOD_RETIRED/u);
-  assert.match(
-    migration,
-    /from private\.zh_webauthn_accounts legacy_account[\s\S]*return false/u,
-  );
+  assert.match(migration, /from private\.zh_webauthn_accounts legacy_account[\s\S]*return false/u);
   assert.match(migration, /ZH_USERNAME_PASSWORD_ROLLOUT_DISABLED/u);
   assert.match(migration, /'zh_username_password', false/u);
   assert.doesNotMatch(migration, /p_password|password_hash|encrypted_password.*zh_username/u);
@@ -194,4 +188,92 @@ test('Chinese registration verifies its separate Turnstile token before allocati
   assert.match(loginPage, /searchParams: Promise/u);
   assert.match(loginPage, /registrationComplete=\{registrationComplete\}/u);
   assert.match(environment, /SAFETYHUB_TURNSTILE_SECRET_KEY=1x0{31}AA/u);
+});
+
+test('Chinese username/password registration reaches manual review without profile or contact onboarding', async () => {
+  const [
+    migration,
+    sqlContract,
+    server,
+    helper,
+    onboarding,
+    legal,
+    profile,
+    queue,
+    data,
+    appTypes,
+    documentation,
+  ] = await Promise.all([
+    read('supabase/migrations/20260902150000_zh_minimal_pending_approval.sql'),
+    read('supabase/tests/zh_minimal_pending_approval.sql'),
+    read('features/auth/zh-username-password-server.ts'),
+    read('features/auth/zh-username-password-minimal-application.ts'),
+    read('app/(account)/onboarding/page.tsx'),
+    read('app/(account)/auth/legal/page.tsx'),
+    read('app/(account)/profile/page.tsx'),
+    read('components/admin/account-approval-queue.tsx'),
+    read('features/admin/data.ts'),
+    read('lib/supabase/types.ts'),
+    read('docs/zh-username-password-auth.md'),
+  ]);
+
+  assert.match(migration, /create or replace function public\.complete_zh_username_registration/u);
+  const controlLock = migration.indexOf('select control.* into v_control');
+  const profileLock = migration.indexOf('select profile.* into v_profile');
+  assert.ok(
+    controlLock >= 0 && profileLock > controlLock,
+    'minimal ZH registration must lock account_controls before profiles',
+  );
+  assert.match(migration, /approval_state = 'pending'/u);
+  assert.match(migration, /approval_due_at = v_due_at/u);
+  assert.match(migration, /v_due_at timestamptz := v_requested_at \+ interval '24 hours'/u);
+  assert.match(migration, /set preferred_locale = 'zh'/u);
+  assert.match(migration, /insert into public\.legal_acceptances/u);
+  assert.match(migration, /create function private\.is_approved_zh_username_learner/u);
+  assert.match(migration, /control\.approval_state = 'approved'::public\.account_approval_state/u);
+  assert.match(migration, /auth_user\.deleted_at is null/u);
+  assert.match(migration, /auth_user\.banned_until is null/u);
+  assert.match(migration, /auth_user\.raw_app_meta_data ->> 'safetyhub_auth_kind' = 'zh_username_password'/u);
+  assert.match(migration, /lower\(auth_user\.email::text\) = account\.synthetic_email/u);
+  assert.match(migration, /create or replace function private\.start_test_attempt_unmetered/u);
+  assert.match(migration, /not v_is_approved_zh_username_learner and \(/u);
+  assert.match(migration, /not v_is_approved_zh_username_learner\s+and v_profile\.avatar_updated_at is null/u);
+  assert.match(migration, /private\.add_zh_username_to_pending_approval_items/u);
+  assert.match(migration, /private\.redact_zh_email_items/u);
+  assert.match(migration, /private\.list_pending_account_approval_page_provider_internal/u);
+  assert.doesNotMatch(
+    migration,
+    /create or replace function private\.emit_approval_requested_notification/u,
+  );
+  assert.doesNotMatch(migration, /p_password|password_hash|encrypted_password/u);
+
+  assert.match(sqlContract, /approval_due_at[\s\S]*?interval '24 hours'/u);
+  assert.match(sqlContract, /profile\.phone_country_iso2 is null/u);
+  assert.match(sqlContract, /profile\.onboarding_completed_at is null/u);
+  assert.match(sqlContract, /v_event_payload \? 'username'/u);
+  assert.match(sqlContract, /v_queue_item ->> 'username' <> 'zhminimal001'/u);
+  assert.match(sqlContract, /public\.decide_account_approval/u);
+  assert.match(sqlContract, /public\.start_test_attempt_locale\(v_test_slug, 'zh'\)/u);
+  assert.match(sqlContract, /public\.complete_test_attempt\(v_attempt_id, v_answers\)/u);
+  assert.match(sqlContract, /certificatePendingVerification' <> 'true'/u);
+  assert.match(sqlContract, /IDENTITY_NOT_VERIFIED/u);
+
+  assert.match(
+    server,
+    /context\.approval_state === 'pending'[\s\S]*?context\.approval_state === 'approved'/u,
+  );
+  assert.match(server, /parsePendingRegistration/u);
+  assert.match(server, /completed\.userId !== userId/u);
+  assert.match(appTypes, /ZhUsernamePasswordRegistrationResult/u);
+  assert.match(helper, /context\.user\.email === null/u);
+  assert.match(helper, /context\.profile\.preferred_locale === 'zh'/u);
+  assert.match(helper, /context\.profile\.onboarding_completed_at === null/u);
+  assert.match(onboarding, /isZhUsernamePasswordMinimalApplication/u);
+  assert.match(legal, /isZhUsernamePasswordMinimalApplication/u);
+  assert.match(profile, /!isMinimalZhApplication/u);
+  assert.match(profile, /!isMinimalZhApplication && \(!profile\.organization/u);
+  assert.match(queue, /item\.username/u);
+  assert.match(data, /username: z[\s\S]*?\.regex/u);
+  assert.match(documentation, /directly from `profile_incomplete` to `pending`/u);
+  assert.match(documentation, /certificate remains `pending_identity`/u);
 });

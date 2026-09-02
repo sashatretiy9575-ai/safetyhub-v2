@@ -262,7 +262,7 @@ async function createZhLoadTestUser(admin, index, legal) {
     p_terms_version: legal.terms.version,
     p_terms_body_revision: legal.terms.bodyRevision,
   });
-  if (completed.data?.userId !== user.id || completed.data?.approvalState !== 'profile_incomplete') {
+  if (completed.data?.userId !== user.id || completed.data?.approvalState !== 'pending') {
     throw new Error(`zh username registration ${index + 1}: COMPLETION_CONTRACT_MISMATCH`);
   }
 
@@ -405,9 +405,7 @@ async function createAuthenticatedClient(url, publishableKey, user, captchaToken
     const retryable =
       signedIn.error.status === 429 || TRANSIENT_NETWORK_ERROR.test(signedIn.error.message);
     if (!retryable || attempt === 8) {
-      throw new Error(
-        `ZH_PASSWORD_SIGN_IN_FAILED_${boundedAuthErrorEvidence(signedIn.error)}`,
-      );
+      throw new Error(`ZH_PASSWORD_SIGN_IN_FAILED_${boundedAuthErrorEvidence(signedIn.error)}`);
     }
     await wait(attempt * 1_000);
   }
@@ -779,15 +777,16 @@ async function main() {
     );
     zhPasswordLoginWaveResults.push({
       concurrency,
-      signInP95Ms: percentile(sessions.map((item) => item.duration), 95),
+      signInP95Ms: percentile(
+        sessions.map((item) => item.duration),
+        95,
+      ),
     });
     process.stdout.write(`LOAD_ZH_PASSWORD_LOGIN_WAVE_COMPLETE=${concurrency}\n`);
   }
   const sessionUsers = createdUsers.slice(0, sessionCount);
-  const clientSessions = await mapLimit(
-    sessionUsers,
-    PREPARATION_CONCURRENCY,
-    (user) => createAuthenticatedClient(url, publishableKey, user, localCiCaptchaToken),
+  const clientSessions = await mapLimit(sessionUsers, PREPARATION_CONCURRENCY, (user) =>
+    createAuthenticatedClient(url, publishableKey, user, localCiCaptchaToken),
   );
   const clients = clientSessions.map((session) => session.client);
   process.stdout.write(`LOAD_SESSIONS_READY=${clients.length}/${sessionUsers.length}\n`);
@@ -1060,8 +1059,14 @@ async function main() {
     attestationsSeeded: synthetic.attestations.length,
     zhUsernamePasswordRegistration: {
       count: createdUsers.length,
-      completeP95Ms: percentile(createdUsers.map((user) => user.registrationMetrics.completeMs), 95),
-      mappingP95Ms: percentile(createdUsers.map((user) => user.registrationMetrics.mappingMs), 95),
+      completeP95Ms: percentile(
+        createdUsers.map((user) => user.registrationMetrics.completeMs),
+        95,
+      ),
+      mappingP95Ms: percentile(
+        createdUsers.map((user) => user.registrationMetrics.mappingMs),
+        95,
+      ),
     },
     zhPasswordLoginWaveResults,
     waveResults,

@@ -440,7 +440,7 @@ export async function loadStage6PublicationBatch({
     { documentType: 'terms', historicalVersion: '2.2', version: '2.3' },
   ]) {
     const currentPrefix = `legal/${descriptor.documentType}/${descriptor.version}`;
-    const [publication, stage, publish] = await Promise.all([
+    const [publication, stage, historicalPublishReceipt] = await Promise.all([
       readReviewedJson(`${currentPrefix}/publication-receipt.json`, 128 * 1024),
       readReviewedJson(`${currentPrefix}/stage-rpc.json`, 16 * 1024),
       readReviewedJson(`${currentPrefix}/publish-rpc.json`, 16 * 1024),
@@ -450,11 +450,14 @@ export async function loadStage6PublicationBatch({
       publication.value?.documentType !== descriptor.documentType ||
       publication.value?.version !== descriptor.version ||
       stage.value?.function !== 'stage_legal_document_version' ||
-      publish.value?.function !== 'publish_legal_document_localizations' ||
+      // Stage 6 is a frozen historical receipt. Its original per-document
+      // publication descriptor remains a provenance artifact protected by the
+      // reviewed manifest; it is never returned as executable runtime input.
+      historicalPublishReceipt.value?.function !== 'publish_legal_document_localizations' ||
       stage.value?.args?.p_document_type !== descriptor.documentType ||
       stage.value?.args?.p_version !== descriptor.version ||
-      publish.value?.args?.p_document_type !== descriptor.documentType ||
-      publish.value?.args?.p_version !== descriptor.version
+      historicalPublishReceipt.value?.args?.p_document_type !== descriptor.documentType ||
+      historicalPublishReceipt.value?.args?.p_version !== descriptor.version
     ) {
       fail('STAGE6_CURRENT_LEGAL_CONTRACT_INVALID');
     }
@@ -498,11 +501,34 @@ export async function loadStage6PublicationBatch({
     legal.push({
       ...descriptor,
       stageArgs: stage.value.args,
-      publishArgs: publish.value.args,
       localizations,
       historical,
     });
   }
+
+  const privacy = legal.find((document) => document.documentType === 'privacy');
+  const terms = legal.find((document) => document.documentType === 'terms');
+  const privacyEffectiveAt = new Date(privacy?.stageArgs?.p_effective_at ?? '');
+  const termsEffectiveAt = new Date(terms?.stageArgs?.p_effective_at ?? '');
+  if (
+    !privacy ||
+    !terms ||
+    Number.isNaN(privacyEffectiveAt.valueOf()) ||
+    Number.isNaN(termsEffectiveAt.valueOf()) ||
+    privacyEffectiveAt.toISOString() !== termsEffectiveAt.toISOString()
+  ) {
+    fail('STAGE6_CURRENT_LEGAL_BUNDLE_INVALID');
+  }
+  // The live publication tool activates the pair through the post-Stage 6
+  // atomic bundle RPC. Deliberately derive this from the frozen version
+  // descriptors instead of exposing the obsolete per-document RPC payloads.
+  const legalBundle = {
+    args: {
+      p_privacy_version: privacy.version,
+      p_terms_version: terms.version,
+    },
+    effectiveAt: privacyEffectiveAt.toISOString(),
+  };
 
   const counts = {
     courses: new Set(courses.map((item) => item.slug)).size,
@@ -559,6 +585,7 @@ export async function loadStage6PublicationBatch({
     courses,
     articles,
     legal,
+    legalBundle,
     review: {
       sha256: batchHash,
       independentSemanticReviewSha256:

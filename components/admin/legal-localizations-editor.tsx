@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { AdminLocaleTabs } from '@/components/admin/admin-locale-tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,13 @@ type MutationResponse = {
   locale?: AppLocale;
   status?: 'draft' | 'complete' | 'published';
   bodyHash?: string;
+  error?: string;
+};
+
+type BundlePublicationResponse = {
+  privacy?: { version: string };
+  terms?: { version: string };
+  replayed?: boolean;
   error?: string;
 };
 
@@ -58,6 +65,19 @@ function LegalVersionEditor({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  // A bundle publication updates the parent copy of both selected legal
+  // versions. Keep this editor's local draft in sync so its badges and
+  // immutable controls reflect that atomic result without a page reload.
+  useEffect(() => {
+    const next = structuredClone(initial);
+    const nextActive = next.localizations.find((item) => item.locale === 'ru') ?? next.localizations[0];
+    setVersion(next);
+    setActiveLocale(nextActive?.locale ?? 'ru');
+    setBodyText(JSON.stringify(nextActive?.body ?? {}, null, 2));
+    setCompleteRequested(nextActive?.status === 'complete' || nextActive?.status === 'published');
+  }, [initial]);
+
   const activeIndex = version.localizations.findIndex((item) => item.locale === activeLocale);
   const active = version.localizations[activeIndex]!;
   const statuses = Object.fromEntries(
@@ -66,9 +86,6 @@ function LegalVersionEditor({
       version.localizations.find((item) => item.locale === locale)?.status ?? 'missing',
     ]),
   ) as Record<AppLocale, (typeof active)['status']>;
-  const allReady = Object.values(statuses).every(
-    (status) => status === 'complete' || status === 'published',
-  );
   const parsedBody = useMemo(() => {
     try {
       const parsed = JSON.parse(bodyText) as unknown;
@@ -154,50 +171,11 @@ function LegalVersionEditor({
       onChange(savedVersion);
       setMessage(
         payload.status === 'complete'
-          ? 'Юридическая локализация готова к общей публикации.'
+          ? 'Юридическая локализация готова к публикации в пакете.'
           : 'Черновик юридической локализации сохранён.',
       );
     } catch (saveError) {
       setError(clientRequestMessage(saveError, 'Не удалось сохранить юридическую локализацию.'));
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const publish = async () => {
-    if (!window.confirm('Опубликовать четыре неизменяемые локализации этой версии?')) return;
-    setBusy(true);
-    setError('');
-    setMessage('');
-    try {
-      const request = await clientRequest('/api/admin/legal/localizations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentType: version.documentType, version: version.version }),
-      });
-      const payload = await readClientResponseJson<{ error?: string }>(request.response);
-      if (!request.ok) {
-        setError(
-          payload?.error === 'LEGAL_LOCALIZATIONS_INCOMPLETE'
-            ? 'Публикация заблокирована: не все четыре языка готовы.'
-            : clientRequestMessage(request.error, 'Не удалось опубликовать юридические копии.'),
-        );
-        return;
-      }
-      const publishedVersion: LegalLocalizationVersion = {
-        ...version,
-        current: true,
-        localizations: version.localizations.map((item) => ({
-          ...item,
-          status: 'published',
-          immutable: true,
-        })),
-      };
-      setVersion(publishedVersion);
-      onChange(publishedVersion);
-      setMessage('Четыре юридические локализации опубликованы одной операцией.');
-    } catch (publishError) {
-      setError(clientRequestMessage(publishError, 'Не удалось опубликовать юридические копии.'));
     } finally {
       setBusy(false);
     }
@@ -342,19 +320,11 @@ function LegalVersionEditor({
           )}
         </section>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-4">
+        <div className="border-t border-[var(--color-border)] pt-4">
           <p className="text-sm text-[var(--color-text-muted)]">
-            Публикация доступна только при готовности четырёх языков.
+            Сохраните и отметьте готовыми четыре языка. Публикация выполняется только общим
+            пакетом Privacy + Terms выше на странице.
           </p>
-          <Button
-            type="button"
-            disabled={
-              busy || !allReady || Object.values(statuses).every((status) => status === 'published')
-            }
-            onClick={() => void publish()}
-          >
-            Опубликовать четыре языка
-          </Button>
         </div>
         {message ? (
           <p role="status" className="text-sm text-[var(--color-text-muted)]">
@@ -377,9 +347,135 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
   const [version, setVersion] = useState('');
   const [bodyRevision, setBodyRevision] = useState('');
   const [effectiveDate, setEffectiveDate] = useState('');
+  const [privacyBundleVersion, setPrivacyBundleVersion] = useState('');
+  const [termsBundleVersion, setTermsBundleVersion] = useState('');
+  const [bundleBusy, setBundleBusy] = useState(false);
+  const [bundleMessage, setBundleMessage] = useState('');
+  const [bundleError, setBundleError] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  const readyVersions = useMemo(
+    () => ({
+      privacy: items.filter(
+        (item) =>
+          item.documentType === 'privacy' &&
+          item.localizations.every(
+            (localization) =>
+              localization.status === 'complete' || localization.status === 'published',
+          ),
+      ),
+      terms: items.filter(
+        (item) =>
+          item.documentType === 'terms' &&
+          item.localizations.every(
+            (localization) =>
+              localization.status === 'complete' || localization.status === 'published',
+          ),
+      ),
+    }),
+    [items],
+  );
+  const selectedPrivacy = readyVersions.privacy.find(
+    (item) => item.version === privacyBundleVersion,
+  );
+  const compatibleTerms = readyVersions.terms.filter(
+    (item) => !selectedPrivacy || item.effectiveAt === selectedPrivacy.effectiveAt,
+  );
+  const selectedTerms = compatibleTerms.find((item) => item.version === termsBundleVersion);
+
+  useEffect(() => {
+    if (!readyVersions.privacy.some((item) => item.version === privacyBundleVersion)) {
+      setPrivacyBundleVersion(readyVersions.privacy[0]?.version ?? '');
+    }
+  }, [privacyBundleVersion, readyVersions.privacy]);
+
+  useEffect(() => {
+    if (!compatibleTerms.some((item) => item.version === termsBundleVersion)) {
+      setTermsBundleVersion(compatibleTerms[0]?.version ?? '');
+    }
+  }, [compatibleTerms, termsBundleVersion]);
+
+  const publishBundle = async () => {
+    if (!selectedPrivacy || !selectedTerms) {
+      setBundleError('Выберите готовые версии Privacy и Terms с одной датой вступления в силу.');
+      return;
+    }
+    if (
+      !window.confirm(
+        `Опубликовать пакет Privacy ${selectedPrivacy.version} и Terms ${selectedTerms.version}?`,
+      )
+    ) {
+      return;
+    }
+    setBundleBusy(true);
+    setBundleMessage('');
+    setBundleError('');
+    try {
+      const request = await clientRequest('/api/admin/legal/bundle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          privacyVersion: selectedPrivacy.version,
+          termsVersion: selectedTerms.version,
+        }),
+      });
+      const payload = await readClientResponseJson<BundlePublicationResponse>(request.response);
+      if (
+        !request.ok ||
+        payload?.privacy?.version !== selectedPrivacy.version ||
+        payload?.terms?.version !== selectedTerms.version
+      ) {
+        const bundleError = payload?.error;
+        setBundleError(
+          bundleError === 'LEGAL_BUNDLE_LOCALIZATIONS_INCOMPLETE'
+            ? 'Публикация заблокирована: не все восемь локализаций готовы.'
+            : bundleError === 'LEGAL_BUNDLE_EFFECTIVE_AT_MISMATCH'
+              ? 'У выбранных версий должна совпадать дата вступления в силу.'
+              : bundleError === 'LEGAL_BUNDLE_MIXED_STATE'
+                ? 'Публикация заблокирована: текущее состояние юридических документов неполное.'
+                : clientRequestMessage(
+                    request.ok ? new Error('INVALID_RESPONSE') : request.error,
+                    'Не удалось опубликовать юридический пакет.',
+                  ),
+        );
+        return;
+      }
+      setItems((current) =>
+        current.map((item) => {
+          const selected =
+            (item.documentType === 'privacy' && item.version === selectedPrivacy.version) ||
+            (item.documentType === 'terms' && item.version === selectedTerms.version);
+          if (selected) {
+            return {
+              ...item,
+              current: true,
+              localizations: item.localizations.map((localization) => ({
+                ...localization,
+                status: 'published',
+                immutable: true,
+              })),
+            };
+          }
+          return item.documentType === 'privacy' || item.documentType === 'terms'
+            ? { ...item, current: false }
+            : item;
+        }),
+      );
+      setBundleMessage(
+        payload.replayed
+          ? 'Этот пакет уже является текущим.'
+          : 'Privacy и Terms опубликованы одним атомарным пакетом.',
+      );
+    } catch (publishError) {
+      setBundleError(
+        clientRequestMessage(publishError, 'Не удалось опубликовать юридический пакет.'),
+      );
+    } finally {
+      setBundleBusy(false);
+    }
+  };
 
   const stageVersion = async () => {
     if (!/^\d{4}-\d{2}-\d{2}$/u.test(effectiveDate)) {
@@ -428,6 +524,71 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
 
   return (
     <div className="space-y-6" data-admin-legal-localizations>
+      <Card data-admin-legal-bundle-publisher>
+        <CardHeader>
+          <CardTitle>Атомарная публикация Privacy + Terms</CardTitle>
+          <p className="text-sm text-[var(--color-text-muted)]">
+            Выберите две готовые версии с одной датой вступления в силу. Все восемь локализаций
+            публикуются в одной транзакции; одиночная публикация отключена.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="legal-bundle-privacy">Privacy</Label>
+              <select
+                id="legal-bundle-privacy"
+                className="min-h-11 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3"
+                value={privacyBundleVersion}
+                onChange={(event) => setPrivacyBundleVersion(event.target.value)}
+              >
+                {readyVersions.privacy.length === 0 ? <option value="">Нет готовых версий</option> : null}
+                {readyVersions.privacy.map((item) => (
+                  <option key={item.version} value={item.version}>
+                    {item.version} · {new Date(item.effectiveAt).toLocaleDateString('ru-RU')}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="legal-bundle-terms">Terms</Label>
+              <select
+                id="legal-bundle-terms"
+                className="min-h-11 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3"
+                value={termsBundleVersion}
+                onChange={(event) => setTermsBundleVersion(event.target.value)}
+              >
+                {compatibleTerms.length === 0 ? (
+                  <option value="">Нет готовой версии с той же датой</option>
+                ) : null}
+                {compatibleTerms.map((item) => (
+                  <option key={item.version} value={item.version}>
+                    {item.version} · {new Date(item.effectiveAt).toLocaleDateString('ru-RU')}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <Button
+            type="button"
+            disabled={bundleBusy || !selectedPrivacy || !selectedTerms}
+            onClick={() => void publishBundle()}
+          >
+            {bundleBusy ? 'Публикуем…' : 'Опубликовать пакет'}
+          </Button>
+          {bundleMessage ? (
+            <p role="status" className="text-sm text-[var(--color-text-muted)]">
+              {bundleMessage}
+            </p>
+          ) : null}
+          {bundleError ? (
+            <p role="alert" className="text-sm text-[var(--color-danger)]">
+              {bundleError}
+            </p>
+          ) : null}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Новая версия документа</CardTitle>

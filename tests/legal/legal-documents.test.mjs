@@ -4,13 +4,16 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
   legalDocumentHref,
+  legalEffectiveDateInAppTimezone,
   PRIVACY_POLICY,
   PRIVACY_POLICY_V1_1,
   PRIVACY_POLICY_V1_2,
+  PRIVACY_POLICY_V1_3,
   resolveLegalDocumentVersion,
   TERMS_POLICY,
   TERMS_POLICY_V2_1,
   TERMS_POLICY_V2_2,
+  TERMS_POLICY_V2_3,
 } from '../../lib/legal.ts';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
@@ -41,24 +44,27 @@ test('legal versions are immutable, resolvable, and have exact profile links', (
     PRIVACY_POLICY_V1_2,
   );
   assert.equal(resolveLegalDocumentVersion('terms', TERMS_POLICY_V2_2.version), TERMS_POLICY_V2_2);
-  assert.equal(PRIVACY_POLICY.bodyRevision, 'privacy-1.3');
-  assert.equal(TERMS_POLICY.bodyRevision, 'terms-2.3');
+  assert.equal(PRIVACY_POLICY.bodyRevision, 'privacy-1.4');
+  assert.equal(TERMS_POLICY.bodyRevision, 'terms-2.4');
   assert.equal(PRIVACY_POLICY_V1_1.bodyRevision, 'privacy-1.1');
   assert.equal(PRIVACY_POLICY_V1_2.bodyRevision, 'privacy-1.2');
   assert.equal(TERMS_POLICY_V2_1.bodyRevision, 'terms-2.1');
   assert.equal(TERMS_POLICY_V2_2.bodyRevision, 'terms-2.2');
+  assert.equal(PRIVACY_POLICY_V1_3.bodyRevision, 'privacy-1.3');
+  assert.equal(TERMS_POLICY_V2_3.bodyRevision, 'terms-2.3');
   assert.equal(resolveLegalDocumentVersion('privacy', '999.0'), null);
+  assert.equal(legalEffectiveDateInAppTimezone('2026-09-01T19:00:00.000Z'), '2026-09-02');
   assert.equal(
     legalDocumentHref('privacy', PRIVACY_POLICY.version),
-    '/privacy?version=1.3#document-version',
+    '/privacy?version=1.4#document-version',
   );
   assert.equal(
     legalDocumentHref('terms', TERMS_POLICY.version),
-    '/terms?version=2.3#document-version',
+    '/terms?version=2.4#document-version',
   );
 });
 
-test('current legal copies disclose passkeys, notifications, client-only PDFs, approval, and the course contract', async () => {
+test('current legal copies accurately disclose the minimal ZH username-password path', async () => {
   const [
     privacyPage,
     termsPage,
@@ -74,10 +80,10 @@ test('current legal copies disclose passkeys, notifications, client-only PDFs, a
   ] = await Promise.all([
     read('app/(public)/privacy/page.tsx'),
     read('app/(public)/terms/page.tsx'),
-    read('content/legal/privacy/1.3.ru.json'),
-    read('content/legal/terms/2.3.ru.json'),
-    read('components/legal/privacy-policy-v1-3.tsx'),
-    read('components/legal/terms-policy-v2-3.tsx'),
+    read('content/legal/privacy/1.4.ru.json'),
+    read('content/legal/terms/2.4.ru.json'),
+    read('components/legal/privacy-policy-v1-4.tsx'),
+    read('components/legal/terms-policy-v2-4.tsx'),
     read('components/legal/localized-legal-document.tsx'),
     read('lib/legal.ts'),
     read('components/layout/footer.tsx'),
@@ -97,14 +103,16 @@ test('current legal copies disclose passkeys, notifications, client-only PDFs, a
   assert.match(privacyPage, /privacy-1\.1/);
   assert.match(privacyPage, /privacy-1\.2/);
   assert.match(privacyPage, /privacy-1\.3/);
+  assert.match(privacyPage, /privacy-1\.4/);
   assert.match(termsPage, /terms-2\.1/);
   assert.match(termsPage, /terms-2\.2/);
   assert.match(termsPage, /terms-2\.3/);
+  assert.match(termsPage, /terms-2\.4/);
 
   const privacyDocument = JSON.parse(privacySource);
   const termsDocument = JSON.parse(termsSource);
-  assert.equal(privacyDocument.version, '1.3');
-  assert.equal(termsDocument.version, '2.3');
+  assert.equal(privacyDocument.version, '1.4');
+  assert.equal(termsDocument.version, '2.4');
   assert.equal(privacyDocument.bodySourceSha256, sha256(privacyDocument.body));
   assert.equal(termsDocument.bodySourceSha256, sha256(termsDocument.body));
   const privacy = JSON.stringify(privacyDocument.body);
@@ -113,33 +121,28 @@ test('current legal copies disclose passkeys, notifications, client-only PDFs, a
   for (const provider of ['Supabase', 'Vercel', 'Cloudflare', 'Telegram']) {
     assert.match(privacy, new RegExp(provider));
   }
-  assert.match(privacy, /localStorage/);
-  assert.match(privacy, /PKCE-восстановления email OTP/iu);
-  assert.match(privacy, /Recovery code показывается один раз/iu);
-  assert.match(privacy, /трансграничн/iu);
-  assert.match(privacy, /окончательном удалении аккаунта[^]*QR-проверка/iu);
-  assert.match(privacy, /квадратную фотографию/iu);
-  assert.match(privacy, /PDF-сертификат[^]*собираются только в браузере/iu);
-  assert.match(privacy, /одноразовым шестизначным кодом/iu);
-  assert.match(privacy, /контактный телефон как фактор входа не используются/iu);
-  assert.match(privacy, /Биометрические данные и PIN устройства не передаются SafetyHub/iu);
-  assert.match(privacy, /synthetic Auth identifier[^]*никогда не показывается/iu);
-  assert.match(privacy, /Telegram не принимает решений и не меняет статус заявки/iu);
-  assert.match(privacy, /Успешные строки доставки Telegram хранятся 30 дней[^]*inbox — 90 дней/iu);
-  assert.match(privacy, /автоматически проверены без human linguistic или legal approval/iu);
-  assert.match(terms, /email OTP/iu);
+  assert.match(privacy, /email OTP/iu);
+  assert.match(privacy, /username и пароль/iu);
+  assert.match(privacy, /не запрашивает email[^]*фото или passkey/iu);
+  assert.match(privacy, /администратор не может его прочитать/iu);
+  assert.match(privacy, /synthetic Auth identifier/iu);
+  assert.match(privacy, /не требуются профиль[^]*фотография/iu);
+  assert.match(privacy, /не выдаёт сертификат автоматически/iu);
+  assert.match(privacy, /без username[^]*пароля[^]*synthetic identifier/iu);
+  assert.match(privacy, /Локальное хранилище/iu);
+  assert.match(terms, /латинский username и пароль/iu);
+  assert.match(terms, /не требуются email[^]*другие данные профиля/iu);
   assert.match(terms, /не более 8 новых попыток[^]*Asia\/Oral/iu);
-  assert.match(terms, /10 вопросов с четырьмя ответами/iu);
-  assert.match(terms, /7 вопросов[^]*70%/iu);
+  assert.match(terms, /10 вопросов, четыре варианта ответа/iu);
+  assert.match(terms, /7 правильных ответов[^]*70%/iu);
   assert.match(terms, /15 минут/iu);
-  assert.match(terms, /Пока заявка ожидает решения, отклонена[^]*учебные функции недоступны/iu);
-  assert.match(terms, /Контактный телефон ни в одной локали не является фактором входа/iu);
-  assert.match(terms, /Биометрическая проверка или PIN[^]*не передаются SafetyHub/iu);
-  assert.match(terms, /Synthetic Auth identifier[^]*нигде ему не показывается/iu);
-  assert.match(terms, /Telegram не принимает решений[^]*только[^]*в веб-админке/iu);
-  assert.match(terms, /собираются только в браузере/iu);
-  assert.match(terms, /не объявляется государственной лицензией/iu);
-  assert.match(terms, /Текущая реализация не содержит оплаты/iu);
+  assert.match(terms, /Пока заявка ожидает, отклонена[^]*учебные функции недоступны/iu);
+  assert.match(terms, /Телефон не используется для входа/iu);
+  assert.match(terms, /Synthetic Auth identifier/iu);
+  assert.match(terms, /Telegram не принимает решений/iu);
+  assert.match(terms, /не создаёт сертификат/iu);
+  assert.match(terms, /не является государственной лицензией/iu);
+  assert.match(terms, /Оплата в текущей версии сервиса не предусмотрена/iu);
   assert.doesNotMatch(legal, /LEGAL_OPERATOR_(?:NAME|ID|ADDRESS)/);
   assert.doesNotMatch(legalContacts, /mailto:/);
   assert.match(legalContacts, /kind="phone"/);
@@ -153,6 +156,18 @@ test('current legal copies disclose passkeys, notifications, client-only PDFs, a
   for (const component of [privacyComponent, termsComponent]) {
     assert.match(component, /LocalizedLegalDocumentView/);
     assert.match(component, /bodySourceSha256/);
+  }
+  for (const locale of ['ru', 'kk', 'en', 'zh']) {
+    const [privacyCopy, termsCopy] = await Promise.all([
+      read(`content/legal/privacy/1.4.${locale}.json`),
+      read(`content/legal/terms/2.4.${locale}.json`),
+    ]);
+    const privacyLocalized = JSON.parse(privacyCopy);
+    const termsLocalized = JSON.parse(termsCopy);
+    assert.equal(privacyLocalized.locale, locale);
+    assert.equal(termsLocalized.locale, locale);
+    assert.equal(privacyLocalized.bodySourceSha256, sha256(privacyLocalized.body));
+    assert.equal(termsLocalized.bodySourceSha256, sha256(termsLocalized.body));
   }
   assert.match(localizedView, /<LegalContacts key=/);
   assert.match(localizedView, /variant="compact"/);
