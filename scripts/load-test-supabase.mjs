@@ -403,7 +403,9 @@ async function createAuthenticatedClient(url, publishableKey, user, captchaToken
       return { client, duration };
     }
     const retryable =
-      signedIn.error.status === 429 || TRANSIENT_NETWORK_ERROR.test(signedIn.error.message);
+      signedIn.error.status === 429 ||
+      signedIn.error.status >= 500 ||
+      TRANSIENT_NETWORK_ERROR.test(signedIn.error.message);
     if (!retryable || attempt === 8) {
       throw new Error(`ZH_PASSWORD_SIGN_IN_FAILED_${boundedAuthErrorEvidence(signedIn.error)}`);
     }
