@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 import { EmailOtpFlow } from '@/features/auth/email-otp-flow';
@@ -6,6 +7,15 @@ import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
+import type { AppLocale } from '@/i18n/config';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = (await getPrivateRequestLocale()) as AppLocale;
+  const t = await getTranslations({ locale, namespace: 'AuthOtp' });
+  return {
+    title: t('loginTitle'),
+  };
+}
 
 type LoginPageProps = {
   searchParams: Promise<{

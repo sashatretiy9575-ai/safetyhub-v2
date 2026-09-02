@@ -40,7 +40,7 @@ export function ContactActions({
         </span>
         <span className="min-w-0">
           <span className="block text-[15px] leading-5 font-bold">WhatsApp</span>
-          <span className="mt-0.5 block truncate text-[15px] leading-5 font-medium text-[var(--color-text-subtle)]">
+          <span className="mt-0.5 block truncate text-[15px] leading-5 font-medium text-[var(--color-text-muted)]">
             {t('chat')}
           </span>
         </span>

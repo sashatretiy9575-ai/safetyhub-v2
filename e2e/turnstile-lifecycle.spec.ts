@@ -33,7 +33,7 @@ test('email OTP executes Turnstile once and sends one request despite a duplicat
   let requests = 0;
   await page.route('**/api/auth/email-otp/request', async (route) => {
     requests += 1;
-    expect(route.request().postDataJSON()).toEqual({ email: 'user@example.com', intent: 'login', captchaToken: 'test-token' });
+    expect(route.request().postDataJSON()).toEqual({ email: 'user@example.com', captchaToken: 'test-token', locale: 'ru' });
     await route.fulfill({ status: 202, contentType: 'application/json', body: JSON.stringify({ sent: true }) });
   });
   await page.goto('/auth/login');

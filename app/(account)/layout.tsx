@@ -16,6 +16,7 @@ import { absoluteUrl } from '@/lib/utils';
 import '../globals.css';
 
 export const metadata: Metadata = {
+  title: 'SafetyHub',
   metadataBase: new URL(absoluteUrl('/')),
   robots: { index: false, follow: false },
   other: { google: 'notranslate' },
