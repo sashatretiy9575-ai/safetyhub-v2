@@ -1,10 +1,8 @@
 export const dynamic = 'force-dynamic';
 
-import Link from 'next/link';
 import { requireCapability } from '@/features/auth/server';
 import {
   getAdminAuditPage,
-  getAdminDataSummary,
   parseAdminAuditQuery,
   type RawAdminSearchParams,
 } from '@/features/admin/data';
@@ -13,8 +11,6 @@ import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data
 import { AdminDetailDialog } from '@/components/admin/admin-detail-dialog';
 import { AdminPagination } from '@/components/admin/admin-pagination';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 const actionLabels: Record<string, string> = {
   'role.bootstrap_superadmin': 'Восстановлен административный доступ (архив)',
@@ -89,10 +85,7 @@ function detailStatus(details: Record<string, unknown>) {
   return null;
 }
 
-function value(params: RawAdminSearchParams, key: string) {
-  const item = params[key];
-  return (Array.isArray(item) ? item[0] : item) ?? '';
-}
+
 
 function auditPageHref(
   query: ReturnType<typeof parseAdminAuditQuery>,
@@ -124,10 +117,7 @@ export default async function AuditPage({
   const params = await searchParams;
   const query = parseAdminAuditQuery(params);
   await requireCapability('audit.read');
-  const [auditResult, summaryResult] = await Promise.all([
-    getAdminAuditPage(query),
-    getAdminDataSummary(),
-  ]);
+  const auditResult = await getAdminAuditPage(query);
 
   return (
     <section className="space-y-6">
@@ -148,65 +138,6 @@ export default async function AuditPage({
           />
         ) : null}
       </div>
-
-      {summaryResult.state === 'ready' ? (
-        <div className="grid gap-3 min-[420px]:grid-cols-2">
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-[var(--color-text-muted)]">Событий за 24 часа</p>
-              <p className="text-2xl font-black tabular-nums">
-                {summaryResult.data.auditEvents24h ?? '—'}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-[var(--color-text-muted)]">Найдено по фильтрам</p>
-              <p className="text-2xl font-black tabular-nums">
-                {auditResult.state === 'ready' ? auditResult.data.total : '—'}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      ) : (
-        <AdminLoadFailure
-          correlationId={summaryResult.correlationId}
-          message="Сводка аудита не загрузилась. Сам журнал может оставаться доступным."
-        />
-      )}
-
-      <form method="get" className="grid gap-3 rounded-xl border p-4 md:grid-cols-2 lg:grid-cols-5">
-        <Input
-          name="actor"
-          defaultValue={query.actor}
-          placeholder="Автор: имя, email или UUID"
-          aria-label="Фильтр по автору"
-        />
-        <Input
-          name="target"
-          defaultValue={query.target}
-          placeholder="Цель: название, тип или UUID"
-          aria-label="Фильтр по цели"
-        />
-        <Input
-          name="action"
-          defaultValue={query.action}
-          placeholder="Действие, например user.suspend"
-          aria-label="Фильтр по действию"
-        />
-        <Input type="date" name="from" defaultValue={value(params, 'from')} aria-label="С даты" />
-        <Input type="date" name="to" defaultValue={value(params, 'to')} aria-label="По дату" />
-        <div className="flex flex-wrap gap-2 md:col-span-2 lg:col-span-5">
-          <Button type="submit" size="sm">
-            Применить
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/admin/settings/history" prefetch={false}>
-              Сбросить
-            </Link>
-          </Button>
-        </div>
-      </form>
 
       {auditResult.state === 'failed' ? (
         <AdminLoadFailure correlationId={auditResult.correlationId} />

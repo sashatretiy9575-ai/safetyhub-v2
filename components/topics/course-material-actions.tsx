@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import {
   ArrowLeft,
   DownloadSimple,
@@ -63,10 +66,31 @@ export function CourseMaterialActions({
 }) {
   const locale = useLocale();
   const t = useTranslations('Course');
+  const [currentAccess, setCurrentAccess] = useState<CourseMaterialAccess>(access);
+
+  useEffect(() => {
+    let active = true;
+    if (access === 'anonymous') {
+      fetch('/api/auth/access')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (active && data?.access) {
+            setCurrentAccess(data.access);
+          }
+        })
+        .catch(() => undefined);
+    } else {
+      setCurrentAccess(access);
+    }
+    return () => {
+      active = false;
+    };
+  }, [access]);
+
   const courseIcon = resolveCourseIcon(course.icon);
   const CourseIcon = courseIcon.component;
   const filename = `${course.slug}.pdf`;
-  const cta = accessCta(access, course.slug, locale, {
+  const cta = accessCta(currentAccess, course.slug, locale, {
     anonymous: { title: t('access.anonymousTitle'), description: t('access.anonymousDescription'), label: t('access.anonymousLabel') },
     legal_required: { title: t('access.legalTitle'), description: t('access.legalDescription'), label: t('access.legalLabel') },
     profile_incomplete: { title: t('access.profileTitle'), description: t('access.profileDescription'), label: t('access.profileLabel') },

@@ -198,6 +198,12 @@ export function AvatarUploader({
   const [feedback, setFeedback] = useState<AvatarFeedback | null>(null);
   const [photoActionsOpen, setPhotoActionsOpen] = useState(!compact);
 
+  useEffect(() => {
+    if (initialUrl) {
+      setAvatarUrl(initialUrl);
+    }
+  }, [initialUrl]);
+
   const avatarErrorMessage = useCallback(
     (error: unknown) => {
       if (error instanceof Error) {
@@ -455,7 +461,13 @@ export function AvatarUploader({
         </Button>
       ) : (
         <div id={photoActionsId} className="flex flex-wrap justify-center gap-2">
-          <Button type="button" size="sm" variant="outline" disabled={busy} onClick={startCamera}>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={busy}
+            onClick={() => captureInputRef.current?.click()}
+          >
             <Camera size={17} /> {t('take')}
           </Button>
           <Button
@@ -557,7 +569,13 @@ export function AvatarUploader({
               {busy ? <SpinnerGap size={17} className="animate-spin" /> : <Check size={17} />}
               {t('usePhoto')}
             </Button>
-            <Button type="button" size="sm" variant="outline" disabled={busy} onClick={startCamera}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={busy}
+              onClick={() => captureInputRef.current?.click()}
+            >
               <ArrowCounterClockwise size={17} /> {t('retake')}
             </Button>
             <Button

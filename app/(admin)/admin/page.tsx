@@ -6,7 +6,6 @@ import {
   CaretRight,
   Certificate,
   CheckCircle,
-  ClockCounterClockwise,
   Plus,
 } from '@phosphor-icons/react/dist/ssr';
 import { AdminLoadFailure } from '@/components/admin/admin-data-state';
@@ -51,11 +50,6 @@ export default async function AdminWorkPage() {
             Очереди показывают только задачи, требующие следующего действия.
           </p>
         </div>
-        <Button asChild size="sm" variant="outline">
-          <Link href="/admin/settings/history">
-            <ClockCounterClockwise /> История действий
-          </Link>
-        </Button>
       </div>
 
       {queue.state === 'failed' ? (

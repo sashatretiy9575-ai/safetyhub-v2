@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { cache } from 'react';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json, LegalAcceptanceRow } from '@/lib/supabase/types';
 import type {
   ApprovedIdentity,
@@ -183,11 +184,14 @@ export const getProfileAvatarUrl = cache(async (userId: string) => {
       !isOwnedAvatarObjectKey(userId, manifest.data.objectKey, manifest.data.legacyImported)
     )
       return null;
-    const storage = await createClient();
-    const { data, error } = await storage.storage
+    const admin = createAdminClient();
+    const { data, error } = await admin.storage
       .from('profile-avatars')
       .createSignedUrl(manifest.data.objectKey, 10 * 60);
-    if (error) return null;
+    if (error) {
+      console.error('AVATAR_SIGNED_URL_FAILED', error);
+      return null;
+    }
     return data.signedUrl;
   } catch {
     return null;

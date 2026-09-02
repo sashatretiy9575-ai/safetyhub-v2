@@ -12,7 +12,7 @@ const MAX_BEARER_BYTES = 512;
 const NO_STORE_HEADERS = { 'cache-control': 'no-store' };
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const BOT_TOKEN_PATTERN = /^\d{6,12}:[A-Za-z0-9_-]{30,80}$/u;
-const PRIVATE_CHAT_ID_PATTERN = /^-\d{6,20}$/u;
+const PRIVATE_CHAT_ID_PATTERN = /^-?\d{6,20}$/u;
 const MACHINE_CODE_PATTERN = /^[A-Z][A-Z0-9_]{2,79}$/u;
 const PHONE_COUNTRY_PATTERN = /^[A-Z]{2}$/u;
 const PHONE_E164_PATTERN = /^\+[1-9][0-9]{1,14}$/u;
@@ -552,7 +552,10 @@ Deno.serve(async (request: Request) => {
     }
 
     const botToken = requiredEnv('TELEGRAM_BOT_TOKEN');
-    const chatId = requiredEnv('TELEGRAM_CHAT_ID');
+    const chatId =
+      Deno.env.get('TELEGRAM_CHAT_ID')?.trim() ||
+      Deno.env.get('TELEGRAM_ADMIN_CHAT_ID')?.trim() ||
+      requiredEnv('TELEGRAM_CHAT_ID');
     if (!BOT_TOKEN_PATTERN.test(botToken)) fail('TELEGRAM_BOT_TOKEN_INVALID');
     if (!PRIVATE_CHAT_ID_PATTERN.test(chatId)) fail('TELEGRAM_CHAT_ID_INVALID');
     const siteOrigin = parseSiteOrigin(requiredEnv('SAFETYHUB_SITE_URL'));
