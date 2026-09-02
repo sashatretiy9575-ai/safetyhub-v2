@@ -38,7 +38,7 @@ export default async function AdminCoursesPage({
           </p>
         </div>
         <Button asChild>
-          <Link href="/admin/courses/new" prefetch={false}>
+          <Link href="/admin/courses/new">
             <Plus /> Новый курс
           </Link>
         </Button>
@@ -99,7 +99,7 @@ export default async function AdminCoursesPage({
                   aria-label={`Редактировать: ${course.title}`}
                   title="Редактировать"
                 >
-                  <Link href={`/admin/courses/${course.id}`} prefetch={false}>
+                  <Link href={`/admin/courses/${course.id}`}>
                     <PencilSimple />
                   </Link>
                 </Button>

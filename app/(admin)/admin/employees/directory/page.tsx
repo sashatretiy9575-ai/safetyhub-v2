@@ -97,7 +97,7 @@ export default async function EmployeeDirectoryPage({
                   </p>
                 </div>
                 <Button asChild variant="outline">
-                  <Link href={`/admin/employees/${user.id}/learning-history`} prefetch={false}>
+                  <Link href={`/admin/employees/${user.id}/learning-history`}>
                     Учебная история
                   </Link>
                 </Button>

@@ -155,7 +155,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
   };
 
   return (
-    <div className="divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
+    <div className="space-y-4">
       {items.map((item) => {
         const busy = busyIds.has(item.id);
         const resolved = resolvedIds.has(item.id);
@@ -166,22 +166,23 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
         return (
           <article
             key={item.id}
-            className="grid gap-3 py-4 sm:grid-cols-[4rem_minmax(0,1fr)] sm:gap-4 sm:py-5"
+            className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm transition-all hover:border-[var(--color-primary)]/40 hover:shadow-[var(--shadow-card)]"
           >
-            {item.avatarAvailable ? (
-              <img
-                src={`/api/admin/attestations/avatar/${item.id}`}
-                alt={`Фото профиля: ${label}`}
-                className="size-14 rounded-[var(--radius-control)] border border-[var(--color-border)] object-cover sm:size-16"
-              />
-            ) : (
-              <div
-                aria-hidden="true"
-                className="grid size-14 place-items-center rounded-[var(--radius-control)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] text-xl font-black text-[var(--color-primary)] sm:size-16"
-              >
-                {label.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <div className="grid gap-4 sm:grid-cols-[4rem_minmax(0,1fr)] sm:gap-5">
+              {item.avatarAvailable ? (
+                <img
+                  src={`/api/admin/attestations/avatar/${item.id}`}
+                  alt={`Фото профиля: ${label}`}
+                  className="size-14 rounded-2xl border border-[var(--color-border)] object-cover sm:size-16"
+                />
+              ) : (
+                <div
+                  aria-hidden="true"
+                  className="grid size-14 place-items-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] text-xl font-black text-[var(--color-primary)] sm:size-16"
+                >
+                  {label.charAt(0).toUpperCase()}
+                </div>
+              )}
 
             <div className="min-w-0 space-y-3">
               <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
@@ -306,7 +307,8 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
                 </div>
               )}
             </div>
-          </article>
+          </div>
+        </article>
         );
       })}
       {message ? (

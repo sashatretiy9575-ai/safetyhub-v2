@@ -90,7 +90,7 @@ export default async function AdminEmployeesPage({
       {queueResult.state === 'ready' ? (
         <nav
           aria-label="Рабочие очереди"
-          className="grid overflow-hidden rounded-xl border bg-[var(--color-surface)] sm:grid-cols-3"
+          className="grid overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm sm:grid-cols-3"
         >
           {[
             {
@@ -115,11 +115,13 @@ export default async function AdminEmployeesPage({
             <Link
               key={href}
               href={href}
-              className="flex min-h-11 items-center gap-2 border-b px-3 py-1.5 text-sm font-semibold last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:border-r sm:border-b-0 sm:last:border-r-0"
+              className="group flex min-h-12 items-center gap-3 border-b px-4 py-2.5 text-sm font-semibold transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:border-r sm:border-b-0 sm:last:border-r-0"
             >
-              <Icon aria-hidden size={18} className="shrink-0 text-[var(--color-primary)]" />
+              <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                <Icon aria-hidden size={18} />
+              </span>
               <span className="min-w-0 flex-1 truncate">{label}</span>
-              <strong className="text-base tabular-nums">{count}</strong>
+              <strong className="text-base font-bold tabular-nums">{count}</strong>
             </Link>
           ))}
         </nav>
