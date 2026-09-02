@@ -68,7 +68,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <aside className="sticky top-0 hidden h-dvh min-h-0 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)] p-3 min-[1180px]:flex">
           <Link
             href="/admin"
-            prefetch={false}
             className="flex min-h-12 items-center gap-3 rounded-xl px-2"
           >
             <span className="grid size-10 place-items-center rounded-xl bg-[var(--color-primary)] font-black text-[var(--color-primary-foreground)]">
@@ -108,7 +107,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </div>
             <Link
               href="/"
-              prefetch={false}
               className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]"
             >
               <House size={19} />
@@ -119,14 +117,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
         <div className="min-w-0">
           <header className="sticky top-0 z-40 flex min-h-14 items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 pt-[var(--safe-area-top)] pr-[max(1rem,var(--safe-area-right))] pl-[max(1rem,var(--safe-area-left))] backdrop-blur-xl min-[1180px]:hidden">
-            <Link href="/admin" prefetch={false} className="min-w-0 py-2">
+            <Link href="/admin" className="min-w-0 py-2">
               <span className="block truncate text-sm font-black">SafetyHub Admin</span>
             </Link>
             <div className="flex items-center gap-1">
               <AdminNotificationInboxButton placement="mobile" />
               <Link
                 href="/"
-                prefetch={false}
                 aria-label="На сайт"
                 className="grid size-11 place-items-center rounded-full text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]"
               >

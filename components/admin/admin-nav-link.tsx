@@ -23,7 +23,6 @@ export function AdminNavLink({
   return (
     <Link
       href={href}
-      prefetch={false}
       aria-current={active ? 'page' : undefined}
       className={cn(
         'group flex min-h-11 items-center gap-3 rounded-xl font-bold transition-colors',

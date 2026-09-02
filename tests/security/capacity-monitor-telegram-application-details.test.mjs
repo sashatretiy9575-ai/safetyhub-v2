@@ -86,5 +86,5 @@ test('prototype capacity monitor remains aggregate-only, bounded, service-only, 
   assert.match(appTypes, /collect_capacity_monitor_snapshot:/u);
   assert.match(appTypes, /set_capacity_monitor_monthly_active_learner_budget:/u);
   assert.match(generatedTypes, /collect_capacity_monitor_snapshot:/u);
-  assert.match(operations, /It is not a\n+signup, approval or learning-access cap/u);
+  assert.match(operations, /It is not a\r?\n+signup, approval or learning-access cap/u);
 });

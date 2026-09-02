@@ -83,7 +83,14 @@ export function buildContentSecurityPolicy({
         'https://challenges.cloudflare.com',
       ];
   const styles =
-    strict && !development ? ["'self'", `'nonce-${nonce}'`] : ["'self'", "'unsafe-inline'"];
+    strict && !development
+      ? [
+          "'self'",
+          `'nonce-${nonce}'`,
+          // Turnstile injected stylesheet hash
+          "'sha256-nzTgYzXYDNe6BAHiiI7NNlfK8n/auuOAhh2t92YvuXo='",
+        ]
+      : ["'self'", "'unsafe-inline'"];
   const avatarSource = strict ? supabaseImageSource(environment) : null;
   const storageOrigins = supabaseOrigins(environment);
 
