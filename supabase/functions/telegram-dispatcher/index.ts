@@ -342,16 +342,22 @@ function eventMessage(claim: ReturnType<typeof parseDeliveryClaim>, siteOrigin: 
     if (payload.approvalKind === 'generic_v2' || payload.approvalKind === 'legacy_blank_zh') {
       return [
         '🔔 Новая заявка на обучение',
-        `Язык: ${localeLabel(payload.locale)}`,
-        `Время: ${messageTime(payload.requestedAt)}`,
+        '',
+        `🌐 Язык: ${localeLabel(payload.locale)}`,
+        `🕒 Время: ${messageTime(payload.requestedAt)}`,
+        '',
+        `🔗 Открыть в админ-панели:`,
         deepLink,
       ].join('\n');
     }
     return [
       '🔔 Новая заявка на обучение',
-      `Участник: ${payload.surname} ${payload.name}`,
-      `Язык: ${localeLabel(payload.locale)}`,
-      `Время: ${messageTime(payload.requestedAt)}`,
+      '',
+      `👤 Участник: ${payload.surname} ${payload.name}`,
+      `🌐 Язык: ${localeLabel(payload.locale)}`,
+      `🕒 Время: ${messageTime(payload.requestedAt)}`,
+      '',
+      `🔗 Открыть в админ-панели:`,
       deepLink,
     ].join('\n');
   }
@@ -360,18 +366,24 @@ function eventMessage(claim: ReturnType<typeof parseDeliveryClaim>, siteOrigin: 
   if (claim.eventType === 'course.completed') {
     return [
       payload.result === 'passed' ? '✅ Курс пройден' : '❌ Курс не пройден',
-      `Участник: ${payload.surname} ${payload.name}`,
-      `Курс: ${payload.courseTitle}`,
-      `Результат: ${payload.result === 'passed' ? 'сдан' : 'не сдан'}, ${payload.score}/${payload.total}`,
-      `Время: ${messageTime(payload.completedAt)}`,
+      '',
+      `👤 Участник: ${payload.surname} ${payload.name}`,
+      `📚 Курс: ${payload.courseTitle}`,
+      `📊 Результат: ${payload.result === 'passed' ? 'сдан' : 'не сдан'} (${payload.score}/${payload.total})`,
+      `🕒 Время: ${messageTime(payload.completedAt)}`,
+      '',
+      `🔗 Результат в админ-панели:`,
       deepLink,
     ].join('\n');
   }
   return [
     '⚠️ Системное уведомление',
-    `Код: ${payload.machineCode}`,
-    `Время: ${messageTime(claim.occurredAt)}`,
-    `Корреляция: ${payload.correlationId}`,
+    '',
+    `🏷️ Код: ${payload.machineCode}`,
+    `🕒 Время: ${messageTime(claim.occurredAt)}`,
+    `🔍 Корреляция: ${payload.correlationId}`,
+    '',
+    `🔗 Подробности:`,
     deepLink,
   ].join('\n');
 }

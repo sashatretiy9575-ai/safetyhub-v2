@@ -67,6 +67,7 @@ export function CourseMaterialActions({
   const locale = useLocale();
   const t = useTranslations('Course');
   const [currentAccess, setCurrentAccess] = useState<CourseMaterialAccess>(access);
+  const [isResolving, setIsResolving] = useState(() => access === 'anonymous');
 
   useEffect(() => {
     let active = true;
@@ -78,9 +79,15 @@ export function CourseMaterialActions({
             setCurrentAccess(data.access);
           }
         })
-        .catch(() => undefined);
+        .catch(() => undefined)
+        .finally(() => {
+          if (active) {
+            setIsResolving(false);
+          }
+        });
     } else {
       setCurrentAccess(access);
+      setIsResolving(false);
     }
     return () => {
       active = false;
@@ -148,7 +155,12 @@ export function CourseMaterialActions({
               </div>
 
               <div data-course-material-actions className="grid w-full gap-3">
-                {cta ? (
+                {isResolving ? (
+                  <div className="space-y-3">
+                    <div className="h-14 w-full animate-pulse rounded-xl bg-[var(--color-surface-muted)]" />
+                    <div className="h-14 w-full animate-pulse rounded-xl bg-[var(--color-surface-muted)]" />
+                  </div>
+                ) : cta ? (
                   <div className="space-y-3 rounded-xl border border-[var(--color-warning)] bg-[var(--color-surface-muted)] p-4 text-left">
                     <p className="font-bold">{cta.title}</p>
                     <p className="text-sm leading-6 text-[var(--color-text-muted)]">{cta.description}</p>

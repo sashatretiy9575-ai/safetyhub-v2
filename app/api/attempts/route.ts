@@ -12,12 +12,16 @@ export async function POST(request: Request) {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
     const parsed = createAttemptSchema.safeParse(await readJsonBody(request));
-    if (!parsed.success) return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
+    if (!parsed.success) {
+      console.error('[POST /api/attempts] Invalid body:', parsed.error);
+      return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
+    }
     await requireUser();
     return NextResponse.json(
       await startAttempt(parsed.data.testSlug, parsed.data.startNew, parsed.data.locale),
     );
   } catch (error) {
+    console.error('[POST /api/attempts] Error starting attempt:', error);
     if (error instanceof AttemptPolicyError) {
       return NextResponse.json(
         { error: error.code, retryAt: error.retryAt },
