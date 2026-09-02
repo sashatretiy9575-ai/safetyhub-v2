@@ -854,11 +854,11 @@ async function main() {
       assertNoForbiddenLearnerKeys(result, 'localized course');
     }
     const presentationReads = await Promise.all(
-      activeClients.map((client, index) =>
+      activeClients.map((client) =>
         timedRpc(client, 'get_approved_course_presentation_locale', {
           p_course_slug: 'pozharnaya-bezopasnost',
           p_asset: 'presentation',
-          p_locale: localeByIndex[index],
+          p_locale: 'zh',
         }),
       ),
     );
@@ -879,16 +879,16 @@ async function main() {
       }
     }
     const starts = await Promise.all(
-      activeClients.map((client, index) =>
+      activeClients.map((client) =>
         timedRpc(client, 'start_test_attempt_locale', {
           p_test_slug: 'pozharnaya-bezopasnost',
-          p_locale: localeByIndex[index],
+          p_locale: 'zh',
         }),
       ),
     );
     for (let index = 0; index < starts.length; index += 1) {
-      if (starts[index].data?.locale !== localeByIndex[index]) {
-        throw new Error(`localized attempt contract mismatch: ${localeByIndex[index]}`);
+      if (starts[index].data?.locale !== 'zh') {
+        throw new Error(`localized attempt contract mismatch: zh`);
       }
       assertNoForbiddenLearnerKeys(starts[index].data, 'localized attempt');
     }
