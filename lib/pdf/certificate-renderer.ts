@@ -125,19 +125,39 @@ async function fetchBoundedAsset(
 
 export function resolveAssetUrl(url: string, verificationUrl?: string): string {
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  if (typeof window !== 'undefined') return url;
-  if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts?: unknown }).importScripts === 'function') {
-    if (self.location && self.location.origin && !self.location.origin.startsWith('blob:') && self.location.origin !== 'null') {
-      return new URL(url, self.location.origin).href;
+  // Preserve relative URLs in Node.js runtime/tests
+  if (typeof window === 'undefined' && typeof self === 'undefined') return url;
+
+  // 1. If verificationUrl is provided, resolve against its origin
+  if (verificationUrl) {
+    try {
+      return new URL(url, new URL(verificationUrl).origin).href;
+    } catch {
+      // ignore
     }
-    if (verificationUrl) {
+  }
+
+  // 2. In browser window, resolve against window.location.origin
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    try {
+      return new URL(url, window.location.origin).href;
+    } catch {
+      // ignore
+    }
+  }
+
+  // 3. In web worker, resolve against self.location.origin if valid
+  if (typeof self !== 'undefined' && self.location?.origin) {
+    const origin = self.location.origin;
+    if (!origin.startsWith('blob:') && origin !== 'null') {
       try {
-        return new URL(url, new URL(verificationUrl).origin).href;
+        return new URL(url, origin).href;
       } catch {
         // ignore
       }
     }
   }
+
   return url;
 }
 

@@ -152,12 +152,25 @@ export async function downloadCertificateInBrowser(
   options: Omit<WorkerOptions, 'destination'> = {},
 ) {
   assertCertificateRenderMetadata(metadata);
-  const taskId = crypto.randomUUID();
-  const result = await runWorker({ type: 'render-certificate', taskId, metadata }, options);
-  if (!result.bytes) throw workerError('CERTIFICATE_RENDER_EMPTY');
+  try {
+    const taskId = crypto.randomUUID();
+    const result = await runWorker({ type: 'render-certificate', taskId, metadata }, options);
+    if (result.bytes) {
+      downloadBlob(
+        new Blob([result.bytes.slice().buffer], { type: 'application/pdf' }),
+        result.filename,
+      );
+      return;
+    }
+  } catch (error) {
+    if (options.signal?.aborted) throw error;
+  }
+
+  const { generateCertificateInBrowser } = await import('./certificate-renderer.ts');
+  const bytes = await generateCertificateInBrowser(metadata, options.signal);
   downloadBlob(
-    new Blob([result.bytes.slice().buffer], { type: 'application/pdf' }),
-    result.filename,
+    new Blob([bytes.slice().buffer], { type: 'application/pdf' }),
+    metadata.filename,
   );
 }
 
