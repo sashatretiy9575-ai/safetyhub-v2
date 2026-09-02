@@ -1,4 +1,4 @@
-import { MapPin, Phone, WhatsappLogo } from '@phosphor-icons/react/dist/ssr';
+import { Clock, MapPin, Phone, WhatsappLogo } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Logo } from '@/components/shared/logo';
@@ -106,7 +106,15 @@ export async function Footer({
                 />
                 {translations('footer.city')}
               </div>
-              <p className="pl-8 text-xs leading-5 text-white/55">{translations('footer.hours')}</p>
+              <div className="flex min-h-11 items-center gap-3 text-white/68">
+                <Clock
+                  size={19}
+                  weight="regular"
+                  className="shrink-0 text-white/50"
+                  aria-hidden="true"
+                />
+                <span className="text-xs">{translations('footer.hours')}</span>
+              </div>
             </div>
           </div>
         </div>
