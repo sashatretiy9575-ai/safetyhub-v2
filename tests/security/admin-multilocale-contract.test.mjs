@@ -29,7 +29,7 @@ test('Russian admin exposes four locale statuses and localized previews', async 
       read('components/admin/article-localizations-editor.tsx'),
       read('components/admin/legal-localizations-editor.tsx'),
       read('app/(admin)/admin/layout.tsx'),
-      read('app/layout.tsx'),
+      read('components/layout/root-document.tsx'),
       read('proxy.ts'),
     ]);
 
@@ -53,7 +53,7 @@ test('Russian admin exposes four locale statuses and localized previews', async 
   assert.match(legal, /lang=\{activeLocale === 'zh' \? 'zh-Hans'/u);
   assert.match(adminLayout, /data-admin-shell/u);
   assert.match(adminLayout, /Админ-панель/u);
-  assert.match(rootLayout, /<html lang=\{htmlLanguage\(locale\)\}/u);
+  assert.match(rootLayout, /<html[\s\S]*?lang=\{htmlLanguage\(locale\)\}/u);
   assert.match(
     proxy,
     /localeRoutesEnabled && localizedPath\.hasLocalePrefix && localeRoutable[\s\S]*?\? localizedPath\.locale[\s\S]*?: DEFAULT_LOCALE/u,

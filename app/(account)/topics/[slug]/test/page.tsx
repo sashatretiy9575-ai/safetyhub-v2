@@ -1,15 +1,14 @@
 import { notFound } from 'next/navigation';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { getTopicBySlug, getTopicSlugs } from '@/lib/content/topics';
 import { QuizClient } from '@/components/quiz/quiz-client';
 import { buildMetadata } from '@/lib/seo';
 import type { AppLocale } from '@/i18n/config';
+import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 
 export async function generateMetadata() {
-  const [locale, t] = await Promise.all([
-    getLocale() as Promise<AppLocale>,
-    getTranslations('Quiz'),
-  ]);
+  const locale = await getPrivateRequestLocale();
+  const t = await getTranslations({ locale, namespace: 'Quiz' });
   return buildMetadata({
     title: t('metadataTitle'),
     description: t('metadataDescription'),
@@ -24,7 +23,7 @@ export async function generateStaticParams() {
 
 export default async function TestPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const locale = (await getLocale()) as AppLocale;
+  const locale = (await getPrivateRequestLocale()) as AppLocale;
 
   const topic = await getTopicBySlug(slug, locale);
   if (!topic) notFound();

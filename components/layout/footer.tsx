@@ -5,7 +5,7 @@ import { Logo } from '@/components/shared/logo';
 import { ContactLink } from '@/components/shared/contact-link';
 import { Container } from '@/components/ui/container';
 import { ROUTES } from '@/lib/constants';
-import { localizePathname } from '@/i18n/config';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 import type { SiteContactSettings } from '@/lib/site-contacts-shared';
 
 const NAV_LINKS = [
@@ -20,8 +20,20 @@ const LEGAL_LINKS = [
   { href: ROUTES.terms, messageKey: 'footer.terms' },
 ] as const;
 
-export async function Footer({ contacts }: { contacts: SiteContactSettings }) {
-  const [locale, translations] = await Promise.all([getLocale(), getTranslations('Shell')]);
+export async function Footer({
+  contacts,
+  locale: explicitLocale,
+}: {
+  contacts: SiteContactSettings;
+  locale?: AppLocale;
+}) {
+  const [requestLocale, translations] = await Promise.all([
+    explicitLocale ? Promise.resolve(explicitLocale) : getLocale(),
+    explicitLocale
+      ? getTranslations({ locale: explicitLocale, namespace: 'Shell' })
+      : getTranslations('Shell'),
+  ]);
+  const locale = requestLocale as AppLocale;
   const year = new Date().getFullYear();
 
   return (
@@ -36,12 +48,12 @@ export async function Footer({ contacts }: { contacts: SiteContactSettings }) {
             <ContactLink
               kind="whatsapp"
               contacts={contacts}
-              className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-white/15 bg-white/[0.05] px-4 text-[15px] font-semibold text-white shadow-[inset_0_1px_rgb(255_255_255_/_0.06)] transition-[color,background-color,border-color] duration-150 hover:border-[#67ca8e]/55 hover:bg-white/[0.08]"
+              className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-[var(--color-primary)]/60 bg-[var(--color-primary)]/15 px-4 text-[15px] font-semibold text-white transition-[color,background-color,border-color] duration-150 hover:bg-[var(--color-primary)]/25 focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
             >
               <WhatsappLogo
                 size={20}
                 weight="regular"
-                className="text-[#67ca8e]"
+                className="text-[var(--color-primary)]"
                 aria-hidden="true"
               />
               {translations('whatsapp')}

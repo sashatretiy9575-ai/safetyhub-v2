@@ -41,6 +41,11 @@
     },
     "language": {
       "label": "Language",
+      "switching": "Changing language…",
+      "switchError": "Could not change the language. Please try again.",
+      "sessionEnded": "Your current sign-in has ended. Open the required sign-in method.",
+      "signedOut": "You signed out on this device.",
+      "quizLocked": "Language cannot be changed while a test is open.",
       "ru": "Русский",
       "kk": "Қазақша",
       "en": "English",
@@ -58,7 +63,8 @@
       "admin": "Admin panel",
       "account": "My account",
       "install": "Install app",
-      "signOut": "Sign out",
+      "signOut": "Sign out and clear data from this device",
+      "signOutShort": "Sign out",
       "signingOut": "Signing out…",
       "signOutError": "Could not sign out. Please try again."
     }
@@ -340,8 +346,8 @@
     "resultAnswer": "After signing in, open your profile. It shows your best score, attestation status and available certificates for each course without listing individual attempts."
   },
   "AuthOtp": {
-    "loginTitle": "Sign in or create an account",
-    "registerTitle": "Create an account",
+    "loginTitle": "Sign in with a code",
+    "registerTitle": "Account access",
     "emailDescription": "Enter your email and we’ll send a one-time six-digit code.",
     "codeDescription": "Enter the code from the email. It expires and can only be used once.",
     "emailLabel": "Email",
@@ -353,10 +359,6 @@
     "resend": "Send again",
     "haveCode": "I already have a code",
     "changeEmail": "Change email",
-    "loginLinkLead": "Don’t have an account?",
-    "registerLinkLead": "Already have an account?",
-    "loginLink": "Sign in",
-    "registerLink": "Register",
     "emailInvalid": "Enter a valid email address.",
     "codeInvalid": "Enter the six-digit code.",
     "storedStatus": "Enter the code from the email. If it has not arrived, request a new one.",
@@ -375,6 +377,9 @@
     "verifyInvalid": "Enter your email and six-digit code.",
     "verifyUnavailable": "Could not verify the code. Try again later.",
     "contextUnavailable": "Your session is confirmed, but your profile is temporarily unavailable. Try again later.",
+    "legalPrefix": "By continuing, you accept the",
+    "legalAnd": "and",
+    "legalRequired": "To continue, confirm that you accept the terms and privacy policy.",
     "captchaAria": "Security check",
     "turnstile": {
       "error": "The Cloudflare check could not be completed.",
@@ -561,7 +566,8 @@
     "pendingNoDue": "We’ll update your account when the review is complete.",
     "overdue": "The 24-hour review target has passed. Call the administrator or message us on WhatsApp so the status can be checked manually.",
     "remaining": "Time until the review target",
-    "countdownHint": "You do not need to refresh the page; the countdown updates automatically.",
+    "deadline": "Review target: {deadline}",
+    "countdownHint": "Time is shown to the nearest minute; you do not need to refresh the page.",
     "call": "Call administrator",
     "callWithNumber": "Call: {phone}",
     "whatsapp": "Message us on WhatsApp"
@@ -580,6 +586,8 @@
     "certificate": "Certificate",
     "openAccount": "Open account",
     "timerAria": "Time remaining {time}",
+    "timerUrgentAria": "Less than five minutes remaining: {time}",
+    "progressAria": "Answered {completed} of {total} questions",
     "checking": "Checking…",
     "check": "Check",
     "submitting": "Submitting…",
@@ -669,8 +677,8 @@
     "compareHint": "Compare the name, programme, result and number with the PDF. Editing a document does not change this server record."
   },
   "LegalFlow": {
-    "title": "Documents and consents",
-    "description": "This area records the version you accepted. Each link opens that exact revision.",
+    "title": "Continuing accepts these documents",
+    "description": "Open the documents if needed. Continuing records acceptance of the current versions.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Use",
     "privacyMetadataDescription": "How SafetyHub processes and protects personal data.",
@@ -683,8 +691,8 @@
     "accepted": "Accepted",
     "notAccepted": "Not accepted yet",
     "historyUnavailable": "Consent history is temporarily unavailable. You can open the documents, but refresh the page before accepting them again.",
-    "confirmation": "I have read and accept Privacy Policy version {privacyVersion} and Terms of Use version {termsVersion}.",
-    "accept": "Accept current versions",
+    "confirmation": "I accept Privacy Policy {privacyVersion} and Terms of Use {termsVersion}.",
+    "accept": "Continue",
     "saving": "Saving…",
     "acceptedCurrent": "Current versions accepted.",
     "history": "Acceptance history",
@@ -696,8 +704,8 @@
     "saveFailed": "Could not record your consent. Refresh the page and try again.",
     "receiptMissing": "The server did not confirm the record. Refresh the page before trying again.",
     "saved": "Current versions accepted and added to your history.",
-    "networkFailed": "Could not record your consent. Check your connection and try again."
-    ,"contactsTitle": "Document contacts",
+    "networkFailed": "Could not record your consent. Check your connection and try again.",
+    "contactsTitle": "Document contacts",
     "contactsDescription": "Call or message us on WhatsApp. Keep the chat if you need a written record of your request.",
     "phone": "Phone",
     "write": "Message us"
@@ -706,13 +714,14 @@
     "confirmation": "DELETE",
     "action": "Delete account",
     "title": "Permanent deletion",
-    "description": "Your profile, photo, all attempts, results, certificates and related audit records will be deleted. QR certificate verification will stop working. PDFs already downloaded to other devices cannot be physically removed.",
+    "description": "This request immediately closes access and starts background cleanup of your profile, photo, attempts, results, certificates and related data. QR certificate verification will stop working. PDFs already saved to other devices cannot be removed.",
     "prompt": "Type {confirmation} to confirm",
-    "deleting": "Deleting your account and related data…",
-    "deletingShort": "Deleting…",
+    "deleting": "Sending the deletion request…",
+    "deletingShort": "Sending…",
     "deleteForever": "Delete permanently",
     "cancel": "Cancel",
-    "failed": "Could not delete the account."
+    "failed": "Could not send the deletion request.",
+    "requested": "Your deletion request was accepted. Access is closed while server cleanup continues in the background."
   },
   "AppState": {
     "loadingAria": "Loading page",

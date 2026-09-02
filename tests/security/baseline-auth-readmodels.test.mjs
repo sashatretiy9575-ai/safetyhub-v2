@@ -65,7 +65,7 @@ test('profile dashboard returns locale-bound draft, approved identity, legal sta
 
 test('public routes take the cookie-free fast path and never prefetch protected data', async () => {
   const proxy = await read('proxy.ts');
-  const publicFastPath = proxy.indexOf('if (!isProtected)');
+  const publicFastPath = proxy.indexOf('if (!isProtected && !isAuthEntry)');
   const refresh = proxy.indexOf('await updateSession');
   assert.ok(publicFastPath > 0 && refresh > publicFastPath);
   assert.equal((proxy.match(/updateSession\(/g) ?? []).length, 1);

@@ -117,16 +117,16 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const localMigrations = inventory;
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
-  assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 17);
+  assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 19);
   assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 2);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 58);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 60);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 56);
+  assert.equal(receipt.matchedCount, 58);
   assert.equal(receipt.pendingCount, 2);
-  assert.equal(receipt.expectedBaseCount, 56);
+  assert.equal(receipt.expectedBaseCount, 58);
   assert.equal(receipt.expectedPendingCount, 2);
-  assert.equal(receipt.expectedTotalCount, 58);
+  assert.equal(receipt.expectedTotalCount, 60);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),
@@ -141,7 +141,7 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   );
 
   const renamedTail = structuredClone(localMigrations);
-  renamedTail.at(-1).filename = '20260902160000_renamed_reviewed_migration.sql';
+  renamedTail.at(-1).filename = '20260902180000_renamed_reviewed_migration.sql';
   assert.throws(
     () => assertReviewedMigrationDelta({ migrationRows: rows, localMigrations: renamedTail }),
     /LINKED_PREFLIGHT_REVIEWED_MIGRATION_HASH_MISMATCH/u,

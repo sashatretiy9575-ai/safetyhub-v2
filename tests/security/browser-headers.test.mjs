@@ -58,11 +58,13 @@ test('public CSP remains static while protected routes receive request nonces', 
   assert.doesNotMatch(publicCsp, /supabase\.co/u);
 
   const proxy = await read('proxy.ts');
-  assert.match(proxy, /const needsNonce = isProtected \|\| pathname\.startsWith\('\/auth'\)/u);
+  assert.match(proxy, /const isAuthEntry =[\s\S]*pathname === '\/auth'/u);
+  assert.match(proxy, /const needsNonce = isProtected \|\| isAuthEntry/u);
   assert.match(proxy, /requestHeaders\.set\('x-nonce', nonce\)/u);
   assert.match(proxy, /requestHeaders\.set\('Content-Security-Policy', csp\)/u);
-  assert.match(proxy, /if \(!isProtected\) \{[\s\S]*NextResponse\.next/u);
-  const publicBranch = proxy.match(/if \(!isProtected\) \{([\s\S]*?)\n  \}/u)?.[1] ?? '';
+  assert.match(proxy, /if \(!isProtected && !isAuthEntry\) \{[\s\S]*NextResponse\.next/u);
+  const publicBranch =
+    proxy.match(/if \(!isProtected && !isAuthEntry\) \{([\s\S]*?)\n  \}/u)?.[1] ?? '';
   assert.doesNotMatch(publicBranch, /updateSession/u);
 });
 

@@ -2,6 +2,28 @@ export const APP_LOCALES = ['ru', 'kk', 'en', 'zh'] as const;
 
 export type AppLocale = (typeof APP_LOCALES)[number];
 
+/**
+ * A locale controls the presentation language; an auth realm controls which
+ * credential contract may create or resume the current browser session.  The
+ * two deliberately are not interchangeable: RU/KK/EN share the passwordless
+ * email-OTP realm while the Chinese route has a server-bound username/password
+ * realm with no browser email/phone recovery surface.
+ */
+export type AuthRealm = 'email_otp' | 'zh_username_password';
+
+export const EMAIL_OTP_LOCALES = ['ru', 'kk', 'en'] as const satisfies readonly Exclude<
+  AppLocale,
+  'zh'
+>[];
+
+export function authRealmForLocale(locale: AppLocale): AuthRealm {
+  return locale === 'zh' ? 'zh_username_password' : 'email_otp';
+}
+
+export function localeMatchesAuthRealm(locale: AppLocale, realm: AuthRealm): boolean {
+  return authRealmForLocale(locale) === realm;
+}
+
 export const DEFAULT_LOCALE: AppLocale = 'ru';
 export const BUSINESS_TIME_ZONE = 'Asia/Oral';
 export const LOCALE_COOKIE_NAME = 'safetyhub-locale';

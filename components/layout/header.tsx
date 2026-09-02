@@ -1,23 +1,19 @@
 import type { ReactNode } from 'react';
-import { headers } from 'next/headers';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { PhoneCall } from '@phosphor-icons/react/dist/ssr/PhoneCall';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/ssr/WhatsappLogo';
 import Link from 'next/link';
 import { ACCOUNT_NAV_ITEMS, type AccountMode } from '@/components/layout/navigation-items';
 import { HeaderNav } from '@/components/layout/header-nav';
-import { LanguageSwitcher } from '@/components/layout/language-switcher';
+import { DeferredLanguageSwitcher } from '@/components/layout/deferred-language-switcher';
 import { Logo } from '@/components/shared/logo';
 import { ContactLink } from '@/components/shared/contact-link';
-import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { DeferredThemeToggle } from '@/components/layout/deferred-theme-toggle';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants';
 import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
-import {
-  localesForLanguageSwitcher,
-  localizePathname,
-  REQUEST_PATHNAME_HEADER_NAME,
-} from '@/i18n/config';
+import { localesForLanguageSwitcher, localizePathname } from '@/i18n/config';
+import type { AppLocale } from '@/i18n/config';
 import type { SiteContactSettings } from '@/lib/site-contacts-shared';
 
 const contactActionClass =
@@ -29,22 +25,30 @@ const tooltipClass =
 export async function Header({
   accountMode,
   accountMenu,
+  accountControl,
   contacts,
+  localePathname,
+  locale: explicitLocale,
 }: {
   accountMode: AccountMode;
   accountMenu?: ReactNode;
+  accountControl?: ReactNode;
   contacts: SiteContactSettings;
+  localePathname?: string;
+  locale?: AppLocale;
 }) {
-  const [locale, translations, requestHeaders] = await Promise.all([
-    getLocale(),
-    getTranslations('Shell'),
-    headers(),
+  const [requestLocale, translations] = await Promise.all([
+    explicitLocale ? Promise.resolve(explicitLocale) : getLocale(),
+    explicitLocale
+      ? getTranslations({ locale: explicitLocale, namespace: 'Shell' })
+      : getTranslations('Shell'),
   ]);
+  const locale = requestLocale as AppLocale;
   const accountItem = ACCOUNT_NAV_ITEMS[accountMode];
   const localeRoutesEnabled = rolloutFeatureEnabled('localeRoutes');
   const zhUsernamePasswordEnabled = rolloutFeatureEnabled('zhUsernamePassword');
   const switcherLocales = localesForLanguageSwitcher({
-    pathname: requestHeaders.get(REQUEST_PATHNAME_HEADER_NAME) ?? '/',
+    pathname: localePathname ?? '/',
     localeRoutesEnabled,
     zhUsernamePasswordEnabled,
   });
@@ -61,37 +65,44 @@ export async function Header({
           <Logo />
         </Link>
 
-        <HeaderNav />
+        <HeaderNav locale={explicitLocale} />
 
         <div className="flex-1" />
 
-        {switcherLocales.length > 1 ? <LanguageSwitcher locales={switcherLocales} /> : null}
+        {switcherLocales.length > 1 ? (
+          <DeferredLanguageSwitcher
+            locales={switcherLocales}
+            locale={locale}
+            label={translations('language.label')}
+            languageName={translations(`language.${locale}`)}
+          />
+        ) : null}
 
         <div className="hidden items-center gap-2 min-[1120px]:flex">
           <div
             role="group"
             aria-label={translations('quickContact')}
-            className="glass flex h-11 items-center overflow-visible rounded-[var(--radius-group)]"
+            className="flex h-11 items-center overflow-visible"
           >
             <ContactLink
               kind="phone"
               contacts={contacts}
               aria-label={translations('call', { phone: contacts.phoneDisplay })}
               aria-describedby="header-phone-tooltip"
-              className={`${contactActionClass} rounded-l-[calc(var(--radius-group)-1px)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]`}
+              className={`${contactActionClass} rounded-[var(--radius-control)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]`}
             >
               <PhoneCall size={20} weight="regular" aria-hidden="true" />
               <span id="header-phone-tooltip" role="tooltip" className={tooltipClass}>
                 {translations('call', { phone: contacts.phoneDisplay })}
               </span>
             </ContactLink>
-            <span aria-hidden="true" className="h-5 w-px bg-[var(--color-border)]" />
+            <span aria-hidden="true" className="mx-0.5 h-5 w-px bg-[var(--color-border)]" />
             <ContactLink
               kind="whatsapp"
               contacts={contacts}
               aria-label={translations('whatsapp')}
               aria-describedby="header-whatsapp-tooltip"
-              className={`${contactActionClass} rounded-r-[calc(var(--radius-group)-1px)] text-[#247a4b] hover:bg-[var(--color-surface-muted)] dark:text-[#75cc96]`}
+              className={`${contactActionClass} rounded-[var(--radius-control)] text-[var(--color-primary)] hover:bg-[var(--color-surface-muted)]`}
             >
               <WhatsappLogo size={21} weight="regular" aria-hidden="true" />
               <span id="header-whatsapp-tooltip" role="tooltip" className={tooltipClass}>
@@ -100,21 +111,22 @@ export async function Header({
             </ContactLink>
           </div>
 
-          <ThemeToggle />
+          <DeferredThemeToggle />
 
           {accountMode === 'authenticated' ? (
             accountMenu
-          ) : (
-            <Button asChild variant="outline" size="sm" className="glass shadow-none">
-              <Link href={localizePathname(accountItem.href, locale)} prefetch={false}>
-                {translations(accountItem.messageKey)}
-              </Link>
-            </Button>
-          )}
+          )
+            : (accountControl ?? (
+                <Button asChild variant="outline" size="sm" className="shadow-none">
+                  <Link href={localizePathname(accountItem.href, locale)} prefetch={false}>
+                    {translations(accountItem.messageKey)}
+                  </Link>
+                </Button>
+              ))}
         </div>
 
         <div className="min-[1120px]:hidden">
-          <ThemeToggle />
+          <DeferredThemeToggle />
         </div>
       </div>
     </header>

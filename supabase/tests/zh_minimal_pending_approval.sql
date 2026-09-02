@@ -210,7 +210,11 @@ begin
   where event.event_type = 'account.approval_requested'
     and event.aggregate_id = v_user_id;
   if v_event_payload is null
+    or v_event_payload ->> 'schemaVersion' <> '2'
+    or (select count(*) from jsonb_object_keys(v_event_payload)) <> 4
     or v_event_payload ->> 'locale' <> 'zh'
+    or v_event_payload ? 'name'
+    or v_event_payload ? 'surname'
     or v_event_payload ? 'username'
     or v_event_payload ? 'email'
     or v_event_payload ? 'phoneCountryIso2'

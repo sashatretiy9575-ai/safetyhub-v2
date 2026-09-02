@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { AuthenticationError, requireUser } from '@/features/auth/server';
 import { isZhUsernamePasswordMinimalApplication } from '@/features/auth/zh-username-password-minimal-application';
 import { OnboardingForm } from '@/features/profile/onboarding-form';
@@ -10,10 +10,11 @@ import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 import { localizePathname, type AppLocale } from '@/i18n/config';
+import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 
 export default async function OnboardingPage() {
-  const locale = (await getLocale()) as AppLocale;
-  const t = await getTranslations('Profile');
+  const locale = (await getPrivateRequestLocale()) as AppLocale;
+  const t = await getTranslations({ locale, namespace: 'Profile' });
   let context: Awaited<ReturnType<typeof requireUser>>;
   try {
     context = await requireUser();

@@ -5,9 +5,10 @@ import test from 'node:test';
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
 test('small and icon actions keep a 44px target and destructive editor actions confirm', async () => {
-  const [button, userMenu, editor, contentEditor] = await Promise.all([
+  const [button, userMenu, signOutAction, editor, contentEditor] = await Promise.all([
     read('components/ui/button.tsx'),
     read('components/shared/user-menu.tsx'),
+    read('components/shared/sign-out-action.tsx'),
     read('components/admin/admin-editor.tsx'),
     read('components/admin/content-block-editor.tsx'),
   ]);
@@ -15,7 +16,8 @@ test('small and icon actions keep a 44px target and destructive editor actions c
   assert.match(button, /sm: 'h-11/);
   assert.match(button, /icon: 'size-11/);
   assert.match(userMenu, /size="icon"/);
-  assert.match(userMenu, /clientRequest\('\/api\/auth\/logout'/);
+  assert.match(userMenu, /<SignOutAction menuItem \/>/);
+  assert.match(signOutAction, /clientRequest\('\/api\/auth\/logout'/);
   assert.doesNotMatch(userMenu, /supabase\/client|auth\.signOut/);
   assert.match(editor, /<ContentBlockEditor mode="article"/);
   assert.match(contentEditor, /window\.confirm\(`Удалить блок/);
@@ -26,14 +28,8 @@ test('hero has one stable heading and no autoplay lifecycle', async () => {
   const hero = await read('components/marketing/hero.tsx');
 
   assert.match(hero, /<h1[\s\S]*id="hero-heading"/);
-  assert.match(
-    hero,
-    /href=\{localizePathname\(ROUTES\.topics, locale\)\}[\s\S]*t\('courses'\)/,
-  );
-  assert.match(
-    hero,
-    /href=\{localizePathname\(ROUTES\.contacts, locale\)\}[\s\S]*t\('contact'\)/,
-  );
+  assert.match(hero, /href=\{localizePathname\(ROUTES\.topics, locale\)\}[\s\S]*t\('courses'\)/);
+  assert.match(hero, /href=\{localizePathname\(ROUTES\.contacts, locale\)\}[\s\S]*t\('contact'\)/);
   assert.doesNotMatch(hero, /useState|setInterval|aria-live="polite"/);
 });
 

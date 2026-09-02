@@ -2,21 +2,38 @@ import type { ReactNode } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { BottomTabBar } from '@/components/layout/bottom-tab-bar';
+import { DeferredBottomTabBar } from '@/components/layout/deferred-bottom-tab-bar';
 import { getSiteContacts } from '@/lib/site-contacts';
+import type { AppLocale } from '@/i18n/config';
 
 export async function AppShell({
   children,
   authed = false,
   accountMode = authed ? 'authenticated' : 'guest',
   accountMenu,
+  accountControl,
+  localePathname,
+  locale,
 }: {
   children: ReactNode;
   authed?: boolean;
   accountMode?: 'authenticated' | 'guest' | 'neutral';
   accountMenu?: ReactNode;
+  /** A client-only, non-authoritative control for static public shells. */
+  accountControl?: ReactNode;
+  /**
+   * Private account layouts may already be dynamic for authentication. Public
+   * layouts deliberately leave this undefined so Header never reads request
+   * headers while rendering CDN-cacheable HTML.
+   */
+  localePathname?: string;
+  /** Explicit only for dynamic account/auth shells rewritten by the proxy. */
+  locale?: AppLocale;
 }) {
-  const [contacts, translations] = await Promise.all([getSiteContacts(), getTranslations('Shell')]);
+  const [contacts, translations] = await Promise.all([
+    getSiteContacts(),
+    locale ? getTranslations({ locale, namespace: 'Shell' }) : getTranslations('Shell'),
+  ]);
   return (
     <div className="flex min-h-dvh min-w-0 flex-col overflow-x-clip">
       <a
@@ -25,7 +42,14 @@ export async function AppShell({
       >
         {translations('skipToContent')}
       </a>
-      <Header accountMode={accountMode} accountMenu={accountMenu} contacts={contacts} />
+      <Header
+        accountMode={accountMode}
+        accountMenu={accountMenu}
+        accountControl={accountControl}
+        contacts={contacts}
+        localePathname={localePathname}
+        locale={locale}
+      />
       <main
         id="main-content"
         tabIndex={-1}
@@ -34,9 +58,9 @@ export async function AppShell({
         {children}
       </main>
       <div className="bg-[var(--color-footer)] pb-[var(--mobile-fixed-bottom-space)] min-[1120px]:pb-0">
-        <Footer contacts={contacts} />
+        <Footer contacts={contacts} locale={locale} />
       </div>
-      <BottomTabBar accountMode={accountMode} />
+      <DeferredBottomTabBar accountMode={accountMode} />
     </div>
   );
 }

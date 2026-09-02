@@ -9,6 +9,7 @@ import {
   ARTICLES_CACHE_TAG,
   CONTENT_CACHE_TAG,
   CONTENT_REVALIDATE_PATHS,
+  localizedContentPaths,
 } from '@/lib/content/cache-policy';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
@@ -303,7 +304,9 @@ function invalidateArticleContent(snapshot: ArticleDraftInput[]) {
   revalidateTag(CONTENT_CACHE_TAG, { expire: 0 });
   revalidateTag(ARTICLES_CACHE_TAG, { expire: 0 });
   for (const route of CONTENT_REVALIDATE_PATHS) revalidatePath(route);
-  for (const article of snapshot) revalidatePath(`/blog/${article.slug}`);
+  for (const article of snapshot) {
+    for (const path of localizedContentPaths(`/blog/${article.slug}`)) revalidatePath(path);
+  }
 }
 
 export async function importApprovedInitialArticles(

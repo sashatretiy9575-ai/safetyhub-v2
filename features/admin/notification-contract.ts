@@ -48,7 +48,7 @@ const eventEnvelopeSchema = z.object({
   delivery: deliverySchema,
 });
 
-const approvalRequestedBaseShape = {
+const approvalRequestedLegacyBaseShape = {
   name: singleLineTextSchema,
   surname: singleLineTextSchema,
   locale: z.enum(['ru', 'kk', 'en', 'zh']),
@@ -57,10 +57,28 @@ const approvalRequestedBaseShape = {
 };
 
 const approvalRequestedPayloadSchema = z.union([
-  z.object({
-    ...approvalRequestedBaseShape,
-  })
-  .strict(),
+  z
+    .object({
+      schemaVersion: z.literal(2),
+      locale: z.enum(['ru', 'kk', 'en', 'zh']),
+      requestedAt: timestampSchema,
+      adminPath: adminPathSchema,
+    })
+    .strict(),
+  z
+    .object({
+      name: z.literal(''),
+      surname: z.literal(''),
+      locale: z.literal('zh'),
+      requestedAt: timestampSchema,
+      adminPath: adminPathSchema,
+    })
+    .strict(),
+  z
+    .object({
+      ...approvalRequestedLegacyBaseShape,
+    })
+    .strict(),
   z
     .object({
       name: singleLineTextSchema,

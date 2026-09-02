@@ -1,16 +1,22 @@
-'use client';
-
 import Link from 'next/link';
-import { useLocale, useTranslations } from 'next-intl';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { PRIMARY_NAV_ITEMS } from '@/components/layout/navigation-items';
-import { useHydratedPathname } from '@/components/layout/use-hydrated-pathname';
-import { isRouteActive } from '@/lib/navigation';
-import { localizePathname } from '@/i18n/config';
+import { localizePathname, type AppLocale } from '@/i18n/config';
 
-export function HeaderNav() {
-  const pathname = useHydratedPathname();
-  const locale = useLocale();
-  const translations = useTranslations('Shell');
+/**
+ * The primary public navigation has no client-only state requirement. Keeping
+ * it server-rendered removes pathname/router hooks from every public initial
+ * bundle; the current-page marker is a visual enhancement, not navigation
+ * state, so links remain fully usable without it.
+ */
+export async function HeaderNav({ locale: explicitLocale }: { locale?: AppLocale }) {
+  const [requestLocale, translations] = await Promise.all([
+    explicitLocale ? Promise.resolve(explicitLocale) : getLocale(),
+    explicitLocale
+      ? getTranslations({ locale: explicitLocale, namespace: 'Shell' })
+      : getTranslations('Shell'),
+  ]);
+  const locale = requestLocale as AppLocale;
 
   return (
     <nav
@@ -19,22 +25,14 @@ export function HeaderNav() {
     >
       {PRIMARY_NAV_ITEMS.map((item) => {
         const href = localizePathname(item.href, locale);
-        const active = pathname !== null && isRouteActive(pathname, href);
         return (
           <Link
             key={item.href}
             href={href}
             prefetch={false}
-            aria-current={active ? 'page' : undefined}
-            className={`relative inline-flex h-full min-w-11 items-center px-2.5 text-sm font-semibold transition-colors duration-150 hover:text-[var(--color-text)] ${active ? 'text-[var(--color-text)]' : 'text-[var(--color-text-muted)]'}`}
+            className="relative inline-flex h-full min-w-11 items-center px-2.5 text-sm font-semibold text-[var(--color-text-muted)] transition-colors duration-150 hover:text-[var(--color-text)]"
           >
             {translations(item.messageKey)}
-            {active ? (
-              <span
-                aria-hidden="true"
-                className="absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2 rounded-full bg-[var(--color-primary)]"
-              />
-            ) : null}
           </Link>
         );
       })}

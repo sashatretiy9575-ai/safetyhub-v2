@@ -26,7 +26,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'ZH_REGISTRATION_FAILED' }, { status: 400 });
     }
     await consumeCoarseQuota('auth.register', requestSecurityMetadata(request).ipHash);
-    return NextResponse.json(await registerZhUsernamePassword(parsed.data));
+    const payload = await registerZhUsernamePassword(parsed.data);
+    // Registration itself intentionally does not create a browser session.
+    // The client subsequently obtains fresh CAPTCHA proof and calls /login;
+    // only that successful session response receives the UI session hint.
+    return NextResponse.json(payload);
   } catch (error) {
     return zhUsernamePasswordApiError(error);
   }

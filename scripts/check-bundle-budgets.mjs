@@ -11,8 +11,19 @@ export const BUNDLE_BUDGETS = [
     manifest: 'server/app/(public)/page_client-reference-manifest.js',
     buildManifest: 'server/app/(public)/page/build-manifest.json',
     pageEntry: '[project]/app/(public)/page',
-    initial: 225 * KIB,
-    route: 55 * KIB,
+    initial: 200 * KIB,
+    route: 50 * KIB,
+  },
+  {
+    // The physical [locale] route backs KK, EN and ZH. Keeping this bound
+    // separate prevents a translated shell (and especially the ZH font/UI)
+    // from silently regressing while the unprefixed Russian page remains slim.
+    label: 'localized home',
+    manifest: 'server/app/[locale]/(public)/page_client-reference-manifest.js',
+    buildManifest: 'server/app/[locale]/(public)/page/build-manifest.json',
+    pageEntry: '[project]/app/[locale]/(public)/page',
+    initial: 200 * KIB,
+    route: 50 * KIB,
   },
   {
     label: 'admin employees',
@@ -48,7 +59,7 @@ export const BUNDLE_BUDGETS = [
   },
 ];
 
-export const CSS_BUDGET = 20 * KIB;
+export const CSS_BUDGET = 18 * KIB;
 
 export function parseClientReferenceManifest(source, label = 'route') {
   const assignment = source.lastIndexOf('globalThis.__RSC_MANIFEST[');
@@ -75,14 +86,21 @@ export function resolveRouteAssets(clientManifest, buildManifest, pageEntry, lab
     throw new Error(`${label}: page entry ${pageEntry} is missing from the client manifest`);
   }
 
+  const runtimeEntries = Object.entries(entries).filter(([entry]) => {
+    // `opengraph-image--metadata` is a server metadata-image worker, not a
+    // browser navigation chunk. Including it in page initial JS gives a false
+    // bundle regression even though it is never requested by a page visit.
+    return !entry.endsWith('--metadata');
+  });
+
   const inherited = new Set(rootMainFiles);
-  for (const [entry, files] of Object.entries(entries)) {
+  for (const [entry, files] of runtimeEntries) {
     if (!Array.isArray(files)) throw new Error(`${label}: malformed JS entry ${entry}`);
     if (entry !== pageEntry) for (const file of files) inherited.add(file);
   }
 
   const initial = new Set(rootMainFiles);
-  for (const files of Object.values(entries)) for (const file of files) initial.add(file);
+  for (const [, files] of runtimeEntries) for (const file of files) initial.add(file);
   const route = new Set(pageFiles.filter((file) => !inherited.has(file)));
   const css = new Set();
   for (const files of Object.values(clientManifest.entryCSSFiles ?? {})) {

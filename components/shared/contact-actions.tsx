@@ -33,9 +33,9 @@ export function ContactActions({
       <ContactLink
         kind="whatsapp"
         contacts={contacts}
-        className="group inline-flex min-h-14 min-w-0 items-center justify-start gap-2.5 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface)]/72 px-3 text-left text-[var(--color-text)] shadow-[var(--shadow-soft)] backdrop-blur-xl transition hover:border-[#128c4a]/45 hover:bg-[var(--color-surface)] focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)] sm:min-h-[60px] sm:px-4"
+        className="group inline-flex min-h-14 min-w-0 items-center justify-start gap-2.5 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-primary)]/45 bg-[var(--color-primary-soft)]/55 px-3 text-left text-[var(--color-text)] shadow-[var(--shadow-soft)] transition hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)] sm:min-h-[60px] sm:px-4"
       >
-        <span className="grid size-8 shrink-0 place-items-center rounded-[12px] border border-[#128c4a]/35 bg-[#128c4a]/12 text-[#128c4a] dark:bg-[#25d366]/12 dark:text-[#39dc7a]">
+        <span className="grid size-8 shrink-0 place-items-center rounded-[12px] border border-[var(--color-primary)]/35 bg-[var(--color-surface)]/60 text-[var(--color-primary)]">
           <WhatsappLogo size={20} weight="regular" aria-hidden="true" />
         </span>
         <span className="min-w-0">

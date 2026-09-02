@@ -7,6 +7,7 @@ import { readJsonBody } from '@/lib/security/request-body';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { consumeCoarseQuota } from '@/lib/security/rate-limit';
 import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { setSafetyHubSessionHint } from '@/lib/supabase/session-hint';
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +25,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'ZH_AUTHENTICATION_FAILED' }, { status: 401 });
     }
     await consumeCoarseQuota('auth.otp.verify', requestSecurityMetadata(request).ipHash);
-    return NextResponse.json(await loginWithZhUsernamePassword(parsed.data));
+    const payload = await loginWithZhUsernamePassword(parsed.data);
+    const response = NextResponse.json(payload);
+    return payload.verified === true ? setSafetyHubSessionHint(request, response) : response;
   } catch (error) {
     return zhUsernamePasswordApiError(error);
   }

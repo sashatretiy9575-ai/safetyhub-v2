@@ -591,6 +591,10 @@ export type Database = {
         Args: { p_limit?: number };
         Returns: Json;
       };
+      recover_legacy_blank_zh_approval_deliveries: {
+        Args: { p_limit?: number };
+        Returns: Json;
+      };
       set_preferred_locale: { Args: { p_locale: AppLocale }; Returns: Json };
       update_profile: {
         Args: { p_name: string; p_surname: string; p_job: string; p_organization: string };

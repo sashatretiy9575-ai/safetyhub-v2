@@ -11,7 +11,7 @@ test('email OTP validation normalizes email and accepts exactly six ASCII digits
       email: ' Learner@Example.COM ',
       intent: 'register',
     }),
-    { email: 'learner@example.com', intent: 'register' },
+    { email: 'learner@example.com' },
   );
   assert.deepEqual(
     emailOtpVerifySchema.parse({
@@ -20,7 +20,7 @@ test('email OTP validation normalizes email and accepts exactly six ASCII digits
       intent: 'login',
       legalAccepted: true,
     }),
-    { email: 'learner@example.com', code: '123456' },
+    { email: 'learner@example.com', code: '123456', legalAccepted: true },
   );
 
   for (const code of ['12345', '1234567', '12 3456', 'abcdef', '１２３４５６', '١٢٣٤٥٦']) {
@@ -28,6 +28,7 @@ test('email OTP validation normalizes email and accepts exactly six ASCII digits
       emailOtpVerifySchema.safeParse({
         email: 'learner@example.com',
         code,
+        legalAccepted: true,
       }).success,
       false,
       code,
@@ -54,6 +55,15 @@ test('email OTP validation normalizes email and accepts exactly six ASCII digits
     false,
     'Chinese authentication must not enter the email flow',
   );
+  assert.equal(
+    emailOtpVerifySchema.safeParse({
+      email: 'learner@example.com',
+      code: '123456',
+      legalAccepted: false,
+    }).success,
+    false,
+    'the post-proof legal receipt requires an explicit acknowledgement',
+  );
 });
 
 test('email OTP request is origin-bound, provider-proven, and issues an opaque receipt', async () => {
@@ -68,19 +78,18 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
     ci,
     loginTemplate,
     confirmationTemplate,
-  ] =
-    await Promise.all([
-      read('app/api/auth/email-otp/request/route.ts'),
-      read('lib/security/email-otp-challenge.ts'),
-      read('supabase/migrations/20260901108000_security_boundary_hardening.sql'),
-      read('lib/supabase/database.generated.ts'),
-      read('lib/supabase/types.ts'),
-      read('supabase/config.toml'),
-      read('.env.example'),
-      read('.github/workflows/ci.yml'),
-      read('supabase/templates/magic-link.html'),
-      read('supabase/templates/confirmation.html'),
-    ]);
+  ] = await Promise.all([
+    read('app/api/auth/email-otp/request/route.ts'),
+    read('lib/security/email-otp-challenge.ts'),
+    read('supabase/migrations/20260901108000_security_boundary_hardening.sql'),
+    read('lib/supabase/database.generated.ts'),
+    read('lib/supabase/types.ts'),
+    read('supabase/config.toml'),
+    read('.env.example'),
+    read('.github/workflows/ci.yml'),
+    read('supabase/templates/magic-link.html'),
+    read('supabase/templates/confirmation.html'),
+  ]);
 
   assert.match(route, /isSameOriginRequest\(request\)/u);
   assert.match(route, /readJsonBody\(request\)/u);
@@ -92,10 +101,7 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
   assert.doesNotMatch(route, /shouldCreateUser: parsed\.data\.intent/u);
   assert.match(route, /captchaToken: parsed\.data\.captchaToken/u);
   assert.match(route, /const locale = parsed\.data\.locale \?\? 'ru'/u);
-  assert.match(
-    route,
-    /emailRedirectTo: emailOtpRedirectUrl\(resolveSiteOrigin\(\), locale\)/u,
-  );
+  assert.match(route, /emailRedirectTo: emailOtpRedirectUrl\(resolveSiteOrigin\(\), locale\)/u);
   assert.match(route, /authProviderRetryAfter\(error\)/u);
   assert.match(route, /\{ error: 'RATE_LIMITED', retryAfter \}/u);
   assert.match(route, /'Retry-After': String\(retryAfter\)/u);
@@ -105,7 +111,10 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
     'the provider must accept CAPTCHA/send before the email-bound receipt is issued',
   );
   assert.match(route, /if \(failure\) return failure/u);
-  assert.match(route, /setEmailOtpChallengeCookie\([\s\S]*NextResponse\.json\(\{ sent: true \}, \{ status: 202 \}\)/u);
+  assert.match(
+    route,
+    /setEmailOtpChallengeCookie\([\s\S]*NextResponse\.json\(\{ sent: true \}, \{ status: 202 \}\)/u,
+  );
   assert.doesNotMatch(route, /siteverify|challenges\.cloudflare\.com|fetch\(/u);
   assert.doesNotMatch(
     route,
@@ -123,7 +132,10 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
   assert.match(migration, /max_attempts smallint not null default 6/u);
   assert.match(migration, /expires_at <= issued_at \+ interval '1 hour'/u);
   assert.match(migration, /create function public\.issue_email_otp_challenge/u);
-  assert.match(migration, /grant execute on function public\.issue_email_otp_challenge[\s\S]*to service_role/u);
+  assert.match(
+    migration,
+    /grant execute on function public\.issue_email_otp_challenge[\s\S]*to service_role/u,
+  );
   for (const typeSource of [generatedTypes, appTypes]) {
     assert.match(typeSource, /issue_email_otp_challenge:/u);
     assert.match(typeSource, /p_expires_in_seconds\?: number/u);
@@ -171,7 +183,8 @@ test('email OTP verification spends only its bound receipt before provider proof
   assert.match(route, /readEmailOtpChallengeCookie\(request\)/u);
   assert.match(route, /consumeEmailOtpChallengeAttempt\(challengeToken, parsed\.data\.email\)/u);
   assert.ok(
-    route.indexOf('await consumeEmailOtpChallengeAttempt(') < route.indexOf('verifier.auth.verifyOtp({'),
+    route.indexOf('await consumeEmailOtpChallengeAttempt(') <
+      route.indexOf('verifier.auth.verifyOtp({'),
     'the challenge attempt must be consumed before provider verification',
   );
   assert.match(
@@ -179,7 +192,10 @@ test('email OTP verification spends only its bound receipt before provider proof
     /verifyOtp\(\{[\s\S]*email: parsed\.data\.email,[\s\S]*token: parsed\.data\.code,[\s\S]*type: 'email'/u,
   );
   assert.match(route, /user\.email\.trim\(\)\.toLowerCase\(\) !== parsed\.data\.email/u);
-  assert.match(route, /completeEmailOtpChallenge\([\s\S]*challengeToken,[\s\S]*parsed\.data\.email/u);
+  assert.match(
+    route,
+    /completeEmailOtpChallenge\([\s\S]*challengeToken,[\s\S]*parsed\.data\.email/u,
+  );
   assert.ok(
     route.indexOf('challengeCompleted = await completeEmailOtpChallenge(') <
       route.indexOf('const supabase = await createClient()'),
@@ -191,19 +207,24 @@ test('email OTP verification spends only its bound receipt before provider proof
     /auth\.setSession\(\{[\s\S]*access_token: session\.access_token,[\s\S]*refresh_token: session\.refresh_token/u,
   );
   assert.match(route, /persisted\.data\.user\?\.id !== user\.id/u);
-  assert.match(
-    route,
-    /context\.has_current_legal_acceptance !== true\)[\s\S]*localizedAccountPath\('\/auth\/legal', locale\)/u,
+  assert.match(route, /rpc\('set_preferred_locale', \{[\s\S]*p_locale: locale/u);
+  assert.match(route, /getCurrentLegalPolicies\(\)/u);
+  assert.match(route, /rpc\('accept_current_legal_documents', \{/u);
+  assert.match(route, /hasCurrentLegalReceipts\(receipts, currentLegal\)/u);
+  assert.match(route, /authContext\.has_current_legal_acceptance !== true/u);
+  assert.match(route, /clearSafetyHubLocalSession\(/u);
+  assert.ok(
+    route.indexOf("rpc('accept_current_legal_documents'") < route.indexOf(".rpc('get_auth_context')"),
+    'the receipt must be committed before the final private-context redirect check',
   );
-  assert.match(route, /rpc\('set_preferred_locale', \{ p_locale: locale \}\)/u);
-  assert.match(route, /auth\.updateUser\(\{ data: \{ preferred_locale: locale \} \}\)/u);
+  assert.doesNotMatch(route, /supabase\.auth\.updateUser/u);
   assert.match(route, /supabase\.auth\.signOut\(\{ scope: 'local' \}\)/u);
   assert.match(route, /authProviderRetryAfter\(error\)/u);
   assert.match(route, /\{ error: 'RATE_LIMITED', retryAfter \}/u);
   assert.match(route, /'Retry-After': String\(retryAfter\)/u);
   assert.doesNotMatch(
     route,
-    /signInWithPassword|passwordContext|password_ticket|createAdminClient|finalizeSignupLegalOperation|accept_current_legal_documents|legalAccepted|parsed\.data\.intent|requestSubjectHash/u,
+    /signInWithPassword|passwordContext|password_ticket|finalizeSignupLegalOperation|parsed\.data\.intent|requestSubjectHash/u,
   );
   assert.match(ephemeralClient, /persistSession: false/u);
   assert.match(ephemeralClient, /detectSessionInUrl: false/u);
@@ -250,8 +271,8 @@ test('passwordless browser form shares a bounded cooldown without storing a code
   assert.match(flow, /pendingCaptchaSubmitRef\.current = \(token\) => void sendCode\(/u);
   assert.match(flow, /value === localizePathname\('\/auth\/legal', locale\)/u);
   assert.match(flow, /locale,/u);
-  for (const source of [login, register]) {
-    assert.match(source, /<EmailOtpFlow intent=/u);
-    assert.doesNotMatch(source, /PasswordInput|type="password"|reset-password/u);
-  }
+  assert.match(login, /<EmailOtpFlow \/>/u);
+  assert.doesNotMatch(login, /PasswordInput|type="password"|reset-password|intent=/u);
+  assert.match(register, /redirect\(localizePathname\('\/auth\/login', locale\)\)/u);
+  assert.doesNotMatch(register, /<EmailOtpFlow|PasswordInput|type="password"|reset-password/u);
 });

@@ -6,10 +6,9 @@ import { JsonLd } from '@/components/shared/json-ld';
 import { breadcrumbsJsonLd, buildMetadata, courseJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { TopicSourcesCard } from '@/components/topics/topic-sources-card';
-import { getAuthContext } from '@/features/auth/server';
 import { localizePathname } from '@/i18n/config';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export async function generateStaticParams() {
   return (await getTopicSlugs()).map((slug) => ({ slug }));
@@ -56,13 +55,6 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
     notFound();
   }
 
-  const auth = await getAuthContext();
-  const access = !auth
-    ? 'anonymous'
-    : !auth.hasCurrentLegalAcceptance
-      ? 'legal_required'
-      : auth.approval.state;
-
   return (
     <>
       <JsonLd
@@ -85,7 +77,13 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
           ]),
         ]}
       />
-      <CourseMaterialActions course={topic} access={access} />
+      {/*
+       * Public course HTML deliberately stays generic. Personal approval and
+       * legal state are only resolved on private, no-store routes after an
+       * explicit interaction; looking at an auth cookie here would make the
+       * public page uncacheable at the CDN.
+       */}
+      <CourseMaterialActions course={topic} access="anonymous" />
       <TopicSourcesCard topic={topic} />
     </>
   );

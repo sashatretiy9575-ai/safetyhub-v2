@@ -1,10 +1,11 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { cookies } from 'next/headers';
+import type { NextRequest } from 'next/server';
 import { apiError } from '@/features/auth/api-error';
 import { isSameOriginRequest } from '@/features/auth/request-origin';
 import { requireAccountDeletionUser } from '@/features/auth/server';
 import { invalidateCertificateVerificationCache } from '@/features/certificates/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { clearSafetyHubLocalSession } from '@/lib/supabase/session-cleanup';
 import { readJsonBody } from '@/lib/security/request-body';
 
 // Language-neutral protocol value. The localized phrase typed by the user is
@@ -38,7 +39,7 @@ function pendingPurge(value: unknown, userId: string) {
   };
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
     if (!isSameOriginRequest(request)) {
       return NextResponse.json({ error: 'FORBIDDEN' }, { status: 403 });
@@ -58,15 +59,8 @@ export async function DELETE(request: Request) {
     if (beginError) throw beginError;
     const pending = pendingPurge(data, context.user.id);
     invalidateCertificateVerificationCache();
-    const cookieStore = await cookies();
-    for (const cookie of cookieStore.getAll()) {
-      if (cookie.name.startsWith('sb-') && cookie.name.includes('auth-token')) {
-        cookieStore.delete(cookie.name);
-      }
-    }
     const response = NextResponse.json(pending, { status: 202 });
-    response.headers.set('Clear-Site-Data', '"cache", "storage"');
-    return response;
+    return clearSafetyHubLocalSession(request, response);
   } catch (error) {
     return apiError(error);
   }

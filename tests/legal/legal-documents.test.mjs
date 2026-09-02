@@ -56,11 +56,11 @@ test('legal versions are immutable, resolvable, and have exact profile links', (
   assert.equal(legalEffectiveDateInAppTimezone('2026-09-01T19:00:00.000Z'), '2026-09-02');
   assert.equal(
     legalDocumentHref('privacy', PRIVACY_POLICY.version),
-    '/privacy?version=1.4#document-version',
+    '/privacy/1.4#document-version',
   );
   assert.equal(
     legalDocumentHref('terms', TERMS_POLICY.version),
-    '/terms?version=2.4#document-version',
+    '/terms/2.4#document-version',
   );
 });
 
@@ -92,22 +92,19 @@ test('current legal copies accurately disclose the minimal ZH username-password 
   ]);
 
   for (const page of [privacyPage, termsPage]) {
-    assert.match(page, /searchParams:[\s\S]*version\?/);
-    assert.match(page, /resolveActivatedLegalPolicy/);
-    assert.match(page, /bodyRevision !==/);
-    assert.match(page, /bodyRevision ===/);
+    assert.match(page, /getStaticLegalDocument/);
+    assert.match(page, /LocalizedLegalDocumentView/);
+    assert.match(page, /export const revalidate = 300/);
+    assert.doesNotMatch(page, /searchParams/);
+    assert.doesNotMatch(page, /resolveActivatedLegalPolicy/);
+    assert.doesNotMatch(page, /getLocalizedLegalDocument/);
+    assert.doesNotMatch(page, /getLocale\(/);
     assert.doesNotMatch(page, /Пилотная среда|реквизиты оператора ещё не настроены/iu);
     assert.doesNotMatch(page, /LEGAL_REVIEW_NOTICE/);
   }
 
-  assert.match(privacyPage, /privacy-1\.1/);
-  assert.match(privacyPage, /privacy-1\.2/);
-  assert.match(privacyPage, /privacy-1\.3/);
-  assert.match(privacyPage, /privacy-1\.4/);
-  assert.match(termsPage, /terms-2\.1/);
-  assert.match(termsPage, /terms-2\.2/);
-  assert.match(termsPage, /terms-2\.3/);
-  assert.match(termsPage, /terms-2\.4/);
+  assert.match(privacyPage, /export function PrivacyPolicyV11/);
+  assert.match(termsPage, /export function TermsPolicyV21/);
 
   const privacyDocument = JSON.parse(privacySource);
   const termsDocument = JSON.parse(termsSource);
@@ -246,14 +243,17 @@ test('profile reads immutable acceptance history and records consent through a s
   assert.match(legalCurrent, /\.eq\('is_current', true\)/u);
   assert.match(legalCurrent, /data\.length !== 2/u);
   assert.match(legalCurrent, /LEGAL_CURRENT_VERSION_UNSUPPORTED/u);
-  assert.match(privacyPage, /resolveActivatedLegalPolicy\('privacy', requestedVersion\)/u);
-  assert.match(termsPage, /resolveActivatedLegalPolicy\('terms', requestedVersion\)/u);
-  assert.match(otpVerify, /localizedAccountPath\('\/auth\/legal', locale\)/u);
-  assert.doesNotMatch(
-    otpVerify,
-    /accept_current_legal_documents|legalAccepted|parsed\.data\.intent/u,
-  );
-  assert.doesNotMatch(otpFlow, /legalAccepted|sessionStorage[\s\S]*consent/u);
+  assert.match(privacyPage, /getStaticLegalDocument\('privacy', PRIVACY_POLICY\.version/u);
+  assert.match(termsPage, /getStaticLegalDocument\('terms', TERMS_POLICY\.version/u);
+  assert.doesNotMatch(privacyPage, /resolveActivatedLegalPolicy/);
+  assert.doesNotMatch(termsPage, /resolveActivatedLegalPolicy/);
+  assert.match(otpVerify, /rpc\('accept_current_legal_documents'/u);
+  assert.match(otpVerify, /hasCurrentLegalReceipts\(receipts, currentLegal\)/u);
+  assert.match(otpVerify, /setSafetyHubSessionHint\(request, response\)/u);
+  assert.doesNotMatch(otpVerify, /localizedAccountPath\('\/auth\/legal', locale\)/u);
+  assert.doesNotMatch(otpVerify, /legalAccepted|parsed\.data\.intent/u);
+  assert.match(otpFlow, /const \[legalAccepted, setLegalAccepted\] = useState\(true\)/u);
+  assert.doesNotMatch(otpFlow, /sessionStorage[\s\S]*consent/u);
   assert.match(baselineMigration, /create table public\.legal_document_versions/);
   assert.match(baselineMigration, /body_revision/);
   assert.match(baselineMigration, /LEGAL_DOCUMENT_VERSION_IMMUTABLE/);

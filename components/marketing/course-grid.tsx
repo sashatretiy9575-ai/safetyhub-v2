@@ -64,7 +64,7 @@ export async function CourseGrid() {
 
           {topics.length > 0 ? (
             <MarketingSlider label={t('slider')} itemLabel={t('item')} className="mt-7 sm:mt-10">
-              {topics.map((topic, index) => (
+              {topics.map((topic) => (
                 <CourseCard
                   key={topic.slug}
                   slug={topic.slug}
@@ -74,7 +74,9 @@ export async function CourseGrid() {
                   durationMinutes={topic.durationMinutes}
                   questionCount={topic.questionCount}
                   pageCount={topic.presentation?.pageCount}
-                  priority={index < 3}
+                  // The LCP hero is the only public image intentionally preloaded.
+                  // Course covers are below the fold and should not compete with it.
+                  priority={false}
                 />
               ))}
             </MarketingSlider>

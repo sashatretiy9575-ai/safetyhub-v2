@@ -4,6 +4,8 @@ import { apiError } from '@/features/auth/api-error';
 import { isSameOriginRequest } from '@/features/auth/request-origin';
 import { createEphemeralAuthClient } from '@/lib/supabase/ephemeral-auth';
 import { createClient } from '@/lib/supabase/server';
+import { setSafetyHubSessionHint } from '@/lib/supabase/session-hint';
+import { clearSafetyHubLocalSession } from '@/lib/supabase/session-cleanup';
 import { emailOtpVerifySchema } from '@/lib/validation/auth';
 import { readJsonBody } from '@/lib/security/request-body';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
@@ -11,6 +13,8 @@ import { consumeCoarseQuota } from '@/lib/security/rate-limit';
 import { authProviderRetryAfter } from '@/features/auth/otp-rate-limit';
 import { localizedAccountPath } from '@/features/auth/email-otp-locale';
 import type { EmailOtpLocale } from '@/features/auth/email-otp-locale';
+import { getCurrentLegalPolicies, type CurrentLegalPolicies } from '@/lib/legal-current';
+import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import {
   clearEmailOtpChallengeCookie,
   completeEmailOtpChallenge,
@@ -45,17 +49,46 @@ function exhaustedChallengeResponse(retryAfter: number) {
   );
 }
 
-function landingPath(context: {
-  role?: unknown;
-  profile_onboarding_completed_at?: unknown;
-  has_current_legal_acceptance?: unknown;
-}, locale: EmailOtpLocale) {
-  if (context.has_current_legal_acceptance !== true)
-    return localizedAccountPath('/auth/legal', locale);
+function landingPath(
+  context: {
+    role?: unknown;
+    profile_onboarding_completed_at?: unknown;
+  },
+  locale: EmailOtpLocale,
+) {
   if (context.role === 'admin') return '/admin';
   return localizedAccountPath(
     context.profile_onboarding_completed_at === null ? '/onboarding' : '/profile',
     locale,
+  );
+}
+
+function hasCurrentLegalReceipts(value: unknown, currentLegal: CurrentLegalPolicies) {
+  if (!Array.isArray(value)) return false;
+  const expected = [
+    ['privacy', currentLegal.privacy.version],
+    ['terms', currentLegal.terms.version],
+  ] as const;
+  return expected.every(([documentType, version]) =>
+    value.some(
+      (entry) =>
+        entry !== null &&
+        typeof entry === 'object' &&
+        !Array.isArray(entry) &&
+        (entry as Record<string, unknown>).documentType === documentType &&
+        (entry as Record<string, unknown>).version === version,
+    ),
+  );
+}
+
+async function clearPersistedSession(
+  request: NextRequest,
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  error: string,
+) {
+  await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
+  return clearEmailOtpChallengeCookie(
+    clearSafetyHubLocalSession(request, NextResponse.json({ error }, { status: 503 })),
   );
 }
 
@@ -87,9 +120,7 @@ export async function POST(request: NextRequest) {
       return clearEmailOtpChallengeCookie(invalidChallengeResponse());
     }
     if (challenge.outcome === 'exhausted') {
-      return clearEmailOtpChallengeCookie(
-        exhaustedChallengeResponse(challenge.retryAfter),
-      );
+      return clearEmailOtpChallengeCookie(exhaustedChallengeResponse(challenge.retryAfter));
     }
 
     const verifier = createEphemeralAuthClient();
@@ -113,10 +144,7 @@ export async function POST(request: NextRequest) {
 
     let challengeCompleted: boolean;
     try {
-      challengeCompleted = await completeEmailOtpChallenge(
-        challengeToken,
-        parsed.data.email,
-      );
+      challengeCompleted = await completeEmailOtpChallenge(challengeToken, parsed.data.email);
     } catch {
       return clearEmailOtpChallengeCookie(
         NextResponse.json({ error: 'OTP_UNAVAILABLE' }, { status: 503 }),
@@ -138,33 +166,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const [{ error: profileLocaleError }, { error: metadataLocaleError }] = await Promise.all([
-      supabase.rpc('set_preferred_locale', { p_locale: locale }),
-      supabase.auth.updateUser({ data: { preferred_locale: locale } }),
-    ]);
-    if (profileLocaleError || metadataLocaleError) {
-      await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
-      return clearEmailOtpChallengeCookie(
-        NextResponse.json({ error: 'AUTH_CONTEXT_UNAVAILABLE' }, { status: 503 }),
-      );
+    // The profile RPC is the only server-authorized locale write. Auth user
+    // metadata is not a display-locale source of truth and a parallel update
+    // can race the realm boundary during a fresh session transition.
+    const { error: profileLocaleError } = await supabase.rpc('set_preferred_locale', {
+      p_locale: locale,
+    });
+    if (profileLocaleError) {
+      return clearPersistedSession(request, supabase, 'AUTH_CONTEXT_UNAVAILABLE');
+    }
+
+    // A successful OTP is the first moment the ordinary realm records the
+    // compact, preselected acknowledgement. The immutable receipt must be
+    // durable before this freshly persisted session can reach a private page.
+    let currentLegal: CurrentLegalPolicies;
+    try {
+      currentLegal = await getCurrentLegalPolicies();
+    } catch {
+      return clearPersistedSession(request, supabase, 'AUTH_CONTEXT_UNAVAILABLE');
+    }
+    const legalResult = await supabase.rpc('accept_current_legal_documents', {
+      p_privacy_version: currentLegal.privacy.version,
+      p_privacy_body_revision: currentLegal.privacy.bodyRevision,
+      p_terms_version: currentLegal.terms.version,
+      p_terms_body_revision: currentLegal.terms.bodyRevision,
+    });
+    try {
+      const receipts = unwrapRpcMutationResponse(legalResult);
+      if (!hasCurrentLegalReceipts(receipts, currentLegal)) {
+        return clearPersistedSession(request, supabase, 'AUTH_CONTEXT_UNAVAILABLE');
+      }
+    } catch {
+      return clearPersistedSession(request, supabase, 'AUTH_CONTEXT_UNAVAILABLE');
     }
 
     const { data: authContext, error: authContextError } = await supabase
       .rpc('get_auth_context')
       .maybeSingle();
     if (!authContext || authContextError) {
-      await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
-      return clearEmailOtpChallengeCookie(
-        NextResponse.json({ error: 'AUTH_CONTEXT_UNAVAILABLE' }, { status: 503 }),
-      );
+      return clearPersistedSession(request, supabase, 'AUTH_CONTEXT_UNAVAILABLE');
+    }
+    if (authContext.has_current_legal_acceptance !== true) {
+      return clearPersistedSession(request, supabase, 'AUTH_CONTEXT_UNAVAILABLE');
     }
 
-    return clearEmailOtpChallengeCookie(
+    const response = clearEmailOtpChallengeCookie(
       NextResponse.json({
         verified: true,
         redirectTo: landingPath(authContext, locale),
       }),
     );
+    return setSafetyHubSessionHint(request, response);
   } catch (error) {
     return apiError(error);
   }

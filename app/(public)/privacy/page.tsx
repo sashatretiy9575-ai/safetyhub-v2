@@ -1,54 +1,36 @@
 import { notFound } from 'next/navigation';
-import { getLocale, getTranslations } from 'next-intl/server';
-import { PrivacyPolicyV12 } from '@/components/legal/privacy-policy-v1-2';
-import { PrivacyPolicyV13 } from '@/components/legal/privacy-policy-v1-3';
-import { PrivacyPolicyV14 } from '@/components/legal/privacy-policy-v1-4';
+import { getTranslations } from 'next-intl/server';
 import { LegalContacts } from '@/components/legal/legal-contacts';
+import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-document';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
-import { formatLegalDate, LEGAL_REFERENCE_LINKS } from '@/lib/legal';
-import { resolveActivatedLegalPolicy } from '@/lib/legal-current';
+import { getStaticLegalDocument } from '@/lib/content/legal-documents';
+import { DEFAULT_LOCALE } from '@/i18n/config';
+import {
+  formatLegalDate,
+  LEGAL_REFERENCE_LINKS,
+  PRIVACY_POLICY,
+  type LegalDocumentVersion,
+} from '@/lib/legal';
 import { buildMetadata } from '@/lib/seo';
-import { getLocalizedLegalDocument } from '@/lib/content/legal-documents';
-import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-document';
-import type { AppLocale } from '@/i18n/config';
+
+export const revalidate = 300;
 
 export async function generateMetadata() {
-  const [locale, t] = await Promise.all([
-    getLocale() as Promise<AppLocale>,
-    getTranslations('LegalFlow'),
-  ]);
+  const t = await getTranslations('LegalFlow');
   return buildMetadata({
     title: t('privacy'),
     description: t('privacyMetadataDescription'),
     path: '/privacy',
-    locale,
+    locale: DEFAULT_LOCALE,
   });
 }
-
-type PrivacyPageProps = {
-  searchParams: Promise<{ version?: string | string[] }>;
-};
 
 const externalLinkClass =
   'font-semibold text-[var(--color-primary)] underline underline-offset-2 hover:no-underline';
 
-export default async function PrivacyPage({ searchParams }: PrivacyPageProps) {
-  const requested = (await searchParams).version;
-  const requestedVersion = Array.isArray(requested) ? requested[0] : requested;
-  const locale = (await getLocale()) as AppLocale;
-  if (locale !== 'ru') {
-    const localized = await getLocalizedLegalDocument('privacy', requestedVersion, locale);
-    if (!localized) notFound();
-    return <LocalizedLegalDocumentView document={localized} />;
-  }
-  const policy = await resolveActivatedLegalPolicy('privacy', requestedVersion);
-  if (!policy) notFound();
-  if (policy.bodyRevision === 'privacy-1.4') return <PrivacyPolicyV14 policy={policy} />;
-  if (policy.bodyRevision === 'privacy-1.3') return <PrivacyPolicyV13 policy={policy} />;
-  if (policy.bodyRevision === 'privacy-1.2') return <PrivacyPolicyV12 policy={policy} />;
-  if (policy.bodyRevision !== 'privacy-1.1') notFound();
-
+/** Immutable renderer for the only pre-structured Russian privacy copy. */
+export function PrivacyPolicyV11({ policy }: { policy: LegalDocumentVersion }) {
   const effectiveDate = formatLegalDate(policy.effectiveDate);
 
   return (
@@ -307,4 +289,15 @@ export default async function PrivacyPage({ searchParams }: PrivacyPageProps) {
       </article>
     </>
   );
+}
+
+/**
+ * The unversioned public URL is deliberately a local immutable read. Historical
+ * versions have physical `/privacy/:version` routes, so neither a session cookie
+ * nor a query string can make this CDN response viewer-specific.
+ */
+export default function PrivacyPage() {
+  const document = getStaticLegalDocument('privacy', PRIVACY_POLICY.version, DEFAULT_LOCALE);
+  if (!document) notFound();
+  return <LocalizedLegalDocumentView document={document} />;
 }

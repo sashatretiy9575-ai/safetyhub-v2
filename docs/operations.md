@@ -33,16 +33,20 @@ metadata и неизменяемых assets, а не на сервере.
 - Проверяйте `/`, `/kk`, `/en`, `/zh` и один вложенный URL каждой локали. RU не
   должен получать `/ru`, а `/zh/admin`, `/en/api/...` и locale-prefixed assets не
   должны становиться alias существующего ресурса.
-- При проверке автоопределения очищайте только cookie `safetyhub-locale` и задавайте
-  конкретный `Accept-Language`. Явный префикс должен иметь приоритет, cookie —
-  приоритет над заголовком, неизвестный язык — возвращать RU.
+- Public URL определяет язык сам: `/` — RU, а `/kk`, `/en`, `/zh` — физические
+  locale trees. Cookie `safetyhub-locale` и `Accept-Language` не должны менять
+  HTML, `lang`, `Content-Language` или CDN cache key на public GET. После warm
+  запроса проверяйте cache hit и `s-maxage=300`; `/auth`, `/profile`, `/admin`,
+  test и API surfaces всегда остаются `private, no-store`.
 - После добавления ключа обновите все четыре `messages/*.json`. Тест каталогов
   блокирует отсутствующий ключ, пустое значение или несовпадающий ICU parameter.
 - Если в `messages/zh.json` появились новые иероглифы, пересоберите UI subset из
   официального Noto Sans SC variable TTF:
   `python scripts/subset-cjk-ui-font.py C:/path/to/NotoSansSC-VF.ttf`.
-  Проверьте, что font остаётся self-hosted, меньше 500 KiB и preloaded только при
-  `data-locale="zh"`.
+  Скрипт выдаёт self-hosted content-addressed WOFF2 name. Обновите ссылку в
+  `RootDocument` и immutable header вместе, затем удалите только точно
+  неиспользуемый старый asset. Font должен быть меньше 500 KiB и preloaded только
+  при `data-locale="zh"`.
 - Проверяйте locale manifest `/manifest/{locale}` и offline shell
   `/offline/{locale}`. После изменения их контракта увеличьте версию
   `safetyhub-static-v*`, иначе установленная PWA может сохранить старый fallback.
@@ -64,6 +68,17 @@ metadata и неизменяемых assets, а не на сервере.
   `LEGAL_BUNDLE_PUBLISH_REQUIRED`. Они не являются operational fallback;
   staging и сохранение draft-копий остаются отдельными capability-gated
   операциями.
+- После публикации выполните обычный content pull/parity flow и включите
+  immutable legal files/snapshot в reviewed build до deploy. Public current
+  документы и `/privacy/{version}`, `/terms/{version}` генерируются только из
+  этих локальных receipts; не добавляйте Supabase read, cookie или query-based
+  renderer как оперативный обход. Старые `?version=` links остаются совместимыми
+  redirect-only aliases и должны вести на physical versioned URL.
+- Smoke после warm deploy: `/privacy`, `/terms`, все доступные locale-prefixed
+  current documents и один historical versioned URL возвращают `s-maxage=300`;
+  legacy `?version=` response сам имеет `private, no-store`, затем открывает
+  static versioned copy. Unknown version должен оставаться 404, а не показывать
+  текущий документ.
 
 ## Клиентские сертификаты и export
 
@@ -121,8 +136,10 @@ Supabase Auth: приложение не хранит password, hash или reco
 действующие ZH-сессии и fail-closed блокирует аккаунт до успешной смены пароля.
 До provisioning ZH registration Vercel server отдельно проверяет первый
 Turnstile token через `SAFETYHUB_TURNSTILE_SECRET_KEY`; failed/unavailable
-verification не создаёт Auth user или mapping. Registration не использует token
-для session: learner получает login redirect и предъявляет новый token GoTrue.
+verification не создаёт Auth user или mapping. Registration не использует первый
+token для session: UI получает новый proof и автоматически проходит обычный
+GoTrue login; старый token никогда не переиспользуется. При невозможности
+получить новый proof UI остаётся на обычном видимом входе.
 В Vercel production/preview secret не может быть public always-pass test value,
 а verifier сверяет hostname ответа с configured deployment origin.
 Подробный контракт: `docs/zh-username-password-auth.md`.
@@ -134,8 +151,9 @@ verification не создаёт Auth user или mapping. Registration не и�
 потоки по-прежнему требуют обычный профиль и контактные данные перед заявкой.
 Синтетический provider email скрыт. В capability-gated очереди
 `identity.manage` администратор видит только канонический ZH username, а
-generic Telegram event при `telegram_application_details=false` не содержит
-username, email, пароль или телефон и не влияет на решение.
+каждый новый schema-v2 generic Telegram event содержит только locale, время и
+safe admin path — без username, email, пароля, телефона или других заявочных
+данных — и не влияет на решение.
 
 После явного `approved` mapped ZH learner может открыть защищённый материал и
 начать/завершить попытку без фиктивного completed profile или avatar. Это не
@@ -194,10 +212,11 @@ reason и новым idempotency UUID для каждого логическог
 2. smoke административного inbox;
 3. `telegram_delivery = true`;
 4. smoke приватной группы с минимизированным событием;
-5. `telegram_application_details = true` только для private owner group, если
-   в Telegram нужна полная заявка (ФИО, должность, организация, контактный
-   country/phone);
-6. smoke новой полной заявки.
+5. `telegram_application_details = false` остаётся выключенным: после
+   schema-v2 migration он не расширяет новый Telegram payload;
+6. при необходимости после deploy выполнить только service-only bounded recovery
+   exact dead legacy blank-ZH deliveries и проверить `dead → retry → delivered`
+   без duplicate remote message.
 
 Отключение выполняется в обратном порядке. Прямые изменения private-таблицы,
 повторное использование UUID с другими параметрами и включение Telegram раньше
@@ -243,6 +262,50 @@ $ServiceKey | npm run runtime:flag:set -- `
   --feature notification_events `
   --enabled true `
   --reason 'Enable notification events after release migration' `
+  --idempotency-key '<NEW_UUID>' `
+  --secret-stdin
+Remove-Variable ServiceKey -ErrorAction SilentlyContinue
+```
+
+### Bounded recovery legacy blank-ZH Telegram deliveries
+
+После применения `20260902180000_generic_approval_notifications.sql` recovery
+является отдельной service-only mutation, а не dry-run. Запускайте её только после
+отдельно сохранённого aggregate-only pre-count exact eligible rows и только для
+dead legacy blank-ZH approval deliveries без `remote_message_id` и active lease.
+Команда вызывает **только**
+`public.recover_legacy_blank_zh_approval_deliveries(p_limit := …)` через
+production service RPC; она не читает и не изменяет таблицы напрямую.
+
+`--limit` принимает только целое `1..100` и по умолчанию равен `100`. Обязательные
+reason и UUID — release-correlation receipt: deployed RPC не принимает UUID как
+параметр, поэтому при неясном результате повторяйте тот же limit/reason/UUID и
+проверяйте `dead → retry → delivered` без duplicate remote message. SQL predicate
+не может повторно requeue уже moved/delivered/leased rows. CLI выводит только
+aggregate receipt (`projectRef`, operation, limit, recovered, idempotencyKey), не
+reason, service key, payload, delivery ID или personal data.
+
+```powershell
+$ProjectRef = '<CURRENT_PRODUCTION_PROJECT_REF>'
+npm run notifications:legacy-zh:recover -- `
+  --expected-project-ref $ProjectRef `
+  --confirm-project-ref $ProjectRef `
+  --limit 100 `
+  --reason 'Recover exact dead legacy blank-ZH approval deliveries after dispatcher deployment' `
+  --idempotency-key '<NEW_UUID>' `
+  --env-file 'C:\secure-operator\production-service.env'
+```
+
+Для diskless режима raw service key остаётся только в памяти и передаётся через
+существующий single-line `--secret-stdin` contract; не передавайте secret в argv,
+Dashboard SQL editor или release receipt:
+
+```powershell
+$ServiceKey | npm run notifications:legacy-zh:recover -- `
+  --expected-project-ref $ProjectRef `
+  --confirm-project-ref $ProjectRef `
+  --limit 100 `
+  --reason 'Recover exact dead legacy blank-ZH approval deliveries after dispatcher deployment' `
   --idempotency-key '<NEW_UUID>' `
   --secret-stdin
 Remove-Variable ServiceKey -ErrorAction SilentlyContinue

@@ -48,6 +48,12 @@ function exactKeys(record: Record<string, unknown>, keys: readonly string[], cat
   if (actual.join('\0') !== expected.join('\0')) fail(category);
 }
 
+function hasExactKeys(record: Record<string, unknown>, keys: readonly string[]) {
+  const actual = Object.keys(record).sort();
+  const expected = [...keys].sort();
+  return actual.join('\0') === expected.join('\0');
+}
+
 function requiredEnv(name: string) {
   const value = Deno.env.get(name)?.trim();
   if (!value) fail(`MISSING_${name}`);
@@ -123,24 +129,29 @@ function requiredPhoneE164(value: unknown) {
   return value;
 }
 
-function parsePayload(eventType: string, value: unknown) {
+function parsePayload(eventType: unknown, value: unknown) {
   if (!isRecord(value)) fail('NOTIFICATION_PAYLOAD_INVALID');
   if (eventType === 'account.approval_requested') {
+    if (hasExactKeys(value, ['schemaVersion', 'locale', 'requestedAt', 'adminPath'])) {
+      if (value.schemaVersion !== 2) fail('NOTIFICATION_PAYLOAD_INVALID');
+      return {
+        approvalKind: 'generic_v2' as const,
+        schemaVersion: 2 as const,
+        locale: requiredLocale(value.locale),
+        requestedAt: requiredTimestamp(value.requestedAt),
+        adminPath: requiredAdminPath(value.adminPath),
+      };
+    }
+
     const hasApplicationDetails = Object.hasOwn(value, 'job');
     if (hasApplicationDetails) {
       exactKeys(
         value,
-        [
-          'name',
-          'surname',
-          'job',
-          'organization',
-          'phoneCountryIso2',
-          'phoneE164',
-        ],
+        ['name', 'surname', 'job', 'organization', 'phoneCountryIso2', 'phoneE164'],
         'NOTIFICATION_PAYLOAD_INVALID',
       );
       return {
+        approvalKind: 'legacy_full' as const,
         name: requiredText(value.name, 120),
         surname: requiredText(value.surname, 120),
         job: requiredText(value.job, 160),
@@ -152,21 +163,27 @@ function parsePayload(eventType: string, value: unknown) {
 
     exactKeys(
       value,
-      [
-        'name',
-        'surname',
-        'locale',
-        'requestedAt',
-        'adminPath',
-      ],
+      ['name', 'surname', 'locale', 'requestedAt', 'adminPath'],
       'NOTIFICATION_PAYLOAD_INVALID',
     );
+    const locale = requiredLocale(value.locale);
+    const requestedAt = requiredTimestamp(value.requestedAt);
+    const adminPath = requiredAdminPath(value.adminPath);
+    if (value.name === '' && value.surname === '' && locale === 'zh') {
+      return {
+        approvalKind: 'legacy_blank_zh' as const,
+        locale,
+        requestedAt,
+        adminPath,
+      };
+    }
     return {
+      approvalKind: 'legacy_generic' as const,
       name: requiredText(value.name, 120),
       surname: requiredText(value.surname, 120),
-      locale: requiredLocale(value.locale),
-      requestedAt: requiredTimestamp(value.requestedAt),
-      adminPath: requiredAdminPath(value.adminPath),
+      locale,
+      requestedAt,
+      adminPath,
     };
   }
   if (eventType === 'course.completed') {
@@ -225,41 +242,54 @@ function parseClaim(value: unknown) {
   if (!Array.isArray(value.items) || value.items.length > CLAIM_LIMIT) {
     fail('NOTIFICATION_CLAIM_INVALID');
   }
-  return value.items.map((item) => {
-    if (!isRecord(item)) fail('NOTIFICATION_CLAIM_INVALID');
-    exactKeys(
-      item,
-      [
-        'deliveryId',
-        'leaseToken',
-        'attempt',
-        'eventId',
-        'eventType',
-        'correlationId',
-        'occurredAt',
-        'payload',
-      ],
-      'NOTIFICATION_CLAIM_INVALID',
-    );
-    if (typeof item.eventType !== 'string' || !ALLOWED_EVENT_TYPES.has(item.eventType)) {
-      fail('NOTIFICATION_EVENT_TYPE_INVALID');
-    }
-    const correlationId = requiredUuid(item.correlationId, 'NOTIFICATION_CLAIM_INVALID');
-    const payload = parsePayload(item.eventType, item.payload);
-    if (item.eventType === 'system.alert' && payload.correlationId !== correlationId) {
-      fail('NOTIFICATION_PAYLOAD_INVALID');
-    }
-    return {
-      deliveryId: requiredUuid(item.deliveryId, 'NOTIFICATION_CLAIM_INVALID'),
-      leaseToken: requiredUuid(item.leaseToken, 'NOTIFICATION_CLAIM_INVALID'),
-      attempt: requiredInteger(item.attempt, 1, 10),
-      eventId: requiredUuid(item.eventId, 'NOTIFICATION_CLAIM_INVALID'),
-      eventType: item.eventType,
-      correlationId,
-      occurredAt: requiredTimestamp(item.occurredAt, 'NOTIFICATION_CLAIM_INVALID'),
-      payload,
-    };
-  });
+  return value.items;
+}
+
+// This first pass validates the lease tuple without looking at the event
+// payload. A malformed payload can therefore be failed for its own delivery
+// rather than aborting every other row claimed in the same batch.
+function parseLeaseClaim(value: unknown) {
+  if (!isRecord(value)) fail('NOTIFICATION_CLAIM_INVALID');
+  return {
+    deliveryId: requiredUuid(value.deliveryId, 'NOTIFICATION_CLAIM_INVALID'),
+    leaseToken: requiredUuid(value.leaseToken, 'NOTIFICATION_CLAIM_INVALID'),
+    raw: value,
+  };
+}
+
+function parseDeliveryClaim(lease: ReturnType<typeof parseLeaseClaim>) {
+  const value = lease.raw;
+  exactKeys(
+    value,
+    [
+      'deliveryId',
+      'leaseToken',
+      'attempt',
+      'eventId',
+      'eventType',
+      'correlationId',
+      'occurredAt',
+      'payload',
+    ],
+    'NOTIFICATION_CLAIM_INVALID',
+  );
+  if (typeof value.eventType !== 'string' || !ALLOWED_EVENT_TYPES.has(value.eventType)) {
+    fail('NOTIFICATION_EVENT_TYPE_INVALID');
+  }
+  const correlationId = requiredUuid(value.correlationId, 'NOTIFICATION_CLAIM_INVALID');
+  const payload = parsePayload(value.eventType, value.payload);
+  if (value.eventType === 'system.alert' && payload.correlationId !== correlationId) {
+    fail('NOTIFICATION_PAYLOAD_INVALID');
+  }
+  return {
+    ...lease,
+    attempt: requiredInteger(value.attempt, 1, 10),
+    eventId: requiredUuid(value.eventId, 'NOTIFICATION_CLAIM_INVALID'),
+    eventType: value.eventType,
+    correlationId,
+    occurredAt: requiredTimestamp(value.occurredAt, 'NOTIFICATION_CLAIM_INVALID'),
+    payload,
+  };
 }
 
 function parseSiteOrigin(value: string) {
@@ -294,10 +324,10 @@ function localeLabel(value: string) {
   return ({ ru: 'RU', kk: 'KK', en: 'EN', zh: 'ZH' } as const)[value];
 }
 
-function eventMessage(claim: ReturnType<typeof parseClaim>[number], siteOrigin: string) {
+function eventMessage(claim: ReturnType<typeof parseDeliveryClaim>, siteOrigin: string) {
   const payload = claim.payload;
   if (claim.eventType === 'account.approval_requested') {
-    if ('job' in payload) {
+    if (payload.approvalKind === 'legacy_full') {
       return [
         '🔔 Новая заявка на обучение',
         `Имя: ${payload.name}`,
@@ -309,6 +339,14 @@ function eventMessage(claim: ReturnType<typeof parseClaim>[number], siteOrigin: 
       ].join('\n');
     }
     const deepLink = new URL(payload.adminPath, siteOrigin).toString();
+    if (payload.approvalKind === 'generic_v2' || payload.approvalKind === 'legacy_blank_zh') {
+      return [
+        '🔔 Новая заявка на обучение',
+        `Язык: ${localeLabel(payload.locale)}`,
+        `Время: ${messageTime(payload.requestedAt)}`,
+        deepLink,
+      ].join('\n');
+    }
     return [
       '🔔 Новая заявка на обучение',
       `Участник: ${payload.surname} ${payload.name}`,
@@ -453,12 +491,13 @@ function failure(error: unknown) {
 
 async function processDelivery(
   client: ReturnType<typeof createClient>,
-  claim: ReturnType<typeof parseClaim>[number],
+  lease: ReturnType<typeof parseLeaseClaim>,
   botToken: string,
   chatId: string,
   siteOrigin: string,
 ) {
   try {
+    const claim = parseDeliveryClaim(lease);
     const remoteMessageId = await sendTelegramMessage(
       botToken,
       chatId,
@@ -475,8 +514,8 @@ async function processDelivery(
     const safe = failure(error);
     try {
       await rpc(client, 'fail_notification_delivery', {
-        p_delivery_id: claim.deliveryId,
-        p_lease_token: claim.leaseToken,
+        p_delivery_id: lease.deliveryId,
+        p_lease_token: lease.leaseToken,
         p_error_category: safe.category,
         p_retry_after_seconds: safe.retryAfterSeconds,
       });
@@ -523,13 +562,26 @@ Deno.serve(async (request: Request) => {
       { auth: { persistSession: false, autoRefreshToken: false } },
     );
     const workerId = crypto.randomUUID();
-    const claims = parseClaim(
+    const claimedItems = parseClaim(
       await rpc(client, 'claim_notification_deliveries', {
         p_worker_id: workerId,
         p_limit: CLAIM_LIMIT,
         p_lease_seconds: CLAIM_LEASE_SECONDS,
       }),
     );
+    const claims: ReturnType<typeof parseLeaseClaim>[] = [];
+    let invalidLeaseClaims = 0;
+    for (const item of claimedItems) {
+      try {
+        claims.push(parseLeaseClaim(item));
+      } catch {
+        // Without a valid delivery ID and lease token the worker cannot safely
+        // transition this one row. Do not let it suppress other valid rows;
+        // the bounded lease will expire and remain visible for investigation.
+        invalidLeaseClaims += 1;
+        console.error('TELEGRAM_CLAIM_ITEM_INVALID');
+      }
+    }
 
     let cursor = 0;
     const results: string[] = [];
@@ -547,7 +599,9 @@ Deno.serve(async (request: Request) => {
     return Response.json(
       {
         ok: true,
-        claimed: claims.length,
+        claimed: claimedItems.length,
+        leaseValid: claims.length,
+        invalidLeaseClaims,
         completed: results.filter((result) => result === 'completed').length,
         failed: results.filter((result) => result === 'failed').length,
       },

@@ -62,6 +62,9 @@ export function buildMetadata({
   const normalizedPath = path || '';
   const localizedPath = localizePathname(normalizedPath || '/', locale);
   const url = absoluteUrl(localizedPath);
+  const resolvedOgImage = ogImage.startsWith('http://') || ogImage.startsWith('https://')
+    ? ogImage
+    : absoluteUrl(ogImage);
   const preventIndexing = noindex || isPreviewDeployment();
   const localeRoutesEnabled = rolloutFeatureEnabled('localeRoutes');
   const languageAlternates = Object.fromEntries(
@@ -107,7 +110,7 @@ export function buildMetadata({
             openGraphLocale(candidate),
           )
         : [],
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title ?? BRAND.domain }],
+      images: [{ url: resolvedOgImage, width: 1200, height: 630, alt: title ?? BRAND.domain }],
       ...(publishedTime ? { publishedTime } : {}),
       ...(modifiedTime ? { modifiedTime } : {}),
     },
@@ -115,9 +118,10 @@ export function buildMetadata({
       card: 'summary_large_image',
       title: ogTitle ?? fullTitle,
       description: ogDescription ?? description,
-      images: [ogImage],
+      images: [resolvedOgImage],
     },
     other: {
+      google: 'notranslate',
       'geo.region': 'KZ-ALA',
       'geo.placename': BRAND.city,
       'geo.position': '43.2389;76.8897',

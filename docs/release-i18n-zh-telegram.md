@@ -72,14 +72,16 @@ npm run content:parity:check -- `
   --ssl-root-cert-sha256 $SslRootCertSha256
 ```
 
-The pre-migration gate now accepts exactly the 56-migration production prefix
-and the reviewed two-file tail: ZH minimal pending approval plus the atomic
-legal consent-bundle publisher. It retains the normalized SHA-256 receipt for
-the already-applied 17-file localization release and pins both pending
-filename/hash entries; a partially applied tail, remote-only version, renamed
-file or changed migration fails closed. The production schema is already
-localized, so a normal linked content check remains mandatory rather than
-falling back to legacy RU preflight behavior.
+The pre-migration gate now accepts exactly the 58-migration production prefix
+and the reviewed two-file tail: the auth-realm/locale boundary and generic
+approval notifications. It retains the normalized SHA-256 receipt for the
+already-applied 19-file localization release (including ZH minimal pending
+approval and atomic legal consent-bundle publication) and pins every pending
+filename/hash entry; a
+partially applied tail, remote-only version, renamed file or changed migration
+fails closed. The production schema is already localized, so a normal linked
+content check remains mandatory rather than falling back to legacy RU preflight
+behavior.
 
 `npm run db:types:check` remains the exact post-migration hosted-schema gate and
 must pass после применения migrations together with
@@ -89,9 +91,9 @@ The PostgreSQL gates have no system or bundled-root fallback: the
 operator-provided current-project Server root CA, hostname/SNI verification and
 optional reviewed SHA-256 pin are mandatory.
 
-The `56 + 2` manifest is deliberately specific to this unapplied forward
-release. It pins the ZH minimal-approval delta and the atomic legal consent
-bundle publisher. If another reviewed migration is added before the linked apply, update
+The `58 + 2` manifest is deliberately specific to this unapplied forward
+release. It pins the realm/locale RPC boundary and the no-PII approval
+notification contract. If another reviewed migration is added before the linked apply, update
 the pinned `REVIEWED_PENDING_MIGRATIONS` filename/hash manifest and its
 exact-count test in the same reviewed change, then obtain a fresh preflight
 receipt. Do not change the gate to tolerate an arbitrary extra local migration.

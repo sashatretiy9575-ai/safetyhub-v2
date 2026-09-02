@@ -31,13 +31,20 @@ test('Telegram dispatcher is bearer-protected, bounded, leased, and service-only
   assert.match(source, /fail_notification_delivery/u);
   assert.match(source, /prune_notification_data/u);
   assert.match(source, /p_lease_token: claim\.leaseToken/u);
+  assert.match(source, /p_lease_token: lease\.leaseToken/u);
+  assert.match(source, /function parseLeaseClaim/u);
+  assert.match(source, /function parseDeliveryClaim/u);
+  assert.match(source, /invalidLeaseClaims/u);
+  const claimParser =
+    source.match(/function parseClaim\(value: unknown\) \{([\s\S]*?)\n\}/u)?.[1] ?? '';
+  assert.doesNotMatch(claimParser, /parsePayload/u);
   assert.match(source, /body\.parameters\.retry_after/u);
   assert.match(source, /TELEGRAM_RATE_LIMITED/u);
   assert.match(source, /cache-control': 'no-store'/u);
   assert.match(config, /\[functions\.telegram-dispatcher\]\s*\r?\nverify_jwt = false/u);
 });
 
-test('Telegram templates allow exactly three informational events and gate full applications by payload shape', async () => {
+test('Telegram templates allow exactly three informational events with a generic v2 approval envelope and bounded legacy parsing', async () => {
   const source = await read('supabase/functions/telegram-dispatcher/index.ts');
   const typeBlock =
     source.match(/const ALLOWED_EVENT_TYPES = new Set\(\[([\s\S]*?)\]\);/u)?.[1] ?? '';
@@ -48,6 +55,10 @@ test('Telegram templates allow exactly three informational events and gate full 
   assert.match(source, /Курс не пройден/u);
   assert.match(source, /Системное уведомление/u);
   assert.match(source, /Корреляция/u);
+  assert.match(source, /'schemaVersion'/u);
+  assert.match(source, /approvalKind: 'generic_v2'/u);
+  assert.match(source, /approvalKind: 'legacy_blank_zh'/u);
+  assert.match(source, /value\.name === '' && value\.surname === '' && locale === 'zh'/u);
   assert.match(source, /hasApplicationDetails/u);
   assert.match(source, /PHONE_E164_PATTERN/u);
   assert.match(source, /Имя:/u);
@@ -57,10 +68,7 @@ test('Telegram templates allow exactly three informational events and gate full 
   assert.match(source, /Страна:/u);
   assert.match(source, /Контактный телефон:/u);
   assert.match(source, /link_preview_options: \{ is_disabled: true \}/u);
-  assert.doesNotMatch(
-    source,
-    /\b(?:email|document|answer|credential|recovery|synthetic)\b/iu,
-  );
+  assert.doesNotMatch(source, /\b(?:email|document|answer|credential|recovery|synthetic)\b/iu);
   assert.doesNotMatch(source, /reply_markup|callback_query|bot_command/iu);
   assert.doesNotMatch(source, /console\.log/u);
   assert.doesNotMatch(source, /console\.error\([^\n]*(?:botToken|dispatcherSecret|chatId|text)/u);

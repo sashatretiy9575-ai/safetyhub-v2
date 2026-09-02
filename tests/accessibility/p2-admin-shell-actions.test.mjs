@@ -13,7 +13,7 @@ test('admin shell exposes six product sections and switches chrome at the laptop
     read('app/(admin)/layout.tsx'),
     read('app/(admin)/admin/layout.tsx'),
     read('components/admin/admin-nav-link.tsx'),
-    read('app/layout.tsx'),
+    read('app/(public)/layout.tsx'),
     read('components/layout/app-shell.tsx'),
     read('app/globals.css'),
   ]);

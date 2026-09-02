@@ -23,14 +23,22 @@ registration, course completion, or system operation.
   contract explicitly accepts it.
 - The dispatcher accepts only `POST` with a constant-time checked bearer. It
   uses a service-role Supabase client only inside the Edge Function.
-- Minimal and non-application events use their own bounded operational envelope.
-  When the separately disabled `telegram_application_details` database flag is
-  enabled, a *new application* uses a replacement strict message with exactly
-  `name`, `surname`, `job`, `organization`, `phoneCountryIso2`, and
-  `phoneE164`. It contains no locale, event time, correlation ID, admin deep
-  link, email, username, technical Auth identifier, avatar bytes, documents,
-  assessment answers, credentials, or recovery data. The full-message fields
-  are not retroactively appended to already-created event rows.
+- Every newly-created `account.approval_requested` event has exactly the
+  schema-v2 generic envelope `schemaVersion`, `locale`, `requestedAt`,
+  and `adminPath`. It has no application identity, contact details, username,
+  provider identifier, avatar bytes, documents, assessment answers, credential
+  material, or recovery data. Telegram renders it as “new training request”,
+  locale, time, and the safe admin link.
+- `telegram_application_details` remains disabled in production. It is
+  retained only as a legacy rollout flag: it never expands a newly-created
+  approval payload after the schema-v2 migration. Historical generic and
+  historic full-detail events remain immutable and are accepted only by narrow
+  backwards-compatible dispatcher/inbox parsers until normal retention prunes
+  them.
+- The one historical blank ZH generic shape is accepted only when it has the
+  exact five legacy keys, both name fields are exactly empty, and locale is
+  exactly `zh`. A blank RU/KK/EN legacy payload is invalid rather than being
+  silently treated as a generic request.
 - Telegram is informational. It has no commands, callbacks, or state-changing
   approval controls.
 
@@ -124,15 +132,28 @@ either in the Function file.
    Remove-Variable ServiceKey, DispatcherSecret -ErrorAction SilentlyContinue
    ```
 
-4. Enable event creation and, only after inbox/dispatcher smoke, Telegram
+4. Deploy the backwards-compatible dispatcher and inbox before applying the
+   schema-v2 trigger migration. Let any active leases drain (or briefly disable
+   only delivery through the reasoned runtime flag) before changing the
+   database contract.
+5. Apply the reviewed forward-only migration through the repository release
+   flow, record aggregate pre-counts for exact dead blank-ZH candidates, then
+   call the service-only bounded
+   `npm run notifications:legacy-zh:recover -- …` operator CLI documented in
+   `docs/operations.md`; do not invoke the RPC through Dashboard/manual SQL.
+   It calls only `recover_legacy_blank_zh_approval_deliveries` and touches only
+   dead/no-remote-message/no-lease legacy ZH deliveries; it never replays
+   delivered, leased, non-ZH, pending, or retry rows. Restore delivery and
+   verify the aggregate receipt and selected rows transition `dead → retry → delivered`
+   without a duplicate remote message. Its `1..100` limit defaults
+   to 100; the mandatory reason and UUID are nonsecret release correlation,
+   while the receipt contains no payload, delivery ID or personal data.
+6. Enable event creation and, only after inbox/dispatcher smoke, Telegram
    delivery through `npm run runtime:flag:set` as documented in
-   `docs/operations.md`. The optional full-application gate remains false.
-5. Verify one minimized pending-application event, then enable
-   `telegram_application_details` with a new reason and UUID and submit a new
-    complete application. Verify that its Telegram message contains exactly name,
-    surname, role, organization, contact country and contact number.
-   Then verify a passed/failed completion and a synthetic system alert.
-6. Exercise duplicate wake-ups, a request timeout, Telegram `429`, `5xx`, an
+   `docs/operations.md`. Keep `telegram_application_details=false`.
+   Verify a generic pending-application event, then verify a passed/failed
+   completion and a synthetic system alert.
+7. Exercise duplicate wake-ups, a request timeout, Telegram `429`, `5xx`, an
    invalid chat ID, and a rotated token. Confirm retries/dead-letter state in
    the Russian admin inbox while the business records remain committed.
 
@@ -145,11 +166,13 @@ uses a 10-second abort timeout, pauses offline, refreshes immediately after an
 admin action, and backs off exponentially to two minutes after failures.
 
 The dispatcher claims at most 12 rows with a 45-second lease and sends at most
-three Telegram requests concurrently. Completion and failure transitions are
-lease-token guarded. Telegram `429` responses honor bounded `retry_after`;
-other errors are stored only as stable categories. Ten failed attempts move a
-delivery to the dead letter state, where an authorized admin can request a
-fresh idempotent retry.
+three Telegram requests concurrently. It validates the lease envelope and then
+parses each payload independently: a malformed but lease-valid row is failed
+for its own delivery, while valid rows in the same claim continue. Completion
+and failure transitions are lease-token guarded. Telegram `429` responses
+honor bounded `retry_after`; other errors are stored only as stable
+categories. Ten failed attempts move a delivery to the dead letter state,
+where an authorized admin can request a fresh idempotent retry.
 
 Telegram Bot API [`sendMessage`](https://core.telegram.org/bots/api#sendmessage)
 has no caller-supplied idempotency key. Lease and
@@ -161,9 +184,9 @@ and event timestamps when investigating a possible duplicate.
 
 ## Rollback and rotation
 
-- Disable `telegram_application_details` first, then delivery through the
-  reasoned runtime-flag CLI with `telegram_delivery=false`; if needed, use
-  dispatcher-secret rotation as a second kill switch. Inbox events remain
+- Keep `telegram_application_details=false`, then disable delivery through
+  the reasoned runtime-flag CLI with `telegram_delivery=false`; if needed,
+  use dispatcher-secret rotation as a second kill switch. Inbox events remain
   available.
 - Revoking the bot token affects only Telegram delivery. Registration and
   course completion continue normally.

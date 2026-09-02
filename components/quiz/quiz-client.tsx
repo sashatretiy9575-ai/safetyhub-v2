@@ -9,6 +9,7 @@ import {
   ArrowRight,
   CaretLeft,
   CheckCircle,
+  WarningCircle,
   XCircle,
 } from '@phosphor-icons/react';
 import Link from 'next/link';
@@ -60,6 +61,36 @@ function retryDate(value: string | undefined, locale: AppLocale) {
 
 async function readAttemptError(response: Response) {
   return (await readClientResponseJson<AttemptErrorPayload>(response)) ?? {};
+}
+
+function AttemptTimer({
+  timerText,
+  urgent,
+  expired,
+  ariaLabel,
+}: {
+  timerText: string;
+  urgent: boolean;
+  expired: boolean;
+  ariaLabel: string;
+}) {
+  const tone = expired
+    ? 'border-[var(--color-danger)]/60 bg-[var(--color-danger-soft)] text-[var(--color-danger)]'
+    : urgent
+      ? 'border-[var(--color-warning)]/65 bg-[var(--color-surface)] text-[var(--color-warning)]'
+      : 'border-[var(--color-border-strong)] bg-[var(--color-surface)] text-[var(--color-text)]';
+
+  return (
+    <span
+      role="timer"
+      aria-label={ariaLabel}
+      data-urgency={urgent ? 'soon' : expired ? 'expired' : 'normal'}
+      className={`inline-flex min-h-11 min-w-[6.25rem] items-center justify-center gap-1.5 rounded-[var(--radius-control)] border px-2.5 text-sm font-black tabular-nums ${tone}`}
+    >
+      {urgent || expired ? <WarningCircle size={16} weight="fill" aria-hidden="true" /> : null}
+      <span className="font-mono">{timerText}</span>
+    </span>
+  );
 }
 
 export function QuizClient({ slug, title }: { slug: string; title: string }) {
@@ -382,9 +413,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
     const persisted = persistDraft(activeAttempt.attemptId);
     if (!persisted) {
       setSaveState('error');
-      setSaveError(
-        t('errors.localSaveFailed'),
-      );
+      setSaveError(t('errors.localSaveFailed'));
     } else {
       setSaveState('saved');
     }
@@ -577,11 +606,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
               <div className="flex flex-col justify-center gap-3 min-[360px]:flex-row">
                 <Button variant="outline" onClick={() => void loadAttempt(true)}>
                   <ArrowCounterClockwise size={18} />
-                  {expired
-                    ? t('newAttempt')
-                    : passed
-                      ? t('improveResult')
-                      : t('retake')}
+                  {expired ? t('newAttempt') : passed ? t('improveResult') : t('retake')}
                 </Button>
                 {attempt.certificateId ? (
                   <CertificateDownloadButton certificateId={attempt.certificateId} size="md">
@@ -601,6 +626,11 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
 
   const timerText = remainingSeconds === null ? '--:--' : formatDeadlineSeconds(remainingSeconds);
   const allAnswered = answers.length === attempt.questions.length;
+  const progress = attempt.questions.length ? (answers.length / attempt.questions.length) * 100 : 0;
+  const timerUrgent =
+    remainingSeconds !== null && remainingSeconds > 0 && remainingSeconds <= 5 * 60;
+  const timerExpired = remainingSeconds === 0;
+  const timerAriaLabel = t(timerUrgent ? 'timerUrgentAria' : 'timerAria', { time: timerText });
   if (reviewing) {
     return (
       <section className="py-8 md:py-16">
@@ -612,23 +642,31 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   <p className="text-sm font-bold text-[var(--color-primary)]">
                     {t('review.eyebrow')}
                   </p>
-                  <span
-                    role="timer"
-                    aria-label={t('timerAria', { time: timerText })}
-                    className="rounded-full bg-[var(--color-surface-muted)] px-3 py-1 text-sm font-black tabular-nums"
-                  >
-                    {timerText}
-                  </span>
+                  <AttemptTimer
+                    timerText={timerText}
+                    urgent={timerUrgent}
+                    expired={timerExpired}
+                    ariaLabel={timerAriaLabel}
+                  />
                 </div>
-                <h1 className="font-display mt-1 text-2xl font-black">
-                  {t('review.title')}
-                </h1>
+                <h1 className="font-display mt-1 text-2xl font-black">{t('review.title')}</h1>
                 <p className="mt-2 text-sm text-[var(--color-text-muted)]">
                   {t('review.description')}
                 </p>
+                <Progress
+                  value={progress}
+                  aria-label={t('progressAria', {
+                    completed: answers.length,
+                    total: attempt.questions.length,
+                  })}
+                  className="mt-4 h-2.5"
+                />
               </div>
               {remainingSeconds === 0 && (
-                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-[var(--color-accent-amber-soft)] p-3 text-sm">
+                <div
+                  role="status"
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-control)] border border-[var(--color-warning)]/45 bg-[var(--color-surface-muted)] px-3 py-2 text-sm"
+                >
                   <span>{t('review.expired')}</span>
                   <button
                     type="button"
@@ -719,13 +757,8 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
   const selectedOptionId = answers.find(
     (answer) => answer.questionId === currentQuestion.id,
   )?.optionId;
-  const progress = (answers.length / attempt.questions.length) * 100;
   const saveLabel =
-    saveState === 'saved'
-      ? t('draftSaved')
-      : saveState === 'error'
-        ? saveError
-        : '';
+    saveState === 'saved' ? t('draftSaved') : saveState === 'error' ? saveError : '';
 
   return (
     <section className="py-8 md:py-16">
@@ -734,10 +767,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           <Link
             href={localizePathname(`/topics/${slug}`, locale)}
             onClick={(event) => {
-              if (
-                localBackupFailedRef.current &&
-                !window.confirm(t('leaveWithoutDraft'))
-              ) {
+              if (localBackupFailedRef.current && !window.confirm(t('leaveWithoutDraft'))) {
                 event.preventDefault();
               }
             }}
@@ -746,20 +776,22 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
             <CaretLeft size={16} /> {t('toCourse')}
           </Link>
           <div className="flex items-center gap-2">
-            <span
-              role="timer"
-              aria-label={t('timerAria', { time: timerText })}
-              className="rounded-full bg-[var(--color-surface-muted)] px-3 py-1 text-xs font-black tabular-nums"
-            >
-              {timerText}
-            </span>
+            <AttemptTimer
+              timerText={timerText}
+              urgent={timerUrgent}
+              expired={timerExpired}
+              ariaLabel={timerAriaLabel}
+            />
             <span className="text-xs font-bold">
               {currentIndex + 1} / {attempt.questions.length}
             </span>
           </div>
         </div>
         {remainingSeconds === 0 && (
-          <div className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-[var(--color-accent-amber-soft)] p-3 text-sm">
+          <div
+            role="status"
+            className="mb-4 flex items-center justify-between gap-3 rounded-[var(--radius-control)] border border-[var(--color-warning)]/45 bg-[var(--color-surface-muted)] px-3 py-2 text-sm"
+          >
             <span>{t('timerExpired')}</span>
             <button
               type="button"
@@ -771,7 +803,14 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
             </button>
           </div>
         )}
-        <Progress value={progress} className="mb-4 h-3" />
+        <Progress
+          value={progress}
+          aria-label={t('progressAria', {
+            completed: answers.length,
+            total: attempt.questions.length,
+          })}
+          className="mb-4 h-2.5"
+        />
         <nav aria-label={t('questionsAria')} className="mb-7 flex justify-center gap-2">
           {attempt.questions.map((question, index) => {
             const answered = answers.some((answer) => answer.questionId === question.id);

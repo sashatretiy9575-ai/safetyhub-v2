@@ -42,26 +42,26 @@ const captchaTokenSchema = z.string().min(1).max(4096).optional();
 const emailOtpLocaleSchema = z.enum(['ru', 'kk', 'en']).optional();
 
 /**
- * Passwordless email entry point. `register` intentionally accepts the same
- * email as an existing account: the server returns a neutral result and never
- * exposes whether an address is already registered.
+ * Passwordless email entry point. It intentionally accepts both a new and an
+ * existing address through the same code flow, so the server never exposes
+ * whether an address already has an account.
  */
-export const emailOtpStartSchema = z
-  .object({
-    email: normalizedEmailSchema,
-    intent: z.enum(['login', 'register']),
-    captchaToken: captchaTokenSchema,
-    locale: emailOtpLocaleSchema,
-  });
+export const emailOtpStartSchema = z.object({
+  email: normalizedEmailSchema,
+  captchaToken: captchaTokenSchema,
+  locale: emailOtpLocaleSchema,
+});
 export type EmailOtpStartValues = z.infer<typeof emailOtpStartSchema>;
 
-// Verification deliberately receives only the proof supplied by the Auth
-// provider. UI mode and legal consent are not properties of a code and must
-// never be inferred from browser-controlled values at this boundary.
+// The code is the authentication proof; the separately explicit, prechecked
+// legal acknowledgement authorizes recording the current immutable receipt
+// only after that proof succeeds. It is never persisted in browser storage or
+// inferred from an old UI mode.
 export const emailOtpVerifySchema = z.object({
   email: normalizedEmailSchema,
   code: z.string().regex(/^\d{6}$/),
   locale: emailOtpLocaleSchema,
+  legalAccepted: z.literal(true),
 });
 export type EmailOtpVerifyValues = z.infer<typeof emailOtpVerifySchema>;
 
