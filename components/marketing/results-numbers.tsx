@@ -26,7 +26,7 @@ export function ResultsNumbers() {
       />
       <div className="relative z-10 mx-auto w-full max-w-[1280px] px-4 md:px-6 xl:px-8">
         <div className="max-w-2xl">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-primary)]">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-primary)]">
             {t('eyebrow')}
           </p>
           <h2 id="format-heading" className="mt-2 text-balance text-2xl font-black tracking-tight md:text-4xl">

@@ -170,7 +170,7 @@ export function CourseMaterialActions({
                     <p className="font-bold">{cta.title}</p>
                     <p className="text-sm leading-6 text-[var(--color-text-muted)]">{cta.description}</p>
                     <Button asChild size="lg" className="w-full">
-                      <Link href={cta.href} prefetch={false}>{cta.label}</Link>
+                      <Link href={cta.href}>{cta.label}</Link>
                     </Button>
                   </div>
                 ) : (
@@ -193,7 +193,7 @@ export function CourseMaterialActions({
                     )}
 
                     <Button asChild size="xl" className="w-full">
-                      <Link href={localizePathname(ROUTES.test(course.slug), locale)} prefetch={false}>
+                      <Link href={localizePathname(ROUTES.test(course.slug), locale)}>
                         <ListChecks size={20} weight="bold" aria-hidden="true" />
                         {t('startTest')}
                       </Link>

@@ -191,31 +191,43 @@ function CourseRow({
   locale: AppLocale;
   t: ProfileTranslator;
 }) {
+  const isIssued = item.certificateState === 'issued' && item.certificateId;
   return (
-    <article className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-3 py-3 first:border-t-0 min-[760px]:min-h-[68px] min-[760px]:grid-cols-[minmax(0,2fr)_7rem_10rem_8rem] min-[760px]:items-center min-[760px]:px-4">
+    <article className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-4 py-3.5 first:border-t-0 min-[760px]:min-h-[68px] min-[760px]:grid-cols-[minmax(0,2fr)_7rem_10rem_8rem] min-[760px]:items-center">
       <div className="min-w-0">
-        <h3 className="font-semibold break-words">{item.courseTitle}</h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="font-semibold break-words">{item.courseTitle}</h3>
+          {!isIssued ? (
+            <Link
+              href={localizePathname(`/topics/${item.testSlug}`, locale)}
+              className="text-[var(--color-primary)] min-[760px]:hidden"
+              aria-label={item.resultState === 'not_started' ? t('start') : t('details')}
+            >
+              <ArrowRight size={18} />
+            </Link>
+          ) : null}
+        </div>
+        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)] min-[760px]:hidden">
+          <span>{resultLabel(item, t)}</span>
+          <span>·</span>
+          <span>{certificateLabel(item.certificateState, t)}</span>
+          {!item.isCurrent ? <span>· {t('archive')}</span> : null}
+        </div>
         {!item.isCurrent ? (
-          <p className="text-xs text-[var(--color-text-muted)]">{t('archive')}</p>
+          <p className="hidden text-xs text-[var(--color-text-muted)] min-[760px]:block">{t('archive')}</p>
         ) : null}
       </div>
-      <div className="flex items-center justify-between gap-2 min-[760px]:block">
-        <span className="text-xs text-[var(--color-text-muted)] min-[760px]:sr-only">
-          {t('result')}
-        </span>
+      <div className="hidden min-[760px]:block">
         <Badge variant={resultVariant(item.resultState)}>{resultLabel(item, t)}</Badge>
       </div>
-      <div className="flex items-center justify-between gap-2 min-[760px]:block">
-        <span className="text-xs text-[var(--color-text-muted)] min-[760px]:sr-only">
-          {t('certificate')}
-        </span>
+      <div className="hidden min-[760px]:block">
         <Badge variant={certificateVariant(item.certificateState)}>
           {certificateLabel(item.certificateState, t)}
         </Badge>
       </div>
-      <div>
-        {item.certificateState === 'issued' && item.certificateId ? (
-          <CertificateDownloadButton certificateId={item.certificateId} className="w-full">
+      <div className={isIssued ? 'block' : 'hidden min-[760px]:block'}>
+        {isIssued ? (
+          <CertificateDownloadButton certificateId={item.certificateId!} className="w-full">
             {t('download')}
           </CertificateDownloadButton>
         ) : (
@@ -401,10 +413,16 @@ export default async function ProfilePage() {
         {!isMinimalZhApplication ? (
           <Card id="my-data">
             <CardContent className="p-0">
-              <details className="group">
+              <details
+                className="group"
+                open={!profile.onboardingCompletedAt || context.approval.state === 'rejected' || !context.profile.phone_e164 || !profile.organization}
+              >
                 <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden md:px-6">
                   <span className="min-w-0">
-                    <span className="font-display block text-lg font-bold">{t('myData')}</span>
+                    <span className="font-display block text-lg font-bold">
+                      {t('myData')}
+                      {!context.profile.phone_e164 || !profile.organization ? ` (${t('actionRequired').replace(/:$/, '')})` : ''}
+                    </span>
                     <span className="block truncate text-sm text-[var(--color-text-muted)]">
                       {fullName} · {profile.organization || t('companyMissing')}
                     </span>

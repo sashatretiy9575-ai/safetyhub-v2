@@ -613,8 +613,21 @@
       "expired": "时间已结束，服务器需要确认最终状态。",
       "selected": "已选择：{answer}",
       "notSelected": "未选择答案",
-      "change": "修改答案",
+      "change": "更改答案",
       "confirmation": "我已检查答案并确认最终提交。"
+    },
+    "rules": {
+      "subtitle": "测试您的知识以获取官方证书。",
+      "questions": "题目数",
+      "time": "时间",
+      "timeValue": "15分钟",
+      "passScore": "及格线",
+      "passScoreValue": "10分中得7分",
+      "attempts": "每日尝试次数",
+      "attemptsValue": "最多8次",
+      "start": "开始测试",
+      "answerFirst": "请在核对前回答所有题目。",
+      "answered": "已答：{completed} / {total}"
     },
     "result": {
       "passedTitle": "测试通过",

@@ -38,7 +38,7 @@ export function CourseCard({
     >
       <div
         data-course-card-cover
-        className="relative h-[10.625rem] shrink-0 overflow-hidden bg-[var(--color-surface-muted)] sm:h-36"
+        className="relative aspect-video shrink-0 overflow-hidden bg-[var(--color-surface-muted)]"
       >
         {coverImage ? (
           <Image
@@ -61,9 +61,6 @@ export function CourseCard({
           aria-hidden="true"
           className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/30 to-transparent"
         />
-        <span className="absolute top-3 left-3 rounded-full border border-white/55 bg-white/80 px-2.5 py-1 text-[10px] font-bold tracking-[0.12em] text-slate-700 uppercase shadow-sm backdrop-blur-md">
-          {t('online')}
-        </span>
         <span
           className="absolute top-3 right-3 grid size-9 place-items-center rounded-xl border border-white/55 bg-white/85 text-slate-700 shadow-sm backdrop-blur-md"
           title={title}
@@ -80,14 +77,14 @@ export function CourseCard({
 
         <div
           data-course-card-actions
-          className="mt-auto grid grid-cols-2 gap-1.5 pt-4 text-[10px] font-semibold text-[var(--color-text-muted)] min-[340px]:gap-2 min-[340px]:text-[11px] sm:text-xs"
+          className="mt-auto grid grid-cols-2 gap-2 pt-4 text-xs font-semibold text-[var(--color-text-muted)]"
         >
           <span
             aria-label={t('questions', { count: questionCount })}
-            className="inline-flex min-h-11 min-w-0 items-center justify-center gap-1 rounded-[12px] bg-[var(--color-surface-muted)] px-1.5 min-[340px]:gap-1.5 min-[340px]:px-2"
+            className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5"
           >
             <ListChecks
-              size={15}
+              size={16}
               weight="duotone"
               className="text-[var(--color-primary)]"
               aria-hidden="true"
@@ -101,10 +98,10 @@ export function CourseCard({
           </span>
           <span
             aria-label={`${t('minutes', { count: durationMinutes })}${pageCount ? `, ${t('pages', { count: pageCount })}` : ''}`}
-            className="inline-flex min-h-11 min-w-0 items-center justify-center gap-1 rounded-[12px] bg-[var(--color-surface-muted)] px-1.5 min-[340px]:gap-1.5 min-[340px]:px-2"
+            className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5"
           >
             <Clock
-              size={15}
+              size={16}
               weight="duotone"
               className="text-[var(--color-primary)]"
               aria-hidden="true"
@@ -117,7 +114,7 @@ export function CourseCard({
           <span
             data-course-card-cta
             aria-label={t('open')}
-            className="col-span-2 mt-1 inline-flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-[14px] bg-[var(--color-primary)] px-4 text-sm font-bold whitespace-nowrap text-[var(--color-primary-foreground)] shadow-[0_10px_24px_-16px_var(--color-primary)] transition-colors group-hover:bg-[var(--color-primary-hover)]"
+            className="col-span-2 mt-1 inline-flex min-h-10 min-w-0 items-center justify-between gap-3 rounded-[14px] bg-[var(--color-primary)] px-4 text-xs sm:text-sm font-bold whitespace-nowrap text-[var(--color-primary-foreground)] shadow-[0_10px_24px_-16px_var(--color-primary)] transition-colors group-hover:bg-[var(--color-primary-hover)]"
           >
             <span aria-hidden="true">{t('open')}</span>
             <ArrowUpRight

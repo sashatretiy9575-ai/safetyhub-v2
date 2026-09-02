@@ -497,7 +497,7 @@ export function EmailOtpFlow() {
           </Button>
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             className="min-h-11 w-full"
             disabled={busy !== null}
             onClick={() => {

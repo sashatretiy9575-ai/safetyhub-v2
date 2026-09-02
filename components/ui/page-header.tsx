@@ -32,7 +32,7 @@ export function PageHeader({
     >
       <Container size="wide" className="space-y-4">
         {eyebrow && (
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-subtle)] sm:text-[11px]">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">
             {eyebrow}
           </p>
         )}

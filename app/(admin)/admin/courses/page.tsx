@@ -82,7 +82,12 @@ export default async function AdminCoursesPage({
             >
               <div className="min-w-0">
                 <h2 className="truncate font-semibold" title={course.title}>
-                  {course.title}
+                  <Link
+                    href={`/admin/courses/${course.id}`}
+                    className="hover:text-[var(--color-primary)] hover:underline"
+                  >
+                    {course.title}
+                  </Link>
                 </h2>
               </div>
               <div className="col-span-2 flex flex-wrap items-center gap-2 text-xs text-[var(--color-text-muted)] md:col-span-1">

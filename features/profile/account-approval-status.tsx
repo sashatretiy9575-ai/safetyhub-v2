@@ -18,9 +18,10 @@ import {
 type ApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
 
 function formatRemaining(milliseconds: number) {
-  const minutes = Math.max(0, Math.ceil(milliseconds / 60_000));
-  const hours = Math.floor(minutes / 60);
-  return [hours, minutes % 60].map((part) => String(part).padStart(2, '0')).join(':');
+  const totalMinutes = Math.max(0, Math.ceil(milliseconds / 60_000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
 function formatDueAt(value: string, locale: AppLocale) {
@@ -182,7 +183,7 @@ export function AccountApprovalStatus({
 
           <div className="inline-flex items-center gap-2 self-start sm:self-auto rounded-full bg-[var(--color-primary-soft)] px-3.5 py-1.5 text-xs font-bold text-[var(--color-primary)] border border-[var(--color-primary)]/20">
             <span className="h-2 w-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
-            <span>{t('pendingEyebrow')}</span>
+            <span>{dueLabel ? t('deadline', { deadline: dueLabel.split(', ')[1] ?? dueLabel }) : t('pendingEyebrow')}</span>
           </div>
         </div>
 
@@ -196,22 +197,19 @@ export function AccountApprovalStatus({
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)] text-xs font-bold mb-1.5">
               ✓
             </div>
-            <span className="text-[11px] sm:text-xs font-semibold text-[var(--color-text)]">1</span>
-            <span className="text-[10px] text-[var(--color-text-muted)] font-medium">{t('profileAction')}</span>
+            <span className="text-xs text-[var(--color-text-muted)] font-medium">{t('profileAction')}</span>
           </div>
           <div className="flex flex-col items-center text-center">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] text-white text-xs font-bold mb-1.5 shadow-sm">
               2
             </div>
-            <span className="text-[11px] sm:text-xs font-bold text-[var(--color-primary)]">2</span>
-            <span className="text-[10px] text-[var(--color-primary)] font-semibold">{t('pendingEyebrow')}</span>
+            <span className="text-xs text-[var(--color-primary)] font-bold">{t('pendingEyebrow')}</span>
           </div>
           <div className="flex flex-col items-center text-center opacity-60">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-border)] text-[var(--color-text-muted)] text-xs font-bold mb-1.5">
               3
             </div>
-            <span className="text-[11px] sm:text-xs font-semibold text-[var(--color-text-muted)]">3</span>
-            <span className="text-[10px] text-[var(--color-text-muted)]">{t('accessEyebrow')}</span>
+            <span className="text-xs text-[var(--color-text-muted)] font-medium">{t('accessEyebrow')}</span>
           </div>
         </div>
 
@@ -251,8 +249,9 @@ export function AccountApprovalStatus({
               <time
                 dateTime={dueAt ?? undefined}
                 role="timer"
+                aria-live="off"
                 aria-label={t('remaining')}
-                className="font-mono text-3xl sm:text-4xl font-black tracking-tight text-[var(--color-primary)] tabular-nums"
+                className="font-mono text-2xl sm:text-3xl font-black tracking-tight text-[var(--color-primary)] tabular-nums"
               >
                 {formatRemaining(remaining)}
               </time>

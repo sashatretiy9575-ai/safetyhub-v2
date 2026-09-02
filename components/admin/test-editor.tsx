@@ -234,6 +234,44 @@ export function TestEditor({
     setActiveQuestion(target);
   };
 
+  const copyVariantFrom = (sourceIndex: number, targetIndex: number) => {
+    setCourse((current) => {
+      const sourceVariant = current.questionVariants[sourceIndex];
+      if (!sourceVariant) return current;
+      const clonedQuestions: AdminTestQuestion[] = sourceVariant.questions.map((q) => {
+        const clonedOptions = q.options.map((opt) => ({
+          id: crypto.randomUUID(),
+          text: opt.text,
+        }));
+        const origCorrectIdx = q.options.findIndex((opt) => opt.id === q.correctOptionId);
+        const newCorrectId =
+          clonedOptions[origCorrectIdx !== -1 ? origCorrectIdx : 0]?.id ?? clonedOptions[0]!.id;
+        return {
+          id: crypto.randomUUID(),
+          text: q.text,
+          options: clonedOptions,
+          correctOptionId: newCorrectId,
+          explanation: q.explanation,
+        };
+      });
+
+      const nextVariants = [...current.questionVariants] as [
+        AdminTestVariant,
+        AdminTestVariant,
+        AdminTestVariant,
+      ];
+      nextVariants[targetIndex] = {
+        ...nextVariants[targetIndex]!,
+        questions: clonedQuestions,
+      };
+
+      return {
+        ...current,
+        questionVariants: nextVariants,
+      };
+    });
+  };
+
   const save = async (publish: boolean) => {
     setValidationAttempted(true);
     const effectiveValidation = publish ? validation : draftValidation;
@@ -625,6 +663,31 @@ export function TestEditor({
                   </Button>
                 ))}
               </div>
+              {activeVariant > 0 && (
+                <div className="flex flex-wrap items-center gap-2 rounded-xl bg-[var(--color-surface-muted)] p-2.5">
+                  <span className="text-xs font-semibold text-[var(--color-text-muted)]">
+                    Скопировать вопросы в вариант {activeVariant + 1}:
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyVariantFrom(0, activeVariant)}
+                  >
+                    Из варианта 1
+                  </Button>
+                  {activeVariant === 2 && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => copyVariantFrom(1, 2)}
+                    >
+                      Из варианта 2
+                    </Button>
+                  )}
+                </div>
+              )}
               <nav aria-label="Вопросы теста" className="grid grid-cols-5 gap-2 sm:grid-cols-10">
                 {currentVariant?.questions.map((question, index) => (
                   <Button

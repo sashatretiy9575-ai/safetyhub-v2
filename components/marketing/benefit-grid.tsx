@@ -21,7 +21,7 @@ export function BenefitGrid() {
       <div className="mx-auto w-full max-w-[1280px] px-4 md:px-6 xl:px-8">
         <div className="grid gap-3 md:grid-cols-[1.15fr_1fr] md:items-end md:gap-8">
           <div>
-            <p className="text-[10px] font-bold tracking-widest text-[var(--color-primary)] uppercase">
+            <p className="text-xs font-bold tracking-widest text-[var(--color-primary)] uppercase">
               {t('eyebrow')}
             </p>
             <h2

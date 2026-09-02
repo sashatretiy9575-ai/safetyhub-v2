@@ -581,7 +581,10 @@ export function AttestationsManager({
           </span>
         </div>
 
-        <div role="rowgroup" className="space-y-2 @min-[960px]:space-y-0">
+        <div
+          role="rowgroup"
+          className={`space-y-2 @min-[960px]:space-y-0 ${selectionSummary.total > 0 ? 'pb-24 @min-[960px]:pb-16' : ''}`}
+        >
           {page.items.map((row, index) => {
             const groupKey = organizationGroupKey(row.organization);
             const showGroup =

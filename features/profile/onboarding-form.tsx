@@ -57,6 +57,36 @@ export function OnboardingForm({
   const surnameRef = useRef<HTMLInputElement>(null);
   const jobRef = useRef<HTMLInputElement>(null);
   const organizationRef = useRef<HTMLInputElement>(null);
+  const phoneContainerRef = useRef<HTMLDivElement>(null);
+  const avatarSectionRef = useRef<HTMLElement>(null);
+
+  const ONBOARDING_DRAFT_KEY = 'safetyhub:onboarding:draft';
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(ONBOARDING_DRAFT_KEY);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        setForm((curr) => ({
+          name: curr.name || draft.name || '',
+          surname: curr.surname || draft.surname || '',
+          job: curr.job || draft.job || '',
+          organization: curr.organization || draft.organization || '',
+          phone: curr.phone || draft.phone || '',
+        }));
+      }
+    } catch {
+      // Storage unavailable or invalid JSON
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(ONBOARDING_DRAFT_KEY, JSON.stringify(form));
+    } catch {
+      // Storage quota or unavailable
+    }
+  }, [form]);
 
   useEffect(() => {
     const query = form.organization.trim();
@@ -74,7 +104,7 @@ export function OnboardingForm({
           setOrganizations(payload.organizations.filter((item) => typeof item === 'string'));
         }
       })();
-    }, 250);
+    }, 400);
     return () => {
       window.clearTimeout(timer);
       controller.abort();
@@ -92,12 +122,21 @@ export function OnboardingForm({
       ? nameRef.current
       : errors.surname
         ? surnameRef.current
-          : errors.job
+        : errors.job
           ? jobRef.current
           : errors.organization
             ? organizationRef.current
-            : null;
-    requestAnimationFrame(() => target?.focus());
+            : errors.phone
+              ? phoneContainerRef.current?.querySelector('input')
+              : errors.avatar
+                ? avatarSectionRef.current
+                : null;
+    requestAnimationFrame(() => {
+      if (target) {
+        target.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+        target.focus?.();
+      }
+    });
   };
 
   const submit = async (event: React.FormEvent) => {
@@ -133,6 +172,11 @@ export function OnboardingForm({
         setMessage(localizedClientRequestMessage(result.error, t('saveFailed'), tErrors));
         return;
       }
+      try {
+        localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+      } catch {
+        // Ignore storage errors
+      }
       router.replace(localizePathname('/profile', locale));
       router.refresh();
     } catch (error) {
@@ -155,7 +199,7 @@ export function OnboardingForm({
   };
 
   return (
-    <form onSubmit={submit} className="space-y-7" noValidate>
+    <form onSubmit={submit} className="space-y-6" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="onboarding-name">{t('name')}</Label>
@@ -262,7 +306,7 @@ export function OnboardingForm({
             </p>
           ) : null}
         </div>
-        <div className="space-y-2 sm:col-span-2">
+        <div ref={phoneContainerRef} className="space-y-2 sm:col-span-2">
           <Label htmlFor="onboarding-phone">{t('phone')}</Label>
           <PhoneInput
             id="onboarding-phone"
@@ -288,8 +332,10 @@ export function OnboardingForm({
       </div>
 
       <section
+        ref={avatarSectionRef}
+        tabIndex={-1}
         aria-labelledby="onboarding-photo-title"
-        className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-muted)]/45 p-4 sm:p-6"
+        className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-muted)]/45 p-4 sm:p-6 outline-none"
       >
         <div className="text-center">
           <h2 id="onboarding-photo-title" className="font-display text-lg font-bold">

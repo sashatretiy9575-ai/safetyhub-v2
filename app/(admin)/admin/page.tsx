@@ -75,6 +75,27 @@ export default async function AdminWorkPage() {
         </div>
       </div>
 
+      {queue.state === 'ready' && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+            <span className="text-xs text-[var(--color-text-muted)]">Активных сертификатов</span>
+            <p className="mt-1 text-2xl font-black tabular-nums">{queue.data.activeCertificates}</p>
+          </div>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+            <span className="text-xs text-[var(--color-text-muted)]">Ожидают проверки</span>
+            <p className="mt-1 text-2xl font-black tabular-nums text-[var(--color-accent-amber)]">
+              {(approvals?.state === 'ready' ? approvals.data.total : 0) + queue.data.pendingIdentity}
+            </p>
+          </div>
+          <div className="col-span-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 sm:col-span-1">
+            <span className="text-xs text-[var(--color-text-muted)]">Готовы к выдаче</span>
+            <p className="mt-1 text-2xl font-black tabular-nums text-[var(--color-primary)]">
+              {queue.data.readyToIssue}
+            </p>
+          </div>
+        </div>
+      )}
+
       {queue.state === 'failed' ? (
         <AdminLoadFailure
           correlationId={queue.correlationId}
@@ -96,7 +117,7 @@ export default async function AdminWorkPage() {
               </span>
               <span className="min-w-0">
                 <span className="block truncate text-sm font-bold">{label}</span>
-                <span className="hidden truncate text-xs text-[var(--color-text-muted)] xl:block">
+                <span className="hidden truncate text-xs text-[var(--color-text-muted)] md:block">
                   {description}
                 </span>
               </span>

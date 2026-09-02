@@ -41,9 +41,9 @@ test('admin shell exposes six product sections and switches chrome at the laptop
   assert.match(layout, /href: employeeHref, icon: Users, label: 'Сотрудники'/);
   assert.doesNotMatch(layout, /href: '\/admin\/(?:users|access|audit|attestations|results)'/);
   assert.match(layout, /data-admin-shell/);
-  assert.match(layout, /<aside[\s\S]+min-\[1180px\]:flex/);
-  assert.match(layout, /<header[\s\S]+min-\[1180px\]:hidden/);
-  assert.match(layout, /<nav[\s\S]+fixed inset-x-0 bottom-0[\s\S]+min-\[1180px\]:hidden/);
+  assert.match(layout, /<aside[\s\S]+min-\[1024px\]:flex/);
+  assert.match(layout, /<header[\s\S]+min-\[1024px\]:hidden/);
+  assert.match(layout, /<nav[\s\S]+fixed inset-x-0 bottom-0[\s\S]+min-\[1024px\]:hidden/);
   assert.match(layout, /grid[^"\n]*grid-cols-6/);
   assert.doesNotMatch(layout, /overflow-x-auto/);
   assert.match(layout, /size="admin"/);

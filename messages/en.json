@@ -616,6 +616,19 @@
       "change": "Change answer",
       "confirmation": "I have reviewed my answers and confirm final submission."
     },
+    "rules": {
+      "subtitle": "Test your knowledge to receive an official certificate.",
+      "questions": "Questions",
+      "time": "Time",
+      "timeValue": "15 minutes",
+      "passScore": "Passing score",
+      "passScoreValue": "7 of 10",
+      "attempts": "Attempts per day",
+      "attemptsValue": "up to 8",
+      "start": "Start test",
+      "answerFirst": "Answer all questions before review.",
+      "answered": "Answered: {completed} of {total}"
+    },
     "result": {
       "passedTitle": "Test passed",
       "expiredTitle": "Test time expired",

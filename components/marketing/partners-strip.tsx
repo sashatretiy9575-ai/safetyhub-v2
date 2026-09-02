@@ -48,7 +48,7 @@ export function PartnersStrip() {
               <span className="absolute top-3 left-3 grid size-10 place-items-center rounded-[14px] border border-white/55 bg-white/82 text-[#176b43] shadow-sm backdrop-blur-xl">
                 <Icon size={21} weight="duotone" aria-hidden="true" />
               </span>
-              <span className="absolute top-3 right-3 rounded-full border border-white/45 bg-white/68 px-2.5 py-1 text-[10px] font-black tracking-[0.1em] text-slate-700 tabular-nums backdrop-blur-xl">
+              <span className="absolute top-3 right-3 rounded-full border border-white/45 bg-white/68 px-2.5 py-1 text-xs font-black tracking-[0.1em] text-slate-700 tabular-nums backdrop-blur-xl">
                 {String(index + 1).padStart(2, '0')}
               </span>
             </div>

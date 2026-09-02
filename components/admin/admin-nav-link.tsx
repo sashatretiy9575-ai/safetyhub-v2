@@ -30,7 +30,7 @@ export function AdminNavLink({
           ? 'bg-[var(--color-primary-soft)] text-[var(--color-on-primary-soft)]'
           : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
         mobile
-          ? 'min-w-0 w-full flex-col justify-center gap-0.5 px-1 py-1.5 text-[10px] leading-none'
+          ? 'min-w-0 w-full flex-col justify-center gap-0.5 px-0.5 py-1 text-[11px] leading-none'
           : 'px-3 py-2 text-sm',
       )}
     >

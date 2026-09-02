@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getPrivateRequestLocale()) as AppLocale;
   const t = await getTranslations({ locale, namespace: 'AuthOtp' });
   return {
-    title: t('loginTitle'),
+    title: `${t('loginTitle')} — SafetyHub.kz`,
   };
 }
 

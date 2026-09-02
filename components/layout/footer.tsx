@@ -111,7 +111,7 @@ export async function Footer({
           </div>
         </div>
 
-        <div className="mt-6 border-t border-white/10 pt-4 text-xs text-white/50 md:mt-8">
+        <div className="mt-6 border-t border-white/10 pt-4 text-xs text-white/70 md:mt-8">
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
             <p>{translations('footer.copyright', { year })}</p>
             <nav
@@ -123,7 +123,7 @@ export async function Footer({
                   key={link.href}
                   href={localizePathname(link.href, locale)}
                   prefetch={false}
-                  className="inline-flex min-h-9 items-center text-white/45 transition-colors duration-150 hover:text-white/80"
+                  className="inline-flex min-h-9 items-center text-white/70 transition-colors duration-150 hover:text-white"
                 >
                   {translations(link.messageKey)}
                 </Link>

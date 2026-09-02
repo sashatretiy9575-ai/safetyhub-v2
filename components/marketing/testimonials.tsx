@@ -43,7 +43,7 @@ export function Testimonials() {
               className="flex h-full flex-col rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/72 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl md:p-6"
             >
               <div className="flex items-center justify-between gap-3">
-                <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-1.5 text-[10px] font-bold tracking-wider text-[var(--color-text-muted)] uppercase">
+                <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-1 text-xs font-bold tracking-wider text-[var(--color-text-muted)] uppercase">
                   {t('type')}
                 </span>
                 <Quotes
@@ -57,7 +57,7 @@ export function Testimonials() {
 
               <div className="mt-4 space-y-3 text-sm">
                 <dl>
-                  <dt className="text-[10px] font-black tracking-widest text-[var(--color-text-subtle)] uppercase">
+                  <dt className="text-xs font-black tracking-widest text-[var(--color-text-subtle)] uppercase">
                     {t('task')}
                   </dt>
                   <dd className="mt-1 leading-relaxed text-[var(--color-text-muted)]">
@@ -72,7 +72,7 @@ export function Testimonials() {
                     aria-hidden="true"
                   />
                   <dl>
-                    <dt className="text-[10px] font-black tracking-widest text-[var(--color-text-subtle)] uppercase">
+                    <dt className="text-xs font-black tracking-widest text-[var(--color-text-subtle)] uppercase">
                       {t('action')}
                     </dt>
                     <dd className="mt-1 leading-relaxed text-[var(--color-text-muted)]">
@@ -88,7 +88,7 @@ export function Testimonials() {
                     aria-hidden="true"
                   />
                   <dl>
-                    <dt className="text-[10px] font-black tracking-widest text-[var(--color-text-subtle)] uppercase">
+                    <dt className="text-xs font-black tracking-widest text-[var(--color-text-subtle)] uppercase">
                       {t('result')}
                     </dt>
                     <dd className="mt-1 leading-relaxed text-[var(--color-text-muted)]">

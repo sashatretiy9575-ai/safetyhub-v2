@@ -250,53 +250,76 @@ export function AttestationsFilterForm({
         </div>
 
         <div className="grid gap-3 md:grid-cols-2 @min-[960px]:grid-cols-4">
-          <div>
+          <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
+            Компания
             <Input
               name="organization"
               defaultValue={values.organization}
               placeholder="Точная компания"
               aria-label="Фильтр по компании"
               list="attestation-organizations"
+              className="mt-1"
             />
             <datalist id="attestation-organizations">
               {dictionaries.organizations.map((organization) => (
                 <option key={organization} value={organization} />
               ))}
             </datalist>
-          </div>
-          <select name="course" defaultValue={values.testId ?? ''} className={selectClass} aria-label="Курс">
-            <option value="">Все курсы</option>
-            {dictionaries.courses.map((course) => (
-              <option key={course.id} value={course.id}>{course.title}</option>
-            ))}
-          </select>
-          <select name="result" defaultValue={values.resultState ?? ''} className={selectClass} aria-label="Результат">
-            <option value="">Все результаты</option>
-            <option value="passed">Сдан</option>
-            <option value="failed">Не сдан</option>
-          </select>
-          <select name="certificate" defaultValue={values.certificateState ?? ''} className={selectClass} aria-label="Состояние сертификата">
-            <option value="">Все состояния сертификата</option>
-            <option value="pending_identity">Ожидает проверки</option>
-            <option value="ready">Готов к выдаче</option>
-            <option value="issued">Выдан</option>
-            <option value="revoked">Отозван</option>
-          </select>
-          <Input type="date" name="from" defaultValue={values.from} aria-label="Дата результата с" />
-          <Input type="date" name="to" defaultValue={values.to} aria-label="Дата результата по" />
-          <select name="sort" defaultValue={values.sort} className={selectClass} aria-label="Сортировка">
-            <option value="completed_desc">Сначала новые</option>
-            <option value="completed_asc">Сначала старые</option>
-            <option value="name_asc">Фамилия и имя</option>
-            <option value="organization_asc">Компания, затем ФИО</option>
-            <option value="score_desc">Сначала высокий балл</option>
-            <option value="score_asc">Сначала низкий балл</option>
-          </select>
-          <select name="pageSize" defaultValue={values.pageSize} className={selectClass} aria-label="Строк на странице">
-            <option value="25">25 строк</option>
-            <option value="50">50 строк</option>
-            <option value="100">100 строк</option>
-          </select>
+          </label>
+          <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
+            Курс
+            <select name="course" defaultValue={values.testId ?? ''} className={`${selectClass} mt-1`} aria-label="Курс">
+              <option value="">Все курсы</option>
+              {dictionaries.courses.map((course) => (
+                <option key={course.id} value={course.id}>{course.title}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
+            Результат
+            <select name="result" defaultValue={values.resultState ?? ''} className={`${selectClass} mt-1`} aria-label="Результат">
+              <option value="">Все результаты</option>
+              <option value="passed">Сдан</option>
+              <option value="failed">Не сдан</option>
+            </select>
+          </label>
+          <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
+            Состояние сертификата
+            <select name="certificate" defaultValue={values.certificateState ?? ''} className={`${selectClass} mt-1`} aria-label="Состояние сертификата">
+              <option value="">Все состояния сертификата</option>
+              <option value="pending_identity">Ожидает проверки</option>
+              <option value="ready">Готов к выдаче</option>
+              <option value="issued">Выдан</option>
+              <option value="revoked">Отозван</option>
+            </select>
+          </label>
+          <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
+            С даты
+            <Input type="date" name="from" defaultValue={values.from} aria-label="Дата результата с" className="mt-1" />
+          </label>
+          <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
+            По дату
+            <Input type="date" name="to" defaultValue={values.to} aria-label="Дата результата по" className="mt-1" />
+          </label>
+          <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
+            Сортировка
+            <select name="sort" defaultValue={values.sort} className={`${selectClass} mt-1`} aria-label="Сортировка">
+              <option value="completed_desc">Сначала новые</option>
+              <option value="completed_asc">Сначала старые</option>
+              <option value="name_asc">Фамилия и имя</option>
+              <option value="organization_asc">Компания, затем ФИО</option>
+              <option value="score_desc">Сначала высокий балл</option>
+              <option value="score_asc">Сначала низкий балл</option>
+            </select>
+          </label>
+          <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
+            Строк на странице
+            <select name="pageSize" defaultValue={values.pageSize} className={`${selectClass} mt-1`} aria-label="Строк на странице">
+              <option value="25">25 строк</option>
+              <option value="50">50 строк</option>
+              <option value="100">100 строк</option>
+            </select>
+          </label>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button type="submit" size="sm">Применить фильтры</Button>

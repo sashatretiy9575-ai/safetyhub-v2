@@ -2,16 +2,25 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
+import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { requestAdminNotificationRefresh } from '@/components/admin/admin-notification-inbox';
 import type { AdminAccountApprovalItem } from '@/features/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 
 type Decision = 'approved' | 'rejected';
+
+const QUICK_REASONS = [
+  'Фото нечёткое или не соответствует требованиям',
+  'Уточните верное название компании',
+  'Неверно указан номер телефона',
+  'Сотрудник отсутствует в списках компании',
+];
 
 const decisionResponseSchema = z
   .object({
@@ -64,19 +73,31 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
   const [resolvedIds, setResolvedIds] = useState<ReadonlySet<string>>(() => new Set());
   const [message, setMessage] = useState('');
   const [operationDiagnostic, setOperationDiagnostic] = useState('');
+  const [search, setSearch] = useState('');
+  const [sortOrder, setSortOrder] = useState<'oldest' | 'newest'>('oldest');
+  const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(() => new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
   const operationKeys = useRef(new Map<string, string>());
   const busyIdsRef = useRef(new Set<string>());
   const resolvedIdsRef = useRef(new Set<string>());
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const refreshQueue = () => {
+  const refreshQueue = (immediate = false) => {
     requestAdminNotificationRefresh();
-    router.refresh();
+    if (immediate) {
+      router.refresh();
+      return;
+    }
+    if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+    refreshTimerRef.current = setTimeout(() => {
+      router.refresh();
+    }, 1500);
   };
 
   const reportUnconfirmedResult = (idempotencyKey: string) => {
     setMessage(unconfirmedResultMessage);
     setOperationDiagnostic(idempotencyKey);
-    refreshQueue();
+    refreshQueue(true);
   };
 
   const decide = async (item: AdminAccountApprovalItem, decision: Decision) => {
@@ -154,21 +175,136 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
     }
   };
 
+  const visibleItems = useMemo(() => {
+    return items
+      .filter((item) => {
+        if (!search.trim()) return true;
+        const q = search.toLowerCase();
+        const name = `${item.name} ${item.surname}`.toLowerCase();
+        const email = (item.email ?? '').toLowerCase();
+        const org = (item.organization ?? '').toLowerCase();
+        const username = (item.username ?? '').toLowerCase();
+        return name.includes(q) || email.includes(q) || org.includes(q) || username.includes(q);
+      })
+      .sort((a, b) => {
+        const timeA = new Date(a.requestedAt).getTime();
+        const timeB = new Date(b.requestedAt).getTime();
+        return sortOrder === 'oldest' ? timeA - timeB : timeB - timeA;
+      });
+  }, [items, search, sortOrder]);
+
+  const approveSelected = async () => {
+    if (selectedIds.size === 0 || bulkBusy) return;
+    setBulkBusy(true);
+    const toApprove = visibleItems.filter(
+      (item) =>
+        selectedIds.has(item.id) &&
+        !busyIdsRef.current.has(item.id) &&
+        !resolvedIdsRef.current.has(item.id),
+    );
+    for (const item of toApprove) {
+      await decide(item, 'approved');
+    }
+    setSelectedIds(new Set());
+    setBulkBusy(false);
+  };
+
+  const toggleSelectAll = () => {
+    const selectable = visibleItems.filter((i) => !resolvedIds.has(i.id));
+    if (selectedIds.size >= selectable.length && selectable.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(selectable.map((i) => i.id)));
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {items.map((item) => {
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5 shadow-sm">
+        <div className="relative flex-1">
+          <MagnifyingGlass
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-subtle)]"
+            size={18}
+          />
+          <Input
+            type="search"
+            placeholder="Поиск по ФИО, email или компании…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 h-10 text-sm"
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as 'oldest' | 'newest')}
+            className="h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs font-semibold text-[var(--color-text)] outline-none focus:border-[var(--color-primary)]"
+            aria-label="Сортировка заявок"
+          >
+            <option value="oldest">Сначала старые</option>
+            <option value="newest">Сначала новые</option>
+          </select>
+          {visibleItems.some((i) => !resolvedIds.has(i.id)) ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-10"
+              onClick={toggleSelectAll}
+            >
+              {selectedIds.size > 0 && selectedIds.size >= visibleItems.filter((i) => !resolvedIds.has(i.id)).length
+                ? 'Снять выбор'
+                : 'Выбрать все'}
+            </Button>
+          ) : null}
+          {selectedIds.size > 0 ? (
+            <Button
+              type="button"
+              size="sm"
+              className="h-10"
+              disabled={bulkBusy}
+              onClick={approveSelected}
+            >
+              {bulkBusy ? 'Подтверждаем…' : `Подтвердить выбранные (${selectedIds.size})`}
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      {visibleItems.map((item) => {
         const busy = busyIds.has(item.id);
         const resolved = resolvedIds.has(item.id);
         const actionDisabled = busy || resolved;
         const label = fullName(item);
         const minimalZh = isMinimalZhApplication(item);
         const requestingRejection = rejectionId === item.id;
+        const isSelected = selectedIds.has(item.id);
         return (
           <article
             key={item.id}
             className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm transition-all hover:border-[var(--color-primary)]/40 hover:shadow-[var(--shadow-card)]"
           >
-            <div className="grid gap-4 sm:grid-cols-[4rem_minmax(0,1fr)] sm:gap-5">
+            <div className="grid gap-4 sm:grid-cols-[auto_4rem_minmax(0,1fr)] sm:gap-5 items-start">
+              {!resolved ? (
+                <div className="pt-2 sm:pt-4">
+                  <input
+                    type="checkbox"
+                    className="size-4 shrink-0 rounded border-[var(--color-border-strong)] accent-[var(--color-primary)] cursor-pointer"
+                    checked={isSelected}
+                    disabled={actionDisabled}
+                    onChange={(e) => {
+                      setSelectedIds((curr) => {
+                        const next = new Set(curr);
+                        if (e.target.checked) next.add(item.id);
+                        else next.delete(item.id);
+                        return next;
+                      });
+                    }}
+                    aria-label={`Выбрать заявку: ${label}`}
+                  />
+                </div>
+              ) : null}
+
               {item.avatarAvailable ? (
                 <img
                   src={`/api/admin/attestations/avatar/${item.id}`}
@@ -238,6 +374,20 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
                     <span className="text-xs font-semibold text-[var(--color-text-muted)]">
                       Что нужно уточнить
                     </span>
+                    <div className="flex flex-wrap gap-1.5 pb-1">
+                      {QUICK_REASONS.map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() =>
+                            setReasons((current) => ({ ...current, [item.id]: preset }))
+                          }
+                          className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs text-[var(--color-text-muted)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                        >
+                          {preset}
+                        </button>
+                      ))}
+                    </div>
                     <Textarea
                       value={reasons[item.id] ?? ''}
                       onChange={(event) =>
@@ -319,8 +469,8 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
         >
           <p>{message}</p>
           {operationDiagnostic ? (
-            <p className="text-xs">
-              Код операции: <code className="font-mono">{operationDiagnostic}</code>
+            <p className="text-xs text-[var(--color-text-subtle)]">
+              Код обращения: <code className="font-mono">{operationDiagnostic}</code> — назовите его в поддержке
             </p>
           ) : null}
         </div>

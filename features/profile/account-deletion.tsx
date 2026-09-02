@@ -77,7 +77,14 @@ export function AccountDeletion() {
         <Input
           id="account-deletion-confirmation"
           value={confirmation}
-          onChange={(event) => setConfirmation(event.target.value)}
+          onChange={(event) => {
+            const val = event.target.value;
+            setConfirmation(
+              val.trim().toLowerCase() === confirmationPhrase.toLowerCase()
+                ? confirmationPhrase
+                : val,
+            );
+          }}
           autoComplete="off"
           disabled={busy}
         />
