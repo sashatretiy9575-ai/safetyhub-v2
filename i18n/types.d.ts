@@ -7,3 +7,8 @@ declare module 'next-intl' {
     Messages: typeof messages;
   }
 }
+
+declare module 'flag-icons/flags/4x3/*.svg' {
+  const content: string;
+  export default content;
+}
