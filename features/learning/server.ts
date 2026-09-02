@@ -28,16 +28,43 @@ const SUPPORTED_ATTEMPT_TOTALS = new Set<number>([
   QUIZ_POLICY.questionCount,
 ]);
 
-const optionSchema = z.object({ id: z.string().uuid(), text: z.string(), position: z.number() });
-const questionSchema = z.object({
-  id: z.string().uuid(),
-  text: z.string(),
-  position: z.number(),
-  selectedOptionId: z.string().uuid().nullable(),
-  // Stage A must continue to parse legacy, already-published question banks. The
-  // v3 publication RPC remains the strict 3 x 10 x 4 enforcement boundary.
-  options: z.array(optionSchema).min(2).max(6),
-});
+const optionSchema = z
+  .object({
+    id: z.string().uuid(),
+    text: z.string(),
+    position: z.number().optional(),
+    displayOrder: z.number().optional(),
+  })
+  .refine((opt) => opt.position !== undefined || opt.displayOrder !== undefined, {
+    message: 'positionRequired',
+  })
+  .transform((opt) => ({
+    id: opt.id,
+    text: opt.text,
+    position: opt.position ?? opt.displayOrder ?? 0,
+  }));
+
+const questionSchema = z
+  .object({
+    id: z.string().uuid(),
+    text: z.string(),
+    position: z.number().optional(),
+    displayOrder: z.number().optional(),
+    selectedOptionId: z.string().uuid().nullable(),
+    // Stage A must continue to parse legacy, already-published question banks. The
+    // v3 publication RPC remains the strict 3 x 10 x 4 enforcement boundary.
+    options: z.array(optionSchema).min(2).max(6),
+  })
+  .refine((q) => q.position !== undefined || q.displayOrder !== undefined, {
+    message: 'positionRequired',
+  })
+  .transform((q) => ({
+    id: q.id,
+    text: q.text,
+    position: q.position ?? q.displayOrder ?? 0,
+    selectedOptionId: q.selectedOptionId,
+    options: q.options,
+  }));
 const timestampSchema = z.string().refine((value) => Number.isFinite(Date.parse(value)));
 const attemptPayloadSchema = z
   .object({

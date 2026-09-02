@@ -54,6 +54,8 @@ function accessCta(access: CourseMaterialAccess, slug: string, locale: ReturnTyp
   };
 }
 
+let cachedClientAccess: CourseMaterialAccess | null = null;
+
 export function CourseMaterialActions({
   course,
   access,
@@ -65,8 +67,12 @@ export function CourseMaterialActions({
 }) {
   const locale = useLocale();
   const t = useTranslations('Course');
-  const [currentAccess, setCurrentAccess] = useState<CourseMaterialAccess>(access);
-  const [isResolving, setIsResolving] = useState(() => access === 'anonymous');
+  const [currentAccess, setCurrentAccess] = useState<CourseMaterialAccess>(
+    () => cachedClientAccess ?? access,
+  );
+  const [isResolving, setIsResolving] = useState(
+    () => cachedClientAccess === null && access === 'anonymous',
+  );
 
   useEffect(() => {
     let active = true;
@@ -75,6 +81,7 @@ export function CourseMaterialActions({
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
           if (active && data?.access) {
+            cachedClientAccess = data.access;
             setCurrentAccess(data.access);
           }
         })
@@ -85,6 +92,7 @@ export function CourseMaterialActions({
           }
         });
     } else {
+      cachedClientAccess = access;
       setCurrentAccess(access);
       setIsResolving(false);
     }
