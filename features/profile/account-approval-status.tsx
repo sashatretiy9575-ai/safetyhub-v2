@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { ContactLink } from '@/components/shared/contact-link';
 import { Button } from '@/components/ui/button';
-import { ClockCountdown, HourglassMedium } from '@phosphor-icons/react';
+import { ClockCountdown } from '@phosphor-icons/react/dist/csr/ClockCountdown';
+import { HourglassMedium } from '@phosphor-icons/react/dist/csr/HourglassMedium';
 import type { SiteContactSettings } from '@/lib/site-contacts-shared';
 import {
   BUSINESS_TIME_ZONE,
@@ -40,14 +41,14 @@ function ReviewContacts({ contacts }: { contacts: SiteContactSettings }) {
       <ContactLink
         kind="phone"
         contacts={contacts}
-        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-4 py-2.5 text-sm font-semibold transition hover:border-[var(--color-primary)] hover:shadow-xs focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
+        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-4 py-2.5 text-sm font-semibold transition hover:border-[var(--color-primary)] hover:shadow-sm focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
       >
         {t('callWithNumber', { phone: contacts.phoneDisplay })}
       </ContactLink>
       <ContactLink
         kind="whatsapp"
         contacts={contacts}
-        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-4 py-2.5 text-sm font-semibold transition hover:bg-emerald-500/20 hover:shadow-xs focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
+        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--color-primary)]/45 bg-[var(--color-primary-soft)]/45 px-4 py-2.5 text-sm font-semibold text-[var(--color-primary)] transition hover:bg-[var(--color-primary-soft)] hover:shadow-sm focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
       >
         {t('whatsapp')}
       </ContactLink>
@@ -103,7 +104,7 @@ export function AccountApprovalStatus({
     return (
       <section
         aria-labelledby="approval-profile-title"
-        className="rounded-2xl border border-[var(--color-warning)]/40 bg-[var(--color-accent-amber-soft)]/20 p-6 sm:p-7 shadow-xs"
+        className="rounded-2xl border border-[var(--color-warning)]/40 bg-[var(--color-accent-amber-soft)]/20 p-6 sm:p-7 shadow-sm"
       >
         <div className="space-y-4">
           <div>
@@ -129,7 +130,7 @@ export function AccountApprovalStatus({
     return (
       <section
         aria-labelledby="approval-rejected-title"
-        className="rounded-2xl border border-[var(--color-danger)]/40 bg-[var(--color-danger-soft)]/20 p-6 sm:p-7 shadow-xs"
+        className="rounded-2xl border border-[var(--color-danger)]/40 bg-[var(--color-danger-soft)]/20 p-6 sm:p-7 shadow-sm"
       >
         <div className="space-y-4">
           <div>
@@ -161,17 +162,13 @@ export function AccountApprovalStatus({
   return (
     <section
       aria-labelledby="approval-pending-title"
-      className="relative overflow-hidden rounded-2xl border border-[var(--color-primary)]/25 bg-gradient-to-br from-[var(--color-primary-soft)]/20 via-[var(--color-surface)] to-[var(--color-surface)] p-6 sm:p-8 shadow-xs"
+      className="relative overflow-hidden rounded-2xl border border-[var(--color-primary)]/40 bg-[var(--color-surface)] p-6 sm:p-8 shadow-sm"
     >
       <div className="relative space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-primary)]/15 text-[var(--color-primary)]">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
               <HourglassMedium size={26} weight="duotone" className="animate-pulse" />
-              <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-primary)] opacity-75" />
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-[var(--color-primary)]" />
-              </span>
             </div>
             <div>
               <p className="text-xs font-bold tracking-wider text-[var(--color-primary)] uppercase">
@@ -183,7 +180,7 @@ export function AccountApprovalStatus({
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 self-start sm:self-auto rounded-full bg-[var(--color-primary)]/10 px-3.5 py-1.5 text-xs font-bold text-[var(--color-primary)] border border-[var(--color-primary)]/20">
+          <div className="inline-flex items-center gap-2 self-start sm:self-auto rounded-full bg-[var(--color-primary-soft)] px-3.5 py-1.5 text-xs font-bold text-[var(--color-primary)] border border-[var(--color-primary)]/20">
             <span className="h-2 w-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
             <span>{t('pendingEyebrow')}</span>
           </div>
@@ -194,16 +191,16 @@ export function AccountApprovalStatus({
         </p>
 
         {/* 3-step progress track */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl bg-[var(--color-surface-muted)]/60 p-3 sm:p-4 border border-[var(--color-border)]">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl bg-[var(--color-surface-muted)] p-3 sm:p-4 border border-[var(--color-border)]">
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold mb-1.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)] text-xs font-bold mb-1.5">
               ✓
             </div>
             <span className="text-[11px] sm:text-xs font-semibold text-[var(--color-text)]">1</span>
-            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">{t('profileAction')}</span>
+            <span className="text-[10px] text-[var(--color-text-muted)] font-medium">{t('profileAction')}</span>
           </div>
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] text-white text-xs font-bold mb-1.5 shadow-xs">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] text-white text-xs font-bold mb-1.5 shadow-sm">
               2
             </div>
             <span className="text-[11px] sm:text-xs font-bold text-[var(--color-primary)]">2</span>
@@ -235,7 +232,7 @@ export function AccountApprovalStatus({
             </p>
           </div>
         ) : (
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[var(--color-primary)]/20 bg-[var(--color-surface)]/80 backdrop-blur-xs p-4 sm:p-5 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[var(--color-primary)]/20 bg-[var(--color-surface)] p-4 sm:p-5 shadow-sm">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <ClockCountdown size={18} weight="duotone" className="text-[var(--color-primary)]" />

@@ -1,18 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  ArrowLeft,
-  DownloadSimple,
-  FilePdf,
-  ListChecks,
-  Timer,
-} from '@phosphor-icons/react/dist/ssr';
+import { ArrowLeft } from '@phosphor-icons/react/dist/ssr/ArrowLeft';
+import { DownloadSimple } from '@phosphor-icons/react/dist/ssr/DownloadSimple';
+import { FilePdf } from '@phosphor-icons/react/dist/ssr/FilePdf';
+import { ListChecks } from '@phosphor-icons/react/dist/ssr/ListChecks';
+import { Timer } from '@phosphor-icons/react/dist/ssr/Timer';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
-import { resolveCourseIcon } from '@/lib/course-icons';
 import type { Course } from '@/lib/content/topics';
 import { ROUTES } from '@/lib/constants';
 import { useLocale, useTranslations } from 'next-intl';
@@ -60,9 +57,11 @@ function accessCta(access: CourseMaterialAccess, slug: string, locale: ReturnTyp
 export function CourseMaterialActions({
   course,
   access,
+  iconSlot,
 }: {
   course: Course;
   access: CourseMaterialAccess;
+  iconSlot?: React.ReactNode;
 }) {
   const locale = useLocale();
   const t = useTranslations('Course');
@@ -94,8 +93,6 @@ export function CourseMaterialActions({
     };
   }, [access]);
 
-  const courseIcon = resolveCourseIcon(course.icon);
-  const CourseIcon = courseIcon.component;
   const filename = `${course.slug}.pdf`;
   const cta = accessCta(currentAccess, course.slug, locale, {
     anonymous: { title: t('access.anonymousTitle'), description: t('access.anonymousDescription'), label: t('access.anonymousLabel') },
@@ -122,7 +119,7 @@ export function CourseMaterialActions({
             <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
               <div className="min-w-0">
                 <div className="mb-5 grid size-14 place-items-center rounded-2xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                  <CourseIcon size={30} weight="duotone" aria-hidden="true" />
+                  {iconSlot ?? <FilePdf size={30} weight="duotone" aria-hidden="true" />}
                 </div>
                 <p className="text-xs font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">
                   {t('online')}

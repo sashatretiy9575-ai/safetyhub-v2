@@ -7,6 +7,7 @@ import { breadcrumbsJsonLd, buildMetadata, courseJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { TopicSourcesCard } from '@/components/topics/topic-sources-card';
 import { localizePathname } from '@/i18n/config';
+import { resolveCourseIcon } from '@/lib/course-icons';
 
 export const revalidate = 300;
 
@@ -55,6 +56,9 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
     notFound();
   }
 
+  const courseIcon = resolveCourseIcon(topic.icon);
+  const CourseIcon = courseIcon.component;
+
   return (
     <>
       <JsonLd
@@ -83,7 +87,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
        * explicit interaction; looking at an auth cookie here would make the
        * public page uncacheable at the CDN.
        */}
-      <CourseMaterialActions course={topic} access="anonymous" />
+      <CourseMaterialActions course={topic} access="anonymous" iconSlot={<CourseIcon size={30} weight="duotone" aria-hidden="true" />} />
       <TopicSourcesCard topic={topic} />
     </>
   );
