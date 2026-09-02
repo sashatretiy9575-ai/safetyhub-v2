@@ -4,7 +4,7 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('public shell uses neutral glass chrome and the 1120px navigation breakpoint', async () => {
+test('public shell uses neutral glass chrome and the 1024px navigation breakpoint', async () => {
   const [css, header, tabs, shell] = await Promise.all([
     read('app/globals.css'),
     read('components/layout/header.tsx'),
@@ -18,12 +18,12 @@ test('public shell uses neutral glass chrome and the 1120px navigation breakpoin
   assert.match(css, /@supports \(\(-webkit-backdrop-filter:/);
   assert.match(css, /@media \(forced-colors: active\)/);
   assert.match(header, /glass-strong/);
-  assert.match(header, /min-\[1120px\]:flex/);
-  assert.match(header, /min-\[1120px\]:hidden/);
+  assert.match(header, /min-\[1024px\]:flex/);
+  assert.match(header, /min-\[1024px\]:hidden/);
   assert.match(tabs, /rounded-\[var\(--radius-dock\)\]/);
   assert.match(tabs, /weight="regular"/);
-  assert.match(tabs, /min-\[1120px\]:hidden/);
-  assert.match(shell, /min-\[1120px\]:pb-0/);
+  assert.match(tabs, /min-\[1024px\]:hidden/);
+  assert.match(shell, /min-\[1024px\]:pb-0/);
 });
 
 test('theme, contact actions, and footer keep explicit accessible labels', async () => {

@@ -141,7 +141,15 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE_VERSION)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then((cache) =>
+        Promise.allSettled(
+          PRECACHE_URLS.map((url) =>
+            fetch(url).then((response) => {
+              if (response.ok) return cache.put(url, response);
+            }),
+          ),
+        ),
+      )
       .then(() => self.skipWaiting()),
   );
 });

@@ -54,8 +54,8 @@ export async function Header({
   });
 
   return (
-    <header className="sticky top-0 z-40 bg-[var(--color-bg)]/96 pt-[var(--safe-area-top)] pr-[max(.5rem,var(--safe-area-right))] pb-2 pl-[max(.5rem,var(--safe-area-left))] backdrop-blur-xl min-[1120px]:pr-[max(1.5rem,var(--safe-area-right))] min-[1120px]:pb-0 min-[1120px]:pl-[max(1.5rem,var(--safe-area-left))] min-[1280px]:pr-[max(2rem,var(--safe-area-right))] min-[1280px]:pl-[max(2rem,var(--safe-area-left))]">
-      <div className="glass-strong mx-auto flex h-[52px] w-full max-w-[1280px] items-center gap-2 rounded-[18px] px-3 min-[1120px]:h-16 min-[1120px]:gap-3 min-[1120px]:rounded-[var(--radius-group)] min-[1120px]:px-5">
+    <header className="sticky top-0 z-40 bg-[var(--color-bg)]/96 pt-[var(--safe-area-top)] pr-[max(.5rem,var(--safe-area-right))] pb-2 pl-[max(.5rem,var(--safe-area-left))] backdrop-blur-xl min-[1024px]:pr-[max(1.5rem,var(--safe-area-right))] min-[1024px]:pb-0 min-[1024px]:pl-[max(1.5rem,var(--safe-area-left))] min-[1280px]:pr-[max(2rem,var(--safe-area-right))] min-[1280px]:pl-[max(2rem,var(--safe-area-left))]">
+      <div className="glass-strong mx-auto flex h-[52px] w-full max-w-[1280px] items-center gap-2 rounded-[18px] px-3 min-[1024px]:h-16 min-[1024px]:gap-3 min-[1024px]:rounded-[var(--radius-group)] min-[1024px]:px-5">
         <Link
           href={localizePathname(ROUTES.home, locale)}
           prefetch={false}
@@ -78,7 +78,7 @@ export async function Header({
           />
         ) : null}
 
-        <div className="hidden items-center gap-2 min-[1120px]:flex">
+        <div className="hidden items-center gap-2 min-[1024px]:flex">
           <div
             role="group"
             aria-label={translations('quickContact')}
@@ -125,7 +125,7 @@ export async function Header({
               ))}
         </div>
 
-        <div className="min-[1120px]:hidden">
+        <div className="min-[1024px]:hidden">
           <DeferredThemeToggle />
         </div>
       </div>

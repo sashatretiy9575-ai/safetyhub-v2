@@ -57,7 +57,7 @@ export function BottomTabBar({ accountMode }: { accountMode: AccountMode }) {
   return (
     <nav
       aria-label={translations('mobileNavigation')}
-      className="glass-strong fixed right-[max(.625rem,var(--safe-area-right))] bottom-[var(--safe-area-bottom)] left-[max(.625rem,var(--safe-area-left))] z-50 mx-auto h-[var(--mobile-tab-height)] max-w-[32.5rem] rounded-[var(--radius-dock)] p-0.5 min-[1120px]:hidden"
+      className="glass-strong fixed right-[max(.625rem,var(--safe-area-right))] bottom-[var(--safe-area-bottom)] left-[max(.625rem,var(--safe-area-left))] z-50 mx-auto h-[var(--mobile-tab-height)] max-w-[32.5rem] rounded-[var(--radius-dock)] p-0.5 min-[1024px]:hidden"
     >
       <div className="flex h-full items-stretch">
         {tabs.map(({ href, icon, label }) => {

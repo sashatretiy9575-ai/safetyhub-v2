@@ -57,7 +57,7 @@ export async function AppShell({
       >
         {children}
       </main>
-      <div className="bg-[var(--color-footer)] pb-[var(--mobile-fixed-bottom-space)] min-[1120px]:pb-0">
+      <div className="bg-[var(--color-footer)] pb-[var(--mobile-fixed-bottom-space)] min-[1024px]:pb-0">
         <Footer contacts={contacts} locale={locale} />
       </div>
       <DeferredBottomTabBar accountMode={accountMode} />

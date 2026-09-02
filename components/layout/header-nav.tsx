@@ -20,7 +20,7 @@ export async function HeaderNav({ locale: explicitLocale }: { locale?: AppLocale
 
   return (
     <nav
-      className="ml-3 hidden h-full items-stretch gap-0.5 min-[1120px]:flex"
+      className="ml-3 hidden h-full items-stretch gap-0.5 min-[1024px]:flex"
       aria-label={translations('primaryNavigation')}
     >
       {PRIMARY_NAV_ITEMS.map((item) => {

@@ -30,12 +30,20 @@ export async function GET(_request: Request, context: { params: Promise<{ locale
     return new Response('Not found', { status: 404 });
   }
 
-  const messages = await loadMessages(candidate);
-  const offline = messages.Offline as Record<'title' | 'description' | 'home', string>;
-  const title = escapeHtml(offline.title);
-  const description = escapeHtml(offline.description);
-  const home = escapeHtml(offline.home);
+  let title = 'Нет подключения к интернету';
+  let description = 'Проверьте соединение с сетью. Сохранённые данные и материалы доступны офлайн.';
+  let home = 'На главную';
   const homeUrl = escapeHtml(localizePathname('/', candidate));
+
+  try {
+    const messages = await loadMessages(candidate);
+    const offline = messages.Offline as Record<'title' | 'description' | 'home', string> | undefined;
+    if (offline?.title) title = escapeHtml(offline.title);
+    if (offline?.description) description = escapeHtml(offline.description);
+    if (offline?.home) home = escapeHtml(offline.home);
+  } catch {
+    // Fallback strings remain active
+  }
 
   const document = `<!doctype html>
 <html lang="${htmlLanguage(candidate)}">

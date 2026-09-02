@@ -252,7 +252,7 @@ test('profile reads immutable acceptance history and records consent through a s
   assert.match(otpVerify, /setSafetyHubSessionHint\(request, response\)/u);
   assert.doesNotMatch(otpVerify, /localizedAccountPath\('\/auth\/legal', locale\)/u);
   assert.doesNotMatch(otpVerify, /legalAccepted|parsed\.data\.intent/u);
-  assert.match(otpFlow, /const \[legalAccepted, setLegalAccepted\] = useState\(true\)/u);
+  assert.match(otpFlow, /const \[legalAccepted, setLegalAccepted\] = useState\(false\)/u);
   assert.doesNotMatch(otpFlow, /sessionStorage[\s\S]*consent/u);
   assert.match(baselineMigration, /create table public\.legal_document_versions/);
   assert.match(baselineMigration, /body_revision/);

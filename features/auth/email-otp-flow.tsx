@@ -131,6 +131,20 @@ function clearStoredSendCooldown() {
 }
 
 function safeLanding(value: unknown, locale: AppLocale) {
+  if (typeof window !== 'undefined') {
+    const returnUrl = new URLSearchParams(window.location.search).get('return');
+    if (
+      returnUrl &&
+      !returnUrl.startsWith('//') &&
+      returnUrl.startsWith('/') &&
+      (returnUrl.startsWith('/topics/') || returnUrl.startsWith(`/${locale}/topics/`))
+    ) {
+      if (value === localizePathname('/profile', locale) || value === '/profile') {
+        return returnUrl;
+      }
+    }
+  }
+
   return value === '/admin' ||
     value === localizePathname('/auth/legal', locale) ||
     value === localizePathname('/onboarding', locale) ||
@@ -157,7 +171,7 @@ export function EmailOtpFlow() {
   const [status, setStatus] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [captchaVersion, setCaptchaVersion] = useState(0);
-  const [legalAccepted, setLegalAccepted] = useState(true);
+  const [legalAccepted, setLegalAccepted] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
   const turnstileRef = useRef<TurnstileHandle>(null);
@@ -439,6 +453,16 @@ export function EmailOtpFlow() {
         </p>
       )}
 
+      {visibleError && (
+        <p
+          role="alert"
+          aria-live="assertive"
+          className="rounded-xl border border-[var(--color-danger)]/20 bg-[var(--color-danger)]/10 p-3 text-sm font-medium text-[var(--color-danger)]"
+        >
+          {visibleError}
+        </p>
+      )}
+
       {stage === 'email' && (
         <form onSubmit={requestCode} className="space-y-4" noValidate>
           <div className="space-y-2">
@@ -582,7 +606,7 @@ export function EmailOtpFlow() {
                 .
               </span>
             </label>
-            {!legalAccepted || fieldErrors.legal ? (
+            {fieldErrors.legal ? (
               <p id="email-otp-legal-error" role="alert" className="text-xs text-[var(--color-danger)]">
                 {t('legalRequired')}
               </p>
