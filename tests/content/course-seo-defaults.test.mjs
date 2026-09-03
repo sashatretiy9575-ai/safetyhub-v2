@@ -47,7 +47,13 @@ test('every course gets a publishable SEO block in every language', async () => 
         parsed.success,
         `${slug}/${locale}: ${JSON.stringify(parsed.error?.issues ?? [])}`,
       );
-      assert.ok(seo.title.includes(title.trim()), `${slug}/${locale} title drops the course name`);
+      // The name survives, but a lower-case course name is capitalized: a page
+      // title opening in lower case reads as a mistake in search results.
+      assert.ok(
+        seo.title.toLowerCase().startsWith(title.trim().toLowerCase()),
+        `${slug}/${locale} title drops the course name: ${seo.title}`,
+      );
+      assert.doesNotMatch(seo.title[0], /\p{Ll}/u, `${slug}/${locale} title starts lower case`);
       assert.equal(seo.ogTitle, seo.title);
       assert.equal(seo.ogDescription, seo.description);
       assert.equal(seo.indexable, true);

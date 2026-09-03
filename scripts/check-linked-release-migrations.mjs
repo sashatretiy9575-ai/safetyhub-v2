@@ -123,6 +123,10 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
     filename: '20260903180000_course_editor_quiet_bank_read.sql',
     sha256: '898c77fae1c943954bdb8173485aa95d78eda149300e8e68d709694579c01f93',
   }),
+  Object.freeze({
+    filename: '20260903200000_course_seo_fill_and_republish.sql',
+    sha256: 'ccfeb07a4ec8a3c4dca484bab9e0d1d23bc65d4b664ea837aaa877e1f19f2382',
+  }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;

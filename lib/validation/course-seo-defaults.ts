@@ -37,6 +37,18 @@ function collapse(value: string) {
   return value.trim().replace(/\s+/gu, ' ');
 }
 
+/**
+ * Some course names were stored in lower case — the Kazakh and English
+ * fire-safety course among them — and a page title that opens lower case reads
+ * as a mistake in search results. Only the first character is touched, so an
+ * acronym like BIOT and a Chinese name are left exactly as they are.
+ */
+function capitalize(value: string, locale: AppLocale) {
+  const first = value.slice(0, 1);
+  const upper = first.toLocaleUpperCase(locale === 'zh' ? 'zh-Hans' : locale);
+  return upper === first ? value : `${upper}${value.slice(1)}`;
+}
+
 function clamp(value: string, max: number) {
   return value.length <= max ? value : `${value.slice(0, max - 1).trimEnd()}…`;
 }
@@ -53,7 +65,7 @@ export function courseSeoDefaults(
   description: string,
   ogImage = '',
 ): ContentSeo {
-  const name = collapse(title);
+  const name = capitalize(collapse(title), locale);
   const suffixed = name ? `${name} — ${TITLE_SUFFIX[locale]}` : TITLE_SUFFIX[locale];
   const seoTitle = clamp(
     suffixed.length <= CONTENT_SEO_LIMITS.titleMax ? suffixed : name || TITLE_SUFFIX[locale],
