@@ -55,18 +55,22 @@ export function IconPicker({
   };
 
   return (
-    <div id={pickerId} className="space-y-3">
-      <div className="flex min-h-12 items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3">
+    // The icon is chosen once and then never touched, but the search field and
+    // the scrolling grid used to occupy the middle of the first editor section
+    // on every visit. Show the current icon and open the gallery on demand.
+    <details id={pickerId} className="space-y-3">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3">
         <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
           <SelectedIcon size={22} weight="duotone" aria-hidden="true" />
         </span>
-        <span className="min-w-0">
-          <span className="block text-xs text-[var(--color-text-muted)]">Выбрано</span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-xs text-[var(--color-text-muted)]">Значок курса</span>
           <span className="block truncate text-sm font-semibold">{selected.label}</span>
         </span>
-      </div>
+        <span className="shrink-0 text-xs font-semibold text-[var(--color-primary)]">Изменить</span>
+      </summary>
 
-      <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_13rem]">
+      <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_13rem]">
         <div>
           <Label className="sr-only" htmlFor={`${pickerId}-search`}>
             Поиск иконки
@@ -103,7 +107,7 @@ export function IconPicker({
         role="listbox"
         aria-label="Иконки курса"
         onKeyDown={navigate}
-        className="grid max-h-64 grid-cols-6 gap-1.5 overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] p-2 sm:grid-cols-8"
+        className="mt-3 grid max-h-64 grid-cols-6 gap-1.5 overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] p-2 sm:grid-cols-8"
       >
         {items.map((item, index) => {
           const Icon = item.component;
@@ -135,6 +139,6 @@ export function IconPicker({
           </p>
         ) : null}
       </div>
-    </div>
+    </details>
   );
 }

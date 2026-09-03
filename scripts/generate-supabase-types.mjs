@@ -31,19 +31,18 @@ async function main() {
 
   const target = path.resolve('lib/supabase/database.generated.ts');
   const cli = path.resolve('node_modules/supabase/dist/supabase.js');
+  // `gen types --local` authenticates with a generated start-secret that the
+  // generator container does not receive once the project has been linked, so it
+  // fails with "password authentication failed for user postgres". The local
+  // stack always accepts the documented default credentials, and the generator
+  // runs in a container, so it must reach the host by name rather than loopback.
+  const localDatabaseUrl =
+    process.env.SUPABASE_LOCAL_DB_URL ??
+    'postgresql://postgres:postgres@host.docker.internal:54322/postgres';
+  const source = useLocal ? ['--db-url', localDatabaseUrl] : ['--linked'];
   const generated = spawnSync(
     process.execPath,
-    [
-      cli,
-      'gen',
-      'types',
-      'typescript',
-      useLocal ? '--local' : '--linked',
-      '--schema',
-      'public',
-      '--schema',
-      'private',
-    ],
+    [cli, 'gen', 'types', 'typescript', ...source, '--schema', 'public', '--schema', 'private'],
     {
       cwd: process.cwd(),
       encoding: 'utf8',

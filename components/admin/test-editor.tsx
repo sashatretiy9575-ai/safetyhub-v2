@@ -409,9 +409,8 @@ export function TestEditor({
           data-course-editor-key-boundary
           className="rounded-xl border border-[var(--color-warning)] bg-[var(--color-surface-muted)] p-4 text-sm leading-6"
         >
-          Сохранённые вопросы, варианты и ключи ответов не загружаются в браузер. Для новой редакции
-          заполните свежий набор из 30 вопросов: прежняя опубликованная редакция останется активной,
-          пока вы не опубликуете новую.
+          Вопросы и ключи ответов не загружаются в браузер. Для новой редакции заполните свежие 30
+          вопросов — текущая опубликованная редакция работает, пока вы не опубликуете новую.
         </p>
       ) : null}
 
@@ -784,7 +783,12 @@ export function TestEditor({
                           <div className="flex items-center gap-2">
                             <input
                               type="radio"
-                              name={`correct-${currentQuestion.id}`}
+                              // Question ids are freshly generated on every
+                              // render pass, so naming the radio group after one
+                              // produced a different attribute on the server and
+                              // in the browser and React reported a hydration
+                              // mismatch it refused to patch. Position is stable.
+                              name={`correct-variant-${activeVariant}-question-${activeQuestion}`}
                               className="size-5 accent-[var(--color-primary)]"
                               checked={currentQuestion.correctOptionId === option.id}
                               onChange={() => updateQuestion({ correctOptionId: option.id })}
@@ -891,11 +895,17 @@ export function TestEditor({
             </CardContent>
           </Card>
 
+          {/* Reference material, not an editing step: keep it one click away. */}
           <Card>
-            <CardHeader>
-              <CardTitle>8. История редакций</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 md:p-6">
+              <details>
+                <summary className="flex min-h-11 cursor-pointer items-center gap-2 font-semibold">
+                  8. История редакций
+                  <span className="text-xs font-medium text-[var(--color-text-muted)] tabular-nums">
+                    {course.revisionHistory.length}
+                  </span>
+                </summary>
+                <div className="mt-4">
               {course.revisionHistory.length > 0 ? (
                 <ol className="space-y-3">
                   {course.revisionHistory.map((revision) => (
@@ -921,9 +931,11 @@ export function TestEditor({
                 </ol>
               ) : (
                 <p className="text-sm text-[var(--color-text-muted)]">
-                  Опубликованных редакций пока нет. Первая запись появится после публикации.
+                  Опубликованных редакций пока нет.
                 </p>
               )}
+                </div>
+              </details>
             </CardContent>
           </Card>
         </>

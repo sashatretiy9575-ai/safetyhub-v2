@@ -219,7 +219,16 @@ test('proxy composes locale routing ahead of the existing Supabase/CSP gate', as
   assert.match(switcher, /SameSite=Lax/u);
   assert.match(switcher, /DropdownMenuRadioGroup/u);
   assert.match(switcher, /!hasSessionHint\(\)/u);
-  assert.match(switcher, /window\.location\.assign\(navigationTarget\(pathname, nextLocale\)\)/u);
+  // A locale change is an ordinary route change and must stay a soft App Router
+  // navigation; only the signed-out realm transition may reload the document,
+  // because the server has just replaced the auth cookies.
+  assert.match(switcher, /openLocale\(navigationTarget\(pathname, nextLocale\)\)/u);
+  assert.match(switcher, /const openLocale = \(target: string\) => \{[\s\S]*router\.replace\(target\)/u);
+  assert.match(switcher, /window\.location\.assign\(payload\.redirectTo\)/u);
+  assert.doesNotMatch(
+    switcher,
+    /window\.location\.assign\(navigationTarget\(pathname, nextLocale\)\)/u,
+  );
   assert.ok(
     switcher.indexOf('if (!hasSessionHint())') < switcher.indexOf("fetch('/api/profile/locale'"),
     'guest locale navigation must precede and avoid the profile API request',

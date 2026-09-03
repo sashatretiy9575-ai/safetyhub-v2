@@ -118,14 +118,17 @@ test('hero uses mobile and desktop artwork without autoplay controls', async ({ 
   await expect(page.getByRole('button', { name: /приостановить|возобновить/i })).toHaveCount(0);
 });
 
-test('app shell hands off to desktop navigation exactly at 1120px', async ({ page }) => {
+// The shell now switches at 1024px, the same width at which the admin sidebar
+// appears. The old 1120px threshold left 1024-1119px showing the floating mobile
+// dock in the middle of a laptop screen; this test still asserted the old value.
+test('app shell hands off to desktop navigation exactly at 1024px', async ({ page }) => {
   await blockRemoteIntegrations(page);
-  await page.setViewportSize({ width: 1119, height: 900 });
+  await page.setViewportSize({ width: 1023, height: 900 });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('navigation', { name: 'Основная навигация' })).toBeHidden();
   await expect(page.getByRole('navigation', { name: 'Основные разделы' })).toBeVisible();
 
-  await page.setViewportSize({ width: 1120, height: 900 });
+  await page.setViewportSize({ width: 1024, height: 900 });
   await expect(page.getByRole('navigation', { name: 'Основная навигация' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Основные разделы' })).toBeHidden();
 });

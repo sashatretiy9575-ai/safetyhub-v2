@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { resolveCourseIcon } from '@/lib/course-icons';
 import { useLocale, useTranslations } from 'next-intl';
 import { localizePathname } from '@/i18n/config';
+import { CARD_BLUR_PLACEHOLDER } from '@/components/marketing/_shared/card-blur-placeholder';
 
 type CourseCardProps = {
   slug: string;
@@ -38,7 +39,10 @@ export function CourseCard({
     >
       <div
         data-course-card-cover
-        className="relative aspect-video shrink-0 overflow-hidden bg-[var(--color-surface-muted)]"
+        // A phone gets a fixed 170px cover so five cards stay scannable; a
+        // `aspect-video` cover grew past 200px on a 390px screen and made the
+        // catalog one long scroll. Wider layouts keep the 16:9 proportion.
+        className="relative h-[170px] shrink-0 overflow-hidden bg-[var(--color-surface-muted)] sm:aspect-video sm:h-auto"
       >
         {coverImage ? (
           <Image
@@ -47,6 +51,9 @@ export function CourseCard({
             fill
             sizes="(min-width: 1200px) 33vw, (min-width: 640px) 50vw, 100vw"
             priority={priority}
+            loading={priority ? undefined : 'lazy'}
+            placeholder="blur"
+            blurDataURL={CARD_BLUR_PLACEHOLDER}
             className="absolute inset-0 size-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.03]"
           />
         ) : (
@@ -114,7 +121,8 @@ export function CourseCard({
           <span
             data-course-card-cta
             aria-label={t('open')}
-            className="col-span-2 mt-1 inline-flex min-h-10 min-w-0 items-center justify-between gap-3 rounded-[14px] bg-[var(--color-primary)] px-4 text-xs sm:text-sm font-bold whitespace-nowrap text-[var(--color-primary-foreground)] shadow-[0_10px_24px_-16px_var(--color-primary)] transition-colors group-hover:bg-[var(--color-primary-hover)]"
+            // 44px is the minimum comfortable tap target; this was 40px.
+            className="col-span-2 mt-1 inline-flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-[14px] bg-[var(--color-primary)] px-4 text-xs sm:text-sm font-bold whitespace-nowrap text-[var(--color-primary-foreground)] shadow-[0_10px_24px_-16px_var(--color-primary)] transition-colors group-hover:bg-[var(--color-primary-hover)]"
           >
             <span aria-hidden="true">{t('open')}</span>
             <ArrowUpRight

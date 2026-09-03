@@ -7,23 +7,34 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+  ADMIN_PAGE_SIZE,
   getLearningHistoryTargetsPage,
   parseLearningHistoryTargetQuery,
   type LearningHistoryTargetQuery,
   type RawAdminSearchParams,
 } from '@/features/admin/data';
+import {
+  ADMIN_TRAIL_PARAM,
+  appendAdminTrail,
+  parseAdminTrail,
+  serializeAdminTrail,
+} from '@/lib/admin/pagination-trail';
 import { requireCapability } from '@/features/auth/server';
 
 function directoryHref(
   query: LearningHistoryTargetQuery,
-  cursor: { at: string; id: string } | null,
+  cursorToken: string,
+  trail: readonly string[],
 ) {
   const params = new URLSearchParams();
   if (query.query) params.set('q', query.query);
-  if (cursor) {
-    params.set('cursorAt', cursor.at);
-    params.set('cursorId', cursor.id);
+  if (cursorToken) {
+    const [at = '', id = ''] = cursorToken.split('|');
+    params.set('cursorAt', at);
+    params.set('cursorId', id);
   }
+  const serialized = serializeAdminTrail(trail);
+  if (serialized) params.set(ADMIN_TRAIL_PARAM, serialized);
   const value = params.toString();
   return value ? `/admin/employees/directory?${value}` : '/admin/employees/directory';
 }
@@ -34,8 +45,12 @@ export default async function EmployeeDirectoryPage({
   searchParams: Promise<RawAdminSearchParams>;
 }) {
   const actor = await requireCapability('results.delete');
-  const query = parseLearningHistoryTargetQuery(await searchParams);
+  const params = await searchParams;
+  const query = parseLearningHistoryTargetQuery(params);
   const result = await getLearningHistoryTargetsPage(query);
+  const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
+  const currentToken = query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
+  const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
   const backHref = actor.capabilities.includes('results.read') ? '/admin/employees' : '/admin';
 
   return (
@@ -107,11 +122,21 @@ export default async function EmployeeDirectoryPage({
           <AdminPagination
             total={result.data.total}
             visible={result.data.items.length}
-            hasCursor={Boolean(query.cursorAt && query.cursorId)}
-            firstHref={directoryHref(query, null)}
+            pageIndex={trail.length}
+            pageSize={ADMIN_PAGE_SIZE}
+            firstHref={directoryHref(query, '', [])}
+            previousHref={
+              previousToken === null
+                ? null
+                : directoryHref(query, previousToken, trail.slice(0, -1))
+            }
             nextHref={
               result.data.hasMore && result.data.nextCursor
-                ? directoryHref(query, result.data.nextCursor)
+                ? directoryHref(
+                    query,
+                    `${result.data.nextCursor.at}|${result.data.nextCursor.id}`,
+                    appendAdminTrail(trail, currentToken),
+                  )
                 : null
             }
           />

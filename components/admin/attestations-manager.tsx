@@ -196,6 +196,10 @@ export function AttestationsManager({
     onClose: closeBulkActions,
   });
 
+  // The list is a company sheet: rows are banded by company and the company
+  // column disappears from the rows themselves, because the band already names it.
+  const grouped = filters.sort === 'organization_asc';
+
   const selectedRows = useMemo(
     () => page.items.filter((row) => selected.has(row.recordId)),
     [page.items, selected],
@@ -289,11 +293,24 @@ export function AttestationsManager({
   };
 
   const setOrganizationGroupSelected = async (organization: string, checked: boolean) => {
+    const key = organizationGroupKey(organization);
     if (!checked) {
-      clearSelection();
+      // Unticking one company must not wipe an unrelated selection. A resolved
+      // "all filtered rows" selection is server-side and cannot be narrowed, so
+      // that one is still dropped whole.
+      if (resolvedSelection) {
+        clearSelection();
+        return;
+      }
+      setSelected((current) => {
+        const next = new Set(current);
+        for (const item of page.items) {
+          if (organizationGroupKey(item.organization) === key) next.delete(item.recordId);
+        }
+        return next;
+      });
       return;
     }
-    const key = organizationGroupKey(organization);
     const groupRows = page.items.filter((row) => organizationGroupKey(row.organization) === key);
     await resolveFilteredSelection(
       { ...filters, organization },
@@ -612,7 +629,7 @@ export function AttestationsManager({
     <div
       data-attestations-manager
       data-client-ready={clientReady ? 'true' : 'false'}
-      className={selectedCount > 0 ? 'space-y-3 pb-28 @min-[960px]:pb-36' : 'space-y-3'}
+      className={selectedCount > 0 ? 'space-y-3 pb-28 @min-[760px]:pb-36' : 'space-y-3'}
     >
       <AttestationSelectionBanner
         selectedCount={selectedCount}
@@ -644,47 +661,66 @@ export function AttestationsManager({
       <div
         role="table"
         aria-label="Аттестации сотрудников"
-        className="space-y-2 @min-[960px]:space-y-0 @min-[960px]:overflow-hidden @min-[960px]:rounded-xl @min-[960px]:border @min-[960px]:bg-[var(--color-surface)]"
+        className="space-y-2 @min-[760px]:space-y-0 @min-[760px]:overflow-hidden @min-[760px]:rounded-xl @min-[760px]:border @min-[760px]:bg-[var(--color-surface)]"
       >
         <div
           role="row"
-          className="sticky top-0 z-20 hidden min-h-11 items-center gap-x-3 bg-[var(--color-surface)] px-2.5 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] @min-[960px]:grid @min-[960px]:grid-cols-[40px_minmax(0,1.2fr)_minmax(0,1.1fr)_minmax(0,1.2fr)_56px_minmax(0,0.8fr)_40px]"
+          className="sticky top-0 z-20 hidden min-h-9 items-center gap-x-2 bg-[var(--color-surface-muted)] px-1.5 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] @min-[760px]:grid @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_32px]"
         >
-          <span role="columnheader" className="sr-only">
-            Выбор
-          </span>
+          {/* An `sr-only` cell is absolutely positioned and therefore leaves the
+              grid flow, which shifted every visible heading one column to the
+              left. Keep the cell in flow and hide only its text. */}
+          <span role="columnheader" aria-label="Выбор" />
           <span role="columnheader">Сотрудник</span>
-          <span role="columnheader">Компания</span>
-          <span role="columnheader">Курс</span>
-          <span role="columnheader">Балл</span>
-          <span role="columnheader">Статус</span>
-          <span role="columnheader" className="sr-only">
-            Действия
+          <span role="columnheader" className="border-l border-[var(--color-border)] pl-2">
+            {grouped ? 'Должность' : 'Компания'}
           </span>
+          <span role="columnheader" className="border-l border-[var(--color-border)] pl-2">
+            Курс
+          </span>
+          <span role="columnheader" className="border-l border-[var(--color-border)] pl-2">
+            Дата
+          </span>
+          <span role="columnheader" className="border-l border-[var(--color-border)] pl-2">
+            Балл
+          </span>
+          <span role="columnheader" className="border-l border-[var(--color-border)] pl-2">
+            Статус
+          </span>
+          <span role="columnheader" aria-label="Действия" />
         </div>
 
         <div
           role="rowgroup"
-          className={`space-y-2 @min-[960px]:space-y-0 ${selectionSummary.total > 0 ? 'pb-24 @min-[960px]:pb-16' : ''}`}
+          className={`space-y-2 @min-[760px]:space-y-0 ${selectionSummary.total > 0 ? 'pb-24 @min-[760px]:pb-16' : ''}`}
         >
           {page.items.map((row, index) => {
             const groupKey = organizationGroupKey(row.organization);
             const showGroup =
-              filters.sort === 'organization_asc' &&
+              grouped &&
               (index === 0 ||
                 groupKey !== organizationGroupKey(page.items[index - 1]?.organization ?? ''));
             const groupCollapsed = collapsedGroups.has(groupKey);
+            const groupRowIds = showGroup
+              ? page.items
+                  .filter((item) => organizationGroupKey(item.organization) === groupKey)
+                  .map((item) => item.recordId)
+              : [];
+            const groupFullySelected =
+              showGroup &&
+              groupRowIds.length > 0 &&
+              groupRowIds.every((recordId) => selected.has(recordId));
 
             return (
               <Fragment key={row.recordId}>
                 {showGroup ? (
                   <div
                     role="row"
-                    className="rounded-lg bg-[var(--color-surface-muted)] @min-[960px]:rounded-none"
+                    className="rounded-lg bg-[var(--color-surface-muted)] @min-[760px]:rounded-none @min-[760px]:border-t-2 @min-[760px]:border-[var(--color-border-strong)]"
                   >
                     <div
                       role="cell"
-                      className="flex min-h-11 items-center gap-2 px-2 py-1 text-xs font-bold"
+                      className="flex min-h-10 items-center gap-1 px-1.5 text-xs font-bold"
                     >
                       <button
                         type="button"
@@ -698,10 +734,10 @@ export function AttestationsManager({
                             return next;
                           })
                         }
-                        className="grid size-11 shrink-0 place-items-center rounded-lg hover:bg-[var(--color-surface)]"
+                        className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-[var(--color-surface)]"
                       >
                         <CaretDown
-                          size={18}
+                          size={16}
                           className={
                             groupCollapsed
                               ? '-rotate-90 transition-transform'
@@ -709,21 +745,49 @@ export function AttestationsManager({
                           }
                         />
                       </button>
-                      <Link
-                        href={organizationHref(filters, row.organization)}
-                        className="min-h-11 min-w-0 flex-1 content-center break-words text-[var(--color-primary)] underline-offset-4 hover:underline"
+                      {/* Clicking the company name selects everyone in it. That is
+                          the operation an administrator actually performs on a
+                          company; jumping to a filtered URL stayed available in
+                          the menu next to it. */}
+                      <button
+                        type="button"
+                        aria-pressed={groupFullySelected}
+                        title={
+                          groupFullySelected
+                            ? 'Снять выделение с компании'
+                            : 'Выбрать всех сотрудников этой компании'
+                        }
+                        onClick={() =>
+                          void setOrganizationGroupSelected(row.organization, !groupFullySelected)
+                        }
+                        className="flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-lg px-1.5 text-left hover:bg-[var(--color-surface)]"
                       >
-                        {row.organization || '—'} · {row.organizationGroupCount}{' '}
-                        строк
-                      </Link>
+                        <span
+                          aria-hidden
+                          className={`grid size-4 shrink-0 place-items-center rounded-[4px] border text-[10px] leading-none ${
+                            groupFullySelected
+                              ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white'
+                              : 'border-[var(--color-border-strong)]'
+                          }`}
+                        >
+                          {groupFullySelected ? '✓' : ''}
+                        </span>
+                        <span className="min-w-0 break-words">
+                          {row.organization || 'Компания не указана'}
+                        </span>
+                        <span className="shrink-0 font-medium text-[var(--color-text-muted)] tabular-nums">
+                          {row.organizationGroupCount}
+                        </span>
+                      </button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             size="icon"
                             variant="ghost"
+                            className="size-9"
                             aria-label={`Действия с компанией: ${row.organization || 'не указана'}`}
                           >
-                            <DotsThree size={20} weight="bold" />
+                            <DotsThree size={18} weight="bold" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -762,6 +826,7 @@ export function AttestationsManager({
                     permissions={permissions}
                     onSingleAction={(action) => openSingleAction(row, action)}
                     organizationHref={(org) => organizationHref(filters, org)}
+                    grouped={grouped}
                   />
                 ) : null}
               </Fragment>
@@ -774,7 +839,7 @@ export function AttestationsManager({
         <>
           <aside
             aria-label="Выбранные аттестации"
-            className="glass-strong sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+.5rem)] z-30 flex items-center gap-3 rounded-2xl border p-3 shadow-[var(--shadow-pop)] @min-[960px]:hidden"
+            className="glass-strong sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+.5rem)] z-30 flex items-center gap-3 rounded-2xl border p-3 shadow-[var(--shadow-pop)] @min-[760px]:hidden"
           >
             <div className="min-w-0 flex-1">
               <p className="font-bold tabular-nums">Выбрано: {selectedCount}</p>
@@ -797,7 +862,7 @@ export function AttestationsManager({
 
           <aside
             aria-label="Массовые действия"
-            className="glass-strong sticky bottom-4 z-30 hidden rounded-2xl border p-4 shadow-[var(--shadow-pop)] @min-[960px]:block"
+            className="glass-strong sticky bottom-4 z-30 hidden rounded-2xl border p-4 shadow-[var(--shadow-pop)] @min-[760px]:block"
           >
             <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-b pb-3 text-sm">
               <strong>{selectionSummary.total} выбрано</strong>
@@ -817,7 +882,7 @@ export function AttestationsManager({
 
           {bulkActionsOpen ? (
             <div
-              className="fixed inset-0 z-50 grid items-end bg-black/45 @min-[960px]:hidden"
+              className="fixed inset-0 z-50 grid items-end bg-black/45 @min-[760px]:hidden"
               role="presentation"
               onMouseDown={(event) => {
                 if (event.target === event.currentTarget) closeBulkActions();

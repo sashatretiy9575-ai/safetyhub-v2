@@ -61,36 +61,39 @@ export default async function ContactsPage() {
 
             <dl className="grid overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/76 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl sm:grid-cols-2">
               {details.map(({ icon: Icon, label, value, ...item }, index) => (
+                // A description list groups a term and its value in a `div` that
+                // may contain nothing but `dt` and `dd`. The icon and an extra
+                // wrapper used to sit in there too, which is invalid markup and
+                // was reported as a serious accessibility violation, so the icon
+                // now lives inside the term it labels.
                 <div
                   key={label}
-                  className={`flex items-start gap-4 p-5 ${
+                  className={`p-5 ${
                     index === 0
                       ? 'border-b border-[var(--color-border)] sm:border-r sm:border-b-0'
                       : ''
                   }`}
                 >
-                  <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                    <Icon size={22} weight="duotone" aria-hidden="true" />
-                  </span>
-                  <div className="min-w-0">
-                    <dt className="text-xs font-bold tracking-[0.08em] text-[var(--color-text-subtle)] uppercase">
-                      {label}
-                    </dt>
-                    <dd className="mt-1 min-w-0 text-[15px] leading-6 font-semibold break-words">
-                      {'href' in item ? (
-                        <a
-                          href={item.href}
-                          target={item.href.startsWith('http') ? '_blank' : undefined}
-                          rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                          className="transition hover:text-[var(--color-primary)]"
-                        >
-                          {value}
-                        </a>
-                      ) : (
-                        value
-                      )}
-                    </dd>
-                  </div>
+                  <dt className="flex min-w-0 items-center gap-4 text-xs font-bold tracking-[0.08em] text-[var(--color-text-subtle)] uppercase">
+                    <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                      <Icon size={22} weight="duotone" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">{label}</span>
+                  </dt>
+                  <dd className="mt-1 min-w-0 pl-[3.75rem] text-[15px] leading-6 font-semibold break-words">
+                    {'href' in item ? (
+                      <a
+                        href={item.href}
+                        target={item.href.startsWith('http') ? '_blank' : undefined}
+                        rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        className="transition hover:text-[var(--color-primary)]"
+                      >
+                        {value}
+                      </a>
+                    ) : (
+                      value
+                    )}
+                  </dd>
                 </div>
               ))}
             </dl>

@@ -7,7 +7,6 @@ import { ArticleRenderer } from '@/components/article-renderer';
 import { ContentBlockEditor } from '@/components/admin/content-block-editor';
 import { ContentSeoEditor } from '@/components/admin/content-seo-editor';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -127,7 +126,7 @@ export function AdminEditor({
   const [blocks, setBlocks] = useState<ArticleBlock[]>(
     initialBlocks.success ? initialBlocks.data : [],
   );
-  const [status, setStatus] = useState<ArticleLifecycleStatus>(initialData?.status ?? 'draft');
+  const [, setStatus] = useState<ArticleLifecycleStatus>(initialData?.status ?? 'draft');
   const [publicationState, setPublicationState] = useState<ArticlePublicationState>(
     initialData?.publicationState ?? 'never_published',
   );
@@ -360,11 +359,15 @@ export function AdminEditor({
   };
 
   const handleStatus = async (nextStatus: ArticleLifecycleStatus) => {
-    const confirmation: Record<ArticleLifecycleStatus, string> = {
-      draft: 'Снять статью с публикации и оставить её черновиком?',
-      published: 'Сохранить изменения и опубликовать статью?',
-    };
-    if (!window.confirm(confirmation[nextStatus])) return;
+    // Publishing is an explicit button and is undone by "Снять с публикации",
+    // so it does not need a second native dialog on every save. Taking a live
+    // page down is the step worth confirming.
+    if (
+      nextStatus === 'draft' &&
+      !window.confirm('Снять статью с публикации и оставить её черновиком?')
+    ) {
+      return;
+    }
 
     setBusy(true);
     setError('');
@@ -509,6 +512,9 @@ export function AdminEditor({
         onTogglePreview={() => setPreview((current) => !current)}
         onSave={() => void handleSave()}
         onPublish={() => void handleStatus('published')}
+        onUnpublish={() => void handleStatus('draft')}
+        onDelete={articleId ? () => setDeleteOpen(true) : undefined}
+        deleteDisabled={!draftVersion}
       />
 
       {error ? (
@@ -519,67 +525,6 @@ export function AdminEditor({
           {error}
         </p>
       ) : null}
-
-      <Card>
-        <CardContent className="space-y-3 p-4 md:p-6">
-          <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <h2 className="font-semibold">Публикация</h2>
-              <p className="text-sm text-[var(--color-text-muted)]">
-                Сохранение не меняет статус и исходную дату публикации.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge
-                variant={
-                  displayedPublicationState === 'published' ||
-                  displayedPublicationState === 'published_with_draft_changes'
-                    ? 'success'
-                    : 'default'
-                }
-              >
-                {PUBLICATION_LABEL[displayedPublicationState]}
-              </Badge>
-              {displayedPublicationState === 'published_with_draft_changes' ? (
-                <Badge variant="default">Есть черновик</Badge>
-              ) : null}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
-            {status !== 'published' ? (
-              <Button
-                type="button"
-                className="min-h-11"
-                disabled={busy}
-                onClick={() => handleStatus('published')}
-              >
-                Опубликовать
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="outline"
-                className="min-h-11"
-                disabled={busy}
-                onClick={() => handleStatus('draft')}
-              >
-                Снять с публикации
-              </Button>
-            )}
-            {articleId ? (
-              <Button
-                type="button"
-                variant="danger"
-                className="min-h-11"
-                disabled={busy || !draftVersion}
-                onClick={() => setDeleteOpen(true)}
-              >
-                Удалить
-              </Button>
-            ) : null}
-          </div>
-        </CardContent>
-      </Card>
 
       {preview ? (
         <Card className="min-w-0 overflow-hidden">
@@ -614,7 +559,7 @@ export function AdminEditor({
                   />
                 </div>
                 <div className="min-w-0 space-y-2">
-                  <Label htmlFor="article-cover">Обложка из /public/images (необязательно)</Label>
+                  <Label htmlFor="article-cover">Обложка</Label>
                   <MediaAssetInput
                     id="article-cover"
                     value={coverImage}
@@ -623,29 +568,37 @@ export function AdminEditor({
                     onChange={setCoverImage}
                     placeholder="/images/generated/cover.webp"
                   />
-                  <p className="text-xs text-[var(--color-text-subtle)]">
-                    Оставьте поле пустым: черновик и опубликованная статья получат компоновку без
-                    изображения.
-                  </p>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Optional sections start folded: they never block publication and
+                used to push the actual text editor off the first screen. */}
             <Card className="min-w-0">
-              <CardContent className="min-w-0 space-y-4 p-4 min-[360px]:p-5 md:p-6">
-                <h2 className="font-semibold">SEO и соцсети</h2>
-                <ContentSeoEditor idPrefix="article" value={seo} onChange={setSeo} />
+              <CardContent className="min-w-0 p-4 min-[360px]:p-5 md:p-6">
+                <details className="group">
+                  <summary className="flex min-h-11 cursor-pointer items-center font-semibold">
+                    SEO и соцсети
+                  </summary>
+                  <div className="mt-4 space-y-4">
+                    <ContentSeoEditor idPrefix="article" value={seo} onChange={setSeo} />
+                  </div>
+                </details>
               </CardContent>
             </Card>
 
             <Card className="min-w-0">
-              <CardContent className="min-w-0 space-y-4 p-4 min-[360px]:p-5 md:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="font-semibold">Данные материала и источники</h2>
-                </div>
-                <p className="text-xs text-[var(--color-text-muted)]">
-                  Все поля в этом разделе необязательны и не блокируют публикацию.
-                </p>
+              <CardContent className="min-w-0 p-4 min-[360px]:p-5 md:p-6">
+                <details className="group">
+                  <summary className="flex min-h-11 cursor-pointer items-center font-semibold">
+                    Источники и юрисдикция
+                    {sources.length ? (
+                      <span className="ml-2 text-xs font-medium text-[var(--color-text-muted)] tabular-nums">
+                        {sources.length}
+                      </span>
+                    ) : null}
+                  </summary>
+                  <div className="mt-4 space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="article-jurisdiction">Юрисдикция</Label>
                   <Input
@@ -725,6 +678,8 @@ export function AdminEditor({
                     <p className="text-xs text-[var(--color-text-muted)]">Источники не указаны.</p>
                   ) : null}
                 </div>
+                  </div>
+                </details>
               </CardContent>
             </Card>
           </div>
@@ -756,12 +711,7 @@ export function AdminEditor({
             </Card>
             <Card className="min-w-0 overflow-hidden">
               <CardContent className="space-y-4 p-4 md:p-5">
-                <div>
-                  <h2 className="font-semibold">Содержание статьи</h2>
-                  <p className="text-sm text-[var(--color-text-muted)]">
-                    Перетаскивайте блоки за маркер или используйте кнопки вверх и вниз.
-                  </p>
-                </div>
+                <h2 className="font-semibold">Содержание статьи</h2>
                 <ContentBlockEditor mode="article" blocks={blocks} onChange={setBlocks} />
               </CardContent>
             </Card>
@@ -774,7 +724,7 @@ export function AdminEditor({
       ) : articleId ? (
         <Card>
           <CardContent className="p-4 text-sm text-[var(--color-text-muted)]">
-            Обновите страницу после первого сохранения, чтобы открыть вкладки RU, KK, EN и ZH.
+            Переводы откроются после обновления страницы.
           </CardContent>
         </Card>
       ) : null}

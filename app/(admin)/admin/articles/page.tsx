@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { Article, DotsThree, Plus } from '@phosphor-icons/react/dist/ssr';
+import { Article, ArrowSquareOut, PencilSimple, Plus } from '@phosphor-icons/react/dist/ssr';
 import { requireCapability } from '@/features/auth/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { ArticleLifecycleStatus } from '@/lib/validation/article';
@@ -81,7 +81,7 @@ export default async function AdminArticlesPage({
         <div>
           <h1 className="font-display text-3xl font-bold">Материалы</h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Черновики и опубликованные статьи в одном списке.
+            Черновики и опубликованные статьи в одном списке. Найдено: {articles.length}.
           </p>
         </div>
         <Button asChild>
@@ -131,41 +131,71 @@ export default async function AdminArticlesPage({
 
       {articles.length ? (
         <div className="overflow-hidden rounded-2xl border bg-[var(--color-surface)]">
-          <div className="hidden min-h-11 grid-cols-[minmax(0,2fr)_9rem_11rem_3rem] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] min-[760px]:grid">
+          <div className="hidden min-h-11 grid-cols-[minmax(0,2fr)_11rem_8rem_auto] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] min-[760px]:grid">
             <span>Название</span>
             <span>Статус</span>
             <span>Изменено</span>
-            <span className="sr-only">Действие</span>
+            <span className="text-right">Действия</span>
           </div>
           {articles.map((item) => {
+            const editHref = `/admin/articles/${item.slug}/edit`;
+            const updated = new Date(item.updated_at);
             return (
               <article
                 key={item.id}
-                className="grid gap-3 border-t p-4 first:border-t-0 min-[760px]:min-h-[68px] min-[760px]:grid-cols-[minmax(0,2fr)_9rem_11rem_3rem] min-[760px]:items-center"
+                className="grid gap-2 border-t p-3 first:border-t-0 min-[760px]:min-h-[60px] min-[760px]:grid-cols-[minmax(0,2fr)_11rem_8rem_auto] min-[760px]:items-center min-[760px]:gap-3 min-[760px]:px-4"
               >
                 <div className="min-w-0">
-                  <h2 className="font-semibold break-words">{item.title}</h2>
-                  <p className="text-xs text-[var(--color-text-muted)]">/{item.slug}</p>
+                  {/* The title is the primary way into the editor: an icon-only
+                      "…" button was the only affordance before, and its glyph
+                      read as "more", not "edit". */}
+                  <h2 className="font-semibold break-words">
+                    <Link href={editHref} className="hover:text-[var(--color-primary)] hover:underline">
+                      {item.title}
+                    </Link>
+                  </h2>
+                  <p className="truncate text-xs text-[var(--color-text-muted)]">/{item.slug}</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   <Badge variant={item.status === 'published' ? 'success' : 'warning'}>
                     {statusLabel[item.status]}
                   </Badge>
                   {item.hasDraftChanges ? <Badge variant="default">Есть черновик</Badge> : null}
                 </div>
-                <div className="text-xs text-[var(--color-text-muted)]">
-                  <p>{new Date(item.updated_at).toLocaleDateString('ru-RU')}</p>
+                <div className="text-xs text-[var(--color-text-muted)] tabular-nums">
+                  <time dateTime={item.updated_at}>
+                    {updated.toLocaleDateString('ru-RU')}
+                    <span className="ml-1.5 text-[var(--color-text-subtle)]">
+                      {updated.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </time>
                 </div>
-                <Button
-                  asChild
-                  size="icon"
-                  variant="ghost"
-                  aria-label={`Редактировать: ${item.title}`}
-                >
-                  <Link href={`/admin/articles/${item.slug}/edit`}>
-                    <DotsThree />
-                  </Link>
-                </Button>
+                <div className="flex items-center justify-start gap-1.5 min-[760px]:justify-end">
+                  {item.status === 'published' ? (
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="ghost"
+                      className="h-9 px-2 text-xs"
+                      title="Открыть на сайте"
+                    >
+                      <Link
+                        href={`/blog/${item.slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`Открыть на сайте: ${item.title}`}
+                      >
+                        <ArrowSquareOut aria-hidden />
+                      </Link>
+                    </Button>
+                  ) : null}
+                  <Button asChild size="sm" variant="outline" className="h-9 px-2.5 text-xs">
+                    <Link href={editHref} aria-label={`Редактировать: ${item.title}`}>
+                      <PencilSimple aria-hidden />
+                      Изменить
+                    </Link>
+                  </Button>
+                </div>
               </article>
             );
           })}

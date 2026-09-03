@@ -110,11 +110,20 @@ const adminCapabilitySchema = z.enum([
   'capability.manage',
 ]);
 
+/**
+ * Every admin directory RPC passes its page through `private.redact_zh_email_items`,
+ * which nulls both `email` and `label` for a synthetic Chinese username account
+ * that has no display name yet. A non-nullable `label` therefore rejected the
+ * whole page and the section rendered "не загрузился" as soon as a single such
+ * account existed. Accept the null and fall back to a readable placeholder.
+ */
+const ANONYMOUS_ACCOUNT_LABEL = 'Без имени';
+
 const adminUserListItemSchema = z
   .object({
     id: z.string().uuid(),
     email: z.string().nullable(),
-    label: z.string().optional(),
+    label: z.string().nullish(),
     // Rolling-deploy compatibility: the previous RPC nested the display name in profile.
     // Zod strips every other legacy profile/identity/activity field before this result leaves
     // the server, and the follow-up migration removes those fields at the database boundary.
@@ -129,17 +138,22 @@ const adminUserListItemSchema = z
     label:
       label?.trim() ||
       [profile?.name, profile?.surname].filter(Boolean).join(' ').trim() ||
-      'Без имени',
+      ANONYMOUS_ACCOUNT_LABEL,
   }));
 
-const learningHistoryTargetSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().nullable(),
-  label: z.string(),
-  role: z.literal('participant'),
-  status: z.enum(['active', 'suspended']),
-  createdAt: isoDateSchema,
-});
+const learningHistoryTargetSchema = z
+  .object({
+    id: z.string().uuid(),
+    email: z.string().nullable(),
+    label: z.string().nullish(),
+    role: z.literal('participant'),
+    status: z.enum(['active', 'suspended']),
+    createdAt: isoDateSchema,
+  })
+  .transform(({ label, ...target }) => ({
+    ...target,
+    label: label?.trim() || ANONYMOUS_ACCOUNT_LABEL,
+  }));
 
 const auditEventSchema = z.object({
   id: z.string().regex(/^\d+$/),
@@ -156,16 +170,26 @@ const auditEventSchema = z.object({
   createdAt: isoDateSchema,
 });
 
-const adminAccessUserSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().nullable(),
-  label: z.string(),
-  capabilities: z.array(adminCapabilitySchema),
-});
+const adminAccessUserSchema = z
+  .object({
+    id: z.string().uuid(),
+    email: z.string().nullable(),
+    label: z.string().nullish(),
+    capabilities: z.array(adminCapabilitySchema),
+  })
+  .transform(({ label, ...user }) => ({
+    ...user,
+    label: label?.trim() || ANONYMOUS_ACCOUNT_LABEL,
+  }));
 
 const adminAccountApprovalItemSchema = z.object({
   id: z.string().uuid(),
-  email: z.string().email().nullable(),
+  // A redacted Chinese account has no email; a legacy row may carry an empty
+  // string. Neither may reject the whole approval queue.
+  email: z
+    .union([z.string().email(), z.literal('')])
+    .nullish()
+    .transform((value) => value || null),
   username: z
     .string()
     .regex(/^[a-z][a-z0-9._-]{2,31}$/u)

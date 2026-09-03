@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { CaretDown } from '@phosphor-icons/react';
 import { useLocale, useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,11 +71,23 @@ function isTransitionResult(value: unknown): value is LocaleTransitionResult {
  */
 export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] }) {
   const locale = useLocale() as AppLocale;
+  const router = useRouter();
   const pathname = usePathname();
   const translations = useTranslations('Shell.language');
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState('');
   const quizLocked = ACTIVE_QUIZ_ROUTE.test(pathname);
+
+  /**
+   * Soft navigation keeps the already-loaded application shell and fetches only
+   * the new server payload. The signed-out branch stays a hard navigation
+   * because the server has just dropped the auth cookies and the next document
+   * must be requested with the new cookie jar.
+   */
+  const openLocale = (target: string) => {
+    router.replace(target);
+    router.refresh();
+  };
 
   const changeLocale = async (nextLocale: AppLocale) => {
     if (!locales.includes(nextLocale) || nextLocale === locale || pending) return;
@@ -87,9 +99,13 @@ export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] })
     setStatus('');
     // A guest language change is a URL/preference change only. It must never
     // hit an authenticated profile endpoint or cause a stray 401.
+    //
+    // It is also a plain route change, so it goes through the App Router rather
+    // than `location.assign`: a full document load re-downloaded the HTML, the
+    // CSS and every chunk, which is what made switching feel slow.
     if (!hasSessionHint()) {
       setLocalePreference(nextLocale);
-      window.location.assign(navigationTarget(pathname, nextLocale));
+      openLocale(navigationTarget(pathname, nextLocale));
       return;
     }
 
@@ -118,7 +134,8 @@ export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] })
         return;
       }
 
-      window.location.assign(navigationTarget(pathname, nextLocale));
+      openLocale(navigationTarget(pathname, nextLocale));
+      setPending(false);
     } catch {
       // Do not open a target realm over an active old-realm session if the
       // server cleanup/transition request was unavailable.

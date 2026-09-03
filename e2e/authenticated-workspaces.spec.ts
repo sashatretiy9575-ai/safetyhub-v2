@@ -260,14 +260,19 @@ test.describe('authenticated operator and participant workspaces', () => {
               Number.parseFloat(style.paddingRight)
             );
           });
-        const contentWideEnough = contentWidth >= 960;
+        // The table appears as soon as the desktop sidebar does: at a 1024px
+        // viewport the workspace container is exactly 760px wide, so a laptop no
+        // longer falls back to the stacked mobile cards.
+        const contentWideEnough = contentWidth >= 760;
         if (contentWideEnough) await expect(tableHeader).toBeVisible();
         else await expect(tableHeader).toBeHidden();
 
         const mobileNavigation = page.getByRole('navigation', {
           name: 'Мобильная навигация админ-панели',
         });
-        if (viewport.width >= 1180) await expect(mobileNavigation).toBeHidden();
+        // The admin sidebar takes over at 1024px, so the bottom dock disappears
+        // there too. This still asserted the retired 1180px threshold.
+        if (viewport.width >= 1024) await expect(mobileNavigation).toBeHidden();
         else await expect(mobileNavigation).toBeVisible();
 
         await captureViewport(page, testInfo, 'admin-employees', viewport);

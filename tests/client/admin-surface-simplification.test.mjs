@@ -30,5 +30,5 @@ test('settings consolidates contacts, companies, and history without access mana
   assert.doesNotMatch(overview, /<Card/);
   assert.doesNotMatch(overview, /Рабочая сводка доступных вам разделов/u);
   const auditList = audit.slice(audit.indexOf('auditResult.data.items.map'));
-  assert.equal((auditList.match(/Correlation ID/g) ?? []).length, 1);
+  assert.equal((auditList.match(/Код обращения/g) ?? []).length, 1);
 });

@@ -15,6 +15,12 @@ import {
   type AdminAttestationQuery,
   type RawAdminAttestationSearchParams,
 } from '@/features/admin/attestations';
+import {
+  ADMIN_TRAIL_PARAM,
+  appendAdminTrail,
+  parseAdminTrail,
+  serializeAdminTrail,
+} from '@/lib/admin/pagination-trail';
 import { requireCapability } from '@/features/auth/server';
 
 function inputDate(value: string | null, exclusiveEnd = false) {
@@ -24,7 +30,11 @@ function inputDate(value: string | null, exclusiveEnd = false) {
   return date.toISOString().slice(0, 10);
 }
 
-function employeeHref(query: AdminAttestationQuery, cursor: AdminAttestationQuery['cursor']) {
+function employeeHref(
+  query: AdminAttestationQuery,
+  cursorToken: string,
+  trail: readonly string[],
+) {
   const params = new URLSearchParams();
   if (query.query) params.set('q', query.query);
   if (query.organization) params.set('organization', query.organization);
@@ -35,8 +45,9 @@ function employeeHref(query: AdminAttestationQuery, cursor: AdminAttestationQuer
   if (query.to) params.set('to', inputDate(query.to, true));
   if (query.sort !== 'organization_asc') params.set('sort', query.sort);
   if (query.pageSize !== 50) params.set('pageSize', String(query.pageSize));
-  const encodedCursor = encodeAdminAttestationCursor(cursor);
-  if (encodedCursor) params.set('cursor', encodedCursor);
+  if (cursorToken) params.set('cursor', cursorToken);
+  const serialized = serializeAdminTrail(trail);
+  if (serialized) params.set(ADMIN_TRAIL_PARAM, serialized);
   const search = params.toString();
   return search ? `/admin/employees?${search}` : '/admin/employees';
 }
@@ -55,6 +66,9 @@ export default async function AdminEmployeesPage({
     getAdminAttestationsPage(query),
     getAdminWorkQueue(),
   ]);
+  const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
+  const currentToken = encodeAdminAttestationCursor(query.cursor);
+  const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
 
   const permissions = {
     canReadUser: actor.capabilities.includes('user.read'),
@@ -151,7 +165,7 @@ export default async function AdminEmployeesPage({
       ) : (
         <>
           <AttestationsManager
-            key={employeeHref(query, query.cursor)}
+            key={employeeHref(query, currentToken, trail)}
             page={result.data}
             filters={{
               query: query.query,
@@ -169,11 +183,19 @@ export default async function AdminEmployeesPage({
           <AdminPagination
             total={result.data.total}
             visible={result.data.items.length}
-            hasCursor={Boolean(query.cursor)}
-            firstHref={employeeHref(query, null)}
+            pageIndex={trail.length}
+            pageSize={query.pageSize}
+            firstHref={employeeHref(query, '', [])}
+            previousHref={
+              previousToken === null ? null : employeeHref(query, previousToken, trail.slice(0, -1))
+            }
             nextHref={
               result.data.hasMore && result.data.nextCursor
-                ? employeeHref(query, result.data.nextCursor)
+                ? employeeHref(
+                    query,
+                    encodeAdminAttestationCursor(result.data.nextCursor),
+                    appendAdminTrail(trail, currentToken),
+                  )
                 : null
             }
           />

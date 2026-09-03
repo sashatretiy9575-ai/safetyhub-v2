@@ -171,7 +171,11 @@ export function EmailOtpFlow() {
   const [status, setStatus] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [captchaVersion, setCaptchaVersion] = useState(0);
-  const [legalAccepted, setLegalAccepted] = useState(false);
+  // The sentence next to the box says that continuing is the acceptance, so the
+  // box starts ticked and stays clearable instead of blocking the button by
+  // default. Nothing about it is persisted; the server records the acceptance
+  // per verification. The ZH flow already starts from the same default.
+  const [legalAccepted, setLegalAccepted] = useState(true);
   const emailRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
   const turnstileRef = useRef<TurnstileHandle>(null);
@@ -556,17 +560,6 @@ export function EmailOtpFlow() {
             />
             <FieldError id="email-otp-code-error" message={fieldErrors.code} />
           </div>
-          <Button
-            type="submit"
-            className="min-h-11 w-full"
-            disabled={busy !== null || verifyRetrySeconds > 0 || !legalAccepted}
-          >
-            {busy === 'verify'
-              ? t('verifying')
-              : verifyRetrySeconds > 0
-                ? t('retryIn', { delay: formatRetryDelay(verifyRetrySeconds, locale) })
-                : t('verify')}
-          </Button>
           <div className="space-y-1">
             <label
               className="flex items-start gap-2 text-xs leading-5 text-[var(--color-text-muted)]"
@@ -612,6 +605,17 @@ export function EmailOtpFlow() {
               </p>
             ) : null}
           </div>
+          <Button
+            type="submit"
+            className="min-h-11 w-full"
+            disabled={busy !== null || verifyRetrySeconds > 0 || !legalAccepted}
+          >
+            {busy === 'verify'
+              ? t('verifying')
+              : verifyRetrySeconds > 0
+                ? t('retryIn', { delay: formatRetryDelay(verifyRetrySeconds, locale) })
+                : t('verify')}
+          </Button>
           <div className="grid gap-2 sm:grid-cols-2">
             <Button
               type="button"
@@ -648,12 +652,6 @@ export function EmailOtpFlow() {
         }}
       />
       <FieldError id="email-otp-captcha-error" message={fieldErrors.captcha} />
-
-      {visibleError && (
-        <p role="alert" className="text-sm text-[var(--color-danger)]">
-          {visibleError}
-        </p>
-      )}
     </>
   );
 }

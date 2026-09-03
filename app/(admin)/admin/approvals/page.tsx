@@ -6,21 +6,27 @@ import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data
 import { AdminPagination } from '@/components/admin/admin-pagination';
 import { Button } from '@/components/ui/button';
 import {
+  ADMIN_PAGE_SIZE,
   getPendingAccountApprovalPage,
   parseAdminAccountApprovalQuery,
-  type AdminAccountApprovalQuery,
   type RawAdminSearchParams,
 } from '@/features/admin/data';
+import {
+  ADMIN_TRAIL_PARAM,
+  appendAdminTrail,
+  parseAdminTrail,
+  serializeAdminTrail,
+} from '@/lib/admin/pagination-trail';
 
-function approvalHref(
-  query: AdminAccountApprovalQuery,
-  cursor: AdminAccountApprovalQuery,
-) {
+function approvalHref(cursorToken: string, trail: readonly string[]) {
   const params = new URLSearchParams();
-  if (cursor.cursorAt && cursor.cursorId) {
-    params.set('cursorAt', cursor.cursorAt);
-    params.set('cursorId', cursor.cursorId);
+  if (cursorToken) {
+    const [at = '', id = ''] = cursorToken.split('|');
+    params.set('cursorAt', at);
+    params.set('cursorId', id);
   }
+  const serialized = serializeAdminTrail(trail);
+  if (serialized) params.set(ADMIN_TRAIL_PARAM, serialized);
   const search = params.toString();
   return search ? `/admin/approvals?${search}` : '/admin/approvals';
 }
@@ -30,8 +36,12 @@ export default async function AdminApprovalsPage({
 }: {
   searchParams: Promise<RawAdminSearchParams>;
 }) {
-  const query = parseAdminAccountApprovalQuery(await searchParams);
+  const params = await searchParams;
+  const query = parseAdminAccountApprovalQuery(params);
   const result = await getPendingAccountApprovalPage(query);
+  const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
+  const currentToken = query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
+  const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
 
   return (
     <section className="space-y-5">
@@ -64,14 +74,18 @@ export default async function AdminApprovalsPage({
           <AdminPagination
             total={result.data.total}
             visible={result.data.items.length}
-            hasCursor={Boolean(query.cursorAt && query.cursorId)}
-            firstHref={approvalHref(query, { cursorAt: null, cursorId: null })}
+            pageIndex={trail.length}
+            pageSize={ADMIN_PAGE_SIZE}
+            firstHref={approvalHref('', [])}
+            previousHref={
+              previousToken === null ? null : approvalHref(previousToken, trail.slice(0, -1))
+            }
             nextHref={
               result.data.hasMore && result.data.nextCursor
-                ? approvalHref(query, {
-                    cursorAt: result.data.nextCursor.at,
-                    cursorId: result.data.nextCursor.id,
-                  })
+                ? approvalHref(
+                    `${result.data.nextCursor.at}|${result.data.nextCursor.id}`,
+                    appendAdminTrail(trail, currentToken),
+                  )
                 : null
             }
           />

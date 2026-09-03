@@ -1,9 +1,21 @@
 'use client';
 
-import { Check, Eye, Pencil, UploadSimple } from '@phosphor-icons/react';
+import { Check, DotsThree, Eye, Pencil, UploadSimple } from '@phosphor-icons/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
+/**
+ * One place for every publication action. The article editor used to repeat the
+ * status badge, "Опубликовать", "Снять с публикации" and "Удалить" in a separate
+ * card directly underneath this bar, which pushed the actual content two screens
+ * down and gave the same action two different buttons.
+ */
 export function EditorActionBar({
   busy,
   preview,
@@ -15,6 +27,9 @@ export function EditorActionBar({
   onTogglePreview,
   onSave,
   onPublish,
+  onUnpublish,
+  onDelete,
+  deleteDisabled = false,
 }: {
   busy: boolean;
   preview: boolean;
@@ -26,7 +41,11 @@ export function EditorActionBar({
   onTogglePreview: () => void;
   onSave: () => void;
   onPublish: () => void;
+  onUnpublish?: () => void;
+  onDelete?: () => void;
+  deleteDisabled?: boolean;
 }) {
+  const hasOverflow = Boolean(onUnpublish || onDelete);
   return (
     <div
       data-editor-action-bar
@@ -89,6 +108,35 @@ export function EditorActionBar({
             <UploadSimple aria-hidden="true" />
             <span className="hidden sm:inline">Опубликовать</span>
           </Button>
+          {hasOverflow ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="min-h-11 min-w-11"
+                  aria-label="Другие действия"
+                  title="Другие действия"
+                  disabled={busy}
+                >
+                  <DotsThree aria-hidden="true" weight="bold" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {onUnpublish ? (
+                  <DropdownMenuItem disabled={!published} onSelect={onUnpublish}>
+                    Снять с публикации
+                  </DropdownMenuItem>
+                ) : null}
+                {onDelete ? (
+                  <DropdownMenuItem disabled={deleteDisabled} onSelect={onDelete}>
+                    Удалить
+                  </DropdownMenuItem>
+                ) : null}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
         </div>
       </div>
     </div>

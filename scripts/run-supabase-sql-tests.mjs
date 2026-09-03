@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
@@ -22,14 +22,48 @@ if (testFiles.length === 0) {
   process.exit(1);
 }
 
-const databaseContainer = `supabase_db_${projectId}`;
+const dockerExecutable = process.platform === "win32" ? "docker.exe" : "docker";
+
+/**
+ * Once `supabase link` has run, the CLI names the local containers after the
+ * linked project ref rather than `project_id`, so the config-derived name alone
+ * left every test reporting "No such container". Prefer the linked ref when it
+ * exists, and fall back to whatever local database container Docker reports.
+ */
+function resolveDatabaseContainer() {
+  const candidates = [];
+  const linkedRefFile = path.join(supabaseDirectory, ".temp", "project-ref");
+  if (existsSync(linkedRefFile)) {
+    const linkedRef = readFileSync(linkedRefFile, "utf8").trim();
+    if (linkedRef) candidates.push(`supabase_db_${linkedRef}`);
+  }
+  candidates.push(`supabase_db_${projectId}`);
+
+  const running = spawnSync(
+    dockerExecutable,
+    ["ps", "--filter", "name=^supabase_db_", "--format", "{{.Names}}"],
+    { encoding: "utf8" },
+  );
+  const runningNames = (running.stdout ?? "")
+    .split(/\r?\n/u)
+    .map((name) => name.trim())
+    .filter(Boolean);
+
+  const match = candidates.find((name) => runningNames.includes(name));
+  if (match) return match;
+  if (runningNames.length === 1) return runningNames[0];
+  return candidates[0];
+}
+
+const databaseContainer = resolveDatabaseContainer();
+console.log(`Using local database container ${databaseContainer}.`);
 const failures = [];
 
 for (const testFile of testFiles) {
   console.log(`Running ${testFile}`);
 
   const result = spawnSync(
-    process.platform === "win32" ? "docker.exe" : "docker",
+    dockerExecutable,
     [
       "exec",
       "-i",

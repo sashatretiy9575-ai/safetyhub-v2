@@ -98,10 +98,20 @@ function first(source: Record<string, unknown>, ...keys: string[]) {
 const rowSchema = z.preprocess(
   (value) => {
     const row = record(value);
-    const fullName = String(first(row, 'fullName', 'full_name') ?? '')
+    const rawFullName = String(first(row, 'fullName', 'full_name') ?? '')
       .normalize('NFC')
       .trim();
-    const pieces = fullName.split(/\s+/u).filter(Boolean);
+    // A Chinese username/password learner is admitted without a profile, so the
+    // row legitimately carries no display name. Rejecting it here failed the
+    // entire employees page instead of one cell.
+    const fullName =
+      rawFullName ||
+      [first(row, 'name', 'profile_name'), first(row, 'surname', 'profile_surname')]
+        .map((part) => (typeof part === 'string' ? part.trim() : ''))
+        .filter(Boolean)
+        .join(' ') ||
+      'Без имени';
+    const pieces = rawFullName.split(/\s+/u).filter(Boolean);
     const rawRecordId = first(row, 'recordId', 'record_id', 'attestationId', 'attestation_id');
     const rawTestId = first(row, 'testId', 'test_id') ?? null;
     const rawRevisionId = first(row, 'revisionId', 'revision_id') ?? null;

@@ -252,7 +252,11 @@ test('profile reads immutable acceptance history and records consent through a s
   assert.match(otpVerify, /setSafetyHubSessionHint\(request, response\)/u);
   assert.doesNotMatch(otpVerify, /localizedAccountPath\('\/auth\/legal', locale\)/u);
   assert.doesNotMatch(otpVerify, /legalAccepted|parsed\.data\.intent/u);
-  assert.match(otpFlow, /const \[legalAccepted, setLegalAccepted\] = useState\(false\)/u);
+  // "Продолжая, вы принимаете…" — continuing is the acceptance, so the visible
+  // box starts ticked and stays clearable. Consent is still recorded per
+  // submission by accept_current_legal_documents, never cached client-side.
+  assert.match(otpFlow, /const \[legalAccepted, setLegalAccepted\] = useState\(true\)/u);
+  assert.match(otpFlow, /checked=\{legalAccepted\}/u);
   assert.doesNotMatch(otpFlow, /sessionStorage[\s\S]*consent/u);
   assert.match(baselineMigration, /create table public\.legal_document_versions/);
   assert.match(baselineMigration, /body_revision/);

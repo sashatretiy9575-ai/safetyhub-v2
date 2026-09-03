@@ -100,9 +100,14 @@ test('article editor keeps sources optional and publishes directly', async () =>
     read('supabase/migrations/20260820010000_content_lifecycle_contract.sql'),
   ]);
 
-  assert.match(editor, /Данные материала и источники/);
-  assert.match(editor, /необязательны и не блокируют публикацию/iu);
-  assert.match(editor, /Есть черновик/);
+  // Jurisdiction and sources stay optional and are folded away by default, so
+  // the block editor is the first thing on screen.
+  assert.match(editor, /Источники и юрисдикция/);
+  assert.match(editor, /<details[\s\S]*?Источники и юрисдикция/u);
+  assert.match(editor, /article-jurisdiction/);
+  assert.match(editor, /Нормативные источники/);
+  // The draft-changes badge now lives in the single publication bar.
+  assert.match(editor, /hasDraftChanges=\{displayedPublicationState === 'published_with_draft_changes'\}/u);
   assert.doesNotMatch(editor, /Ревью|reviewReady|reviewedContentHash/);
   assert.match(action, /save_article_draft_v2/);
   assert.match(action, /set_article_status_v2/);

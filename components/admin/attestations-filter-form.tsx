@@ -224,7 +224,7 @@ export function AttestationsFilterForm({
         <button
           type="button"
           aria-label="Закрыть фильтры"
-          className="fixed inset-0 z-40 bg-black/45 @min-[960px]:hidden"
+          className="fixed inset-0 z-40 bg-black/45 @min-[760px]:hidden"
           onClick={closeFilters}
         />
       ) : null}
@@ -238,7 +238,7 @@ export function AttestationsFilterForm({
         aria-labelledby={filtersOpen ? 'attestation-filters-title' : undefined}
         className={`${
           filtersOpen
-            ? 'fixed inset-x-3 bottom-3 z-50 block max-h-[88dvh] overflow-y-auto rounded-3xl border bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)] @min-[960px]:absolute @min-[960px]:top-[4.5rem] @min-[960px]:right-3 @min-[960px]:bottom-auto @min-[960px]:left-auto @min-[960px]:w-[min(52rem,calc(100%-1.5rem))] @min-[960px]:max-h-[min(42rem,calc(100dvh-8rem))] @min-[960px]:rounded-2xl @min-[960px]:pb-4'
+            ? 'fixed inset-x-3 bottom-3 z-50 block max-h-[88dvh] overflow-y-auto rounded-3xl border bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)] @min-[760px]:absolute @min-[760px]:top-[4.5rem] @min-[760px]:right-3 @min-[760px]:bottom-auto @min-[760px]:left-auto @min-[760px]:w-[min(52rem,calc(100%-1.5rem))] @min-[760px]:max-h-[min(42rem,calc(100dvh-8rem))] @min-[760px]:rounded-2xl @min-[760px]:pb-4'
             : 'hidden'
         }`}
       >
@@ -249,7 +249,7 @@ export function AttestationsFilterForm({
           </Button>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2 @min-[960px]:grid-cols-4">
+        <div className="grid gap-3 md:grid-cols-2 @min-[760px]:grid-cols-4">
           <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
             Компания
             <Input

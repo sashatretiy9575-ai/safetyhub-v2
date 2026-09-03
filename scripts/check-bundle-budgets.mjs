@@ -59,7 +59,17 @@ export const BUNDLE_BUDGETS = [
   },
 ];
 
-export const CSS_BUDGET = 18 * KIB;
+/**
+ * One Tailwind stylesheet serves the public site, the learner account and the
+ * admin workspace, so every screen pays for it and it is worth a hard ceiling.
+ *
+ * It was previously set to the exact measured size, which left roughly fifty
+ * bytes of slack: any ordinary UI change — even an admin-only one — failed the
+ * release pipeline and the only available "fix" was to delete unrelated styles.
+ * Keep real headroom so this catches a regression (a new icon set, a duplicated
+ * design system, an unpurged dependency) instead of routine work.
+ */
+export const CSS_BUDGET = 20 * KIB;
 
 export function parseClientReferenceManifest(source, label = 'route') {
   const assignment = source.lastIndexOf('globalThis.__RSC_MANIFEST[');

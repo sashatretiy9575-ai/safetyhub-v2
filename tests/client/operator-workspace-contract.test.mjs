@@ -71,8 +71,9 @@ test('materials and course editors keep primary content central and protect draf
   assert.match(blockEditor, /Блок \{index \+ 1\}/);
   assert.match(testList, />Курсы<\/h1>/);
   assert.match(testList, /min-h-16/);
-  assert.match(testList, /size="icon"/);
-  assert.match(testList, /PencilSimple/);
+  // The edit affordance carries a visible label, not just a pencil glyph.
+  assert.match(testList, /<PencilSimple aria-hidden \/>\s*\n\s*Изменить/u);
+  assert.match(testList, /aria-label=\{`Редактировать: \$\{course\.title\}`\}/u);
   assert.match(testStatusControls, /aria-label="В черновик"/);
   assert.match(testStatusControls, /aria-label="Удалить курс"/);
   assert.match(testStatusControls, /<NotePencil/);

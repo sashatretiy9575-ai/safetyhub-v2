@@ -3,14 +3,24 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { requireCapability } from '@/features/auth/server';
 import {
+  ADMIN_PAGE_SIZE,
   getAdminAuditPage,
   parseAdminAuditQuery,
   type RawAdminSearchParams,
 } from '@/features/admin/data';
+import {
+  ADMIN_TRAIL_PARAM,
+  appendAdminTrail,
+  parseAdminTrail,
+  serializeAdminTrail,
+} from '@/lib/admin/pagination-trail';
 import { ResultsExport } from '@/components/admin/results-export';
 import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data-state';
 import { AdminDetailDialog } from '@/components/admin/admin-detail-dialog';
 import { AdminPagination } from '@/components/admin/admin-pagination';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const actionLabels: Record<string, string> = {
   'role.bootstrap_superadmin': 'Восстановлен административный доступ (архив)',
@@ -61,6 +71,13 @@ const statusLabels: Record<string, string> = {
   revoked: 'Отозвано',
 };
 
+const quickFilters = [
+  { value: '', label: 'Все события' },
+  { value: 'identity', label: 'Регистрации и доступ' },
+  { value: 'test', label: 'Тесты и баллы' },
+  { value: 'certificate', label: 'Сертификаты' },
+] as const;
+
 function readableAction(action: string) {
   if (actionLabels[action]) return actionLabels[action];
   const operation = action.match(/^auth_admin\.(invite|suspend|restore|delete)\.([a-z_]+)$/);
@@ -73,16 +90,34 @@ function readableAction(action: string) {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
+function nested(details: Record<string, unknown>, key: 'before' | 'after') {
+  const value = details[key];
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+/**
+ * The RPC packs the event payload into `before`/`after`/`reason`/`batchId`, so
+ * a status lives one level down. The previous version only read the flat keys
+ * and therefore never showed a status at all.
+ */
 function detailStatus(details: Record<string, unknown>) {
-  const direct = details.status ?? details.state;
-  if (typeof direct === 'string') return statusLabels[direct] ?? direct;
-  const next = details.to;
-  if (typeof next === 'string') return statusLabels[next] ?? next;
-  if (next && typeof next === 'object' && 'status' in next) {
-    const nested = next.status;
-    if (typeof nested === 'string') return statusLabels[nested] ?? nested;
+  const candidates = [
+    details.status,
+    details.state,
+    details.to,
+    nested(details, 'after')?.status,
+    nested(details, 'after')?.state,
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string') return statusLabels[candidate] ?? candidate;
   }
   return null;
+}
+
+function detailReason(details: Record<string, unknown>) {
+  return typeof details.reason === 'string' && details.reason.trim() ? details.reason : null;
 }
 
 type EventCategory = 'user' | 'test' | 'certificate' | 'technical';
@@ -102,39 +137,26 @@ function eventCategory(action: string, details: Record<string, unknown>): EventC
   return 'technical';
 }
 
-function categoryBadge(category: EventCategory) {
-  switch (category) {
-    case 'certificate':
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-on-primary-soft)]">
-          🎓 Сертификат
-        </span>
-      );
-    case 'test':
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-on-primary-soft)]">
-          📝 Тестирование
-        </span>
-      );
-    case 'user':
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-surface-muted)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-text)]">
-          👤 Пользователь
-        </span>
-      );
-    case 'technical':
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-surface-muted)] px-2 py-0.5 text-xs font-medium text-[var(--color-text-muted)]">
-          ⚙️ Системный лог
-        </span>
-      );
-  }
-}
+const categoryStyles: Record<EventCategory, { label: string; className: string }> = {
+  certificate: {
+    label: 'Сертификат',
+    className: 'bg-[var(--color-primary-soft)] text-[var(--color-on-primary-soft)]',
+  },
+  test: {
+    label: 'Тест',
+    className: 'bg-[var(--color-primary-soft)] text-[var(--color-on-primary-soft)]',
+  },
+  user: {
+    label: 'Аккаунт',
+    className: 'bg-[var(--color-surface-muted)] text-[var(--color-text)]',
+  },
+  technical: {
+    label: 'Система',
+    className: 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]',
+  },
+};
 
-function auditPageHref(
-  query: ReturnType<typeof parseAdminAuditQuery>,
-  cursor: { at: string; id: string } | null,
-) {
+function auditFilterParams(query: ReturnType<typeof parseAdminAuditQuery>) {
   const params = new URLSearchParams();
   if (query.actor) params.set('actor', query.actor);
   if (query.target) params.set('target', query.target);
@@ -145,10 +167,30 @@ function auditPageHref(
     to.setUTCDate(to.getUTCDate() - 1);
     params.set('to', to.toISOString().slice(0, 10));
   }
-  if (cursor) {
-    params.set('cursorAt', cursor.at);
-    params.set('cursorId', cursor.id);
+  return params;
+}
+
+function auditPageHref(
+  query: ReturnType<typeof parseAdminAuditQuery>,
+  cursorToken: string,
+  trail: readonly string[],
+) {
+  const params = auditFilterParams(query);
+  if (cursorToken) {
+    const [at = '', id = ''] = cursorToken.split('|');
+    params.set('cursorAt', at);
+    params.set('cursorId', id);
   }
+  const serialized = serializeAdminTrail(trail);
+  if (serialized) params.set(ADMIN_TRAIL_PARAM, serialized);
+  const encoded = params.toString();
+  return encoded ? `/admin/settings/history?${encoded}` : '/admin/settings/history';
+}
+
+function quickFilterHref(query: ReturnType<typeof parseAdminAuditQuery>, action: string) {
+  const params = auditFilterParams(query);
+  params.delete('action');
+  if (action) params.set('action', action);
   const encoded = params.toString();
   return encoded ? `/admin/settings/history?${encoded}` : '/admin/settings/history';
 }
@@ -163,10 +205,26 @@ export default async function AuditPage({
   await requireCapability('audit.read');
   const auditResult = await getAdminAuditPage(query);
 
+  const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
+  const currentToken = query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
+  const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
+  const fromValue = query.from ? query.from.slice(0, 10) : '';
+  const toValue = query.to
+    ? new Date(new Date(query.to).setUTCDate(new Date(query.to).getUTCDate() - 1))
+        .toISOString()
+        .slice(0, 10)
+    : '';
+  const hasFilters = Boolean(query.actor || query.target || query.action || query.from || query.to);
+
   return (
-    <section className="space-y-6">
+    <section className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h1 className="font-display text-3xl font-bold">Журнал аудита</h1>
+        <div>
+          <h1 className="font-display text-3xl font-bold">История действий</h1>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+            Кто и что изменил в системе. Записи только читаются и не редактируются.
+          </p>
+        </div>
         {auditResult.state === 'ready' ? (
           <ResultsExport
             filename="audit-page"
@@ -183,173 +241,243 @@ export default async function AuditPage({
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 border-b border-[var(--color-border)] pb-4 text-xs">
-        <span className="font-semibold text-[var(--color-text-muted)]">Быстрый фильтр:</span>
-        <Link
-          href="/admin/settings/history"
-          className={`rounded-lg px-3 py-1.5 font-bold transition-colors ${
-            !query.action
-              ? 'bg-[var(--color-primary)] text-white'
-              : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
-          }`}
-        >
-          Все события
-        </Link>
-        <Link
-          href="/admin/settings/history?action=identity"
-          className={`rounded-lg px-3 py-1.5 font-bold transition-colors ${
-            query.action === 'identity'
-              ? 'bg-[var(--color-primary)] text-white'
-              : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
-          }`}
-        >
-          Регистрации и доступ
-        </Link>
-        <Link
-          href="/admin/settings/history?action=test"
-          className={`rounded-lg px-3 py-1.5 font-bold transition-colors ${
-            query.action === 'test'
-              ? 'bg-[var(--color-primary)] text-white'
-              : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
-          }`}
-        >
-          Тесты и баллы
-        </Link>
-        <Link
-          href="/admin/settings/history?action=certificate"
-          className={`rounded-lg px-3 py-1.5 font-bold transition-colors ${
-            query.action === 'certificate'
-              ? 'bg-[var(--color-primary)] text-white'
-              : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
-          }`}
-        >
-          Сертификаты
-        </Link>
+      <div className="flex flex-wrap items-center gap-1.5 text-xs">
+        {quickFilters.map(({ value, label }) => {
+          const active = (query.action ?? '') === value;
+          return (
+            <Link
+              key={value || 'all'}
+              href={quickFilterHref(query, value)}
+              aria-current={active ? 'true' : undefined}
+              className={`inline-flex min-h-9 items-center rounded-full px-3 font-semibold transition-colors ${
+                active
+                  ? 'bg-[var(--color-primary)] text-white'
+                  : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
+              }`}
+            >
+              {label}
+            </Link>
+          );
+        })}
       </div>
 
+      <form className="grid gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 sm:grid-cols-2 sm:items-end lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_9.5rem_9.5rem_auto_auto]">
+        {query.action ? <input type="hidden" name="action" value={query.action} /> : null}
+        <div className="space-y-1">
+          <Label htmlFor="audit-actor" className="text-xs">
+            Кто (инициатор)
+          </Label>
+          <Input id="audit-actor" name="actor" defaultValue={query.actor} maxLength={100} />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="audit-target" className="text-xs">
+            Над кем / над чем
+          </Label>
+          <Input id="audit-target" name="target" defaultValue={query.target} maxLength={100} />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="audit-from" className="text-xs">
+            С даты
+          </Label>
+          <Input id="audit-from" name="from" type="date" defaultValue={fromValue} />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="audit-to" className="text-xs">
+            По дату
+          </Label>
+          <Input id="audit-to" name="to" type="date" defaultValue={toValue} />
+        </div>
+        <Button type="submit" size="sm" className="h-11">
+          Показать
+        </Button>
+        {hasFilters ? (
+          <Button asChild type="button" size="sm" variant="outline" className="h-11">
+            <Link href="/admin/settings/history">Сбросить</Link>
+          </Button>
+        ) : null}
+      </form>
+
       {auditResult.state === 'failed' ? (
-        <AdminLoadFailure correlationId={auditResult.correlationId} />
+        <AdminLoadFailure
+          correlationId={auditResult.correlationId}
+          message="Журнал временно не загрузился. Повторите запрос."
+        />
       ) : auditResult.data.items.length === 0 ? (
         <AdminEmptyState>События по выбранным фильтрам не найдены.</AdminEmptyState>
       ) : (
-        <div className="overflow-hidden rounded-xl border bg-[var(--color-surface)]">
-          <div className="hidden min-h-10 grid-cols-[140px_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.4fr)_70px] items-center gap-3 bg-[var(--color-surface-muted)] px-3 text-xs font-bold text-[var(--color-text-muted)] md:grid border-b">
-            <span>Время</span>
-            <span>Действие</span>
-            <span>Инициатор</span>
-            <span>Цель / Результат</span>
-            <span className="text-right">Детали</span>
-          </div>
-          {auditResult.data.items.map((event) => {
-            const category = eventCategory(event.action, event.details);
-            const score = typeof event.details.score === 'number' ? event.details.score : undefined;
-            const total = typeof event.details.total === 'number' ? event.details.total : undefined;
-            const certNum =
-              typeof event.details.certificateNumber === 'string'
-                ? event.details.certificateNumber
-                : undefined;
+        <>
+          <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+            <div className="hidden min-h-10 grid-cols-[9.5rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1.2fr)_5rem] items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 text-xs font-bold text-[var(--color-text-muted)] lg:grid">
+              <span>Когда</span>
+              <span>Что произошло</span>
+              <span>Кто</span>
+              <span>Над кем / над чем</span>
+              <span className="text-right">Детали</span>
+            </div>
 
-            return (
-              <div
-                key={event.id}
-                className="grid min-h-12 items-center gap-2 border-b px-3 py-2 text-xs transition-colors hover:bg-[var(--color-surface-muted)]/50 last:border-b-0 md:grid-cols-[140px_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.4fr)_70px] md:gap-3"
-              >
-                <time className="text-[var(--color-text-muted)] font-mono text-[11px]">
-                  {new Date(event.createdAt).toLocaleString('ru-RU', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </time>
-                <div className="min-w-0 flex items-center gap-1.5">
-                  {categoryBadge(category)}
-                  <span className="font-semibold text-[var(--color-text)] truncate" title={readableAction(event.action)}>
-                    {readableAction(event.action)}
-                  </span>
-                </div>
-                <div className="min-w-0 truncate text-[var(--color-text)]" title={event.actorLabel}>
-                  {event.actorLabel}
-                </div>
-                <div className="min-w-0">
-                  <div className="truncate text-[var(--color-text)]" title={event.targetLabel}>
+            {auditResult.data.items.map((event) => {
+              const category = eventCategory(event.action, event.details);
+              const style = categoryStyles[category];
+              const status = detailStatus(event.details);
+              const reason = detailReason(event.details);
+              const created = new Date(event.createdAt);
+
+              return (
+                <div
+                  key={event.id}
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1 border-b border-[var(--color-border)] px-3 py-2.5 text-xs transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)]/60 lg:min-h-12 lg:grid-cols-[9.5rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1.2fr)_5rem] lg:items-center"
+                >
+                  <time
+                    dateTime={event.createdAt}
+                    className="order-2 font-mono text-[11px] whitespace-nowrap text-[var(--color-text-subtle)] lg:order-none"
+                  >
+                    {created.toLocaleDateString('ru-RU', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: '2-digit',
+                    })}
+                    <span className="ml-1.5 text-[var(--color-text-muted)]">
+                      {created.toLocaleTimeString('ru-RU', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </time>
+
+                  <div className="order-1 col-span-2 min-w-0 lg:order-none lg:col-span-1">
+                    <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                      <span
+                        className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-bold ${style.className}`}
+                      >
+                        {style.label}
+                      </span>
+                      <span className="min-w-0 font-semibold text-[var(--color-text)]">
+                        {readableAction(event.action)}
+                      </span>
+                      {status ? (
+                        <span className="shrink-0 text-[11px] text-[var(--color-text-muted)]">
+                          · {status}
+                        </span>
+                      ) : null}
+                    </div>
+                    {reason ? (
+                      <p className="mt-0.5 truncate text-[11px] text-[var(--color-text-subtle)]">
+                        {reason}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <div
+                    className="order-3 min-w-0 truncate text-[var(--color-text-muted)] lg:order-none lg:text-[var(--color-text)]"
+                    title={event.actorLabel}
+                  >
+                    {event.actorLabel}
+                  </div>
+
+                  <div
+                    className="order-4 col-span-2 min-w-0 truncate text-[var(--color-text-muted)] lg:order-none lg:col-span-1 lg:text-[var(--color-text)]"
+                    title={event.targetLabel}
+                  >
                     {event.targetLabel}
                   </div>
-                  {score !== undefined && total !== undefined ? (
-                    <span className="mt-0.5 inline-block text-[11px] font-medium text-[var(--color-text-muted)]">
-                      Результат: {score}/{total} {score >= 7 ? '(Сдан)' : '(Не сдан)'}
-                    </span>
-                  ) : null}
-                  {certNum ? (
-                    <span className="mt-0.5 inline-block text-[11px] font-medium text-[var(--color-primary)]">
-                      № {certNum}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="flex justify-end">
-                  <AdminDetailDialog
-                    title={readableAction(event.action)}
-                    description={`${event.actorLabel} → ${event.targetLabel}`}
-                    triggerLabel="Детали"
-                  >
-                    <div className="space-y-4 text-sm">
-                      <dl className="grid gap-3 sm:grid-cols-2">
-                        <div>
-                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Автор</dt>
-                          <dd className="mt-1 break-words">{event.actorLabel}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Цель</dt>
-                          <dd className="mt-1 break-words">{event.targetLabel}</dd>
-                        </div>
-                        {detailStatus(event.details) ? (
-                          <div>
-                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Статус</dt>
-                            <dd className="mt-1">{detailStatus(event.details)}</dd>
-                          </div>
-                        ) : null}
-                        <div>
-                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Время</dt>
-                          <dd className="mt-1">{new Date(event.createdAt).toLocaleString('ru-RU')}</dd>
-                        </div>
-                        <div className="sm:col-span-2">
-                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Correlation ID</dt>
-                          <dd className="mt-1 font-mono text-xs break-all">{event.correlationId}</dd>
-                        </div>
-                        <div className="sm:col-span-2">
-                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Технические идентификаторы</dt>
-                          <dd className="mt-1 font-mono text-xs break-all">Action: {event.action} · Target: {event.targetId ?? '—'} · Event: {event.id}</dd>
-                        </div>
-                      </dl>
-                      <div>
-                        <h3 className="font-semibold text-xs">Данные события</h3>
-                        <pre className="mt-2 max-h-72 overflow-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3 text-xs break-words whitespace-pre-wrap">
-                          {JSON.stringify(event.details, null, 2)}
-                        </pre>
-                      </div>
-                    </div>
-                  </AdminDetailDialog>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
 
-      {auditResult.state === 'ready' ? (
-        <AdminPagination
-          total={auditResult.data.total}
-          visible={auditResult.data.items.length}
-          hasCursor={Boolean(query.cursorAt)}
-          firstHref={auditPageHref(query, null)}
-          nextHref={
-            auditResult.data.hasMore && auditResult.data.nextCursor
-              ? auditPageHref(query, auditResult.data.nextCursor)
-              : null
-          }
-        />
-      ) : null}
+                  <div className="order-2 flex justify-end lg:order-none">
+                    <AdminDetailDialog
+                      title={readableAction(event.action)}
+                      description={`${event.actorLabel} → ${event.targetLabel}`}
+                      triggerLabel="Детали"
+                    >
+                      <div className="space-y-4 text-sm">
+                        <dl className="grid gap-3 sm:grid-cols-2">
+                          <div>
+                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                              Кто
+                            </dt>
+                            <dd className="mt-1 break-words">{event.actorLabel}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                              Над кем / над чем
+                            </dt>
+                            <dd className="mt-1 break-words">{event.targetLabel}</dd>
+                          </div>
+                          {status ? (
+                            <div>
+                              <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                                Статус
+                              </dt>
+                              <dd className="mt-1">{status}</dd>
+                            </div>
+                          ) : null}
+                          <div>
+                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                              Когда
+                            </dt>
+                            <dd className="mt-1">{created.toLocaleString('ru-RU')}</dd>
+                          </div>
+                          {reason ? (
+                            <div className="sm:col-span-2">
+                              <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                                Причина
+                              </dt>
+                              <dd className="mt-1 break-words">{reason}</dd>
+                            </div>
+                          ) : null}
+                          <div className="sm:col-span-2">
+                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                              Код обращения
+                            </dt>
+                            <dd className="mt-1 font-mono text-xs break-all">
+                              {event.correlationId}
+                            </dd>
+                          </div>
+                          <div className="sm:col-span-2">
+                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                              Технические идентификаторы
+                            </dt>
+                            <dd className="mt-1 font-mono text-xs break-all">
+                              Action: {event.action} · Target: {event.targetId ?? '—'} · Event:{' '}
+                              {event.id}
+                            </dd>
+                          </div>
+                        </dl>
+                        <div>
+                          <h3 className="text-xs font-semibold">Данные события</h3>
+                          <pre className="mt-2 max-h-72 overflow-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3 text-xs break-words whitespace-pre-wrap">
+                            {JSON.stringify(event.details, null, 2)}
+                          </pre>
+                        </div>
+                      </div>
+                    </AdminDetailDialog>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <AdminPagination
+            total={auditResult.data.total}
+            visible={auditResult.data.items.length}
+            pageIndex={trail.length}
+            pageSize={ADMIN_PAGE_SIZE}
+            firstHref={auditPageHref(query, '', [])}
+            previousHref={
+              previousToken === null
+                ? null
+                : auditPageHref(query, previousToken, trail.slice(0, -1))
+            }
+            nextHref={
+              auditResult.data.hasMore && auditResult.data.nextCursor
+                ? auditPageHref(
+                    query,
+                    `${auditResult.data.nextCursor.at}|${auditResult.data.nextCursor.id}`,
+                    appendAdminTrail(trail, currentToken),
+                  )
+                : null
+            }
+          />
+        </>
+      )}
     </section>
   );
 }

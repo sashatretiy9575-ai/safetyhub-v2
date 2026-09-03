@@ -92,7 +92,7 @@ test('attestation screen is responsive and exposes selection, filters, and confi
   ]);
   const fullManager = `${manager}\n${rowComponent}\n${bannerComponent}`;
   assert.equal(page.match(/<h1(?:\s|>)/g)?.length, 1);
-  assert.match(page, /key=\{employeeHref\(query, query\.cursor\)\}/);
+  assert.match(page, /key=\{employeeHref\(query, currentToken, trail\)\}/);
   for (const name of [
     'q',
     'organization',
@@ -107,11 +107,15 @@ test('attestation screen is responsive and exposes selection, filters, and confi
     assert.match(filters, new RegExp(`name="${name}"`));
   }
   assert.match(filters, /role=\{filtersOpen \? 'dialog' : undefined\}/);
-  assert.match(filters, /@min-\[960px\]:absolute/);
-  assert.match(filters, /@min-\[960px\]:right-3/);
+  assert.match(filters, /@min-\[760px\]:absolute/);
+  assert.match(filters, /@min-\[760px\]:right-3/);
   assert.equal((manager.match(/page\.items\.map\(\(row, index\)/g) ?? []).length, 1);
-  assert.match(fullManager, /@min-\[960px\]:grid/);
-  assert.match(fullManager, /@min-\[960px\]:min-h-\[56px\]/);
+  assert.match(fullManager, /@min-\[760px\]:grid/);
+  // Spreadsheet density on the desktop sheet, with a company band that selects
+  // every row of that company in one click.
+  assert.match(fullManager, /@min-\[760px\]:min-h-9/);
+  assert.match(manager, /aria-pressed=\{groupFullySelected\}/);
+  assert.match(manager, /setOrganizationGroupSelected\(row\.organization, !groupFullySelected\)/);
   assert.match(fullManager, /Выбрать все \$\{totalFiltered\} по фильтру/);
   assert.match(manager, /organizationHref\(filters, row\.organization\)/);
   assert.match(manager, /resolvedSelection\.uniquePeople/);

@@ -71,7 +71,7 @@
     "content:assets:seed:local": "node scripts/seed-course-presentation-assets.mjs",
     "content:parity:check": "node --env-file-if-exists=.env.local scripts/content-sync-linked.mjs --check",
     "db:seed:generate": "npm run content:seed:generate",
-    "db:reset": "supabase db reset && npm run storage:buckets:ensure:local && npm run content:assets:seed:local",
+    "db:reset": "supabase db reset --local && npm run storage:buckets:ensure:local && npm run content:assets:seed:local",
     "db:push": "supabase db push"
   },
   "dependencies": {

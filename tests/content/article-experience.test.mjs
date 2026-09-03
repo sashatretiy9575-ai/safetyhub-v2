@@ -188,7 +188,7 @@ test('stored content and admin editing use the same runtime block contract', asy
   assert.doesNotMatch(content, /blocks as unknown as ArticleBlock/);
   assert.match(editPage, /articleBlocksSchema\.safeParse\(data\.blocks\)/);
   assert.match(editor, /<ContentBlockEditor mode="article"/);
-  assert.match(editor, /Есть черновик/);
+  assert.match(editor, /hasDraftChanges=\{displayedPublicationState === 'published_with_draft_changes'\}/u);
   assert.match(editor, /publishedContentHash === result\.contentHash/);
   assert.match(editPage, /live\.data\.content_hash === data\.content_hash/);
   assert.doesNotMatch(

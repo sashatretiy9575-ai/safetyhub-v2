@@ -231,15 +231,35 @@ function expectedTarByteLength(restoreDetails) {
 }
 
 async function runTarExtraction(tarFile, destination) {
+  // GNU tar reads `host:path` in a path argument as a remote archive, so a
+  // Windows absolute path fails with "Cannot connect to C: resolve failed" and
+  // an absolute `-C` target is mangled the same way. Extracting from inside the
+  // destination and naming the archive relatively keeps one command portable
+  // across GNU tar, bsdtar and macOS tar.
+  const relativeArchive = path.relative(destination, tarFile).split(path.sep).join('/');
+  requireCondition(
+    relativeArchive.length > 0 && !path.isAbsolute(relativeArchive) && !/^[A-Za-z]:/u.test(relativeArchive),
+    'STORAGE_RESTORE_TAR_EXTRACTION_FAILED',
+  );
+  let diagnostics = '';
   const exitCode = await new Promise((resolve, reject) => {
-    const child = spawn('tar', ['-xf', tarFile, '-C', destination], {
-      stdio: 'ignore',
+    const child = spawn('tar', ['-xf', relativeArchive], {
+      cwd: destination,
+      stdio: ['ignore', 'ignore', 'pipe'],
       windowsHide: true,
       timeout: 10 * 60 * 1_000,
+    });
+    child.stderr.setEncoding('utf8');
+    child.stderr.on('data', (chunk) => {
+      if (diagnostics.length < 2_000) diagnostics += chunk;
     });
     child.once('error', reject);
     child.once('exit', (code, signal) => resolve(signal === null ? code : null));
   }).catch(() => null);
+  if (exitCode !== 0 && diagnostics.trim()) {
+    // Without this, an extraction failure gave the operator nothing to act on.
+    console.error(`tar: ${diagnostics.trim().slice(0, 500)}`);
+  }
   requireCondition(exitCode === 0, 'STORAGE_RESTORE_TAR_EXTRACTION_FAILED');
 }
 

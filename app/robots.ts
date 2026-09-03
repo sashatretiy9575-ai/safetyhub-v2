@@ -20,6 +20,8 @@ export default function robots(): MetadataRoute.Robots {
           '/auth/*',
           '/callback',
           '/topics/*/test',
+          // Internal certificate-archive diagnostic harness, not a product page.
+          '/zip-harness',
           ...LOCALE_PREFIXES.flatMap((locale) => [
             `/${locale}/profile`,
             `/${locale}/auth/*`,

@@ -4,13 +4,22 @@ import path from 'node:path';
 import process from 'node:process';
 
 const cli = path.resolve('node_modules/supabase/dist/supabase.js');
-const generated = spawnSync(process.execPath, [cli, 'gen', 'types', 'typescript', '--local'], {
-  cwd: process.cwd(),
-  encoding: 'utf8',
-  windowsHide: true,
-  timeout: 2 * 60 * 1000,
-  maxBuffer: 32 * 1024 * 1024,
-});
+// See scripts/generate-supabase-types.mjs: `--local` cannot authenticate against
+// a linked project's local stack, so address the local database explicitly.
+const localDatabaseUrl =
+  process.env.SUPABASE_LOCAL_DB_URL ??
+  'postgresql://postgres:postgres@host.docker.internal:54322/postgres';
+const generated = spawnSync(
+  process.execPath,
+  [cli, 'gen', 'types', 'typescript', '--db-url', localDatabaseUrl],
+  {
+    cwd: process.cwd(),
+    encoding: 'utf8',
+    windowsHide: true,
+    timeout: 2 * 60 * 1000,
+    maxBuffer: 32 * 1024 * 1024,
+  },
+);
 if (generated.error || generated.status !== 0 || !generated.stdout.trim()) {
   throw new Error('Could not generate local Supabase types.');
 }
