@@ -120,7 +120,7 @@
     "sharp": "0.35.3",
     "supabase": "^2.111.0",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "yaml": "^2.8.1"
   },
   "packageManager": "npm@11.17.0",
