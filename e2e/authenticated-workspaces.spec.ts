@@ -88,6 +88,19 @@ async function assertAuthenticatedLanding(page: Page, expectedLanding: 'admin' |
   }
 }
 
+/**
+ * `toEqual([])` reports only "expect(received).toEqual(expected)" on the line
+ * the release CI summary keeps; the diff carrying the actual error text is on
+ * the lines that summary discards (release-e2e-report.mjs deliberately never
+ * uploads full page content — a page error can embed rendered DOM or seeded
+ * account data). Failing with the message on line one instead makes a CI-only
+ * failure diagnosable from that summary without a local repro.
+ */
+function assertNoPageErrors(pageErrors: readonly string[]) {
+  if (pageErrors.length === 0) return;
+  throw new Error(`page threw ${pageErrors.length} uncaught error(s): ${pageErrors.join(' | ')}`.slice(0, 400));
+}
+
 async function expectNoPageOverflow(page: Page, label: string) {
   await expect
     .poll(
@@ -170,7 +183,7 @@ test.describe('authenticated operator and participant workspaces', () => {
       await expect(page.getByRole('heading', { name: 'Сотрудники' })).toBeVisible();
       await expect(page.getByLabel('Поиск по ФИО, компании или номеру сертификата')).toBeVisible();
       await waitForEmployeesWorkspace(page);
-      expect(pageErrors).toEqual([]);
+      assertNoPageErrors(pageErrors);
 
       const collapse = page.getByRole('button', { name: /^Свернуть компанию/u }).first();
       if (await collapse.isVisible()) {
@@ -377,7 +390,7 @@ test.describe('authenticated operator and participant workspaces', () => {
           );
         }
       }
-      expect(pageErrors).toEqual([]);
+      assertNoPageErrors(pageErrors);
     });
   });
 });
