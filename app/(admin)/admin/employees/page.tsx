@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { Buildings, Certificate, CheckCircle } from '@phosphor-icons/react/dist/ssr';
+import { Certificate, CheckCircle } from '@phosphor-icons/react/dist/ssr';
 import { AttestationsFilterForm } from '@/components/admin/attestations-filter-form';
 import { AttestationsManager } from '@/components/admin/attestations-manager';
 import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data-state';
@@ -104,7 +104,7 @@ export default async function AdminEmployeesPage({
       {queueResult.state === 'ready' ? (
         <nav
           aria-label="Рабочие очереди"
-          className="grid overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm sm:grid-cols-3"
+          className="grid overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm sm:grid-cols-2"
         >
           {[
             {
@@ -118,12 +118,6 @@ export default async function AdminEmployeesPage({
               label: 'Готовы к выдаче',
               count: queueResult.data.readyToIssue,
               icon: Certificate,
-            },
-            {
-              href: '/admin/organizations/cleanup',
-              label: 'Ошибки в компаниях',
-              count: queueResult.data.companyIssues,
-              icon: Buildings,
             },
           ].map(({ href, label, count, icon: Icon }) => (
             <Link

@@ -50,9 +50,6 @@ function routeAllowsAutomaticPrompt(pathname: string) {
   const routePathname = splitLocalePathname(pathname).pathname;
   return !(
     routePathname.startsWith('/admin') ||
-    routePathname.startsWith('/auth') ||
-    routePathname.startsWith('/onboarding') ||
-    routePathname.startsWith('/profile') ||
     routePathname.startsWith('/install') ||
     /^\/topics\/[^/]+\/test(?:\/|$)/.test(routePathname)
   );
