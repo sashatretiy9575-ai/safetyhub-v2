@@ -736,9 +736,15 @@ async function main() {
   )) {
     const approved = await admin
       .from('account_controls')
+      // account_controls_approval_state_shape allows an approved account only
+      // with the whole decision recorded (requested, due and decided together)
+      // or with none of it. A seeded load user never went through a review, so
+      // it takes the second shape; a decision timestamp on its own is rejected.
       .update({
         approval_state: 'approved',
-        approval_decided_at: now,
+        approval_requested_at: null,
+        approval_due_at: null,
+        approval_decided_at: null,
         approval_decided_by: null,
         approval_rejection_reason: null,
       })
