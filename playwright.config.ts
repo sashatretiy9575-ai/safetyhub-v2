@@ -1,9 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const port = Number(process.env.PLAYWRIGHT_PORT ?? 3100);
-// Next normalizes the development request URL to localhost even when the
-// listener is bound to 127.0.0.1. Use the same canonical origin in browser
-// requests so the production-grade same-origin guard is exercised, not bypassed.
+// The listener and the browser must agree on the origin: Next drops proxy
+// request headers across a localhost/127.0.0.1 mismatch, which silently turned
+// the localized routes back into the Russian shell and made every locale
+// assertion meaningless. Same canonical origin on both sides.
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${port}`;
 
 export default defineConfig({
@@ -29,7 +30,7 @@ export default defineConfig({
     : {
         command:
           process.env.PLAYWRIGHT_SERVER_COMMAND ??
-          `npm run dev -- --hostname 127.0.0.1 --port ${port}`,
+          `npm run dev -- --hostname localhost --port ${port}`,
         env: {
           ...process.env,
           NEXT_PUBLIC_SITE_URL: baseURL,

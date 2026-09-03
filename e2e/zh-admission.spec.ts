@@ -17,23 +17,25 @@ test.describe('Chinese admission', () => {
     expect(response?.ok()).toBeTruthy();
 
     // `/zh/auth/login` is a rewrite that carries its locale in a proxy request
-    // header. The local dev server binds to 127.0.0.1 while the suite browses
-    // localhost (see playwright.config.ts), and Next drops middleware request
-    // headers across that origin mismatch, so the Russian shell renders. That
-    // is a dev-server artifact — production serves this page in Chinese — but it
-    // makes the assertion meaningless here rather than wrong.
-    const documentLocale = await page.locator('html').getAttribute('lang');
-    test.skip(
-      documentLocale !== 'zh-Hans',
-      'The dev server did not deliver the locale rewrite header; run against a deployed origin.',
-    );
+    // header, and Next drops middleware request headers when the browser origin
+    // does not match the listener. The dev server is therefore bound to the same
+    // host the suite browses (see playwright.config.ts); if that ever regresses,
+    // this assertion fails loudly instead of quietly skipping the whole path.
+    await expect(page.locator('html')).toHaveAttribute('lang', 'zh-Hans');
 
     // Switching to registration must not ask for an email anywhere.
-    const registerTab = page.getByRole('button', { name: '注册' }).first();
+    const registerTab = page.getByRole('button', { name: '创建访问账号' }).first();
     await expect(registerTab).toBeVisible();
-    await registerTab.click();
+    // The tab is server-rendered before its handler is attached, so a click can
+    // land on an unhydrated button and do nothing at all. Retry until the panel
+    // actually switches instead of asserting once against the login form.
+    await expect(async () => {
+      await registerTab.click();
+      await expect(page.locator('#zh-register-legal')).toBeVisible({ timeout: 1_000 });
+    }).toPass({ timeout: 15_000 });
+
     await expect(page.locator('input[type="email"]')).toHaveCount(0);
-    await expect(page.getByLabel('用户名')).toBeVisible();
+    await expect(page.getByLabel('拉丁用户名')).toBeVisible();
 
     // Consent is pre-ticked here as well.
     await expect(page.locator('#zh-register-legal')).toBeChecked();
