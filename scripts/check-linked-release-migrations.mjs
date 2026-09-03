@@ -15,11 +15,11 @@ const MIGRATION_FILENAME = /^([0-9]{14})_([a-z0-9_]+)[.]sql$/u;
 const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 
 // This is an explicit approval record for the post-localization forward delta,
-// not a generic migration policy. Production now holds the original 39 + 17
-// reviewed release; keep that historical receipt pinned and accept only the
-// newly reviewed two-file tail. An open-ended local tail would defeat this
-// preflight.
-export const REVIEWED_BASE_MIGRATION_COUNT = 58;
+// not a generic migration policy. Production now holds every reviewed migration,
+// so the pending tail is empty and the whole history is a pinned receipt. Adding
+// a migration means adding it here too, with its hash; an open-ended local tail
+// would defeat this preflight.
+export const REVIEWED_BASE_MIGRATION_COUNT = 63;
 export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260901100000_locale_profile_legal_contracts.sql',
@@ -97,8 +97,6 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
     filename: '20260902160000_atomic_legal_bundle_publication.sql',
     sha256: '51a34bf7d01e504dc1fa47a3c5ff71cd152d17c5eedc37352bc0245c3341034c',
   }),
-]);
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260902170000_auth_realm_locale_boundary.sql',
     sha256: '75c6af9450886b4be4abb0cf97b3baf68516a7c92e94df9a0f38a204b6fb53a5',
@@ -120,6 +118,7 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
     sha256: 'ddabe6dd7f5460b4a979f1a45bfdaa2f5e7962bf572f951c4fe42d9327e1e1b9',
   }),
 ]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;
 const REVIEWED_APPLIED_RELEASE_START_INDEX =

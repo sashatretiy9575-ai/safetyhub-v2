@@ -81,6 +81,20 @@ export function isContentTransportError(error: unknown, status?: number): boolea
   return cause !== undefined && cause !== error ? isContentTransportError(cause) : false;
 }
 
+/**
+ * A localized read RPC signals `missing content` by raising, not by returning
+ * null: `get_published_course_locale` answers COURSE_LOCALIZATION_NOT_FOUND for a
+ * course that has no published localization. Treated as a backend failure that
+ * became a 500 page for an unpublished slug, where a plain 404 is correct. This
+ * is deliberately narrow: only no_data_found carrying a *_NOT_FOUND message,
+ * so a real outage still falls back to the last known content.
+ */
+export function isContentAbsentError(error: unknown): boolean {
+  const record = errorRecord(error);
+  if (!record || record.code !== 'P0002') return false;
+  const message = typeof record.message === 'string' ? record.message : '';
+  return /^[A-Z][A-Z_]*_NOT_FOUND$/u.test(message);
+}
 export function classifyContentFailure({
   configured,
   error,

@@ -6,6 +6,7 @@ import { unstable_cache } from 'next/cache';
 import {
   ContentSourceError,
   fallbackAfterContentFailure,
+  isContentAbsentError,
   fallbackForUnavailableLocalizedContent,
 } from '@/lib/content/fallback-policy';
 import {
@@ -405,6 +406,9 @@ async function getLocalizedArticleBySlugFromSource(slug: string, locale: AppLoca
       'get_published_article_locale',
       { p_slug: slug, p_locale: locale },
     );
+    // An unpublished slug is answered by a raised *_NOT_FOUND, which used to be
+    // classified as a backend failure and rendered a 500 instead of a 404.
+    if (isContentAbsentError(error)) return null;
     if (error) {
       return fallbackAfterContentFailure({
         configured: true,

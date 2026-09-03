@@ -8,6 +8,7 @@ import {
   classifyContentFailure,
   fallbackAfterContentFailure,
   fallbackForUnavailableLocalizedContent,
+  isContentAbsentError,
   isContentFallbackEnabled,
   isContentTransportError,
 } from '../../lib/content/fallback-policy.ts';
@@ -141,6 +142,39 @@ test('content readers preserve empty and not-found remote results', async () => 
   }
 });
 
+test('an unpublished slug reads as absent content, not as a backend failure', async () => {
+  // A localized read RPC reports missing content by raising, so an unpublished
+  // course rendered a 500 instead of a 404 on the live site.
+  assert.equal(
+    isContentAbsentError({ code: 'P0002', message: 'COURSE_LOCALIZATION_NOT_FOUND' }),
+    true,
+  );
+  assert.equal(isContentAbsentError({ code: 'P0002', message: 'ARTICLE_NOT_FOUND' }), true);
+
+  // Everything else keeps its existing handling: a real outage must still fall
+  // back to the last known content rather than silently render a 404.
+  assert.equal(isContentAbsentError({ code: 'P0002', message: 'boom' }), false);
+  assert.equal(isContentAbsentError({ code: '57014', message: 'COURSE_NOT_FOUND' }), false);
+  assert.equal(isContentAbsentError(new Error('COURSE_LOCALIZATION_NOT_FOUND')), false);
+  assert.equal(isContentAbsentError(null), false);
+
+  // The guard belongs to the single-item readers only; the list readers return
+  // collections and must keep falling back.
+  for (const file of [
+    'lib/content/topics.ts',
+    'lib/content/articles.ts',
+  ]) {
+    const source = await read(file);
+    assert.match(
+      source,
+      /get_published_(?:course|article)_locale',[\s\S]{0,400}?if \(isContentAbsentError\(error\)\) return null;/u,
+    );
+    assert.doesNotMatch(
+      source,
+      /list_published_(?:courses|articles)_locale',[\s\S]{0,300}?isContentAbsentError/u,
+    );
+  }
+});
 test('localized public content never relabels the bundled Russian snapshot', async () => {
   assert.equal(
     fallbackForUnavailableLocalizedContent(
