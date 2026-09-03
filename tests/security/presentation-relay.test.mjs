@@ -101,7 +101,7 @@ test('private presentation GET is quota-, lease-, deadline-, and stream-bounded 
   assert.match(route, /claim_course_presentation_download_lease/);
   assert.match(route, /release_course_presentation_download_lease/);
   assert.match(route, /PRESENTATION_LEASE_SECONDS = 90/);
-  assert.match(route, /PRESENTATION_RELAY_TIMEOUT_MS = 60_000/);
+  assert.match(route, /PRESENTATION_RELAY_TIMEOUT_MS = 300_000/);
   assert.match(route, /AbortSignal\.any/);
   assert.match(route, /AbortSignal\.timeout\(PRESENTATION_RELAY_TIMEOUT_MS\)/);
   assert.match(route, /\.download\(objectPath, \{\}, \{ signal \}\)[\s\S]*?\.asStream\(\)/);

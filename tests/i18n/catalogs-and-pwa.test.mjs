@@ -77,7 +77,7 @@ test('locale-aware PWA resources are precached and Chinese font loading is route
   assert.match(worker, /OFFLINE_URLS/u);
   assert.match(worker, /offlineUrlForPathname/u);
   assert.match(worker, /Object\.keys\(OFFLINE_URLS\).*`\/manifest\/\$\{locale\}`/su);
-  assert.match(worker, /CACHE_PREFIX\}v7/u);
+  assert.match(worker, /CACHE_PREFIX\}v8/u);
   assert.match(rootDocument, /locale === 'zh'/u);
   assert.match(rootDocument, /\/fonts\/noto-sans-sc-ui\.f113fe63\.woff2/u);
   assert.match(styles, /html\[data-locale='zh'\]/u);

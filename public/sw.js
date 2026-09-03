@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'safetyhub-static-';
-const CACHE_VERSION = `${CACHE_PREFIX}v7`;
+const CACHE_VERSION = `${CACHE_PREFIX}v8`;
 const OFFLINE_URL = '/offline.html';
 const OFFLINE_URLS = {
   ru: '/offline/ru',
@@ -29,6 +29,10 @@ const PRIVATE_PATH =
   /^\/(?:[a-z]{2}\/)?(?:api|auth|admin|profile|account|onboarding|callback)(?:\/|$)/;
 const AUTH_CALLBACK_PATH = /^\/(?:[a-z]{2}\/)?(?:auth\/)?callback(?:\/|$)/;
 const PRIVATE_TOPIC_TEST_PATH = /^\/(?:[a-z]{2}\/)?topics\/[^/]+\/test(?:\/|$)/;
+// Byte downloads (PDF presentations and thumbnails). An anchor download is a
+// navigation-mode request, so a service-worker response would replace the file
+// body with the offline shell on any slow or non-OK answer.
+const PRIVATE_DOWNLOAD_PATH = /^\/course-presentations(?:\/|$)/;
 const PRECACHE_PATHS = new Set(PRECACHE_URLS);
 
 function isPrecached(request) {
@@ -36,7 +40,11 @@ function isPrecached(request) {
 }
 
 function isPrivatePath(pathname) {
-  return PRIVATE_PATH.test(pathname) || PRIVATE_TOPIC_TEST_PATH.test(pathname);
+  return (
+    PRIVATE_PATH.test(pathname) ||
+    PRIVATE_TOPIC_TEST_PATH.test(pathname) ||
+    PRIVATE_DOWNLOAD_PATH.test(pathname)
+  );
 }
 
 function isAuthCallbackPath(pathname) {
@@ -108,11 +116,14 @@ async function freshCachedResponse(cache, request) {
 
 async function navigationResponse(event) {
   const offlineUrl = offlineUrlForPathname(new URL(event.request.url).pathname);
+  // A non-OK response is still the server speaking (the real 404 page, an
+  // auth redirect target, a rate-limit message). Only a transport failure may
+  // fall back to the offline shell.
   const network = Promise.resolve(event.preloadResponse)
     .catch(() => undefined)
     .then((preloaded) => preloaded || fetch(event.request))
     .then((response) => {
-      if (!response || !response.ok) throw new Error('NAVIGATION_FAILED');
+      if (!response) throw new Error('NAVIGATION_FAILED');
       return response;
     });
   // Keep a useful slow response alive without blocking the offline fallback.

@@ -17,7 +17,10 @@ export const dynamic = 'force-dynamic';
 const PRESENTATION_BUCKET = 'course-presentations';
 const PRESENTATION_MAX_BYTES = 25 * 1024 * 1024;
 const THUMBNAIL_MAX_BYTES = 5 * 1024 * 1024;
-const PRESENTATION_RELAY_TIMEOUT_MS = 60_000;
+// A 25 MiB presentation over a ~1 Mbit/s mobile link needs over three minutes.
+// The deadline exists to bound stuck transfers, not to race slow readers, so it
+// matches the platform's function ceiling instead of cutting real downloads.
+const PRESENTATION_RELAY_TIMEOUT_MS = 300_000;
 const PRESENTATION_LEASE_SECONDS = 90;
 const ASSETS = {
   presentation: { contentType: 'application/pdf', filenameSuffix: '.pdf' },

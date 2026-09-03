@@ -252,7 +252,12 @@ test('course material is approval-gated, private, and stays out of precache', as
     /downloadPublishedPresentationAsset\(storage, row\.storage_bucket, row\.storage_path\)/,
   );
   assert.doesNotMatch(contentSync, /storage\/v1\/object\/public/);
-  assert.doesNotMatch(serviceWorker, /presentation\.pdf|course-presentations/);
+  // The worker must never answer for presentation bytes: the download path is
+  // named only inside the private bypass, which returns before any respondWith.
+  assert.match(serviceWorker, /PRIVATE_DOWNLOAD_PATH = \/\^\\\/course-presentations\(\?:\\\/\|\$\)\//);
+  assert.match(serviceWorker, /PRIVATE_DOWNLOAD_PATH\.test\(pathname\)/);
+  assert.doesNotMatch(serviceWorker, /presentation\.pdf/);
+  assert.equal(serviceWorker.match(/course-presentations/gu).length, 1);
   assert.match(csp, /worker-src/);
   assert.doesNotMatch(buildContentSecurityPolicy({ development: false }), /unsafe-eval/);
 });

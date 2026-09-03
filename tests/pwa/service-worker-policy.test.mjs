@@ -42,7 +42,8 @@ test('authenticated navigations and generated downloads bypass the service worke
   assert.ok(privateBypass >= 0 && privateBypass < navigationHandler);
   assert.match(worker, /\(\?:api\|auth\|admin\|profile\|account\|onboarding\|callback\)/u);
   assert.match(worker, /topics\\\/\[\^\/\]\+\\\/test/u);
-  assert.match(worker, /CACHE_PREFIX\}v7/u);
+  assert.match(worker, /CACHE_PREFIX\}v8/u);
+  assert.match(worker, /PRIVATE_DOWNLOAD_PATH = \/\^\\\/course-presentations/u);
 });
 
 test('retired legacy auth links still bypass the service worker without exchanging state', async () => {
