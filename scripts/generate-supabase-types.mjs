@@ -34,25 +34,54 @@ async function main() {
   // `gen types --local` authenticates with a generated start-secret that the
   // generator container does not receive once the project has been linked, so it
   // fails with "password authentication failed for user postgres". The local
-  // stack always accepts the documented default credentials, and the generator
-  // runs in a container, so it must reach the host by name rather than loopback.
-  const localDatabaseUrl =
-    process.env.SUPABASE_LOCAL_DB_URL ??
-    'postgresql://postgres:postgres@host.docker.internal:54322/postgres';
-  const source = useLocal ? ['--db-url', localDatabaseUrl] : ['--linked'];
-  const generated = spawnSync(
-    process.execPath,
-    [cli, 'gen', 'types', 'typescript', ...source, '--schema', 'public', '--schema', 'private'],
-    {
-      cwd: process.cwd(),
-      encoding: 'utf8',
-      windowsHide: true,
-      timeout: 3 * 60 * 1000,
-      maxBuffer: 64 * 1024 * 1024,
-    },
-  );
+  // stack always accepts the documented default credentials.
+  //
+  // The generator runs in a container, so how it reaches the host differs by
+  // platform: Docker Desktop resolves host.docker.internal, a plain Linux daemon
+  // (every CI runner) does not and answers on the bridge gateway instead. Pinning
+  // one of them is why this passed on a laptop and failed in CI, so each
+  // candidate is tried in turn and the first that answers wins.
+  const localDatabaseUrls = process.env.SUPABASE_LOCAL_DB_URL
+    ? [process.env.SUPABASE_LOCAL_DB_URL]
+    : [
+        'postgresql://postgres:postgres@host.docker.internal:54322/postgres',
+        'postgresql://postgres:postgres@172.17.0.1:54322/postgres',
+        'postgresql://postgres:postgres@127.0.0.1:54322/postgres',
+      ];
+
+  function generateFrom(source) {
+    return spawnSync(
+      process.execPath,
+      [cli, 'gen', 'types', 'typescript', ...source, '--schema', 'public', '--schema', 'private'],
+      {
+        cwd: process.cwd(),
+        encoding: 'utf8',
+        windowsHide: true,
+        timeout: 3 * 60 * 1000,
+        maxBuffer: 64 * 1024 * 1024,
+      },
+    );
+  }
+
+  let generated;
+  const attempted = [];
+  if (useLocal) {
+    for (const databaseUrl of localDatabaseUrls) {
+      const host = new URL(databaseUrl).hostname;
+      attempted.push(host);
+      generated = generateFrom(['--db-url', databaseUrl]);
+      if (!generated.error && generated.status === 0 && generated.stdout.trim()) break;
+    }
+  } else {
+    generated = generateFrom(['--linked']);
+  }
   if (generated.error || generated.status !== 0 || !generated.stdout.trim()) {
-    console.error('Supabase CLI could not generate database types.');
+    console.error(
+      useLocal
+        ? `Supabase CLI could not generate database types. Tried ${attempted.join(', ')}; ` +
+            'set SUPABASE_LOCAL_DB_URL to point at the local database directly.'
+        : 'Supabase CLI could not generate database types.',
+    );
     process.exit(1);
   }
 

@@ -262,7 +262,11 @@ async function createZhLoadTestUser(admin, index, legal) {
     p_terms_version: legal.terms.version,
     p_terms_body_revision: legal.terms.bodyRevision,
   });
-  if (completed.data?.userId !== user.id || completed.data?.approvalState !== 'pending') {
+  // Registration is no longer the application: since
+  // 20260903120000_zh_full_profile_admission it leaves the account at
+  // profile_incomplete, and the learner reaches pending by submitting the same
+  // form as every other locale.
+  if (completed.data?.userId !== user.id || completed.data?.approvalState !== 'profile_incomplete') {
     throw new Error(`zh username registration ${index + 1}: COMPLETION_CONTRACT_MISMATCH`);
   }
 

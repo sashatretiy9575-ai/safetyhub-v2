@@ -5,23 +5,38 @@ import process from 'node:process';
 
 const cli = path.resolve('node_modules/supabase/dist/supabase.js');
 // See scripts/generate-supabase-types.mjs: `--local` cannot authenticate against
-// a linked project's local stack, so address the local database explicitly.
-const localDatabaseUrl =
-  process.env.SUPABASE_LOCAL_DB_URL ??
-  'postgresql://postgres:postgres@host.docker.internal:54322/postgres';
-const generated = spawnSync(
-  process.execPath,
-  [cli, 'gen', 'types', 'typescript', '--db-url', localDatabaseUrl],
-  {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    windowsHide: true,
-    timeout: 2 * 60 * 1000,
-    maxBuffer: 32 * 1024 * 1024,
-  },
-);
+// a linked project's local stack, so address the local database explicitly, and
+// how the generator container reaches the host differs between Docker Desktop
+// and a plain Linux daemon. Try each candidate rather than pinning one.
+const localDatabaseUrls = process.env.SUPABASE_LOCAL_DB_URL
+  ? [process.env.SUPABASE_LOCAL_DB_URL]
+  : [
+      'postgresql://postgres:postgres@host.docker.internal:54322/postgres',
+      'postgresql://postgres:postgres@172.17.0.1:54322/postgres',
+      'postgresql://postgres:postgres@127.0.0.1:54322/postgres',
+    ];
+let generated;
+const attempted = [];
+for (const databaseUrl of localDatabaseUrls) {
+  attempted.push(new URL(databaseUrl).hostname);
+  generated = spawnSync(
+    process.execPath,
+    [cli, 'gen', 'types', 'typescript', '--db-url', databaseUrl],
+    {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      windowsHide: true,
+      timeout: 2 * 60 * 1000,
+      maxBuffer: 32 * 1024 * 1024,
+    },
+  );
+  if (!generated.error && generated.status === 0 && generated.stdout.trim()) break;
+}
 if (generated.error || generated.status !== 0 || !generated.stdout.trim()) {
-  throw new Error('Could not generate local Supabase types.');
+  throw new Error(
+    `Could not generate local Supabase types. Tried ${attempted.join(', ')}; set ` +
+      'SUPABASE_LOCAL_DB_URL to point at the local database directly.',
+  );
 }
 
 const committed = await readFile('lib/supabase/types.ts', 'utf8');
