@@ -189,7 +189,13 @@ export function LearningHistoryControl({
             <dt className="text-xs text-[var(--color-text-subtle)]">Последняя активность</dt>
             <dd className="font-semibold">
               {history.lastActivityAt
-                ? new Date(history.lastActivityAt).toLocaleDateString('ru-RU')
+                ? // Pinned so this Client Component's SSR pass and its browser
+                  // hydration render the same text regardless of either
+                  // process's OS timezone; otherwise a mismatch forces a
+                  // client-side re-render of the tree.
+                  new Date(history.lastActivityAt).toLocaleDateString('ru-RU', {
+                    timeZone: 'Asia/Oral',
+                  })
                 : '—'}
             </dd>
           </div>

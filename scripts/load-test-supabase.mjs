@@ -197,6 +197,14 @@ function buildProfile(user, index, timestamp) {
     phone_country_iso2: 'KZ',
     phone_e164: `+7701${String(index + 1).padStart(7, '0')}`,
     onboarding_completed_at: timestamp,
+    // start_test_attempt_unmetered requires avatar_updated_at for every
+    // learner, ZH included, since 20260903120000_zh_full_profile_admission
+    // removed the bypass that let a ZH account skip it. This is the first run
+    // ever to reach that check with a real course to attempt (pozharnaya-
+    // bezopasnost had no published revision before this session), so nothing
+    // caught it until now. buildProfileAvatarManifest below provisions the
+    // matching legacy_imported manifest row.
+    avatar_updated_at: timestamp,
   };
 }
 
@@ -898,7 +906,9 @@ async function main() {
     );
     for (let index = 0; index < starts.length; index += 1) {
       if (starts[index].data?.locale !== 'zh') {
-        throw new Error(`localized attempt contract mismatch: zh`);
+        throw new Error(
+          `localized attempt contract mismatch: zh (got ${JSON.stringify(starts[index].data)})`,
+        );
       }
       assertNoForbiddenLearnerKeys(starts[index].data, 'localized attempt');
     }

@@ -26,7 +26,16 @@ type AttestationTableRowProps = {
 /** Vertical rule between desktop cells; a spreadsheet reads by columns. */
 const CELL = '@min-[760px]:border-l @min-[760px]:border-[var(--color-border)] @min-[760px]:pl-2';
 
-/** A spreadsheet column needs one short line, not "8 авг. 2026 г., 14:51". */
+/**
+ * A spreadsheet column needs one short line, not "8 авг. 2026 г., 14:51".
+ *
+ * `timeZone` must be pinned: this is a Client Component, so its first render
+ * happens twice — once during SSR on the server (whatever OS timezone that
+ * process runs in) and once during hydration in the browser (the visitor's
+ * own timezone). Without a fixed zone the two renders produce different text
+ * for the same instant whenever they differ, which React reports as a
+ * hydration mismatch and forces a client-side re-render of the whole tree.
+ */
 function compactDateTime(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '—';
@@ -36,6 +45,7 @@ function compactDateTime(value: string) {
     year: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Asia/Oral',
   });
 }
 

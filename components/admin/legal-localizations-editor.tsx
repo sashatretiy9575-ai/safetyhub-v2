@@ -196,7 +196,11 @@ function LegalVersionEditor({
             </CardTitle>
             <p className="mt-1 text-sm text-[var(--color-text-muted)]">
               Редакция тела: {version.bodyRevision} · действует с{' '}
-              {new Date(version.effectiveAt).toLocaleDateString('ru-RU')}
+              {/* Pinned timeZone (here and at every other effectiveAt render
+                  below): this Client Component's SSR pass and its browser
+                  hydration must agree, or a mismatched OS timezone on either
+                  side makes React discard and re-render the tree. */}
+              {new Date(version.effectiveAt).toLocaleDateString('ru-RU', { timeZone: 'Asia/Oral' })}
             </p>
           </div>
           {version.current ? <Badge variant="success">Текущая версия</Badge> : null}
@@ -545,7 +549,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
                 {readyVersions.privacy.length === 0 ? <option value="">Нет готовых версий</option> : null}
                 {readyVersions.privacy.map((item) => (
                   <option key={item.version} value={item.version}>
-                    {item.version} · {new Date(item.effectiveAt).toLocaleDateString('ru-RU')}
+                    {item.version} · {new Date(item.effectiveAt).toLocaleDateString('ru-RU', { timeZone: 'Asia/Oral' })}
                   </option>
                 ))}
               </select>
@@ -563,7 +567,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
                 ) : null}
                 {compatibleTerms.map((item) => (
                   <option key={item.version} value={item.version}>
-                    {item.version} · {new Date(item.effectiveAt).toLocaleDateString('ru-RU')}
+                    {item.version} · {new Date(item.effectiveAt).toLocaleDateString('ru-RU', { timeZone: 'Asia/Oral' })}
                   </option>
                 ))}
               </select>
