@@ -5,7 +5,6 @@ import { AccountDeletion } from '@/features/profile/account-deletion';
 import { getProfileAvatarUrl } from '@/features/profile/server';
 import { ProfileForm } from '@/features/auth/profile-form';
 import { requireRole } from '@/features/auth/server';
-import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
 import { SignOutAction } from '@/components/shared/sign-out-action';
 import { Card, CardContent } from '@/components/ui/card';
 import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
@@ -62,14 +61,8 @@ export default async function AdminAccountPage() {
       </Card>
 
       <Card>
-        <CardContent className="space-y-5 p-5 sm:p-6">
-          <div>
-            <h2 className="text-xl font-bold">Настройки входа</h2>
-            <p className="text-sm text-[var(--color-text-muted)]">
-              Вход выполняется одноразовым кодом, который приходит на email. Пароль не используется.
-            </p>
-          </div>
-          <PwaManualInstall />
+        <CardContent className="space-y-4 p-5 sm:p-6">
+          <h2 className="text-xl font-bold">Действия с аккаунтом</h2>
           <SignOutAction />
           <AccountDeletion />
         </CardContent>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Archive } from '@phosphor-icons/react/dist/csr/Archive';
 import { NotePencil } from '@phosphor-icons/react/dist/csr/NotePencil';
 import { Trash } from '@phosphor-icons/react/dist/csr/Trash';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ export function TestStatusControls({
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [unpublishOpen, setUnpublishOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const change = async (next: 'draft' | 'published') => {
     setBusy(true);
@@ -64,11 +66,12 @@ export function TestStatusControls({
             size="icon"
             variant="ghost"
             aria-label="В черновик"
-            title="Снять с публикации"
-            onClick={() => change('draft')}
+            title="Снять с публикации (в черновик)"
+            onClick={() => setUnpublishOpen(true)}
             disabled={busy}
           >
-            <NotePencil />
+            <Archive aria-hidden="true" />
+            <span className="sr-only"><NotePencil /></span>
           </Button>
         ) : null}
         <Button
@@ -82,6 +85,17 @@ export function TestStatusControls({
           <Trash />
         </Button>
       </div>
+      <DestructiveDialog
+        open={unpublishOpen}
+        title="Снять курс с публикации?"
+        description="Курс перейдёт в статус черновика и временно перестанет быть доступен учащимся на портале."
+        busy={busy}
+        onOpenChange={setUnpublishOpen}
+        onConfirm={async () => {
+          await change('draft');
+          setUnpublishOpen(false);
+        }}
+      />
       <DestructiveDialog
         open={deleteOpen}
         title="Удалить курс?"

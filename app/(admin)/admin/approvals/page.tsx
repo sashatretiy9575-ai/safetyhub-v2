@@ -38,17 +38,13 @@ export default async function AdminApprovalsPage({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
-            <p className="text-sm font-semibold text-[var(--color-primary)]">Ручная проверка доступа</p>
-            {result.state === 'ready' ? (
+            <h1 className="font-display text-2xl font-bold">Заявки на обучение</h1>
+            {result.state === 'ready' && result.data.total > 0 ? (
               <span className="rounded-full bg-[var(--color-primary-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-on-primary-soft)]">
-                Ожидают проверки: {result.data.total}
+                {result.data.total}
               </span>
             ) : null}
           </div>
-          <h1 className="font-display mt-1 text-3xl font-bold">Заявки на обучение</h1>
-          <p className="mt-1 max-w-3xl text-sm leading-6 text-[var(--color-text-muted)]">
-            Подтверждение открывает только доступ к курсам и тестам. Сертификаты по-прежнему требуют отдельной проверки личности.
-          </p>
         </div>
         <Button asChild size="sm" variant="outline">
           <Link href="/admin">К рабочим очередям</Link>

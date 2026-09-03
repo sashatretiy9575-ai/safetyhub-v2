@@ -99,6 +99,59 @@ function organizationHref(filters: FilterSnapshot, organization: string) {
   return `/admin/employees?${params.toString()}`;
 }
 
+function levenshteinDistance(a: string, b: string): number {
+  if (Math.abs(a.length - b.length) > 2) return 99;
+  const m = b.length;
+  const n = a.length;
+  const dp: number[] = Array.from({ length: n + 1 }, (_, idx) => idx);
+
+  for (let i = 1; i <= m; i++) {
+    let prev = dp[0] ?? 0;
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const temp = dp[j] ?? 0;
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        dp[j] = prev;
+      } else {
+        dp[j] = Math.min(prev + 1, (dp[j - 1] ?? 0) + 1, temp + 1);
+      }
+      prev = temp;
+    }
+  }
+  return dp[n] ?? 99;
+}
+
+function findCompanyTypoWarnings(rows: AdminAttestationRow[]) {
+  const orgCounts = new Map<string, number>();
+  for (const row of rows) {
+    const org = (row.organization ?? '').trim();
+    if (org) orgCounts.set(org, (orgCounts.get(org) ?? 0) + 1);
+  }
+  const orgs = Array.from(orgCounts.keys());
+  const warnings: Array<{ primary: string; primaryCount: number; typo: string; typoCount: number }> = [];
+
+  for (let i = 0; i < orgs.length; i++) {
+    const a = orgs[i];
+    if (!a) continue;
+    for (let j = i + 1; j < orgs.length; j++) {
+      const b = orgs[j];
+      if (!b) continue;
+      const normA = a.toLowerCase().replace(/[\s\-_"«»]/g, '');
+      const normB = b.toLowerCase().replace(/[\s\-_"«»]/g, '');
+      if (normA !== normB && (normA.includes(normB) || normB.includes(normA) || levenshteinDistance(normA, normB) <= 2)) {
+        const countA = orgCounts.get(a) ?? 0;
+        const countB = orgCounts.get(b) ?? 0;
+        if (countA >= countB) {
+          warnings.push({ primary: a, primaryCount: countA, typo: b, typoCount: countB });
+        } else {
+          warnings.push({ primary: b, primaryCount: countB, typo: a, typoCount: countA });
+        }
+      }
+    }
+  }
+  return warnings;
+}
+
 export function AttestationsManager({
   page,
   filters,
@@ -307,9 +360,15 @@ export function AttestationsManager({
       };
     }
     if (pending.kind === 'issue') {
+      const typoWarnings = findCompanyTypoWarnings(selectedRows);
+      const firstWarning = typoWarnings[0];
+      const warningText =
+        firstWarning
+          ? ` ⚠️ Внимание: обнаружены похожие компании («${firstWarning.primary}» — ${firstWarning.primaryCount} чел. и «${firstWarning.typo}» — ${firstWarning.typoCount} чел.). Возможно, это опечатка в названии. Рекомендуем объединить перед выдачей.`
+          : '';
       return {
         title: 'Выдать сертификаты',
-        description: `Выбрано ${selectionSummary.total} результатов. Сейчас выдача применима к ${selectionSummary.readyToIssue}; ожидаемо будет пропущено ${Math.max(0, selectionSummary.total - selectionSummary.readyToIssue)}. Сервер повторно проверит каждую строку перед выдачей.`,
+        description: `Выбрано ${selectionSummary.total} результатов. Сейчас выдача применима к ${selectionSummary.readyToIssue}; ожидаемо будет пропущено ${Math.max(0, selectionSummary.total - selectionSummary.readyToIssue)}.${warningText}`,
         confirmLabel: `Выдать ${selectionSummary.readyToIssue}`,
       };
     }
@@ -323,12 +382,22 @@ export function AttestationsManager({
         confirmationPhrase:
           selectionSummary.issued >= 20 ? `ОТОЗВАТЬ ${selectionSummary.issued}` : undefined,
       };
+    if (pending.kind === 'bulk-delete') {
+      return {
+        title: 'Удалить пользователей',
+        description: `Выбрано пользователей для удаления: ${selectionSummary.people}. Все связанные данные, попытки и профили будут удалены. Это действие необратимо.`,
+        confirmLabel: `Удалить ${selectionSummary.people} пользователей`,
+        tone: 'danger',
+        confirmationPhrase:
+          selectionSummary.people >= 5 ? `УДАЛИТЬ ${selectionSummary.people}` : undefined,
+      };
+    }
     return {
       title: 'Скачать пакет документов',
       description: `Выбрано строк: ${selectionSummary.total}. Действующих сертификатов: ${selectionSummary.exportable}. Строки без действующего сертификата не войдут в ZIP. Даже при нуле сертификатов архив содержит общий отчёт.`,
       confirmLabel: 'Сформировать ZIP',
     };
-  }, [pending, selectionSummary]);
+  }, [pending, selectedRows, selectionSummary]);
 
   const mutationSummary = (
     items: AdminAttestationMutationItem[],
@@ -344,6 +413,7 @@ export function AttestationsManager({
       issue: 'Готово: сертификаты выданы',
       revoke: 'Готово: сертификаты отозваны',
       export: 'Архив сформирован',
+      'bulk-delete': 'Пользователи удалены',
     }[kind];
     const reasons = items
       .filter((item) => item.status === 'skipped' && item.reason)
@@ -370,6 +440,33 @@ export function AttestationsManager({
     if (pending.kind === 'export') {
       setPending(null);
       await downloadZip();
+      return;
+    }
+    if (pending.kind === 'bulk-delete') {
+      setBusy(true);
+      setError('');
+      try {
+        let deleted = 0;
+        let failed = 0;
+        for (const targetUserId of userIds) {
+          const res = await clientRequest(`/api/admin/users/${targetUserId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason || 'Массовое удаление пользователей администратором' }),
+          });
+          if (res.ok) deleted++;
+          else failed++;
+        }
+        setPending(null);
+        setDetail(null);
+        clearSelection();
+        setMessage(`Удалено пользователей: ${deleted}.${failed > 0 ? ` Ошибок: ${failed}.` : ''}`);
+        router.refresh();
+      } catch {
+        setError('Не удалось удалить пользователей.');
+      } finally {
+        setBusy(false);
+      }
       return;
     }
     setBusy(true);
@@ -551,12 +648,13 @@ export function AttestationsManager({
       >
         <div
           role="row"
-          className="sticky top-0 z-20 hidden min-h-11 items-center gap-x-2 bg-[var(--color-surface)] px-2 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] @min-[960px]:grid @min-[960px]:grid-cols-[40px_minmax(0,1.4fr)_minmax(0,1.4fr)_64px_minmax(0,0.8fr)_40px]"
+          className="sticky top-0 z-20 hidden min-h-11 items-center gap-x-3 bg-[var(--color-surface)] px-2.5 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] @min-[960px]:grid @min-[960px]:grid-cols-[40px_minmax(0,1.2fr)_minmax(0,1.1fr)_minmax(0,1.2fr)_56px_minmax(0,0.8fr)_40px]"
         >
           <span role="columnheader" className="sr-only">
             Выбор
           </span>
           <span role="columnheader">Сотрудник</span>
+          <span role="columnheader">Компания</span>
           <span role="columnheader">Курс</span>
           <span role="columnheader">Балл</span>
           <span role="columnheader">Статус</span>
@@ -635,6 +733,14 @@ export function AttestationsManager({
                             }
                           >
                             Выбрать всю компанию
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              void setOrganizationGroupSelected(row.organization, true);
+                              setPending({ kind: 'bulk-update', field: 'organization' });
+                            }}
+                          >
+                            Изменить название компании
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
                             <Link href={organizationHref(filters, row.organization)}>

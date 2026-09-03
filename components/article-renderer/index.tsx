@@ -253,14 +253,20 @@ export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
             );
 
           case 'list': {
-            const List = block.style === 'ordered' ? 'ol' : 'ul';
+            const isOrdered = block.style === 'ordered';
+            const List = isOrdered ? 'ol' : 'ul';
             return (
               <List
                 key={index}
-                className="my-6 space-y-2.5 leading-7 marker:font-bold marker:text-[var(--color-primary)]"
+                className={cn(
+                  'my-6 space-y-2 leading-7 pl-6',
+                  isOrdered ? 'list-decimal' : 'list-disc',
+                )}
               >
                 {block.items.map((item, itemIndex) => (
-                  <li key={itemIndex}>{item}</li>
+                  <li key={itemIndex} className="pl-1 text-[var(--color-text)]">
+                    {item}
+                  </li>
                 ))}
               </List>
             );
@@ -273,18 +279,22 @@ export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
                 role="region"
                 aria-label={block.caption ?? t('table', { count: index + 1 })}
                 tabIndex={0}
-                className="my-7 max-w-full overflow-x-auto rounded-[var(--radius-md)] focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                className="my-7 w-full overflow-x-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
-                <table className="min-w-[36rem] overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-surface)] text-sm sm:text-[15px]">
+                <table className="w-full text-left text-sm sm:text-[15px]">
                   {block.caption ? (
-                    <caption className="pb-3 text-left text-sm font-bold text-[var(--color-text)]">
+                    <caption className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]/50 px-4 py-2 text-left text-xs font-bold text-[var(--color-text-muted)]">
                       {block.caption}
                     </caption>
                   ) : null}
                   <thead>
-                    <tr>
+                    <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]/70">
                       {block.headers.map((header, headerIndex) => (
-                        <th key={headerIndex} scope="col" className="text-[var(--color-text)]">
+                        <th
+                          key={headerIndex}
+                          scope="col"
+                          className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-[var(--color-text-muted)]"
+                        >
                           {header}
                         </th>
                       ))}
@@ -292,9 +302,17 @@ export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
                   </thead>
                   <tbody>
                     {block.rows.map((row, rowIndex) => (
-                      <tr key={rowIndex}>
+                      <tr
+                        key={rowIndex}
+                        className="border-t border-[var(--color-border)] transition-colors hover:bg-[var(--color-surface-muted)]/40"
+                      >
                         {row.map((cell, cellIndex) => (
-                          <td key={cellIndex}>{cell}</td>
+                          <td
+                            key={cellIndex}
+                            className="px-4 py-3 leading-relaxed text-[var(--color-text)]"
+                          >
+                            {cell}
+                          </td>
                         ))}
                       </tr>
                     ))}

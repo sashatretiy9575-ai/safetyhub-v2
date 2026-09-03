@@ -11,7 +11,6 @@ import { ResultsExport } from '@/components/admin/results-export';
 import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data-state';
 import { AdminDetailDialog } from '@/components/admin/admin-detail-dialog';
 import { AdminPagination } from '@/components/admin/admin-pagination';
-import { Card, CardContent } from '@/components/ui/card';
 
 const actionLabels: Record<string, string> = {
   'role.bootstrap_superadmin': 'Восстановлен административный доступ (архив)',
@@ -204,7 +203,7 @@ export default async function AuditPage({
               : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
           }`}
         >
-          👤 Регистрации и доступ
+          Регистрации и доступ
         </Link>
         <Link
           href="/admin/settings/history?action=test"
@@ -214,7 +213,7 @@ export default async function AuditPage({
               : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
           }`}
         >
-          📝 Тесты и баллы
+          Тесты и баллы
         </Link>
         <Link
           href="/admin/settings/history?action=certificate"
@@ -224,7 +223,7 @@ export default async function AuditPage({
               : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
           }`}
         >
-          🎓 Сертификаты
+          Сертификаты
         </Link>
       </div>
 
@@ -233,7 +232,14 @@ export default async function AuditPage({
       ) : auditResult.data.items.length === 0 ? (
         <AdminEmptyState>События по выбранным фильтрам не найдены.</AdminEmptyState>
       ) : (
-        <div className="space-y-3">
+        <div className="overflow-hidden rounded-xl border bg-[var(--color-surface)]">
+          <div className="hidden min-h-10 grid-cols-[140px_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.4fr)_70px] items-center gap-3 bg-[var(--color-surface-muted)] px-3 text-xs font-bold text-[var(--color-text-muted)] md:grid border-b">
+            <span>Время</span>
+            <span>Действие</span>
+            <span>Инициатор</span>
+            <span>Цель / Результат</span>
+            <span className="text-right">Детали</span>
+          </div>
           {auditResult.data.items.map((event) => {
             const category = eventCategory(event.action, event.details);
             const score = typeof event.details.score === 'number' ? event.details.score : undefined;
@@ -244,112 +250,90 @@ export default async function AuditPage({
                 : undefined;
 
             return (
-              <Card
+              <div
                 key={event.id}
-                className="overflow-hidden transition-all hover:border-[var(--color-primary)]/40 hover:shadow-[var(--shadow-card)]"
+                className="grid min-h-12 items-center gap-2 border-b px-3 py-2 text-xs transition-colors hover:bg-[var(--color-surface-muted)]/50 last:border-b-0 md:grid-cols-[140px_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.4fr)_70px] md:gap-3"
               >
-                <CardContent className="p-4 text-sm">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-start gap-3 min-w-0">
-                      <div className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--color-surface-muted)] text-base">
-                        {category === 'certificate' ? '🎓' : category === 'test' ? '📝' : category === 'user' ? '👤' : '⚙️'}
-                      </div>
-                      <div className="min-w-0 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          {categoryBadge(category)}
-                          <h2 className="font-semibold text-[var(--color-text)]">{readableAction(event.action)}</h2>
-                        </div>
-                        <p className="text-xs text-[var(--color-text-muted)] truncate">
-                          {event.actorLabel} → {event.targetLabel}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                          {score !== undefined && total !== undefined ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--color-surface-muted)] px-2 py-0.5 text-xs font-bold text-[var(--color-text)]">
-                              🎯 Результат: {score} из {total} {score >= 7 ? '· 🟢 Сдан' : '· 🔴 Не сдан'}
-                            </span>
-                          ) : null}
-                          {certNum ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--color-primary-soft)] px-2 py-0.5 text-xs font-bold text-[var(--color-on-primary-soft)]">
-                              🎓 Сертификат: № {certNum}
-                            </span>
-                          ) : null}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 shrink-0 border-t sm:border-t-0 border-[var(--color-border)] pt-2 sm:pt-0">
-                      <time className="text-xs text-[var(--color-text-muted)]">
-                        {new Date(event.createdAt).toLocaleString('ru-RU', {
-                          day: 'numeric',
-                          month: 'short',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </time>
-                      <AdminDetailDialog
-                        title={readableAction(event.action)}
-                        description={`${event.actorLabel} → ${event.targetLabel}`}
-                        triggerLabel="Детали"
-                      >
-                  <div className="space-y-5 text-sm">
-                    <dl className="grid gap-3 sm:grid-cols-2">
-                      <div>
-                        <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
-                          Автор
-                        </dt>
-                        <dd className="mt-1 break-words">{event.actorLabel}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
-                          Цель
-                        </dt>
-                        <dd className="mt-1 break-words">{event.targetLabel}</dd>
-                      </div>
-                      {detailStatus(event.details) ? (
-                        <div>
-                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
-                            Статус
-                          </dt>
-                          <dd className="mt-1">{detailStatus(event.details)}</dd>
-                        </div>
-                      ) : null}
-                      <div>
-                        <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
-                          Время
-                        </dt>
-                        <dd className="mt-1">
-                          {new Date(event.createdAt).toLocaleString('ru-RU')}
-                        </dd>
-                      </div>
-                      <div className="sm:col-span-2">
-                        <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
-                          Correlation ID
-                        </dt>
-                        <dd className="mt-1 font-mono text-xs break-all">{event.correlationId}</dd>
-                      </div>
-                      <div className="sm:col-span-2">
-                        <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
-                          Технические идентификаторы
-                        </dt>
-                        <dd className="mt-1 font-mono text-xs break-all">
-                          Action: {event.action} · Target: {event.targetId ?? '—'} · Event:{' '}
-                          {event.id}
-                        </dd>
-                      </div>
-                    </dl>
-                    <div>
-                      <h3 className="font-semibold">Данные события</h3>
-                      <pre className="mt-2 max-h-72 overflow-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3 text-xs break-words whitespace-pre-wrap">
-                        {JSON.stringify(event.details, null, 2)}
-                      </pre>
-                    </div>
+                <time className="text-[var(--color-text-muted)] font-mono text-[11px]">
+                  {new Date(event.createdAt).toLocaleString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </time>
+                <div className="min-w-0 flex items-center gap-1.5">
+                  {categoryBadge(category)}
+                  <span className="font-semibold text-[var(--color-text)] truncate" title={readableAction(event.action)}>
+                    {readableAction(event.action)}
+                  </span>
+                </div>
+                <div className="min-w-0 truncate text-[var(--color-text)]" title={event.actorLabel}>
+                  {event.actorLabel}
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-[var(--color-text)]" title={event.targetLabel}>
+                    {event.targetLabel}
                   </div>
-                </AdminDetailDialog>
+                  {score !== undefined && total !== undefined ? (
+                    <span className="mt-0.5 inline-block text-[11px] font-medium text-[var(--color-text-muted)]">
+                      Результат: {score}/{total} {score >= 7 ? '(Сдан)' : '(Не сдан)'}
+                    </span>
+                  ) : null}
+                  {certNum ? (
+                    <span className="mt-0.5 inline-block text-[11px] font-medium text-[var(--color-primary)]">
+                      № {certNum}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex justify-end">
+                  <AdminDetailDialog
+                    title={readableAction(event.action)}
+                    description={`${event.actorLabel} → ${event.targetLabel}`}
+                    triggerLabel="Детали"
+                  >
+                    <div className="space-y-4 text-sm">
+                      <dl className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Автор</dt>
+                          <dd className="mt-1 break-words">{event.actorLabel}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Цель</dt>
+                          <dd className="mt-1 break-words">{event.targetLabel}</dd>
+                        </div>
+                        {detailStatus(event.details) ? (
+                          <div>
+                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Статус</dt>
+                            <dd className="mt-1">{detailStatus(event.details)}</dd>
+                          </div>
+                        ) : null}
+                        <div>
+                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Время</dt>
+                          <dd className="mt-1">{new Date(event.createdAt).toLocaleString('ru-RU')}</dd>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Correlation ID</dt>
+                          <dd className="mt-1 font-mono text-xs break-all">{event.correlationId}</dd>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">Технические идентификаторы</dt>
+                          <dd className="mt-1 font-mono text-xs break-all">Action: {event.action} · Target: {event.targetId ?? '—'} · Event: {event.id}</dd>
+                        </div>
+                      </dl>
+                      <div>
+                        <h3 className="font-semibold text-xs">Данные события</h3>
+                        <pre className="mt-2 max-h-72 overflow-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3 text-xs break-words whitespace-pre-wrap">
+                          {JSON.stringify(event.details, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
+                  </AdminDetailDialog>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-          );
-        })}
+            );
+          })}
         </div>
       )}
 

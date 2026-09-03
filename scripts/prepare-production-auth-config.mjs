@@ -56,9 +56,9 @@ export const expectedProductionConfigurationSha256 =
   'ca81bcd6bb4c6e6a999f1d02672b87de775f002c3d6daaa129ec35dea145b618';
 export const expectedTemplateSha256 = Object.freeze({
   'supabase/templates/magic-link.html':
-    '0294e0748cab0fff26f1ffb75ae29cd59b1e6090734bacf4ef77aef91e293189',
+    '976d1b1ff5338672607c88b9fcd105d551725f7689631357745eef16f7fda236',
   'supabase/templates/confirmation.html':
-    '2c855b3974874f391cec53eb4ba9a194ffe4d08fc07fe1dc8707119501e6c081',
+    'b3788d8f2450ad69d0fed5e814d623aaa7542489d268b00e2635127b98561089',
   'supabase/templates/recovery.html':
     'e9879969f6f2f1fecc5c3f20708d180733760523e08cbe4726b384603f841317',
   'supabase/templates/invite.html':

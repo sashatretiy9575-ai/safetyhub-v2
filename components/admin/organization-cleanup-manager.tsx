@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 
 export function OrganizationCleanupManager({
   clusters,
@@ -27,7 +26,6 @@ export function OrganizationCleanupManager({
   const [targetId, setTargetId] = useState('');
   const [preview, setPreview] = useState<OrganizationMergePreview | null>(null);
   const [policy, setPolicy] = useState<'preserve' | 'reissue'>('preserve');
-  const [reason, setReason] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [idempotencyKey, setIdempotencyKey] = useState('');
   const [busy, setBusy] = useState(false);
@@ -73,7 +71,6 @@ export function OrganizationCleanupManager({
   const openCluster = (item: OrganizationCleanupCluster) => {
     setCluster(item);
     setPolicy('preserve');
-    setReason('');
     setConfirmation('');
     setIdempotencyKey(crypto.randomUUID());
     void loadPreview(item, item.left.id);
@@ -104,7 +101,7 @@ export function OrganizationCleanupManager({
           sourceIds: sourceIds(cluster, targetId),
           targetId,
           reissueCertificates: policy === 'reissue',
-          reason,
+          reason: 'Объединение дубликатов организаций',
         }),
       });
       const payload = await readClientResponseJson<OrganizationMergeResult | { error?: string }>(
@@ -281,18 +278,6 @@ export function OrganizationCleanupManager({
               </label>
             </fieldset>
 
-            <div className="space-y-2">
-              <Label htmlFor="organization-merge-reason">Причина изменения</Label>
-              <Textarea
-                id="organization-merge-reason"
-                value={reason}
-                onChange={(event) => setReason(event.target.value)}
-                minLength={10}
-                maxLength={500}
-                required
-                placeholder="Например: варианты относятся к одному юридическому лицу"
-              />
-            </div>
 
             {requiredPhrase ? (
               <div className="space-y-2 rounded-xl bg-[var(--color-danger-soft)] p-3">

@@ -66,6 +66,7 @@ export async function POST(request: Request) {
         shouldCreateUser: true,
         captchaToken: parsed.data.captchaToken,
         emailRedirectTo: emailOtpRedirectUrl(resolveSiteOrigin(), locale),
+        data: { locale },
       },
     });
     if (error) {

@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import { Buildings } from '@phosphor-icons/react/dist/csr/Buildings';
 import { CheckCircle } from '@phosphor-icons/react/dist/csr/CheckCircle';
 import { DotsThree } from '@phosphor-icons/react/dist/csr/DotsThree';
 import { DownloadSimple } from '@phosphor-icons/react/dist/csr/DownloadSimple';
 import { FloppyDisk } from '@phosphor-icons/react/dist/csr/FloppyDisk';
+import { Trash } from '@phosphor-icons/react/dist/csr/Trash';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import type { AdminAttestationRow } from '@/features/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
@@ -56,7 +57,8 @@ export type AttestationPendingAction =
     }
   | { kind: 'issue' }
   | { kind: 'revoke' }
-  | { kind: 'export' };
+  | { kind: 'export' }
+  | { kind: 'bulk-delete' };
 
 export type AttestationSelectionSummary = {
   total: number;
@@ -239,21 +241,13 @@ export function AttestationBulkActionButtons({
             <CheckCircle /> {confirmLabel}
           </Button>
           <Button
-            asChild
-            size={compact ? 'md' : 'sm'}
-            variant="outline"
-            className={compact ? 'w-full justify-start' : undefined}
-          >
-            <Link href="/admin/organizations/cleanup">Очистка компаний</Link>
-          </Button>
-          <Button
             size={compact ? 'md' : 'sm'}
             variant="outline"
             disabled={summary.people === 0}
-            onClick={() => onAction({ kind: 'bulk-update', field: 'job' })}
+            onClick={() => onAction({ kind: 'bulk-update', field: 'organization' })}
             className={compact ? 'w-full justify-start' : undefined}
           >
-            Изменить должность ({summary.people})
+            <Buildings /> Изменить компанию ({summary.people})
           </Button>
         </>
       ) : null}
@@ -276,6 +270,17 @@ export function AttestationBulkActionButtons({
           className={compact ? 'w-full justify-start' : undefined}
         >
           Отозвать {summary.issued}
+        </Button>
+      ) : null}
+      {permissions.canManageIdentity || permissions.canDeleteHistory ? (
+        <Button
+          size={compact ? 'md' : 'sm'}
+          variant="danger"
+          disabled={summary.people === 0}
+          onClick={() => onAction({ kind: 'bulk-delete' })}
+          className={compact ? 'w-full justify-start' : undefined}
+        >
+          <Trash /> Удалить пользователей ({summary.people})
         </Button>
       ) : null}
       {permissions.canExport ? (

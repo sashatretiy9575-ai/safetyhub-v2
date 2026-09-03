@@ -56,7 +56,8 @@ export default async function AdminCoursesPage({
           name="status"
           defaultValue={status ?? ''}
           aria-label="Статус курса"
-          className="min-h-11 rounded-lg border bg-[var(--color-surface)] px-3 text-sm"
+          onChange={(event) => event.target.form?.requestSubmit()}
+          className="min-h-11 rounded-lg border bg-[var(--color-surface)] px-3 text-sm cursor-pointer"
         >
           <option value="">Все статусы</option>
           <option value="draft">Черновики</option>

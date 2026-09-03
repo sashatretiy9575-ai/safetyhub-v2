@@ -1,5 +1,5 @@
 <!doctype html>
-{{ if or (eq .RedirectTo "https://safetyhub.kz/en/auth/login?email_locale=en") (eq .RedirectTo "http://localhost:3000/en/auth/login?email_locale=en") }}
+{{ if or (eq .Data.locale "en") (eq .RedirectTo "https://safetyhub.kz/en/auth/login?email_locale=en") (eq .RedirectTo "http://localhost:3000/en/auth/login?email_locale=en") (eq .RedirectTo "https://www.safetyhub.kz/en/auth/login?email_locale=en") }}
 <html lang="en">
   <body style="margin:0;background:#f4f7f5;color:#173d2b;font-family:Arial,sans-serif">
     <div style="max-width:520px;margin:0 auto;padding:32px 20px"><div style="border-radius:20px;background:#ffffff;padding:32px;box-shadow:0 8px 30px rgba(23,61,43,.08)">
@@ -11,7 +11,7 @@
     </div></div>
   </body>
 </html>
-{{ else if or (eq .RedirectTo "https://safetyhub.kz/kk/auth/login?email_locale=kk") (eq .RedirectTo "http://localhost:3000/kk/auth/login?email_locale=kk") }}
+{{ else if or (eq .Data.locale "kk") (eq .RedirectTo "https://safetyhub.kz/kk/auth/login?email_locale=kk") (eq .RedirectTo "http://localhost:3000/kk/auth/login?email_locale=kk") (eq .RedirectTo "https://www.safetyhub.kz/kk/auth/login?email_locale=kk") }}
 <html lang="kk">
   <body style="margin:0;background:#f4f7f5;color:#173d2b;font-family:Arial,sans-serif">
     <div style="max-width:520px;margin:0 auto;padding:32px 20px"><div style="border-radius:20px;background:#ffffff;padding:32px;box-shadow:0 8px 30px rgba(23,61,43,.08)">

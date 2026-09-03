@@ -63,32 +63,34 @@ export default async function ContactsPage() {
               {details.map(({ icon: Icon, label, value, ...item }, index) => (
                 <div
                   key={label}
-                  className={`min-w-0 p-4 sm:p-5 ${
+                  className={`flex items-start gap-4 p-5 ${
                     index === 0
                       ? 'border-b border-[var(--color-border)] sm:border-r sm:border-b-0'
                       : ''
                   }`}
                 >
-                  <dt className="text-xs font-bold tracking-[0.12em] text-[var(--color-text-subtle)] uppercase">
-                    <span className="grid size-9 place-items-center rounded-[13px] border border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                      <Icon size={19} weight="duotone" aria-hidden="true" />
-                    </span>
-                    <span className="mt-3 block sm:mt-4">{label}</span>
-                  </dt>
-                  <dd className="mt-1 min-w-0 text-[15px] leading-6 font-semibold break-words">
-                    {'href' in item ? (
-                      <a
-                        href={item.href}
-                        target={item.href.startsWith('http') ? '_blank' : undefined}
-                        rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                        className="transition hover:text-[var(--color-primary)]"
-                      >
-                        {value}
-                      </a>
-                    ) : (
-                      value
-                    )}
-                  </dd>
+                  <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                    <Icon size={22} weight="duotone" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <dt className="text-xs font-bold tracking-[0.08em] text-[var(--color-text-subtle)] uppercase">
+                      {label}
+                    </dt>
+                    <dd className="mt-1 min-w-0 text-[15px] leading-6 font-semibold break-words">
+                      {'href' in item ? (
+                        <a
+                          href={item.href}
+                          target={item.href.startsWith('http') ? '_blank' : undefined}
+                          rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          className="transition hover:text-[var(--color-primary)]"
+                        >
+                          {value}
+                        </a>
+                      ) : (
+                        value
+                      )}
+                    </dd>
+                  </div>
                 </div>
               ))}
             </dl>

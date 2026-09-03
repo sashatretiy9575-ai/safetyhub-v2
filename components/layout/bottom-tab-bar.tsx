@@ -82,7 +82,7 @@ export function BottomTabBar({ accountMode }: { accountMode: AccountMode }) {
                 />
               ) : null}
               <span className="flex h-7 items-center justify-center">{icon}</span>
-              <span className="whitespace-nowrap">{label}</span>
+              <span className="max-w-full truncate px-0.5 text-center leading-tight">{label}</span>
             </Link>
           );
         })}

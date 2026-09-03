@@ -107,8 +107,10 @@ function freshTestFromSeed(seed?: TestEditorSeed): TestEditorPayload {
     ...(seed.status ? { status: seed.status } : {}),
     ...(seed.publicationState ? { publicationState: seed.publicationState } : {}),
     ...(seed.draftVersion !== undefined ? { draftVersion: seed.draftVersion } : {}),
-    ...(seed.contentHash ? { contentHash: seed.contentHash } : {}),
-    seo: { ...seed.seo },
+    seo: {
+      ...seed.seo,
+      indexable: seed.seo?.indexable !== false,
+    },
     revisionHistory: seed.revisionHistory.map((revision) => ({ ...revision })),
     questionVariants: empty.questionVariants,
   };

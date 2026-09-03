@@ -131,10 +131,11 @@ export function ContentBlockEditor({
             setDraggedIndex(null);
           }}
         >
-          <legend className="px-1 text-sm font-bold">
-            Блок {index + 1} · {BLOCK_LABELS[block.type]}
-          </legend>
-          <div className="flex flex-wrap justify-end gap-1">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)]/40 pb-2">
+            <legend className="px-1 text-sm font-bold">
+              Блок {index + 1} · {BLOCK_LABELS[block.type]}
+            </legend>
+            <div className="flex items-center gap-0.5 sm:gap-1">
             <Button
               type="button"
               size="icon"
@@ -201,6 +202,7 @@ export function ContentBlockEditor({
               <Trash />
             </Button>
           </div>
+        </div>
 
           {block.type === 'paragraph' || block.type === 'quote' ? (
             <Textarea
@@ -527,13 +529,14 @@ export function ContentBlockEditor({
         </fieldset>
       ))}
 
-      <div className="flex flex-wrap gap-2" aria-label="Добавить блок">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2" aria-label="Добавить блок">
         {allowedTypes.map((type) => (
           <Button
             key={type}
             type="button"
             size="sm"
             variant="outline"
+            className="w-full justify-start text-xs font-semibold"
             onClick={() => onChange([...blocks, createBlock(type)])}
           >
             <Plus /> {BLOCK_LABELS[type]}

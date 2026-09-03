@@ -30,7 +30,7 @@ export function EditorActionBar({
   return (
     <div
       data-editor-action-bar
-      className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-30 -mx-4 max-h-16 border-y border-[var(--color-border-strong)] bg-[var(--color-surface)]/96 px-2 py-2 shadow-[var(--shadow-card)] backdrop-blur-xl md:top-4 md:mx-0 md:rounded-[var(--radius-lg)] md:border-x"
+      className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-30 max-h-16 border-y border-[var(--color-border-strong)] bg-[var(--color-surface)]/96 px-3 py-2 shadow-[var(--shadow-card)] backdrop-blur-xl md:top-4 md:rounded-[var(--radius-lg)] md:border-x"
     >
       <div className="flex min-w-0 items-center gap-1.5">
         {progress ? <Badge variant="default">{progress}</Badge> : null}

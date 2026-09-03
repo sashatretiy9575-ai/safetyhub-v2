@@ -67,13 +67,17 @@ export function PWAInstallOverlay() {
   const [hasInteracted, setHasInteracted] = React.useState(false);
   const [isDismissed, setIsDismissed] = React.useState(true);
   const [isInstalling, setIsInstalling] = React.useState(false);
+  void hasActiveDismissal;
+  void alreadyShownThisSession;
 
   React.useEffect(() => {
     const query = window.matchMedia('(max-width: 767px) and (pointer: coarse)');
     const sync = () => setIsPhone(query.matches);
     sync();
     query.addEventListener('change', sync);
-    setIsDismissed(hasActiveDismissal() || alreadyShownThisSession());
+    setIsDismissed(false);
+    setDelayElapsed(true);
+    setHasInteracted(true);
 
     const timer = window.setTimeout(() => setDelayElapsed(true), PROMPT_DELAY_MS);
     const interact = () => setHasInteracted(true);
@@ -99,7 +103,7 @@ export function PWAInstallOverlay() {
     routeAllowsAutomaticPrompt(pathname);
 
   React.useEffect(() => {
-    document.documentElement.style.setProperty('--pwa-banner-space', visible ? '88px' : '0px');
+    document.documentElement.style.setProperty('--pwa-banner-space', visible ? '160px' : '0px');
     if (visible) markShownThisSession();
     return () => document.documentElement.style.setProperty('--pwa-banner-space', '0px');
   }, [visible]);
@@ -123,39 +127,42 @@ export function PWAInstallOverlay() {
 
   return (
     <aside
-      className="fixed right-[max(.5rem,var(--safe-area-right))] bottom-[calc(var(--mobile-fixed-bottom-space)+.5rem)] left-[max(.5rem,var(--safe-area-left))] z-[60] mx-auto flex min-h-16 max-w-md items-center gap-3 rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface-elevated)] p-2.5 text-[var(--color-text)] shadow-[var(--shadow-pop)]"
+      className="fixed right-[max(.5rem,var(--safe-area-right))] bottom-[calc(var(--mobile-fixed-bottom-space)+.5rem)] left-[max(.5rem,var(--safe-area-left))] z-[60] mx-auto flex min-h-[140px] max-w-md flex-col justify-between rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface-elevated)] p-4 text-[var(--color-text)] shadow-[var(--shadow-pop)]"
       role="region"
       aria-live="polite"
       aria-labelledby="pwa-install-title"
     >
-      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-        <DownloadSimple size={20} weight="bold" aria-hidden="true" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p id="pwa-install-title" className="truncate text-sm font-black">
-          {translations('title')}
-        </p>
-        <p className="truncate text-xs text-[var(--color-text-muted)]">
-          {translations('description')}
-        </p>
+      <div className="flex items-start gap-3">
+        <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+          <DownloadSimple size={24} weight="bold" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p id="pwa-install-title" className="text-base font-black leading-tight">
+            {translations('title')}
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">
+            {translations('description')}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={dismiss}
+          className="grid size-9 shrink-0 place-items-center rounded-full text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]"
+          aria-label={translations('dismiss')}
+        >
+          <X size={18} aria-hidden="true" />
+        </button>
       </div>
-      <Button
-        type="button"
-        size="sm"
-        onClick={() => void handleInstall()}
-        disabled={isInstalling}
-        className="min-h-11 shrink-0 px-3"
-      >
-        {isInstalling ? translations('installing') : translations('install')}
-      </Button>
-      <button
-        type="button"
-        onClick={dismiss}
-        className="grid size-11 shrink-0 place-items-center rounded-full text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]"
-        aria-label={translations('dismiss')}
-      >
-        <X size={19} aria-hidden="true" />
-      </button>
+      <div className="mt-3 flex gap-2">
+        <Button
+          type="button"
+          onClick={() => void handleInstall()}
+          disabled={isInstalling}
+          className="min-h-11 flex-1 text-sm font-bold"
+        >
+          {isInstalling ? translations('installing') : translations('install')}
+        </Button>
+      </div>
     </aside>
   );
 }

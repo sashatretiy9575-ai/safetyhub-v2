@@ -324,7 +324,7 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
         .eq('id', presentationId)
         .eq('course_id', testResult.data.id)
         .maybeSingle()
-    : { data: null, error: null };
+      : { data: null, error: null };
   if (presentationResult.error) throw presentationResult.error;
 
   const presentation = presentationResult.data;
@@ -350,6 +350,7 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
 
   const test = testResult.data;
   const draft = draftResult.data;
+
   return {
     id: test.id,
     slug: draft.slug,
@@ -392,8 +393,11 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
 export async function saveTest(values: SaveTestValues) {
   const actor = await requireCapability('test.manage');
   let previousPublishedSlug: string | null = null;
+  let variantsPayload: unknown = values.questionVariants;
+
   if (values.id) {
-    const current = await createAdminClient()
+    const admin = createAdminClient();
+    const current = await admin
       .from('tests')
       .select('slug,current_revision_id')
       .eq('id', values.id)
@@ -401,6 +405,24 @@ export async function saveTest(values: SaveTestValues) {
     if (current.error) throw current.error;
     if (!current.data) throw new Error('TEST_NOT_FOUND');
     if (current.data.current_revision_id) previousPublishedSlug = current.data.slug;
+
+    // Check if submitted variants are empty placeholders from browser editor
+    const isPlaceholderVariants =
+      !values.questionVariants ||
+      values.questionVariants.every((v) =>
+        v.questions.every((q) => !q.text || !q.text.trim()),
+      );
+    if (isPlaceholderVariants) {
+      const existingDraft = await admin
+        .from('course_drafts')
+        .select('*')
+        .eq('test_id', values.id)
+        .maybeSingle();
+      const existingVariants = existingDraft.data && (existingDraft.data as Record<string, unknown>)['question_variants'];
+      if (Array.isArray(existingVariants) && existingVariants.length > 0) {
+        variantsPayload = existingVariants;
+      }
+    }
   }
   const mutationArgs = {
     p_actor_id: actor.user.id,
@@ -416,7 +438,7 @@ export async function saveTest(values: SaveTestValues) {
     p_pass_score: values.passScore,
     p_attempts_per_calendar_day: values.attemptsPerCalendarDay,
     p_attempt_reset_timezone: values.attemptResetTimezone,
-    p_question_variants: values.questionVariants as unknown as Json,
+    p_question_variants: variantsPayload as unknown as Json,
     p_seo: values.seo as unknown as Json,
     p_content_metadata: {
       jurisdiction: values.jurisdiction,

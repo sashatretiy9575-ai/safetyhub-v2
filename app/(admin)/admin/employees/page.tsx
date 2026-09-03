@@ -49,7 +49,7 @@ export default async function AdminEmployeesPage({
   const params = await searchParams;
   const parsed = parseAdminAttestationQuery(params);
   const query: AdminAttestationQuery =
-    params.sort === undefined ? { ...parsed, sort: 'completed_desc' } : parsed;
+    params.sort === undefined ? { ...parsed, sort: 'organization_asc' } : parsed;
   const actor = await requireCapability('results.read');
   const [result, queueResult] = await Promise.all([
     getAdminAttestationsPage(query),

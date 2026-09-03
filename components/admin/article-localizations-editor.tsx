@@ -145,9 +145,6 @@ export function ArticleLocalizationsEditor({
     <Card data-admin-article-localizations>
       <CardHeader>
         <CardTitle>Локализации статьи</CardTitle>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          RU, KK, EN и ZH публикуются одной неизменяемой редакцией. Админ-панель остаётся русской.
-        </p>
       </CardHeader>
       <CardContent className="space-y-5">
         <AdminLocaleTabs
@@ -201,10 +198,8 @@ export function ArticleLocalizationsEditor({
               <ArticleRenderer blocks={active.blocks} />
             </article>
           ) : activeLocale === 'ru' ? (
-            <div className="rounded-xl border border-[var(--color-border)] p-4 text-sm leading-6">
-              Русский текст синхронизируется из основной формы статьи. Здесь он доступен только для
-              статуса и предпросмотра, поэтому канонический RU-черновик остаётся единственным
-              источником.
+            <div className="rounded-xl border border-[var(--color-border)] p-3.5 text-xs text-[var(--color-text-muted)]">
+              Основной текст на русском языке заполняется во вкладке «Содержание статьи».
             </div>
           ) : (
             <div className="space-y-6">

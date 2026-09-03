@@ -497,7 +497,6 @@ export default async function ProfilePage() {
                 <CaretDown className="transition-transform group-open:rotate-180" />
               </summary>
               <div className="space-y-4 border-t p-4 md:p-6">
-                <p className="text-sm text-[var(--color-text-muted)]">{t('passwordlessHint')}</p>
                 <PwaManualInstall />
                 <SignOutAction />
                 <AccountDeletion />
