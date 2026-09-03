@@ -27,7 +27,7 @@ export function AdminNavLink({
       className={cn(
         'group flex min-h-11 items-center gap-3 rounded-xl font-bold transition-colors',
         active
-          ? 'bg-[var(--color-primary-soft)] text-[var(--color-on-primary-soft)]'
+          ? 'bg-[var(--color-surface-muted)] text-[var(--color-text)]'
           : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
         mobile
           ? 'min-w-0 w-full flex-col justify-center gap-0.5 px-0.5 py-1 text-[11px] leading-none'

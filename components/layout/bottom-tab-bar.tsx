@@ -21,8 +21,6 @@ export function BottomTabBar({ accountMode }: { accountMode: AccountMode }) {
   const locale = useLocale();
   const translations = useTranslations('Shell');
   const accountItem = ACCOUNT_NAV_ITEMS[accountMode];
-  // The icon is stored as a component, not an element, so the active tab can
-  // render it filled — colour alone was too faint to read at a glance.
   const tabs = [
     { href: ROUTES.home, Icon: House, label: translations('nav.home') },
     { href: ROUTES.topics, Icon: BookOpen, label: translations('nav.topics') },
@@ -54,18 +52,18 @@ export function BottomTabBar({ accountMode }: { accountMode: AccountMode }) {
               className={cn(
                 'group relative flex min-h-14 min-w-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-[18px] px-0 py-1 text-[10.5px] leading-none font-semibold tracking-normal transition-[color,background-color] duration-150',
                 isActive
-                  ? 'bg-[var(--color-primary-soft)] text-[var(--color-on-primary-soft)]'
+                  ? 'bg-[var(--color-surface-muted)] text-[var(--color-text)]'
                   : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
               )}
             >
               {isActive ? (
                 <span
                   aria-hidden="true"
-                  className="absolute top-1 size-2 rounded-full bg-[var(--color-primary)]"
+                  className="absolute top-1 size-1 rounded-full bg-[var(--color-primary)]"
                 />
               ) : null}
               <span className="flex h-7 items-center justify-center">
-                <Icon size={21} weight={isActive ? 'fill' : 'regular'} />
+                <Icon size={21} weight="regular" />
               </span>
               <span className="max-w-full truncate px-0.5 text-center leading-tight">{label}</span>
             </Link>

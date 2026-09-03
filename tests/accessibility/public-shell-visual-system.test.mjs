@@ -21,9 +21,11 @@ test('public shell uses neutral glass chrome and the 1024px navigation breakpoin
   assert.match(header, /min-\[1024px\]:flex/);
   assert.match(header, /min-\[1024px\]:hidden/);
   assert.match(tabs, /rounded-\[var\(--radius-dock\)\]/);
-  // Inactive tabs stay in the light weight; the current one fills so it reads
-  // at a glance instead of relying on a barely-tinted background.
-  assert.match(tabs, /weight=\{isActive \? 'fill' : 'regular'\}/);
+  // The owner asked for the quiet dock back: one weight for every icon, the
+  // small dot, and a neutral surface tint rather than a green pill.
+  assert.match(tabs, /weight="regular"/);
+  assert.match(tabs, /size-1 rounded-full bg-\[var\(--color-primary\)\]/);
+  assert.match(tabs, /bg-\[var\(--color-surface-muted\)\] text-\[var\(--color-text\)\]/);
   assert.match(tabs, /min-\[1024px\]:hidden/);
   assert.match(shell, /min-\[1024px\]:pb-0/);
 });

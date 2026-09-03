@@ -1502,6 +1502,10 @@ export type Database = {
         }
         Returns: string
       }
+      course_draft_bank_from_revision: {
+        Args: { p_revision_id: string }
+        Returns: Json
+      }
       course_question_variants_valid: {
         Args: { p_variants: Json }
         Returns: boolean
@@ -1784,6 +1788,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      restore_course_draft_from_revision_unmetered: {
+        Args: { p_actor_id: string; p_test_id: string }
+        Returns: Json
       }
       revoke_certificates_unmetered: {
         Args: { p_certificate_ids: string[]; p_reason: string }
@@ -4766,6 +4774,10 @@ export type Database = {
       }
       resolve_course_slug: { Args: { p_old_slug: string }; Returns: string }
       restore_admin_access: { Args: { p_user_id: string }; Returns: string }
+      restore_course_draft_from_published_revision_v1: {
+        Args: { p_actor_id: string; p_test_id: string }
+        Returns: Json
+      }
       resume_test_attempt: { Args: { p_test_slug: string }; Returns: Json }
       retire_course_presentation: {
         Args: {
