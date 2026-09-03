@@ -21,7 +21,9 @@ test('public shell uses neutral glass chrome and the 1024px navigation breakpoin
   assert.match(header, /min-\[1024px\]:flex/);
   assert.match(header, /min-\[1024px\]:hidden/);
   assert.match(tabs, /rounded-\[var\(--radius-dock\)\]/);
-  assert.match(tabs, /weight="regular"/);
+  // Inactive tabs stay in the light weight; the current one fills so it reads
+  // at a glance instead of relying on a barely-tinted background.
+  assert.match(tabs, /weight=\{isActive \? 'fill' : 'regular'\}/);
   assert.match(tabs, /min-\[1024px\]:hidden/);
   assert.match(shell, /min-\[1024px\]:pb-0/);
 });

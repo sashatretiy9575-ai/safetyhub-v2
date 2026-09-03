@@ -6,6 +6,10 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { buildContentSecurityPolicy } from '../../lib/security/content-security-policy.ts';
 import { THEME_BOOTSTRAP, THEME_BOOTSTRAP_CSP_HASH } from '../../lib/theme.ts';
+import {
+  PWA_INSTALL_BOOTSTRAP,
+  PWA_INSTALL_BOOTSTRAP_CSP_HASH,
+} from '../../lib/pwa-install-bootstrap.ts';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
@@ -46,9 +50,18 @@ test('sensitive HTML uses an injection-safe nonce policy compatible with Turnsti
   );
 });
 
-test('the strict CSP hash exactly matches the early theme bootstrap', () => {
-  const digest = createHash('sha256').update(THEME_BOOTSTRAP).digest('base64');
-  assert.equal(THEME_BOOTSTRAP_CSP_HASH, `'sha256-${digest}'`);
+test('the strict CSP hashes exactly match the two early bootstrap scripts', () => {
+  const themeDigest = createHash('sha256').update(THEME_BOOTSTRAP).digest('base64');
+  assert.equal(THEME_BOOTSTRAP_CSP_HASH, `'sha256-${themeDigest}'`);
+  // The install-prompt bootstrap runs on protected pages too, where the policy
+  // has no 'unsafe-inline'; an unpinned hash silently blocks it.
+  const installDigest = createHash('sha256').update(PWA_INSTALL_BOOTSTRAP).digest('base64');
+  assert.equal(PWA_INSTALL_BOOTSTRAP_CSP_HASH, `'sha256-${installDigest}'`);
+  assert.ok(
+    buildContentSecurityPolicy({ nonce: 'a'.repeat(32), strict: true }).includes(
+      PWA_INSTALL_BOOTSTRAP_CSP_HASH,
+    ),
+  );
 });
 
 test('public CSP remains static while protected routes receive request nonces', async () => {

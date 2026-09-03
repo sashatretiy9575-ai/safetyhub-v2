@@ -35,7 +35,15 @@ test('deferred install banner stays compact above the mobile bar and reserves te
   assert.match(deferredInstall, /ssr: false/);
   assert.match(installSurface, /<PWAProvider>/);
   assert.match(installSurface, /<PWAInstallOverlay \/>/);
-  assert.match(overlay, /bottom-\[calc\(var\(--mobile-fixed-bottom-space\)\+\.5rem\)\]/);
+  // The banner is docked onto the mobile tab bar, not floated above it.
+  assert.match(
+    overlay,
+    /bottom-\[calc\(var\(--safe-area-bottom\)\+var\(--mobile-tab-height\)\)\]/,
+  );
+  assert.match(overlay, /max-w-\[32\.5rem\]/);
+  // The dismissal, session cap and delay must stay wired up.
+  assert.match(overlay, /setIsDismissed\(hasActiveDismissal\(\) \|\| alreadyShownThisSession\(\)\)/);
+  assert.doesNotMatch(overlay, /void hasActiveDismissal/);
   assert.match(overlay, /--pwa-banner-space/);
   assert.match(overlay, /PROMPT_DELAY_MS = 15_000/);
   assert.match(overlay, /30 \* 24 \* 60 \* 60/);

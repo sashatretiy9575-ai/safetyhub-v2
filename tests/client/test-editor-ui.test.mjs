@@ -128,7 +128,11 @@ test('course editor exposes presentation, policy, three variants, stable ids and
   assert.match(component, /clientRequest\('\/api\/admin\/courses'/);
   assert.match(component, /router\.replace\(`\/admin\/courses\//);
   assert.match(component, /freshTestFromSeed/);
-  assert.match(component, /questionVariants: empty\.questionVariants/);
+  // The saved bank is loaded when the audited server read returned one, and the
+  // blank set is only the fallback for a course that has none yet.
+  assert.match(component, /questionVariants: seed\.questionVariants/);
+  assert.match(component, /: empty\.questionVariants,/);
+  assert.match(component, /options: question\.options\.map\(\(option\) => \(\{ \.\.\.option \}\)\)/);
   assert.match(component, /data-course-editor-key-boundary/);
   assert.match(component, /removeItem\(key\)/);
   assert.doesNotMatch(component, /readTestEditorDraft|writeTestEditorDraft|clearTestEditorDraft/);

@@ -66,21 +66,26 @@ export default async function ContactsPage() {
                 // wrapper used to sit in there too, which is invalid markup and
                 // was reported as a serious accessibility violation, so the icon
                 // now lives inside the term it labels.
+                // The icon has to live inside `dt`, because a `dl` group may
+                // contain nothing but `dt` and `dd` — putting it back outside
+                // reopens a serious accessibility violation. Positioning it
+                // against the whole cell instead centres it on the label *and*
+                // the value, rather than leaving the value hanging below it.
                 <div
                   key={label}
-                  className={`p-5 ${
+                  className={`relative p-5 pl-[4.75rem] ${
                     index === 0
                       ? 'border-b border-[var(--color-border)] sm:border-r sm:border-b-0'
                       : ''
                   }`}
                 >
-                  <dt className="flex min-w-0 items-center gap-4 text-xs font-bold tracking-[0.08em] text-[var(--color-text-subtle)] uppercase">
-                    <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                  <dt className="min-w-0 text-xs font-bold tracking-[0.08em] text-[var(--color-text-subtle)] uppercase">
+                    <span className="absolute top-1/2 left-5 grid size-11 -translate-y-1/2 place-items-center rounded-2xl border border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                       <Icon size={22} weight="duotone" aria-hidden="true" />
                     </span>
-                    <span className="min-w-0">{label}</span>
+                    {label}
                   </dt>
-                  <dd className="mt-1 min-w-0 pl-[3.75rem] text-[15px] leading-6 font-semibold break-words">
+                  <dd className="mt-1 min-w-0 text-[15px] leading-6 font-semibold break-words">
                     {'href' in item ? (
                       <a
                         href={item.href}

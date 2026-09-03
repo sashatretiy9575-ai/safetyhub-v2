@@ -9,6 +9,7 @@ import { UserCircleCheck } from '@phosphor-icons/react/dist/ssr/UserCircleCheck'
 import { House } from '@phosphor-icons/react/dist/ssr/House';
 import { Gear } from '@phosphor-icons/react/dist/ssr/Gear';
 import { Users } from '@phosphor-icons/react/dist/ssr/Users';
+import { AdminMoreMenu } from '@/components/admin/admin-more-menu';
 import { AdminNavLink } from '@/components/admin/admin-nav-link';
 import {
   AdminNotificationInboxButton,
@@ -155,12 +156,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             aria-label="Мобильная навигация админ-панели"
             className="fixed inset-x-0 bottom-0 z-50 overflow-x-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)]/95 pb-[var(--safe-area-bottom)] backdrop-blur-xl min-[1024px]:hidden"
           >
-            <div className="grid min-h-[var(--mobile-tab-height)] grid-cols-6 px-[max(.25rem,var(--safe-area-left))] py-1 pr-[max(.25rem,var(--safe-area-right))]">
-              {items.map(({ href, icon: Icon, label }) => (
+            <div className="grid min-h-[var(--mobile-tab-height)] grid-cols-5 px-[max(.25rem,var(--safe-area-left))] py-1 pr-[max(.25rem,var(--safe-area-right))]">
+              {items.slice(0, 4).map(({ href, icon: Icon, label }) => (
                 <AdminNavLink key={href} href={href} label={label} mobile>
                   <Icon size={20} />
                 </AdminNavLink>
               ))}
+              <AdminMoreMenu items={items.slice(4).map(({ href, label }) => ({ href, label }))} />
             </div>
           </nav>
         </div>

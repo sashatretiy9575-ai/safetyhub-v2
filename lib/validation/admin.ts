@@ -89,6 +89,15 @@ export const testVariantSchema = z
   })
   .strict();
 
+/**
+ * Shape returned by `public.read_course_question_bank_v4`. The database emits it
+ * only when its own validator accepts the bank, so the editor never has to
+ * guess a missing correct option or pad a short variant.
+ */
+export const courseQuestionBankSchema = z
+  .array(testVariantSchema)
+  .length(TEST_EDITOR_LIMITS.variantCount);
+
 const draftTestVariantSchema = z
   .object({
     id: stableIdSchema,

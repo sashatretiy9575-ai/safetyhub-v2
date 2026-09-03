@@ -107,6 +107,14 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
     filename: '20260902180000_generic_approval_notifications.sql',
     sha256: 'dfe58bf11bad8c60c41b08a19b085a0b5ce2af5bb053a0717a14199a292be4d3',
   }),
+  Object.freeze({
+    filename: '20260903090000_course_editor_question_bank_read.sql',
+    sha256: '424d69c17873a72b1a37c578b8f87176270a635ea20a18dad3a3902867d9c233',
+  }),
+  Object.freeze({
+    filename: '20260903120000_zh_full_profile_admission.sql',
+    sha256: '3395026046b965d87f711e195fb6b02dc854f4cf69ea022e5578024512a078a5',
+  }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;

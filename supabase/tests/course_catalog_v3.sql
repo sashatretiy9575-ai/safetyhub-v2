@@ -93,6 +93,17 @@ begin
     or has_function_privilege(
       'service_role', 'public.get_course_editor_payload_v3(uuid,uuid)', 'execute'
     )
+    -- The narrow audited replacement is the only editor read that is granted,
+    -- and it stays away from anon and service_role.
+    or not has_function_privilege(
+      'authenticated', 'public.read_course_question_bank_v4(uuid,uuid)', 'execute'
+    )
+    or has_function_privilege(
+      'anon', 'public.read_course_question_bank_v4(uuid,uuid)', 'execute'
+    )
+    or has_function_privilege(
+      'service_role', 'public.read_course_question_bank_v4(uuid,uuid)', 'execute'
+    )
     or has_function_privilege(
       'authenticated', 'public.get_test_editor_payload(uuid,uuid)', 'execute'
     )
@@ -1279,6 +1290,74 @@ begin
   );
   if v_result #>> '{__safetyhubRpcError,message}' <> 'PRESENTATION_IN_USE' then
     raise exception 'referenced presentation retirement was not rejected: %', v_result;
+  end if;
+
+  -- The course editor may now read the saved question bank, and every read is
+  -- audited. The bank must come back complete and shaped for the editor.
+  v_result := public.read_course_question_bank_v4(v_admin_id, v_test_ids[1]);
+  if (v_result ->> 'bankAvailable')::boolean is not true
+    or jsonb_array_length(v_result -> 'questionVariants') <> 3
+    or jsonb_array_length(v_result #> '{questionVariants,0,questions}') <> 10
+    or jsonb_array_length(v_result #> '{questionVariants,0,questions,0,options}') <> 4
+    or coalesce(v_result #>> '{questionVariants,0,questions,0,correctOptionId}', '') = ''
+    or coalesce(v_result #>> '{questionVariants,0,questions,0,text}', '') = ''
+    or v_result #> '{questionVariants,0,questions,0}' ? 'displayOrder' then
+    raise exception 'course editor question bank read invalid: %', v_result;
+  end if;
+  if not exists (
+    select 1
+    from public.admin_audit_log entry
+    where entry.action = 'course.question_bank_read'
+      and entry.target_id = v_test_ids[1]::text
+      and entry.actor_user_id = v_admin_id
+      and (entry.after_data ->> 'bankAvailable')::boolean
+      and not (entry.after_data::text ilike '%correctOptionId%')
+  ) then
+    raise exception 'course question bank read was not audited without answer keys';
+  end if;
+
+  -- A participant must never reach it, capability or not.
+  perform set_config('request.jwt.claim.sub', v_participant_b::text, true);
+  v_blocked := false;
+  begin
+    perform public.read_course_question_bank_v4(v_participant_b, v_test_ids[1]);
+  exception when insufficient_privilege then
+    v_blocked := true;
+  end;
+  if not v_blocked then
+    raise exception 'participant read the course question bank';
+  end if;
+  perform set_config('request.jwt.claim.sub', v_admin_id::text, true);
+
+  -- Regression: saving a blank bank over a complete one used to wipe 30
+  -- questions when an administrator edited a single line.
+  select draft_version into v_draft_version
+  from public.course_drafts where test_id = v_test_ids[1];
+  v_result := public.save_course_draft_v3(
+    p_actor_id => v_admin_id,
+    p_test_id => v_test_ids[1],
+    p_expected_version => v_draft_version,
+    p_slug => v_slugs[1],
+    p_title => v_titles[1],
+    p_description => 'Поведенческий каталог v3',
+    p_icon => 'factory',
+    p_display_order => 1,
+    p_presentation_id => v_presentation_ids[1],
+    p_duration_minutes => 15,
+    p_pass_score => 7,
+    p_attempts_per_calendar_day => 8,
+    p_attempt_reset_timezone => 'Asia/Oral',
+    p_question_variants => '[]'::jsonb,
+    p_seo => '{}'::jsonb,
+    p_content_metadata => '{}'::jsonb
+  );
+  if v_result #>> '{__safetyhubRpcError,message}' <> 'COURSE_QUESTION_BANK_MISSING' then
+    raise exception 'blank question bank overwrote a complete one: %', v_result;
+  end if;
+  if not private.course_question_variants_valid(
+    (select question_variants from public.course_drafts where test_id = v_test_ids[1])
+  ) then
+    raise exception 'stored question bank was damaged by a rejected save';
   end if;
 
   v_result := public.prepare_course_catalog_batch(v_admin_id, v_test_ids);

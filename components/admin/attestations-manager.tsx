@@ -629,7 +629,9 @@ export function AttestationsManager({
     <div
       data-attestations-manager
       data-client-ready={clientReady ? 'true' : 'false'}
-      className={selectedCount > 0 ? 'space-y-3 pb-28 @min-[760px]:pb-36' : 'space-y-3'}
+      // The bottom reserve is constant: making it appear only while something is
+      // selected made the whole page jump on the first tick of a checkbox.
+      className="space-y-3 pb-28 @min-[760px]:pb-36"
     >
       <AttestationSelectionBanner
         selectedCount={selectedCount}
@@ -692,7 +694,7 @@ export function AttestationsManager({
 
         <div
           role="rowgroup"
-          className={`space-y-2 @min-[760px]:space-y-0 ${selectionSummary.total > 0 ? 'pb-24 @min-[760px]:pb-16' : ''}`}
+          className="space-y-2 @min-[760px]:space-y-0"
         >
           {page.items.map((row, index) => {
             const groupKey = organizationGroupKey(row.organization);

@@ -4,14 +4,12 @@ import { redirect } from 'next/navigation';
 import { Container } from '@/components/ui/container';
 import { LegalAcceptanceGate } from '@/features/auth/legal-acceptance-gate';
 import { AuthenticationError, requireUser } from '@/features/auth/server';
-import { isZhUsernamePasswordMinimalApplication } from '@/features/auth/zh-username-password-minimal-application';
 import { localizePathname, type AppLocale } from '@/i18n/config';
 import { getCurrentLegalPolicies } from '@/lib/legal-current';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 
 function authenticatedLanding(context: Awaited<ReturnType<typeof requireUser>>) {
   if (context.role === 'admin') return '/admin' as const;
-  if (isZhUsernamePasswordMinimalApplication(context)) return '/profile' as const;
   return context.profile.onboarding_completed_at === null
     ? ('/onboarding' as const)
     : ('/profile' as const);

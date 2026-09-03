@@ -333,9 +333,13 @@ export type TestEditorPayload = {
 };
 
 /**
- * Safe server-to-client seed for the course editor. Existing question
- * variants, correct options, explanations and variant identifiers are
- * intentionally absent: an operator may only author a fresh set in memory
- * and submit it through the protected mutation route.
+ * Server-to-client seed for the course editor. Since 20260903090000 it carries
+ * the saved question bank — texts, options and the correct option — for an
+ * administrator holding `test.manage`, and every such read is written to the
+ * audit log by `public.read_course_question_bank_v4`. `null` means the stored
+ * bank is absent or incomplete, and the editor starts from blank variants.
+ * Immutable storage locations and learner payloads stay server-only.
  */
-export type TestEditorSeed = Omit<TestEditorPayload, 'questionVariants'>;
+export type TestEditorSeed = Omit<TestEditorPayload, 'questionVariants'> & {
+  questionVariants: [AdminTestVariant, AdminTestVariant, AdminTestVariant] | null;
+};

@@ -104,23 +104,28 @@ function parseProvisionTarget(value: unknown): ProvisionTarget | null {
   return { userId: result.userId, state: result.state };
 }
 
-function parsePendingRegistration(value: unknown): ZhUsernamePasswordRegistrationResult {
+/**
+ * Registration no longer submits the application. It leaves the account at
+ * `profile_incomplete`, and the learner reaches `pending` by filling in the same
+ * profile form as every other locale.
+ */
+function parseIncompleteRegistration(value: unknown): ZhUsernamePasswordRegistrationResult {
   const result = record(value);
   if (
     !result ||
     typeof result.userId !== 'string' ||
     !UUID_PATTERN.test(result.userId) ||
-    result.approvalState !== 'pending' ||
-    typeof result.approvalRequestedAt !== 'string' ||
-    typeof result.approvalDueAt !== 'string'
+    result.approvalState !== 'profile_incomplete' ||
+    result.approvalRequestedAt !== null ||
+    result.approvalDueAt !== null
   ) {
     throw new ZhUsernamePasswordError('ZH_AUTH_UNAVAILABLE', 503);
   }
   return {
     userId: result.userId,
-    approvalState: 'pending',
-    approvalRequestedAt: result.approvalRequestedAt,
-    approvalDueAt: result.approvalDueAt,
+    approvalState: 'profile_incomplete',
+    approvalRequestedAt: null,
+    approvalDueAt: null,
   };
 }
 
@@ -228,13 +233,11 @@ function zhLandingPath(value: unknown) {
   if (!context) return null;
   if (context.has_current_legal_acceptance !== true) return '/zh/auth/legal';
   if (context.role === 'admin') return '/admin';
-  if (
-    context.approval_state === 'pending' ||
-    context.approval_state === 'approved' ||
-    context.approval_state === 'rejected'
-  ) {
-    return '/zh/profile';
-  }
+  // A rejected learner needs to read the reason, not refill the form.
+  if (context.approval_state === 'rejected') return '/zh/profile';
+  // Everything else follows the ordinary rule: no profile yet means the form.
+  // This branch used to be unreachable, because registration itself set
+  // `pending` and the two states above short-circuited to the profile page.
   if (context.profile_onboarding_completed_at === null) return '/zh/onboarding';
   if (typeof context.profile_onboarding_completed_at === 'string') return '/zh/profile';
   return null;
@@ -345,7 +348,7 @@ export async function registerZhUsernamePassword(input: ZhUsernamePasswordRegist
 
   let mapping: LoginMapping | null = null;
   try {
-    const completed = parsePendingRegistration(
+    const completed = parseIncompleteRegistration(
       await serviceRpc('complete_zh_username_registration', {
         p_user_id: userId,
         p_username: input.username,

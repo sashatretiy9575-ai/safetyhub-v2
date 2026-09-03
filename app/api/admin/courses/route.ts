@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
-    const parsed = saveTestSchema.safeParse(await readJsonBody(request, 256 * 1024));
+    const parsed = saveTestSchema.safeParse(await readJsonBody(request, 512 * 1024));
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'INVALID_COURSE', issues: parsed.error.issues },

@@ -211,12 +211,12 @@ test('Chinese registration verifies its separate Turnstile token before allocati
   assert.match(environment, /SAFETYHUB_TURNSTILE_SECRET_KEY=1x0{31}AA/u);
 });
 
-test('Chinese username/password registration reaches manual review without profile or contact onboarding', async () => {
+test('Chinese learners follow the same profile, review and photo admission as everyone else', async () => {
   const [
     migration,
     sqlContract,
+    admissionContract,
     server,
-    helper,
     onboarding,
     legal,
     profile,
@@ -225,10 +225,10 @@ test('Chinese username/password registration reaches manual review without profi
     appTypes,
     documentation,
   ] = await Promise.all([
-    read('supabase/migrations/20260902150000_zh_minimal_pending_approval.sql'),
+    read('supabase/migrations/20260903120000_zh_full_profile_admission.sql'),
     read('supabase/tests/zh_minimal_pending_approval.sql'),
+    read('supabase/tests/zh_full_profile_admission.sql'),
     read('features/auth/zh-username-password-server.ts'),
-    read('features/auth/zh-username-password-minimal-application.ts'),
     read('app/(account)/onboarding/page.tsx'),
     read('app/(account)/auth/legal/page.tsx'),
     read('app/(account)/profile/page.tsx'),
@@ -238,69 +238,67 @@ test('Chinese username/password registration reaches manual review without profi
     read('docs/zh-username-password-auth.md'),
   ]);
 
+  // Registration creates the credential and the legal acceptance, nothing else.
   assert.match(migration, /create or replace function public\.complete_zh_username_registration/u);
   const controlLock = migration.indexOf('select control.* into v_control');
   const profileLock = migration.indexOf('select profile.* into v_profile');
   assert.ok(
     controlLock >= 0 && profileLock > controlLock,
-    'minimal ZH registration must lock account_controls before profiles',
+    'ZH registration must lock account_controls before profiles',
   );
-  assert.match(migration, /approval_state = 'pending'/u);
-  assert.match(migration, /approval_due_at = v_due_at/u);
-  assert.match(migration, /v_due_at timestamptz := v_requested_at \+ interval '24 hours'/u);
   assert.match(migration, /set preferred_locale = 'zh'/u);
   assert.match(migration, /insert into public\.legal_acceptances/u);
-  assert.match(migration, /create function private\.is_approved_zh_username_learner/u);
-  assert.match(migration, /control\.approval_state = 'approved'::public\.account_approval_state/u);
-  assert.match(migration, /auth_user\.deleted_at is null/u);
-  assert.match(migration, /auth_user\.banned_until is null/u);
-  assert.match(
-    migration,
-    /auth_user\.raw_app_meta_data ->> 'safetyhub_auth_kind' = 'zh_username_password'/u,
+  const registration = migration.slice(
+    migration.indexOf('create or replace function public.complete_zh_username_registration'),
+    migration.indexOf('create or replace function private.start_test_attempt_unmetered'),
   );
-  assert.match(migration, /lower\(auth_user\.email::text\) = account\.synthetic_email/u);
+  assert.doesNotMatch(registration, /approval_state = 'pending'/u);
+  assert.doesNotMatch(registration, /approval_due_at/u);
+  assert.doesNotMatch(registration, /account\.approval_requested/u);
+  assert.match(registration, /'approvalRequestedAt', null/u);
+
+  // The single SQL bypass is gone, and so is the helper it depended on.
   assert.match(migration, /create or replace function private\.start_test_attempt_unmetered/u);
-  assert.match(migration, /not v_is_approved_zh_username_learner and \(/u);
-  assert.match(
-    migration,
-    /not v_is_approved_zh_username_learner\s+and v_profile\.avatar_updated_at is null/u,
-  );
-  assert.match(migration, /private\.add_zh_username_to_pending_approval_items/u);
-  assert.match(migration, /private\.redact_zh_email_items/u);
-  assert.match(migration, /private\.list_pending_account_approval_page_provider_internal/u);
-  assert.doesNotMatch(
-    migration,
-    /create or replace function private\.emit_approval_requested_notification/u,
-  );
+  assert.doesNotMatch(migration, /is_approved_zh_username_learner\(v_user_id\)/u);
+  assert.match(migration, /drop function private\.is_approved_zh_username_learner\(uuid\)/u);
+  assert.match(migration, /PROFILE_ONBOARDING_REQUIRED/u);
+  assert.match(migration, /AVATAR_REQUIRED/u);
+  // Accounts admitted under the old rule are sent back to the form.
+  assert.match(migration, /approval_state = 'profile_incomplete'/u);
+  assert.match(migration, /ZH_FULL_PROFILE_ADMISSION_INCOMPLETE/u);
   assert.doesNotMatch(migration, /p_password|password_hash|encrypted_password/u);
 
+  assert.match(sqlContract, /submit_profile_for_approval_from_trusted_server/u);
   assert.match(sqlContract, /approval_due_at[\s\S]*?interval '24 hours'/u);
-  assert.match(sqlContract, /profile\.phone_country_iso2 is null/u);
-  assert.match(sqlContract, /profile\.onboarding_completed_at is null/u);
   assert.match(sqlContract, /v_event_payload \? 'username'/u);
   assert.match(sqlContract, /v_queue_item ->> 'username' <> 'zhminimal001'/u);
+  assert.match(sqlContract, /avatarAvailable/u);
   assert.match(sqlContract, /public\.decide_account_approval/u);
   assert.match(sqlContract, /public\.start_test_attempt_locale\(v_test_slug, 'zh'\)/u);
-  assert.match(sqlContract, /public\.complete_test_attempt\(v_attempt_id, v_answers\)/u);
-  assert.match(sqlContract, /certificatePendingVerification' <> 'true'/u);
   assert.match(sqlContract, /IDENTITY_NOT_VERIFIED/u);
+  assert.match(admissionContract, /the ZH admission bypass function still exists/u);
+  assert.match(admissionContract, /PROFILE_ONBOARDING_REQUIRED/u);
+  assert.match(admissionContract, /AVATAR_REQUIRED/u);
 
-  assert.match(
-    server,
-    /context\.approval_state === 'pending'[\s\S]*?context\.approval_state === 'approved'/u,
-  );
-  assert.match(server, /parsePendingRegistration/u);
+  // A ZH login now lands on the ordinary onboarding form when no profile exists.
+  assert.match(server, /parseIncompleteRegistration/u);
+  assert.match(server, /result\.approvalState !== 'profile_incomplete'/u);
+  assert.match(server, /profile_onboarding_completed_at === null\) return '\/zh\/onboarding'/u);
+  assert.match(server, /approval_state === 'rejected'\) return '\/zh\/profile'/u);
+  assert.doesNotMatch(server, /approval_state === 'pending' \|\|/u);
   assert.match(server, /completed\.userId !== userId/u);
   assert.match(appTypes, /ZhUsernamePasswordRegistrationResult/u);
-  assert.match(helper, /context\.user\.email === null/u);
-  assert.match(helper, /context\.profile\.preferred_locale === 'zh'/u);
-  assert.match(helper, /context\.profile\.onboarding_completed_at === null/u);
-  assert.match(onboarding, /isZhUsernamePasswordMinimalApplication/u);
-  assert.match(legal, /isZhUsernamePasswordMinimalApplication/u);
-  assert.match(profile, /!isMinimalZhApplication/u);
-  assert.match(profile, /!isMinimalZhApplication && \(!profile\.organization/u);
+  assert.match(appTypes, /approvalState: 'profile_incomplete'/u);
+
+  // Nothing hides the form from a Chinese learner any more.
+  for (const surface of [onboarding, legal, profile]) {
+    assert.doesNotMatch(surface, /isZhUsernamePasswordMinimalApplication|isMinimalZhApplication/u);
+  }
+  assert.match(profile, /needsProfileAction=\{!profile\.organization/u);
+  assert.doesNotMatch(queue, /minimalZh|заявка без контактных данных/u);
+  // The login stays visible to the reviewer next to the ordinary details.
   assert.match(queue, /item\.username/u);
   assert.match(data, /username: z[\s\S]*?\.regex/u);
-  assert.match(documentation, /directly from `profile_incomplete` to `pending`/u);
+  assert.match(documentation, /profile_incomplete/u);
   assert.match(documentation, /certificate remains `pending_identity`/u);
 });

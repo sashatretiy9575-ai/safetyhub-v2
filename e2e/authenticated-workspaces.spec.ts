@@ -346,6 +346,17 @@ test.describe('authenticated operator and participant workspaces', () => {
         await page.goto(href!, { waitUntil: 'domcontentloaded' });
         await expect(page.locator('[data-editor-shell]')).toBeVisible();
 
+        if (editor.snapshot === 'admin-course-editor') {
+          // The saved question bank has to actually arrive: an empty first
+          // question means the editor is back to inventing 30 blank ones and a
+          // save would wipe the stored bank.
+          const firstQuestion = page.locator('#variant-0-question-0');
+          await expect(firstQuestion).toBeVisible();
+          await expect(firstQuestion).not.toHaveValue('');
+          const firstAnswer = page.getByRole('radio', { name: /^Ответ 1 правильный$/u });
+          await expect(firstAnswer).toBeVisible();
+        }
+
         for (const viewport of [
           { width: 390, height: 844 },
           { width: 1440, height: 900 },

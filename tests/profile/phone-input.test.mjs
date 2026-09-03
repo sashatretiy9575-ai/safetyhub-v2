@@ -31,9 +31,9 @@ test('country labels are serialized by server pages instead of recomputed during
   ]);
   assert.match(phoneInput, /countryOptions\.map/u);
   assert.doesNotMatch(phoneInput, /countryLabel|phoneCountries|Intl\.DisplayNames/u);
-  assert.match(onboardingPage, /countryOptions=\{phoneCountryOptions\(\)\}/u);
+  assert.match(onboardingPage, /countryOptions=\{phoneCountryOptions\(locale\)\}/u);
   assert.match(onboardingForm, /countryOptions=\{countryOptions\}/u);
-  assert.match(profilePage, /countryOptions=\{phoneCountryOptions\(\)\}/u);
+  assert.match(profilePage, /countryOptions=\{phoneCountryOptions\(locale\)\}/u);
   assert.match(adminAccountPage, /countryOptions=\{phoneCountryOptions\(\)\}/u);
   assert.match(profileForm, /countryOptions=\{countryOptions\}/u);
 });

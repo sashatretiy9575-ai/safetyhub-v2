@@ -346,7 +346,7 @@
     "resultAnswer": "登录后打开个人资料。每门课程会显示最佳分数、认证状态和可用证书，不展示每次尝试的明细列表。"
   },
   "AuthOtp": {
-    "loginTitle": "验证码登录",
+    "loginTitle": "登录与注册",
     "registerTitle": "账户访问",
     "emailDescription": "我们会将验证码发送到您的邮箱，无需密码。",
     "codeDescription": "请输入邮件中的验证码。",

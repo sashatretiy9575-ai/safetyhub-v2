@@ -154,15 +154,22 @@ test('public assets and public course rendering exclude snapshots, answer keys a
   );
 });
 
-test('previously persisted assessment keys have no browser editor or RPC read path', async () => {
-  const [editor, editPage, adminServer, courseRoute, migration, contract] = await Promise.all([
-    read('components/admin/test-editor.tsx'),
-    read('app/(admin)/admin/courses/[id]/page.tsx'),
-    read('features/admin/server.ts'),
-    read('app/api/admin/courses/route.ts'),
-    read('supabase/migrations/20260831116000_retire_browser_editor_key_reads.sql'),
-    read('supabase/tests/course_catalog_v3.sql'),
-  ]);
+// The saved question bank now reaches the course editor, by owner decision: an
+// administrator could not fix a typo without retyping 30 questions, and the
+// blank editor was overwriting the stored bank on the first save. The read is
+// capability-gated and audited, and it is the ONLY relaxation — presentation
+// storage paths, learner payloads and the wide v3 payload stay server-only.
+test('the saved question bank is readable only through the audited editor path', async () => {
+  const [editor, editPage, adminServer, courseRoute, migration, bankMigration, contract] =
+    await Promise.all([
+      read('components/admin/test-editor.tsx'),
+      read('app/(admin)/admin/courses/[id]/page.tsx'),
+      read('features/admin/server.ts'),
+      read('app/api/admin/courses/route.ts'),
+      read('supabase/migrations/20260831116000_retire_browser_editor_key_reads.sql'),
+      read('supabase/migrations/20260903090000_course_editor_question_bank_read.sql'),
+      read('supabase/tests/course_catalog_v3.sql'),
+    ]);
   const seed = sourceBetween(
     adminServer,
     'export async function getTestEditorSeed',
@@ -172,7 +179,9 @@ test('previously persisted assessment keys have no browser editor or RPC read pa
   assert.match(editPage, /getTestEditorSeed/);
   assert.doesNotMatch(editPage, /getTestEditorPayload|TestEditorPayload/u);
   assert.match(editor, /freshTestFromSeed/);
-  assert.match(editor, /questionVariants: empty\.questionVariants/);
+  // Loaded when the server sent one, blank otherwise — never a silent spread.
+  assert.match(editor, /questionVariants: seed\.questionVariants/u);
+  assert.match(editor, /: empty\.questionVariants,/u);
   assert.match(editor, /data-course-editor-key-boundary/);
   assert.doesNotMatch(editor, /readTestEditorDraft|writeTestEditorDraft|clearTestEditorDraft/u);
   assert.doesNotMatch(editor, /localStorage\.getItem|localStorage\.setItem/u);
@@ -188,12 +197,11 @@ test('previously persisted assessment keys have no browser editor or RPC read pa
   assert.doesNotMatch(saveResult, /return saved;/u);
   assert.match(courseRoute, /const result = await saveTest\(parsed\.data\);/u);
   assert.match(courseRoute, /NextResponse\.json\(result,/u);
+  // The seed still never touches the wide payload or the storage columns; it
+  // reaches the bank exclusively through the narrow audited function.
   for (const privateField of [
     'get_course_editor_payload_v3',
     'question_variants',
-    'correctOptionId',
-    'explanation',
-    'variantNumber',
     'storage_bucket',
     'storage_path',
     'thumbnail_path',
@@ -201,6 +209,21 @@ test('previously persisted assessment keys have no browser editor or RPC read pa
   ]) {
     assert.doesNotMatch(seed, new RegExp(privateField, 'u'), privateField);
   }
+  assert.match(adminServer, /read_course_question_bank_v4/u);
+  assert.match(seed, /readCourseQuestionBank\(testId, actor\.user\.id\)/u);
+  // The heuristic that preserved the stored bank only when all 30 questions were
+  // blank is gone; the guarantee now lives in the database.
+  assert.doesNotMatch(adminServer, /isPlaceholderVariants/u);
+  assert.match(bankMigration, /grant execute on function public\.read_course_question_bank_v4\(uuid,uuid\) to authenticated/u);
+  assert.match(
+    bankMigration,
+    /revoke all on function public\.read_course_question_bank_v4\(uuid,uuid\)\s+from public, anon, service_role/u,
+  );
+  assert.match(bankMigration, /private\.require_capability\('test\.manage'\)/u);
+  assert.match(bankMigration, /'course\.question_bank_read'/u);
+  assert.match(bankMigration, /COURSE_QUESTION_BANK_MISSING/u);
+  // The audit row carries counts and versions only.
+  assert.doesNotMatch(bankMigration, /after_data[\s\S]{0,400}questionVariants/u);
   assert.match(migration, /revoke all on function public\.get_test_editor_payload\(uuid,uuid\)/u);
   assert.match(
     migration,

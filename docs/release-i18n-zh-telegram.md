@@ -245,18 +245,19 @@ npm run runtime:flag:set -- `
   and offline behavior match the selected locale. `/admin` remains Russian.
 - Existing PS.KZ test mailboxes complete RU/KK/EN six-digit OTP end to end. No
   mailbox credential is logged, committed or included in a receipt.
-- ZH registration and login accept only a Latin username and password. Email,
-  SMS, telephone, profile/contact fields and avatar are absent from the
-  registration-to-pending approval path and from authentication/recovery;
-  recovery is administrator-only. The Russian `identity.manage` queue displays
-  the canonical username for the minimal application, while the generic
-  Telegram event contains no username, provider email, password or telephone.
+- ZH registration and login accept only a Latin username and password; email,
+  SMS and telephone are absent from authentication and recovery, and recovery is
+  administrator-only. Registration itself is not the application: the learner
+  then completes the same name/job/organization/phone/photo form as every other
+  locale, and that submission requests the review. The Russian
+  `identity.manage` queue shows those details plus the canonical username, while
+  the generic Telegram event contains no username, provider email, password or
+  telephone.
 - Pending and rejected accounts cannot fetch either presentation, create/resume
   an attempt or obtain a certificate through browser or direct RPC. Approval in
   the Russian admin UI opens the same gates immediately after session refresh.
-  An approved minimal ZH account may learn and pass without profile/avatar
-  fields, while certificate issuance remains blocked until a verified real
-  identity exists; its username is never used as a certificate name.
+  A ZH account reaches a test only with a complete profile and photo, exactly
+  like every other locale; its username is never used as a certificate name.
 - Every localized course exposes one immutable presentation and exactly three
   hidden variants of ten questions/four options. Learner HTML/JSON contains no
   variant identity, answer key or private Storage locator.

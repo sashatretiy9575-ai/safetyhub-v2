@@ -12,10 +12,9 @@ RU/KK/EN email-code flow:
 - An opaque `@auth.invalid` provider identifier exists only in the private,
   server-only username mapping. It is redacted from JWT claims, the learner
   context, and administrator directory projections.
-- A fresh ZH username/password application enters administrator review without
-  an email address, SMS, telephone, name, job, organization, avatar, or a
-  completed profile. Those ordinary profile/contact fields are neither an
-  authentication factor nor a recovery channel.
+- A username and a password are the only credentials. They are not an email
+  address, an SMS channel, or a recovery channel, and the profile fields
+  collected afterwards are not authentication factors either.
 - Registration first sends a dedicated Turnstile token to a Vercel server-only
   Cloudflare `Siteverify` call. It verifies before username lookup, legal
   acceptance, provider-user creation, or mapping. A failed or unavailable
@@ -49,19 +48,27 @@ is off. Do not enable the browser flag before the database receipt.
 
 ## Approval and recovery
 
-Registration records current legal acceptance and moves the mapped ZH account
-directly from `profile_incomplete` to `pending` manual review. It does not set
-`onboarding_completed_at` and does not require a profile, contact phone, email,
-or avatar. Administrator approval remains mandatory before protected learner
-access. This exception is restricted to the private ZH username/password
-mapping; the RU/KK/EN email-code flows still use the existing profile/contact
-onboarding and approval submission contract.
+Registration records current legal acceptance, creates the private username
+mapping and leaves the account at `profile_incomplete`. It is not the
+application. The learner is then sent to `/zh/onboarding` and fills in the same
+form as every other locale — name, surname, job, organization, phone and photo —
+and that submission, through the ordinary
+`submit_profile_for_approval_from_trusted_server`, is what moves the account to
+`pending`. Administrator approval remains mandatory before protected learner
+access.
 
-After approval, the mapped ZH learner can open protected course material and
-start/complete an assessment without a fabricated onboarding or avatar state.
-The exception is limited to those ordinary learner-admission checks: current
-legal acceptance, active-account status, manual approval, quotas, and all
-normal assessment rules still apply. A passed attempt creates its ordinary
+Until 2026-09-03 a ZH registration jumped straight to `pending` and
+`private.start_test_attempt_unmetered` waived the profile and avatar
+prerequisites for such an account. That was a dead end: the learner could pass a
+test but never receive a certificate, because issuance still requires a verified
+identity and a login name is not a person's name. Migration
+`20260903120000_zh_full_profile_admission.sql` removed the waiver, dropped
+`private.is_approved_zh_username_learner`, and returned every ZH account that had
+been admitted with an empty profile to `profile_incomplete` so it goes through
+the form once.
+
+Current legal acceptance, active-account status, manual approval, quotas, and all
+normal assessment rules apply exactly as for any other locale. A passed attempt creates its ordinary
 attestation, but its certificate remains `pending_identity` until a real,
 verified identity is supplied later. The login username is an approval-queue
 identifier only; it is never copied into a certificate name, job, or
@@ -103,6 +110,7 @@ The focused contract coverage is in:
 - `supabase/tests/zh_session_provider_method.sql`
 - `supabase/tests/zh_webauthn_auth.sql`
 - `supabase/tests/zh_minimal_pending_approval.sql`
+- `supabase/tests/zh_full_profile_admission.sql`
 
 After a local database reset, regenerate the CLI schema contract with
 `npm run db:types:generate:local`, then run `npm run check:db-types` and

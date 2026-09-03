@@ -27,6 +27,7 @@ declare
   v_rejected_start_blocked boolean := false;
   v_certificate_blocked boolean := false;
   v_control public.account_controls%rowtype;
+  v_avatar_token uuid;
   v_privacy public.legal_document_versions%rowtype;
   v_terms public.legal_document_versions%rowtype;
 begin
@@ -149,25 +150,27 @@ begin
     v_terms.version,
     v_terms.body_revision
   );
+  -- Registration creates the credential only. The application itself is the
+  -- ordinary profile submission, exactly as in every other locale.
   if v_result ->> 'userId' <> v_user_id::text
-    or v_result ->> 'approvalState' <> 'pending'
-    or (v_result ->> 'approvalRequestedAt') is null
-    or (v_result ->> 'approvalDueAt') is null then
-    raise exception 'minimal ZH registration did not return a pending review: %', v_result;
+    or v_result ->> 'approvalState' <> 'profile_incomplete'
+    or (v_result -> 'approvalRequestedAt') <> 'null'::jsonb
+    or (v_result -> 'approvalDueAt') <> 'null'::jsonb then
+    raise exception 'ZH registration did not leave the account incomplete: %', v_result;
   end if;
 
   select * into v_control
   from public.account_controls control
   where control.user_id = v_user_id;
-  if v_control.approval_state <> 'pending'
-    or v_control.approval_requested_at is null
-    or v_control.approval_due_at
-      <> v_control.approval_requested_at + interval '24 hours'
+  if v_control.approval_state <> 'profile_incomplete'
+    or v_control.approval_requested_at is not null
+    or v_control.approval_due_at is not null
     or v_control.approval_decided_at is not null
     or v_control.approval_decided_by is not null
     or v_control.approval_rejection_reason is not null then
-    raise exception 'minimal ZH approval state is invalid';
+    raise exception 'ZH registration approval state is invalid';
   end if;
+  -- Right after registration the profile is still empty; the form comes next.
   if not exists (
     select 1
     from public.profiles profile
@@ -182,7 +185,7 @@ begin
       and profile.avatar_updated_at is null
       and profile.onboarding_completed_at is null
   ) then
-    raise exception 'minimal ZH registration unexpectedly required profile/contact data';
+    raise exception 'ZH registration unexpectedly pre-filled profile data';
   end if;
   if (
     select count(*)
@@ -203,6 +206,44 @@ begin
   end if;
   if not private.authorize_zh_username_password_session(v_user_id, v_user_session_id) then
     raise exception 'minimal ZH fixture could not establish its bound username session';
+  end if;
+
+  -- Registration must NOT request a review yet.
+  if exists (
+    select 1
+    from private.notification_events event
+    where event.event_type = 'account.approval_requested'
+      and event.aggregate_id = v_user_id
+  ) then
+    raise exception 'ZH registration requested a review before the profile existed';
+  end if;
+
+  -- The learner fills in the same form as everyone else, avatar included.
+  v_avatar_token := gen_random_uuid();
+  insert into private.profile_avatar_manifests (
+    user_id, object_key, sha256, byte_length, operation_token
+  ) values (
+    v_user_id,
+    v_user_id::text || '/objects/' || v_avatar_token::text || '.webp',
+    encode(extensions.digest(convert_to('zh-avatar', 'utf8'), 'sha256'), 'hex'),
+    2048,
+    v_avatar_token
+  );
+  update public.profiles set avatar_updated_at = statement_timestamp() where id = v_user_id;
+  v_result := public.submit_profile_for_approval_from_trusted_server(
+    v_user_id, '伟', '张', '安全工程师', 'SafetyHub ZH fixture', 'CN', '+8613800138000'
+  );
+  if v_result ->> 'approvalState' <> 'pending' then
+    raise exception 'ZH profile submission did not request a review: %', v_result;
+  end if;
+  select * into v_control
+  from public.account_controls control
+  where control.user_id = v_user_id;
+  if v_control.approval_state <> 'pending'
+    or v_control.approval_requested_at is null
+    or v_control.approval_due_at
+      <> v_control.approval_requested_at + interval '24 hours' then
+    raise exception 'ZH review window was not opened by the profile submission';
   end if;
 
   select event.payload into v_event_payload
@@ -244,8 +285,8 @@ begin
   if v_context -> 'email' <> 'null'::jsonb
     or v_context ->> 'approval_state' <> 'pending'
     or v_context ->> 'profile_preferred_locale' <> 'zh'
-    or v_context -> 'profile_onboarding_completed_at' <> 'null'::jsonb then
-    raise exception 'minimal ZH auth projection is invalid: %', v_context;
+    or v_context -> 'profile_onboarding_completed_at' = 'null'::jsonb then
+    raise exception 'ZH auth projection is invalid: %', v_context;
   end if;
 
   -- Provide disposable non-RU localizations for a seeded published course.
@@ -429,15 +470,19 @@ begin
   select item.value into v_queue_item
   from jsonb_array_elements(v_result -> 'items') item(value)
   where item.value ->> 'id' = v_user_id::text;
+  -- The administrator now reviews the same details as for any other applicant,
+  -- plus the login. The provider email stays redacted.
   if v_queue_item is null
     or v_queue_item -> 'email' <> 'null'::jsonb
     or v_queue_item ->> 'username' <> 'zhminimal001'
-    or v_queue_item ->> 'name' <> ''
-    or v_queue_item ->> 'surname' <> ''
-    or v_queue_item ->> 'job' <> ''
-    or v_queue_item ->> 'organization' <> ''
-    or v_queue_item -> 'phoneE164' <> 'null'::jsonb then
-    raise exception 'minimal ZH queue projection is invalid: %', v_queue_item;
+    or v_queue_item ->> 'name' <> '伟'
+    or v_queue_item ->> 'surname' <> '张'
+    or v_queue_item ->> 'job' <> '安全工程师'
+    or v_queue_item ->> 'organization' <> 'SafetyHub ZH fixture'
+    or v_queue_item ->> 'phoneE164' <> '+8613800138000'
+    or v_queue_item ->> 'phoneCountryIso2' <> 'CN'
+    or (v_queue_item ->> 'avatarAvailable')::boolean is not true then
+    raise exception 'ZH queue projection is invalid: %', v_queue_item;
   end if;
 
   v_result := public.decide_account_approval(
@@ -473,18 +518,21 @@ begin
     or coalesce(jsonb_array_length(v_result -> 'questions'), 0) <> 10 then
     raise exception 'approved minimal ZH account could not start a localized attempt: %', v_result;
   end if;
+  -- Inverted on purpose: a Chinese learner reaches a test only with the same
+  -- complete profile and photo as everyone else.
   if not exists (
     select 1
     from public.profiles profile
     where profile.id = v_user_id
-      and profile.name = ''
-      and profile.surname = ''
-      and profile.job = ''
-      and profile.organization = ''
-      and profile.avatar_updated_at is null
-      and profile.onboarding_completed_at is null
+      and profile.name = '伟'
+      and profile.surname = '张'
+      and profile.job = '安全工程师'
+      and profile.organization = 'SafetyHub ZH fixture'
+      and profile.phone_e164 = '+8613800138000'
+      and profile.avatar_updated_at is not null
+      and profile.onboarding_completed_at is not null
   ) then
-    raise exception 'learner access fabricated ordinary ZH profile or avatar state';
+    raise exception 'ZH learner reached a test without a complete profile';
   end if;
 
   select attempt.variant_id into v_variant_id
@@ -564,8 +612,29 @@ begin
     v_terms.version,
     v_terms.body_revision
   );
+  if v_result ->> 'approvalState' <> 'profile_incomplete' then
+    raise exception 'ZH rejection fixture did not start incomplete: %', v_result;
+  end if;
+  -- The second fixture also has to go through the form before it can be
+  -- reviewed, and therefore before it can be rejected.
+  v_avatar_token := gen_random_uuid();
+  insert into private.profile_avatar_manifests (
+    user_id, object_key, sha256, byte_length, operation_token
+  ) values (
+    v_rejected_user_id,
+    v_rejected_user_id::text || '/objects/' || v_avatar_token::text || '.webp',
+    encode(extensions.digest(convert_to('zh-avatar-2', 'utf8'), 'sha256'), 'hex'),
+    2048,
+    v_avatar_token
+  );
+  update public.profiles
+  set avatar_updated_at = statement_timestamp()
+  where id = v_rejected_user_id;
+  v_result := public.submit_profile_for_approval_from_trusted_server(
+    v_rejected_user_id, '娜', '李', '技术员', 'SafetyHub ZH rejected', 'CN', '+8613800138001'
+  );
   if v_result ->> 'approvalState' <> 'pending' then
-    raise exception 'rejected minimal ZH fixture did not enter pending review: %', v_result;
+    raise exception 'ZH rejection fixture did not enter pending review: %', v_result;
   end if;
   if not private.authorize_zh_username_password_session(
     v_rejected_user_id,

@@ -113,7 +113,10 @@ export async function Footer({
                   className="shrink-0 text-white/50"
                   aria-hidden="true"
                 />
-                <span className="text-xs">{translations('footer.hours')}</span>
+                {/* This was text-xs while the phone and city rows next to it
+                    inherit 15px, so the hours read as a footnote beside an
+                    identically sized icon. */}
+                <span>{translations('footer.hours')}</span>
               </div>
             </div>
           </div>

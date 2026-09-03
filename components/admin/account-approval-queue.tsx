@@ -61,10 +61,6 @@ function accountIdentifier(item: AdminAccountApprovalItem) {
   return item.username ? `Логин: ${item.username}` : (item.email ?? 'Вход по логину и паролю');
 }
 
-function isMinimalZhApplication(item: AdminAccountApprovalItem) {
-  return Boolean(item.username) && item.email === null;
-}
-
 export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalItem[] }) {
   const router = useRouter();
   const [reasons, setReasons] = useState<Record<string, string>>({});
@@ -276,7 +272,6 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
         const resolved = resolvedIds.has(item.id);
         const actionDisabled = busy || resolved;
         const label = fullName(item);
-        const minimalZh = isMinimalZhApplication(item);
         const requestingRejection = rejectionId === item.id;
         const isSelected = selectedIds.has(item.id);
         return (
@@ -333,35 +328,31 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
                 </p>
               </header>
 
-              {minimalZh ? (
-                <p className="text-sm text-[var(--color-text-muted)]">
-                  ZH · заявка без контактных данных
-                </p>
-              ) : (
-                <dl className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--color-text-muted)]">
-                  {item.job ? (
-                    <div className="flex gap-1">
-                      <dt className="font-semibold">Должность:</dt>
-                      <dd className="break-words">{item.job}</dd>
-                    </div>
-                  ) : null}
-                  {item.organization ? (
-                    <div className="flex gap-1">
-                      <dt className="font-semibold">Компания:</dt>
-                      <dd className="break-words">{item.organization}</dd>
-                    </div>
-                  ) : null}
-                  {item.phoneE164 ? (
-                    <div className="flex gap-1">
-                      <dt className="font-semibold">Телефон:</dt>
-                      <dd>
-                        {item.phoneE164}
-                        {item.phoneCountryIso2 ? ` · ${item.phoneCountryIso2}` : ''}
-                      </dd>
-                    </div>
-                  ) : null}
-                </dl>
-              )}
+              {/* A Chinese application now carries the same details as any
+                  other; the login line above is simply extra. */}
+              <dl className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--color-text-muted)]">
+                {item.job ? (
+                  <div className="flex gap-1">
+                    <dt className="font-semibold">Должность:</dt>
+                    <dd className="break-words">{item.job}</dd>
+                  </div>
+                ) : null}
+                {item.organization ? (
+                  <div className="flex gap-1">
+                    <dt className="font-semibold">Компания:</dt>
+                    <dd className="break-words">{item.organization}</dd>
+                  </div>
+                ) : null}
+                {item.phoneE164 ? (
+                  <div className="flex gap-1">
+                    <dt className="font-semibold">Телефон:</dt>
+                    <dd>
+                      {item.phoneE164}
+                      {item.phoneCountryIso2 ? ` · ${item.phoneCountryIso2}` : ''}
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
 
               <p className="text-xs text-[var(--color-text-muted)]">
                 Заявка отправлена:{' '}

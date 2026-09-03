@@ -72,6 +72,7 @@ export function buildContentSecurityPolicy({
         "'self'",
         `'nonce-${nonce}'`,
         THEME_BOOTSTRAP_CSP_HASH,
+        PWA_INSTALL_BOOTSTRAP_CSP_HASH,
         "'strict-dynamic'",
         ...(development ? ["'unsafe-eval'"] : []),
         'https://challenges.cloudflare.com',
@@ -129,3 +130,4 @@ export const STATIC_CONTENT_SECURITY_POLICY = buildContentSecurityPolicy({
   strict: false,
 });
 import { THEME_BOOTSTRAP_CSP_HASH } from '../theme.ts';
+import { PWA_INSTALL_BOOTSTRAP_CSP_HASH } from '../pwa-install-bootstrap.ts';

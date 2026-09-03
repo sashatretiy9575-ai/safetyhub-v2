@@ -12,11 +12,12 @@ export type LegalDocumentType = 'privacy' | 'terms';
 export type LegalAcceptanceSource = 'registration' | 'profile';
 export type AppLocale = 'ru' | 'kk' | 'en' | 'zh';
 export type AccountApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
+/** Registration only creates the credential; the profile form requests review. */
 export type ZhUsernamePasswordRegistrationResult = Readonly<{
   userId: string;
-  approvalState: 'pending';
-  approvalRequestedAt: string;
-  approvalDueAt: string;
+  approvalState: 'profile_incomplete';
+  approvalRequestedAt: null;
+  approvalDueAt: null;
 }>;
 
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {

@@ -6,8 +6,9 @@ import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { requireCapability, requireRole } from '@/features/auth/server';
 import type { AppRole, Json, TestRow } from '@/lib/supabase/types';
-import type { SaveTestValues } from '@/lib/validation/admin';
+import { courseQuestionBankSchema, type SaveTestValues } from '@/lib/validation/admin';
 import type { AdminCapability } from '@/lib/security/capabilities';
+import { cache } from 'react';
 import type {
   ActivatedCourseCatalogBatch,
   AdminLearningHistory,
@@ -288,8 +289,25 @@ export async function listTests(): Promise<AdminTestRow[]> {
   });
 }
 
+/**
+ * Audited read of the saved question bank. Wrapped in React `cache` so one page
+ * render produces exactly one RPC call — and therefore exactly one audit row —
+ * even if the tree reads the seed twice.
+ */
+const readCourseQuestionBank = cache(async (testId: string, actorId: string) => {
+  const response = await untypedClient(await createClient()).rpc('read_course_question_bank_v4', {
+    p_actor_id: actorId,
+    p_test_id: testId,
+  });
+  if (response.error) throw new Error(response.error.message);
+  const payload = response.data as { bankAvailable?: unknown; questionVariants?: unknown } | null;
+  if (!payload || payload.bankAvailable !== true) return null;
+  const parsed = courseQuestionBankSchema.safeParse(payload.questionVariants);
+  return parsed.success ? (parsed.data as TestEditorSeed['questionVariants']) : null;
+});
+
 export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed | null> {
-  await requireCapability('test.manage');
+  const actor = await requireCapability('test.manage');
   const admin = createAdminClient();
   const [testResult, draftResult, revisions] = await Promise.all([
     admin
@@ -350,9 +368,11 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
 
   const test = testResult.data;
   const draft = draftResult.data;
+  const questionVariants = await readCourseQuestionBank(testId, actor.user.id);
 
   return {
     id: test.id,
+    questionVariants,
     slug: draft.slug,
     title: draft.title,
     description: draft.description,
@@ -393,7 +413,6 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
 export async function saveTest(values: SaveTestValues) {
   const actor = await requireCapability('test.manage');
   let previousPublishedSlug: string | null = null;
-  let variantsPayload: unknown = values.questionVariants;
 
   if (values.id) {
     const admin = createAdminClient();
@@ -406,23 +425,6 @@ export async function saveTest(values: SaveTestValues) {
     if (!current.data) throw new Error('TEST_NOT_FOUND');
     if (current.data.current_revision_id) previousPublishedSlug = current.data.slug;
 
-    // Check if submitted variants are empty placeholders from browser editor
-    const isPlaceholderVariants =
-      !values.questionVariants ||
-      values.questionVariants.every((v) =>
-        v.questions.every((q) => !q.text || !q.text.trim()),
-      );
-    if (isPlaceholderVariants) {
-      const existingDraft = await admin
-        .from('course_drafts')
-        .select('*')
-        .eq('test_id', values.id)
-        .maybeSingle();
-      const existingVariants = existingDraft.data && (existingDraft.data as Record<string, unknown>)['question_variants'];
-      if (Array.isArray(existingVariants) && existingVariants.length > 0) {
-        variantsPayload = existingVariants;
-      }
-    }
   }
   const mutationArgs = {
     p_actor_id: actor.user.id,
@@ -438,7 +440,7 @@ export async function saveTest(values: SaveTestValues) {
     p_pass_score: values.passScore,
     p_attempts_per_calendar_day: values.attemptsPerCalendarDay,
     p_attempt_reset_timezone: values.attemptResetTimezone,
-    p_question_variants: variantsPayload as unknown as Json,
+    p_question_variants: values.questionVariants as unknown as Json,
     p_seo: values.seo as unknown as Json,
     p_content_metadata: {
       jurisdiction: values.jurisdiction,

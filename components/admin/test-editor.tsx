@@ -85,9 +85,10 @@ function freshTestFromSeed(seed?: TestEditorSeed): TestEditorPayload {
   const empty = emptyTest();
   if (!seed) return empty;
 
-  // Never spread a persisted payload into the client editor. This explicit
-  // allowlist intentionally creates new variants/questions and only carries
-  // catalogue metadata that is safe for an administrator to see.
+  // Still an explicit allowlist rather than a spread, so a future server field
+  // cannot leak into the editor by accident. The saved question bank is now
+  // deliberately part of it: an administrator has to see what they are editing,
+  // and the blank set used to overwrite the stored one on the first save.
   return {
     ...(seed.id ? { id: seed.id } : {}),
     slug: seed.slug,
@@ -112,7 +113,15 @@ function freshTestFromSeed(seed?: TestEditorSeed): TestEditorPayload {
       indexable: seed.seo?.indexable !== false,
     },
     revisionHistory: seed.revisionHistory.map((revision) => ({ ...revision })),
-    questionVariants: empty.questionVariants,
+    questionVariants: seed.questionVariants
+      ? (seed.questionVariants.map((variant) => ({
+          ...variant,
+          questions: variant.questions.map((question) => ({
+            ...question,
+            options: question.options.map((option) => ({ ...option })),
+          })),
+        })) as TestEditorPayload['questionVariants'])
+      : empty.questionVariants,
   };
 }
 
@@ -141,6 +150,7 @@ export function TestEditor({
 }) {
   const router = useRouter();
   const normalizedInitial = useMemo(() => freshTestFromSeed(initial), [initial]);
+  const bankLoaded = Boolean(initial?.questionVariants);
   const [course, setCourse] = useState<TestEditorPayload>(normalizedInitial);
   const [savedSnapshot, setSavedSnapshot] = useState(() =>
     serializeTestEditorPayload(normalizedInitial),
@@ -397,7 +407,11 @@ export function TestEditor({
         hasDraftChanges={publicationState === 'published_with_draft_changes'}
         progress={`${validation.completedCount}/30`}
         liveMessage={
-          dirty ? 'Есть несохранённые изменения.' : 'Черновик хранится только в памяти до отправки.'
+          dirty
+            ? 'Есть несохранённые изменения.'
+            : bankLoaded
+              ? 'Открыт сохранённый банк вопросов.'
+              : 'Черновик хранится только в памяти до отправки.'
         }
         onTogglePreview={() => setPreview((value) => !value)}
         onSave={() => void save(false)}
@@ -409,8 +423,9 @@ export function TestEditor({
           data-course-editor-key-boundary
           className="rounded-xl border border-[var(--color-warning)] bg-[var(--color-surface-muted)] p-4 text-sm leading-6"
         >
-          Вопросы и ключи ответов не загружаются в браузер. Для новой редакции заполните свежие 30
-          вопросов — текущая опубликованная редакция работает, пока вы не опубликуете новую.
+          {bankLoaded
+            ? 'Загружен сохранённый банк вопросов вместе с правильными ответами. Каждое открытие записывается в историю действий. Опубликованная редакция продолжает работать, пока вы не опубликуете новую.'
+            : 'Сохранённого банка вопросов нет или он неполный — заполните 30 вопросов заново. Текущая опубликованная редакция работает, пока вы не опубликуете новую.'}
         </p>
       ) : null}
 

@@ -67,17 +67,16 @@ export function PWAInstallOverlay() {
   const [hasInteracted, setHasInteracted] = React.useState(false);
   const [isDismissed, setIsDismissed] = React.useState(true);
   const [isInstalling, setIsInstalling] = React.useState(false);
-  void hasActiveDismissal;
-  void alreadyShownThisSession;
 
   React.useEffect(() => {
     const query = window.matchMedia('(max-width: 767px) and (pointer: coarse)');
     const sync = () => setIsPhone(query.matches);
     sync();
     query.addEventListener('change', sync);
-    setIsDismissed(false);
-    setDelayElapsed(true);
-    setHasInteracted(true);
+    // These three were previously forced open, which silently disabled the
+    // 30-day dismissal, the once-per-session cap and the 15-second delay: the
+    // banner came back immediately after every dismissal and on every reload.
+    setIsDismissed(hasActiveDismissal() || alreadyShownThisSession());
 
     const timer = window.setTimeout(() => setDelayElapsed(true), PROMPT_DELAY_MS);
     const interact = () => setHasInteracted(true);
@@ -127,7 +126,10 @@ export function PWAInstallOverlay() {
 
   return (
     <aside
-      className="fixed right-[max(.5rem,var(--safe-area-right))] bottom-[calc(var(--mobile-fixed-bottom-space)+.5rem)] left-[max(.5rem,var(--safe-area-left))] z-[60] mx-auto flex min-h-[140px] max-w-md flex-col justify-between rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface-elevated)] p-4 text-[var(--color-text)] shadow-[var(--shadow-pop)]"
+      // Sits directly on top of the mobile dock instead of floating 24px above
+      // it: same side insets and same max width as the tab bar, so the two read
+      // as one block rather than two unrelated cards.
+      className="fixed right-[max(.625rem,var(--safe-area-right))] bottom-[calc(var(--safe-area-bottom)+var(--mobile-tab-height))] left-[max(.625rem,var(--safe-area-left))] z-[60] mx-auto flex min-h-[140px] max-w-[32.5rem] flex-col justify-between rounded-t-2xl border border-b-0 border-[var(--color-border-strong)] bg-[var(--color-surface-elevated)] p-4 text-[var(--color-text)] shadow-[var(--shadow-pop)]"
       role="region"
       aria-live="polite"
       aria-labelledby="pwa-install-title"

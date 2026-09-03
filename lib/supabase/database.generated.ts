@@ -1562,10 +1562,6 @@ export type Database = {
           title: string
         }[]
       }
-      is_approved_zh_username_learner: {
-        Args: { p_user_id: string }
-        Returns: boolean
-      }
       is_zh_synthetic_user: { Args: { p_user_id: string }; Returns: boolean }
       issue_certificate_for_attestation: {
         Args: {
@@ -4711,6 +4707,10 @@ export type Database = {
         Returns: Json
       }
       purge_user_account: { Args: { p_target_id: string }; Returns: Json }
+      read_course_question_bank_v4: {
+        Args: { p_actor_id: string; p_test_id: string }
+        Returns: Json
+      }
       recover_legacy_blank_zh_approval_deliveries: {
         Args: { p_limit?: number }
         Returns: Json

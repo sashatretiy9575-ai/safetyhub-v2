@@ -54,7 +54,10 @@ export function AttestationTableRow({
   return (
     <article
       role="row"
-      className="grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] gap-x-2 gap-y-1 rounded-xl border bg-[var(--color-surface)] p-3 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:min-h-9 @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_32px] @min-[760px]:items-center @min-[760px]:gap-x-2 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:text-[13px] @min-[760px]:shadow-none"
+      // Phone: two lines per person instead of four — name/score/actions, then
+      // course · date · status. The company is deliberately absent, the band
+      // above already names it, and a four-line card made fifty rows a marathon.
+      className="grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] gap-x-2 gap-y-0.5 rounded-xl border bg-[var(--color-surface)] px-2 py-1.5 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:min-h-9 @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_32px] @min-[760px]:items-center @min-[760px]:gap-x-2 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:text-[13px] @min-[760px]:shadow-none"
       onClick={(event) => {
         const target = event.target as HTMLElement;
         if (!target.closest('button, input, a, [role="menuitem"]')) onOpenDetails();
@@ -65,7 +68,7 @@ export function AttestationTableRow({
         role="cell"
         className="col-start-1 row-start-1 @min-[760px]:col-start-1 @min-[760px]:row-start-1 @min-[760px]:grid @min-[760px]:place-items-center"
       >
-        <label className="grid size-10 cursor-pointer place-items-center @min-[760px]:size-8">
+        <label className="grid size-8 cursor-pointer place-items-center">
           <input
             type="checkbox"
             checked={selected}
@@ -92,39 +95,30 @@ export function AttestationTableRow({
         >
           {row.fullName}
         </button>
-        {row.job ? (
-          <div className="mt-0.5 truncate text-xs text-[var(--color-text-subtle)] @min-[760px]:hidden">
-            {row.job}
-          </div>
-        ) : null}
       </div>
 
-      {/* 3. Company, or the position while the list is grouped by company */}
+      {/* 3. Desktop only. While the sheet is banded by company this column shows
+             the position; otherwise it shows the company, matching its header.
+             On a phone the company rides along on the second line instead. */}
       <div
         role="cell"
-        className={`col-start-2 row-start-2 min-w-0 text-xs @min-[760px]:col-start-3 @min-[760px]:row-start-1 @min-[760px]:text-[13px] ${CELL}`}
+        className={`hidden min-w-0 text-xs @min-[760px]:col-start-3 @min-[760px]:row-start-1 @min-[760px]:block @min-[760px]:text-[13px] ${CELL}`}
       >
         {grouped ? (
-          <span
-            className="hidden truncate text-[var(--color-text-muted)] @min-[760px]:block"
-            title={row.job}
-          >
+          <span className="block truncate text-[var(--color-text-muted)]" title={row.job}>
             {row.job || '—'}
           </span>
-        ) : null}
-        <span className={grouped ? '@min-[760px]:hidden' : undefined}>
-          {row.organization ? (
-            <Link
-              href={organizationHref(row.organization)}
-              className="block truncate font-medium text-[var(--color-primary)] hover:underline"
-              title={`Фильтр по компании: ${row.organization}`}
-            >
-              {row.organization}
-            </Link>
-          ) : (
-            <span className="text-[var(--color-text-subtle)]">—</span>
-          )}
-        </span>
+        ) : row.organization ? (
+          <Link
+            href={organizationHref(row.organization)}
+            className="block truncate font-medium text-[var(--color-primary)] hover:underline"
+            title={`Фильтр по компании: ${row.organization}`}
+          >
+            {row.organization}
+          </Link>
+        ) : (
+          <span className="text-[var(--color-text-subtle)]">—</span>
+        )}
       </div>
 
       {/* 4. Course — `col-end` must be reset, otherwise the desktop start column
@@ -132,16 +126,17 @@ export function AttestationTableRow({
           the course lands back on top of the previous cell. */}
       <div
         role="cell"
-        className={`col-start-1 col-end-3 row-start-3 min-w-0 border-t pt-1.5 @min-[760px]:col-start-4 @min-[760px]:col-end-auto @min-[760px]:row-start-1 @min-[760px]:border-t-0 @min-[760px]:pt-0 ${CELL}`}
+        className={`col-start-2 col-end-4 row-start-2 min-w-0 @min-[760px]:col-start-4 @min-[760px]:col-end-auto @min-[760px]:row-start-1 ${CELL}`}
       >
         <p
-          className="font-medium break-words @min-[760px]:truncate @min-[760px]:font-normal"
+          className="truncate text-xs @min-[760px]:text-[13px] @min-[760px]:font-normal"
           title={row.courseTitle}
         >
           {row.courseTitle}
         </p>
-        <p className="mt-0.5 text-[11px] text-[var(--color-text-subtle)] @min-[760px]:hidden">
+        <p className="truncate text-[11px] text-[var(--color-text-subtle)] @min-[760px]:hidden">
           {completed}
+          {!grouped && row.organization ? ` · ${row.organization}` : ''}
         </p>
       </div>
 
@@ -156,7 +151,7 @@ export function AttestationTableRow({
       {/* 6. Score */}
       <div
         role="cell"
-        className={`col-start-3 row-start-2 flex items-center justify-end @min-[760px]:col-start-6 @min-[760px]:row-start-1 @min-[760px]:justify-start ${CELL}`}
+        className={`col-start-3 row-start-1 flex items-center justify-end @min-[760px]:col-start-6 @min-[760px]:row-start-1 @min-[760px]:justify-start ${CELL}`}
       >
         <span className="font-bold tabular-nums @min-[760px]:font-semibold">
           {row.score}/{row.total}
@@ -166,7 +161,7 @@ export function AttestationTableRow({
       {/* 7. Status */}
       <div
         role="cell"
-        className={`col-start-2 row-start-4 flex min-w-0 items-center @min-[760px]:col-start-7 @min-[760px]:row-start-1 ${CELL}`}
+        className={`col-start-4 row-start-2 flex min-w-0 items-center justify-end @min-[760px]:col-start-7 @min-[760px]:row-start-1 @min-[760px]:justify-start ${CELL}`}
       >
         <AttestationWorkflowBadge row={row} />
       </div>
@@ -174,7 +169,7 @@ export function AttestationTableRow({
       {/* 8. Actions */}
       <div
         role="cell"
-        className="col-start-3 row-start-1 flex justify-end @min-[760px]:col-start-8 @min-[760px]:row-start-1 @min-[760px]:justify-center"
+        className="col-start-4 row-start-1 flex justify-end @min-[760px]:col-start-8 @min-[760px]:row-start-1 @min-[760px]:justify-center"
       >
         <AttestationRowActions
           row={row}

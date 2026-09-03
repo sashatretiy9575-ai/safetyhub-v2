@@ -44,7 +44,11 @@ test('admin shell exposes six product sections and switches chrome at the laptop
   assert.match(layout, /<aside[\s\S]+min-\[1024px\]:flex/);
   assert.match(layout, /<header[\s\S]+min-\[1024px\]:hidden/);
   assert.match(layout, /<nav[\s\S]+fixed inset-x-0 bottom-0[\s\S]+min-\[1024px\]:hidden/);
-  assert.match(layout, /grid[^"\n]*grid-cols-6/);
+  // Six 55px cells on a 360px phone clipped every caption. Four sections keep a
+  // tab of their own; the rest live behind "Ещё", so the sidebar still lists all six.
+  assert.match(layout, /grid[^"\n]*grid-cols-5/);
+  assert.match(layout, /items\.slice\(0, 4\)\.map/);
+  assert.match(layout, /<AdminMoreMenu items=\{items\.slice\(4\)/);
   assert.doesNotMatch(layout, /overflow-x-auto/);
   assert.match(layout, /size="admin"/);
   assert.match(layout, /admin-workspace-container/);
