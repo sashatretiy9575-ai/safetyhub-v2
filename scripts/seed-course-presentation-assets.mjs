@@ -92,7 +92,12 @@ async function ensureObject(bucket, storagePath, bytes, contentType, expectedHas
 
   const { data, error: downloadError } = await supabase.storage.from(bucket).download(storagePath);
   if (downloadError || !data) {
-    throw new Error(`${storagePath}: existing object could not be verified.`);
+    // Naming the underlying failure matters: an interrupted earlier run leaves a
+    // row without a body, and 'could not be verified' alone reads like a hash
+    // mismatch rather than a half-written object.
+    throw new Error(
+      `${storagePath}: existing object could not be read back (${downloadError?.message ?? 'no body returned'}).`,
+    );
   }
   const existing = Buffer.from(await data.arrayBuffer());
   if (sha256(existing) !== expectedHash) {

@@ -63,6 +63,9 @@ jobs:
       # The app's ZH registration Siteverify call uses the matching local-only
       # test secret independently of the Supabase Auth container.
       SAFETYHUB_TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
+      # Optional: any Docker Hub account lifts the anonymous image-pull limit
+      # that rate limits these jobs. Absent, the start step simply retries.
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -76,10 +79,38 @@ jobs:
 
       - run: npm ci
 
+      - name: Log in to Docker Hub when credentials are configured
+        # GitHub runners share one anonymous Docker Hub quota, so image pulls can
+        # fail with "toomanyrequests: Rate exceeded" regardless of the change
+        # under test. Any Docker Hub account lifts the limit; without the secrets
+        # this step is skipped and the retry below carries the run.
+        if: env.DOCKERHUB_USERNAME != ''
+        shell: bash
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: printf '%s' "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+
       - name: Start local Supabase
         shell: bash
         run: |
-          npx --no-install supabase start
+          # Only the containers these checks actually use are started: eight
+          # fewer images is eight fewer chances to be rate limited, and nothing
+          # here reads Studio, Realtime or the connection pooler.
+          excluded='realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor'
+          started=0
+          for attempt in 1 2 3; do
+            if npx --no-install supabase start -x "$excluded"; then
+              started=1
+              break
+            fi
+            echo "Supabase failed to start (attempt $attempt/3); cleaning up and retrying." >&2
+            npx --no-install supabase stop --no-backup || true
+            sleep $((attempt * 30))
+          done
+          if [[ "$started" -ne 1 ]]; then
+            echo "Supabase did not start after three attempts." >&2
+            exit 1
+          fi
           # A freshly provisioned GitHub runner can briefly lose the reset
           # container immediately after the initial image pulls. Retry once
           # with diagnostics; SQL failures remain fatal on both attempts.
@@ -184,7 +215,24 @@ jobs:
       - name: Start isolated local Supabase
         shell: bash
         run: |
-          npx --no-install supabase start
+          # Only the containers these checks actually use are started: eight
+          # fewer images is eight fewer chances to be rate limited, and nothing
+          # here reads Studio, Realtime or the connection pooler.
+          excluded='realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor'
+          started=0
+          for attempt in 1 2 3; do
+            if npx --no-install supabase start -x "$excluded"; then
+              started=1
+              break
+            fi
+            echo "Supabase failed to start (attempt $attempt/3); cleaning up and retrying." >&2
+            npx --no-install supabase stop --no-backup || true
+            sleep $((attempt * 30))
+          done
+          if [[ "$started" -ne 1 ]]; then
+            echo "Supabase did not start after three attempts." >&2
+            exit 1
+          fi
           if ! npx --no-install supabase db reset; then
             echo "Initial database reset failed; retrying once with debug output." >&2
             npx --no-install supabase db reset --debug

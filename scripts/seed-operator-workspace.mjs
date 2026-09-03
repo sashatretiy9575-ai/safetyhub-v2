@@ -42,6 +42,34 @@ async function mapLimit(values, concurrency, worker) {
   return results;
 }
 
+/**
+ * The Auth container keeps answering 502 for a few seconds after a database
+ * reset, and the admin API then fails with an empty error body: `list auth
+ * users page 1: {}`, which says nothing about what to wait for. Block until it
+ * is actually serving, so a local run behaves like CI instead of failing on
+ * timing.
+ */
+async function waitForAuth(timeoutMs = 60_000) {
+  const deadline = Date.now() + timeoutMs;
+  let lastStatus = 0;
+  for (;;) {
+    try {
+      const response = await fetch(new URL('/auth/v1/health', url));
+      lastStatus = response.status;
+      if (response.ok) return;
+    } catch {
+      lastStatus = 0;
+    }
+    if (Date.now() >= deadline) {
+      throw new Error(
+        `Auth is not serving at ${url} (last status ${lastStatus || 'unreachable'}). ` +
+          'Wait for the container to become healthy and run the seed again.',
+      );
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+  }
+}
+
 async function existingUsers() {
   const users = [];
   for (let page = 1; ; page += 1) {
@@ -117,6 +145,7 @@ const accounts = [
   })),
 ];
 
+await waitForAuth();
 const knownUsers = await existingUsers();
 const users = await mapLimit(accounts, 6, async (account) => {
   let user = knownUsers.get(account.email);
