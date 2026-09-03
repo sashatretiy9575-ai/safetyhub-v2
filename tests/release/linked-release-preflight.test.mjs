@@ -118,15 +118,15 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 24);
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 63);
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 64);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(receipt.matchedCount, 63);
-  assert.equal(receipt.pendingCount, 0);
+  assert.equal(receipt.pendingCount, 1);
   assert.equal(receipt.expectedBaseCount, 63);
-  assert.equal(receipt.expectedPendingCount, 0);
-  assert.equal(receipt.expectedTotalCount, 63);
+  assert.equal(receipt.expectedPendingCount, 1);
+  assert.equal(receipt.expectedTotalCount, 64);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),
@@ -149,13 +149,14 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
     /LINKED_PREFLIGHT_REVIEWED_MIGRATION_HASH_MISMATCH/u,
   );
 
-  // The pending tail is empty, so the hosted history must now match the reviewed
-  // one exactly. A single migration missing from production is a mismatch, not a
-  // pending delta to be pushed.
-  const missingOnRemote = structuredClone(rows);
-  missingOnRemote.at(-1).remote = '';
+  // Production must hold exactly the reviewed prefix. A migration from the
+  // pending tail that is already applied there is a history mismatch, not a
+  // shorter delta to push.
+  const partiallyApplied = structuredClone(rows);
+  partiallyApplied[REVIEWED_BASE_MIGRATION_COUNT].remote =
+    partiallyApplied[REVIEWED_BASE_MIGRATION_COUNT].local;
   assert.throws(
-    () => assertReviewedMigrationDelta({ migrationRows: missingOnRemote, localMigrations }),
+    () => assertReviewedMigrationDelta({ migrationRows: partiallyApplied, localMigrations }),
     /LINKED_PREFLIGHT_HOSTED_HISTORY_NOT_REVIEWED_PREFIX/u,
   );
 

@@ -673,6 +673,7 @@ declare
   v_invalid_variants jsonb;
   v_variant jsonb;
   v_result jsonb;
+  v_bank_read_at timestamptz;
   v_replay jsonb;
   v_answers jsonb;
   v_tampered_answers jsonb;
@@ -1292,8 +1293,9 @@ begin
     raise exception 'referenced presentation retirement was not rejected: %', v_result;
   end if;
 
-  -- The course editor may now read the saved question bank, and every read is
-  -- audited. The bank must come back complete and shaped for the editor.
+  -- The course editor may read the saved question bank. Opening a course is not
+  -- a change and is deliberately not written to the action history.
+  v_bank_read_at := clock_timestamp();
   v_result := public.read_course_question_bank_v4(v_admin_id, v_test_ids[1]);
   if (v_result ->> 'bankAvailable')::boolean is not true
     or jsonb_array_length(v_result -> 'questionVariants') <> 3
@@ -1304,16 +1306,15 @@ begin
     or v_result #> '{questionVariants,0,questions,0}' ? 'displayOrder' then
     raise exception 'course editor question bank read invalid: %', v_result;
   end if;
-  if not exists (
+  if exists (
     select 1
     from public.admin_audit_log entry
     where entry.action = 'course.question_bank_read'
       and entry.target_id = v_test_ids[1]::text
       and entry.actor_user_id = v_admin_id
-      and (entry.after_data ->> 'bankAvailable')::boolean
-      and not (entry.after_data::text ilike '%correctOptionId%')
+      and entry.created_at >= v_bank_read_at
   ) then
-    raise exception 'course question bank read was not audited without answer keys';
+    raise exception 'opening the question bank still writes to the action history';
   end if;
 
   -- A participant must never reach it, capability or not.

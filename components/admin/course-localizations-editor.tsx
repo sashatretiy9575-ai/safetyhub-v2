@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { ArticleRenderer } from '@/components/article-renderer';
 import { AdminLocaleTabs } from '@/components/admin/admin-locale-tabs';
 import { ContentSeoEditor } from '@/components/admin/content-seo-editor';
+import { withCourseSeoDefaults } from '@/lib/validation/course-seo-defaults';
 import { CourseContentEditor } from '@/components/admin/course-content-editor';
 import { CoursePresentationInput } from '@/components/admin/course-presentation-input';
 import { Badge } from '@/components/ui/badge';
@@ -118,7 +119,18 @@ export function CourseLocalizationsEditor({
         ADMIN_CONTENT_LOCALES.map((locale) => {
           const item = initial.find((entry) => entry.locale === locale);
           if (!item) throw new Error(`COURSE_LOCALIZATION_${locale.toUpperCase()}_MISSING`);
-          return [locale, cloneItem(item)];
+          // Localizations inherited the same empty SEO object as their course,
+          // so every language showed blank fields and the public pages fell back
+          // to a bare one-word title. Fill the gaps from this locale's own title
+          // and description; anything already written wins.
+          const clone = cloneItem(item);
+          return [
+            locale,
+            {
+              ...clone,
+              seo: withCourseSeoDefaults(locale, clone.title, clone.description, clone.seo),
+            },
+          ];
         }),
       ) as Record<AppLocale, CourseLocalizationEditorItem>,
     [initial],

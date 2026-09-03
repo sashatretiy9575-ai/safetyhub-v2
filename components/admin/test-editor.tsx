@@ -22,6 +22,7 @@ import {
 } from '@/lib/admin-test-editor';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { defaultContentSeo } from '@/lib/validation/content-seo';
+import { withCourseSeoDefaults } from '@/lib/validation/course-seo-defaults';
 import { resolveCourseIcon } from '@/lib/course-icons';
 import { IconPicker } from '@/components/admin/icon-picker';
 import { ContentSeoEditor } from '@/components/admin/content-seo-editor';
@@ -108,10 +109,11 @@ function freshTestFromSeed(seed?: TestEditorSeed): TestEditorPayload {
     ...(seed.status ? { status: seed.status } : {}),
     ...(seed.publicationState ? { publicationState: seed.publicationState } : {}),
     ...(seed.draftVersion !== undefined ? { draftVersion: seed.draftVersion } : {}),
-    seo: {
-      ...seed.seo,
-      indexable: seed.seo?.indexable !== false,
-    },
+    // Courses created before SEO was collected carry `{}`. Spreading that left
+    // every SEO field blank in the editor and blocked publication with nothing
+    // to look at, so any missing field is filled from the course's own title and
+    // description. Whatever the course actually stores always wins.
+    seo: withCourseSeoDefaults('ru', seed.title, seed.description, seed.seo),
     revisionHistory: seed.revisionHistory.map((revision) => ({ ...revision })),
     questionVariants: seed.questionVariants
       ? (seed.questionVariants.map((variant) => ({
@@ -423,7 +425,7 @@ export function TestEditor({
             : dirty
               ? 'Есть несохранённые изменения.'
               : bankLoaded
-                ? 'Открыт сохранённый банк вопросов.'
+                ? 'Изменений нет.'
                 : 'Черновик хранится только в памяти до отправки.'
         }
         onTogglePreview={() => setPreview((value) => !value)}
@@ -431,16 +433,17 @@ export function TestEditor({
         onPublish={() => void save(true)}
       />
 
-      {course.id ? (
+      {/* Only states that change what the administrator can do are worth a line
+          here. A bank that loaded normally is the expected case and says so by
+          simply showing the questions. */}
+      {course.id && (bankUnreadable || !bankLoaded) ? (
         <p
           data-course-editor-key-boundary
           className="rounded-xl border border-[var(--color-warning)] bg-[var(--color-surface-muted)] p-4 text-sm leading-6"
         >
           {bankUnreadable
             ? 'Банк вопросов сейчас прочитать нельзя, поэтому сохранение и публикация выключены: иначе сохранённые вопросы были бы стёрты. Остальные поля курса показаны только для просмотра. Обновите базу данных и откройте курс заново.'
-            : bankLoaded
-              ? 'Загружен сохранённый банк вопросов вместе с правильными ответами. Каждое открытие записывается в историю действий. Опубликованная редакция продолжает работать, пока вы не опубликуете новую.'
-              : 'Сохранённого банка вопросов нет или он неполный — заполните 30 вопросов заново. Текущая опубликованная редакция работает, пока вы не опубликуете новую.'}
+            : 'Сохранённого банка вопросов нет или он неполный — заполните 30 вопросов заново. Текущая опубликованная редакция работает, пока вы не опубликуете новую.'}
         </p>
       ) : null}
 

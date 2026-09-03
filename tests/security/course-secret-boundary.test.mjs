@@ -160,16 +160,25 @@ test('public assets and public course rendering exclude snapshots, answer keys a
 // capability-gated and audited, and it is the ONLY relaxation — presentation
 // storage paths, learner payloads and the wide v3 payload stay server-only.
 test('the saved question bank is readable only through the audited editor path', async () => {
-  const [editor, editPage, adminServer, courseRoute, migration, bankMigration, contract] =
-    await Promise.all([
-      read('components/admin/test-editor.tsx'),
-      read('app/(admin)/admin/courses/[id]/page.tsx'),
-      read('features/admin/server.ts'),
-      read('app/api/admin/courses/route.ts'),
-      read('supabase/migrations/20260831116000_retire_browser_editor_key_reads.sql'),
-      read('supabase/migrations/20260903090000_course_editor_question_bank_read.sql'),
-      read('supabase/tests/course_catalog_v3.sql'),
-    ]);
+  const [
+    editor,
+    editPage,
+    adminServer,
+    courseRoute,
+    migration,
+    bankMigration,
+    quietReadMigration,
+    contract,
+  ] = await Promise.all([
+    read('components/admin/test-editor.tsx'),
+    read('app/(admin)/admin/courses/[id]/page.tsx'),
+    read('features/admin/server.ts'),
+    read('app/api/admin/courses/route.ts'),
+    read('supabase/migrations/20260831116000_retire_browser_editor_key_reads.sql'),
+    read('supabase/migrations/20260903090000_course_editor_question_bank_read.sql'),
+    read('supabase/migrations/20260903180000_course_editor_quiet_bank_read.sql'),
+    read('supabase/tests/course_catalog_v3.sql'),
+  ]);
   const seed = sourceBetween(
     adminServer,
     'export async function getTestEditorSeed',
@@ -234,6 +243,18 @@ test('the saved question bank is readable only through the audited editor path',
   );
   assert.match(bankMigration, /private\.require_capability\('test\.manage'\)/u);
   assert.match(bankMigration, /'course\.question_bank_read'/u);
+  // Opening a course is not a change, so the follow-up migration drops that
+  // audit write. Writes still audit, and the capability gate is unchanged.
+  assert.match(
+    quietReadMigration,
+    /create or replace function public\.read_course_question_bank_v4/u,
+  );
+  assert.doesNotMatch(quietReadMigration, /insert into public\.admin_audit_log/u);
+  assert.match(quietReadMigration, /private\.require_capability\('test\.manage'\)/u);
+  assert.match(
+    quietReadMigration,
+    /grant execute on function public\.read_course_question_bank_v4\(uuid,uuid\) to authenticated/u,
+  );
   assert.match(bankMigration, /COURSE_QUESTION_BANK_MISSING/u);
   // The audit row carries counts and versions only.
   assert.doesNotMatch(bankMigration, /after_data[\s\S]{0,400}questionVariants/u);
