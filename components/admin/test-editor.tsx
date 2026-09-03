@@ -151,6 +151,11 @@ export function TestEditor({
   const router = useRouter();
   const normalizedInitial = useMemo(() => freshTestFromSeed(initial), [initial]);
   const bankLoaded = Boolean(initial?.questionVariants);
+  // The bank could not be read at all (the read path is missing in this
+  // environment). Its real contents are unknown, so saving would ship the blank
+  // placeholder over a full bank — exactly the silent data loss this editor used
+  // to cause. Open read-only instead.
+  const bankUnreadable = Boolean(initial) && initial?.questionBankReadable === false;
   const [course, setCourse] = useState<TestEditorPayload>(normalizedInitial);
   const [savedSnapshot, setSavedSnapshot] = useState(() =>
     serializeTestEditorPayload(normalizedInitial),
@@ -285,6 +290,12 @@ export function TestEditor({
   };
 
   const save = async (publish: boolean) => {
+    if (bankUnreadable) {
+      setError(
+        'Банк вопросов сейчас недоступен для чтения, поэтому сохранение выключено — иначе сохранённые вопросы были бы стёрты. Обновите базу данных и откройте курс заново.',
+      );
+      return;
+    }
     setValidationAttempted(true);
     const effectiveValidation = publish ? validation : draftValidation;
     if (!effectiveValidation.valid) {
@@ -398,7 +409,7 @@ export function TestEditor({
   return (
     <EditorShell>
       <EditorActionBar
-        busy={busy}
+        busy={busy || bankUnreadable}
         preview={preview}
         statusLabel={PUBLICATION_LABEL[publicationState]}
         published={
@@ -407,11 +418,13 @@ export function TestEditor({
         hasDraftChanges={publicationState === 'published_with_draft_changes'}
         progress={`${validation.completedCount}/30`}
         liveMessage={
-          dirty
-            ? 'Есть несохранённые изменения.'
-            : bankLoaded
-              ? 'Открыт сохранённый банк вопросов.'
-              : 'Черновик хранится только в памяти до отправки.'
+          bankUnreadable
+            ? 'Только просмотр: банк вопросов недоступен, сохранение выключено.'
+            : dirty
+              ? 'Есть несохранённые изменения.'
+              : bankLoaded
+                ? 'Открыт сохранённый банк вопросов.'
+                : 'Черновик хранится только в памяти до отправки.'
         }
         onTogglePreview={() => setPreview((value) => !value)}
         onSave={() => void save(false)}
@@ -423,9 +436,11 @@ export function TestEditor({
           data-course-editor-key-boundary
           className="rounded-xl border border-[var(--color-warning)] bg-[var(--color-surface-muted)] p-4 text-sm leading-6"
         >
-          {bankLoaded
-            ? 'Загружен сохранённый банк вопросов вместе с правильными ответами. Каждое открытие записывается в историю действий. Опубликованная редакция продолжает работать, пока вы не опубликуете новую.'
-            : 'Сохранённого банка вопросов нет или он неполный — заполните 30 вопросов заново. Текущая опубликованная редакция работает, пока вы не опубликуете новую.'}
+          {bankUnreadable
+            ? 'Банк вопросов сейчас прочитать нельзя, поэтому сохранение и публикация выключены: иначе сохранённые вопросы были бы стёрты. Остальные поля курса показаны только для просмотра. Обновите базу данных и откройте курс заново.'
+            : bankLoaded
+              ? 'Загружен сохранённый банк вопросов вместе с правильными ответами. Каждое открытие записывается в историю действий. Опубликованная редакция продолжает работать, пока вы не опубликуете новую.'
+              : 'Сохранённого банка вопросов нет или он неполный — заполните 30 вопросов заново. Текущая опубликованная редакция работает, пока вы не опубликуете новую.'}
         </p>
       ) : null}
 

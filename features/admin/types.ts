@@ -339,7 +339,13 @@ export type TestEditorPayload = {
  * audit log by `public.read_course_question_bank_v4`. `null` means the stored
  * bank is absent or incomplete, and the editor starts from blank variants.
  * Immutable storage locations and learner payloads stay server-only.
+ *
+ * `questionBankReadable` is false only when the audited read function itself is absent —
+ * an environment where the application already runs but the migration has not
+ * been applied yet. The bank is then unknown rather than empty, so the editor
+ * must refuse to write instead of shipping blank variants over a full bank.
  */
 export type TestEditorSeed = Omit<TestEditorPayload, 'questionVariants'> & {
   questionVariants: [AdminTestVariant, AdminTestVariant, AdminTestVariant] | null;
+  questionBankReadable: boolean;
 };

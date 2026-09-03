@@ -210,6 +210,19 @@ test('the saved question bank is readable only through the audited editor path',
     assert.doesNotMatch(seed, new RegExp(privateField, 'u'), privateField);
   }
   assert.match(adminServer, /read_course_question_bank_v4/u);
+  // Application code reaches production one deploy before its migration. In
+  // that window the read path does not exist yet: the panel must open
+  // read-only instead of throwing, and it must refuse to write a blank bank
+  // over a full one, which is the data loss this whole change removes.
+  assert.match(adminServer, /PGRST202/u);
+  assert.match(adminServer, /return \{ readable: false, variants: null \}/u);
+  assert.match(adminServer, /questionBankReadable: questionBank\.readable/u);
+  assert.match(
+    editor,
+    /const bankUnreadable = Boolean\(initial\) && initial\?\.questionBankReadable === false/u,
+  );
+  assert.match(editor, /if \(bankUnreadable\) \{[\s\S]{0,320}?return;/u);
+  assert.match(editor, /busy=\{busy \|\| bankUnreadable\}/u);
   assert.match(seed, /readCourseQuestionBank\(testId, actor\.user\.id\)/u);
   // The heuristic that preserved the stored bank only when all 30 questions were
   // blank is gone; the guarantee now lives in the database.

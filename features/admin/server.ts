@@ -299,11 +299,24 @@ const readCourseQuestionBank = cache(async (testId: string, actorId: string) => 
     p_actor_id: actorId,
     p_test_id: testId,
   });
-  if (response.error) throw new Error(response.error.message);
+  // Application code ships before its migration, so for one release window the
+  // function is absent. Crashing the whole section was the previous failure
+  // mode of this panel; reporting the bank as unreadable lets the editor open
+  // read-only instead.
+  if (response.error) {
+    const missing =
+      response.error.code === 'PGRST202' ||
+      /could not find the function|does not exist|schema cache/iu.test(response.error.message);
+    if (missing) return { readable: false, variants: null };
+    throw new Error(response.error.message);
+  }
   const payload = response.data as { bankAvailable?: unknown; questionVariants?: unknown } | null;
-  if (!payload || payload.bankAvailable !== true) return null;
+  if (!payload || payload.bankAvailable !== true) return { readable: true, variants: null };
   const parsed = courseQuestionBankSchema.safeParse(payload.questionVariants);
-  return parsed.success ? (parsed.data as TestEditorSeed['questionVariants']) : null;
+  return {
+    readable: true,
+    variants: parsed.success ? (parsed.data as TestEditorSeed['questionVariants']) : null,
+  };
 });
 
 export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed | null> {
@@ -368,11 +381,12 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
 
   const test = testResult.data;
   const draft = draftResult.data;
-  const questionVariants = await readCourseQuestionBank(testId, actor.user.id);
+  const questionBank = await readCourseQuestionBank(testId, actor.user.id);
 
   return {
     id: test.id,
-    questionVariants,
+    questionVariants: questionBank.variants,
+    questionBankReadable: questionBank.readable,
     slug: draft.slug,
     title: draft.title,
     description: draft.description,
