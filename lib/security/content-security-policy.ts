@@ -74,13 +74,13 @@ export function buildContentSecurityPolicy({
         THEME_BOOTSTRAP_CSP_HASH,
         PWA_INSTALL_BOOTSTRAP_CSP_HASH,
         "'strict-dynamic'",
-        ...(development ? ["'unsafe-eval'"] : []),
+        "'unsafe-eval'",
         'https://challenges.cloudflare.com',
       ]
     : [
         "'self'",
         "'unsafe-inline'",
-        ...(development ? ["'unsafe-eval'"] : []),
+        "'unsafe-eval'",
         'https://challenges.cloudflare.com',
       ];
   const styles =
@@ -114,7 +114,7 @@ export function buildContentSecurityPolicy({
     ]),
     directive('font-src', ["'self'"]),
     directive('frame-src', ['https://challenges.cloudflare.com']),
-    directive('worker-src', ["'self'"]),
+    directive('worker-src', ["'self'", 'blob:', 'https://challenges.cloudflare.com']),
     directive('manifest-src', ["'self'"]),
     directive('media-src', ["'self'"]),
     directive('object-src', ["'none'"]),

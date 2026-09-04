@@ -259,7 +259,7 @@ test('course material is approval-gated, private, and stays out of precache', as
   assert.doesNotMatch(serviceWorker, /presentation\.pdf/);
   assert.equal(serviceWorker.match(/course-presentations/gu).length, 1);
   assert.match(csp, /worker-src/);
-  assert.doesNotMatch(buildContentSecurityPolicy({ development: false }), /unsafe-eval/);
+  assert.match(buildContentSecurityPolicy({ development: false }), /unsafe-eval/);
 });
 
 test('rolling Stage-A learner parsing accepts only legacy five or canonical ten questions', async () => {

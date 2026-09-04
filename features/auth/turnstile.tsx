@@ -116,9 +116,9 @@ export const Turnstile = forwardRef<
         size,
         execution: 'execute',
         appearance: 'always',
-        retry: 'never',
-        'refresh-expired': 'manual',
-        'refresh-timeout': 'manual',
+        retry: 'auto',
+        'refresh-expired': 'auto',
+        'refresh-timeout': 'auto',
         callback: (token: string) => {
           pendingExecutionRef.current = false;
           completedRef.current = true;

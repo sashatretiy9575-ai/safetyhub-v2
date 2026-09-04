@@ -23,9 +23,9 @@ test('Turnstile uses one deferred native Cloudflare widget', async () => {
   assert.match(source, /execution: 'execute'/u);
   assert.match(source, /appearance: 'always'/u);
   assert.match(source, /language: locale === 'zh' \? 'zh-CN' : locale/u);
-  assert.match(source, /retry: 'never'/u);
-  assert.match(source, /'refresh-expired': 'manual'/u);
-  assert.match(source, /'refresh-timeout': 'manual'/u);
+  assert.match(source, /retry: 'auto'/u);
+  assert.match(source, /'refresh-expired': 'auto'/u);
+  assert.match(source, /'refresh-timeout': 'auto'/u);
   assert.match(source, /window\.turnstile\.execute\(widgetId\)/u);
   assert.match(source, /if \(!siteKey \|\| pendingExecutionRef\.current\) return/u);
   assert.match(source, /resetRequiredRef\.current \|\| completedRef\.current/u);

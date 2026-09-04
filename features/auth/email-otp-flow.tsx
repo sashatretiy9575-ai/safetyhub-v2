@@ -323,6 +323,7 @@ export function EmailOtpFlow() {
     }
 
     if (captchaRequired) {
+      setBusy('send');
       pendingCaptchaSubmitRef.current = (token) => void sendCode(parsed.data.email, token);
       setError('');
       setFieldErrors({});
@@ -439,6 +440,28 @@ export function EmailOtpFlow() {
           : t('verifyLimitExpired')
         : error;
 
+  const captchaWidget = (
+    <>
+      <Turnstile
+        key={captchaVersion}
+        ref={turnstileRef}
+        onToken={(token) => {
+          if (!token) return;
+          const pending = pendingCaptchaSubmitRef.current;
+          pendingCaptchaSubmitRef.current = null;
+          pending?.(token);
+        }}
+        onFailure={() => {
+          pendingCaptchaSubmitRef.current = null;
+          setBusy(null);
+          setError(t('captchaFailed'));
+          setCaptchaVersion((value) => value + 1);
+        }}
+      />
+      <FieldError id="email-otp-captcha-error" message={fieldErrors.captcha} />
+    </>
+  );
+
   return (
     <>
       <div className="space-y-2 text-center">
@@ -487,6 +510,8 @@ export function EmailOtpFlow() {
             />
             <FieldError id="email-otp-email-error" message={fieldErrors.email} />
           </div>
+
+          {captchaWidget}
 
           <Button
             type="submit"
@@ -616,6 +641,7 @@ export function EmailOtpFlow() {
                 ? t('retryIn', { delay: formatRetryDelay(verifyRetrySeconds, locale) })
                 : t('verify')}
           </Button>
+          {captchaWidget}
           <div className="grid gap-2 sm:grid-cols-2">
             <Button
               type="button"
@@ -640,18 +666,6 @@ export function EmailOtpFlow() {
           </div>
         </form>
       )}
-
-      <Turnstile
-        key={captchaVersion}
-        ref={turnstileRef}
-        onToken={(token) => {
-          if (!token) return;
-          const pending = pendingCaptchaSubmitRef.current;
-          pendingCaptchaSubmitRef.current = null;
-          pending?.(token);
-        }}
-      />
-      <FieldError id="email-otp-captcha-error" message={fieldErrors.captcha} />
     </>
   );
 }

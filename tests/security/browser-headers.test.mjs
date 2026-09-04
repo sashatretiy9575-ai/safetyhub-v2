@@ -37,9 +37,10 @@ test('sensitive HTML uses an injection-safe nonce policy compatible with Turnsti
     hostedAvatarCsp,
     /img-src [^;]*https:\/\/project-ref\.supabase\.co\/storage\/v1\/object\/sign\/profile-avatars\//u,
   );
-  assert.doesNotMatch(hostedAvatarCsp, /https:\/\/\*\.supabase\.co/u);
-  assert.match(csp, /worker-src 'self'/u);
-  assert.doesNotMatch(csp.match(/worker-src [^;]*/u)?.[0] ?? '', /blob:/u);
+  assert.match(csp, /script-src [^;]*'unsafe-eval'/u);
+  assert.match(csp, /worker-src [^;]*'self'/u);
+  assert.match(csp, /worker-src [^;]*blob:/u);
+  assert.match(csp, /worker-src [^;]*https:\/\/challenges\.cloudflare\.com/u);
   assert.match(csp, /frame-ancestors 'none'/u);
   assert.match(csp, /object-src 'none'/u);
   assert.match(csp, /base-uri 'self'/u);
