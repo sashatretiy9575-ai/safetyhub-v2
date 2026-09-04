@@ -76,6 +76,17 @@ content_path = "./supabase/templates/invite.html"
 enabled = true
 uri = "pg-functions://postgres/public/enforce_email_otp_access_token"
 
+# Auth hands every email to the Vercel app, which answers immediately and
+# relays the message to the PS.kz mailbox in the background. Direct SMTP from
+# Supabase to that mailbox exceeded the 10-second Auth request budget, which
+# surfaced to users as a false "captcha expired" error. The app renders the
+# same code/notice templates as supabase/templates and verifies the Standard
+# Webhooks signature with SUPABASE_SEND_EMAIL_HOOK_SECRETS.
+[auth.hook.send_email]
+enabled = true
+uri = "https://safetyhub.kz/api/auth/send-email"
+secrets = "env(SUPABASE_SEND_EMAIL_HOOK_SECRETS)"
+
 # A scheduler has no user JWT. The function verifies its own high-entropy
 # STORAGE_RECONCILER_SECRET bearer before it creates a service-role client.
 [functions.storage-reconciler]

@@ -46,8 +46,17 @@ client-only сертификатов зафиксирован отдельно �
   только раздельные HMAC challenge/email, не более часа и шести попыток. Ошибка
   CAPTCHA не создаёт receipt и не изменяет email-wide счётчик; verify без точного
   receipt/email binding получает общий `OTP_CODE_INVALID`.
-- SMTP sender: `SafetyHub <no-reply@safetyhub.kz>` через
-  `srv-plesk28.ps.kz:465`; не заменяйте provider-host на apex или `mail.safetyhub.kz`.
+- Письма Auth отправляет не напрямую по SMTP, а через hook
+  `[auth.hook.send_email]` → `https://safetyhub.kz/api/auth/send-email`. Vercel
+  отвечает Auth сразу и в фоне (`after()`) отправляет письмо через
+  `srv-plesk28.ps.kz:465` от `SafetyHub <no-reply@safetyhub.kz>`; не заменяйте
+  provider-host на apex или `mail.safetyhub.kz`. Причина: прямой SMTP из Supabase
+  в PS.kz с 3 сентября 2026 не укладывался в 10-секундный лимит Auth, шлюз
+  повторял запрос со старым Turnstile-токеном, и пользователь видел ложное
+  «Проверка безопасности истекла». Секрет hook (`SUPABASE_SEND_EMAIL_HOOK_SECRETS`,
+  формат `v1,whsec_<base64>`) должен совпадать в Auth config и Vercel env;
+  пароль ящика (`SAFETYHUB_SMTP_PASSWORD`) хранится только в Vercel env.
+  Custom SMTP в Supabase при этом не нужен.
 - Перенесите из `supabase/config.toml` в целевой hosted Supabase лимит отправки,
   точные subjects и тела всех четырёх шаблонов. Только `magic_link` и
   `confirmation` содержат `{{ .Token }}`. `recovery` и `invite` — статические

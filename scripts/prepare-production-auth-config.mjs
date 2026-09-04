@@ -51,9 +51,9 @@ const expectedConfigurationLineChanges = Object.freeze([
 // Updating either value is an intentional release-review step. These hashes pin
 // exactly the committed localhost source and the only permitted production copy.
 export const expectedSourceConfigurationSha256 =
-  'd451dea0d3c96f675bbe5ad92606f553a2559ed0a999cffed8277894a25d7d19';
+  '178f954eee7d3325d54c3416229873cb902ae0c5d4000cbdbf7e31b8b40b6c56';
 export const expectedProductionConfigurationSha256 =
-  'ca81bcd6bb4c6e6a999f1d02672b87de775f002c3d6daaa129ec35dea145b618';
+  '78f7729e3f1e2a15290225493fe9fd7c595be64e1f5cd98aab13941688f69569';
 export const expectedTemplateSha256 = Object.freeze({
   'supabase/templates/magic-link.html':
     '976d1b1ff5338672607c88b9fcd105d551725f7689631357745eef16f7fda236',
