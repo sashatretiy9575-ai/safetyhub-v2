@@ -24,7 +24,7 @@ type Transport = Readonly<{
 function smtpTransport(): Transport | null {
   const host = process.env.SAFETYHUB_SMTP_HOST?.trim();
   const user = process.env.SAFETYHUB_SMTP_USER?.trim();
-  const password = process.env.SAFETYHUB_SMTP_PASSWORD;
+  const password = process.env.SAFETYHUB_SMTP_PASSWORD?.trim();
   const from = process.env.SAFETYHUB_SMTP_FROM?.trim() || user;
   const port = Number(process.env.SAFETYHUB_SMTP_PORT ?? '465');
   if (!host || !user || !password || !from || !Number.isInteger(port) || port <= 0) {
@@ -47,10 +47,10 @@ async function deliver(transport: Transport, to: string, subject: string, html: 
       await sendSmtpMail(transport, { from: transport.from, to, subject, html });
       return;
     } catch (error) {
-      // The message holds a one-time code, so only the failure class reaches
-      // the Vercel log; that is still enough to spot an SMTP outage.
+      // The message holds a one-time code, so only the SMTP stage and the
+      // server reply line reach the Vercel log; that is enough to spot an outage.
       if (attempt === SEND_ATTEMPTS) {
-        const reason = error instanceof Error ? error.message.split(':')[0] : 'SMTP_UNKNOWN';
+        const reason = error instanceof Error ? error.message.slice(0, 80) : 'SMTP_UNKNOWN';
         process.stderr.write(`auth send-email hook: delivery failed (${reason})\n`);
       }
     }
