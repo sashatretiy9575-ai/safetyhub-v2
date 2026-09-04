@@ -19,6 +19,17 @@ type Asset = {
   usageCount: number;
 };
 
+/**
+ * A library image is addressed by its identifier, so the raw last path segment
+ * is a bare UUID. Prefer the filename the library already knows.
+ */
+function selectedAssetName(value: string, assets: Asset[]) {
+  const known = assets.find((asset) => asset.url === value);
+  if (known) return known.filename;
+  if (/^\/api\/content-assets\//u.test(value)) return 'Изображение из медиатеки';
+  return value.split('/').pop() || value;
+}
+
 export function MediaAssetInput({
   id,
   value,
@@ -143,6 +154,10 @@ export function MediaAssetInput({
                 alt="Выбранное изображение"
                 fill
                 sizes="128px"
+                // The whole point of this thumbnail is to be visible the moment
+                // a path is chosen; deferring it to the lazy-load observer left
+                // an empty frame in the editor.
+                loading="eager"
                 className="object-cover"
                 onError={() => setPreviewFailed(true)}
               />
@@ -150,7 +165,7 @@ export function MediaAssetInput({
           </span>
           <div className="min-w-0 flex-1 space-y-1">
             <p className="truncate text-xs font-bold" title={value}>
-              {value.split('/').pop() || value}
+              {selectedAssetName(value, assets)}
             </p>
             {previewFailed ? (
               <p role="alert" className="text-xs text-[var(--color-danger)]">

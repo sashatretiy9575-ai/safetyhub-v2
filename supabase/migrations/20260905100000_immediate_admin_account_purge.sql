@@ -90,11 +90,16 @@ revoke all on function private.quota_policy(text)
 
 -- `role` is claimed by the operator-role migration that follows this one; both
 -- values are admitted here so the constraint is edited exactly once.
+-- `organization.merge` was added by 20260818040000 and production holds
+-- receipts carrying it: dropping it here would fail the constraint on real data
+-- and would silently break company merges afterwards.
 alter table private.admin_operation_receipts
   drop constraint admin_operation_receipts_action;
 alter table private.admin_operation_receipts
   add constraint admin_operation_receipts_action
-  check (action in ('confirm', 'update', 'issue', 'revoke', 'purge', 'role'));
+  check (
+    action in ('confirm', 'update', 'issue', 'revoke', 'organization.merge', 'purge', 'role')
+  );
 
 create function private.purge_user_account_immediate(
   p_actor_id uuid,
