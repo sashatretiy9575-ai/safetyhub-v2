@@ -111,9 +111,32 @@ class SmtpSession {
   }
 }
 
+async function authenticate(session: SmtpSession, transport: SmtpTransport, greeting: string) {
+  const advertised = greeting.toUpperCase();
+  // RFC 4616 PLAIN: authorization identity (empty), NUL, user, NUL, password.
+  const plain = Buffer.concat([
+    Buffer.from([0]),
+    Buffer.from(transport.user, 'utf8'),
+    Buffer.from([0]),
+    Buffer.from(transport.password, 'utf8'),
+  ]).toString('base64');
+  if (advertised.includes('PLAIN')) {
+    return session.command('AUTH', `AUTH PLAIN ${plain}`, /^235/u);
+  }
+  // LOGIN is the fallback for servers that advertise no PLAIN mechanism.
+  await session.command('AUTH', 'AUTH LOGIN', /^334/u);
+  await session.command('AUTH', Buffer.from(transport.user, 'utf8').toString('base64'), /^334/u);
+  return session.command(
+    'AUTH',
+    Buffer.from(transport.password, 'utf8').toString('base64'),
+    /^235/u,
+  );
+}
+
 /**
  * Minimal SMTP-over-implicit-TLS client (port 465) for transactional auth
- * mail. It deliberately supports only AUTH PLAIN over TLS and one recipient.
+ * mail. It deliberately supports only AUTH PLAIN/LOGIN over TLS and one
+ * recipient.
  */
 export async function sendSmtpMail(transport: SmtpTransport, message: SmtpMessage) {
   const timeoutMs = transport.timeoutMs ?? DEFAULT_TIMEOUT_MS;
@@ -134,15 +157,12 @@ export async function sendSmtpMail(transport: SmtpTransport, message: SmtpMessag
     const session = new SmtpSession(socket);
     const greeting = await session.read();
     if (!greeting.startsWith('220')) throw new SmtpError('GREETING', greeting);
-    await session.command('EHLO', `EHLO ${message.from.split('@')[1]}`, /^250/u);
-    // RFC 4616: authorization identity (empty), NUL, user, NUL, password.
-    const credentials = Buffer.concat([
-      Buffer.from([0]),
-      Buffer.from(transport.user, 'utf8'),
-      Buffer.from([0]),
-      Buffer.from(transport.password, 'utf8'),
-    ]).toString('base64');
-    await session.command('AUTH', `AUTH PLAIN ${credentials}`, /^235/u);
+    const capabilities = await session.command(
+      'EHLO',
+      `EHLO ${message.from.split('@')[1]}`,
+      /^250/u,
+    );
+    await authenticate(session, transport, capabilities);
     await session.command('MAIL', `MAIL FROM:<${message.from}>`, /^250/u);
     await session.command('RCPT', `RCPT TO:<${message.to}>`, /^25[01]/u);
     await session.command('DATA', 'DATA', /^354/u);

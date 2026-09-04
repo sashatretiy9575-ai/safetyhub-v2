@@ -51,7 +51,13 @@ async function deliver(transport: Transport, to: string, subject: string, html: 
       // server reply line reach the Vercel log; that is enough to spot an outage.
       if (attempt === SEND_ATTEMPTS) {
         const reason = error instanceof Error ? error.message.slice(0, 80) : 'SMTP_UNKNOWN';
-        process.stderr.write(`auth send-email hook: delivery failed (${reason})\n`);
+        // A rejected login is nearly always a mailbox credential that no longer
+        // matches. The character count distinguishes "wrong password" from
+        // "password never reached the runtime" without exposing the value.
+        const shape = reason.startsWith('SMTP_AUTH')
+          ? ` user=${transport.user} secretChars=${transport.password.length}`
+          : '';
+        process.stderr.write(`auth send-email hook: delivery failed (${reason})${shape}\n`);
       }
     }
   }
