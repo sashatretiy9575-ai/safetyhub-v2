@@ -922,6 +922,8 @@ export function TestEditor({
                 <ContentSeoEditor
                   idPrefix="course"
                   value={course.seo}
+                  imageLabel="Обложка курса и картинка для соцсетей"
+                  imageHint="Эта картинка стоит на карточке курса в каталоге и в предпросмотре ссылки. У пяти базовых курсов обложка встроена в сайт и не меняется."
                   onChange={(seo) => setCourse((current) => ({ ...current, seo }))}
                 />
               </div>

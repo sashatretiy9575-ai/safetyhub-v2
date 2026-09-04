@@ -46,37 +46,22 @@ export default async function VerifyCertificatePage({
     );
   }
 
-  const revoked = certificate.revokedAt !== null;
   return (
     <section className="py-12 md:py-20">
       <Container size="narrow">
-        <Card className={revoked ? 'border-2 border-[var(--color-danger)]' : 'border-2'}>
+        <Card className="border-2">
           <CardContent className="space-y-6 p-5 md:p-8">
             <div className="flex items-start gap-4">
-              <span
-                className={`grid size-14 shrink-0 place-items-center rounded-full ${
-                  revoked
-                    ? 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]'
-                    : 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
-                }`}
-              >
-                {revoked ? (
-                  <XCircle size={32} weight="fill" />
-                ) : (
-                  <CheckCircle size={32} weight="fill" />
-                )}
+              <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                <CheckCircle size={32} weight="fill" />
               </span>
               <div>
                 <p className="text-xs font-bold tracking-wider text-[var(--color-text-muted)] uppercase">
                   {t('verification')}
                 </p>
-                <h1 className="font-display text-2xl font-bold md:text-3xl">
-                  {revoked ? t('revoked') : t('valid')}
-                </h1>
+                <h1 className="font-display text-2xl font-bold md:text-3xl">{t('valid')}</h1>
                 <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                  {revoked
-                    ? t('revokedDescription')
-                    : t('validDescription')}
+                  {t('validDescription')}
                 </p>
               </div>
             </div>
@@ -108,14 +93,6 @@ export default async function VerifyCertificatePage({
                   {certificate.certificateNumber}
                 </dd>
               </div>
-              {certificate.revokedAt && (
-                <div className="sm:col-span-2">
-                  <dt className="text-xs text-[var(--color-text-muted)]">{t('revokedAt')}</dt>
-                  <dd className="mt-1 font-semibold text-[var(--color-danger)]">
-                    {new Date(certificate.revokedAt).toLocaleString(htmlLanguage(locale))}
-                  </dd>
-                </div>
-              )}
             </dl>
 
             <p className="text-sm text-[var(--color-text-muted)]">

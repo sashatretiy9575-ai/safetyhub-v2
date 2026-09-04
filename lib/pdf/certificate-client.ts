@@ -20,6 +20,63 @@ type WritableDestination = Readonly<{
   abort(reason?: unknown): Promise<void>;
 }>;
 
+/** File System Access streams also accept positional commands. */
+type SeekableDestination = Readonly<{
+  write(command: { type: 'truncate'; size: number } | { type: 'seek'; position: number }): Promise<void>;
+}>;
+
+function writtenByteLength(data: BufferSource | Blob | string) {
+  if (typeof data === 'string') return new TextEncoder().encode(data).byteLength;
+  if (data instanceof Blob) return data.size;
+  return data.byteLength;
+}
+
+/**
+ * Wraps the picked file so a failed worker run can be retried on the main
+ * thread without corrupting the archive.
+ *
+ * The worker path aborts the destination from three of its own error handlers.
+ * Forwarding those aborts immediately destroyed the only handle we had, and the
+ * retry then appended a second ZIP after the bytes the worker had already
+ * written — producing exactly the "damaged archive" users reported. The wrapper
+ * defers the abort, counts what actually reached the file, and can rewind the
+ * file to zero before a retry.
+ */
+function createRewindableDestination(target: WritableDestination) {
+  let bytesWritten = 0;
+  let closed = false;
+
+  const proxy: WritableDestination = {
+    async write(data) {
+      await target.write(data);
+      bytesWritten += writtenByteLength(data);
+    },
+    async close() {
+      await target.close();
+      closed = true;
+    },
+    async abort() {
+      // Deliberately deferred: the caller decides between rewind and abort.
+    },
+  };
+
+  return {
+    proxy,
+    async rewind() {
+      if (closed) return false;
+      if (bytesWritten === 0) return true;
+      try {
+        await (target as unknown as SeekableDestination).write({ type: 'truncate', size: 0 });
+        await (target as unknown as SeekableDestination).write({ type: 'seek', position: 0 });
+        bytesWritten = 0;
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  };
+}
+
 export type CertificateArchiveFileHandle = Readonly<{
   createWritable(): Promise<WritableDestination>;
 }>;
@@ -279,19 +336,29 @@ export async function downloadCertificateExportInBrowser(
   if (options.fileHandle) {
     if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
     const destination = await options.fileHandle.createWritable();
+    const rewindable = createRewindableDestination(destination);
     const taskId = crypto.randomUUID();
     try {
       await runWorker(
         { type: 'render-archive', taskId, metadata, stream: true },
-        { ...options, destination },
+        { ...options, destination: rewindable.proxy },
       );
     } catch (workerError) {
       if (options.signal?.aborted) {
         await destination.abort(workerError).catch(() => undefined);
         throw workerError;
       }
+      // Retrying on top of a partially written file would produce a broken
+      // archive, so a file that cannot be rewound is abandoned instead.
+      if (!(await rewindable.rewind())) {
+        await destination.abort(workerError).catch(() => undefined);
+        throw workerError;
+      }
       try {
-        await renderArchiveInMainThread(metadata, { ...options, destination });
+        await renderArchiveInMainThread(metadata, {
+          ...options,
+          destination: rewindable.proxy,
+        });
       } catch (fallbackError) {
         await destination.abort(fallbackError).catch(() => undefined);
         throw fallbackError;

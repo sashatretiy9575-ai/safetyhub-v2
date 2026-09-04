@@ -4,6 +4,7 @@ import { apiError } from '@/features/auth/api-error';
 import { isSameOriginRequest } from '@/features/auth/request-origin';
 import { requireUser } from '@/features/auth/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getProfileAvatarUrl } from '@/features/profile/server';
 import { createClient } from '@/lib/supabase/server';
 import { AVATAR_HEIGHT, AVATAR_MAX_BYTES, AVATAR_WIDTH } from '@/lib/avatar-image';
 import { validatedStaticWebpDimensions } from '@/lib/security/avatar-webp';
@@ -496,6 +497,32 @@ export async function POST(request: Request) {
         'APP_PRECOMMIT_FAILURE',
       );
     }
+    return apiError(error);
+  }
+}
+
+/**
+ * Streams the signed URL of the caller's own avatar.
+ *
+ * Every authenticated layout used to resolve this on the server: one RPC for
+ * the manifest and one Storage call for the signed URL, both on the critical
+ * path of a decorative header image. Serving it from its own address lets the
+ * page render immediately and the browser fetch the picture in parallel.
+ */
+export async function GET() {
+  try {
+    const auth = await requireUser({ enforceLegal: false });
+    if (!auth.profile.avatar_updated_at) {
+      return NextResponse.json({ error: 'AVATAR_NOT_FOUND' }, { status: 404 });
+    }
+    const signedUrl = await getProfileAvatarUrl(auth.user.id);
+    if (!signedUrl) {
+      return NextResponse.json({ error: 'AVATAR_NOT_FOUND' }, { status: 404 });
+    }
+    const response = NextResponse.redirect(signedUrl, 307);
+    response.headers.set('Cache-Control', 'private, no-store');
+    return response;
+  } catch (error) {
     return apiError(error);
   }
 }

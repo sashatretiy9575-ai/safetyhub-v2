@@ -206,7 +206,7 @@ export function AttestationsFilterForm({
                 pending_identity: 'Ожидает проверки',
                 ready: 'Готов к выдаче',
                 issued: 'Выдан',
-                revoked: 'Отозван',
+                revoked: 'Нужно выдать заново',
               }[values.certificateState]}
               href={removeFilterHref(values, 'certificate')}
             />
@@ -290,7 +290,7 @@ export function AttestationsFilterForm({
               <option value="pending_identity">Ожидает проверки</option>
               <option value="ready">Готов к выдаче</option>
               <option value="issued">Выдан</option>
-              <option value="revoked">Отозван</option>
+              <option value="revoked">Нужно выдать заново</option>
             </select>
           </label>
           <label className="block text-xs font-semibold text-[var(--color-text-muted)]">

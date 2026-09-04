@@ -182,7 +182,7 @@ export function LearningHistoryControl({
             <dd className="font-black tabular-nums">{history.counts.activeCertificates}</dd>
           </div>
           <div>
-            <dt className="text-xs text-[var(--color-text-subtle)]">Отозванные</dt>
+            <dt className="text-xs text-[var(--color-text-subtle)]">Заменённые</dt>
             <dd className="font-black tabular-nums">{history.counts.revokedCertificates}</dd>
           </div>
           <div>
@@ -217,7 +217,7 @@ export function LearningHistoryControl({
           <p className="text-sm text-[var(--color-text-muted)]">
             Попытки: {history?.counts.attempts ?? 0} (незавершённые:{' '}
             {history?.counts.startedAttempts ?? 0}); аттестации: {history?.counts.attestations ?? 0}
-            ; сертификаты: {history?.counts.activeCertificates ?? 0}; отозванные сертификаты:{' '}
+            ; сертификаты: {history?.counts.activeCertificates ?? 0}; заменённые:{' '}
             {history?.counts.revokedCertificates ?? 0}.
           </p>
           <div className="space-y-1">

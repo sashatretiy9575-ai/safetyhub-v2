@@ -14,8 +14,8 @@ test('homepage topics and resources use the shared published content APIs', asyn
 
   assert.match(courses, /await getTopics\(locale\)/);
   assert.doesNotMatch(courses, /const TOPICS =/);
-  assert.match(courses, /getCourseCoverImage\(topic\.slug\)/);
-  assert.match(catalog, /getCourseCoverImage\(topic\.slug\)/);
+  assert.match(courses, /getCourseCoverImage\(topic\.slug, topic\.seo\.ogImage\)/);
+  assert.match(catalog, /getCourseCoverImage\(topic\.slug, topic\.seo\.ogImage\)/);
   assert.doesNotMatch(`${courses}\n${catalog}`, /presentation\?\.thumbnailUrl/);
   for (const slug of [
     'plotnik',

@@ -62,7 +62,6 @@ test('attestation mutations have narrow capability checks and bounded targets', 
   assert.match(route, /requireCapability\(/);
   assert.match(route, /'identity\.manage'/);
   assert.match(route, /'certificate\.issue'/);
-  assert.match(route, /'certificate\.revoke'/);
   assert.match(route, /executeAdminAttestationAction/);
   assert.match(server, /rpc\('execute_admin_attestation_action'/);
   assert.match(route, /max\(ADMIN_ATTESTATION_BULK_LIMIT\)/);
@@ -122,14 +121,17 @@ test('attestation screen is responsive and exposes selection, filters, and confi
   assert.match(manager, /resolvedSelection\.pendingIdentity/);
   assert.match(manager, /resolvedSelection\.ready/);
   assert.match(manager, /resolvedSelection\.exportable/);
-  assert.match(manager, /row\.certificateState === 'issued' && row\.certificateId/);
+  // Export eligibility is still derived from a live certificate on the row.
+  assert.match(manager, /certificateState === 'issued' && Boolean\(row\.certificateId\)/);
   assert.match(manager, /recordIds\.length > 100/);
   assert.match(manager, /\/api\/admin\/attestations\/export-jobs/);
   assert.doesNotMatch(manager, /certificateIds\.length > 100/);
   assert.match(manager, /sticky bottom-/);
   assert.match(manager, /action: 'confirm'/);
   assert.match(manager, /action: 'issue'/);
-  assert.match(manager, /action: 'revoke'/);
+  // Manual revocation is gone from the product; deletion is its own bulk route.
+  assert.doesNotMatch(manager, /action: 'revoke'/);
+  assert.match(manager, /\/api\/admin\/users\/purge/);
   assert.match(manager, /\/api\/admin\/attestations\/export/);
   assert.doesNotMatch(manager, /window\.confirm/);
   assert.doesNotMatch(`${page}\n${manager}`, /количеств[ао] попыт/iu);

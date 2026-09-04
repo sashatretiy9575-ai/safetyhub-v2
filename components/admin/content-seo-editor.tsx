@@ -12,11 +12,17 @@ export function ContentSeoEditor({
   value,
   onChange,
   className,
+  imageLabel = 'Open Graph изображение',
+  imageHint,
 }: {
   idPrefix: string;
   value: ContentSeo;
   onChange: (value: ContentSeo) => void;
   className?: string;
+  /** A course has no cover field of its own, so this image is also its catalog
+   *  cover. Naming it accordingly is the only way an editor can tell. */
+  imageLabel?: string;
+  imageHint?: string;
 }) {
   const update = <Key extends keyof ContentSeo>(key: Key, next: ContentSeo[Key]) => {
     onChange({ ...value, [key]: next });
@@ -61,7 +67,10 @@ export function ContentSeoEditor({
         />
       </div>
       <div className="space-y-1.5 md:col-span-2">
-        <Label htmlFor={`${idPrefix}-og-image`}>Open Graph изображение</Label>
+        <Label htmlFor={`${idPrefix}-og-image`}>{imageLabel}</Label>
+        {imageHint ? (
+          <p className="text-xs text-[var(--color-text-muted)]">{imageHint}</p>
+        ) : null}
         <MediaAssetInput
           id={`${idPrefix}-og-image`}
           value={value.ogImage}

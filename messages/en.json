@@ -458,7 +458,7 @@
     "certificatePendingIdentity": "Awaiting review",
     "certificateReady": "Preparing",
     "certificateIssued": "Issued",
-    "certificateRevoked": "Revoked",
+    "certificateRevoked": "Being reissued",
     "certificateUnavailable": "Unavailable",
     "nextStep": "Next step",
     "testPassed": "Test passed — {score}/{total}",
@@ -678,9 +678,7 @@
     "notFoundTitle": "Document not found",
     "notFoundDescription": "The link is invalid, or the certificate and its related account have been deleted.",
     "verification": "Certificate verification",
-    "revoked": "Certificate revoked",
     "valid": "Certificate valid",
-    "revokedDescription": "The record is authentic, but the certificate is no longer valid.",
     "validDescription": "Authenticity is confirmed by the SafetyHub.kz record.",
     "participant": "Participant",
     "program": "Programme",
@@ -688,7 +686,6 @@
     "score": "{score} of {total}",
     "issuedAt": "Issue date",
     "number": "Number",
-    "revokedAt": "Revoked",
     "compareHint": "Compare the name, programme, result and number with the PDF. Editing a document does not change this server record."
   },
   "LegalFlow": {

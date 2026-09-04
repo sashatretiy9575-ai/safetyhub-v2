@@ -12,7 +12,7 @@ export type AttestationDialogConfig = {
   confirmLabel: string;
   tone?: 'primary' | 'danger';
   input?: { label: string; initialValue?: string; placeholder?: string };
-  reason?: boolean;
+  reason?: { label: string; minLength: number; placeholder?: string };
   confirmationPhrase?: string;
 };
 
@@ -100,16 +100,18 @@ export function AttestationsActionDialog({
             ) : null}
             {config.reason ? (
               <div className="space-y-2">
-                <Label htmlFor={`${titleId}-reason`}>Причина отзыва</Label>
+                <Label htmlFor={`${titleId}-reason`}>{config.reason.label}</Label>
                 <Textarea
                   id={`${titleId}-reason`}
                   value={reason}
                   onChange={(event) => setReason(event.target.value)}
-                  minLength={3}
+                  minLength={config.reason.minLength}
                   maxLength={500}
                   required
                   autoFocus
-                  placeholder="Укажите причину для журнала аудита"
+                  placeholder={
+                    config.reason.placeholder ?? 'Укажите причину для журнала действий'
+                  }
                 />
               </div>
             ) : null}

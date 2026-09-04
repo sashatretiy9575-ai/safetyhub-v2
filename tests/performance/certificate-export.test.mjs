@@ -236,13 +236,13 @@ test('streaming ZIP builder preserves Unicode names and rejects traversal', asyn
 
 test('streaming ZIP rejects oversized individual and cumulative output', async () => {
   await assert.rejects(
-    createZipArchive([{ name: 'report.pdf', bytes: new Uint8Array(4 * 1024 * 1024 + 1) }]),
+    createZipArchive([{ name: 'report.pdf', bytes: new Uint8Array(16 * 1024 * 1024 + 1) }]),
     /CERTIFICATE_ARCHIVE_BYTES_INVALID/,
   );
 
   const source = await read('lib/pdf/certificate-archive.ts');
   assert.match(source, /MAX_ARCHIVE_ENTRIES = 501/);
-  assert.match(source, /MAX_ARCHIVE_TOTAL_BYTES = 160 \* 1024 \* 1024/);
+  assert.match(source, /MAX_ARCHIVE_TOTAL_BYTES = 512 \* 1024 \* 1024/);
   assert.match(source, /totalBytes \+ bytes\.byteLength > MAX_ARCHIVE_TOTAL_BYTES/);
 });
 

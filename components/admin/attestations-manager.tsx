@@ -12,6 +12,7 @@ import type {
   AdminAttestationSelection,
   AdminAttestationMutationItem,
 } from '@/features/admin/types';
+import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import {
   assertCertificateExportMetadata,
@@ -72,6 +73,36 @@ type CertificateExportJob = {
   expiresAt: string;
   downloadUrl: string;
 };
+
+/**
+ * Machine skip codes from the database, in the words an operator can act on.
+ *
+ * The previous mapping collapsed every code into one of four vague phrases, and
+ * "состояние изменилось" swallowed the two codes that actually explain a failed
+ * reissue. An unrecognised code is now shown verbatim instead of being hidden.
+ */
+const SKIP_REASON_LABELS: Record<string, string> = {
+  IDENTITY_NOT_VERIFIED: 'данные сотрудника не подтверждены',
+  ATTESTATION_NOT_ELIGIBLE: 'тест не сдан на проходной балл',
+  ATTESTATION_NOT_FOUND: 'результат теста больше не существует',
+  ACCOUNT_UNAVAILABLE: 'аккаунт недоступен',
+  ACTIVE_CERTIFICATE_EXISTS: 'действующий сертификат уже выдан',
+  CERTIFICATE_LOCALIZATION_NOT_FOUND:
+    'у курса нет версии на языке, на котором сдавали тест — переопубликуйте курс',
+  CERTIFICATE_NOT_FOUND: 'сертификат не найден',
+  ACCOUNT_SUSPENDED: 'аккаунт заблокирован',
+  ACCOUNT_DELETION_REQUESTED: 'сотрудник помечен на удаление — восстановить его нельзя',
+  CANNOT_DELETE_SELF: 'нельзя удалить собственный аккаунт',
+  ACCOUNT_HAS_PENDING_AUTH_OPERATIONS:
+    'по аккаунту не завершена служебная операция — повторите через минуту',
+  LAST_ACTIVE_SUPERADMIN_PROTECTED: 'нельзя удалить последнего администратора',
+  OPERATION_SKIPPED: 'состояние строки изменилось до выполнения',
+};
+
+function skipReasonLabel(code: string | null | undefined) {
+  if (!code) return SKIP_REASON_LABELS.OPERATION_SKIPPED as string;
+  return SKIP_REASON_LABELS[code] ?? `код ${code}`;
+}
 
 function organizationGroupKey(value: string) {
   return value.normalize('NFC').trim().replace(/\s+/gu, ' ').toLocaleLowerCase('ru-RU');
@@ -172,6 +203,7 @@ export function AttestationsManager({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [messageReasons, setMessageReasons] = useState<Array<[string, number]>>([]);
   const [exportProgress, setExportProgress] = useState<{ completed: number; total: number } | null>(
     null,
   );
@@ -182,6 +214,7 @@ export function AttestationsManager({
   const bulkActionsPanelRef = useRef<HTMLElement>(null);
   const closeBulkActions = useCallback(() => setBulkActionsOpen(false), []);
   const idempotencyKeyRef = useRef('');
+  const purgeKeysRef = useRef<string[]>([]);
   const exportAbortRef = useRef<AbortController | null>(null);
   useEffect(() => {
     setClientReady(true);
@@ -205,18 +238,13 @@ export function AttestationsManager({
     [page.items, selected],
   );
   const selectedCount = resolvedSelection?.total ?? selected.size;
-  const userIds =
-    resolvedSelection?.userIds ??
-    unique(selectedRows.filter((row) => !row.courseDeleted).map((row) => row.userId));
+  // A row whose course was deleted still belongs to a real person, and deleting
+  // that person is exactly what an operator expects the checkbox to cover.
+  const userIds = resolvedSelection?.userIds ?? unique(selectedRows.map((row) => row.userId));
   const recordIds = resolvedSelection?.recordIds ?? selectedRows.map((row) => row.recordId);
   const attestationIds =
     resolvedSelection?.attestationIds ??
     selectedRows.flatMap((row) => (row.attestationId ? [row.attestationId] : []));
-  const certificateIds =
-    resolvedSelection?.certificateIds ??
-    selectedRows.flatMap((row) =>
-      row.certificateState === 'issued' && row.certificateId ? [row.certificateId] : [],
-    );
   const selectionSummary = useMemo<AttestationSelectionSummary>(() => {
     if (resolvedSelection) {
       return {
@@ -336,6 +364,7 @@ export function AttestationsManager({
     setSelected(new Set());
     setResolvedSelection(null);
     setMessage('');
+    setMessageReasons([]);
     setBulkActionsOpen(false);
   };
 
@@ -389,22 +418,17 @@ export function AttestationsManager({
         confirmLabel: `Выдать ${selectionSummary.readyToIssue}`,
       };
     }
-    if (pending.kind === 'revoke')
-      return {
-        title: 'Отозвать сертификаты',
-        description: `Будет обработано ${selectionSummary.issued} действующих сертификатов. После отзыва они исчезнут из кабинетов пользователей, а причина и идентификатор операции попадут в историю действий.`,
-        confirmLabel: `Отозвать ${selectionSummary.issued}`,
-        tone: 'danger',
-        reason: true,
-        confirmationPhrase:
-          selectionSummary.issued >= 20 ? `ОТОЗВАТЬ ${selectionSummary.issued}` : undefined,
-      };
     if (pending.kind === 'bulk-delete') {
       return {
-        title: 'Удалить пользователей',
-        description: `Выбрано пользователей для удаления: ${selectionSummary.people}. Все связанные данные, попытки и профили будут удалены. Это действие необратимо.`,
-        confirmLabel: `Удалить ${selectionSummary.people} пользователей`,
+        title: 'Удалить сотрудников',
+        description: `Будет удалено человек: ${selectionSummary.people}. Аккаунт, профиль, попытки, аттестации и сертификаты стираются сразу и безвозвратно; человек больше не сможет войти и исчезнет из всех списков.`,
+        confirmLabel: `Удалить ${selectionSummary.people} чел.`,
         tone: 'danger',
+        reason: {
+          label: 'Причина удаления (останется в истории действий)',
+          minLength: 10,
+          placeholder: 'Например: уволен, данные удалены по заявлению',
+        },
         confirmationPhrase:
           selectionSummary.people >= 5 ? `УДАЛИТЬ ${selectionSummary.people}` : undefined,
       };
@@ -422,34 +446,93 @@ export function AttestationsManager({
   ) => {
     const completed = items.filter((item) => item.status === 'completed').length;
     const already = items.filter((item) => item.status === 'already_completed').length;
-    const skipped = items.filter((item) => item.status === 'skipped').length;
+    const skipped = items.filter((item) => item.status === 'skipped');
     const actionLabel = {
       confirm: 'Данные подтверждены',
       'bulk-update': 'Данные обновлены',
       'individual-update': 'Данные обновлены',
-      issue: 'Готово: сертификаты выданы',
-      revoke: 'Готово: сертификаты отозваны',
+      issue: 'Сертификаты выданы',
       export: 'Архив сформирован',
-      'bulk-delete': 'Пользователи удалены',
+      'bulk-delete': 'Сотрудники удалены',
     }[kind];
-    const reasons = items
-      .filter((item) => item.status === 'skipped' && item.reason)
-      .reduce<Record<string, number>>((result, item) => {
-        const code = item.reason ?? 'STATE_CHANGED';
-        const label = /IDENTITY|pending_identity/u.test(code)
-          ? 'данные не подтверждены'
-          : /ELIGIBLE|PASS|not_eligible/u.test(code)
-            ? 'тест не сдан'
-            : /ACCOUNT|SUSPEND|DELETION/u.test(code)
-              ? 'аккаунт недоступен'
-              : 'состояние изменилось';
-        result[label] = (result[label] ?? 0) + 1;
-        return result;
-      }, {});
-    const reasonText = Object.entries(reasons)
-      .map(([label, count]) => `${count} — ${label}`)
-      .join('; ');
-    return `${actionLabel}: ${completed}. Без изменений: ${already}. Пропущено: ${skipped}.${reasonText ? ` Причины: ${reasonText}.` : ''}`;
+    const reasons = skipped.reduce<Record<string, number>>((result, item) => {
+      const label = skipReasonLabel(item.reason);
+      result[label] = (result[label] ?? 0) + 1;
+      return result;
+    }, {});
+    const headline = `${actionLabel}: ${completed}.${already > 0 ? ` Уже были в нужном состоянии: ${already}.` : ''}${
+      skipped.length > 0 ? ` Пропущено: ${skipped.length}.` : ''
+    }`;
+    return { headline, reasons: Object.entries(reasons) };
+  };
+
+  /**
+   * Deletes every selected person in as few requests as the endpoint allows.
+   *
+   * The previous implementation sent one DELETE per person. The `admin.delete`
+   * quota is 10 requests per five minutes, so from the eleventh person on every
+   * request came back 429 and the panel reported them as nameless "Ошибок: N"
+   * while claiming the rest had been deleted.
+   */
+  const purgeSelectedUsers = async (reason: string) => {
+    if (userIds.length === 0) return;
+    setBusy(true);
+    setError('');
+    const chunks: string[][] = [];
+    for (let offset = 0; offset < userIds.length; offset += ADMIN_PURGE_BULK_LIMIT) {
+      chunks.push(userIds.slice(offset, offset + ADMIN_PURGE_BULK_LIMIT));
+    }
+    // One stable key per chunk, so a retry of the same click replays instead of
+    // deleting twice.
+    if (purgeKeysRef.current.length !== chunks.length) {
+      purgeKeysRef.current = chunks.map(() => crypto.randomUUID());
+    }
+    const items: AdminAttestationMutationItem[] = [];
+    try {
+      for (const [index, chunk] of chunks.entries()) {
+        const result = await clientRequest(
+          '/api/admin/users/purge',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userIds: chunk,
+              reason,
+              confirmation: 'УДАЛИТЬ',
+              idempotencyKey: purgeKeysRef.current[index],
+            }),
+          },
+          { timeoutMs: 120_000 },
+        );
+        const payload = await readClientResponseJson<{
+          error?: string;
+          items?: AdminAttestationMutationItem[];
+        }>(result.response);
+        if (!result.ok || !payload?.items) {
+          const fallback =
+            payload?.error === 'LAST_ACTIVE_ADMIN_PROTECTED'
+              ? 'Нельзя удалить последнего администратора.'
+              : payload?.error === 'CANNOT_DELETE_SELF'
+                ? 'Нельзя удалить собственный аккаунт.'
+                : 'Удаление не выполнено. Обновите страницу и проверьте список.';
+          setError(result.ok ? fallback : clientRequestMessage(result.error, fallback));
+          return;
+        }
+        items.push(...payload.items);
+      }
+      const summary = mutationSummary(items, 'bulk-delete');
+      purgeKeysRef.current = [];
+      setPending(null);
+      setDetail(null);
+      clearSelection();
+      setMessage(summary.headline);
+      setMessageReasons(summary.reasons);
+      router.refresh();
+    } catch (requestError) {
+      setError(clientRequestMessage(requestError, 'Удаление не выполнено.'));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const confirmAction = async ({ value, reason }: { value: string; reason: string }) => {
@@ -460,30 +543,7 @@ export function AttestationsManager({
       return;
     }
     if (pending.kind === 'bulk-delete') {
-      setBusy(true);
-      setError('');
-      try {
-        let deleted = 0;
-        let failed = 0;
-        for (const targetUserId of userIds) {
-          const res = await clientRequest(`/api/admin/users/${targetUserId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reason: reason || 'Массовое удаление пользователей администратором' }),
-          });
-          if (res.ok) deleted++;
-          else failed++;
-        }
-        setPending(null);
-        setDetail(null);
-        clearSelection();
-        setMessage(`Удалено пользователей: ${deleted}.${failed > 0 ? ` Ошибок: ${failed}.` : ''}`);
-        router.refresh();
-      } catch {
-        setError('Не удалось удалить пользователей.');
-      } finally {
-        setBusy(false);
-      }
+      await purgeSelectedUsers(reason);
       return;
     }
     setBusy(true);
@@ -504,9 +564,7 @@ export function AttestationsManager({
                 value,
                 idempotencyKey,
               }
-            : pending.kind === 'issue'
-              ? { action: 'issue', attestationIds, idempotencyKey }
-              : { action: 'revoke', certificateIds, reason, idempotencyKey };
+            : { action: 'issue', attestationIds, idempotencyKey };
     try {
       const result = await clientRequest('/api/admin/attestations/actions', {
         method: 'POST',
@@ -529,7 +587,8 @@ export function AttestationsManager({
       setPending(null);
       setDetail(null);
       clearSelection();
-      setMessage(summary);
+      setMessage(summary.headline);
+      setMessageReasons(summary.reasons);
       router.refresh();
     } catch (requestError) {
       setError(clientRequestMessage(requestError, 'Операция не выполнена.'));
@@ -546,9 +605,16 @@ export function AttestationsManager({
     setExportProgress({ completed: 0, total: selectionSummary.exportable });
     setMessage('Получаем данные сертификатов. PDF и ZIP будут сформированы только в браузере…');
     try {
-      const fileHandle = await requestCertificateArchiveFileHandle(
-        `safetyhub-certificates-${new Date().toISOString().slice(0, 10)}.zip`,
-      );
+      // `showSaveFilePicker` creates the .zip on disk before a single
+      // certificate is rendered, so any later failure leaves a 0-byte file that
+      // Windows reports as a damaged archive. Small exports therefore stay on
+      // the buffered path, which only ever hands over a finished blob.
+      const fileHandle =
+        recordIds.length > 100
+          ? await requestCertificateArchiveFileHandle(
+              `safetyhub-certificates-${new Date().toISOString().slice(0, 10)}.zip`,
+            )
+          : null;
       let metadataResponse: Response | undefined;
       if (recordIds.length > 100) {
         const jobResult = await clientRequest(
@@ -644,9 +710,21 @@ export function AttestationsManager({
       />
 
       {message ? (
-        <p role="status" className="rounded-xl bg-[var(--color-primary-soft)] px-4 py-3 text-sm">
-          {message}
-        </p>
+        <div role="status" className="rounded-xl bg-[var(--color-primary-soft)] px-4 py-3 text-sm">
+          <p>{message}</p>
+          {messageReasons.length > 0 ? (
+            <>
+              <p className="mt-2 font-bold">Почему пропущено:</p>
+              <ul className="mt-1 list-disc space-y-0.5 pl-5">
+                {messageReasons.map(([label, count]) => (
+                  <li key={label}>
+                    {count} — {label}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+        </div>
       ) : null}
 
       {exportProgress ? (
@@ -936,6 +1014,7 @@ export function AttestationsManager({
       <AttestationDetailDrawer
         row={detail}
         permissions={permissions}
+        onAction={(row, action) => openSingleAction(row, action)}
         onClose={() => setDetail(null)}
         onSaved={(row, fields: AttestationIdentityFields) => {
           setDetail((current) =>

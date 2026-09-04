@@ -73,7 +73,8 @@ type ReadRpcClient = {
       | 'list_admin_access_users_page'
       | 'list_admin_access_outbox_page'
       | 'list_pending_account_approval_page'
-      | 'list_learning_history_targets_page',
+      | 'list_learning_history_targets_page'
+      | 'list_admin_operators_page',
     args?: Record<string, unknown>,
   ): PromiseLike<{ data: unknown; error: { code?: string; message?: string } | null }>;
 };
@@ -140,6 +141,22 @@ const adminUserListItemSchema = z
       [profile?.name, profile?.surname].filter(Boolean).join(' ').trim() ||
       ANONYMOUS_ACCOUNT_LABEL,
   }));
+
+const adminOperatorSchema = z
+  .object({
+    id: z.string().uuid(),
+    email: z.string().nullable(),
+    label: z.string().nullish(),
+    createdAt: isoDateSchema,
+    isSelf: z.boolean(),
+    protected: z.boolean(),
+  })
+  .transform(({ label, ...operator }) => ({
+    ...operator,
+    label: label?.trim() || ANONYMOUS_ACCOUNT_LABEL,
+  }));
+
+export type AdminOperator = z.infer<typeof adminOperatorSchema>;
 
 const learningHistoryTargetSchema = z
   .object({
@@ -355,6 +372,21 @@ export function parseAdminAccountApprovalQuery(
   return { cursorAt: cursor.at, cursorId: cursor.id };
 }
 
+export type AdminOperatorQuery = {
+  query: string;
+  cursorAt: string | null;
+  cursorId: string | null;
+};
+
+export function parseAdminOperatorQuery(params: RawAdminSearchParams): AdminOperatorQuery {
+  const cursor = pairedCursor(cursorDate(params), uuidCursor(params));
+  return {
+    query: boundedText(params, 'q'),
+    cursorAt: cursor.at,
+    cursorId: cursor.id,
+  };
+}
+
 export function parseLearningHistoryTargetQuery(
   params: RawAdminSearchParams,
 ): LearningHistoryTargetQuery {
@@ -427,6 +459,23 @@ export async function getLearningHistoryTargetsPage(
       p_cursor_id: query.cursorId,
     });
     return { state: 'ready', data: pageEnvelope(learningHistoryTargetSchema).parse(data) };
+  } catch (error) {
+    return loadFailure(error);
+  }
+}
+
+export async function getAdminOperatorsPage(
+  query: AdminOperatorQuery,
+): Promise<AdminDataResult<AdminPage<AdminOperator>>> {
+  await requireCapability('role.manage');
+  try {
+    const data = await readRpc('list_admin_operators_page', {
+      p_limit: ADMIN_PAGE_SIZE,
+      p_query: query.query || null,
+      p_cursor_created_at: query.cursorAt,
+      p_cursor_id: query.cursorId,
+    });
+    return { state: 'ready', data: pageEnvelope(adminOperatorSchema).parse(data) };
   } catch (error) {
     return loadFailure(error);
   }

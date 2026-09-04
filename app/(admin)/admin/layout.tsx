@@ -19,7 +19,6 @@ import { UserMenu } from '@/components/shared/user-menu';
 import { Container } from '@/components/ui/container';
 import { AuthenticationError, requireAnyCapability } from '@/features/auth/server';
 import { ADMIN_CAPABILITIES } from '@/lib/security/capabilities';
-import { getProfileAvatarUrl } from '@/features/profile/server';
 import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -47,9 +46,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ];
 
   const fullName = `${actor.profile.name ?? ''} ${actor.profile.surname ?? ''}`.trim() || undefined;
-  const avatarUrl = actor.profile.avatar_updated_at
-    ? await getProfileAvatarUrl(actor.user.id)
-    : null;
+  // The header picture is served from its own address instead of a signed URL
+  // resolved here: two Supabase round-trips used to sit on the critical path of
+  // every admin navigation for a decorative avatar.
+  const avatarUrl = actor.profile.avatar_updated_at ? '/api/profile/avatar' : null;
   const notificationsEnabled =
     rolloutFeatureEnabled('adminInbox') && actor.capabilities.includes('audit.read');
 

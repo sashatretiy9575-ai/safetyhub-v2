@@ -41,8 +41,9 @@ function certificateLabel(state: ProfileAttestation['certificateState'], t: Prof
 
 function certificateVariant(state: ProfileAttestation['certificateState']): BadgeProps['variant'] {
   if (state === 'issued') return 'success';
-  if (state === 'pending_identity' || state === 'ready') return 'warning';
-  if (state === 'revoked') return 'danger';
+  // `revoked` means the document is being replaced, not that the learner did
+  // something wrong, so it reads as pending rather than as an error.
+  if (state === 'pending_identity' || state === 'ready' || state === 'revoked') return 'warning';
   return 'outline';
 }
 

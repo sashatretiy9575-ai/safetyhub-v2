@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Buildings } from '@phosphor-icons/react/dist/csr/Buildings';
+import { Certificate } from '@phosphor-icons/react/dist/csr/Certificate';
 import { CheckCircle } from '@phosphor-icons/react/dist/csr/CheckCircle';
 import { DotsThree } from '@phosphor-icons/react/dist/csr/DotsThree';
 import { DownloadSimple } from '@phosphor-icons/react/dist/csr/DownloadSimple';
@@ -32,9 +33,9 @@ export type AttestationPermissions = {
   canReadCertificate: boolean;
   canManageIdentity: boolean;
   canIssue: boolean;
-  canRevoke: boolean;
   canExport: boolean;
   canDeleteHistory: boolean;
+  canDeleteUser: boolean;
 };
 
 type CertificateHistoryItem = {
@@ -56,7 +57,6 @@ export type AttestationPendingAction =
       field: 'name' | 'surname' | 'job' | 'organization';
     }
   | { kind: 'issue' }
-  | { kind: 'revoke' }
   | { kind: 'export' }
   | { kind: 'bulk-delete' };
 
@@ -73,7 +73,9 @@ const identityLabels: Record<AdminAttestationRow['identityState'], string> = {
   pending: 'Ожидает проверки',
   verified: 'Подтверждено',
   changed: 'Данные изменены',
-  revoked: 'Подтверждение отозвано',
+  // The stored value is still `revoked`, but revocation is no longer a product
+  // concept: for an operator this state simply means "check the data again".
+  revoked: 'Нужна повторная проверка',
 };
 
 const certificateLabels: Record<AdminAttestationRow['certificateState'], string> = {
@@ -81,7 +83,7 @@ const certificateLabels: Record<AdminAttestationRow['certificateState'], string>
   pending_identity: 'Ожидает проверки',
   ready: 'Готов к выдаче',
   issued: 'Выдан',
-  revoked: 'Отозван',
+  revoked: 'Нужно выдать заново',
 };
 
 export const attestationFieldLabels = {
@@ -100,15 +102,15 @@ export type AttestationIdentityFields = {
 
 function identityVariant(state: AdminAttestationRow['identityState']): BadgeProps['variant'] {
   if (state === 'verified') return 'success';
-  if (state === 'changed') return 'warning';
-  if (state === 'revoked') return 'danger';
+  if (state === 'changed' || state === 'revoked') return 'warning';
   return 'outline';
 }
 
 function certificateVariant(state: AdminAttestationRow['certificateState']): BadgeProps['variant'] {
   if (state === 'issued') return 'success';
   if (state === 'ready') return 'primary';
-  if (state === 'revoked' || state === 'not_eligible') return 'danger';
+  if (state === 'not_eligible') return 'danger';
+  // `revoked` now reads as "reissue needed", which is an action, not a failure.
   return 'warning';
 }
 
@@ -163,6 +165,34 @@ function ProfileAvatar({
   );
 }
 
+/**
+ * The single most useful action for a row, derived from its state.
+ *
+ * Operators had to work out which of "confirm", "issue" and "fix data" applied
+ * to a given person by reading two badges. The row, the card and the bulk panel
+ * now all agree on one answer.
+ */
+export function nextAttestationStep(
+  row: AdminAttestationRow,
+  permissions: AttestationPermissions,
+): { label: string; action: AttestationPendingAction } | null {
+  if (row.courseDeleted) return null;
+  if (row.certificateState === 'not_eligible') return null;
+  if (row.identityState !== 'verified' && permissions.canManageIdentity) {
+    return { label: 'Проверить и подтвердить данные', action: { kind: 'confirm' } };
+  }
+  if (
+    permissions.canIssue &&
+    (row.certificateState === 'ready' || row.certificateState === 'revoked')
+  ) {
+    return {
+      label: row.certificateState === 'revoked' ? 'Выдать сертификат заново' : 'Выдать сертификат',
+      action: { kind: 'issue' },
+    };
+  }
+  return null;
+}
+
 export function AttestationRowActions({
   row,
   permissions,
@@ -174,6 +204,7 @@ export function AttestationRowActions({
   openDetails: () => void;
   openAction: (action: AttestationPendingAction) => void;
 }) {
+  const nextStep = nextAttestationStep(row, permissions);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -181,34 +212,43 @@ export function AttestationRowActions({
           <DotsThree size={22} weight="bold" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem onSelect={openDetails}>Открыть сведения</DropdownMenuItem>
-        {permissions.canManageIdentity && !row.courseDeleted ? (
+      <DropdownMenuContent align="end" className="w-64">
+        {nextStep ? (
           <>
+            <DropdownMenuItem onSelect={() => openAction(nextStep.action)}>
+              {nextStep.label}
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={openDetails}>Исправить данные</DropdownMenuItem>
           </>
         ) : null}
-        {permissions.canIssue &&
-        !row.courseDeleted &&
-        (row.certificateState === 'ready' || row.certificateState === 'revoked') ? (
-          <DropdownMenuItem onSelect={() => openAction({ kind: 'issue' })}>
-            {row.certificateState === 'revoked' ? 'Выдать повторно' : 'Выдать сертификат'}
-          </DropdownMenuItem>
+        <DropdownMenuItem onSelect={openDetails}>Открыть карточку сотрудника</DropdownMenuItem>
+        {permissions.canManageIdentity && !row.courseDeleted ? (
+          <DropdownMenuItem onSelect={openDetails}>Исправить имя, должность, компанию</DropdownMenuItem>
         ) : null}
-        {permissions.canRevoke && row.certificateId && row.certificateState === 'issued' ? (
-          <DropdownMenuItem
-            className="text-[var(--color-danger)]"
-            onSelect={() => openAction({ kind: 'revoke' })}
-          >
-            Отозвать сертификат
-          </DropdownMenuItem>
+        {permissions.canDeleteUser ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-[var(--color-danger)]"
+              onSelect={() => openAction({ kind: 'bulk-delete' })}
+            >
+              Удалить сотрудника и все его данные
+            </DropdownMenuItem>
+          </>
         ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
+/**
+ * Bulk actions.
+ *
+ * Every label used to be a bare counter ("Выдать 3"), which said nothing about
+ * what the button does or why the number differs from the selection. Each
+ * action now names itself and states, underneath, how much of the selection it
+ * will actually touch.
+ */
 export function AttestationBulkActionButtons({
   summary,
   permissions,
@@ -224,76 +264,116 @@ export function AttestationBulkActionButtons({
   onClear: () => void;
   compact?: boolean;
 }) {
-  const issueLabel = `Выдать ${summary.readyToIssue}`;
-  const confirmLabel = `Подтвердить ${summary.pendingIdentity}`;
+  const scope = (applicable: number, unit: 'people' | 'rows') =>
+    applicable === 0
+      ? 'Нет подходящих строк в выделении'
+      : `${applicable} из ${unit === 'people' ? summary.people : summary.total} ${
+          unit === 'people' ? 'выбранных человек' : 'выбранных строк'
+        }`;
+
+  const primary: Array<{
+    key: string;
+    label: string;
+    hint: string;
+    icon: React.ReactNode;
+    disabled: boolean;
+    variant: 'primary' | 'outline';
+    action: AttestationPendingAction;
+  }> = [];
+
+  if (permissions.canManageIdentity) {
+    primary.push({
+      key: 'confirm',
+      label: 'Подтвердить данные',
+      hint: scope(summary.pendingIdentity, 'people'),
+      icon: <CheckCircle />,
+      disabled: summary.pendingIdentity === 0,
+      variant: 'outline',
+      action: { kind: 'confirm' },
+    });
+  }
+  if (permissions.canIssue) {
+    primary.push({
+      key: 'issue',
+      label: 'Выдать сертификаты',
+      hint: scope(summary.readyToIssue, 'rows'),
+      icon: <Certificate />,
+      disabled: summary.readyToIssue === 0,
+      variant: 'primary',
+      action: { kind: 'issue' },
+    });
+  }
+  if (permissions.canExport) {
+    primary.push({
+      key: 'export',
+      label: 'Скачать пакет документов',
+      hint:
+        summary.exportable === 0
+          ? 'Только сводный отчёт: действующих сертификатов нет'
+          : `${summary.exportable} PDF + сводный отчёт`,
+      icon: <DownloadSimple />,
+      disabled: busy,
+      variant: 'outline',
+      action: { kind: 'export' },
+    });
+  }
 
   return (
-    <div className={compact ? 'grid gap-2' : 'flex flex-wrap items-center gap-2'}>
-      {permissions.canManageIdentity ? (
-        <>
-          <Button
-            size={compact ? 'md' : 'sm'}
-            variant="outline"
-            disabled={summary.pendingIdentity === 0}
-            onClick={() => onAction({ kind: 'confirm' })}
-            className={compact ? 'w-full justify-start' : undefined}
-          >
-            <CheckCircle /> {confirmLabel}
-          </Button>
-          <Button
-            size={compact ? 'md' : 'sm'}
-            variant="outline"
-            disabled={summary.people === 0}
-            onClick={() => onAction({ kind: 'bulk-update', field: 'organization' })}
-            className={compact ? 'w-full justify-start' : undefined}
-          >
-            <Buildings /> Изменить компанию ({summary.people})
-          </Button>
-        </>
-      ) : null}
-      {permissions.canIssue ? (
+    <div className={compact ? 'grid gap-2' : 'flex flex-wrap items-stretch gap-2'}>
+      {primary.map((item) => (
         <Button
+          key={item.key}
           size={compact ? 'md' : 'sm'}
-          disabled={summary.readyToIssue === 0}
-          onClick={() => onAction({ kind: 'issue' })}
-          className={compact ? 'w-full justify-start' : undefined}
+          variant={item.variant}
+          disabled={item.disabled}
+          onClick={() => onAction(item.action)}
+          className={`h-auto flex-col items-start gap-0.5 py-2 text-left ${
+            compact ? 'w-full' : ''
+          }`}
         >
-          {issueLabel}
+          <span className="flex items-center gap-2 font-bold">
+            {item.icon} {item.label}
+          </span>
+          <span className="text-[11px] font-normal opacity-80">{item.hint}</span>
         </Button>
+      ))}
+
+      {permissions.canManageIdentity || permissions.canDeleteUser ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size={compact ? 'md' : 'sm'}
+              variant="ghost"
+              className={compact ? 'w-full justify-start' : undefined}
+            >
+              <DotsThree size={20} weight="bold" /> Ещё
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-72">
+            {permissions.canManageIdentity ? (
+              <DropdownMenuItem
+                disabled={summary.people === 0}
+                onSelect={() => onAction({ kind: 'bulk-update', field: 'organization' })}
+              >
+                <Buildings /> Переименовать компанию у {summary.people} чел.
+              </DropdownMenuItem>
+            ) : null}
+            {permissions.canDeleteUser ? (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  disabled={summary.people === 0}
+                  className="text-[var(--color-danger)]"
+                  onSelect={() => onAction({ kind: 'bulk-delete' })}
+                >
+                  <Trash /> Удалить {summary.people} чел. со всеми данными
+                </DropdownMenuItem>
+              </>
+            ) : null}
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : null}
-      {permissions.canRevoke ? (
-        <Button
-          size={compact ? 'md' : 'sm'}
-          variant="danger"
-          disabled={summary.issued === 0}
-          onClick={() => onAction({ kind: 'revoke' })}
-          className={compact ? 'w-full justify-start' : undefined}
-        >
-          Отозвать {summary.issued}
-        </Button>
-      ) : null}
-      {permissions.canManageIdentity || permissions.canDeleteHistory ? (
-        <Button
-          size={compact ? 'md' : 'sm'}
-          variant="danger"
-          disabled={summary.people === 0}
-          onClick={() => onAction({ kind: 'bulk-delete' })}
-          className={compact ? 'w-full justify-start' : undefined}
-        >
-          <Trash /> Удалить пользователей ({summary.people})
-        </Button>
-      ) : null}
-      {permissions.canExport ? (
-        <Button
-          size={compact ? 'md' : 'sm'}
-          variant="outline"
-          disabled={busy}
-          onClick={() => onAction({ kind: 'export' })}
-          className={compact ? 'w-full justify-start' : undefined}
-        >
-          <DownloadSimple /> ZIP ({summary.exportable})
-        </Button>
-      ) : null}
+
       <Button
         size={compact ? 'md' : 'sm'}
         variant="ghost"
@@ -426,12 +506,14 @@ export function AttestationDetailDrawer({
   onClose,
   onSaved,
   onHistoryDeleted,
+  onAction,
 }: {
   row: AdminAttestationRow | null;
   permissions: AttestationPermissions;
   onClose: () => void;
   onSaved: (row: AdminAttestationRow, fields: AttestationIdentityFields) => void;
   onHistoryDeleted: () => void;
+  onAction: (row: AdminAttestationRow, action: AttestationPendingAction) => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [history, setHistory] = useState<
@@ -515,6 +597,22 @@ export function AttestationDetailDrawer({
             </Button>
           </header>
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
+            {/* One obvious next step, so the card answers "what do I do with
+                this person?" before any of the reference data. */}
+            {(() => {
+              const nextStep = nextAttestationStep(row, permissions);
+              if (!nextStep) return null;
+              return (
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={() => onAction(row, nextStep.action)}
+                >
+                  {nextStep.label}
+                </Button>
+              );
+            })()}
+
             <div className="flex items-center gap-3 rounded-xl bg-[var(--color-surface-muted)] p-3">
               <ProfileAvatar row={row} canReadIdentity={permissions.canReadIdentity} />
               <dl className="min-w-0 space-y-2 text-sm">

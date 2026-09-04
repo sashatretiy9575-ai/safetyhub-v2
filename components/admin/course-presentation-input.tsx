@@ -188,6 +188,10 @@ export function CoursePresentationInput({
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [pendingFinalize, setPendingFinalize] = useState<PendingFinalize | null>(null);
+  // The thumbnail route answers 404/503 for a presentation whose bytes are not
+  // reconciled yet. Without this the editor showed a blank grey box and no
+  // explanation for a file that had, in fact, uploaded fine.
+  const [thumbnailFailed, setThumbnailFailed] = useState(false);
 
   const finalizePresentation = async (pending: PendingFinalize) => {
     if (!courseId) throw new PresentationFinalizeError('PRESENTATION_NOT_READY', false);
@@ -356,7 +360,7 @@ export function CoursePresentationInput({
       ) : null}
       {value ? (
         <div className="flex flex-col gap-4 rounded-xl border border-[var(--color-border)] p-4 sm:flex-row sm:items-center">
-          {courseId ? (
+          {courseId && !thumbnailFailed ? (
             // The same-origin route checks the administrator capability and
             // streams the private bytes with no-store. Immutable Storage paths
             // never enter this browser bundle as public or signed URLs.
@@ -369,8 +373,16 @@ export function CoursePresentationInput({
               loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"
+              onError={() => setThumbnailFailed(true)}
               className="aspect-video w-full rounded-lg bg-slate-100 object-cover sm:w-48"
             />
+          ) : courseId ? (
+            <div className="grid aspect-video w-full place-items-center gap-1 rounded-lg bg-[var(--color-surface-muted)] p-3 text-center sm:w-48">
+              <FilePdf size={32} aria-hidden="true" />
+              <span className="text-[11px] leading-tight text-[var(--color-text-muted)]">
+                Файл загружен, но превью первой страницы пока недоступно
+              </span>
+            </div>
           ) : (
             <FilePdf size={48} aria-hidden="true" />
           )}

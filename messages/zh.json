@@ -458,7 +458,7 @@
     "certificatePendingIdentity": "等待审核",
     "certificateReady": "准备中",
     "certificateIssued": "已签发",
-    "certificateRevoked": "已撤销",
+    "certificateRevoked": "正在重新签发",
     "certificateUnavailable": "不可用",
     "nextStep": "下一步",
     "testPassed": "测试已通过 — {score}/{total}",
@@ -678,9 +678,7 @@
     "notFoundTitle": "未找到文件",
     "notFoundDescription": "链接无效，或证书及关联账户已删除。",
     "verification": "证书验证",
-    "revoked": "证书已撤销",
     "valid": "证书有效",
-    "revokedDescription": "记录真实，但证书已不再有效。",
     "validDescription": "SafetyHub.kz 服务器记录已确认其真实性。",
     "participant": "学员",
     "program": "培训项目",
@@ -688,7 +686,6 @@
     "score": "{score}/{total}",
     "issuedAt": "签发日期",
     "number": "编号",
-    "revokedAt": "撤销日期",
     "compareHint": "请将姓名、培训项目、结果和编号与 PDF 对照。修改 PDF 不会改变服务器记录。"
   },
   "LegalFlow": {

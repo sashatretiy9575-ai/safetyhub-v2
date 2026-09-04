@@ -20,7 +20,11 @@ import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/l
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-const POLL_INTERVAL_MS = 15_000;
+// Every poll is a serverless invocation plus two Supabase round-trips, which
+// measured around half a second on production. Four of those a minute ran
+// against the operator's own navigations for a badge that is never urgent;
+// admin actions still refresh the inbox immediately through the event below.
+const POLL_INTERVAL_MS = 60_000;
 const MAX_BACKOFF_MS = 120_000;
 const REQUEST_TIMEOUT_MS = 10_000;
 export const ADMIN_NOTIFICATION_REFRESH_EVENT = 'safetyhub:admin-action-complete';

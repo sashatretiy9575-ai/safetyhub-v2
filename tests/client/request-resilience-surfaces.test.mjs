@@ -18,8 +18,6 @@ test('client mutations use bounded requests and release every busy scope in fina
       releases: ['setBusy(false)'],
     },
     { file: 'components/admin/test-editor.tsx', releases: ['setBusy(false)'] },
-    { file: 'components/admin/identity-controls.tsx', releases: ['setBusy(false)'] },
-    { file: 'components/admin/certificate-revoke-control.tsx', releases: ['setBusy(false)'] },
     { file: 'features/auth/profile-form.tsx', releases: ['setBusy(false)'] },
   ];
   for (const { file, releases } of surfaces) {

@@ -52,7 +52,7 @@ test('one provider polls the two responsive inbox controls without amplification
     read('components/admin/account-approval-queue.tsx'),
   ]);
 
-  assert.match(component, /const POLL_INTERVAL_MS = 15_000/u);
+  assert.match(component, /const POLL_INTERVAL_MS = 60_000/u);
   assert.match(component, /const MAX_BACKOFF_MS = 120_000/u);
   assert.match(component, /document\.visibilityState === 'visible'/u);
   assert.match(component, /navigator\.onLine !== false/u);

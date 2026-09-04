@@ -18,7 +18,6 @@ test('certificate-changing application flows invalidate the verification cache',
   const sources = await Promise.all(
     [
       'features/admin/attestations.ts',
-      'features/admin/certificates.ts',
       'features/identity/server.ts',
       'features/learning/server.ts',
       'features/admin/server.ts',
@@ -30,10 +29,10 @@ test('certificate-changing application flows invalidate the verification cache',
     assert.match(source, /invalidateCertificateVerificationCache/u);
   }
 
-  const admin = sources[4];
+  const admin = sources[3];
   const suspension = admin.slice(
     admin.indexOf('export async function setUserSuspended'),
-    admin.indexOf('export async function changeUserRole'),
+    admin.indexOf('export async function setProductRoleByEmail'),
   );
   const reconciliation = admin.slice(
     admin.indexOf('export async function reconcileAuthAdminOperation'),

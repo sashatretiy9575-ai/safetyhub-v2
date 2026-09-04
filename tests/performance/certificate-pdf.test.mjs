@@ -44,7 +44,9 @@ test('authorized certificate metadata is bounded and precedes browser-only rende
 
   assert.ok(auth >= 0 && auth < certificate && certificate < metadata);
   assert.match(route, /requireCapability\('certificate\.read'/);
-  assert.match(route, /data\.revokedAt/);
+  // Revocation is no longer a product state: a superseded certificate resolves
+  // to its replacement in the database, so the route only guards a missing one.
+  assert.match(route, /if \(!data\) {/);
   assert.match(route, /createBoundedCertificateMetadataResponse/);
   assert.match(helper, /CERTIFICATE_METADATA_MAX_BYTES = 32 \* 1024/);
   assert.match(helper, /CERTIFICATE_EXPORT_METADATA_MAX_BYTES = 2 \* 1024 \* 1024/);

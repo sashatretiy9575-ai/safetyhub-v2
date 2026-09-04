@@ -1308,6 +1308,16 @@ export type Database = {
         }
         Returns: Json
       }
+      apply_product_role_change: {
+        Args: {
+          p_actor_id: string
+          p_idempotency_key: string
+          p_reason: string
+          p_role: Database["public"]["Enums"]["product_role"]
+          p_target_id: string
+        }
+        Returns: Json
+      }
       article_content_hash: {
         Args: {
           p_blocks: Json
@@ -1387,6 +1397,16 @@ export type Database = {
       authorize_zh_username_password_session: {
         Args: { p_session_id: string; p_user_id: string }
         Returns: boolean
+      }
+      begin_product_role_operation: {
+        Args: {
+          p_actor_id: string
+          p_idempotency_key: string
+          p_reason: string
+          p_role: Database["public"]["Enums"]["product_role"]
+          p_target_key: string
+        }
+        Returns: string
       }
       bulk_update_participants_unmetered: {
         Args: { p_field: string; p_user_ids: string[]; p_value: string }
@@ -1591,6 +1611,15 @@ export type Database = {
         }
         Returns: Json
       }
+      list_admin_operators_page_provider_internal: {
+        Args: {
+          p_cursor_created_at?: string
+          p_cursor_id?: string
+          p_limit?: number
+          p_query?: string
+        }
+        Returns: Json
+      }
       list_admin_users_page_provider_internal: {
         Args: {
           p_cursor_created_at?: string
@@ -1729,6 +1758,15 @@ export type Database = {
           p_actor_id: string
           p_expected_content_hash: string
           p_test_id: string
+        }
+        Returns: Json
+      }
+      purge_user_account_immediate: {
+        Args: {
+          p_actor_id: string
+          p_idempotency_key: string
+          p_reason: string
+          p_target_id: string
         }
         Returns: Json
       }
@@ -3846,6 +3884,14 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_purge_user_accounts: {
+        Args: {
+          p_idempotency_key: string
+          p_reason: string
+          p_target_ids: string[]
+        }
+        Returns: Json
+      }
       advance_account_storage_cleanup: {
         Args: {
           p_error_code?: string
@@ -4440,6 +4486,15 @@ export type Database = {
         }
         Returns: Json
       }
+      list_admin_operators_page: {
+        Args: {
+          p_cursor_created_at?: string
+          p_cursor_id?: string
+          p_limit?: number
+          p_query?: string
+        }
+        Returns: Json
+      }
       list_admin_users_page: {
         Args: {
           p_cursor_created_at?: string
@@ -5015,6 +5070,24 @@ export type Database = {
       }
       set_preferred_locale: {
         Args: { p_locale: Database["public"]["Enums"]["app_locale"] }
+        Returns: Json
+      }
+      set_product_role_by_email: {
+        Args: {
+          p_email: string
+          p_idempotency_key: string
+          p_reason: string
+          p_role: Database["public"]["Enums"]["product_role"]
+        }
+        Returns: Json
+      }
+      set_product_role_by_user_id: {
+        Args: {
+          p_idempotency_key: string
+          p_reason: string
+          p_role: Database["public"]["Enums"]["product_role"]
+          p_target_id: string
+        }
         Returns: Json
       }
       set_runtime_feature_flag: {

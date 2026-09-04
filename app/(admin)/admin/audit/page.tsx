@@ -31,15 +31,14 @@ const actionLabels: Record<string, string> = {
   'user.restore': 'Пользователь восстановлен',
   'user.suspend_requested': 'Запрошена блокировка пользователя',
   'user.restore_requested': 'Запрошено восстановление пользователя',
-  'user.delete_prepare': 'Подготовлено удаление пользователя',
-  'user.delete_requested': 'Запрошено удаление пользователя',
-  'user.delete_confirmed': 'Подтверждено удаление пользователя',
+  'user.purged': 'Пользователь удалён безвозвратно',
+  'user.purge.bulk': 'Массовое удаление пользователей',
   'capability.set': 'Изменена прежняя конфигурация доступа',
   'identity.verified': 'Личность подтверждена',
-  'identity.revoked': 'Подтверждение личности отозвано',
-  'certificate.revoke': 'Сертификат отозван',
-  'certificate.auto_revoked_identity_migration': 'Сертификат автоматически отозван',
-  'certificate.revoke_legacy_backfill': 'Зафиксирован прежний отзыв сертификата',
+  'identity.revoked': 'Подтверждение личности сброшено',
+  'certificate.revoke': 'Сертификат заменён',
+  'certificate.auto_revoked_identity_migration': 'Сертификат заменён автоматически',
+  'certificate.revoke_legacy_backfill': 'Зафиксирована прежняя замена сертификата',
   'test.status': 'Изменён статус теста',
   'course.question_bank_read': 'Открыт банк вопросов курса',
   'article.status': 'Изменён статус статьи',
@@ -84,7 +83,7 @@ const actionLabels: Record<string, string> = {
   'legal.localization_saved': 'Сохранён перевод документа',
   'legal.localizations_published': 'Опубликованы переводы документов',
   'certificate.issued': 'Сертификат выдан',
-  'certificate.revoked': 'Сертификат отозван',
+  'certificate.revoked': 'Сертификат заменён',
   'certificate.exported': 'Сертификаты выгружены',
   'certificate.export_job.created': 'Создана выгрузка сертификатов',
   'certificate.export_job.downloaded': 'Скачана выгрузка сертификатов',
@@ -106,7 +105,7 @@ const bulkAttestationLabels: Record<string, string> = {
   confirm: 'Массовое подтверждение результатов',
   update: 'Массовое изменение результатов',
   issue: 'Массовая выдача сертификатов',
-  revoke: 'Массовый отзыв сертификатов',
+  revoke: 'Массовая замена сертификатов',
 };
 
 const operationLabels: Record<string, string> = {
@@ -132,7 +131,7 @@ const statusLabels: Record<string, string> = {
   suspended: 'Заблокировано',
   published: 'Опубликовано',
   draft: 'Черновик',
-  revoked: 'Отозвано',
+  revoked: 'Заменено',
 };
 
 const quickFilters = [

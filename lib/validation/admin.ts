@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
 import { TEST_EDITOR_LIMITS, TEST_EDITOR_SLUG_PATTERN } from '@/lib/admin-test-editor';
 import { contentMetadataDraftSchema } from '@/lib/content/content-metadata';
 import { courseSeoSchema } from '@/lib/validation/course';
@@ -20,8 +21,40 @@ export const suspendUserSchema = z.object({
   reason: adminActionReasonSchema,
 });
 
-export const deleteUserSchema = z.object({ reason: adminActionReasonSchema });
 export const outboxRetrySchema = z.object({ reason: adminActionReasonSchema });
+
+export const purgeUsersSchema = z
+  .object({
+    userIds: z
+      .array(z.string().uuid())
+      .min(1)
+      .max(ADMIN_PURGE_BULK_LIMIT)
+      .refine((values) => new Set(values).size === values.length, 'DUPLICATE_TARGET_IDS'),
+    reason: adminActionReasonSchema,
+    confirmation: z.literal('УДАЛИТЬ'),
+    idempotencyKey: z.string().uuid(),
+  })
+  .strict();
+
+const productRoleSchema = z.enum(['participant', 'admin']);
+
+export const operatorRoleByEmailSchema = z
+  .object({
+    email: z.string().trim().toLowerCase().email().max(254),
+    role: productRoleSchema,
+    reason: adminActionReasonSchema,
+    idempotencyKey: z.string().uuid(),
+  })
+  .strict();
+
+export const operatorRoleByIdSchema = z
+  .object({
+    userId: z.string().uuid(),
+    role: productRoleSchema,
+    reason: adminActionReasonSchema,
+    idempotencyKey: z.string().uuid(),
+  })
+  .strict();
 
 export const learningHistoryDeleteSchema = z
   .object({

@@ -5,8 +5,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export type AdminMutationQuotaAction =
   | 'admin.attestation.mutate'
   | 'admin.identity.mutate'
-  | 'admin.certificate.revoke'
   | 'admin.access.mutate'
+  | 'admin.purge'
   | 'admin.test.mutate'
   | 'content.article.mutate'
   | 'site.settings.update';

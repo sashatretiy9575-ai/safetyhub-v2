@@ -25,7 +25,7 @@ export async function GET(
     if (auth.role === 'admin') await requireCapability('certificate.read');
     await consumeBusinessQuota('certificate.pdf', auth.user.id);
     const data = await getCertificateDownloadPayload(certificateId);
-    if (!data || data.revokedAt) {
+    if (!data) {
       return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 });
     }
     return NextResponse.json(

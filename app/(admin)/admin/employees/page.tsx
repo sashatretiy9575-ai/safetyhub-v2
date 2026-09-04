@@ -76,11 +76,11 @@ export default async function AdminEmployeesPage({
     canReadCertificate: actor.capabilities.includes('certificate.read'),
     canManageIdentity: actor.capabilities.includes('identity.manage'),
     canIssue: actor.capabilities.includes('certificate.issue'),
-    canRevoke: actor.capabilities.includes('certificate.revoke'),
     canExport:
       actor.capabilities.includes('results.export') &&
       actor.capabilities.includes('certificate.read'),
     canDeleteHistory: actor.capabilities.includes('results.delete'),
+    canDeleteUser: actor.capabilities.includes('user.delete'),
   };
 
   return (

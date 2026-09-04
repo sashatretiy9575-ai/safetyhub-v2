@@ -26,8 +26,6 @@ const publicCertificateSchema = z.object({
   score: z.number().int(),
   total: z.number().int().positive(),
   issuedAt: z.string(),
-  revokedAt: z.string().nullable(),
-  revokeReason: z.string().nullable().optional(),
 });
 
 const boundedText = (maximum: number) => z.string().trim().min(1).max(maximum);
@@ -61,7 +59,6 @@ export const certificateDownloadPayloadSchema = z
   bestCompletedAt: z.string().datetime({ offset: true }),
   issuedAt: z.string().datetime({ offset: true }),
   templateVersion: templateVersionSchema,
-  revokedAt: z.string().datetime({ offset: true }).nullable(),
   })
   .superRefine((value, context) => {
     if (value.score > value.total || value.passScore > value.total) {

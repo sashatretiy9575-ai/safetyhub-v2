@@ -89,11 +89,12 @@ test('canonical admin screens own one heading while retained compatibility scree
 });
 
 test('dangerous operator payloads are bounded, reasoned and idempotent', async () => {
-  const [validation, actionRoute, organizationRoute, manager] = await Promise.all([
+  const [validation, actionRoute, organizationRoute, manager, purge] = await Promise.all([
     read('lib/validation/admin.ts'),
     read('app/api/admin/attestations/actions/route.ts'),
     read('app/api/admin/organizations/merge/route.ts'),
     read('components/admin/attestations-manager.tsx'),
+    read('app/api/admin/users/purge/route.ts'),
   ]);
   assert.match(
     validation,
@@ -103,7 +104,11 @@ test('dangerous operator payloads are bounded, reasoned and idempotent', async (
   assert.match(actionRoute, /max\(ADMIN_ATTESTATION_BULK_LIMIT\)/);
   assert.match(organizationRoute, /reason: z\.string\(\)\.trim\(\)\.min\(10\)\.max\(500\)/);
   assert.match(organizationRoute, /idempotencyKey: z\.string\(\)\.uuid\(\)/);
-  assert.match(manager, /ОТОЗВАТЬ \$\{selectionSummary\.issued\}/);
+  assert.match(purge, /purgeUsersSchema/);
+  assert.match(validation, /idempotencyKey: z\.string\(\)\.uuid\(\)/);
+  assert.match(validation, /max\(ADMIN_PURGE_BULK_LIMIT\)/);
+  assert.match(validation, /confirmation: z\.literal\('УДАЛИТЬ'\)/u);
+  assert.match(manager, /УДАЛИТЬ \$\{selectionSummary\.people\}/);
   assert.match(manager, /crypto\.randomUUID\(\)/);
 });
 
@@ -120,22 +125,40 @@ test('confirmation dialog has browser-native modal and accessible cancel semanti
   assert.match(dialog, /maxLength=\{500\}/);
 });
 
-test('role and capability editing are absent from the product surface', async () => {
+test('role assignment is one bounded contract and the capability matrix stays absent', async () => {
   await assert.rejects(access(path.join(root, 'components/admin/user-manager.tsx')));
   await assert.rejects(access(path.join(root, 'components/admin/capability-manager.tsx')));
   await assert.rejects(access(path.join(root, 'app/api/admin/users/[userId]/role/route.ts')));
   await assert.rejects(
     access(path.join(root, 'app/api/admin/users/[userId]/capabilities/route.ts')),
   );
-  const [roles, auth] = await Promise.all([
+  const [roles, auth, operators, roleMigration] = await Promise.all([
     read('supabase/migrations/20260818000000_two_product_roles.sql'),
     read('features/auth/server.ts'),
+    read('app/api/admin/operators/route.ts'),
+    read('supabase/migrations/20260905110000_product_role_assignment_by_email.sql'),
   ]);
   assert.match(roles, /create type public\.product_role as enum \('participant', 'admin'\)/);
   assert.match(roles, /restore_admin_access/);
   assert.match(roles, /revoke execute on function public\.manage_user_role_confirmed/);
   assert.match(roles, /revoke execute on function public\.set_user_capabilities_confirmed/);
   assert.match(auth, /z\.enum\(\['participant', 'admin'\]\)/);
+
+  // The single live path: appointment by verified email, with a written reason,
+  // idempotent, capability-checked and quota-charged after authorization.
+  assert.match(operators, /invalidOriginResponse\(request\)/);
+  assert.match(operators, /operatorRoleByEmailSchema/);
+  assert.match(operators, /requireCapability\('role\.manage'\)/);
+  assert.match(operators, /consumeAdminMutationQuota\(\s*'admin\.access\.mutate'/);
+  assert.doesNotMatch(operators, /user_capabilities|capabilities:|capabilityMatrix/u);
+  assert.match(roleMigration, /create function public\.set_product_role_by_email/);
+  assert.match(roleMigration, /private\.require_capability\('role\.manage'\)/);
+  assert.match(roleMigration, /private\.lock_active_superadmin_invariant\(\)/);
+  assert.match(roleMigration, /safetyhub\.skip_role_audit/);
+  assert.match(roleMigration, /CANNOT_CHANGE_OWN_ROLE/);
+  assert.match(roleMigration, /LAST_ACTIVE_ADMIN_PROTECTED/);
+  assert.match(roleMigration, /SUPERADMIN_DEMOTION_FORBIDDEN/);
+  assert.match(roleMigration, /'role\.changed'/);
 });
 
 test('database operations recheck capability and audit a batch atomically', async () => {

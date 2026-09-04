@@ -42,6 +42,14 @@ export function MediaAssetInput({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [preparation, setPreparation] = useState('');
+  // A path can be typed by hand or point at a file that was later removed from
+  // the library, so the preview has to survive a failed load instead of leaving
+  // an unexplained empty box.
+  const [previewFailed, setPreviewFailed] = useState(false);
+
+  useEffect(() => {
+    setPreviewFailed(false);
+  }, [value]);
 
   const load = async () => {
     const result = await clientRequest('/api/admin/content-assets');
@@ -121,6 +129,50 @@ export function MediaAssetInput({
           {open ? <X /> : <ImageSquare />} {open ? 'Закрыть' : 'Медиатека'}
         </Button>
       </div>
+
+      {value ? (
+        <div className="flex items-start gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-2">
+          <span className="relative block aspect-video w-32 shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface)]">
+            {previewFailed ? (
+              <span className="grid size-full place-items-center px-1 text-center text-[10px] leading-tight text-[var(--color-text-muted)]">
+                Файл не открылся
+              </span>
+            ) : (
+              <Image
+                src={value}
+                alt="Выбранное изображение"
+                fill
+                sizes="128px"
+                className="object-cover"
+                onError={() => setPreviewFailed(true)}
+              />
+            )}
+          </span>
+          <div className="min-w-0 flex-1 space-y-1">
+            <p className="truncate text-xs font-bold" title={value}>
+              {value.split('/').pop() || value}
+            </p>
+            {previewFailed ? (
+              <p role="alert" className="text-xs text-[var(--color-danger)]">
+                По этому пути изображение не загружается. Выберите файл из медиатеки.
+              </p>
+            ) : (
+              <p className="text-xs text-[var(--color-text-muted)]">
+                Так изображение выглядит на сайте.
+              </p>
+            )}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Button type="button" size="sm" variant="outline" onClick={() => setOpen(true)}>
+                Заменить
+              </Button>
+              <Button type="button" size="sm" variant="ghost" onClick={() => onChange('')}>
+                Очистить
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {open ? (
         <div className="space-y-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -159,7 +211,11 @@ export function MediaAssetInput({
               {assets.map((asset) => (
                 <div
                   key={asset.id}
-                  className="min-w-0 space-y-1 rounded-lg border bg-[var(--color-surface)] p-2"
+                  className={`min-w-0 space-y-1 rounded-lg border bg-[var(--color-surface)] p-2 ${
+                    asset.url === value
+                      ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)]'
+                      : ''
+                  }`}
                 >
                   <button
                     type="button"

@@ -6,6 +6,15 @@ const COURSE_COVER_IMAGES: Readonly<Record<string, string>> = {
   'pozharnaya-bezopasnost': '/images/generated/topic-fire-safety-v2.webp',
 };
 
-export function getCourseCoverImage(slug: string) {
-  return COURSE_COVER_IMAGES[slug];
+/**
+ * Catalog cover for a course.
+ *
+ * The five launch courses ship a hand-made cover in the bundle. Every other
+ * course has no cover of its own in the schema, so the picture an editor
+ * actually uploads in the course editor — the SEO/Open Graph image — is used
+ * instead. Without this fallback an uploaded image was stored, previewed and
+ * then silently ignored by the catalog.
+ */
+export function getCourseCoverImage(slug: string, uploadedImage?: string | null) {
+  return COURSE_COVER_IMAGES[slug] ?? (uploadedImage ? uploadedImage : undefined);
 }

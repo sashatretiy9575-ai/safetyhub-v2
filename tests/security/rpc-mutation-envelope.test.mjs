@@ -28,7 +28,6 @@ test('every metered application RPC unwraps the reserved error envelope before s
     'features/identity/server.ts',
     'features/learning/server.ts',
     'features/admin/attestations.ts',
-    'features/admin/certificates.ts',
     'features/admin/server.ts',
     'app/api/profile/route.ts',
     'app/api/profile/onboarding/route.ts',

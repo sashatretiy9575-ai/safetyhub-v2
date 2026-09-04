@@ -131,6 +131,26 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
     filename: '20260903220000_presentation_service_role_grant.sql',
     sha256: '74293956a2ab53f2758fcb9eddad6f9abba351bad3fae8e7c7107c8cdc3ef5f6',
   }),
+  Object.freeze({
+    filename: '20260905100000_immediate_admin_account_purge.sql',
+    sha256: 'e25f21074b8f1291c7bdd440525dbc68227ada6b676604b591048173392c2777',
+  }),
+  Object.freeze({
+    filename: '20260905101000_deletion_pending_admin_read_filters.sql',
+    sha256: 'fe4e9a23b12ba4f067c986b0e369ffc5cd4b6edcd03e1c0100e705b9c712d3e5',
+  }),
+  Object.freeze({
+    filename: '20260905110000_product_role_assignment_by_email.sql',
+    sha256: '5610b664fec6cfdb17c4de98ea95bc99019f67db052e2884f80d2129b30350f5',
+  }),
+  Object.freeze({
+    filename: '20260905120000_retire_certificate_revocation_surface.sql',
+    sha256: '1987b4ae86616837b166c6f7f13cb76ea5b7c84298c8b06f841355e444fbbb93',
+  }),
+  Object.freeze({
+    filename: '20260905130000_distinguishable_certificate_issue_refusals.sql',
+    sha256: '0b27d75f48ea6bacf95e4a96ce9648819300373f52c54de1c43363a54952d1a7',
+  }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;

@@ -26,12 +26,6 @@ const actionSchema = z.discriminatedUnion('action', [
     idempotencyKey: z.string().uuid(),
   }),
   z.object({ action: z.literal('issue'), attestationIds: ids, idempotencyKey: z.string().uuid() }),
-  z.object({
-    action: z.literal('revoke'),
-    certificateIds: ids,
-    reason: z.string().trim().min(3).max(500),
-    idempotencyKey: z.string().uuid(),
-  }),
 ]);
 
 export async function POST(request: Request) {
@@ -43,13 +37,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
     const action = parsed.data;
-    await requireCapability(
-      action.action === 'issue'
-        ? 'certificate.issue'
-        : action.action === 'revoke'
-          ? 'certificate.revoke'
-          : 'identity.manage',
-    );
+    await requireCapability(action.action === 'issue' ? 'certificate.issue' : 'identity.manage');
     await consumeAdminMutationQuota(
       'admin.attestation.mutate',
       requestSecurityMetadata(request).ipHash,
@@ -66,9 +54,7 @@ export async function POST(request: Request) {
               field: action.field,
               value: action.value,
             }
-          : action.action === 'issue'
-            ? { action: 'issue', targetIds: action.attestationIds }
-            : { action: 'revoke', targetIds: action.certificateIds, reason: action.reason },
+          : { action: 'issue', targetIds: action.attestationIds },
     );
     return NextResponse.json(operation);
   } catch (error) {

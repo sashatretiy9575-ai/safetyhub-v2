@@ -458,7 +458,7 @@
     "certificatePendingIdentity": "Тексеруді күтуде",
     "certificateReady": "Дайындалуда",
     "certificateIssued": "Берілді",
-    "certificateRevoked": "Күші жойылды",
+    "certificateRevoked": "Қайта дайындалуда",
     "certificateUnavailable": "Қолжетімсіз",
     "nextStep": "Келесі қадам",
     "testPassed": "Тест өтті — {score}/{total}",
@@ -678,9 +678,7 @@
     "notFoundTitle": "Құжат табылмады",
     "notFoundDescription": "Сілтеме жарамсыз немесе сертификат пен оған қатысты аккаунт жойылған.",
     "verification": "Сертификатты тексеру",
-    "revoked": "Сертификаттың күші жойылды",
     "valid": "Сертификат жарамды",
-    "revokedDescription": "Жазба түпнұсқа, бірақ сертификат енді жарамсыз.",
     "validDescription": "Түпнұсқалығы SafetyHub.kz жазбасымен расталды.",
     "participant": "Қатысушы",
     "program": "Бағдарлама",
@@ -688,7 +686,6 @@
     "score": "{total} ішінен {score}",
     "issuedAt": "Берілген күні",
     "number": "Нөмірі",
-    "revokedAt": "Күші жойылған",
     "compareHint": "Аты-жөнін, бағдарламаны, нәтижені және нөмірді PDF деректерімен салыстырыңыз. Құжатты өзгерту бұл серверлік жазбаны өзгертпейді."
   },
   "LegalFlow": {

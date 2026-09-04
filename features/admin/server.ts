@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { requireCapability, requireRole } from '@/features/auth/server';
-import type { AppRole, Json, TestRow } from '@/lib/supabase/types';
+import type { Json, TestRow } from '@/lib/supabase/types';
 import { courseQuestionBankSchema, type SaveTestValues } from '@/lib/validation/admin';
 import type { AdminCapability } from '@/lib/security/capabilities';
 import { cache } from 'react';
@@ -20,7 +20,9 @@ import type {
   TestEditorSeed,
 } from '@/features/admin/types';
 import type { AdminRequestMetadata } from '@/lib/security/request-metadata';
-import { consumeCoarseQuota } from '@/lib/security/rate-limit';
+import { consumeAdminMutationQuota, consumeCoarseQuota } from '@/lib/security/rate-limit';
+import { removeAvatarPrefix } from '@/lib/supabase/avatar-prefix-cleanup';
+import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
 import { CONTENT_CACHE_TAG, TOPICS_CACHE_TAG } from '@/lib/content/cache-policy';
 import { invalidateCertificateVerificationCache } from '@/features/certificates/server';
 
@@ -192,55 +194,95 @@ export async function setUserSuspended(
   }
 }
 
-export async function changeUserRole(
-  userId: string,
-  role: AppRole,
+export async function setProductRoleByEmail(
+  email: string,
+  role: 'participant' | 'admin',
   reason: string,
+  idempotencyKey: string,
   metadata: AdminRequestMetadata,
 ) {
-  await requireRole(['admin']);
   await requireCapability('role.manage');
-  await authenticatedRpc('manage_user_role_confirmed', {
+  await consumeAdminMutationQuota('admin.access.mutate', metadata.ipHash);
+  const result = await authenticatedRpc('set_product_role_by_email', {
+    p_idempotency_key: idempotencyKey,
+    p_email: email,
+    p_role: role,
+    p_reason: reason,
+  });
+  revalidatePath('/admin', 'layout');
+  return result as Record<string, unknown>;
+}
+
+export async function setProductRoleByUserId(
+  userId: string,
+  role: 'participant' | 'admin',
+  reason: string,
+  idempotencyKey: string,
+  metadata: AdminRequestMetadata,
+) {
+  await requireCapability('role.manage');
+  await consumeAdminMutationQuota('admin.access.mutate', metadata.ipHash);
+  const result = await authenticatedRpc('set_product_role_by_user_id', {
+    p_idempotency_key: idempotencyKey,
     p_target_id: userId,
     p_role: role,
     p_reason: reason,
-    ...metadataArgs(metadata),
   });
+  revalidatePath('/admin', 'layout');
+  return result as Record<string, unknown>;
 }
 
-export async function permanentlyDeleteUser(
-  userId: string,
+type PurgeItem = { id: string; status: 'completed' | 'skipped'; reason: string | null };
+
+/**
+ * Deletes operator-selected accounts outright.
+ *
+ * The staged `begin_user_account_purge` path only flags an account and relies on
+ * a scheduled Edge Function to finish; with no schedule configured the account
+ * survived indefinitely and stayed in every list. This calls the immediate
+ * database purge and then clears the account's Storage prefix, which is the one
+ * part the transaction cannot cover.
+ */
+export async function purgeUserAccounts(
+  userIds: string[],
   reason: string,
+  idempotencyKey: string,
   metadata: AdminRequestMetadata,
 ) {
-  await requireRole(['admin']);
   const actor = await requireCapability('user.delete');
-  if (userId === actor.user.id) throw new Error('CANNOT_DELETE_SELF');
-  await consumeCoarseQuota('admin.delete', metadata.ipHash);
-  const admin = createAdminClient();
-  // Validate and retain the explicit operator reason only for the duration of
-  // this request: the approved deletion semantics remove every related audit row.
-  if (reason.trim().length < 10) throw new Error('DELETE_REASON_REQUIRED');
-  const begin = await untypedClient(admin).rpc('begin_user_account_purge', {
-    p_target_id: userId,
-  });
-  if (begin.error) throw new Error(begin.error.message);
-  const pending = begin.data as Record<string, unknown> | null;
-  if (
-    !pending ||
-    pending.userId !== userId ||
-    pending.exists !== true ||
-    pending.pending !== true ||
-    typeof pending.tombstoneId !== 'string' ||
-    typeof pending.cleanupNotBefore !== 'string'
-  ) {
-    throw new Error('ACCOUNT_PURGE_CONTRACT_INVALID');
-  }
+  if (userIds.includes(actor.user.id)) throw new Error('CANNOT_DELETE_SELF');
+  await consumeAdminMutationQuota('admin.purge', metadata.ipHash);
   invalidateCertificateVerificationCache();
+  const raw = (await authenticatedRpc('admin_purge_user_accounts', {
+    p_idempotency_key: idempotencyKey,
+    p_target_ids: userIds,
+    p_reason: reason,
+  })) as { operationId?: string; replayed?: boolean; items?: PurgeItem[] } | null;
+  const items = Array.isArray(raw?.items) ? raw.items : [];
+
+  const admin = createAdminClient();
+  await Promise.allSettled(
+    items
+      .filter((item) => item.status === 'completed')
+      .map((item) =>
+        removeAvatarPrefix(admin, item.id).catch((error: unknown) => {
+          // The account is already gone; leftover bytes are the reconciler's
+          // job and must not turn a committed deletion into a request failure.
+          console.error('ACCOUNT_AVATAR_PREFIX_CLEANUP_FAILED', {
+            cause: safeErrorDiagnosticCode(error, 'UNKNOWN_STORAGE_CLEANUP_ERROR'),
+          });
+        }),
+      ),
+  );
+
+  invalidateCertificateVerificationCache();
+  for (const path of ['/admin', '/admin/employees', '/admin/employees/directory']) {
+    revalidatePath(path);
+  }
   return {
-    pending: true,
-    state: pending.state,
-    cleanupNotBefore: pending.cleanupNotBefore,
+    operationId: typeof raw?.operationId === 'string' ? raw.operationId : idempotencyKey,
+    replayed: raw?.replayed === true,
+    items,
   };
 }
 

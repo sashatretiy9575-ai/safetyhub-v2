@@ -458,7 +458,7 @@
     "certificatePendingIdentity": "Ожидает проверки",
     "certificateReady": "Готовится",
     "certificateIssued": "Выдан",
-    "certificateRevoked": "Отозван",
+    "certificateRevoked": "Готовится заново",
     "certificateUnavailable": "Недоступен",
     "nextStep": "Следующий шаг",
     "testPassed": "Тест пройден — {score}/{total}",
@@ -678,9 +678,7 @@
     "notFoundTitle": "Документ не найден",
     "notFoundDescription": "Ссылка недействительна либо сертификат и связанная с ним учётная запись удалены.",
     "verification": "Проверка сертификата",
-    "revoked": "Сертификат отозван",
     "valid": "Сертификат действует",
-    "revokedDescription": "Запись подлинная, но сертификат больше не действует.",
     "validDescription": "Подлинность подтверждена записью SafetyHub.kz.",
     "participant": "Участник",
     "program": "Программа",
@@ -688,7 +686,6 @@
     "score": "{score} из {total}",
     "issuedAt": "Дата выдачи",
     "number": "Номер",
-    "revokedAt": "Отозван",
     "compareHint": "Сверьте имя, программу, результат и номер с данными в PDF. Изменённый документ не изменяет эту серверную запись."
   },
   "LegalFlow": {

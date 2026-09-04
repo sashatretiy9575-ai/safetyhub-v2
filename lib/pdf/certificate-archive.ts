@@ -4,8 +4,12 @@ export type ArchiveEntry = {
 };
 
 const MAX_ARCHIVE_ENTRIES = 501;
-const MAX_ARCHIVE_ENTRY_BYTES = 4 * 1024 * 1024;
-const MAX_ARCHIVE_TOTAL_BYTES = 160 * 1024 * 1024;
+// Defensive ceilings against a runaway generator, not product limits. The old
+// pair (4 MiB / 160 MiB) sat under a full 500-certificate export: at the
+// measured ~300 KB per certificate the total ceiling was reached mid-stream,
+// and the failure surfaced only after part of the file had been written.
+const MAX_ARCHIVE_ENTRY_BYTES = 16 * 1024 * 1024;
+const MAX_ARCHIVE_TOTAL_BYTES = 512 * 1024 * 1024;
 const MAX_ARCHIVE_NAME_BYTES = 512;
 const unsafeArchiveNameCharacters = /[\u0000-\u001f\u007f\\:]/u;
 

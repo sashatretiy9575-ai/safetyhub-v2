@@ -9,7 +9,8 @@ const read = (file) => readFile(path.join(root, file), 'utf8');
 
 const guardedRoutes = new Map([
   ['app/api/admin/users/[userId]/identity/route.ts', 'admin.identity.mutate'],
-  ['app/api/admin/certificates/[certificateId]/revoke/route.ts', 'admin.certificate.revoke'],
+  ['app/api/admin/users/purge/route.ts', 'admin.purge'],
+  ['app/api/admin/operators/route.ts', 'admin.access.mutate'],
   ['app/api/admin/courses/route.ts', 'admin.test.mutate'],
   ['app/api/admin/courses/[courseId]/status/route.ts', 'admin.test.mutate'],
   ['app/api/admin/courses/[courseId]/presentation/upload-token/route.ts', 'admin.test.mutate'],
@@ -50,13 +51,17 @@ test('every live privileged mutation applies same-origin and shared actor/IP quo
 });
 
 test('shared admin mutation limiter consumes the app-layer coarse-IP budget', async () => {
-  const [rateLimit, baseline, securityHardening, emailOtpLimits] = await Promise.all([
-    read('lib/security/rate-limit.ts'),
-    read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
-    read('supabase/migrations/20260813020000_security_hardening.sql'),
-    read('supabase/migrations/20260831100000_email_otp_rate_limits.sql'),
-  ]);
-  const quotaContracts = [baseline, securityHardening, emailOtpLimits].join('\n');
+  const [rateLimit, baseline, securityHardening, emailOtpLimits, immediatePurge] =
+    await Promise.all([
+      read('lib/security/rate-limit.ts'),
+      read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
+      read('supabase/migrations/20260813020000_security_hardening.sql'),
+      read('supabase/migrations/20260831100000_email_otp_rate_limits.sql'),
+      read('supabase/migrations/20260905100000_immediate_admin_account_purge.sql'),
+    ]);
+  const quotaContracts = [baseline, securityHardening, emailOtpLimits, immediatePurge].join(
+    '\n',
+  );
   assert.match(rateLimit, /export async function consumeAdminMutationQuota/);
   assert.match(rateLimit, /await consumeCoarseQuota\(action, ipHash\)/);
   assert.match(

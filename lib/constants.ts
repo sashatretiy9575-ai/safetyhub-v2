@@ -59,3 +59,12 @@ export const QUIZ = {
   defaultPassPercent: QUIZ_POLICY.passPercent,
   defaultQuestionCount: QUIZ_POLICY.questionCount,
 } as const;
+
+/**
+ * How many accounts one purge request may carry.
+ *
+ * The database function accepts up to 500, but a single HTTP request has to
+ * finish inside the hosted statement timeout, so the admin UI splits a large
+ * selection into chunks of this size and sends them one after another.
+ */
+export const ADMIN_PURGE_BULK_LIMIT = 50;

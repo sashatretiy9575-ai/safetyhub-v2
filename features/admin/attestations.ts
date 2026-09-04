@@ -69,7 +69,6 @@ type UntypedRpcClient = {
       | 'confirm_admin_identities'
       | 'bulk_update_participants'
       | 'issue_certificates'
-      | 'revoke_certificates'
       | 'execute_admin_attestation_action',
     args: Record<string, unknown>,
   ): PromiseLike<{ data: unknown; error: RpcError | null }>;
@@ -480,18 +479,6 @@ export async function issueAdminCertificates(attestationIds: string[]) {
   return result;
 }
 
-export async function revokeAdminCertificates(certificateIds: string[], reason: string) {
-  await requireCapability('certificate.revoke');
-  const result = mutationItemsSchema.parse(
-    await rpc('revoke_certificates', {
-      p_certificate_ids: uuidArraySchema.min(1).parse(certificateIds),
-      p_reason: z.string().trim().min(3).max(500).parse(reason).normalize('NFC'),
-    }),
-  ) satisfies AdminAttestationMutationItem[];
-  invalidateCertificateVerificationCache();
-  return result;
-}
-
 export type AdminAttestationAction =
   | { action: 'confirm'; targetIds: string[] }
   | {
@@ -500,8 +487,7 @@ export type AdminAttestationAction =
       field: 'name' | 'surname' | 'job' | 'organization';
       value: string;
     }
-  | { action: 'issue'; targetIds: string[] }
-  | { action: 'revoke'; targetIds: string[]; reason: string };
+  | { action: 'issue'; targetIds: string[] };
 
 export async function executeAdminAttestationAction(
   idempotencyKey: string,
@@ -513,7 +499,7 @@ export async function executeAdminAttestationAction(
     p_target_ids: uuidArraySchema.min(1).parse(action.targetIds),
     p_field: action.action === 'update' ? action.field : null,
     p_value: action.action === 'update' ? action.value : null,
-    p_reason: action.action === 'revoke' ? action.reason : null,
+    p_reason: null,
   });
   const envelope = record(raw);
   return {

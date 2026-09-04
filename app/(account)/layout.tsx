@@ -8,7 +8,6 @@ import { PWAProvider } from '@/components/shared/pwa-provider';
 import { UserMenu } from '@/components/shared/user-menu';
 import { CspNonceProvider } from '@/features/auth/csp-nonce';
 import { getAuthContext } from '@/features/auth/server';
-import { getProfileAvatarUrl } from '@/features/profile/server';
 import { REQUEST_PATHNAME_HEADER_NAME } from '@/i18n/config';
 import { loadMessages } from '@/i18n/messages';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
@@ -37,9 +36,9 @@ export default async function AccountLayout({ children }: { children: ReactNode 
   const fullName = auth
     ? `${auth.profile.name ?? ''} ${auth.profile.surname ?? ''}`.trim() || undefined
     : undefined;
-  const avatarUrl = auth?.profile.avatar_updated_at
-    ? await getProfileAvatarUrl(auth.user.id)
-    : null;
+  // Same-origin address instead of a server-resolved signed URL: the shell no
+  // longer waits on a manifest RPC and a Storage call to paint.
+  const avatarUrl = auth?.profile.avatar_updated_at ? '/api/profile/avatar' : null;
 
   return (
     <RootDocument locale={locale} messages={messages}>

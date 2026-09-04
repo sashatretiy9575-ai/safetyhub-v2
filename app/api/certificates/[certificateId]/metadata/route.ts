@@ -29,7 +29,7 @@ export async function GET(
     await consumeBusinessQuota('certificate.pdf', auth.user.id);
 
     const data = await getCertificateDownloadPayload(certificateId);
-    if (!data || data.revokedAt) {
+    if (!data) {
       return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 });
     }
     const metadata = await createCertificateRenderMetadata(data, getSiteUrl());
