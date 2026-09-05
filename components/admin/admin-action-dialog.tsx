@@ -147,10 +147,10 @@ export function AdminActionDialog({
             disabled={busy}
             invalid={reason.length > 0 && reason.trim().length < 10}
             aria-describedby={error ? errorId : undefined}
-            placeholder="Не менее 10 символов; причина попадёт в журнал аудита"
+            placeholder="Не менее 10 символов"
           />
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--color-text-subtle)]">
-            <span>Укажите причину: она попадёт в журнал аудита и поможет проверить действие позже.</span>
+            <span>Причина попадёт в журнал аудита.</span>
             <span>{reason.length}/500</span>
           </div>
           {error ? (

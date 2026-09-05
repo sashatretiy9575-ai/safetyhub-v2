@@ -13,12 +13,13 @@ test('admin inbox stays behind a same-origin capability-gated API', async () => 
     read('features/admin/notification-contract.ts'),
   ]);
 
-  assert.match(server, /requireCapability\('audit\.read'\)/u);
+  assert.match(server, /requireAnyCapability\(INBOX_CAPABILITIES\)/u);
+  assert.match(server, /\['notifications\.read', 'audit\.read'\]/u);
   assert.match(server, /list_admin_notification_inbox/u);
   assert.match(server, /mark_admin_notifications_read/u);
   assert.match(server, /retry_admin_notification_delivery/u);
   assert.match(server, /requestedLimit \+ 1/u);
-  assert.match(server, /items\.slice\(0, requestedLimit\)/u);
+  assert.match(server, /Items\.slice\(0, requestedLimit\)/u);
 
   assert.match(listRoute, /createApiResponse\(null, \{ status: 304/u);
   assert.match(listRoute, /request\.headers\.get\('if-none-match'\) === etag/u);
@@ -70,6 +71,6 @@ test('one provider polls the two responsive inbox controls without amplification
 
   assert.equal((layout.match(/<AdminNotificationInboxProvider/u) ?? []).length, 1);
   assert.equal((layout.match(/<AdminNotificationInboxButton/gu) ?? []).length, 2);
-  assert.match(layout, /actor\.capabilities\.includes\('audit\.read'\)/u);
+  assert.match(layout, /actor\.capabilities\.includes\('notifications\.read'\)/u);
   assert.match(approvalQueue, /requestAdminNotificationRefresh\(\)/u);
 });

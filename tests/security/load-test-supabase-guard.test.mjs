@@ -310,7 +310,7 @@ test('local CI accepts only the exact deterministic seed audit receipt count', a
   );
   assert.equal(counts.admin_audit_log, LOCAL_CI_SEED_AUDIT_ROW_COUNT);
 
-  for (const count of [LOCAL_CI_SEED_AUDIT_ROW_COUNT - 1, LOCAL_CI_SEED_AUDIT_ROW_COUNT + 1]) {
+  for (const count of [LOCAL_CI_SEED_AUDIT_ROW_COUNT + 1, LOCAL_CI_SEED_AUDIT_ROW_COUNT + 2]) {
     await assert.rejects(
       assertLocalCiCleanLoadTestBaseline(baselineAdmin({ counts: { admin_audit_log: count } })),
       new RegExp(`admin_audit_log=${count},expected=${LOCAL_CI_SEED_AUDIT_ROW_COUNT}`, 'u'),

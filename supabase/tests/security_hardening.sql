@@ -580,23 +580,29 @@ begin
       and payload = jsonb_build_object('targetId', v_purge_target)
       and last_error = 'AUTH_ADMIN_UNKNOWN'
       and processing_lease_expires_at is null
-  ) or not exists (
+  ) or exists (
+    -- auth_operation.* events are filtered out by the audit whitelist
+    -- (20260905140000): the outbox failure must leave no audit row behind.
     select 1 from public.admin_audit_log
     where action = 'auth_operation.failed'
       and target_type = 'auth_admin_operation'
       and target_id = v_outbox_id::text
-      and after_data ->> 'errorCategory' = 'AUTH_ADMIN_UNKNOWN'
   ) then
     raise exception 'terminal outbox sanitization/audit contract failed';
   end if;
 
+  -- The action must be whitelisted (20260905140000), otherwise the insert is
+  -- silently dropped and the survival check below loses its subject.
   insert into public.admin_audit_log (
     actor_user_id, action, target_type, target_id, reason, correlation_id
   ) values (
-    v_superadmin_a, 'security.regression_unrelated', 'system',
+    v_superadmin_a, 'role.changed', 'system',
     'unrelated-audit-row', 'Must survive colliding correlation',
     v_correlation_id
   ) returning id into v_unrelated_audit_id;
+  if v_unrelated_audit_id is null then
+    raise exception 'whitelisted audit insert unexpectedly dropped';
+  end if;
 
   v_result := public.begin_user_account_purge(v_purge_target);
   v_tombstone_id := (v_result ->> 'tombstoneId')::uuid;

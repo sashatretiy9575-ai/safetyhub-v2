@@ -25,6 +25,7 @@ test('ordinary admin gets the bounded operator preset while superadmin-only powe
     'content.manage',
     'identity.manage',
     'identity.read',
+    'notifications.read',
     'results.delete',
     'results.export',
     'results.read',

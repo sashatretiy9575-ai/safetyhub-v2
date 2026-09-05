@@ -195,6 +195,15 @@ lease удерживается до EOF, cancel, timeout или ошибки, з
 - `SAFETYHUB_ZH_USERNAME_PASSWORD_ENABLED` — ZH registration/login с латинским
   username/password; восстановление доступно только администратору;
 - `SAFETYHUB_ADMIN_INBOX_ENABLED` — UI и no-store API административного inbox.
+  С 20260905150000 inbox доступен любому администратору через capability
+  `notifications.read` (admin_default = true); `audit.read` остаётся достаточной.
+
+История действий (`admin_audit_log`) с 20260905140000 хранит только продуктовые
+события (подтверждение регистрации, сдача теста, выдача сертификата, удаление
+учётной записи пользователем и администратором, назначение администратора) —
+остальные вставки отбрасывает BEFORE INSERT-триггер `admin_audit_log_event_whitelist`.
+Ретенция — 30 дней: почасовой pg_cron-джоб `safetyhub-audit-retention` вызывает
+`public.prune_admin_audit_log(1000)`; сама миграция разово очистила всю историю.
 
 В production/preview отсутствие значения и любое значение кроме точного `true`
 оставляет поверхность закрытой. Включение выполняется отдельной reviewed

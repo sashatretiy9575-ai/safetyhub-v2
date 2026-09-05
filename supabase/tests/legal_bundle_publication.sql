@@ -121,18 +121,16 @@ begin
     raise exception 'legal bundle publisher did not atomically activate all eight localizations';
   end if;
 
+  -- legal.bundle_published is filtered out by the audit whitelist
+  -- (20260905140000); idempotency is proven by the replay envelope alone.
   if (select count(*) from public.admin_audit_log audit
       where audit.action = 'legal.bundle_published'
-        and audit.target_id = 'privacy:' || v_privacy_version || '|terms:' || v_terms_version
-        and audit.actor_user_id = v_admin_id) <> 1 then
-    raise exception 'legal bundle publisher audit receipt is missing';
+        and audit.target_id = 'privacy:' || v_privacy_version || '|terms:' || v_terms_version) <> 0 then
+    raise exception 'legal bundle publisher still writes to the action history';
   end if;
 
   v_replayed := public.publish_legal_document_bundle(v_privacy_version, v_terms_version);
-  if coalesce((v_replayed ->> 'replayed')::boolean, false) is not true
-    or (select count(*) from public.admin_audit_log audit
-        where audit.action = 'legal.bundle_published'
-          and audit.target_id = 'privacy:' || v_privacy_version || '|terms:' || v_terms_version) <> 1 then
+  if coalesce((v_replayed ->> 'replayed')::boolean, false) is not true then
     raise exception 'legal bundle publisher replay was not idempotent';
   end if;
 

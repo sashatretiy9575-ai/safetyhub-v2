@@ -16,11 +16,13 @@ registration, course completion, or system operation.
 ## Trust boundaries
 
 - The browser reads the inbox only through same-origin, no-store Next.js APIs.
-- Inbox RPCs require the `audit.read` capability. The browser never creates a
-  Supabase client and never receives delivery leases.
+- Inbox RPCs require the `notifications.read` capability (granted to every
+  admin by default since 20260905150000) or `audit.read`. The browser never
+  creates a Supabase client and never receives delivery leases.
 - The API validates an exact payload allowlist per event type before returning
-  data. A future SQL payload field is fail-closed until the application
-  contract explicitly accepts it.
+  data. An item that fails the contract is skipped (and logged server-side)
+  instead of failing the whole inbox; legacy pre-20260902180000 payloads were
+  purged by 20260905150000.
 - The dispatcher accepts only `POST` with a constant-time checked bearer. It
   uses a service-role Supabase client only inside the Edge Function.
 - Every newly-created `account.approval_requested` event has exactly the

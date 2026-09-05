@@ -19,28 +19,8 @@ const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 // so the pending tail is empty and the whole history is a pinned receipt. Adding
 // a migration means adding it here too, with its hash; an open-ended local tail
 // would defeat this preflight.
-export const REVIEWED_BASE_MIGRATION_COUNT = 66;
+export const REVIEWED_BASE_MIGRATION_COUNT = 71;
 export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
-  Object.freeze({
-    filename: '20260901100000_locale_profile_legal_contracts.sql',
-    sha256: '5b07cd3e7784c6d33993879905e24a012c40397a5e46fed991fb0d7c37da5ce4',
-  }),
-  Object.freeze({
-    filename: '20260901101000_localized_content_tables.sql',
-    sha256: 'a39f0fb3e7c055299827e1120d132bf899f38fddb42986a27f61b581e6d3edf2',
-  }),
-  Object.freeze({
-    filename: '20260901102000_localized_course_publication_reads.sql',
-    sha256: '032ade2af4a60febe82f0d995d65c387eec5d4a691d23b7eaa29d7c26c845699',
-  }),
-  Object.freeze({
-    filename: '20260901102500_localized_article_legal_publication_reads.sql',
-    sha256: '7adff3230de440c1c4ce8134531af2496538119041f66f91c52cbea8ecbc10ed',
-  }),
-  Object.freeze({
-    filename: '20260901103000_zh_webauthn_auth.sql',
-    sha256: 'bdcb02d52c3a107a23203715156facfde6c74ac8b0f59d1560f57527363b5c15',
-  }),
   Object.freeze({
     filename: '20260901103500_zh_session_epoch_enforcement.sql',
     sha256: '7fe0749100fd693a1c844c33d1b229c466b65494cd85aeb6209d84b8483a1d8f',
@@ -129,8 +109,6 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
     filename: '20260903220000_presentation_service_role_grant.sql',
     sha256: '74293956a2ab53f2758fcb9eddad6f9abba351bad3fae8e7c7107c8cdc3ef5f6',
   }),
-]);
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260905100000_immediate_admin_account_purge.sql',
     sha256: '90f9fbc139659a0a4d70c7ce67304b0fd03e481dd6528700c94e6f6196e50907',
@@ -150,6 +128,20 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260905130000_distinguishable_certificate_issue_refusals.sql',
     sha256: '0b27d75f48ea6bacf95e4a96ce9648819300373f52c54de1c43363a54952d1a7',
+  }),
+]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+  Object.freeze({
+    filename: '20260905140000_audit_event_whitelist_and_retention.sql',
+    sha256: '104a95972b6ef01c1a6c61d2ba1c85b17cfdc9f051b33bd99f4c43ff49da5d7f',
+  }),
+  Object.freeze({
+    filename: '20260905150000_admin_inbox_capability_and_legacy_payloads.sql',
+    sha256: 'd6f1d1cff502de8c30f8df6a6a64a3c0d237b158387815f78a553ced4eadb441',
+  }),
+  Object.freeze({
+    filename: '20260905160000_confirm_and_issue_certificates.sql',
+    sha256: 'ec1179eb7c49ae9d5737a4e57aca08f1505ce8d650e605d11e5df4e460f1dc0a',
   }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =

@@ -2,9 +2,12 @@ import { CourseCard } from '@/components/marketing/course-card';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
+import { JsonLd } from '@/components/shared/json-ld';
 import { getTopics } from '@/lib/content/topics';
 import { getCourseCoverImage } from '@/lib/course-cover-images';
-import { buildMetadata } from '@/lib/seo';
+import { breadcrumbsJsonLd, buildMetadata } from '@/lib/seo';
+import { absoluteUrl } from '@/lib/utils';
+import { localizePathname } from '@/i18n/config';
 
 export async function generateMetadata() {
   const t = await getTranslations('Topics');
@@ -23,6 +26,12 @@ export default async function TopicsPage() {
 
   return (
     <>
+      <JsonLd
+        data={breadcrumbsJsonLd([
+          { name: t('breadcrumbHome'), url: absoluteUrl(localizePathname('/', locale)) },
+          { name: t('breadcrumbCourses'), url: absoluteUrl(localizePathname('/topics', locale)) },
+        ])}
+      />
       <PageHeader
         title={t('title')}
         description={t('description')}

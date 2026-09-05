@@ -300,7 +300,6 @@ async function createZhLoadTestUser(admin, index, legal) {
 function buildSyntheticDomainData(users, revisions, timestamp) {
   const attempts = [];
   const attestations = [];
-  const audits = [];
   const completedBase = Date.parse(timestamp) - 20 * 24 * 60 * 60 * 1_000;
 
   users.forEach((user, userIndex) => {
@@ -364,19 +363,9 @@ function buildSyntheticDomainData(users, revisions, timestamp) {
       });
     });
 
-    audits.push({
-      actor_user_id: null,
-      target_user_id: user.id,
-      target_type: 'user',
-      target_id: user.id,
-      action: 'load_test.seeded',
-      after_data: { synthetic: true },
-      correlation_id: crypto.randomUUID(),
-      created_at: timestamp,
-    });
   });
 
-  return { attempts, attestations, audits };
+  return { attempts, attestations };
 }
 
 async function timedRpc(client, name, args) {
@@ -778,7 +767,6 @@ async function main() {
   const synthetic = buildSyntheticDomainData(createdUsers, revisions, now);
   await insertChunks(admin, 'test_attempts', synthetic.attempts);
   await insertChunks(admin, 'attestations', synthetic.attestations);
-  await insertChunks(admin, 'admin_audit_log', synthetic.audits);
   process.stdout.write(
     `LOAD_PREP_DOMAIN=attempts:${synthetic.attempts.length},attestations:${synthetic.attestations.length}\n`,
   );

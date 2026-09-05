@@ -92,19 +92,15 @@ export function OperatorRoleForm() {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
         />
-        <p className="text-xs text-[var(--color-text-muted)]">
-          Адрес, которым человек входит на сайт. Он должен зайти хотя бы один раз — только тогда
-          аккаунт существует и его можно назначить.
-        </p>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="operator-reason">Причина, минимум 10 символов</Label>
+        <Label htmlFor="operator-reason">Причина (в журнал действий)</Label>
         <Textarea
           id="operator-reason"
           required
           minLength={10}
           maxLength={500}
-          placeholder="Например: новый специалист по охране труда, ведёт выдачу сертификатов"
+          placeholder="Не менее 10 символов"
           value={reason}
           onChange={(event) => setReason(event.target.value)}
         />

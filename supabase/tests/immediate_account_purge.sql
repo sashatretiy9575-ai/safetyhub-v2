@@ -142,6 +142,13 @@ begin
   ) then
     raise exception 'deletion left no audit trail';
   end if;
+  -- The batch summary row is filtered out by the audit whitelist
+  -- (20260905140000): per-account user.purged rows are the only record.
+  if exists (
+    select 1 from public.admin_audit_log where action = 'user.purge.bulk'
+  ) then
+    raise exception 'bulk purge still writes a duplicate summary row';
+  end if;
 
   if (public.admin_purge_user_accounts(
         v_key, array[v_target], 'Проверка немедленного удаления администратором'

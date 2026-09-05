@@ -61,24 +61,15 @@ begin
     raise exception 'the restored description differs from the destroyed one';
   end if;
 
-  -- The audit row carries counts and field names, never question text.
-  if not exists (
-    select 1
-    from public.admin_audit_log entry
-    where entry.action = 'course.draft_restored_from_revision'
-      and entry.target_id = v_test_id::text
-  ) then
-    raise exception 'the restore was not audited';
-  end if;
+  -- course.draft_restored_from_revision is filtered out by the audit whitelist
+  -- (20260905140000): the restore leaves no history row.
   if exists (
     select 1
     from public.admin_audit_log entry
     where entry.action = 'course.draft_restored_from_revision'
       and entry.target_id = v_test_id::text
-      and (entry.after_data::text ilike '%correctOptionId%'
-        or entry.after_data::text ilike '%options%')
   ) then
-    raise exception 'the restore audit row leaked question content';
+    raise exception 'the restore still writes to the action history';
   end if;
 
   -- A second run must not touch a bank that is now complete.

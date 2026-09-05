@@ -57,13 +57,7 @@ export default async function AdminOperatorsPage({
   return (
     <section className="mx-auto max-w-4xl space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight">Администраторы</h1>
-          <p className="mt-1 max-w-2xl text-sm text-[var(--color-text-muted)]">
-            У администратора есть доступ ко всей панели: заявки, сотрудники, курсы, материалы и
-            настройки.
-          </p>
-        </div>
+        <h1 className="font-display text-2xl font-bold tracking-tight">Администраторы</h1>
         <Button asChild variant="outline">
           <Link href="/admin/settings">К настройкам</Link>
         </Button>

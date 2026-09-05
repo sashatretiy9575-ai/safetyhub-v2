@@ -50,6 +50,7 @@ type CertificateHistoryItem = {
 
 export type AttestationPendingAction =
   | { kind: 'confirm' }
+  | { kind: 'confirm-issue' }
   | { kind: 'bulk-update'; field: 'job' | 'organization' }
   | {
       kind: 'individual-update';
@@ -179,7 +180,14 @@ export function nextAttestationStep(
   if (row.courseDeleted) return null;
   if (row.certificateState === 'not_eligible') return null;
   if (row.identityState !== 'verified' && permissions.canManageIdentity) {
-    return { label: 'Проверить и подтвердить данные', action: { kind: 'confirm' } };
+    if (
+      permissions.canIssue &&
+      row.certificateState === 'pending_identity' &&
+      Boolean(row.attestationId)
+    ) {
+      return { label: 'Подтвердить и выдать', action: { kind: 'confirm-issue' } };
+    }
+    return { label: 'Подтвердить данные', action: { kind: 'confirm' } };
   }
   if (
     permissions.canIssue &&
@@ -266,10 +274,8 @@ export function AttestationBulkActionButtons({
 }) {
   const scope = (applicable: number, unit: 'people' | 'rows') =>
     applicable === 0
-      ? 'Нет подходящих строк в выделении'
-      : `${applicable} из ${unit === 'people' ? summary.people : summary.total} ${
-          unit === 'people' ? 'выбранных человек' : 'выбранных строк'
-        }`;
+      ? 'Нет подходящих строк'
+      : `${applicable} из ${unit === 'people' ? summary.people : summary.total}`;
 
   const primary: Array<{
     key: string;
@@ -281,6 +287,17 @@ export function AttestationBulkActionButtons({
     action: AttestationPendingAction;
   }> = [];
 
+  if (permissions.canManageIdentity && permissions.canIssue) {
+    primary.push({
+      key: 'confirm-issue',
+      label: 'Подтвердить и выдать',
+      hint: summary.total === 0 ? 'Нет подходящих строк' : `${summary.total} строк`,
+      icon: <CheckCircle />,
+      disabled: summary.total === 0,
+      variant: 'primary',
+      action: { kind: 'confirm-issue' },
+    });
+  }
   if (permissions.canManageIdentity) {
     primary.push({
       key: 'confirm',
@@ -459,7 +476,7 @@ function AttestationIdentityForm({
       <div>
         <h3 className="text-base font-bold">Исправить данные</h3>
         <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-          Измените нужные поля и сохраните один раз. Данные будут подтверждены для сертификата.
+          Изменения сохраняются и подтверждаются сразу.
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">

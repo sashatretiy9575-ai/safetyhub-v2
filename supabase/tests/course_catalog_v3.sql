@@ -1083,9 +1083,11 @@ begin
   );
   if (v_replay ->> 'replayed')::boolean is not true
     or v_replay -> 'counts' is distinct from v_result -> 'counts'
+    -- learning_history.deleted is filtered out by the audit whitelist
+    -- (20260905140000); idempotency is proven by the replay envelope alone.
     or (select count(*) from public.admin_audit_log
         where action = 'learning_history.deleted'
-          and batch_id = v_history_key) <> 1 then
+          and batch_id = v_history_key) <> 0 then
     raise exception 'learning-history idempotency failed: %', v_replay;
   end if;
 

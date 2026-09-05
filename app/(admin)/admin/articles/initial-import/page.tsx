@@ -14,7 +14,7 @@ export default async function InitialArticleImportPage() {
       <div>
         <h1 className="font-display text-3xl font-bold">Первичная публикация материалов</h1>
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Защищённая публикация утверждённого снимка статей в новый каталог.
+          Публикация утверждённого снимка статей.
         </p>
       </div>
       <Card>
@@ -26,7 +26,6 @@ export default async function InitialArticleImportPage() {
         </CardHeader>
         <CardContent>
           <p className="mb-4 text-sm text-[var(--color-text-muted)]">
-            Операция прекращается при несовпадении проекта, снимка или уже размещённых данных.
             Повторный запуск не создаёт дубликаты.
           </p>
           <InitialArticleImportForm confirmation={INITIAL_ARTICLE_IMPORT_CONFIRMATION} />

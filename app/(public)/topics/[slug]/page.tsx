@@ -70,6 +70,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
             locale,
             credentialName: courseT('credentialAwarded'),
             locationName: footerT('city'),
+            durationMinutes: topic.durationMinutes,
           }),
           breadcrumbsJsonLd([
             { name: t('breadcrumbHome'), url: absoluteUrl(localizePathname('/', locale)) },

@@ -87,14 +87,12 @@ const SKIP_REASON_LABELS: Record<string, string> = {
   ATTESTATION_NOT_FOUND: 'результат теста больше не существует',
   ACCOUNT_UNAVAILABLE: 'аккаунт недоступен',
   ACTIVE_CERTIFICATE_EXISTS: 'действующий сертификат уже выдан',
-  CERTIFICATE_LOCALIZATION_NOT_FOUND:
-    'у курса нет версии на языке, на котором сдавали тест — переопубликуйте курс',
+  CERTIFICATE_LOCALIZATION_NOT_FOUND: 'нет версии курса на языке теста — переопубликуйте курс',
   CERTIFICATE_NOT_FOUND: 'сертификат не найден',
   ACCOUNT_SUSPENDED: 'аккаунт заблокирован',
-  ACCOUNT_DELETION_REQUESTED: 'сотрудник помечен на удаление — восстановить его нельзя',
+  ACCOUNT_DELETION_REQUESTED: 'помечен на удаление',
   CANNOT_DELETE_SELF: 'нельзя удалить собственный аккаунт',
-  ACCOUNT_HAS_PENDING_AUTH_OPERATIONS:
-    'по аккаунту не завершена служебная операция — повторите через минуту',
+  ACCOUNT_HAS_PENDING_AUTH_OPERATIONS: 'идёт служебная операция — повторите через минуту',
   LAST_ACTIVE_SUPERADMIN_PROTECTED: 'нельзя удалить последнего администратора',
   OPERATION_SKIPPED: 'состояние строки изменилось до выполнения',
 };
@@ -369,6 +367,10 @@ export function AttestationsManager({
   };
 
   const openSingleAction = (row: AdminAttestationRow, action: AttestationPendingAction) => {
+    if (action.kind === 'confirm-issue') {
+      void runConfirmIssueDirect(row);
+      return;
+    }
     setSelected(new Set([row.recordId]));
     setResolvedSelection(null);
     setPending(action);
@@ -381,14 +383,21 @@ export function AttestationsManager({
     if (pending.kind === 'confirm') {
       return {
         title: 'Подтвердить данные',
-        description: `Выбрано ${selectionSummary.people} человек. Подтверждение применимо к ${selectionSummary.pendingIdentity}. Сертификаты станут доступны к выдаче только для сданных курсов.`,
+        description: `Будут подтверждены данные: ${selectionSummary.pendingIdentity} чел.`,
         confirmLabel: `Подтвердить ${selectionSummary.pendingIdentity}`,
+      };
+    }
+    if (pending.kind === 'confirm-issue') {
+      return {
+        title: 'Подтвердить и выдать',
+        description: `Данные будут подтверждены, сертификаты выданы: ${selectionSummary.total}.`,
+        confirmLabel: `Подтвердить и выдать ${selectionSummary.total}`,
       };
     }
     if (pending.kind === 'bulk-update') {
       return {
         title: `Изменить поле «${attestationFieldLabels[pending.field]}»`,
-        description: `Новое значение будет применено к ${selectionSummary.people} людям. Действующие сертификаты будут отозваны и перевыпущены с новыми номерами.`,
+        description: `Значение применится к ${selectionSummary.people} чел.; действующие сертификаты перевыпускаются.`,
         confirmLabel: 'Сохранить изменение',
         input: { label: `Новое значение: ${attestationFieldLabels[pending.field]}` },
       };
@@ -397,7 +406,7 @@ export function AttestationsManager({
       const oldValue = pending.row[pending.field];
       return {
         title: `Изменить поле «${attestationFieldLabels[pending.field]}»`,
-        description: `Текущее значение: «${oldValue || 'не указано'}». Действующие сертификаты этого человека будут перевыпущены.`,
+        description: `Текущее: «${oldValue || 'не указано'}». Сертификаты перевыпускаются.`,
         confirmLabel: 'Сохранить изменение',
         input: {
           label: `Новое значение: ${attestationFieldLabels[pending.field]}`,
@@ -410,18 +419,18 @@ export function AttestationsManager({
       const firstWarning = typoWarnings[0];
       const warningText =
         firstWarning
-          ? ` ⚠️ Внимание: обнаружены похожие компании («${firstWarning.primary}» — ${firstWarning.primaryCount} чел. и «${firstWarning.typo}» — ${firstWarning.typoCount} чел.). Возможно, это опечатка в названии. Рекомендуем объединить перед выдачей.`
+          ? ` ⚠️ Похожие компании: «${firstWarning.primary}» и «${firstWarning.typo}» — проверьте перед выдачей.`
           : '';
       return {
         title: 'Выдать сертификаты',
-        description: `Выбрано ${selectionSummary.total} результатов. Сейчас выдача применима к ${selectionSummary.readyToIssue}; ожидаемо будет пропущено ${Math.max(0, selectionSummary.total - selectionSummary.readyToIssue)}.${warningText}`,
+        description: `Выдача: ${selectionSummary.readyToIssue} из ${selectionSummary.total} выбранных.${warningText}`,
         confirmLabel: `Выдать ${selectionSummary.readyToIssue}`,
       };
     }
     if (pending.kind === 'bulk-delete') {
       return {
         title: 'Удалить сотрудников',
-        description: `Будет удалено человек: ${selectionSummary.people}. Аккаунт, профиль, попытки, аттестации и сертификаты стираются сразу и безвозвратно; человек больше не сможет войти и исчезнет из всех списков.`,
+        description: `Будет удалено человек: ${selectionSummary.people}. Аккаунт, попытки и сертификаты удаляются безвозвратно.`,
         confirmLabel: `Удалить ${selectionSummary.people} чел.`,
         tone: 'danger',
         reason: {
@@ -435,7 +444,7 @@ export function AttestationsManager({
     }
     return {
       title: 'Скачать пакет документов',
-      description: `Выбрано строк: ${selectionSummary.total}. Действующих сертификатов: ${selectionSummary.exportable}. Строки без действующего сертификата не войдут в ZIP. Даже при нуле сертификатов архив содержит общий отчёт.`,
+      description: `Сертификатов в ZIP: ${selectionSummary.exportable} из ${selectionSummary.total} + сводный отчёт.`,
       confirmLabel: 'Сформировать ZIP',
     };
   }, [pending, selectedRows, selectionSummary]);
@@ -449,6 +458,7 @@ export function AttestationsManager({
     const skipped = items.filter((item) => item.status === 'skipped');
     const actionLabel = {
       confirm: 'Данные подтверждены',
+      'confirm-issue': 'Данные подтверждены, сертификаты выданы',
       'bulk-update': 'Данные обновлены',
       'individual-update': 'Данные обновлены',
       issue: 'Сертификаты выданы',
@@ -535,36 +545,12 @@ export function AttestationsManager({
     }
   };
 
-  const confirmAction = async ({ value, reason }: { value: string; reason: string }) => {
-    if (!pending) return;
-    if (pending.kind === 'export') {
-      setPending(null);
-      await downloadZip();
-      return;
-    }
-    if (pending.kind === 'bulk-delete') {
-      await purgeSelectedUsers(reason);
-      return;
-    }
+  const runAttestationAction = async (
+    body: Record<string, unknown>,
+    actionKind: AttestationPendingAction['kind'],
+  ) => {
     setBusy(true);
     setError('');
-    const actionKind = pending.kind;
-    const idempotencyKey = idempotencyKeyRef.current || crypto.randomUUID();
-    idempotencyKeyRef.current = idempotencyKey;
-    const body =
-      pending.kind === 'confirm'
-        ? { action: 'confirm', userIds, idempotencyKey }
-        : pending.kind === 'bulk-update'
-          ? { action: 'update', userIds, field: pending.field, value, idempotencyKey }
-          : pending.kind === 'individual-update'
-            ? {
-                action: 'update',
-                userIds: [pending.row.userId],
-                field: pending.field,
-                value,
-                idempotencyKey,
-              }
-            : { action: 'issue', attestationIds, idempotencyKey };
     try {
       const result = await clientRequest('/api/admin/attestations/actions', {
         method: 'POST',
@@ -595,6 +581,56 @@ export function AttestationsManager({
     } finally {
       setBusy(false);
     }
+  };
+
+  const confirmAction = async ({ value, reason }: { value: string; reason: string }) => {
+    if (!pending) return;
+    if (pending.kind === 'export') {
+      setPending(null);
+      await downloadZip();
+      return;
+    }
+    if (pending.kind === 'bulk-delete') {
+      await purgeSelectedUsers(reason);
+      return;
+    }
+    const idempotencyKey = idempotencyKeyRef.current || crypto.randomUUID();
+    idempotencyKeyRef.current = idempotencyKey;
+    const body =
+      pending.kind === 'confirm'
+        ? { action: 'confirm', userIds, idempotencyKey }
+        : pending.kind === 'confirm-issue'
+          ? { action: 'confirm_and_issue', attestationIds, idempotencyKey }
+          : pending.kind === 'bulk-update'
+            ? { action: 'update', userIds, field: pending.field, value, idempotencyKey }
+            : pending.kind === 'individual-update'
+              ? {
+                  action: 'update',
+                  userIds: [pending.row.userId],
+                  field: pending.field,
+                  value,
+                  idempotencyKey,
+                }
+              : { action: 'issue', attestationIds, idempotencyKey };
+    await runAttestationAction(body, pending.kind);
+  };
+
+  // Single-row "confirm + issue" has no inputs, so it skips the dialog entirely.
+  const runConfirmIssueDirect = async (row: AdminAttestationRow) => {
+    if (!row.attestationId) return;
+    setSelected(new Set([row.recordId]));
+    setResolvedSelection(null);
+    setPending(null);
+    setDetail(null);
+    setBulkActionsOpen(false);
+    await runAttestationAction(
+      {
+        action: 'confirm_and_issue',
+        attestationIds: [row.attestationId],
+        idempotencyKey: crypto.randomUUID(),
+      },
+      'confirm-issue',
+    );
   };
 
   const downloadZip = async () => {
@@ -990,10 +1026,6 @@ export function AttestationsManager({
                     <X />
                   </Button>
                 </header>
-                <p className="mb-4 rounded-xl bg-[var(--color-surface-muted)] p-3 text-sm text-[var(--color-text-muted)]">
-                  {selectionSummary.people} чел. · проверить {selectionSummary.pendingIdentity} ·
-                  выдать {selectionSummary.readyToIssue} · PDF {selectionSummary.exportable}
-                </p>
                 <AttestationBulkActionButtons
                   summary={selectionSummary}
                   permissions={permissions}

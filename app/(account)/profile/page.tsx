@@ -114,19 +114,7 @@ function NextStep({
               </div>
             </div>
           ) : (
-            <div className="space-y-1 text-sm text-[var(--color-text-muted)]">
-              <p>
-                <strong className="text-[var(--color-text)]">{t('now')}</strong>{' '}
-                {t('nowDescription')}
-              </p>
-              <p>
-                <strong className="text-[var(--color-text)]">{t('then')}</strong>{' '}
-                {t('thenDescription')}
-              </p>
-              <p>
-                <strong className="text-[var(--color-text)]">{t('nothingRequired')}</strong>
-              </p>
-            </div>
+            <p className="text-sm text-[var(--color-text-muted)]">{t('certificateAfterReview')}</p>
           )}
         </CardContent>
       </Card>
@@ -163,7 +151,9 @@ function NextStep({
           <p className="text-sm text-[var(--color-text-muted)]">{t('nextStep')}</p>
           <h2 className="font-display text-lg font-bold">
             {nextCourse
-              ? t('continueCourse', { title: nextCourse.courseTitle })
+              ? nextCourse.resultState === 'not_started'
+                ? t('startCourse', { title: nextCourse.courseTitle })
+                : t('continueCourse', { title: nextCourse.courseTitle })
               : t('chooseCourse')}
           </h2>
         </div>
@@ -174,7 +164,11 @@ function NextStep({
               locale,
             )}
           >
-            {nextCourse ? t('toCourse') : t('allCourses')}
+            {nextCourse
+              ? nextCourse.resultState === 'not_started'
+                ? t('start')
+                : t('toCourse')
+              : t('allCourses')}
           </Link>
         </Button>
       </CardContent>

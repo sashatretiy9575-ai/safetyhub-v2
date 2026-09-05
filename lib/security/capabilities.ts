@@ -17,6 +17,7 @@ export const ADMIN_CAPABILITIES = [
   'results.export',
   'site.settings.manage',
   'audit.read',
+  'notifications.read',
   'capability.manage',
 ] as const;
 
@@ -35,6 +36,7 @@ export const DEFAULT_ADMIN_CAPABILITIES: readonly AdminCapability[] = [
   'results.delete',
   'results.export',
   'site.settings.manage',
+  'notifications.read',
 ];
 
 export const SUPERADMIN_ONLY_CAPABILITIES: readonly AdminCapability[] = [
@@ -62,6 +64,7 @@ export const CAPABILITY_LABELS: Record<AdminCapability, string> = {
   'results.export': 'Результаты: экспорт отчётов и ZIP',
   'site.settings.manage': 'Сайт: телефон и WhatsApp',
   'audit.read': 'Аудит: просмотр журнала',
+  'notifications.read': 'Уведомления администратора',
   'capability.manage': 'Доступ: назначение полномочий',
 };
 

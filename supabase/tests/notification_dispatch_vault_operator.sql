@@ -103,17 +103,14 @@ begin
     ) then
     raise exception 'Vault operator receipt is invalid or leaked configuration bytes';
   end if;
-  if not exists (
+  -- notification_dispatch.vault_configured is filtered out by the audit
+  -- whitelist (20260905140000); the vault receipt above stays the record.
+  if exists (
     select 1
     from public.admin_audit_log audit
     where audit.action = 'notification_dispatch.vault_configured'
-      and audit.correlation_id = v_key
-      and audit.reason = v_reason
-      and audit.after_data ->> 'configured' = 'true'
-      and audit.after_data::text not like '%' || v_secret || '%'
-      and audit.after_data::text not like '%' || v_url || '%'
   ) then
-    raise exception 'Vault operator audit receipt is missing or unsafe';
+    raise exception 'Vault operator still writes to the action history';
   end if;
 
   v_failed := false;

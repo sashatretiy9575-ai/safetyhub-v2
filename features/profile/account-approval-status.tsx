@@ -19,9 +19,7 @@ type ApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
 
 function formatRemaining(milliseconds: number) {
   const totalMinutes = Math.max(0, Math.ceil(milliseconds / 60_000));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  return { hours: Math.floor(totalMinutes / 60), minutes: totalMinutes % 60 };
 }
 
 function formatDueAt(value: string, locale: AppLocale) {
@@ -165,70 +163,27 @@ export function AccountApprovalStatus({
       aria-labelledby="approval-pending-title"
       className="relative overflow-hidden rounded-2xl border border-[var(--color-primary)]/40 bg-[var(--color-surface)] p-6 sm:p-8 shadow-sm"
     >
-      <div className="relative space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-              <HourglassMedium size={26} weight="duotone" className="animate-pulse" />
-            </div>
-            <div>
-              <p className="text-xs font-bold tracking-wider text-[var(--color-primary)] uppercase">
-                {t('pendingEyebrow')}
-              </p>
-              <h2 id="approval-pending-title" className="font-display text-xl sm:text-2xl font-black text-[var(--color-text)]">
-                {t('pendingTitle')}
-              </h2>
-            </div>
+      <div className="relative space-y-5">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+            <HourglassMedium size={26} weight="duotone" className="animate-pulse" />
           </div>
-
-          <div className="inline-flex items-center gap-2 self-start sm:self-auto rounded-full bg-[var(--color-primary-soft)] px-3.5 py-1.5 text-xs font-bold text-[var(--color-primary)] border border-[var(--color-primary)]/20">
-            <span className="h-2 w-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
-            <span>{dueLabel ? t('deadline', { deadline: dueLabel.split(', ')[1] ?? dueLabel }) : t('pendingEyebrow')}</span>
+          <div>
+            <h2 id="approval-pending-title" className="font-display text-xl sm:text-2xl font-black text-[var(--color-text)]">
+              {t('pendingTitle')}
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--color-text-muted)] max-w-2xl">
+              {t('pendingDescription')}
+            </p>
           </div>
         </div>
 
-        <p className="text-sm leading-relaxed text-[var(--color-text-muted)] max-w-2xl">
-          {t('pendingDescription')}
-        </p>
-
-        {/* 3-step progress track */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl bg-[var(--color-surface-muted)] p-3 sm:p-4 border border-[var(--color-border)]">
-          <div className="flex flex-col items-center text-center">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)] text-xs font-bold mb-1.5">
-              ✓
-            </div>
-            <span className="text-xs text-[var(--color-text-muted)] font-medium">{t('profileAction')}</span>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] text-white text-xs font-bold mb-1.5 shadow-sm">
-              2
-            </div>
-            <span className="text-xs text-[var(--color-primary)] font-bold">{t('pendingEyebrow')}</span>
-          </div>
-          <div className="flex flex-col items-center text-center opacity-60">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-border)] text-[var(--color-text-muted)] text-xs font-bold mb-1.5">
-              3
-            </div>
-            <span className="text-xs text-[var(--color-text-muted)] font-medium">{t('accessEyebrow')}</span>
-          </div>
-        </div>
-
-        {/* Timer countdown box */}
         {remaining === null ? (
-          <div className="rounded-xl border border-[var(--color-border-strong)]/40 bg-[var(--color-surface)]/70 p-4">
-            <p className="text-sm font-medium text-[var(--color-text-muted)]">
-              {t('pendingNoDue')}
-            </p>
-          </div>
+          <p className="text-sm font-medium text-[var(--color-text-muted)]">{t('pendingNoDue')}</p>
         ) : expired ? (
-          <div
-            role="status"
-            className="rounded-xl border border-[var(--color-warning)]/60 bg-[var(--color-accent-amber-soft)]/20 p-4"
-          >
-            <p className="text-sm font-semibold text-[var(--color-warning)]">
-              {t('overdue')}
-            </p>
-          </div>
+          <p role="status" className="text-sm font-semibold text-[var(--color-warning)]">
+            {t('overdue')}
+          </p>
         ) : (
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[var(--color-primary)]/20 bg-[var(--color-surface)] p-4 sm:p-5 shadow-sm">
             <div className="min-w-0">
@@ -243,25 +198,20 @@ export function AccountApprovalStatus({
                   {t('deadline', { deadline: dueLabel })}
                 </p>
               ) : null}
-              <p className="mt-0.5 text-xs text-[var(--color-text-subtle)]">{t('countdownHint')}</p>
             </div>
-            <div className="flex flex-col items-end">
-              <time
-                dateTime={dueAt ?? undefined}
-                role="timer"
-                aria-live="off"
-                aria-label={t('remaining')}
-                className="font-mono text-2xl sm:text-3xl font-black tracking-tight text-[var(--color-primary)] tabular-nums"
-              >
-                {formatRemaining(remaining)}
-              </time>
-            </div>
+            <time
+              dateTime={dueAt ?? undefined}
+              role="timer"
+              aria-live="off"
+              aria-label={t('remaining')}
+              className="font-mono text-2xl sm:text-3xl font-black tracking-tight text-[var(--color-primary)] tabular-nums"
+            >
+              {t('remainingValue', formatRemaining(remaining))}
+            </time>
           </div>
         )}
 
-        <div className="pt-1">
-          <ReviewContacts contacts={contacts} />
-        </div>
+        <ReviewContacts contacts={contacts} />
       </div>
     </section>
   );

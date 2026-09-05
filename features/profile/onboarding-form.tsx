@@ -362,7 +362,7 @@ export function OnboardingForm({
       </section>
 
       <div className="space-y-3">
-        <Button type="submit" className="w-full" disabled={busy}>
+        <Button type="submit" size="xl" className="w-full" disabled={busy}>
           <UserCircleCheck size={19} />
           {busy ? t('submitting') : t('submit')}
           {!busy ? <ArrowRight size={18} /> : null}

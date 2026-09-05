@@ -1394,6 +1394,7 @@ export type Database = {
         Args: { p_attempt_id: string; p_retry_at?: string }
         Returns: Json
       }
+      audit_event_allowed: { Args: { p_action: string }; Returns: boolean }
       authorize_zh_username_password_session: {
         Args: { p_session_id: string; p_user_id: string }
         Returns: boolean
@@ -1447,6 +1448,10 @@ export type Database = {
       }
       confirm_admin_identities_unmetered: {
         Args: { p_user_ids: string[] }
+        Returns: Json
+      }
+      confirm_and_issue_certificates_unmetered: {
+        Args: { p_attestation_ids: string[] }
         Returns: Json
       }
       confirm_profile_identity: {
@@ -4677,6 +4682,7 @@ export type Database = {
         Args: { p_limit?: number }
         Returns: Json
       }
+      prune_admin_audit_log: { Args: { p_limit?: number }; Returns: Json }
       prune_admin_operation_receipts: {
         Args: { p_limit?: number }
         Returns: number

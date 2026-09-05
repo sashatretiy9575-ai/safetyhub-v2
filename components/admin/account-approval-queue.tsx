@@ -41,7 +41,7 @@ const errorMessages: Record<string, string> = {
 };
 
 const unconfirmedResultMessage =
-  'Решение могло сохраниться, но ответ сервера не удалось подтвердить. Очередь обновлена; перед повтором проверьте заявку.';
+  'Ответ сервера не подтверждён. Проверьте заявку перед повтором.';
 
 function dateTime(value: string) {
   const date = new Date(value);

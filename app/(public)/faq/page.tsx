@@ -1,6 +1,7 @@
-import { FaqAccordion } from '@/components/marketing/faq-accordion';
+import { FaqAccordion, getFaqData } from '@/components/marketing/faq-accordion';
 import { ContactCta } from '@/components/marketing/contact-cta';
-import { buildMetadata } from '@/lib/seo';
+import { JsonLd } from '@/components/shared/json-ld';
+import { buildMetadata, faqJsonLd } from '@/lib/seo';
 import { getLocale, getTranslations } from 'next-intl/server';
 
 export async function generateMetadata() {
@@ -13,9 +14,11 @@ export async function generateMetadata() {
   });
 }
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const faqData = await getFaqData();
   return (
     <>
+      <JsonLd data={faqJsonLd(faqData)} />
       <FaqAccordion headingLevel={1} />
       <ContactCta />
     </>

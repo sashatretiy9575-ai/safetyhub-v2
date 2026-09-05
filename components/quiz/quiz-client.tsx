@@ -10,7 +10,6 @@ import {
   CaretLeft,
   CheckCircle,
   Clock,
-  ListChecks,
   WarningCircle,
   XCircle,
 } from '@phosphor-icons/react';
@@ -156,7 +155,6 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
   const [error, setError] = useState('');
   const [errorCode, setErrorCode] = useState('');
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
-  const [startedQuiz, setStartedQuiz] = useState(false);
 
   const attemptRef = useRef<AttemptPayload | null>(null);
   const answersRef = useRef<QuizAnswer[]>([]);
@@ -789,54 +787,6 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                       ? t('retrySubmit')
                       : t('confirmSubmit')}
                   <CheckCircle size={18} />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </Container>
-      </section>
-    );
-  }
-
-  if (attempt.status === 'started' && !startedQuiz && answers.length === 0) {
-    return (
-      <section className="py-10 md:py-20">
-        <Container size="narrow">
-          <Card className="overflow-hidden border-2">
-            <CardContent className="space-y-6 p-6 sm:p-10 text-center">
-              <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                <ListChecks size={36} weight="duotone" />
-              </span>
-              <div className="space-y-2">
-                <h1 className="font-display text-2xl sm:text-3xl font-bold">{title}</h1>
-                <p className="text-sm text-[var(--color-text-muted)]">
-                  {t('rules.subtitle')}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 rounded-xl bg-[var(--color-surface-muted)] p-4 border border-[var(--color-border)] text-left">
-                <div className="space-y-1">
-                  <p className="text-xs text-[var(--color-text-muted)]">{t('rules.questions')}</p>
-                  <p className="font-bold text-base sm:text-lg tabular-nums">{attempt.questions.length}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-[var(--color-text-muted)]">{t('rules.time')}</p>
-                  <p className="font-bold text-base sm:text-lg tabular-nums">{t('rules.timeValue')}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-[var(--color-text-muted)]">{t('rules.passScore')}</p>
-                  <p className="font-bold text-base sm:text-lg tabular-nums">{t('rules.passScoreValue')}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-[var(--color-text-muted)]">{t('rules.attempts')}</p>
-                  <p className="font-bold text-base sm:text-lg tabular-nums">{t('rules.attemptsValue')}</p>
-                </div>
-              </div>
-
-              <div className="flex justify-center gap-3">
-                <Button size="lg" className="w-full sm:w-auto min-w-[12rem]" onClick={() => setStartedQuiz(true)}>
-                  {t('rules.start')}
-                  <ArrowRight size={18} />
                 </Button>
               </div>
             </CardContent>

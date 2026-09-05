@@ -8,7 +8,7 @@
 - Before changing courses, assessments, articles, or presentation assets, run `npm run content:pull:linked -- --check` when linked credentials are available. If it reports drift, pull and review the hosted content before editing.
 - Publish operational content through the admin application. After publication, run `npm run content:pull:linked`, review the deterministic diff, run `npm run content:parity:check`, and commit the refreshed snapshot.
 - Never export users, profiles, attempts, attestations, certificates, legal acceptances, sessions, identities, or audit events into `content/snapshots/`.
-- Keep assessment answer keys out of `public/`, learner payloads, public/anon RPC responses, logs, and analytics. The single exception is the Russian course editor, which reads the saved bank through `public.read_course_question_bank_v4` under the `test.manage` capability with an audit row per read. The repository is currently private; re-check repository visibility before committing answer-key snapshots.
+- Keep assessment answer keys out of `public/`, learner payloads, public/anon RPC responses, logs, and analytics. The single exception is the Russian course editor, which reads the saved bank through `public.read_course_question_bank_v4` under the `test.manage` capability. The repository is currently private; re-check repository visibility before committing answer-key snapshots.
 - Treat hosted Supabase as the operational content source and `content/snapshots/` as the reproducible local receipt. A local reset must recreate the same schema and catalog without copying operational personal data.
 
 ## Required verification

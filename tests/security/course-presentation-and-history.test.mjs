@@ -341,7 +341,7 @@ test('learning-history deletion is separately authorized, reasoned, idempotent a
   assert.match(control, /Попытки: \{history\?\.counts\.attempts/);
   assert.match(directory, /getLearningHistoryTargetsPage\(query\)/);
   assert.match(directory, /actor\.capabilities\.includes\('results\.read'\)/);
-  assert.match(directory, /аккаунтам и профилям/);
+  assert.match(directory, /включая сотрудников без аттестаций/);
   assert.match(directory, /\/admin\/employees\/\$\{user\.id\}\/learning-history/);
   assert.match(historyPage, /getAdminLearningHistory\(parsed\.data\.userId\)/);
   assert.match(historyPage, /initialHistory=\{history\}/);

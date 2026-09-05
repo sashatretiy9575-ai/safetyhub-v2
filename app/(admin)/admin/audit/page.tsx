@@ -23,137 +23,34 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 const actionLabels: Record<string, string> = {
-  'role.bootstrap_superadmin': 'Восстановлен административный доступ (архив)',
-  'role.update': 'Изменена роль',
-  'role.break_glass_superadmin': 'Аварийно восстановлен административный доступ (архив)',
-  'admin.break_glass_restored': 'Аварийно восстановлен административный доступ',
-  'user.suspend': 'Пользователь заблокирован',
-  'user.restore': 'Пользователь восстановлен',
-  'user.suspend_requested': 'Запрошена блокировка пользователя',
-  'user.restore_requested': 'Запрошено восстановление пользователя',
-  'user.purged': 'Пользователь удалён безвозвратно',
-  'user.purge.bulk': 'Массовое удаление пользователей',
-  'capability.set': 'Изменена прежняя конфигурация доступа',
-  'identity.verified': 'Личность подтверждена',
-  'identity.revoked': 'Подтверждение личности сброшено',
-  'certificate.revoke': 'Сертификат заменён',
-  'certificate.auto_revoked_identity_migration': 'Сертификат заменён автоматически',
-  'certificate.revoke_legacy_backfill': 'Зафиксирована прежняя замена сертификата',
-  'test.status': 'Изменён статус теста',
-  'course.question_bank_read': 'Открыт банк вопросов курса',
-  'article.status': 'Изменён статус статьи',
-  'auth_admin.reconcile_claim': 'Запущено согласование Auth Admin',
-  'account.approval_requested': 'Подана заявка на доступ',
-  'account.approval.approved': 'Заявка на доступ одобрена',
-  'account.approval.rejected': 'Заявка на доступ отклонена',
+  'account.approval.approved': 'Регистрация подтверждена',
+  'test.passed': 'Тест пройден',
+  'certificate.issued': 'Сертификат выдан',
+  'user.self_delete_requested': 'Пользователь удалил учётную запись',
+  'user.purged': 'Администратор удалил учётную запись',
+  'role.changed': 'Назначен администратор',
+  'role.changed_directly': 'Роль изменена напрямую в базе',
   'admin.provisioned_by_email': 'Администратор назначен по адресу почты',
   'superadmin.bootstrapped': 'Создан первый администратор',
-  'role.changed': 'Изменена роль',
-  'role.changed_directly': 'Роль изменена напрямую в базе',
-  'capabilities.changed': 'Изменены права доступа',
-  'learning_history.deleted': 'Удалена история обучения',
-  'organization.merged': 'Объединены компании',
-  'site.settings_updated': 'Изменены настройки сайта',
-  'notification.delivery_retried': 'Повторная отправка уведомления',
-  'auth_operation.claimed': 'Взята в работу операция входа',
-  'course.draft_saved': 'Сохранён черновик курса',
-  'course.draft_reviewed': 'Черновик курса проверен',
-  'course.published': 'Курс опубликован',
-  'course.deleted': 'Курс удалён',
-  'course.slug_changed': 'Изменён адрес курса',
-  'course.unused_draft_deleted': 'Удалён неиспользуемый черновик курса',
-  'course.localization_saved': 'Сохранён перевод курса',
-  'course.localizations_published': 'Опубликованы переводы курса',
-  'course.localization_assessment_imported': 'Загружены переводы вопросов курса',
-  'course.presentation_finalized': 'Презентация курса сохранена',
-  'course.presentation_retired': 'Презентация курса выведена из работы',
-  'test.draft_saved': 'Сохранён черновик теста',
-  'test.published': 'Тест опубликован',
-  'test.status_changed': 'Изменён статус теста',
-  'article.draft_saved': 'Сохранён черновик статьи',
-  'article.draft_reviewed': 'Черновик статьи проверен',
-  'article.published': 'Статья опубликована',
-  'article.deleted': 'Статья удалена',
-  'article.status_changed': 'Изменён статус статьи',
-  'article.localization_saved': 'Сохранён перевод статьи',
-  'article.localizations_published': 'Опубликованы переводы статьи',
-  'legal.version_staged': 'Подготовлена редакция документа',
-  'legal.version_published': 'Опубликована редакция документа',
-  'legal.bundle_published': 'Опубликован комплект документов',
-  'legal.localization_saved': 'Сохранён перевод документа',
-  'legal.localizations_published': 'Опубликованы переводы документов',
-  'certificate.issued': 'Сертификат выдан',
-  'certificate.revoked': 'Сертификат заменён',
-  'certificate.exported': 'Сертификаты выгружены',
-  'certificate.export_job.created': 'Создана выгрузка сертификатов',
-  'certificate.export_job.downloaded': 'Скачана выгрузка сертификатов',
-  'catalog.replaced': 'Каталог заменён',
-  'catalog.batch_prepared': 'Подготовлена загрузка каталога',
-  'catalog.initial_import_activated': 'Первичная загрузка каталога включена',
-  'catalog.maintenance_enabled': 'Включён режим обслуживания каталога',
-  'catalog.maintenance_disabled': 'Выключен режим обслуживания каталога',
-  'content_asset.delete_prepared': 'Подготовлено удаление файла',
-  'content_asset.orphan_marked': 'Файл отмечен как неиспользуемый',
-  'zh_username_password.created': 'Создан китайский аккаунт (логин и пароль)',
-  'zh_username_password.provisioning_started': 'Начата выдача китайского доступа',
-  'zh_username_password.reset_started': 'Начата смена китайского пароля',
-  'zh_username_password.reset_completed': 'Китайский пароль изменён',
-  'zh_credential.reset': 'Сброшен китайский доступ',
-};
-
-const bulkAttestationLabels: Record<string, string> = {
-  confirm: 'Массовое подтверждение результатов',
-  update: 'Массовое изменение результатов',
-  issue: 'Массовая выдача сертификатов',
-  revoke: 'Массовая замена сертификатов',
-};
-
-const operationLabels: Record<string, string> = {
-  invite: 'Приглашение пользователя',
-  suspend: 'Блокировка пользователя',
-  restore: 'Восстановление пользователя',
-  delete: 'Удаление пользователя',
+  'admin.break_glass_restored': 'Аварийно восстановлен административный доступ',
 };
 
 const statusLabels: Record<string, string> = {
-  started: 'В процессе',
-  completed: 'Завершено',
   passed: 'Пройдено',
-  failed: 'Ошибка',
-  expired: 'Время истекло',
-  prepared: 'Подготовлено',
-  confirmed: 'Подтверждено',
-  external_succeeded: 'Внешняя операция выполнена',
-  committed: 'Зафиксировано',
-  retryable: 'Ожидает повтора',
-  rolled_back: 'Откачено',
   active: 'Активно',
-  suspended: 'Заблокировано',
-  published: 'Опубликовано',
-  draft: 'Черновик',
-  revoked: 'Заменено',
+  approved: 'Подтверждено',
 };
 
 const quickFilters = [
   { value: '', label: 'Все события' },
-  { value: 'identity', label: 'Регистрации и доступ' },
-  { value: 'test', label: 'Тесты и баллы' },
+  { value: 'approval', label: 'Регистрации' },
+  { value: 'test', label: 'Тесты' },
   { value: 'certificate', label: 'Сертификаты' },
+  { value: 'user', label: 'Удаления' },
 ] as const;
 
 function readableAction(action: string) {
   if (actionLabels[action]) return actionLabels[action];
-  const operation = action.match(/^auth_admin\.(invite|suspend|restore|delete)\.([a-z_]+)$/);
-  if (operation) {
-    const operationName = operation[1] ?? '';
-    const status = operation[2] ?? '';
-    return `${operationLabels[operationName] ?? operationName}: ${statusLabels[status] ?? status}`;
-  }
-  const bulk = action.match(/^attestation.bulk.([a-z_]+)$/u);
-  if (bulk) {
-    const name = bulk[1] ?? '';
-    return bulkAttestationLabels[name] ?? `Массовая операция: ${name}`;
-  }
   const words = action.replace(/[._]/g, ' ');
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
@@ -290,7 +187,7 @@ export default async function AuditPage({
         <div>
           <h1 className="font-display text-3xl font-bold">История действий</h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Кто и что изменил в системе. Записи только читаются и не редактируются.
+            Кто и что изменил. Только чтение; записи старше 30 дней удаляются.
           </p>
         </div>
         {auditResult.state === 'ready' ? (

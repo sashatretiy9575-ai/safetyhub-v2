@@ -51,7 +51,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // every admin navigation for a decorative avatar.
   const avatarUrl = actor.profile.avatar_updated_at ? '/api/profile/avatar' : null;
   const notificationsEnabled =
-    rolloutFeatureEnabled('adminInbox') && actor.capabilities.includes('audit.read');
+    rolloutFeatureEnabled('adminInbox') &&
+    (actor.capabilities.includes('notifications.read') ||
+      actor.capabilities.includes('audit.read'));
 
   return (
     <AdminNotificationInboxProvider enabled={notificationsEnabled}>

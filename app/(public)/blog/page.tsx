@@ -4,8 +4,11 @@ import { ArticleCard } from '@/components/marketing/article-card';
 import { Container } from '@/components/ui/container';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/ui/page-header';
+import { JsonLd } from '@/components/shared/json-ld';
 import { getArticles } from '@/lib/content/articles';
-import { buildMetadata } from '@/lib/seo';
+import { breadcrumbsJsonLd, buildMetadata } from '@/lib/seo';
+import { absoluteUrl } from '@/lib/utils';
+import { localizePathname } from '@/i18n/config';
 
 export async function generateMetadata() {
   const t = await getTranslations('Blog');
@@ -76,9 +79,15 @@ async function ArticlesGrid() {
 }
 
 export default async function BlogPage() {
-  const t = await getTranslations('Blog');
+  const [locale, t] = await Promise.all([getLocale(), getTranslations('Blog')]);
   return (
     <>
+      <JsonLd
+        data={breadcrumbsJsonLd([
+          { name: t('breadcrumbsHome'), url: absoluteUrl(localizePathname('/', locale)) },
+          { name: t('breadcrumbsBlog'), url: absoluteUrl(localizePathname('/blog', locale)) },
+        ])}
+      />
       <PageHeader
         title={t('title')}
         description={t('description')}

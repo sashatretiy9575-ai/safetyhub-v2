@@ -17,8 +17,7 @@ export default async function OrganizationCleanupPage() {
         </Button>
         <h1 className="font-display text-3xl font-bold">Очистка компаний</h1>
         <p className="mt-1 max-w-3xl text-sm text-[var(--color-text-muted)]">
-          Система только предлагает похожие названия. Объединение, итоговое название и влияние на
-          действующие сертификаты всегда подтверждает администратор.
+          Объединение похожих названий подтверждает администратор.
         </p>
       </div>
       {result.state === 'failed' ? (

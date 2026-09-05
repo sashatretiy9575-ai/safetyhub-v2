@@ -178,6 +178,7 @@ export function courseJsonLd(input: {
   locale?: AppLocale;
   credentialName?: string;
   locationName?: string;
+  durationMinutes?: number;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -193,6 +194,15 @@ export function courseJsonLd(input: {
     inLanguage: htmlLanguage(input.locale ?? DEFAULT_LOCALE),
     educationalCredentialAwarded: input.credentialName,
     courseMode: 'online',
+    ...(input.durationMinutes
+      ? {
+          hasCourseInstance: {
+            '@type': 'CourseInstance',
+            courseMode: 'online',
+            courseWorkload: `PT${input.durationMinutes}M`,
+          },
+        }
+      : {}),
     ...(input.locationName
       ? { locationCreated: { '@type': 'Place', name: input.locationName } }
       : {}),

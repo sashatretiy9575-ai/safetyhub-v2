@@ -487,7 +487,8 @@ export type AdminAttestationAction =
       field: 'name' | 'surname' | 'job' | 'organization';
       value: string;
     }
-  | { action: 'issue'; targetIds: string[] };
+  | { action: 'issue'; targetIds: string[] }
+  | { action: 'confirm_and_issue'; targetIds: string[] };
 
 export async function executeAdminAttestationAction(
   idempotencyKey: string,
@@ -502,6 +503,9 @@ export async function executeAdminAttestationAction(
     p_reason: null,
   });
   const envelope = record(raw);
+  if (action.action === 'issue' || action.action === 'confirm_and_issue') {
+    invalidateCertificateVerificationCache();
+  }
   return {
     operationId: z.string().uuid().parse(envelope.operationId),
     replayed: z.boolean().parse(envelope.replayed),

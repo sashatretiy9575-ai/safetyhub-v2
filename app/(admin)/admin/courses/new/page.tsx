@@ -8,7 +8,7 @@ export default async function NewCoursePage() {
       <div>
         <h1 className="font-display text-3xl font-bold">Новый курс</h1>
         <p className="text-sm text-[var(--color-text-muted)]">
-          Создайте черновик, загрузите PDF и заполните три варианта по десять вопросов.
+          Черновик, PDF и три варианта по десять вопросов.
         </p>
       </div>
       <TestEditor />

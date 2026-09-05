@@ -19,11 +19,9 @@ test('approval status uses a calm, minute-resolution status strip instead of nes
   assert.match(status, /formatDueAt/);
   assert.match(status, /t\('deadline', \{ deadline: dueLabel \}\)/);
   assert.doesNotMatch(status, /<Card|<CardContent/);
-  assert.equal(
-    ru.Approval.countdownHint,
-    'Время показано с точностью до минуты; обновлять страницу не нужно.',
-  );
-  assert.equal(ru.Approval.deadline, 'Контрольный срок: {deadline}');
+  assert.equal(ru.Approval.deadline, 'Ответим до {deadline}');
+  assert.equal(ru.Approval.remainingValue, '{hours} ч {minutes} мин');
+  assert.equal(ru.Approval.countdownHint, undefined);
 });
 
 test('quiz exposes one consistent fixed-width timer and accessible progress in question and review views', async () => {

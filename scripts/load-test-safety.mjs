@@ -10,7 +10,9 @@ export const DISPOSABLE_PROJECT_MARKER = 'DISPOSABLE SECURITY TEST';
 export const LOCAL_CI_LOAD_TEST_MARKER = 'LOCAL DISPOSABLE SUPABASE ONLY';
 export const LOCAL_CI_SUPABASE_URL = 'http://127.0.0.1:54321';
 export const LOCAL_CI_DATABASE_URL = 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
-export const LOCAL_CI_SEED_AUDIT_ROW_COUNT = 7;
+// The audit whitelist (20260905140000) drops the seed's course.published rows,
+// so a clean local reset leaves an empty action history.
+export const LOCAL_CI_SEED_AUDIT_ROW_COUNT = 0;
 
 export const CLEAN_LOAD_TEST_TABLES = Object.freeze([
   'profiles',

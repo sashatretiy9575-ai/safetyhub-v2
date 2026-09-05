@@ -15,12 +15,15 @@ test('Open Graph and structured-data image URLs point to real application assets
 });
 
 test('JSON-LD describes only visible capabilities and is mounted on matching pages', async () => {
-  const [seo, home, courseGrid, article, topic] = await Promise.all([
+  const [seo, home, courseGrid, article, topic, faq, blogList, topicsList] = await Promise.all([
     read('lib/seo.ts'),
     read('app/(public)/page.tsx'),
     read('components/marketing/course-grid.tsx'),
     read('app/(public)/blog/[slug]/page.tsx'),
     read('app/(public)/topics/[slug]/page.tsx'),
+    read('app/(public)/faq/page.tsx'),
+    read('app/(public)/blog/page.tsx'),
+    read('app/(public)/topics/page.tsx'),
   ]);
 
   assert.doesNotMatch(seo, /SearchAction|search_term_string/);
@@ -31,6 +34,12 @@ test('JSON-LD describes only visible capabilities and is mounted on matching pag
   assert.match(article, /breadcrumbsJsonLd/);
   assert.match(topic, /courseJsonLd/);
   assert.match(topic, /breadcrumbsJsonLd/);
+  assert.match(topic, /durationMinutes: topic\.durationMinutes/);
+  assert.match(seo, /hasCourseInstance/);
+  assert.match(seo, /courseWorkload/);
+  assert.match(faq, /faqJsonLd\(faqData\)/);
+  assert.match(blogList, /breadcrumbsJsonLd/);
+  assert.match(topicsList, /breadcrumbsJsonLd/);
 });
 
 test('sitemap uses every published source row and stable content timestamps', async () => {

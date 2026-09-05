@@ -59,8 +59,7 @@ export default async function EmployeeDirectoryPage({
         <div>
           <h1 className="font-display text-3xl font-bold">Все аккаунты сотрудников</h1>
           <p className="mt-1 max-w-3xl text-sm text-[var(--color-text-muted)]">
-            Список строится по аккаунтам и профилям, поэтому здесь остаются сотрудники без
-            аттестаций, с незавершёнными или неуспешными попытками.
+            Все аккаунты, включая сотрудников без аттестаций.
           </p>
         </div>
         <Button asChild variant="outline">

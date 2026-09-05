@@ -31,7 +31,6 @@ export default async function AdminWorkPage() {
           {
             key: 'approvals',
             label: 'Новые заявки',
-            description: 'Пользователи, ожидающие ручной проверки и открытия доступа.',
             href: '/admin/approvals',
             count: approvals?.state === 'ready' ? approvals.data.total : 0,
             icon: UserCircleCheck,
@@ -41,7 +40,6 @@ export default async function AdminWorkPage() {
     {
       key: 'pendingIdentity',
       label: 'Проверить данные',
-      description: 'Участники с изменёнными или ещё не подтверждёнными данными.',
       href: '/admin/employees?certificate=pending_identity&sort=organization_asc',
       count: queue.state === 'ready' ? queue.data.pendingIdentity : 0,
       icon: CheckCircle,
@@ -49,7 +47,6 @@ export default async function AdminWorkPage() {
     {
       key: 'readyToIssue',
       label: 'Выдать сертификаты',
-      description: 'Сданные курсы с подтверждёнными данными, готовые к выдаче.',
       href: '/admin/employees?certificate=ready&sort=organization_asc',
       count: queue.state === 'ready' ? queue.data.readyToIssue : 0,
       icon: Certificate,
@@ -57,7 +54,6 @@ export default async function AdminWorkPage() {
     {
       key: 'companyIssues',
       label: 'Очистить компании',
-      description: 'Похожие или ещё не связанные с каталогом названия компаний.',
       href: '/admin/organizations/cleanup',
       count: queue.state === 'ready' ? queue.data.companyIssues : 0,
       icon: Buildings,
@@ -80,11 +76,10 @@ export default async function AdminWorkPage() {
           aria-label="Рабочие очереди"
           className="grid overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] sm:grid-cols-2 lg:grid-cols-4"
         >
-          {queueItems.map(({ key, label, description, href, count, icon: Icon }) => (
+          {queueItems.map(({ key, label, href, count, icon: Icon }) => (
             <Link
               key={key}
               href={href}
-              title={description}
               className="group grid min-h-14 min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto_auto] items-center gap-3 border-b px-3 py-2 transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:border-r sm:border-b-0 sm:last:border-r-0"
             >
               <span className="grid size-9 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
