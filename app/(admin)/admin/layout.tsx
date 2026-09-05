@@ -96,17 +96,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </nav>
 
           <div className="mt-4 space-y-2 border-t border-[var(--color-border)] pt-4">
-            <div className="flex min-h-11 items-center justify-between gap-2 px-3">
-              <span className="text-sm font-bold text-[var(--color-text-muted)]">Аккаунт</span>
-              <div className="flex items-center gap-1">
-                <AdminNotificationInboxButton placement="desktop" />
-                <UserMenu
-                  email={actor.user.email ?? ''}
-                  fullName={fullName}
-                  isAdmin
-                  avatarUrl={avatarUrl}
-                />
-              </div>
+            <div className="flex min-h-11 items-center gap-1 px-3">
+              <AdminNotificationInboxButton placement="desktop" />
+              <UserMenu
+                email={actor.user.email ?? ''}
+                fullName={fullName}
+                isAdmin
+                avatarUrl={avatarUrl}
+              />
             </div>
             <Link
               href="/"

@@ -250,37 +250,25 @@ export function AttestationRowActions({
 }
 
 /**
- * Bulk actions.
- *
- * Every label used to be a bare counter ("Выдать 3"), which said nothing about
- * what the button does or why the number differs from the selection. Each
- * action now names itself and states, underneath, how much of the selection it
- * will actually touch.
+ * Bulk actions: one combined primary action, an export, and the rest behind
+ * «Ещё». Selection is cleared from the banner above the table.
  */
 export function AttestationBulkActionButtons({
   summary,
   permissions,
   busy,
   onAction,
-  onClear,
   compact = false,
 }: {
   summary: AttestationSelectionSummary;
   permissions: AttestationPermissions;
   busy: boolean;
   onAction: (action: AttestationPendingAction) => void;
-  onClear: () => void;
   compact?: boolean;
 }) {
-  const scope = (applicable: number, unit: 'people' | 'rows') =>
-    applicable === 0
-      ? 'Нет подходящих строк'
-      : `${applicable} из ${unit === 'people' ? summary.people : summary.total}`;
-
   const primary: Array<{
     key: string;
     label: string;
-    hint: string;
     icon: React.ReactNode;
     disabled: boolean;
     variant: 'primary' | 'outline';
@@ -291,29 +279,24 @@ export function AttestationBulkActionButtons({
     primary.push({
       key: 'confirm-issue',
       label: 'Подтвердить и выдать',
-      hint: summary.total === 0 ? 'Нет подходящих строк' : `${summary.total} строк`,
       icon: <CheckCircle />,
       disabled: summary.total === 0,
       variant: 'primary',
       action: { kind: 'confirm-issue' },
     });
-  }
-  if (permissions.canManageIdentity) {
+  } else if (permissions.canManageIdentity) {
     primary.push({
       key: 'confirm',
       label: 'Подтвердить данные',
-      hint: scope(summary.pendingIdentity, 'people'),
       icon: <CheckCircle />,
       disabled: summary.pendingIdentity === 0,
-      variant: 'outline',
+      variant: 'primary',
       action: { kind: 'confirm' },
     });
-  }
-  if (permissions.canIssue) {
+  } else if (permissions.canIssue) {
     primary.push({
       key: 'issue',
       label: 'Выдать сертификаты',
-      hint: scope(summary.readyToIssue, 'rows'),
       icon: <Certificate />,
       disabled: summary.readyToIssue === 0,
       variant: 'primary',
@@ -324,10 +307,6 @@ export function AttestationBulkActionButtons({
     primary.push({
       key: 'export',
       label: 'Скачать пакет документов',
-      hint:
-        summary.exportable === 0
-          ? 'Только сводный отчёт: действующих сертификатов нет'
-          : `${summary.exportable} PDF + сводный отчёт`,
       icon: <DownloadSimple />,
       disabled: busy,
       variant: 'outline',
@@ -336,7 +315,7 @@ export function AttestationBulkActionButtons({
   }
 
   return (
-    <div className={compact ? 'grid gap-2' : 'flex flex-wrap items-stretch gap-2'}>
+    <div className={compact ? 'grid gap-2' : 'flex flex-wrap items-center gap-2'}>
       {primary.map((item) => (
         <Button
           key={item.key}
@@ -344,14 +323,9 @@ export function AttestationBulkActionButtons({
           variant={item.variant}
           disabled={item.disabled}
           onClick={() => onAction(item.action)}
-          className={`h-auto flex-col items-start gap-0.5 py-2 text-left ${
-            compact ? 'w-full' : ''
-          }`}
+          className={compact ? 'w-full' : undefined}
         >
-          <span className="flex items-center gap-2 font-bold">
-            {item.icon} {item.label}
-          </span>
-          <span className="text-[11px] font-normal opacity-80">{item.hint}</span>
+          {item.icon} {item.label}
         </Button>
       ))}
 
@@ -390,15 +364,6 @@ export function AttestationBulkActionButtons({
           </DropdownMenuContent>
         </DropdownMenu>
       ) : null}
-
-      <Button
-        size={compact ? 'md' : 'sm'}
-        variant="ghost"
-        onClick={onClear}
-        className={compact ? 'w-full justify-start' : undefined}
-      >
-        Снять выделение
-      </Button>
     </div>
   );
 }

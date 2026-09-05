@@ -957,12 +957,7 @@ export function AttestationsManager({
             aria-label="Выбранные аттестации"
             className="glass-strong sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+.5rem)] z-30 flex items-center gap-3 rounded-2xl border p-3 shadow-[var(--shadow-pop)] @min-[760px]:hidden"
           >
-            <div className="min-w-0 flex-1">
-              <p className="font-bold tabular-nums">Выбрано: {selectedCount}</p>
-              <p className="truncate text-xs text-[var(--color-text-muted)]">
-                {selectionSummary.people} чел. · PDF: {selectionSummary.exportable}
-              </p>
-            </div>
+            <p className="min-w-0 flex-1 font-bold tabular-nums">Выбрано: {selectedCount}</p>
             <Button ref={bulkActionsTriggerRef} size="sm" onClick={() => setBulkActionsOpen(true)}>
               Действия
             </Button>
@@ -980,20 +975,15 @@ export function AttestationsManager({
             aria-label="Массовые действия"
             className="glass-strong sticky bottom-4 z-30 hidden rounded-2xl border p-4 shadow-[var(--shadow-pop)] @min-[760px]:block"
           >
-            <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-b pb-3 text-sm">
-              <strong>{selectionSummary.total} выбрано</strong>
-              <span className="text-[var(--color-text-muted)]">
-                {selectionSummary.people} чел. · проверить {selectionSummary.pendingIdentity} ·
-                выдать {selectionSummary.readyToIssue} · PDF {selectionSummary.exportable}
-              </span>
+            <div className="flex flex-wrap items-center gap-3">
+              <strong className="text-sm tabular-nums">Выбрано: {selectionSummary.total}</strong>
+              <AttestationBulkActionButtons
+                summary={selectionSummary}
+                permissions={permissions}
+                busy={busy}
+                onAction={setPending}
+              />
             </div>
-            <AttestationBulkActionButtons
-              summary={selectionSummary}
-              permissions={permissions}
-              busy={busy}
-              onAction={setPending}
-              onClear={clearSelection}
-            />
           </aside>
 
           {bulkActionsOpen ? (
@@ -1034,7 +1024,6 @@ export function AttestationsManager({
                     setBulkActionsOpen(false);
                     setPending(action);
                   }}
-                  onClear={clearSelection}
                   compact
                 />
               </section>

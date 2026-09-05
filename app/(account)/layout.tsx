@@ -14,11 +14,27 @@ import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 import { absoluteUrl } from '@/lib/utils';
 import '../globals.css';
 
+// The install block lives on /profile, so this group must carry the full PWA
+// identity too: without a manifest link here, iOS "Add to Home Screen" from
+// the profile page created a plain Safari bookmark instead of the app.
 export const metadata: Metadata = {
   title: 'SafetyHub',
   metadataBase: new URL(absoluteUrl('/')),
   robots: { index: false, follow: false },
-  other: { google: 'notranslate' },
+  manifest: '/manifest/ru',
+  icons: {
+    icon: [
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'SafetyHub',
+  },
+  other: { google: 'notranslate', 'apple-mobile-web-app-capable': 'yes' },
 };
 
 export default async function AccountLayout({ children }: { children: ReactNode }) {

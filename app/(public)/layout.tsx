@@ -38,6 +38,9 @@ export async function generateMetadata(): Promise<Metadata> {
       statusBarStyle: 'black-translucent',
       title: 'SafetyHub',
     },
+    // Next 15+ emits only `mobile-web-app-capable`; older iOS Safari decides
+    // standalone launch by the apple-prefixed meta, so add it explicitly.
+    other: { 'apple-mobile-web-app-capable': 'yes' },
     formatDetection: { telephone: false },
   };
 }

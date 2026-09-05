@@ -137,9 +137,9 @@ export function AdminEditor({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(
     initialPublicationNotice === 'incomplete'
-      ? 'Черновик сохранён, но публикация заблокирована: подготовьте RU, KK, EN и ZH.'
+      ? 'Для публикации нужны все 4 языка (RU, KK, EN, ZH). Черновик сохранён.'
       : initialPublicationNotice === 'failed'
-        ? 'Черновик сохранён, но четыре локализации опубликовать не удалось.'
+        ? 'Локализации не опубликованы. Черновик сохранён.'
         : '',
   );
   const [saveState, setSaveState] = useState<'saved' | 'unsaved' | 'saving'>('saved');
@@ -406,8 +406,8 @@ export function AdminEditor({
           );
           setError(
             result.publicationError === 'ARTICLE_LOCALIZATIONS_INCOMPLETE'
-              ? 'Черновик сохранён, но публикация заблокирована: подготовьте RU, KK, EN и ZH.'
-              : 'Черновик сохранён, но четыре локализации опубликовать не удалось.',
+              ? 'Для публикации нужны все 4 языка (RU, KK, EN, ZH). Черновик сохранён.'
+              : 'Локализации не опубликованы. Черновик сохранён.',
           );
           approveNavigation();
           router.replace(
@@ -440,7 +440,7 @@ export function AdminEditor({
     } catch (statusError) {
       setError(
         statusError instanceof Error && statusError.message === 'ARTICLE_LOCALIZATIONS_INCOMPLETE'
-          ? 'Публикация заблокирована: подготовьте RU, KK, EN и ZH.'
+          ? 'Для публикации нужны все 4 языка (RU, KK, EN, ZH).'
           : 'Не удалось изменить статус статьи. Повторите действие после проверки полей.',
       );
     } finally {
@@ -545,7 +545,8 @@ export function AdminEditor({
         </Card>
       ) : (
         <div className="grid min-w-0 gap-6 lg:grid-cols-3 lg:gap-8">
-          <div className="min-w-0 space-y-6 lg:order-2 lg:col-span-1">
+          {/* On the phone the text comes first; the metadata cards follow. */}
+          <div className="order-2 min-w-0 space-y-6 lg:col-span-1">
             <Card className="min-w-0">
               <CardContent className="min-w-0 space-y-4 p-4 min-[360px]:p-5 md:p-6">
                 <h2 className="font-semibold">Метаданные</h2>
@@ -684,7 +685,7 @@ export function AdminEditor({
             </Card>
           </div>
 
-          <div className="min-w-0 space-y-4 lg:order-1 lg:col-span-2">
+          <div className="order-1 min-w-0 space-y-4 lg:col-span-2">
             <Card>
               <CardContent className="space-y-4 p-4 md:p-5">
                 <div className="space-y-2">
@@ -732,7 +733,7 @@ export function AdminEditor({
       <DestructiveDialog
         open={deleteOpen}
         title="Удалить статью?"
-        description="Статья, её черновик, ревизии и перенаправления будут удалены. Публичная ссылка начнёт возвращать 404."
+        description="Статья удаляется безвозвратно; публичная ссылка перестанет работать."
         busy={busy}
         onOpenChange={setDeleteOpen}
         onConfirm={() => void handleDelete()}
