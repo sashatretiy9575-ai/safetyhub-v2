@@ -118,14 +118,14 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 3);
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
   assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 74);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 71);
-  assert.equal(receipt.pendingCount, 3);
-  assert.equal(receipt.expectedBaseCount, 71);
-  assert.equal(receipt.expectedPendingCount, 3);
+  assert.equal(receipt.matchedCount, 74);
+  assert.equal(receipt.pendingCount, 0);
+  assert.equal(receipt.expectedBaseCount, 74);
+  assert.equal(receipt.expectedPendingCount, 0);
   assert.equal(receipt.expectedTotalCount, 74);
   assert.deepEqual(
     receipt.pendingMigrations,
@@ -151,14 +151,17 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
 
   // Production must hold exactly the reviewed prefix. A migration from the
   // pending tail that is already applied there is a history mismatch, not a
-  // shorter delta to push.
-  const partiallyApplied = structuredClone(rows);
-  partiallyApplied[REVIEWED_BASE_MIGRATION_COUNT].remote =
-    partiallyApplied[REVIEWED_BASE_MIGRATION_COUNT].local;
-  assert.throws(
-    () => assertReviewedMigrationDelta({ migrationRows: partiallyApplied, localMigrations }),
-    /LINKED_PREFLIGHT_HOSTED_HISTORY_NOT_REVIEWED_PREFIX/u,
-  );
+  // shorter delta to push. With an empty pending tail there is no such row to
+  // simulate, so the check only runs while a tail exists.
+  if (REVIEWED_PENDING_MIGRATIONS.length > 0) {
+    const partiallyApplied = structuredClone(rows);
+    partiallyApplied[REVIEWED_BASE_MIGRATION_COUNT].remote =
+      partiallyApplied[REVIEWED_BASE_MIGRATION_COUNT].local;
+    assert.throws(
+      () => assertReviewedMigrationDelta({ migrationRows: partiallyApplied, localMigrations }),
+      /LINKED_PREFLIGHT_HOSTED_HISTORY_NOT_REVIEWED_PREFIX/u,
+    );
+  }
 
   const remoteOnly = [...structuredClone(rows), { local: '', remote: '20260901999999' }];
   assert.throws(
