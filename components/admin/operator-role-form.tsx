@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 const FAILURES: Record<string, string> = {
-  USER_NOT_FOUND: 'Пользователь с таким адресом не найден. Он должен хотя бы раз войти на сайт.',
+  USER_NOT_FOUND: 'Пользователь с таким адресом не найден.',
   TARGET_REJECTED: 'Заявка этого человека отклонена. Сначала пересмотрите решение в разделе «Заявки».',
   ACCOUNT_UNAVAILABLE: 'Аккаунт заблокирован или удаляется.',
   CANNOT_CHANGE_OWN_ROLE: 'Свои собственные права изменить нельзя.',
@@ -47,9 +47,11 @@ export function OperatorRoleForm() {
           idempotencyKey: idempotencyKey.current,
         }),
       });
-      const payload = await readClientResponseJson<{ error?: string; changed?: boolean }>(
-        result.response,
-      );
+      const payload = await readClientResponseJson<{
+        error?: string;
+        changed?: boolean;
+        pending?: boolean;
+      }>(result.response);
       if (!result.ok || !payload) {
         const known = payload?.error ? FAILURES[payload.error] : undefined;
         setFailed(true);
@@ -65,9 +67,11 @@ export function OperatorRoleForm() {
       setEmail('');
       setReason('');
       setMessage(
-        payload.changed === false
-          ? 'Этот человек уже администратор.'
-          : 'Готово: человек стал администратором.',
+        payload.pending
+          ? 'Готово: человек станет администратором при первом входе с этой почтой.'
+          : payload.changed === false
+            ? 'Этот человек уже администратор.'
+            : 'Готово: человек стал администратором.',
       );
       router.refresh();
     } catch (error) {

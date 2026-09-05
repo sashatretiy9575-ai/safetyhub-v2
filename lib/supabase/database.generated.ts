@@ -706,6 +706,27 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_admin_grants: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          normalized_email: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          normalized_email: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          normalized_email?: string
+          reason?: string
+        }
+        Relationships: []
+      }
       profile_avatar_manifests: {
         Row: {
           byte_length: number
@@ -4533,6 +4554,7 @@ export type Database = {
         }
         Returns: Json
       }
+      list_pending_admin_grants: { Args: never; Returns: Json }
       list_published_articles_locale: {
         Args: {
           p_before_id?: string
@@ -4562,6 +4584,7 @@ export type Database = {
         Args: { p_event_ids: string[] }
         Returns: Json
       }
+      mark_all_admin_notifications_read: { Args: never; Returns: Json }
       mark_content_asset_orphan: {
         Args: { p_actor_id: string; p_asset_id: string }
         Returns: Json

@@ -5,12 +5,14 @@ import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data
 import { AdminPagination } from '@/components/admin/admin-pagination';
 import { OperatorRoleForm } from '@/components/admin/operator-role-form';
 import { OperatorRevokeButton } from '@/components/admin/operator-revoke-button';
+import { PendingGrantRevokeButton } from '@/components/admin/pending-grant-revoke-button';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   ADMIN_PAGE_SIZE,
   getAdminOperatorsPage,
+  getPendingAdminGrants,
   parseAdminOperatorQuery,
   type AdminOperatorQuery,
   type RawAdminSearchParams,
@@ -49,7 +51,10 @@ export default async function AdminOperatorsPage({
   await requireCapability('role.manage');
   const params = await searchParams;
   const query = parseAdminOperatorQuery(params);
-  const result = await getAdminOperatorsPage(query);
+  const [result, pendingGrants] = await Promise.all([
+    getAdminOperatorsPage(query),
+    getPendingAdminGrants(),
+  ]);
   const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
   const currentToken = query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
   const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
@@ -67,6 +72,26 @@ export default async function AdminOperatorsPage({
         <h2 className="text-lg font-bold">Добавить администратора</h2>
         <OperatorRoleForm />
       </section>
+
+      {pendingGrants.state === 'ready' && pendingGrants.data.items.length > 0 ? (
+        <section className="space-y-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+          <h2 className="text-lg font-bold">Ждут первого входа</h2>
+          <ul className="grid gap-2">
+            {pendingGrants.data.items.map((grant) => (
+              <li
+                key={grant.email}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-bold">{grant.email}</p>
+                  <p className="truncate text-xs text-[var(--color-text-muted)]">{grant.reason}</p>
+                </div>
+                <PendingGrantRevokeButton email={grant.email} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <form className="grid gap-3 rounded-xl border bg-[var(--color-surface)] p-4 sm:grid-cols-[1fr_auto_auto] sm:items-end">
         <div className="space-y-1">

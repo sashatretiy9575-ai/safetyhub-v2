@@ -74,7 +74,8 @@ type ReadRpcClient = {
       | 'list_admin_access_outbox_page'
       | 'list_pending_account_approval_page'
       | 'list_learning_history_targets_page'
-      | 'list_admin_operators_page',
+      | 'list_admin_operators_page'
+      | 'list_pending_admin_grants',
     args?: Record<string, unknown>,
   ): PromiseLike<{ data: unknown; error: { code?: string; message?: string } | null }>;
 };
@@ -108,6 +109,7 @@ const adminCapabilitySchema = z.enum([
   'results.export',
   'site.settings.manage',
   'audit.read',
+  'notifications.read',
   'capability.manage',
 ]);
 
@@ -476,6 +478,28 @@ export async function getAdminOperatorsPage(
       p_cursor_id: query.cursorId,
     });
     return { state: 'ready', data: pageEnvelope(adminOperatorSchema).parse(data) };
+  } catch (error) {
+    return loadFailure(error);
+  }
+}
+
+const pendingAdminGrantSchema = z.object({
+  email: z.string().min(3).max(254),
+  reason: z.string(),
+  createdAt: isoDateSchema,
+});
+export type PendingAdminGrant = z.infer<typeof pendingAdminGrantSchema>;
+
+export async function getPendingAdminGrants(): Promise<
+  AdminDataResult<{ items: PendingAdminGrant[] }>
+> {
+  await requireCapability('role.manage');
+  try {
+    const data = await readRpc('list_pending_admin_grants');
+    return {
+      state: 'ready',
+      data: z.object({ items: z.array(pendingAdminGrantSchema) }).parse(data),
+    };
   } catch (error) {
     return loadFailure(error);
   }

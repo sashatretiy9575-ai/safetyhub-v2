@@ -94,9 +94,11 @@ begin
     null;
   end;
 
+  -- An unknown address with the admin role is parked as a pending grant since
+  -- 20260905170000; the refusal contract remains for the participant role.
   begin
     perform public.set_product_role_by_email(
-      gen_random_uuid(), 'nobody@example.com', 'admin', 'Неизвестный адрес почты'
+      gen_random_uuid(), 'nobody@example.com', 'participant', 'Неизвестный адрес почты'
     );
     raise exception 'an unknown address was accepted';
   exception when no_data_found then

@@ -39,6 +39,7 @@ type InboxContextValue = Readonly<{
   refresh: () => void;
   loadMore: () => Promise<void>;
   markRead: (eventIds: string[]) => Promise<boolean>;
+  markAllRead: () => Promise<boolean>;
   retryDelivery: (eventId: string) => Promise<boolean>;
 }>;
 
@@ -197,8 +198,8 @@ function parseEvent(value: unknown): AdminNotificationEvent | null {
       ]) ||
       !isUuid(payload.attemptId) ||
       !isUuid(payload.userId) ||
-      !isSingleLine(payload.name) ||
-      !isSingleLine(payload.surname) ||
+      !(payload.name === '' || isSingleLine(payload.name)) ||
+      !(payload.surname === '' || isSingleLine(payload.surname)) ||
       typeof payload.locale !== 'string' ||
       !LOCALES.has(payload.locale) ||
       !isSingleLine(payload.courseTitle) ||
@@ -317,6 +318,13 @@ export function AdminNotificationInboxProvider({
       if (eventIds.length === 0 || eventIds.length > 100) return false;
       return mutate('/api/admin/notifications/read', { eventIds });
     },
+    [mutate],
+  );
+
+  // Clears the badge even for events the client-side contract refuses to
+  // render: those can never be marked read one by one.
+  const markAllRead = useCallback(
+    () => mutate('/api/admin/notifications/read', { all: true }),
     [mutate],
   );
 
@@ -485,9 +493,21 @@ export function AdminNotificationInboxProvider({
       refresh,
       loadMore,
       markRead,
+      markAllRead,
       retryDelivery,
     }),
-    [enabled, page, state, message, loadingMore, refresh, loadMore, markRead, retryDelivery],
+    [
+      enabled,
+      page,
+      state,
+      message,
+      loadingMore,
+      refresh,
+      loadMore,
+      markRead,
+      markAllRead,
+      retryDelivery,
+    ],
   );
   return <InboxContext.Provider value={value}>{children}</InboxContext.Provider>;
 }
@@ -535,12 +555,16 @@ function eventPresentation(event: AdminNotificationEvent) {
         description: `${event.payload.surname} ${event.payload.name}${applicationSummary}`,
       };
     }
-    case 'course.completed':
+    case 'course.completed': {
+      const person =
+        `${event.payload.surname} ${event.payload.name}`.trim() ||
+        event.payload.locale.toUpperCase();
       return {
         icon: event.payload.result === 'passed' ? CheckCircle : XCircle,
         title: event.payload.result === 'passed' ? 'Курс пройден' : 'Курс не пройден',
-        description: `${event.payload.surname} ${event.payload.name} · ${event.payload.courseTitle} · ${event.payload.score}/${event.payload.total}`,
+        description: `${person} · ${event.payload.courseTitle} · ${event.payload.score}/${event.payload.total}`,
       };
+    }
     case 'system.alert':
       return {
         icon: Warning,
@@ -569,8 +593,18 @@ export function AdminNotificationInboxButton({
   placement: 'desktop' | 'mobile';
   className?: string;
 }) {
-  const { enabled, page, state, message, loadingMore, refresh, loadMore, markRead, retryDelivery } =
-    useInbox();
+  const {
+    enabled,
+    page,
+    state,
+    message,
+    loadingMore,
+    refresh,
+    loadMore,
+    markRead,
+    markAllRead,
+    retryDelivery,
+  } = useInbox();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -591,14 +625,12 @@ export function AdminNotificationInboxButton({
   }, [open]);
 
   if (!enabled || state === 'forbidden') return null;
-  const unreadIds =
-    page?.items.filter((event) => event.readAt === null).map((event) => event.id) ?? [];
 
-  const markVisibleRead = async () => {
-    if (unreadIds.length === 0) return;
+  const markEverythingRead = async () => {
+    if (!page?.unread) return;
     setBusy('read');
     try {
-      await markRead(unreadIds);
+      await markAllRead();
     } finally {
       setBusy(null);
     }
@@ -666,9 +698,9 @@ export function AdminNotificationInboxButton({
                 type="button"
                 size="icon"
                 variant="ghost"
-                aria-label="Отметить видимые уведомления прочитанными"
-                disabled={unreadIds.length === 0 || busy !== null}
-                onClick={() => void markVisibleRead()}
+                aria-label="Отметить все уведомления прочитанными"
+                disabled={!page?.unread || busy !== null}
+                onClick={() => void markEverythingRead()}
               >
                 <Check />
               </Button>

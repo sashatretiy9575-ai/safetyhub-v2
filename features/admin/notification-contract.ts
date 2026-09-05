@@ -91,12 +91,16 @@ const approvalRequestedPayloadSchema = z.union([
     .strict(),
 ]);
 
+// ZH accounts sign up without a printable name, so `name`/`surname` may both
+// be empty strings; an empty pair renders as a locale-only line in the inbox.
+const blankableLineSchema = z.union([singleLineTextSchema, z.literal('')]);
+
 const courseCompletedPayloadSchema = z
   .object({
     attemptId: uuidSchema,
     userId: uuidSchema,
-    name: singleLineTextSchema,
-    surname: singleLineTextSchema,
+    name: blankableLineSchema,
+    surname: blankableLineSchema,
     locale: z.enum(['ru', 'kk', 'en', 'zh']),
     courseTitle: singleLineTextSchema,
     result: z.enum(['passed', 'failed']),

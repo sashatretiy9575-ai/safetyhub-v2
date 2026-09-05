@@ -99,6 +99,17 @@ export async function markAdminNotificationsRead(eventIds: string[]) {
   return { marked: Number(value.marked) };
 }
 
+export async function markAllAdminNotificationsRead() {
+  await requireAnyCapability(INBOX_CAPABILITIES);
+  const value = unwrapRpcMutationResponse(
+    await authenticatedRpc('mark_all_admin_notifications_read', {}),
+  ) as Partial<{ marked: number }> | null;
+  if (!value || !Number.isInteger(value.marked) || Number(value.marked) < 0) {
+    throw new Error('NOTIFICATION_MARK_READ_RESPONSE_INVALID');
+  }
+  return { marked: Number(value.marked) };
+}
+
 export async function retryAdminNotificationDelivery(eventId: string) {
   await requireAnyCapability(INBOX_CAPABILITIES);
   const value = unwrapRpcMutationResponse(
