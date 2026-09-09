@@ -50,7 +50,13 @@ export async function AppShell({
         localePathname={localePathname}
         locale={locale}
       />
-      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+      {/* The scroll margin clears the sticky header: without it the skip link
+          landed the reader underneath it. */}
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex-1 scroll-mt-[calc(3.75rem+var(--safe-area-top))] outline-none min-[1024px]:scroll-mt-[calc(4.5rem+var(--safe-area-top))]"
+      >
         {children}
       </main>
       {/* The install banner overlays the bottom of the page, so the reserve has

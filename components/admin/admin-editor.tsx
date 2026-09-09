@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Trash } from '@phosphor-icons/react';
@@ -504,13 +505,10 @@ export function AdminEditor({
   return (
     <EditorShell>
       <div className="flex min-w-0 items-center gap-2">
-        <Button
-          type="button"
-          variant="ghost"
-          className="min-h-11 shrink-0"
-          onClick={() => router.back()}
-        >
-          Назад
+        {/* router.back() did nothing when the editor was opened by its own URL,
+            and the two navigations into it use router.replace. */}
+        <Button asChild variant="ghost" className="min-h-11 shrink-0">
+          <Link href="/admin/articles">Назад</Link>
         </Button>
         <div className="min-w-0">
           <h1 className="text-lg leading-tight font-bold break-words md:text-xl">

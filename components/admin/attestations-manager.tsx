@@ -306,6 +306,14 @@ export function AttestationsManager({
   }, [resolvedSelection, selectedCount, selectedRows, userIds.length]);
 
   const setRowSelected = (row: AdminAttestationRow, checked: boolean) => {
+    // "All rows matching the filter" arrives from the server as aggregates and
+    // cannot be narrowed here, so touching one checkbox drops it entirely.
+    // Silently, this turned «Выбрано: 480» into the size of one page.
+    if (resolvedSelection) {
+      setMessage(
+        `Выборка по фильтру (${resolvedSelection.total}) снята: изменение одной строки оставляет только строки этой страницы.`,
+      );
+    }
     setResolvedSelection(null);
     setSelected((current) => {
       const next = new Set(current);

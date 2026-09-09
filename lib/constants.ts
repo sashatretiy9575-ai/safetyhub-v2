@@ -41,7 +41,11 @@ const DEFAULT_PASS_SCORE = 7;
 export const QUIZ_POLICY = {
   questionCount: DEFAULT_QUESTION_COUNT,
   passScore: DEFAULT_PASS_SCORE,
+  /** Answers per question. The renderer, the editor and the parser share it. */
+  optionCount: 4,
   durationMinutes: 15,
+  durationMinutesMin: 1,
+  durationMinutesMax: 120,
   variants: 3,
   attemptsPerCalendarDay: 8,
   attemptResetTimezone: 'Asia/Oral',

@@ -278,7 +278,7 @@ test('rolling Stage-A learner parsing accepts only legacy five or canonical ten 
   assert.doesNotMatch(server, /correctOptionId|reviewItemSchema|payload\.review/);
   assert.match(
     server,
-    /payload\.total === QUIZ_POLICY\.questionCount[\s\S]*question\.options\.length !== 4/,
+    /payload\.total === QUIZ_POLICY\.questionCount[\s\S]*question\.options\.length !== QUIZ_POLICY\.optionCount/,
   );
   assert.doesNotMatch(
     server,

@@ -84,7 +84,11 @@ const attemptPayloadSchema = z
     passed: z.boolean().nullable(),
     certificateId: z.string().uuid().nullable(),
     certificatePendingVerification: z.boolean().default(false),
-    durationMinutes: z.number().int().min(1).max(120),
+    durationMinutes: z
+      .number()
+      .int()
+      .min(QUIZ_POLICY.durationMinutesMin)
+      .max(QUIZ_POLICY.durationMinutesMax),
     passScore: z.number().int().min(1).max(QUIZ_POLICY.questionCount),
     startedAt: timestampSchema,
     expiresAt: timestampSchema,
@@ -99,7 +103,7 @@ const attemptPayloadSchema = z
     }
     if (payload.total === QUIZ_POLICY.questionCount) {
       for (const question of payload.questions) {
-        if (question.options.length !== 4) {
+        if (question.options.length !== QUIZ_POLICY.optionCount) {
           context.addIssue({ code: 'custom', message: 'optionTotal' });
           break;
         }

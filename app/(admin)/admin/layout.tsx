@@ -140,7 +140,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
           <main
             id="admin-main"
-            className="min-w-0 pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)] min-[1024px]:pb-0"
+            // Without tabIndex the skip link moves the viewport and leaves
+            // focus on <body>, and without the scroll margin the heading it
+            // jumps to sits under the sticky header.
+            tabIndex={-1}
+            className="min-w-0 scroll-mt-[calc(3.5rem+var(--safe-area-top))] pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)] outline-none min-[1024px]:scroll-mt-0 min-[1024px]:pb-0"
           >
             <Container
               size="admin"
