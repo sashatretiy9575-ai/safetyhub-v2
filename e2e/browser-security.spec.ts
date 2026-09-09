@@ -11,7 +11,14 @@ test('auth HTML carries a unique strict CSP and baseline hardening headers', asy
   expect(firstCsp).toContain("frame-ancestors 'none'");
   // pdf.js compiles WebAssembly; it does not need `eval`.
   expect(firstCsp).toContain("'wasm-unsafe-eval'");
-  expect(firstCsp).not.toContain("'unsafe-eval'");
+  // `'unsafe-eval'` is granted in development only, where Next's own dev
+  // runtime requires it. Against `next dev` — the default web server for this
+  // suite — asserting its absence would only prove the suite is not running
+  // against what ships, so the check is made where it means something.
+  // Next stamps its build id into the flight payload; `development` is the
+  // value `next dev` uses and no production build can produce.
+  const development = (await page.content()).includes('\\"b\\":\\"development\\"');
+  if (!development) expect(firstCsp).not.toContain("'unsafe-eval'");
   expect(firstCsp).toContain('report-uri /api/security/csp-report');
   expect(firstHeaders['reporting-endpoints']).toContain('csp=');
   expect(firstCsp).not.toContain("script-src 'self' 'unsafe-inline'");
