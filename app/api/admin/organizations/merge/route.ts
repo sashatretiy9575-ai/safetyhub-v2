@@ -8,13 +8,15 @@ import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { NextResponse } from '@/lib/security/api-response';
 
-const schema = z.object({
-  idempotencyKey: z.string().uuid(),
-  sourceIds: z.array(z.string().uuid()).min(1).max(100),
-  targetId: z.string().uuid(),
-  reissueCertificates: z.boolean(),
-  reason: z.string().trim().min(10).max(500),
-});
+const schema = z
+  .object({
+    idempotencyKey: z.string().uuid(),
+    sourceIds: z.array(z.string().uuid()).min(1).max(100),
+    targetId: z.string().uuid(),
+    reissueCertificates: z.boolean(),
+    reason: z.string().trim().min(10).max(500),
+  })
+  .strict();
 
 export async function POST(request: Request) {
   try {

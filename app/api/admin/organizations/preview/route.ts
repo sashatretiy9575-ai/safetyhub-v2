@@ -5,10 +5,12 @@ import { previewOrganizationMerge } from '@/features/admin/organizations';
 import { readJsonBody } from '@/lib/security/request-body';
 import { NextResponse } from '@/lib/security/api-response';
 
-const schema = z.object({
-  sourceIds: z.array(z.string().uuid()).min(1).max(100),
-  targetId: z.string().uuid(),
-});
+const schema = z
+  .object({
+    sourceIds: z.array(z.string().uuid()).min(1).max(100),
+    targetId: z.string().uuid(),
+  })
+  .strict();
 
 export async function POST(request: Request) {
   try {

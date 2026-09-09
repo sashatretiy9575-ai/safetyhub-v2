@@ -8,14 +8,17 @@ import { readJsonBody } from '@/lib/security/request-body';
 import { consumeCoarseQuota } from '@/lib/security/rate-limit';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { NextResponse } from '@/lib/security/api-response';
+import { CERTIFICATE_EXPORT_JOB_LIMIT } from '@/lib/constants';
 
-const requestSchema = z.object({
-  attestationIds: z
-    .array(z.string().uuid())
-    .min(1)
-    .max(500)
-    .refine((values) => new Set(values).size === values.length),
-});
+const requestSchema = z
+  .object({
+    attestationIds: z
+      .array(z.string().uuid())
+      .min(1)
+      .max(CERTIFICATE_EXPORT_JOB_LIMIT)
+      .refine((values) => new Set(values).size === values.length),
+  })
+  .strict();
 
 const jobSchema = z.object({
   id: z.string().uuid(),

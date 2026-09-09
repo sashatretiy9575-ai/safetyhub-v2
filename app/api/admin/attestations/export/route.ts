@@ -16,17 +16,20 @@ import { readJsonBody } from '@/lib/security/request-body';
 import { consumeCoarseQuota } from '@/lib/security/rate-limit';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { NextResponse } from '@/lib/security/api-response';
+import { CERTIFICATE_EXPORT_SYNC_LIMIT } from '@/lib/constants';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const exportSchema = z.object({
-  attestationIds: z
-    .array(z.string().uuid())
-    .min(1)
-    .max(100)
-    .refine((values) => new Set(values).size === values.length, 'DUPLICATE_ATTESTATION_IDS'),
-});
+const exportSchema = z
+  .object({
+    attestationIds: z
+      .array(z.string().uuid())
+      .min(1)
+      .max(CERTIFICATE_EXPORT_SYNC_LIMIT)
+      .refine((values) => new Set(values).size === values.length, 'DUPLICATE_ATTESTATION_IDS'),
+  })
+  .strict();
 
 type RpcClient = {
   rpc(

@@ -13,6 +13,7 @@ import type {
   AdminAttestationMutationItem,
 } from '@/features/admin/types';
 import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
+import { ADMIN_ATTESTATION_BULK_LIMIT } from '@/lib/constants';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import {
   assertCertificateExportMetadata,
@@ -40,6 +41,7 @@ import {
   AttestationBulkActionButtons,
   AttestationDetailDrawer,
   attestationFieldLabels,
+  attestationFieldMaxLengths,
   type AttestationIdentityFields,
   type AttestationPendingAction,
   type AttestationPermissions,
@@ -301,10 +303,17 @@ export function AttestationsManager({
         result.response,
       );
       if (!result.ok || !payload || !('attestationIds' in payload)) {
+        // The server answers 409 when the filter matches more rows than one
+        // operation may carry; that is an instruction to narrow the filter, not
+        // a failure to report as a server fault.
+        const tooLarge =
+          payload && 'error' in payload && payload.error === 'ATTESTATION_SELECTION_TOO_LARGE';
         setMessage(
-          result.ok
-            ? 'Сервер вернул неполный список.'
-            : clientRequestMessage(result.error, 'Не удалось выбрать строки по фильтру.'),
+          tooLarge
+            ? `Под фильтр попало больше ${ADMIN_ATTESTATION_BULK_LIMIT} строк. Уточните фильтр и повторите.`
+            : result.ok
+              ? 'Сервер вернул неполный список.'
+              : clientRequestMessage(result.error, 'Не удалось выбрать строки по фильтру.'),
         );
         return;
       }
@@ -347,8 +356,10 @@ export function AttestationsManager({
   };
 
   const selectAllFiltered = async () => {
-    if (page.total > 500) {
-      setMessage('За один раз можно обработать не более 500 строк. Уточните фильтр.');
+    if (page.total > ADMIN_ATTESTATION_BULK_LIMIT) {
+      setMessage(
+        `За один раз можно обработать не более ${ADMIN_ATTESTATION_BULK_LIMIT} строк. Уточните фильтр.`,
+      );
       return;
     }
     await resolveFilteredSelection(
@@ -399,7 +410,10 @@ export function AttestationsManager({
         title: `Изменить поле «${attestationFieldLabels[pending.field]}»`,
         description: `Значение применится к ${selectionSummary.people} чел.; действующие сертификаты перевыпускаются.`,
         confirmLabel: 'Сохранить изменение',
-        input: { label: `Новое значение: ${attestationFieldLabels[pending.field]}` },
+        input: {
+          label: `Новое значение: ${attestationFieldLabels[pending.field]}`,
+          maxLength: attestationFieldMaxLengths[pending.field],
+        },
       };
     }
     if (pending.kind === 'individual-update') {
@@ -411,6 +425,7 @@ export function AttestationsManager({
         input: {
           label: `Новое значение: ${attestationFieldLabels[pending.field]}`,
           initialValue: oldValue,
+          maxLength: attestationFieldMaxLengths[pending.field],
         },
       };
     }

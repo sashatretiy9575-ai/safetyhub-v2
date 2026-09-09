@@ -14,6 +14,9 @@ import { renderPdfBoundaryPages } from '@/lib/pdf/server-render-validation';
 import { getRpcMutationError, unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 
 const STAGING_BUCKET = 'course-presentations-staging';
+// Kept in step with the ceiling in app/course-presentations/[slug]/[asset].
+const THUMBNAIL_MAX_BYTES = 5 * 1024 * 1024;
+
 const PUBLIC_BUCKET = 'course-presentations';
 const paramsSchema = z.object({ courseId: z.string().uuid() });
 const bodySchema = z.object({
@@ -414,6 +417,10 @@ export async function POST(request: Request, context: { params: Promise<{ course
         !thumbnail.height ||
         thumbnail.width > 1600 ||
         thumbnail.height > 1600 ||
+        // The relay that serves this file refuses anything above 5 MB, so a
+        // larger thumbnail would be accepted here and then be permanently
+        // unreadable on the course page: the published path is immutable.
+        thumbnailBytes.byteLength > THUMBNAIL_MAX_BYTES ||
         Math.abs(thumbnailRatio - 16 / 9) > 0.02
       ) {
         const code = safetyError ?? 'PRESENTATION_VALIDATION_FAILED';

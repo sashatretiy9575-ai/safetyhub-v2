@@ -7,6 +7,7 @@ import { requireAnyCapability, requireCapability } from '@/features/auth/server'
 import { invalidateCertificateVerificationCache } from '@/features/certificates/server';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
+import { ADMIN_ATTESTATION_BULK_LIMIT } from '@/lib/constants';
 import type {
   AdminAttestationMutationItem,
   AdminAttestationFilters,
@@ -18,7 +19,9 @@ import type {
 
 export const ADMIN_ATTESTATION_DEFAULT_PAGE_SIZE = 50;
 export const ADMIN_ATTESTATION_PAGE_SIZES = [25, 50, 100] as const;
-export const ADMIN_ATTESTATION_BULK_LIMIT = 500;
+// Re-exported for the many server modules that already import it from here.
+// A bare `export ... from` would not create the local binding this file uses.
+export { ADMIN_ATTESTATION_BULK_LIMIT };
 
 export const ADMIN_ATTESTATION_SORTS = [
   'name_asc',

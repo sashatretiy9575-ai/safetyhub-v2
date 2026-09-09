@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 import { NextResponse } from '@/lib/security/api-response';
+import { readBoundedBytes } from '@/lib/security/request-body';
 import { invalidOriginResponse } from '@/features/auth/request-origin';
 import { apiError } from '@/features/auth/api-error';
 import { requireCapability } from '@/features/auth/server';
@@ -57,6 +58,47 @@ export async function GET() {
   }
 }
 
+type ContentAssetRow = {
+  id: string;
+  width: number | null;
+  height: number | null;
+  byte_size: number | null;
+};
+
+async function reviveContentAsset(
+  admin: ReturnType<typeof createAdminClient>,
+  assetId: string,
+  storageKey: string,
+  bytes: Uint8Array,
+) {
+  const upload = await admin.storage.from('content-media').upload(storageKey, bytes, {
+    contentType: 'image/webp',
+    cacheControl: '31536000',
+    upsert: true,
+  });
+  if (upload.error) throw upload.error;
+  const reactivated = await admin
+    .from('content_assets')
+    .update({ status: 'active' })
+    .eq('id', assetId)
+    .in('status', ['orphan_candidate', 'delete_pending'])
+    .select('*')
+    .maybeSingle();
+  if (reactivated.error) throw reactivated.error;
+  // Somebody else changed the row between the read and the update. Reporting a
+  // stale URL would be worse than failing loudly.
+  if (!reactivated.data) throw new Error('CONTENT_ASSET_STATUS_CHANGED');
+  const row = reactivated.data as ContentAssetRow;
+  return {
+    id: row.id,
+    url: assetUrl(row.id),
+    width: row.width,
+    height: row.height,
+    bytes: row.byte_size,
+    deduplicated: true,
+  };
+}
+
 export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
@@ -64,15 +106,32 @@ export async function POST(request: Request) {
     const actor = await requireCapability('content.manage');
     await consumeAdminMutationQuota('admin.test.mutate', requestSecurityMetadata(request).ipHash);
 
-    const declaredLength = Number(request.headers.get('content-length') ?? '0');
+    const contentType = request.headers.get('content-type') ?? '';
     if (
-      !Number.isSafeInteger(declaredLength) ||
-      declaredLength <= 0 ||
-      declaredLength > SOURCE_MAX_BYTES + MULTIPART_OVERHEAD_BYTES
+      contentType.length > 512 ||
+      !/^multipart\/form-data\s*;\s*boundary=(?:[!#$%&'*+\-.^_`|~0-9A-Za-z]{1,70}|"[!#$%&'*+\-.^_`|~()\/:<=>?@\[\]{},0-9A-Za-z ]{1,70}")$/u.test(
+        contentType,
+      )
     ) {
+      return NextResponse.json({ error: 'CONTENT_ASSET_FORMAT_INVALID' }, { status: 400 });
+    }
+    // The cap applies to the bytes actually read. `Content-Length` is a client
+    // hint: a chunked upload omits it, and an understated value used to let an
+    // arbitrarily large body reach `request.formData()`.
+    let requestBytes: Uint8Array<ArrayBuffer>;
+    try {
+      requestBytes = await readBoundedBytes(request, SOURCE_MAX_BYTES + MULTIPART_OVERHEAD_BYTES);
+    } catch {
       return NextResponse.json({ error: 'CONTENT_ASSET_TOO_LARGE' }, { status: 413 });
     }
-    const form = await request.formData();
+    if (requestBytes.byteLength === 0) {
+      return NextResponse.json({ error: 'CONTENT_ASSET_FORMAT_INVALID' }, { status: 400 });
+    }
+    const form = await new Request('http://safetyhub.local/content-asset', {
+      method: 'POST',
+      headers: { 'content-type': contentType },
+      body: requestBytes,
+    }).formData();
     const source = form.get('asset');
     if (!(source instanceof File) || !ALLOWED_INPUT_TYPES.has(source.type)) {
       return NextResponse.json({ error: 'CONTENT_ASSET_FORMAT_INVALID' }, { status: 400 });
@@ -118,7 +177,7 @@ export async function POST(request: Request) {
       .eq('sha256', sha256)
       .maybeSingle();
     if (existing.error) throw existing.error;
-    if (existing.data) {
+    if (existing.data && existing.data.status === 'active') {
       return NextResponse.json({
         id: existing.data.id,
         url: assetUrl(existing.data.id),
@@ -127,6 +186,13 @@ export async function POST(request: Request) {
         bytes: existing.data.byte_size,
         deduplicated: true,
       });
+    }
+    if (existing.data) {
+      // The row exists but is orphaned or scheduled for deletion, so its bytes
+      // may already be gone. Re-uploading them and reactivating the row is what
+      // the operator asked for by uploading the picture again.
+      const revived = await reviveContentAsset(admin, existing.data.id, storageKey, normalized.data);
+      if (revived) return NextResponse.json(revived);
     }
 
     const upload = await admin.storage.from('content-media').upload(storageKey, normalized.data, {

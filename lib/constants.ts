@@ -67,4 +67,22 @@ export const QUIZ = {
  * finish inside the hosted statement timeout, so the admin UI splits a large
  * selection into chunks of this size and sends them one after another.
  */
+/**
+ * The largest row set one bulk attestation operation may carry. The database
+ * refuses a broader filter, so the browser needs the same number to say why
+ * before the request is made.
+ */
+export const ADMIN_ATTESTATION_BULK_LIMIT = 500;
+
+/**
+ * A synchronous certificate export renders every PDF inside one request, so it
+ * is deliberately smaller than the queued job that the browser polls. Both
+ * numbers used to be literals repeated across the route, the archive builder
+ * and the operator panel.
+ */
+export const CERTIFICATE_EXPORT_SYNC_LIMIT = 100;
+
+/** Upper bound of a queued certificate export job. */
+export const CERTIFICATE_EXPORT_JOB_LIMIT = 500;
+
 export const ADMIN_PURGE_BULK_LIMIT = 50;

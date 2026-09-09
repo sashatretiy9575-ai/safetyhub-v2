@@ -5,6 +5,7 @@ import { invalidOriginResponse } from '@/features/auth/request-origin';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
+import { PROFILE_FIELD_LIMITS } from '@/features/profile/fields';
 import { requireCapability } from '@/features/auth/server';
 import {
   ADMIN_ATTESTATION_BULK_LIMIT,
@@ -17,20 +18,41 @@ const ids = z
   .max(ADMIN_ATTESTATION_BULK_LIMIT)
   .refine((values) => new Set(values).size === values.length, 'DUPLICATE_TARGET_IDS');
 const actionSchema = z.discriminatedUnion('action', [
-  z.object({ action: z.literal('confirm'), userIds: ids, idempotencyKey: z.string().uuid() }),
-  z.object({
-    action: z.literal('update'),
-    userIds: ids,
-    field: z.enum(['name', 'surname', 'job', 'organization']),
-    value: z.string().trim().min(1).max(200),
-    idempotencyKey: z.string().uuid(),
-  }),
-  z.object({ action: z.literal('issue'), attestationIds: ids, idempotencyKey: z.string().uuid() }),
-  z.object({
-    action: z.literal('confirm_and_issue'),
-    attestationIds: ids,
-    idempotencyKey: z.string().uuid(),
-  }),
+  z
+    .object({ action: z.literal('confirm'), userIds: ids, idempotencyKey: z.string().uuid() })
+    .strict(),
+  z
+    .object({
+      action: z.literal('update'),
+      userIds: ids,
+      field: z.enum(['name', 'surname', 'job', 'organization']),
+      // Bounded per field: the columns hold 80 characters for a name and 160
+      // for a job or a company. A single 200-character ceiling let a value
+      // through to the column CHECK, where the whole batch rolled back with no
+      // indication of which field was at fault.
+      value: z.string().trim().min(1).max(PROFILE_FIELD_LIMITS.job),
+      idempotencyKey: z.string().uuid(),
+    })
+    .strict()
+    .superRefine((update, context) => {
+      if (update.value.length > PROFILE_FIELD_LIMITS[update.field]) {
+        context.addIssue({
+          code: 'custom',
+          path: ['value'],
+          message: `FIELD_TOO_LONG:${update.field}:${PROFILE_FIELD_LIMITS[update.field]}`,
+        });
+      }
+    }),
+  z
+    .object({ action: z.literal('issue'), attestationIds: ids, idempotencyKey: z.string().uuid() })
+    .strict(),
+  z
+    .object({
+      action: z.literal('confirm_and_issue'),
+      attestationIds: ids,
+      idempotencyKey: z.string().uuid(),
+    })
+    .strict(),
 ]);
 
 export async function POST(request: Request) {

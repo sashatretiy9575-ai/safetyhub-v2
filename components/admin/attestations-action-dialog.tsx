@@ -11,7 +11,14 @@ export type AttestationDialogConfig = {
   description: string;
   confirmLabel: string;
   tone?: 'primary' | 'danger';
-  input?: { label: string; initialValue?: string; placeholder?: string };
+  input?: {
+    label: string;
+    initialValue?: string;
+    placeholder?: string;
+    // Matches the profile column the value is written to; a single 200
+    // character ceiling let a name reach the database and fail there.
+    maxLength?: number;
+  };
   reason?: { label: string; minLength: number; placeholder?: string };
   confirmationPhrase?: string;
 };
@@ -92,7 +99,7 @@ export function AttestationsActionDialog({
                   onChange={(event) => setValue(event.target.value)}
                   placeholder={config.input.placeholder}
                   minLength={1}
-                  maxLength={200}
+                  maxLength={config.input.maxLength ?? 160}
                   required
                   autoFocus
                 />

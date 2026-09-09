@@ -11,6 +11,10 @@ import {
 } from '../../lib/pdf/certificate.ts';
 import { createStreamingZipArchive, createZipArchive } from '../../lib/pdf/certificate-archive.ts';
 import { generateCertificateReportInBrowser } from '../../lib/pdf/certificate-report.ts';
+import {
+  CERTIFICATE_EXPORT_JOB_LIMIT,
+  CERTIFICATE_EXPORT_SYNC_LIMIT,
+} from '../../lib/constants.ts';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
@@ -20,9 +24,19 @@ test('small export caps at one hundred while background jobs accept five hundred
     read('app/api/admin/attestations/export-jobs/route.ts'),
     read('features/admin/certificate-export-archive.ts'),
   ]);
-  assert.match(route, /attestationIds:[\s\S]*\.min\(1\)[\s\S]*\.max\(100\)/);
+  // The numbers themselves are asserted against `lib/constants.ts`, so a change
+  // to either ceiling has to be a deliberate one rather than a stray literal.
+  assert.equal(CERTIFICATE_EXPORT_SYNC_LIMIT, 100);
+  assert.equal(CERTIFICATE_EXPORT_JOB_LIMIT, 500);
+  assert.match(
+    route,
+    /attestationIds:[\s\S]*\.min\(1\)[\s\S]*\.max\(CERTIFICATE_EXPORT_SYNC_LIMIT\)/,
+  );
   assert.match(route, /DUPLICATE_ATTESTATION_IDS/);
-  assert.match(jobs, /attestationIds:[\s\S]*\.min\(1\)[\s\S]*\.max\(500\)/);
+  assert.match(
+    jobs,
+    /attestationIds:[\s\S]*\.min\(1\)[\s\S]*\.max\(CERTIFICATE_EXPORT_JOB_LIMIT\)/,
+  );
   assert.match(jobs, /create_certificate_export_job/);
   assert.match(helper, /items: z\.array\(certificateDownloadPayloadSchema\)\.max\(500\)/);
   assert.match(route, /requireCapability\('results\.export'/);

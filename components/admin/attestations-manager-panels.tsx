@@ -94,6 +94,18 @@ export const attestationFieldLabels = {
   organization: 'Компания',
 } as const;
 
+/**
+ * Mirrors the profile column widths. It is duplicated here rather than imported
+ * from `features/profile/fields`, because that module pulls in the phone
+ * library and this panel is measured against a bundle budget.
+ */
+export const attestationFieldMaxLengths = {
+  name: 80,
+  surname: 80,
+  job: 160,
+  organization: 160,
+} as const satisfies Record<keyof typeof attestationFieldLabels, number>;
+
 export type AttestationIdentityFields = {
   name: string;
   surname: string;
