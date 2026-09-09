@@ -18,13 +18,11 @@ export function ProcessTimeline() {
       aria-labelledby="process-heading"
       className="relative isolate overflow-hidden py-10 sm:py-14 lg:py-16"
     >
+      {/* A painted wash replaces the former 44 KB texture: the image was drawn at
+          0.08 opacity under an 82% surface fill, so nothing of it was visible. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-20 bg-[url('/images/generated/process-journey.webp')] bg-cover bg-center opacity-[0.08] dark:opacity-[0.06]"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[var(--color-bg)]/82 backdrop-blur-sm"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(120%_100%_at_50%_0%,var(--color-primary-soft),transparent_70%)]"
       />
 
       <Container size="wide">

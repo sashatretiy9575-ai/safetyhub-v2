@@ -1,5 +1,12 @@
 @import 'tailwindcss';
 
+/* Markdown in the repository (AUDIT.md, docs/*.md, README) quotes class names
+   from this codebase. Tailwind v4 detects sources automatically and would turn
+   those quotes into real utilities: prose mentioning `bg-[url(...)]` emits a
+   rule for an asset that need not exist, and `--safe-area-*` emits invalid
+   CSS. Both break `next build`. Documentation is never a class source. */
+@source not '../**/*.md';
+
 @font-face {
   font-family: 'Manrope';
   src: url('/fonts/manrope-cyrillic-ext.woff2') format('woff2');
