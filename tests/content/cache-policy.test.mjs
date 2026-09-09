@@ -75,8 +75,11 @@ test('static params and sitemap use the same published content APIs', async () =
     read('app/sitemap.ts'),
   ]);
 
-  assert.match(articles, /return \(await getArticles\(\)\)\.map/);
-  assert.match(topics, /return \(await getTopics\(\)\)\.map/);
+  // The slug lists take a locale now: they were Russian-only, and the prefixed
+  // routes re-exported them under `dynamicParams = false`, which made every
+  // localization with its own slug a permanent 404.
+  assert.match(articles, /return \(await getArticles\(locale\)\)\.map/);
+  assert.match(topics, /return \(await getTopics\(locale\)\)\.map/);
   for (const page of [articlePage, topicPage, testPage]) {
     assert.match(page, /export async function generateStaticParams/);
     assert.match(page, /await get(?:Article|Topic)Slugs\(\)/);

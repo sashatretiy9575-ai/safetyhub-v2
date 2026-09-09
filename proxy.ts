@@ -120,6 +120,24 @@ export async function proxy(request: NextRequest) {
   // A compatible production build can be deployed before the translated
   // catalog is published. Until the explicit cutover, prefixed routes remain
   // physically unresolved and therefore return the App Router 404.
+  // `ru` is the default locale and therefore has no public prefix. Collapse a
+  // manually entered `/ru/...` alias instead of creating duplicate URLs. This
+  // has to happen before the rollout gate below: `/ru/topics` is a duplicate of
+  // a page that exists whether or not prefixed routes are switched on, and
+  // answering 404 there turned every historical link into a dead end.
+  if (
+    localizedPath.hasLocalePrefix &&
+    localizedPath.locale === DEFAULT_LOCALE &&
+    localeRoutable &&
+    (request.method === 'GET' || request.method === 'HEAD')
+  ) {
+    const destination = request.nextUrl.clone();
+    destination.pathname = localizedPath.pathname;
+    // 308 rather than 307: the collapse is permanent and consolidates the
+    // duplicate for search engines, and it preserves the request method.
+    return NextResponse.redirect(destination, 308);
+  }
+
   if (!localeRoutesEnabled && localizedPath.hasLocalePrefix && localeRoutable) {
     // Physical locale route files exist in this build, unlike the historical
     // header rewrite. Keep the rollout fail-closed until the app/database
@@ -133,19 +151,6 @@ export async function proxy(request: NextRequest) {
   // exist. Let the App Router return 404 instead of widening those surfaces.
   if (localizedPath.hasLocalePrefix && !localeRoutable) {
     return NextResponse.next();
-  }
-
-  // `ru` is the default locale and therefore has no public prefix. Collapse a
-  // manually entered `/ru/...` alias instead of creating duplicate URLs.
-  if (
-    localizedPath.hasLocalePrefix &&
-    localizedPath.locale === DEFAULT_LOCALE &&
-    localeRoutable &&
-    (request.method === 'GET' || request.method === 'HEAD')
-  ) {
-    const destination = request.nextUrl.clone();
-    destination.pathname = localizedPath.pathname;
-    return NextResponse.redirect(destination);
   }
 
   // Query-string legal links were published before physical historical routes
@@ -183,7 +188,10 @@ export async function proxy(request: NextRequest) {
       `${localizedPath.pathname}/${encodeURIComponent(policy.version)}`,
       targetLocale,
     );
-    const redirect = NextResponse.redirect(destination);
+    // Permanent only when the version was named. `?version=` with an empty
+    // value resolves to whatever is current, so a cached 308 would pin the
+    // reader to a document that is no longer in force.
+    const redirect = NextResponse.redirect(destination, requestedVersion ? 308 : 307);
     redirect.headers.set('Cache-Control', 'private, no-store');
     return redirect;
   }
@@ -290,5 +298,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\..*).*)'],
+  // Excluding every path that contains a dot also excluded the versioned
+  // legal documents — `/kk/privacy/1.4` — from the locale rollout gate and
+  // from every security header this proxy sets. Static assets are listed by
+  // extension instead, which is what the pattern meant to say.
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|sw\\.js|manifest\\.json|icons/|images/|fonts/|screenshots/|certificates/|course-presentations/|.*\\.(?:html?|png|jpg|jpeg|gif|webp|avif|svg|ico|woff2?|ttf|otf|css|js|map|pdf|txt|xml|json|webmanifest)$).*)',
+  ],
 };

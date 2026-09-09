@@ -18,7 +18,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 import { isContentSlug } from '@/lib/content/slug';
 import { coerceContentMetadata, type ContentMetadata } from '@/lib/content/content-metadata';
 import { contentSeoSchema, defaultContentSeo, type ContentSeo } from '@/lib/validation/content-seo';
-import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
+import { APP_LOCALES, DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
 import { QUIZ_POLICY } from '@/lib/constants';
 import type { Json } from '@/lib/supabase/types';
 import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
@@ -552,8 +552,20 @@ export const getTopicBySlug = cache((slug: string, locale: AppLocale = DEFAULT_L
     : getLegacyTopicBySlug(slug);
 });
 
-export async function getTopicSlugs(): Promise<string[]> {
-  return (await getTopics()).map((topic) => topic.slug).filter(isContentSlug);
+export async function getTopicSlugs(locale: AppLocale = DEFAULT_LOCALE): Promise<string[]> {
+  return (await getTopics(locale)).map((topic) => topic.slug).filter(isContentSlug);
+}
+
+/**
+ * The locales a course is actually published in.
+ *
+ * Both the sitemap and the hreflang cluster assumed all four, so a course that
+ * only ever had a Russian text advertised three URLs that answer 404. Each read
+ * here is the same cached list the catalogue pages already fetch.
+ */
+export async function getTopicLocales(slug: string): Promise<readonly AppLocale[]> {
+  const lists = await Promise.all(APP_LOCALES.map((locale) => getTopics(locale)));
+  return APP_LOCALES.filter((_, index) => (lists[index] ?? []).some((topic) => topic.slug === slug));
 }
 
 type CourseRedirectClient = {

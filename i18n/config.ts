@@ -132,7 +132,10 @@ export function localesForLanguageSwitcher({
 export function isLocaleRoutablePath(pathname: string) {
   const normalized = normalizePathname(pathname);
   if (NON_LOCALIZED_PATHS.has(normalized)) return false;
-  if (/\.[a-z0-9]{1,10}$/iu.test(normalized)) return false;
+  // A legal version — `/privacy/1.4` — is not a file: an extension always
+  // starts with a letter. The looser form declared those URLs non-routable,
+  // which took them out of the locale gate entirely.
+  if (/\.[a-z][a-z0-9]{0,9}$/iu.test(normalized)) return false;
   return !NON_LOCALIZED_PREFIXES.some(
     (prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`),
   );

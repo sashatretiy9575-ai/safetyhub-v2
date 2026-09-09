@@ -1,6 +1,6 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { getTopicBySlug, getTopicRedirectBySlug, getTopicSlugs } from '@/lib/content/topics';
+import { getTopicLocales, getTopicBySlug, getTopicRedirectBySlug, getTopicSlugs } from '@/lib/content/topics';
 import { CourseMaterialActions } from '@/components/topics/course-material-actions';
 import { JsonLd } from '@/components/shared/json-ld';
 import { breadcrumbsJsonLd, buildMetadata, courseJsonLd } from '@/lib/seo';
@@ -20,7 +20,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const locale = await getLocale();
   const [topic, t] = await Promise.all([getTopicBySlug(slug, locale), getTranslations('Topics')]);
-  if (!topic) return {};
+  if (!topic)
+    // Without this the layout's canonical is inherited and a missing course
+    // declares itself to be the home page.
+    return { robots: { index: false, follow: false }, alternates: { canonical: null } };
 
   return buildMetadata({
     title: topic.seo.title,
@@ -33,6 +36,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     type: 'article',
     keywords: [topic.title, t('seoKeyword')],
     locale,
+    // Only the locales this document was actually published in. Announcing all
+    // four pointed hreflang at URLs that do not exist.
+    availableLocales: await getTopicLocales(slug),
   });
 }
 

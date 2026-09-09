@@ -27,8 +27,9 @@ test('JSON-LD describes only visible capabilities and is mounted on matching pag
   ]);
 
   assert.doesNotMatch(seo, /SearchAction|search_term_string/);
-  assert.match(home, /getFaqData\(\)/);
-  assert.match(home, /faqJsonLd\(faqData\)/);
+  // The FAQPage graph is emitted once, on the page that is about the
+  // questions; the home page carries the accordion without the markup.
+  assert.doesNotMatch(home, /faqJsonLd|getFaqData/);
   assert.match(courseGrid, /courseJsonLd/);
   assert.match(article, /articleJsonLd/);
   assert.match(article, /breadcrumbsJsonLd/);
@@ -78,7 +79,7 @@ test('deployment URLs fail closed, previews cannot be indexed, and retired regis
   assert.match(siteUrl, /VERCEL_ENV === 'preview'/);
   assert.match(siteUrl, /VERCEL_URL/);
   assert.match(config, /assertDeploymentSiteUrl\(\)/);
-  assert.match(seo, /noindex \|\| isPreviewDeployment\(\)/);
+  assert.match(seo, /noindex \|\| preview/);
   assert.match(robots, /disallow: '\/'/);
   assert.match(registerRoute, /passwordAuthRetiredResponse\(\)/u);
   assert.doesNotMatch(registerRoute, /auth\.signUp|new URL\(request\.url\)\.origin|window\./u);

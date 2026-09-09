@@ -6,8 +6,8 @@ import {
   hasLegacyRussianLegalRenderer,
   staticLegalVersions,
 } from '@/lib/content/legal-documents';
-import { DEFAULT_LOCALE } from '@/i18n/config';
-import { resolveLegalDocumentVersion } from '@/lib/legal';
+import { APP_LOCALES, DEFAULT_LOCALE } from '@/i18n/config';
+import { TERMS_POLICY, resolveLegalDocumentVersion } from '@/lib/legal';
 import { buildMetadata } from '@/lib/seo';
 
 export const revalidate = 300;
@@ -33,11 +33,22 @@ export async function generateMetadata({ params }: TermsVersionPageProps) {
   }
 
   const t = await getTranslations('LegalFlow');
+  // The version in force is the same document as /terms: canonicalise it
+  // there rather than competing with it, and keep superseded revisions out of
+  // the index while still letting a crawler follow them to the current text.
+  const isCurrent = policy.version === TERMS_POLICY.version;
+  const availableLocales = APP_LOCALES.filter(
+    (candidate) =>
+      getStaticLegalDocument('terms', policy.version, candidate) !== null ||
+      (candidate === DEFAULT_LOCALE && hasLegacyRussianLegalRenderer('terms', policy.version)),
+  );
   return buildMetadata({
     title: `${t('terms')} ${policy.version}`,
     description: t('termsMetadataDescription'),
-    path: `/terms/${encodeURIComponent(policy.version)}`,
+    path: isCurrent ? '/terms' : `/terms/${encodeURIComponent(policy.version)}`,
+    noindex: !isCurrent,
     locale: DEFAULT_LOCALE,
+    availableLocales,
   });
 }
 

@@ -6,12 +6,16 @@ import { buildMetadata } from '@/lib/seo';
 import type { AppLocale } from '@/i18n/config';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const locale = await getPrivateRequestLocale();
   const t = await getTranslations({ locale, namespace: 'Quiz' });
   return buildMetadata({
     title: t('metadataTitle'),
     description: t('metadataDescription'),
+    // Without a path this canonicalised to «/» and inherited the home page's
+    // hreflang cluster, on a screen that is noindex to begin with.
+    path: `/topics/${encodeURIComponent(slug)}/test`,
     noindex: true,
     locale,
   });

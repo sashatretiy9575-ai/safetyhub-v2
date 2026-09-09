@@ -21,6 +21,7 @@ import { JsonLd } from '@/components/shared/json-ld';
 import { Container } from '@/components/ui/container';
 import {
   getArticleBySlug,
+  getArticleLocales,
   getArticleRedirectBySlug,
   getArticles,
   getArticleSlugs,
@@ -55,7 +56,10 @@ export async function generateMetadata({
   const { slug } = await params;
   const locale = await getLocale();
   const article = await getArticleBySlug(slug, locale);
-  if (!article) return {};
+  if (!article)
+    // Without this the layout's canonical is inherited and a missing article
+    // declares itself to be the home page.
+    return { robots: { index: false, follow: false }, alternates: { canonical: null } };
   return buildMetadata({
     title: article.seo?.title ?? article.title,
     description: article.seo?.description ?? article.description,
@@ -68,6 +72,9 @@ export async function generateMetadata({
     publishedTime: article.createdAt,
     modifiedTime: article.updatedAt,
     locale,
+    // Only the locales this document was actually published in. Announcing all
+    // four pointed hreflang at URLs that do not exist.
+    availableLocales: await getArticleLocales(slug),
   });
 }
 

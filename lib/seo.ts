@@ -28,6 +28,13 @@ type SeoOptions = {
   authors?: string[];
   type?: 'website' | 'article';
   locale?: AppLocale;
+  /**
+   * The locales this particular document exists in. Defaults to all of them,
+   * which is right for the static shell and wrong for anything published per
+   * locale — a legal revision that only ever had a Russian text was still
+   * advertising kk, en and zh alternates.
+   */
+  availableLocales?: readonly AppLocale[];
 };
 
 /**
@@ -41,6 +48,13 @@ const LOCALIZED_CITY: Record<AppLocale, string> = {
   en: 'Almaty',
   zh: '阿拉木图',
 };
+
+const HREFLANG_BY_LOCALE = {
+  ru: 'ru-KZ',
+  kk: 'kk-KZ',
+  en: 'en',
+  zh: 'zh-Hans',
+} as const satisfies Record<AppLocale, string>;
 
 export const BASE_KEYWORDS = [
   'промышленная безопасность Алматы',
@@ -69,6 +83,7 @@ export function buildMetadata({
   authors,
   type = 'website',
   locale = DEFAULT_LOCALE,
+  availableLocales = APP_LOCALES,
 }: SeoOptions): Metadata {
   const fullTitle = title ? `${title} — ${BRAND.domain}` : `${BRAND.domain}`;
   const normalizedPath = path || '';
@@ -77,12 +92,19 @@ export function buildMetadata({
   const resolvedOgImage = ogImage.startsWith('http://') || ogImage.startsWith('https://')
     ? ogImage
     : absoluteUrl(ogImage);
-  const preventIndexing = noindex || isPreviewDeployment();
+  const preview = isPreviewDeployment();
+  const preventIndexing = noindex || preview;
   const localeRoutesEnabled = rolloutFeatureEnabled('localeRoutes');
+  const publishedLanguages = new Set<string>([
+    ...availableLocales.map((candidate) => HREFLANG_BY_LOCALE[candidate]),
+    'x-default',
+  ]);
   const languageAlternates = Object.fromEntries(
     Object.entries(localeAlternates(normalizedPath || '/'))
-      .filter(
-        ([language]) => localeRoutesEnabled || language === 'ru-KZ' || language === 'x-default',
+      .filter(([language]) =>
+        localeRoutesEnabled
+          ? publishedLanguages.has(language)
+          : language === 'ru-KZ' || language === 'x-default',
       )
       .map(([language, pathname]) => [language, absoluteUrl(pathname)]),
   );
@@ -97,7 +119,11 @@ export function buildMetadata({
     applicationName: BRAND.domain,
     category: 'education',
     robots: preventIndexing
-      ? { index: false, follow: false }
+      ? // A page kept out of the index should still pass a crawler along to the
+        // pages it points at — a superseded legal revision links to the one in
+        // force. A preview deployment is the exception: nothing there should be
+        // crawled or followed at all.
+        { index: false, follow: !preview }
       : {
           index: true,
           follow: true,
@@ -165,10 +191,26 @@ export function organizationJsonLd(
       telephone: contacts.phoneDisplay,
       contactType: 'customer service',
       areaServed: 'KZ',
-      availableLanguage: ['Russian', 'Kazakh', 'English', 'Chinese'],
+      availableLanguage: servedLocales().map((candidate) => SCHEMA_LANGUAGE_NAME[candidate]),
     },
     areaServed: { '@type': 'Country', name: 'Kazakhstan' },
   };
+}
+
+const SCHEMA_LANGUAGE_NAME = {
+  ru: 'Russian',
+  kk: 'Kazakh',
+  en: 'English',
+  zh: 'Chinese',
+} as const satisfies Record<AppLocale, string>;
+
+/**
+ * The locales actually reachable right now. Prefixed routes are behind a
+ * rollout flag, and until it is on the site answers Russian only — announcing
+ * four languages in the structured data invited crawls of URLs that 404.
+ */
+function servedLocales(): readonly AppLocale[] {
+  return rolloutFeatureEnabled('localeRoutes') ? APP_LOCALES : [DEFAULT_LOCALE];
 }
 
 export function websiteJsonLd(locale: AppLocale = DEFAULT_LOCALE) {
@@ -178,7 +220,7 @@ export function websiteJsonLd(locale: AppLocale = DEFAULT_LOCALE) {
     name: BRAND.domain,
     url: absoluteUrl(localizePathname('/', locale)),
     inLanguage: htmlLanguage(locale),
-    availableLanguage: APP_LOCALES.map((candidate) => htmlLanguage(candidate)),
+    availableLanguage: servedLocales().map((candidate) => htmlLanguage(candidate)),
   };
 }
 

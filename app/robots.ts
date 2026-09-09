@@ -3,6 +3,21 @@ import { absoluteUrl } from '@/lib/utils';
 import { isPreviewDeployment } from '@/lib/site-url';
 import { LOCALE_PREFIXES } from '@/i18n/config';
 
+/**
+ * The private screens, listed once.
+ *
+ * The prefixed and unprefixed lists were written out separately and had already
+ * drifted: `/onboarding` was disallowed under `/kk`, `/en` and `/zh` and left
+ * open on the route that actually exists today.
+ */
+const PRIVATE_PATHS = [
+  '/profile',
+  '/onboarding',
+  '/auth/*',
+  '/callback',
+  '/topics/*/test',
+] as const;
+
 export default function robots(): MetadataRoute.Robots {
   if (isPreviewDeployment()) {
     return { rules: [{ userAgent: '*', disallow: '/' }] };
@@ -16,19 +31,12 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           '/admin',
           '/admin/*',
-          '/profile',
-          '/auth/*',
-          '/callback',
-          '/topics/*/test',
+          ...PRIVATE_PATHS,
           // Internal certificate-archive diagnostic harness, not a product page.
           '/zip-harness',
-          ...LOCALE_PREFIXES.flatMap((locale) => [
-            `/${locale}/profile`,
-            `/${locale}/auth/*`,
-            `/${locale}/callback`,
-            `/${locale}/onboarding`,
-            `/${locale}/topics/*/test`,
-          ]),
+          ...LOCALE_PREFIXES.flatMap((locale) =>
+            PRIVATE_PATHS.map((pathname) => `/${locale}${pathname}`),
+          ),
         ],
       },
     ],

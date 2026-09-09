@@ -27,7 +27,7 @@ import {
   type ArticleLifecycleStatus,
 } from '@/lib/validation/article';
 import { contentSeoSchema, defaultContentSeo, type ContentSeo } from '@/lib/validation/content-seo';
-import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
+import { APP_LOCALES, DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
 import type { Json } from '@/lib/supabase/types';
 import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
 
@@ -511,6 +511,14 @@ export const getArticleRedirectBySlug = cache((slug: string) =>
   isContentSlug(slug) ? getCachedArticleRedirectBySlug(slug) : Promise.resolve(null),
 );
 
-export async function getArticleSlugs(): Promise<string[]> {
-  return (await getArticles()).map((article) => article.slug).filter(isContentSlug);
+export async function getArticleSlugs(locale: AppLocale = DEFAULT_LOCALE): Promise<string[]> {
+  return (await getArticles(locale)).map((article) => article.slug).filter(isContentSlug);
+}
+
+/** The locales an article is actually published in. See `getTopicLocales`. */
+export async function getArticleLocales(slug: string): Promise<readonly AppLocale[]> {
+  const lists = await Promise.all(APP_LOCALES.map((locale) => getArticles(locale)));
+  return APP_LOCALES.filter((_, index) =>
+    (lists[index] ?? []).some((article) => article.slug === slug),
+  );
 }

@@ -6,10 +6,9 @@ import { CourseGrid } from '@/components/marketing/course-grid';
 import { ProcessTimeline } from '@/components/marketing/process-timeline';
 import { Testimonials } from '@/components/marketing/testimonials';
 import { Resources } from '@/components/marketing/resources';
-import { FaqAccordion, getFaqData } from '@/components/marketing/faq-accordion';
+import { FaqAccordion } from '@/components/marketing/faq-accordion';
 import { ContactCta } from '@/components/marketing/contact-cta';
-import { JsonLd } from '@/components/shared/json-ld';
-import { buildMetadata, faqJsonLd } from '@/lib/seo';
+import { buildMetadata } from '@/lib/seo';
 
 function HomeSectionFallback({ label }: { label: string }) {
   return (
@@ -42,10 +41,11 @@ export async function generateMetadata() {
 }
 
 export default async function HomePage() {
-  const [t, faqData] = await Promise.all([getTranslations('Home'), getFaqData()]);
+  const t = await getTranslations('Home');
   return (
     <>
-      <JsonLd data={faqJsonLd(faqData)} />
+      {/* The FAQPage graph belongs to /faq. Emitting the identical one here as
+          well described the same questions at two URLs from one source. */}
       <Hero />
       <Suspense fallback={<HomeSectionFallback label={t('loadingCourses')} />}>
         <CourseGrid />

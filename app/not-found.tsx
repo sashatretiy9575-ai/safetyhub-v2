@@ -1,58 +1,19 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { Container } from '@/components/ui/container';
-import { Button } from '@/components/ui/button';
-import { htmlLanguage, localizePathname, type AppLocale } from '@/i18n/config';
-import { emergencyLocale } from '@/i18n/emergency-locale';
-import ruMessages from '@/messages/global-error/ru.json';
-import kkMessages from '@/messages/global-error/kk.json';
-import enMessages from '@/messages/global-error/en.json';
-import zhMessages from '@/messages/global-error/zh.json';
-
-const MESSAGE_CATALOGS = {
-  ru: ruMessages,
-  kk: kkMessages,
-  en: enMessages,
-  zh: zhMessages,
-} as const;
+import type { Metadata } from 'next';
+import { NotFoundNotice } from '@/components/shared/not-found-notice';
 
 /**
- * Root 404: the answer for a URL that matches no route at all.
- *
- * It sits outside every locale layout, so there is no request locale and no
- * provider — the same situation `global-error` is in, and it uses the same
- * four-key emergency catalogs rather than pulling a 50 KB dictionary into a
- * client chunk. The copy used to be English on every locale.
- *
- * The document element belongs to the wrapper Next generates for this file, so
- * the language is set on it rather than rendered; without that the page
- * announced itself as having no language at all.
+ * The not-found convention resolves last and overrides the layouts above it.
+ * Without these two fields a 404 inherited the public layout's canonical — so
+ * it declared itself to be «/» — and its `robots: index, follow`. That happens
+ * wherever the page itself never runs: unmatched URLs, and every prefixed route
+ * under `dynamicParams = false`.
  */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+  alternates: { canonical: null },
+};
+
+/** Root 404 also sits outside the independent locale layouts. */
 export default function NotFound() {
-  const [locale, setLocale] = useState<AppLocale>('ru');
-  const messages = MESSAGE_CATALOGS[locale];
-
-  useEffect(() => {
-    const resolved = emergencyLocale();
-    setLocale(resolved);
-    document.documentElement.lang = htmlLanguage(resolved);
-  }, []);
-
-  return (
-    <Container size="narrow" className="grid min-h-[60vh] place-items-center py-16 text-center">
-      <div className="space-y-4">
-        <p className="font-mono text-sm tracking-widest text-[var(--color-text-muted)] uppercase">
-          404
-        </p>
-        <h1 className="font-display text-3xl font-semibold">
-          {messages.AppState.notFoundTitle}
-        </h1>
-        <p className="text-[var(--color-text-muted)]">{messages.AppState.notFoundDescription}</p>
-        <Button asChild>
-          <a href={localizePathname('/', locale)}>{messages.Common.home}</a>
-        </Button>
-      </div>
-    </Container>
-  );
+  return <NotFoundNotice />;
 }

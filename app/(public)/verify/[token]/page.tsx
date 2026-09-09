@@ -16,6 +16,11 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t('verifyMetadataTitle'),
     description: t('verifyMetadataDescription'),
     robots: { index: false, follow: false },
+    // The parent layout's canonical would otherwise apply here, pointing a
+    // per-certificate page at «/» and putting it in the home page's hreflang
+    // cluster. A self-canonical is not an option either: the token would then
+    // be published in the markup.
+    alternates: { canonical: null },
   };
 }
 

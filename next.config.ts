@@ -97,6 +97,9 @@ const legacyTopicRedirects = [
 const localizedPrivateSource = (pathname: string) =>
   `/:locale(${LOCALE_PREFIXES.join('|')})${pathname}`;
 
+/** The screens allowed to use the camera, in every form they are served. */
+const CAMERA_EXEMPT_PATH = `(?:(?:${LOCALE_PREFIXES.join('|')})/)?(?:onboarding|profile)(?:/.*)?$`;
+
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const nextConfig: NextConfig = {
@@ -150,16 +153,20 @@ const nextConfig: NextConfig = {
       { source: '/onboarding/:path*', headers: [...securityHeaders, profilePermissions] },
       { source: '/profile/:path*', headers: [...securityHeaders, profilePermissions] },
       {
-        source: '/:path((?!onboarding(?:/.*)?$|profile(?:/.*)?$).*)',
-        headers: [...securityHeaders, restrictedPermissions],
-      },
-      {
         source: localizedPrivateSource('/onboarding/:path*'),
         headers: [...securityHeaders, profilePermissions],
       },
       {
         source: localizedPrivateSource('/profile/:path*'),
         headers: [...securityHeaders, profilePermissions],
+      },
+      {
+        // Last, and skipping exactly the screens above — including their
+        // locale-prefixed forms. Next stops at the first matching source, so
+        // with this rule ahead of them /kk/profile was served `camera=()` and
+        // the avatar camera could not open on any prefixed route.
+        source: `/:path((?!${CAMERA_EXEMPT_PATH}).*)`,
+        headers: [...securityHeaders, restrictedPermissions],
       },
       {
         source: '/api/:path*',
