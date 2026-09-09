@@ -225,7 +225,7 @@ export function CourseLocalizationsEditor({
   return (
     <Card data-admin-course-localizations>
       <CardHeader>
-        <CardTitle>Локализации курса</CardTitle>
+        <CardTitle as="h2">Локализации курса</CardTitle>
         <p className="text-sm text-[var(--color-text-muted)]">
           Русские подписи админки не меняются. Публикация создаёт одну редакцию только после
           готовности RU, KK, EN и ZH.

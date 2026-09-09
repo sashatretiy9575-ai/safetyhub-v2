@@ -214,7 +214,7 @@ export default async function AuditPage({
               key={value || 'all'}
               href={quickFilterHref(query, value)}
               aria-current={active ? 'true' : undefined}
-              className={`inline-flex min-h-9 items-center rounded-full px-3 font-semibold transition-colors ${
+              className={`inline-flex min-h-11 items-center rounded-full px-3 font-semibold transition-colors ${
                 active
                   ? 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
                   : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'

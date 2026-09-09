@@ -12,7 +12,11 @@ export function TopicSourcesCard({ topic }: { topic: Pick<Topic, 'sources'> }) {
         <div className="space-y-3">
           <details className="group rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)]">
             <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-2.5 text-sm font-bold marker:content-none md:px-5 [&::-webkit-details-marker]:hidden">
-              <span>{t('sources', { count: topic.sources.length })}</span>
+              {/* The only heading of this section. As a bare span it left the
+                  page with a single h1 and nothing beneath it. */}
+              <h2 className="font-sans text-sm leading-5 font-bold">
+                {t('sources', { count: topic.sources.length })}
+              </h2>
               <span
                 aria-hidden="true"
                 className="text-xl text-[var(--color-primary)] transition-transform group-open:rotate-45"

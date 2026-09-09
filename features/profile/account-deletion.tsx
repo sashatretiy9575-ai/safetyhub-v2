@@ -67,7 +67,8 @@ export function AccountDeletion() {
   return (
     <div className="space-y-4 border-t border-[var(--color-danger)] pt-4">
       <div>
-        <h2 className="font-display text-lg font-bold">{t('title')}</h2>
+        {/* Both callers place this inside a section that already has an h2. */}
+        <h3 className="font-display text-lg font-bold">{t('title')}</h3>
         <p className="mt-2 text-sm text-[var(--color-text-muted)]">{t('description')}</p>
       </div>
       <div className="space-y-2">

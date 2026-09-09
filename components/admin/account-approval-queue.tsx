@@ -247,6 +247,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
           <Input
             type="search"
             placeholder="Поиск по ФИО, email или компании…"
+            aria-label="Поиск по ФИО, email или компании"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10 h-10 text-sm"
@@ -256,7 +257,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value as 'oldest' | 'newest')}
-            className="h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs font-semibold text-[var(--color-text)] outline-none focus:border-[var(--color-primary)]"
+            className="h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs font-semibold text-[var(--color-text)] focus:border-[var(--color-primary)]"
             aria-label="Сортировка заявок"
           >
             <option value="oldest">Сначала старые</option>
@@ -383,10 +384,17 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
 
               {requestingRejection ? (
                 <div className="space-y-2 border-t border-[var(--color-border)] pt-3">
-                  <label className="block space-y-1">
-                    <span className="text-xs font-semibold text-[var(--color-text-muted)]">
+                  {/* The label used to wrap the whole block, so the quick-reason
+                      buttons were inside it: their text joined the field's
+                      accessible name, and clicking one also focused the
+                      textarea. */}
+                  <div className="block space-y-1">
+                    <label
+                      htmlFor={`approval-reason-${item.id}`}
+                      className="block text-xs font-semibold text-[var(--color-text-muted)]"
+                    >
                       Что нужно уточнить
-                    </span>
+                    </label>
                     <div className="flex flex-wrap gap-1.5 pb-1">
                       {QUICK_REASONS.map((preset) => (
                         <button
@@ -402,6 +410,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
                       ))}
                     </div>
                     <Textarea
+                      id={`approval-reason-${item.id}`}
                       value={reasons[item.id] ?? ''}
                       onChange={(event) =>
                         setReasons((current) => ({ ...current, [item.id]: event.target.value }))
@@ -411,7 +420,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
                       placeholder="Например: уточните название компании."
                       disabled={actionDisabled}
                     />
-                  </label>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     <Button
                       type="button"

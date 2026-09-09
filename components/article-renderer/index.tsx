@@ -13,6 +13,14 @@ import { useTranslations } from 'next-intl';
 interface ArticleRendererProps {
   blocks: unknown;
   contacts?: SiteContactSettings;
+  /**
+   * How far to push the body's own heading levels down.
+   *
+   * The body always starts at h2, which is right on an article page. Inside an
+   * admin preview it sits under a heading of its own, and without this the
+   * article's sections came out above the title of the thing being previewed.
+   */
+  headingOffset?: 0 | 1 | 2;
 }
 
 export type ArticleTocItem = {
@@ -103,7 +111,7 @@ const calloutStyles = {
   },
 } as const;
 
-export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
+export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: ArticleRendererProps) {
   const t = useTranslations('Blog');
   const result = articleBlocksSchema.safeParse(blocks);
   if (!result.success) {
@@ -132,7 +140,10 @@ export function ArticleRenderer({ blocks, contacts }: ArticleRendererProps) {
             );
 
           case 'heading': {
-            const Tag = `h${block.level}` as 'h2' | 'h3' | 'h4';
+            // The body always starts at h2. Inside an admin preview it sits under
+            // a heading of its own, so every level shifts down with it.
+            const level = Math.min(block.level + headingOffset, 6);
+            const Tag = `h${level}` as 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
             return (
               <Tag
                 key={index}

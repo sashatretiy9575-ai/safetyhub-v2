@@ -244,7 +244,7 @@ export const Turnstile = forwardRef<
           <button
             type="button"
             onClick={execute}
-            className="min-h-10 shrink-0 rounded-lg px-2 font-bold underline underline-offset-4 focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+            className="min-h-11 shrink-0 rounded-lg px-2 font-bold underline underline-offset-4 focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           >
             {t('turnstile.retry')}
           </button>

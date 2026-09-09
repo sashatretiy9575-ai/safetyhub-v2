@@ -498,7 +498,7 @@ export function TestEditor({
             <Badge variant="sapphire" className="w-fit">
               Предпросмотр
             </Badge>
-            <CardTitle>{course.title || 'Название курса'}</CardTitle>
+            <CardTitle as="h2">{course.title || 'Название курса'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p>{course.description || 'Описание курса'}</p>
@@ -516,9 +516,9 @@ export function TestEditor({
             )}
             {currentQuestion ? (
               <div className="rounded-xl border p-4">
-                <h2 className="font-bold">
+                <h3 className="font-bold">
                   Вариант {activeVariant + 1}, вопрос {activeQuestion + 1}
-                </h2>
+                </h3>
                 <p className="mt-2">{currentQuestion.text || 'Текст вопроса'}</p>
                 {currentQuestion.options.map((option, index) => (
                   <p key={option.id} className="mt-1 text-sm">
@@ -536,7 +536,7 @@ export function TestEditor({
         <fieldset disabled={busy} className="contents">
           <Card>
             <CardHeader>
-              <CardTitle>1. Основные сведения</CardTitle>
+              <CardTitle as="h2">1. Основные сведения</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5 md:col-span-2">
@@ -611,7 +611,7 @@ export function TestEditor({
 
           <Card id="test-presentation">
             <CardHeader>
-              <CardTitle>2. Презентация</CardTitle>
+              <CardTitle as="h2">2. Презентация</CardTitle>
             </CardHeader>
             <CardContent>
               <CoursePresentationInput
@@ -636,7 +636,7 @@ export function TestEditor({
 
           <Card>
             <CardHeader>
-              <CardTitle>3. Правила прохождения</CardTitle>
+              <CardTitle as="h2">3. Правила прохождения</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-1.5">
@@ -711,7 +711,7 @@ export function TestEditor({
 
           <Card>
             <CardHeader>
-              <CardTitle>4–6. Варианты теста</CardTitle>
+              <CardTitle as="h2">4–6. Варианты теста</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="grid grid-cols-3 gap-2" role="tablist" aria-label="Варианты теста">
@@ -769,7 +769,9 @@ export function TestEditor({
                     type="button"
                     size="icon"
                     variant={activeQuestion === index ? 'primary' : 'outline'}
-                    aria-controls={`question-panel-${index}`}
+                    aria-controls={
+                      activeQuestion === index ? `question-panel-${index}` : undefined
+                    }
                     aria-expanded={activeQuestion === index}
                     aria-label={`Вопрос ${index + 1}`}
                     className={cn(
@@ -903,7 +905,7 @@ export function TestEditor({
 
           <Card>
             <CardHeader>
-              <CardTitle>7. Проверка перед публикацией</CardTitle>
+              <CardTitle as="h2">7. Проверка перед публикацией</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="grid gap-3 sm:grid-cols-3">

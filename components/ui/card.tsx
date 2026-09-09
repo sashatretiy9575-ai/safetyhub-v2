@@ -22,15 +22,21 @@ export const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
 );
 CardHeader.displayName = 'CardHeader';
 
-export const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <h3
-      ref={ref}
-      className={cn('text-xl font-semibold leading-tight tracking-tight', className)}
-      {...props}
-    />
-  ),
-);
+/**
+ * The visual weight of a card title is fixed; its level in the document is not.
+ * Hard-wired to h3, this skipped a level under every page whose own title is an
+ * h1, and there was no way to opt out for a card whose "title" is a count.
+ */
+export const CardTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement> & { as?: 'h2' | 'h3' | 'h4' | 'p' }
+>(({ className, as: Tag = 'h3', ...props }, ref) => (
+  <Tag
+    ref={ref}
+    className={cn('text-xl font-semibold leading-tight tracking-tight', className)}
+    {...props}
+  />
+));
 CardTitle.displayName = 'CardTitle';
 
 export const CardDescription = React.forwardRef<

@@ -213,6 +213,8 @@ export function MediaAssetInput({
               type="file"
               accept="image/jpeg,image/png,image/webp,image/avif"
               className="sr-only"
+              tabIndex={-1}
+              aria-label="Файл изображения для загрузки в медиатеку"
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (file) void upload(file);

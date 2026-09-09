@@ -946,7 +946,7 @@ export function AttestationsManager({
                             return next;
                           })
                         }
-                        className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-[var(--color-surface)]"
+                        className="grid size-11 shrink-0 place-items-center rounded-lg hover:bg-[var(--color-surface)] @min-[760px]:size-9"
                       >
                         <CaretDown
                           size={16}
@@ -973,7 +973,7 @@ export function AttestationsManager({
                         onClick={() =>
                           void setOrganizationGroupSelected(row.organization, !groupFullySelected)
                         }
-                        className="flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-lg px-1.5 text-left hover:bg-[var(--color-surface)]"
+                        className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-lg px-1.5 text-left hover:bg-[var(--color-surface)] @min-[760px]:min-h-9"
                       >
                         <span
                           aria-hidden
@@ -997,7 +997,7 @@ export function AttestationsManager({
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="size-9"
+                            className="size-11 @min-[760px]:size-9"
                             aria-label={`Действия с компанией: ${row.organization || 'не указана'}`}
                           >
                             <DotsThree size={18} weight="bold" />

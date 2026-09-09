@@ -167,7 +167,7 @@ export function CourseMaterialActions({
                   </div>
                 ) : cta ? (
                   <div className="space-y-3 rounded-xl border border-[var(--color-warning)] bg-[var(--color-surface-muted)] p-4 text-left">
-                    <p className="font-bold">{cta.title}</p>
+                    <h2 className="font-sans text-base leading-6 font-bold">{cta.title}</h2>
                     <p className="text-sm leading-6 text-[var(--color-text-muted)]">{cta.description}</p>
                     <Button asChild size="lg" className="w-full">
                       <Link href={cta.href}>{cta.label}</Link>

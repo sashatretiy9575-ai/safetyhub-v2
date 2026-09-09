@@ -3,10 +3,18 @@
 import dynamic from 'next/dynamic';
 import type { AccountMode } from '@/components/layout/navigation-items';
 
+/**
+ * The mobile dock stays code-split, but it is rendered on the server.
+ *
+ * It used to be loaded with `ssr: false` behind an empty `aria-hidden` box, so
+ * below 1024 px — where the desktop navigation is hidden and this is the only
+ * replacement — the delivered HTML contained no navigation at all. Dropping the
+ * flag puts the five links in the document without moving the chunk into the
+ * initial bundle.
+ */
 const BottomTabBar = dynamic(
   () => import('@/components/layout/bottom-tab-bar').then((module) => module.BottomTabBar),
   {
-    ssr: false,
     loading: () => (
       <div
         aria-hidden="true"

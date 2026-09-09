@@ -22,6 +22,7 @@ export function LegalAcceptanceGate({
 
   return (
     <LegalAcceptancePanel
+      headingLevel={1}
       initialAcceptances={[]}
       initiallyUnavailable={false}
       currentPolicies={currentPolicies}

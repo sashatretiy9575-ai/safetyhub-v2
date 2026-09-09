@@ -316,6 +316,40 @@ export const articleBlocksSchema = z
     }
   });
 
+/**
+ * The same blocks, plus the rule that heading levels may not skip.
+ *
+ * The editor offers H2, H3 and H4 as three independent choices, so an article
+ * could be published whose first heading is an H4, or which drops from H2
+ * straight to H4. A reader navigating by headings then meets a level with no
+ * parent. This is deliberately separate from `articleBlocksSchema`: that one
+ * also parses content already in the database, and tightening it there would
+ * make an article that was legal when it was saved unreadable now.
+ */
+export const articleBlocksWriteSchema = articleBlocksSchema.superRefine((blocks, context) => {
+  let previous = 1;
+  blocks.forEach((block, index) => {
+    if (!isHeadingBlock(block)) return;
+    if (block.level > previous + 1) {
+      context.addIssue({
+        code: 'custom',
+        path: [index, 'level'],
+        message: 'ARTICLE_HEADING_LEVEL_SKIPPED',
+      });
+    }
+    previous = block.level;
+  });
+});
+
+function isHeadingBlock(block: unknown): block is { type: 'heading'; level: 2 | 3 | 4 } {
+  return (
+    typeof block === 'object' &&
+    block !== null &&
+    (block as { type?: unknown }).type === 'heading' &&
+    typeof (block as { level?: unknown }).level === 'number'
+  );
+}
+
 export const articleStatusSchema = z.enum(['draft', 'published']);
 
 const articleDateSchema = z.string().trim().min(1).max(40);
@@ -398,7 +432,7 @@ export const articleDraftInputSchema = z
     coverImage: articleCoverImageSchema,
     seo: articleSeoSchema.optional(),
     ...contentMetadataDraftSchema.shape,
-    blocks: articleBlocksSchema,
+    blocks: articleBlocksWriteSchema,
   })
   .strict()
   .superRefine((article, context) => {

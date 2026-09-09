@@ -191,8 +191,11 @@ function CourseRow({
     item.certificateState === 'ready';
 
   return (
-    <article className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-4 py-3 first:border-t-0 md:min-h-[58px] md:grid-cols-[minmax(0,1fr)_13rem_8.5rem] md:items-center">
-      <div className="min-w-0">
+    <div
+      role="row"
+      className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-4 py-3 first:border-t-0 md:min-h-[58px] md:grid-cols-[minmax(0,1fr)_13rem_8.5rem] md:items-center"
+    >
+      <div role="cell" className="min-w-0">
         <h3 className="font-semibold break-words leading-tight">{item.courseTitle}</h3>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--color-text-muted)] md:hidden">
           <Badge
@@ -211,7 +214,7 @@ function CourseRow({
         ) : null}
       </div>
 
-      <div className="hidden min-w-0 md:flex md:flex-wrap md:items-center md:gap-1.5">
+      <div role="cell" className="hidden min-w-0 md:flex md:flex-wrap md:items-center md:gap-1.5">
         <Badge
           variant={
             isSpecialCertState
@@ -228,7 +231,7 @@ function CourseRow({
         ) : null}
       </div>
 
-      <div className="w-full">
+      <div role="cell" className="w-full">
         {isIssued ? (
           <CertificateDownloadButton certificateId={item.certificateId!} className="w-full">
             {t('download')}
@@ -241,7 +244,7 @@ function CourseRow({
           </Button>
         )}
       </div>
-    </article>
+    </div>
   );
 }
 
@@ -298,15 +301,27 @@ function LearningDashboard({
           </Button>
         </div>
         <div className="overflow-hidden rounded-2xl border bg-[var(--color-surface)]">
-          <div className="hidden min-h-10 grid-cols-[minmax(0,1fr)_13rem_8.5rem] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] md:grid">
-            <span>{t('course')}</span>
-            <span>{t('result')}</span>
-            <span className="sr-only">{t('action')}</span>
-          </div>
           {rows.length ? (
-            rows.map((item) => (
-              <CourseRow key={item.attestationId} item={item} locale={locale} t={t} />
-            ))
+            // A grid of divs with a row of bare spans above it: the column
+            // headings were visible and announced nothing, and no cell was tied
+            // to one. The roles carry that relationship where the markup cannot.
+            <div role="table" aria-labelledby="my-courses-title">
+              <div
+                role="row"
+                className="hidden min-h-10 grid-cols-[minmax(0,1fr)_13rem_8.5rem] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] md:grid"
+              >
+                <span role="columnheader">{t('course')}</span>
+                <span role="columnheader">{t('result')}</span>
+                <span role="columnheader" className="sr-only">
+                  {t('action')}
+                </span>
+              </div>
+              <div role="rowgroup">
+                {rows.map((item) => (
+                  <CourseRow key={item.attestationId} item={item} locale={locale} t={t} />
+                ))}
+              </div>
+            </div>
           ) : (
             <p className="p-6 text-center text-sm text-[var(--color-text-muted)]">
               {t('coursesEmpty')}
@@ -414,15 +429,17 @@ export default async function ProfilePage() {
               open={!profile.onboardingCompletedAt || context.approval.state === 'rejected' || !context.profile.phone_e164 || !profile.organization}
             >
               <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden md:px-6">
-                <span className="min-w-0">
-                  <span className="font-display block text-lg font-bold">
+                {/* The status badge stays outside the heading: it would otherwise
+                    join the section's accessible name. */}
+                <h2 className="font-display min-w-0 text-lg font-bold">
+                  <span className="block">
                     {t('myData')}
                     {!context.profile.phone_e164 || !profile.organization ? ` (${t('actionRequired').replace(/:$/, '')})` : ''}
                   </span>
-                  <span className="block truncate text-sm text-[var(--color-text-muted)]">
+                  <span className="block truncate text-sm leading-normal font-normal text-[var(--color-text-muted)]">
                     {fullName} · {profile.organization || t('companyMissing')}
                   </span>
-                </span>
+                </h2>
                 <span className="flex shrink-0 items-center gap-2">
                   <Badge variant={approval.variant}>{approval.label}</Badge>
                   <CaretDown className="transition-transform group-open:rotate-180" />
@@ -437,7 +454,7 @@ export default async function ProfilePage() {
                 />
                 <div className="min-w-0 space-y-4">
                   <div>
-                    <h2 className="font-display text-xl font-bold break-words">{fullName}</h2>
+                    <h3 className="font-display text-xl font-bold break-words">{fullName}</h3>
                     <p className="text-sm text-[var(--color-text-muted)]">
                       {profile.job || t('jobMissing')}
                     </p>
@@ -480,7 +497,7 @@ export default async function ProfilePage() {
           <CardContent className="p-0">
             <details className="group">
               <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden md:px-6">
-                <span className="font-display text-lg font-bold">{t('settings')}</span>
+                <h2 className="font-display text-lg font-bold">{t('settings')}</h2>
                 <CaretDown className="transition-transform group-open:rotate-180" />
               </summary>
               <div className="space-y-4 border-t p-4 md:p-6">

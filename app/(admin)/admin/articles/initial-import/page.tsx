@@ -19,7 +19,7 @@ export default async function InitialArticleImportPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>{INITIAL_ARTICLE_SNAPSHOT_COUNT} статей</CardTitle>
+          <CardTitle as="p">{INITIAL_ARTICLE_SNAPSHOT_COUNT} статей</CardTitle>
           <CardDescription className="break-all">
             SHA-256: {INITIAL_ARTICLE_SNAPSHOT_HASH}
           </CardDescription>

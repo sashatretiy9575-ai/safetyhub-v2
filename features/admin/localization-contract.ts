@@ -3,7 +3,7 @@ import type { AppLocale } from '@/lib/supabase/types';
 import type { ArticleBlock } from '@/lib/content/articles';
 import type { ContentSource } from '@/lib/content/content-metadata';
 import type { ContentSeo } from '@/lib/validation/content-seo';
-import { articleBlocksSchema } from '@/lib/validation/article';
+import { articleBlocksWriteSchema } from '@/lib/validation/article';
 import { contentMetadataSchema } from '@/lib/content/content-metadata';
 import { contentSeoSchema } from '@/lib/validation/content-seo';
 
@@ -117,7 +117,7 @@ export const articleLocalizationDraftSchema = z
     expectedVersion: z.number().int().positive().nullable(),
     title: z.string().trim().min(1).max(200),
     description: z.string().trim().max(2_000),
-    blocks: articleBlocksSchema.max(100),
+    blocks: articleBlocksWriteSchema.max(100),
     seo: contentSeoSchema,
     sources: contentMetadataSchema.shape.sources,
     complete: z.boolean().default(false),

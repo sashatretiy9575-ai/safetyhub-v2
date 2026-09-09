@@ -20,6 +20,11 @@ type LegalAcceptancePanelProps = {
     terms: LegalDocumentVersion;
   }>;
   onAccepted?: () => void;
+  /**
+   * The panel is a section of /profile and the whole of /auth/legal. On the
+   * latter its heading is the page's own, and the page had no h1 without this.
+   */
+  headingLevel?: 1 | 2;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -78,6 +83,7 @@ export function LegalAcceptancePanel({
   initiallyUnavailable,
   currentPolicies,
   onAccepted,
+  headingLevel = 2,
 }: LegalAcceptancePanelProps) {
   const locale = useLocale() as AppLocale;
   const t = useTranslations('LegalFlow');
@@ -139,10 +145,12 @@ export function LegalAcceptancePanel({
     }
   };
 
+  const Heading = headingLevel === 1 ? 'h1' : 'h2';
+
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <h2 className="font-display text-xl font-bold">{t('title')}</h2>
+        <Heading className="font-display text-xl font-bold">{t('title')}</Heading>
         <p className="text-sm text-[var(--color-text-muted)]">{t('description')}</p>
       </div>
 
@@ -240,7 +248,7 @@ export function LegalAcceptancePanel({
                   href={localizedDocumentHref(acceptance.document_type, acceptance.version, locale)}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex min-h-9 shrink-0 items-center font-medium text-[var(--color-primary)] underline underline-offset-2"
+                  className="inline-flex min-h-11 shrink-0 items-center font-medium text-[var(--color-primary)] underline underline-offset-2"
                 >
                   {t('openAccepted')}
                 </Link>

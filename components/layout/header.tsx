@@ -125,8 +125,18 @@ export async function Header({
               ))}
         </div>
 
-        <div className="min-[1024px]:hidden">
+        <div className="flex items-center gap-1 min-[1024px]:hidden">
           <DeferredThemeToggle />
+          {/* Below 1024 px the header showed a theme toggle and nothing else:
+              signing in was reachable only through the dock, and only after the
+              client bundle had loaded. */}
+          {accountMode === 'authenticated' ? null : (
+            <Button asChild variant="outline" size="sm" className="shadow-none">
+              <Link href={localizePathname(accountItem.href, locale)} prefetch={false}>
+                {translations(accountItem.messageKey)}
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>

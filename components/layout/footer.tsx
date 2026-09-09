@@ -134,7 +134,7 @@ export async function Footer({
                   key={link.href}
                   href={localizePathname(link.href, locale)}
                   prefetch={false}
-                  className="inline-flex min-h-9 items-center text-white/70 transition-colors duration-150 hover:text-white"
+                  className="inline-flex min-h-11 items-center text-white/70 transition-colors duration-150 hover:text-white"
                 >
                   {translations(link.messageKey)}
                 </Link>

@@ -122,7 +122,7 @@ export function IconPicker({
               title={item.label}
               data-icon-index={index}
               className={cn(
-                'grid aspect-square min-h-10 place-items-center rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-focus)]',
+                'grid aspect-square min-h-11 place-items-center rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-focus)]',
                 active
                   ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
                   : 'border-transparent bg-[var(--color-surface)] hover:border-[var(--color-border-strong)]',

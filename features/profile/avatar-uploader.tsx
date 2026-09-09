@@ -187,6 +187,8 @@ export function AvatarUploader({
   const captureInputRef = useRef<HTMLInputElement>(null);
   const cropPanelRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const cameraPanelRef = useRef<HTMLDivElement>(null);
+  const cameraTriggerRef = useRef<HTMLElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const cameraRequestRef = useRef(0);
   const mountedRef = useRef(true);
@@ -296,6 +298,8 @@ export function AvatarUploader({
 
   const startCamera = async () => {
     if (busy) return;
+    // Remembered so focus can go back where it came from when the dialog closes.
+    cameraTriggerRef.current = document.activeElement as HTMLElement | null;
     stopCamera();
     setCandidate(null);
     setFeedback(null);
@@ -339,17 +343,67 @@ export function AvatarUploader({
       const denied =
         error instanceof DOMException &&
         (error.name === 'NotAllowedError' || error.name === 'SecurityError');
-      setCameraError(denied ? t('cameraDenied') : t('cameraFailed'));
+      if (denied) {
+        // The document may simply not be allowed to use a camera — the admin
+        // account page is served `camera=()`. Fall through to the system
+        // camera instead of leaving the user at a dead end.
+        setCameraOpen(false);
+        setFeedback({ kind: 'status', message: t('cameraUnavailable') });
+        captureInputRef.current?.click();
+        return;
+      }
+      setCameraError(t('cameraFailed'));
     } finally {
       if (mountedRef.current && requestId === cameraRequestRef.current) setCameraStarting(false);
     }
   };
 
-  const closeCamera = () => {
+  const closeCamera = useCallback(() => {
     stopCamera();
     setCameraOpen(false);
     setCameraError('');
-  };
+    cameraTriggerRef.current?.focus();
+  }, [stopCamera]);
+
+  // B5-07: the panel declared role="dialog" and aria-modal, and behaved like
+  // neither — Tab walked out into the page behind it, Escape did nothing, and
+  // closing it left focus on the document body.
+  useEffect(() => {
+    if (!cameraOpen) return;
+    const panel = cameraPanelRef.current;
+    if (!panel) return;
+    const frame = requestAnimationFrame(() => {
+      panel.querySelector<HTMLElement>('[data-camera-initial-focus]')?.focus();
+    });
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeCamera();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [
+        ...panel.querySelectorAll<HTMLElement>(
+          'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
+        ),
+      ];
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [cameraOpen, closeCamera]);
 
   const takePhoto = async () => {
     if (!videoRef.current || !streamRef.current) return;
@@ -456,8 +510,7 @@ export function AvatarUploader({
           size="sm"
           variant="ghost"
           disabled={busy}
-          aria-expanded="false"
-          aria-controls={photoActionsId}
+          aria-expanded={false}
           onClick={() => setPhotoActionsOpen(true)}
         >
           <Camera size={17} /> {t('change')}
@@ -469,7 +522,10 @@ export function AvatarUploader({
             size="sm"
             variant="outline"
             disabled={busy}
-            onClick={() => captureInputRef.current?.click()}
+            // This opened the operating system's camera app, exactly like the
+            // hidden capture input beside it, so the built-in preview — the
+            // whole of startCamera and its dialog — could never be reached.
+            onClick={() => void startCamera()}
           >
             <Camera size={17} /> {t('take')}
           </Button>
@@ -617,6 +673,7 @@ export function AvatarUploader({
             role="dialog"
             aria-modal="true"
             aria-labelledby="camera-title"
+            ref={cameraPanelRef}
             className="fixed inset-0 z-[var(--z-camera)] grid place-items-center overflow-y-auto bg-black/70 p-4"
           >
             <div className="w-full max-w-lg space-y-4 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 text-left shadow-[var(--shadow-pop)] sm:p-6">
@@ -624,7 +681,13 @@ export function AvatarUploader({
                 <h2 id="camera-title" className="font-display text-xl font-bold">
                   {t('cameraTitle')}
                 </h2>
-                <Button type="button" variant="ghost" size="icon" onClick={closeCamera}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  data-camera-initial-focus
+                  onClick={closeCamera}
+                >
                   <X size={20} /> <span className="sr-only">{t('closeCamera')}</span>
                 </Button>
               </div>

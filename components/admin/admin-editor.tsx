@@ -21,6 +21,7 @@ import type { Article, ArticleBlock, ArticlePublicationState } from '@/lib/conte
 import {
   articleBlockSchema,
   articleBlocksSchema,
+  articleBlocksWriteSchema,
   type ArticleLifecycleStatus,
 } from '@/lib/validation/article';
 import { defaultContentSeo } from '@/lib/validation/content-seo';
@@ -328,7 +329,7 @@ export function AdminEditor({
     const canAutosave =
       normalizeSlug(slug).length > 0 &&
       title.trim().length >= 2 &&
-      articleBlocksSchema.safeParse(blocks).success;
+      articleBlocksWriteSchema.safeParse(blocks).success;
     if (!canAutosave || busy) return;
     let cancelled = false;
     const timeout = window.setTimeout(() => {
@@ -574,7 +575,7 @@ export function AdminEditor({
                 Незаполненные блоки скрыты из предпросмотра.
               </p>
             ) : null}
-            <ArticleRenderer blocks={previewBlocks} />
+            <ArticleRenderer headingOffset={1} blocks={previewBlocks} />
           </CardContent>
         </Card>
       ) : (

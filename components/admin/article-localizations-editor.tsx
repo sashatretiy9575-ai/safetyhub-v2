@@ -144,7 +144,7 @@ export function ArticleLocalizationsEditor({
   return (
     <Card data-admin-article-localizations>
       <CardHeader>
-        <CardTitle>Локализации статьи</CardTitle>
+        <CardTitle as="h2">Локализации статьи</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         <AdminLocaleTabs
@@ -195,7 +195,7 @@ export function ArticleLocalizationsEditor({
               <p className="mt-2 mb-6 break-words text-[var(--color-text-muted)]">
                 {active.description}
               </p>
-              <ArticleRenderer blocks={active.blocks} />
+              <ArticleRenderer blocks={active.blocks} headingOffset={2} />
             </article>
           ) : activeLocale === 'ru' ? (
             <div className="rounded-xl border border-[var(--color-border)] p-3.5 text-xs text-[var(--color-text-muted)]">

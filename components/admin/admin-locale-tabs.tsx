@@ -34,7 +34,9 @@ export function AdminLocaleTabs({
             type="button"
             role="tab"
             aria-selected={locale === activeLocale}
-            aria-controls={`${idPrefix}-panel-${locale}`}
+            // Only the active tab has a panel in the DOM; the rest pointed at ids
+            // that never existed.
+            aria-controls={locale === activeLocale ? `${idPrefix}-panel-${locale}` : undefined}
             id={`${idPrefix}-tab-${locale}`}
             tabIndex={locale === activeLocale ? 0 : -1}
             className={cn(

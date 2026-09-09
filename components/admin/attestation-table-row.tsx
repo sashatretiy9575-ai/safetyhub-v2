@@ -82,7 +82,7 @@ export function AttestationTableRow({
         role="cell"
         className="col-start-1 row-start-1 @min-[760px]:col-start-1 @min-[760px]:row-start-1 @min-[760px]:grid @min-[760px]:place-items-center"
       >
-        <label className="grid size-8 cursor-pointer place-items-center">
+        <label className="grid size-11 cursor-pointer place-items-center @min-[760px]:size-8">
           <input
             type="checkbox"
             checked={selected}

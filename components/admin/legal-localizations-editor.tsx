@@ -210,7 +210,7 @@ function LegalVersionEditor({
       <CardHeader>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <CardTitle>
+            <CardTitle as="h2">
               {version.documentType === 'privacy'
                 ? 'Политика конфиденциальности'
                 : 'Условия использования'}{' '}
@@ -552,7 +552,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
     <div className="space-y-6" data-admin-legal-localizations>
       <Card data-admin-legal-bundle-publisher>
         <CardHeader>
-          <CardTitle>Атомарная публикация Privacy + Terms</CardTitle>
+          <CardTitle as="h2">Атомарная публикация Privacy + Terms</CardTitle>
           <p className="text-sm text-[var(--color-text-muted)]">
             Выберите две готовые версии с одной датой вступления в силу. Все восемь локализаций
             публикуются в одной транзакции; одиночная публикация отключена.
@@ -617,7 +617,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
 
       <Card>
         <CardHeader>
-          <CardTitle>Новая версия документа</CardTitle>
+          <CardTitle as="h2">Новая версия документа</CardTitle>
           <p className="text-sm text-[var(--color-text-muted)]">
             Создайте каноническую версию, затем заполните RU, KK, EN и ZH. Дата фиксируется на
             начало дня по времени Asia/Oral.

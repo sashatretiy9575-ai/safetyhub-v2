@@ -463,6 +463,8 @@ export function CoursePresentationInput({
           type="file"
           accept="application/pdf,.pdf"
           className="sr-only"
+          tabIndex={-1}
+          aria-label="PDF-файл презентации курса"
           onChange={(event) => {
             const file = event.target.files?.[0];
             if (file) void uploadFile(file);

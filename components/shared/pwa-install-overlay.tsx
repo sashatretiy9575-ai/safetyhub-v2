@@ -170,7 +170,7 @@ export function PWAInstallOverlay() {
         <button
           type="button"
           onClick={dismiss}
-          className="grid size-9 shrink-0 place-items-center rounded-full text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]"
+          className="grid size-11 shrink-0 place-items-center rounded-full text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]"
           aria-label={translations('dismiss')}
         >
           <X size={18} aria-hidden="true" />

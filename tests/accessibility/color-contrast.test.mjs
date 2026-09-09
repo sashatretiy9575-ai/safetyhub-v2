@@ -60,6 +60,9 @@ test('light semantic tokens meet WCAG AA text contrast', async () => {
     ['color-on-primary-soft', 'color-primary-soft'],
     ['color-success', 'color-primary-soft'],
     ['color-warning', 'color-accent-amber-soft'],
+    // The success token had no dark override at all, so the light green sat
+    // on a dark surface at 2.29:1.
+    ['color-success', 'color-primary-soft'],
     ['color-danger', 'color-danger-soft'],
     ['color-danger', 'color-danger-foreground'],
     ['color-accent-sapphire', 'color-accent-sapphire-soft'],

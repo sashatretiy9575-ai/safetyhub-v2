@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants';
 import { usePWA } from '@/components/shared/pwa-provider';
@@ -81,32 +82,34 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
         className="glass-strong min-w-56 rounded-[var(--radius-card)] border-[var(--glass-border)] p-2 shadow-[var(--shadow-pop)]"
       >
         <DropdownMenuItem
+          asChild
           className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
-          onSelect={() =>
-            router.push(isAdmin ? ROUTES.admin : localizePathname(ROUTES.profile, locale))
-          }
         >
-          <div className="flex items-center gap-3">
-            {isAdmin ? (
-              <Gauge size={18} weight="regular" className="text-[var(--color-text-muted)]" />
-            ) : (
-              <User size={18} weight="regular" className="text-[var(--color-text-muted)]" />
-            )}
-            <span className="text-sm font-medium">
-              {isAdmin ? translations('admin') : translations('profile')}
-            </span>
-          </div>
+          <Link href={isAdmin ? ROUTES.admin : localizePathname(ROUTES.profile, locale)}>
+            <div className="flex items-center gap-3">
+              {isAdmin ? (
+                <Gauge size={18} weight="regular" className="text-[var(--color-text-muted)]" />
+              ) : (
+                <User size={18} weight="regular" className="text-[var(--color-text-muted)]" />
+              )}
+              <span className="text-sm font-medium">
+                {isAdmin ? translations('admin') : translations('profile')}
+              </span>
+            </div>
+          </Link>
         </DropdownMenuItem>
 
         {isAdmin ? (
           <DropdownMenuItem
+            asChild
             className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
-            onSelect={() => router.push(ROUTES.adminAccount)}
           >
-            <div className="flex items-center gap-3">
-              <User size={18} weight="regular" className="text-[var(--color-text-muted)]" />
-              <span className="text-sm font-medium">{translations('account')}</span>
-            </div>
+            <Link href={ROUTES.adminAccount}>
+              <div className="flex items-center gap-3">
+                <User size={18} weight="regular" className="text-[var(--color-text-muted)]" />
+                <span className="text-sm font-medium">{translations('account')}</span>
+              </div>
+            </Link>
           </DropdownMenuItem>
         ) : null}
 
