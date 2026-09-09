@@ -24,6 +24,7 @@ import {
 } from '@/lib/avatar-image';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
+import { AdminOverlay } from '@/components/admin/admin-overlay';
 
 type AvatarFeedback = Readonly<{
   kind: 'status' | 'error';
@@ -262,20 +263,23 @@ export function AvatarUploader({
     return () => cancelAnimationFrame(frame);
   }, [candidate]);
 
-  const chooseCandidate = useCallback((file: File) => {
-    try {
-      validateAvatarSource(file);
-      setCandidate(file);
-      setCrop(DEFAULT_AVATAR_CROP);
-      setFeedback({
-        kind: 'status',
-        message: t('selected'),
-      });
-    } catch (error) {
-      setCandidate(null);
-      setFeedback({ kind: 'error', message: avatarErrorMessage(error) });
-    }
-  }, [avatarErrorMessage, t]);
+  const chooseCandidate = useCallback(
+    (file: File) => {
+      try {
+        validateAvatarSource(file);
+        setCandidate(file);
+        setCrop(DEFAULT_AVATAR_CROP);
+        setFeedback({
+          kind: 'status',
+          message: t('selected'),
+        });
+      } catch (error) {
+        setCandidate(null);
+        setFeedback({ kind: 'error', message: avatarErrorMessage(error) });
+      }
+    },
+    [avatarErrorMessage, t],
+  );
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -333,11 +337,7 @@ export function AvatarUploader({
       const denied =
         error instanceof DOMException &&
         (error.name === 'NotAllowedError' || error.name === 'SecurityError');
-      setCameraError(
-        denied
-          ? t('cameraDenied')
-          : t('cameraFailed'),
-      );
+      setCameraError(denied ? t('cameraDenied') : t('cameraFailed'));
     } finally {
       if (mountedRef.current && requestId === cameraRequestRef.current) setCameraStarting(false);
     }
@@ -381,9 +381,7 @@ export function AvatarUploader({
         avatarUrl?: unknown;
         bytes?: unknown;
         error?: unknown;
-      }>(
-        result.response,
-      );
+      }>(result.response);
       if (!result.ok || typeof payload?.avatarUrl !== 'string') {
         if (!result.ok && typeof payload?.error === 'string') throw new Error(payload.error);
         throw result.ok ? new Error('AVATAR_UPLOAD_INVALID') : result.error;
@@ -409,10 +407,13 @@ export function AvatarUploader({
     setCrop((current) => ({ ...current, [field]: Number(event.target.value) }));
   };
 
-  const previewError = useCallback((value: unknown) => {
-    setCandidate(null);
-    setFeedback({ kind: 'error', message: avatarErrorMessage(value) });
-  }, [avatarErrorMessage]);
+  const previewError = useCallback(
+    (value: unknown) => {
+      setCandidate(null);
+      setFeedback({ kind: 'error', message: avatarErrorMessage(value) });
+    },
+    [avatarErrorMessage],
+  );
 
   return (
     <div className={compact ? 'space-y-2 text-center' : 'space-y-4 text-center'}>
@@ -509,9 +510,7 @@ export function AvatarUploader({
             <h3 id={cropTitleId} className="font-display text-base font-bold">
               {t('cropTitle')}
             </h3>
-            <p className="text-xs text-[var(--color-text-muted)]">
-              {t('cropDescription')}
-            </p>
+            <p className="text-xs text-[var(--color-text-muted)]">{t('cropDescription')}</p>
           </div>
           <CropPreview
             file={candidate}
@@ -611,73 +610,75 @@ export function AvatarUploader({
       ) : null}
 
       {cameraOpen ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="camera-title"
-          className="fixed inset-0 z-[120] grid place-items-center overflow-y-auto bg-black/70 p-4"
-        >
-          <div className="w-full max-w-lg space-y-4 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 text-left shadow-[var(--shadow-pop)] sm:p-6">
-            <div className="flex items-center justify-between gap-4">
-              <h2 id="camera-title" className="font-display text-xl font-bold">
-                {t('cameraTitle')}
-              </h2>
-              <Button type="button" variant="ghost" size="icon" onClick={closeCamera}>
-                <X size={20} /> <span className="sr-only">{t('closeCamera')}</span>
-              </Button>
-            </div>
-            <div className="mx-auto aspect-square max-h-[62vh] overflow-hidden rounded-2xl bg-black">
-              <video
-                ref={videoRef}
-                muted
-                playsInline
-                autoPlay
-                className="size-full -scale-x-100 object-cover"
-                aria-label={t('cameraPreview')}
-              />
-            </div>
-            {cameraStarting ? (
-              <p role="status" className="flex items-center gap-2 text-sm">
-                <SpinnerGap size={18} className="animate-spin" /> {t('openingCamera')}
-              </p>
-            ) : null}
-            {cameraError ? (
-              <p role="alert" className="text-sm text-[var(--color-danger)]">
-                {cameraError}
-              </p>
-            ) : null}
-            <div className="flex flex-wrap justify-end gap-2">
+        <AdminOverlay>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="camera-title"
+            className="fixed inset-0 z-[var(--z-camera)] grid place-items-center overflow-y-auto bg-black/70 p-4"
+          >
+            <div className="w-full max-w-lg space-y-4 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 text-left shadow-[var(--shadow-pop)] sm:p-6">
+              <div className="flex items-center justify-between gap-4">
+                <h2 id="camera-title" className="font-display text-xl font-bold">
+                  {t('cameraTitle')}
+                </h2>
+                <Button type="button" variant="ghost" size="icon" onClick={closeCamera}>
+                  <X size={20} /> <span className="sr-only">{t('closeCamera')}</span>
+                </Button>
+              </div>
+              <div className="mx-auto aspect-square max-h-[62vh] overflow-hidden rounded-2xl bg-black">
+                <video
+                  ref={videoRef}
+                  muted
+                  playsInline
+                  autoPlay
+                  className="size-full -scale-x-100 object-cover"
+                  aria-label={t('cameraPreview')}
+                />
+              </div>
+              {cameraStarting ? (
+                <p role="status" className="flex items-center gap-2 text-sm">
+                  <SpinnerGap size={18} className="animate-spin" /> {t('openingCamera')}
+                </p>
+              ) : null}
               {cameraError ? (
+                <p role="alert" className="text-sm text-[var(--color-danger)]">
+                  {cameraError}
+                </p>
+              ) : null}
+              <div className="flex flex-wrap justify-end gap-2">
+                {cameraError ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => captureInputRef.current?.click()}
+                  >
+                    <Camera size={17} /> {t('systemCamera')}
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={cameraStarting || busy}
+                    onClick={startCamera}
+                  >
+                    <ArrowCounterClockwise size={17} /> {t('restart')}
+                  </Button>
+                )}
                 <Button
                   type="button"
                   size="sm"
-                  variant="outline"
-                  onClick={() => captureInputRef.current?.click()}
+                  disabled={cameraStarting || busy || !cameraReady}
+                  onClick={takePhoto}
                 >
-                  <Camera size={17} /> {t('systemCamera')}
+                  <Camera size={17} /> {t('capture')}
                 </Button>
-              ) : (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={cameraStarting || busy}
-                  onClick={startCamera}
-                >
-                  <ArrowCounterClockwise size={17} /> {t('restart')}
-                </Button>
-              )}
-              <Button
-                type="button"
-                size="sm"
-                disabled={cameraStarting || busy || !cameraReady}
-                onClick={takePhoto}
-              >
-                <Camera size={17} /> {t('capture')}
-              </Button>
+              </div>
             </div>
           </div>
-        </div>
+        </AdminOverlay>
       ) : null}
     </div>
   );

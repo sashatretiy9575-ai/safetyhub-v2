@@ -19,6 +19,7 @@ import type {
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { AdminOverlay } from '@/components/admin/admin-overlay';
 
 // Every poll is a serverless invocation plus two Supabase round-trips, which
 // measured around half a second on production. Four of those a minute ran
@@ -273,6 +274,17 @@ export function requestAdminNotificationRefresh() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(ADMIN_NOTIFICATION_REFRESH_EVENT));
   }
+}
+
+function NotificationPanelHost({
+  portal,
+  children,
+}: {
+  portal: boolean;
+  children: React.ReactNode;
+}) {
+  if (!portal) return <>{children}</>;
+  return <AdminOverlay lockScroll={false}>{children}</AdminOverlay>;
 }
 
 export function AdminNotificationInboxProvider({
@@ -608,19 +620,31 @@ export function AdminNotificationInboxButton({
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const close = (event: MouseEvent | KeyboardEvent) => {
       if (event instanceof KeyboardEvent && event.key !== 'Escape') return;
-      if (event instanceof MouseEvent && rootRef.current?.contains(event.target as Node)) return;
+      if (event instanceof MouseEvent) {
+        // On mobile the panel is rendered outside this subtree, so a click
+        // inside it is no longer a click inside `rootRef`.
+        if (rootRef.current?.contains(event.target as Node)) return;
+        if (panelRef.current?.contains(event.target as Node)) return;
+      }
       setOpen(false);
     };
     document.addEventListener('mousedown', close);
     document.addEventListener('keydown', close);
+    // The panel announces itself as a dialog; without moving focus into it a
+    // screen-reader user was told a dialog opened and left standing outside it.
+    panelRef.current?.focus();
+    const trigger = triggerRef.current;
     return () => {
       document.removeEventListener('mousedown', close);
       document.removeEventListener('keydown', close);
+      trigger?.focus();
     };
   }, [open]);
 
@@ -648,6 +672,7 @@ export function AdminNotificationInboxButton({
   return (
     <div ref={rootRef} className={cn('relative', className)}>
       <button
+        ref={triggerRef}
         type="button"
         aria-label={page?.unread ? `Уведомления: непрочитанных ${page.unread}` : 'Уведомления'}
         aria-haspopup="dialog"
@@ -667,131 +692,135 @@ export function AdminNotificationInboxButton({
       </button>
 
       {open ? (
-        <section
-          role="dialog"
-          aria-label="Уведомления администратора"
-          className={cn(
-            'z-[80] w-[min(24rem,calc(100vw-1rem))] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-pop)]',
-            placement === 'desktop'
-              ? 'absolute bottom-0 left-[calc(100%+0.75rem)]'
-              : 'fixed top-[calc(var(--safe-area-top)+3.5rem)] right-2',
-          )}
-        >
-          <header className="flex min-h-14 items-center justify-between gap-3 border-b border-[var(--color-border)] px-4">
-            <div className="min-w-0">
-              <h2 className="font-display font-bold">Уведомления</h2>
-              <p className="text-xs text-[var(--color-text-muted)]">
-                {page ? `Непрочитанных: ${page.unread}` : 'Загрузка списка'}
-              </p>
-            </div>
-            <div className="flex items-center gap-1">
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                aria-label="Обновить уведомления"
-                onClick={refresh}
-              >
-                <ArrowClockwise />
-              </Button>
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                aria-label="Отметить все уведомления прочитанными"
-                disabled={!page?.unread || busy !== null}
-                onClick={() => void markEverythingRead()}
-              >
-                <Check />
-              </Button>
-            </div>
-          </header>
-
-          <div className="max-h-[min(32rem,70dvh)] overflow-y-auto overscroll-contain">
-            {page?.items.length ? (
-              <ul className="divide-y divide-[var(--color-border)]">
-                {page.items.map((event) => {
-                  const presentation = eventPresentation(event);
-                  const Icon = presentation.icon;
-                  const retryable =
-                    event.delivery.status === 'retry' || event.delivery.status === 'dead';
-                  return (
-                    <li
-                      key={event.id}
-                      className={cn(
-                        'p-3',
-                        event.readAt === null && 'bg-[var(--color-primary-soft)]/35',
-                      )}
-                    >
-                      <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-2">
-                        <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-surface-muted)] text-[var(--color-primary)]">
-                          <Icon size={17} />
-                        </span>
-                        <div className="min-w-0">
-                          <Link
-                            href={eventAdminPath(event)}
-                            prefetch={false}
-                            className="block rounded-sm focus-visible:outline-[3px] focus-visible:outline-[var(--color-focus)]"
-                            onClick={() => {
-                              setOpen(false);
-                              if (event.readAt === null) void markRead([event.id]);
-                            }}
-                          >
-                            <span className="block text-sm font-bold">{presentation.title}</span>
-                            <span className="mt-0.5 block text-xs leading-5 break-words text-[var(--color-text-muted)]">
-                              {presentation.description}
-                            </span>
-                          </Link>
-                          <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--color-text-subtle)]">
-                            <time dateTime={event.occurredAt}>{dateTime(event.occurredAt)}</time>
-                            <span>{deliveryLabels[event.delivery.status]}</span>
-                          </div>
-                          {retryable ? (
-                            <button
-                              type="button"
-                              className="mt-2 min-h-11 rounded-lg px-2 text-xs font-bold text-[var(--color-primary)] underline-offset-4 hover:underline disabled:opacity-50"
-                              disabled={busy !== null}
-                              onClick={() => void retry(event.id)}
-                            >
-                              Повторить отправку в Telegram
-                            </button>
-                          ) : null}
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : state === 'loading' || state === 'idle' ? (
-              <p className="p-5 text-sm text-[var(--color-text-muted)]">Загружаем уведомления…</p>
-            ) : (
-              <p className="p-5 text-sm text-[var(--color-text-muted)]">Новых уведомлений нет.</p>
+        <NotificationPanelHost portal={placement !== 'desktop'}>
+          <section
+            ref={panelRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-label="Уведомления администратора"
+            className={cn(
+              'z-[var(--z-popover)] w-[min(24rem,calc(100vw-1rem))] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-pop)]',
+              placement === 'desktop'
+                ? 'absolute bottom-0 left-[calc(100%+0.75rem)]'
+                : 'fixed top-[calc(var(--safe-area-top)+3.5rem)] right-2',
             )}
-            {page?.hasMore ? (
-              <div className="border-t border-[var(--color-border)] p-3 text-center">
+          >
+            <header className="flex min-h-14 items-center justify-between gap-3 border-b border-[var(--color-border)] px-4">
+              <div className="min-w-0">
+                <h2 className="font-display font-bold">Уведомления</h2>
+                <p className="text-xs text-[var(--color-text-muted)]">
+                  {page ? `Непрочитанных: ${page.unread}` : 'Загрузка списка'}
+                </p>
+              </div>
+              <div className="flex items-center gap-1">
                 <Button
                   type="button"
-                  size="sm"
+                  size="icon"
                   variant="ghost"
-                  disabled={loadingMore}
-                  onClick={() => void loadMore()}
+                  aria-label="Обновить уведомления"
+                  onClick={refresh}
                 >
-                  {loadingMore ? 'Загружаем…' : 'Показать предыдущие'}
+                  <ArrowClockwise />
+                </Button>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  aria-label="Отметить все уведомления прочитанными"
+                  disabled={!page?.unread || busy !== null}
+                  onClick={() => void markEverythingRead()}
+                >
+                  <Check />
                 </Button>
               </div>
-            ) : null}
-          </div>
+            </header>
 
-          {state === 'offline' || state === 'failed' || message ? (
-            <p
-              role="status"
-              aria-live="polite"
-              className="border-t border-[var(--color-border)] px-4 py-3 text-xs text-[var(--color-text-muted)]"
-            >
-              {state === 'offline' ? 'Обновление продолжится после подключения к сети.' : message}
-            </p>
-          ) : null}
-        </section>
+            <div className="max-h-[min(32rem,70dvh)] overflow-y-auto overscroll-contain">
+              {page?.items.length ? (
+                <ul className="divide-y divide-[var(--color-border)]">
+                  {page.items.map((event) => {
+                    const presentation = eventPresentation(event);
+                    const Icon = presentation.icon;
+                    const retryable =
+                      event.delivery.status === 'retry' || event.delivery.status === 'dead';
+                    return (
+                      <li
+                        key={event.id}
+                        className={cn(
+                          'p-3',
+                          event.readAt === null && 'bg-[var(--color-primary-soft)]/35',
+                        )}
+                      >
+                        <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-2">
+                          <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-surface-muted)] text-[var(--color-primary)]">
+                            <Icon size={17} />
+                          </span>
+                          <div className="min-w-0">
+                            <Link
+                              href={eventAdminPath(event)}
+                              prefetch={false}
+                              className="block rounded-sm focus-visible:outline-[3px] focus-visible:outline-[var(--color-focus)]"
+                              onClick={() => {
+                                setOpen(false);
+                                if (event.readAt === null) void markRead([event.id]);
+                              }}
+                            >
+                              <span className="block text-sm font-bold">{presentation.title}</span>
+                              <span className="mt-0.5 block text-xs leading-5 break-words text-[var(--color-text-muted)]">
+                                {presentation.description}
+                              </span>
+                            </Link>
+                            <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--color-text-subtle)]">
+                              <time dateTime={event.occurredAt}>{dateTime(event.occurredAt)}</time>
+                              <span>{deliveryLabels[event.delivery.status]}</span>
+                            </div>
+                            {retryable ? (
+                              <button
+                                type="button"
+                                className="mt-2 min-h-11 rounded-lg px-2 text-xs font-bold text-[var(--color-primary)] underline-offset-4 hover:underline disabled:opacity-50"
+                                disabled={busy !== null}
+                                onClick={() => void retry(event.id)}
+                              >
+                                Повторить отправку в Telegram
+                              </button>
+                            ) : null}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : state === 'loading' || state === 'idle' ? (
+                <p className="p-5 text-sm text-[var(--color-text-muted)]">Загружаем уведомления…</p>
+              ) : (
+                <p className="p-5 text-sm text-[var(--color-text-muted)]">Новых уведомлений нет.</p>
+              )}
+              {page?.hasMore ? (
+                <div className="border-t border-[var(--color-border)] p-3 text-center">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    disabled={loadingMore}
+                    onClick={() => void loadMore()}
+                  >
+                    {loadingMore ? 'Загружаем…' : 'Показать предыдущие'}
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+
+            {state === 'offline' || state === 'failed' || message ? (
+              <p
+                role="status"
+                aria-live="polite"
+                className="border-t border-[var(--color-border)] px-4 py-3 text-xs text-[var(--color-text-muted)]"
+              >
+                {state === 'offline' ? 'Обновление продолжится после подключения к сети.' : message}
+              </p>
+            ) : null}
+          </section>
+        </NotificationPanelHost>
       ) : null}
     </div>
   );

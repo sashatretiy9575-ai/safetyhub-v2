@@ -14,6 +14,7 @@ import type {
 } from '@/features/admin/types';
 import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
 import { ADMIN_ATTESTATION_BULK_LIMIT } from '@/lib/constants';
+import { AdminOverlay } from '@/components/admin/admin-overlay';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import {
   assertCertificateExportMetadata,
@@ -159,7 +160,12 @@ function findCompanyTypoWarnings(rows: AdminAttestationRow[]) {
     if (org) orgCounts.set(org, (orgCounts.get(org) ?? 0) + 1);
   }
   const orgs = Array.from(orgCounts.keys());
-  const warnings: Array<{ primary: string; primaryCount: number; typo: string; typoCount: number }> = [];
+  const warnings: Array<{
+    primary: string;
+    primaryCount: number;
+    typo: string;
+    typoCount: number;
+  }> = [];
 
   for (let i = 0; i < orgs.length; i++) {
     const a = orgs[i];
@@ -169,7 +175,10 @@ function findCompanyTypoWarnings(rows: AdminAttestationRow[]) {
       if (!b) continue;
       const normA = a.toLowerCase().replace(/[\s\-_"«»]/g, '');
       const normB = b.toLowerCase().replace(/[\s\-_"«»]/g, '');
-      if (normA !== normB && (normA.includes(normB) || normB.includes(normA) || levenshteinDistance(normA, normB) <= 2)) {
+      if (
+        normA !== normB &&
+        (normA.includes(normB) || normB.includes(normA) || levenshteinDistance(normA, normB) <= 2)
+      ) {
         const countA = orgCounts.get(a) ?? 0;
         const countB = orgCounts.get(b) ?? 0;
         if (countA >= countB) {
@@ -432,10 +441,9 @@ export function AttestationsManager({
     if (pending.kind === 'issue') {
       const typoWarnings = findCompanyTypoWarnings(selectedRows);
       const firstWarning = typoWarnings[0];
-      const warningText =
-        firstWarning
-          ? ` ⚠️ Похожие компании: «${firstWarning.primary}» и «${firstWarning.typo}» — проверьте перед выдачей.`
-          : '';
+      const warningText = firstWarning
+        ? ` ⚠️ Похожие компании: «${firstWarning.primary}» и «${firstWarning.typo}» — проверьте перед выдачей.`
+        : '';
       return {
         title: 'Выдать сертификаты',
         description: `Выдача: ${selectionSummary.readyToIssue} из ${selectionSummary.total} выбранных.${warningText}`,
@@ -694,7 +702,9 @@ export function AttestationsManager({
           { timeoutMs: 60_000, signal: controller.signal },
         );
         if (!metadataResult.ok) {
-          setMessage(clientRequestMessage(metadataResult.error, 'Не удалось получить данные экспорта.'));
+          setMessage(
+            clientRequestMessage(metadataResult.error, 'Не удалось получить данные экспорта.'),
+          );
           return;
         }
         metadataResponse = metadataResult.response;
@@ -709,7 +719,9 @@ export function AttestationsManager({
           { timeoutMs: 60_000, signal: controller.signal },
         );
         if (!metadataResult.ok) {
-          setMessage(clientRequestMessage(metadataResult.error, 'Не удалось получить данные экспорта.'));
+          setMessage(
+            clientRequestMessage(metadataResult.error, 'Не удалось получить данные экспорта.'),
+          );
           return;
         }
         metadataResponse = metadataResult.response;
@@ -721,7 +733,9 @@ export function AttestationsManager({
         signal: controller.signal,
         onProgress: (progress) => {
           setExportProgress(progress);
-          setMessage(`Формируем сертификаты в браузере: ${progress.completed} из ${progress.total}…`);
+          setMessage(
+            `Формируем сертификаты в браузере: ${progress.completed} из ${progress.total}…`,
+          );
         },
       });
       setMessage(
@@ -730,7 +744,10 @@ export function AttestationsManager({
           : `ZIP сформирован в браузере и передан на скачивание${result.archives > 1 ? ` (${result.archives} частей по 100 сертификатов максимум)` : ''}.`,
       );
     } catch (requestError) {
-      if (controller.signal.aborted || (requestError instanceof DOMException && requestError.name === 'AbortError')) {
+      if (
+        controller.signal.aborted ||
+        (requestError instanceof DOMException && requestError.name === 'AbortError')
+      ) {
         setMessage('Формирование ZIP отменено.');
       } else {
         setMessage(clientRequestMessage(requestError, 'Не удалось сформировать ZIP в браузере.'));
@@ -796,7 +813,7 @@ export function AttestationsManager({
       >
         <div
           role="row"
-          className="sticky top-0 z-20 hidden min-h-9 items-center gap-x-2 bg-[var(--color-surface-muted)] px-1.5 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] @min-[760px]:grid @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_32px]"
+          className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-20 hidden min-h-9 items-center gap-x-2 bg-[var(--color-surface-muted)] px-1.5 min-[1024px]:top-0 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] @min-[760px]:grid @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px]"
         >
           {/* An `sr-only` cell is absolutely positioned and therefore leaves the
               grid flow, which shifted every visible heading one column to the
@@ -821,10 +838,7 @@ export function AttestationsManager({
           <span role="columnheader" aria-label="Действия" />
         </div>
 
-        <div
-          role="rowgroup"
-          className="space-y-2 @min-[760px]:space-y-0"
-        >
+        <div role="rowgroup" className="space-y-2 @min-[760px]:space-y-0">
           {page.items.map((row, index) => {
             const groupKey = organizationGroupKey(row.organization);
             const showGroup =
@@ -988,7 +1002,7 @@ export function AttestationsManager({
 
           <aside
             aria-label="Массовые действия"
-            className="glass-strong sticky bottom-4 z-30 hidden rounded-2xl border p-4 shadow-[var(--shadow-pop)] @min-[760px]:block"
+            className="glass-strong sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+1rem)] z-[var(--z-sticky)] hidden rounded-2xl border p-4 shadow-[var(--shadow-pop)] min-[1024px]:bottom-4 @min-[760px]:block"
           >
             <div className="flex flex-wrap items-center gap-3">
               <strong className="text-sm tabular-nums">Выбрано: {selectionSummary.total}</strong>
@@ -1002,47 +1016,49 @@ export function AttestationsManager({
           </aside>
 
           {bulkActionsOpen ? (
-            <div
-              className="fixed inset-0 z-50 grid items-end bg-black/45 @min-[760px]:hidden"
-              role="presentation"
-              onMouseDown={(event) => {
-                if (event.target === event.currentTarget) closeBulkActions();
-              }}
-            >
-              <section
-                ref={bulkActionsPanelRef}
-                tabIndex={-1}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="bulk-actions-title"
-                className="max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)]"
+            <AdminOverlay>
+              <div
+                className="fixed inset-0 z-[var(--z-overlay)] grid items-end bg-black/45 @min-[760px]:hidden"
+                role="presentation"
+                onMouseDown={(event) => {
+                  if (event.target === event.currentTarget) closeBulkActions();
+                }}
               >
-                <header className="mb-4 flex items-start justify-between gap-3">
-                  <h2 id="bulk-actions-title" className="text-lg font-bold">
-                    Действия · {selectionSummary.total}
-                  </h2>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={closeBulkActions}
-                    aria-label="Закрыть действия"
-                    data-modal-initial-focus
-                  >
-                    <X />
-                  </Button>
-                </header>
-                <AttestationBulkActionButtons
-                  summary={selectionSummary}
-                  permissions={permissions}
-                  busy={busy}
-                  onAction={(action) => {
-                    setBulkActionsOpen(false);
-                    setPending(action);
-                  }}
-                  compact
-                />
-              </section>
-            </div>
+                <section
+                  ref={bulkActionsPanelRef}
+                  tabIndex={-1}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="bulk-actions-title"
+                  className="max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)]"
+                >
+                  <header className="mb-4 flex items-start justify-between gap-3">
+                    <h2 id="bulk-actions-title" className="text-lg font-bold">
+                      Действия · {selectionSummary.total}
+                    </h2>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={closeBulkActions}
+                      aria-label="Закрыть действия"
+                      data-modal-initial-focus
+                    >
+                      <X />
+                    </Button>
+                  </header>
+                  <AttestationBulkActionButtons
+                    summary={selectionSummary}
+                    permissions={permissions}
+                    busy={busy}
+                    onAction={(action) => {
+                      setBulkActionsOpen(false);
+                      setPending(action);
+                    }}
+                    compact
+                  />
+                </section>
+              </div>
+            </AdminOverlay>
           ) : null}
         </>
       ) : null}

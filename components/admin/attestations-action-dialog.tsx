@@ -68,6 +68,11 @@ export function AttestationsActionDialog({
         event.preventDefault();
         cancel();
       }}
+      onMouseDown={(event) => {
+        // The dialog element itself only covers the backdrop area: the panel
+        // inside it swallows its own clicks.
+        if (event.target === event.currentTarget) cancel();
+      }}
       onClose={() => {
         if (config && !busy) onCancel();
       }}

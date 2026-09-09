@@ -67,7 +67,7 @@ export function AttestationTableRow({
       // Phone: two lines per person instead of four — name/score/actions, then
       // course · date · status. The company is deliberately absent, the band
       // above already names it, and a four-line card made fifty rows a marathon.
-      className="grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] gap-x-2 gap-y-0.5 rounded-xl border bg-[var(--color-surface)] px-2 py-1.5 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:min-h-9 @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_32px] @min-[760px]:items-center @min-[760px]:gap-x-2 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:text-[13px] @min-[760px]:shadow-none"
+      className="grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] gap-x-2 gap-y-0.5 rounded-xl border bg-[var(--color-surface)] px-2 py-1.5 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:min-h-9 @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px] @min-[760px]:items-center @min-[760px]:gap-x-2 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:text-[13px] @min-[760px]:shadow-none"
       onClick={(event) => {
         const target = event.target as HTMLElement;
         if (!target.closest('button, input, a, [role="menuitem"]')) onOpenDetails();

@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { AdminOverlay } from '@/components/admin/admin-overlay';
 
 export function DestructiveDialog({
   open,
@@ -64,53 +65,60 @@ export function DestructiveDialog({
   if (!open) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[100] grid place-items-center bg-black/55 p-4"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget && !busy) onOpenChange(false);
-      }}
-    >
+    <AdminOverlay>
       <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        aria-describedby={descriptionId}
-        className="w-full max-w-md rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 shadow-2xl"
+        className="fixed inset-0 z-[var(--z-dialog)] grid place-items-center bg-black/55 p-4"
+        onMouseDown={(event) => {
+          if (event.target === event.currentTarget && !busy) onOpenChange(false);
+        }}
       >
-        <h2 id={titleId} className="text-xl font-bold">
-          {title}
-        </h2>
-        <p id={descriptionId} className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
-          {description}
-        </p>
+        <div
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          aria-describedby={descriptionId}
+          className="w-full max-w-md rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 shadow-2xl"
+        >
+          <h2 id={titleId} className="text-xl font-bold">
+            {title}
+          </h2>
+          <p id={descriptionId} className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
+            {description}
+          </p>
 
-        <label className="mt-5 flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] p-3 text-sm font-semibold">
-          <input
-            ref={checkboxRef}
-            type="checkbox"
-            checked={confirmed}
-            disabled={busy}
-            className="mt-0.5 size-5 shrink-0 accent-[var(--color-danger)]"
-            onChange={(event) => setConfirmed(event.target.checked)}
-          />
-          <span>Да, удалить без возможности восстановления</span>
-        </label>
+          <label className="mt-5 flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] p-3 text-sm font-semibold">
+            <input
+              ref={checkboxRef}
+              type="checkbox"
+              checked={confirmed}
+              disabled={busy}
+              className="mt-0.5 size-5 shrink-0 accent-[var(--color-danger)]"
+              onChange={(event) => setConfirmed(event.target.checked)}
+            />
+            <span>Да, удалить без возможности восстановления</span>
+          </label>
 
-        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={busy}
-            onClick={() => onOpenChange(false)}
-          >
-            Отмена
-          </Button>
-          <Button type="button" variant="danger" disabled={!confirmed || busy} onClick={onConfirm}>
-            {busy ? 'Удаляем…' : 'Удалить'}
-          </Button>
+          <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={() => onOpenChange(false)}
+            >
+              Отмена
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              disabled={!confirmed || busy}
+              onClick={onConfirm}
+            >
+              {busy ? 'Удаляем…' : 'Удалить'}
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </AdminOverlay>
   );
 }

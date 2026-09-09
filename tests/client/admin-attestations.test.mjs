@@ -106,7 +106,12 @@ test('attestation screen is responsive and exposes selection, filters, and confi
     assert.match(filters, new RegExp(`name="${name}"`));
   }
   assert.match(filters, /role=\{filtersOpen \? 'dialog' : undefined\}/);
-  assert.match(filters, /@min-\[760px\]:absolute/);
+  // The panel is rendered outside the workspace container, which declares
+  // container-type and would otherwise anchor `position: fixed` to the whole
+  // scrollable page. Its controls therefore name the form they submit to.
+  assert.match(filters, /AdminOverlay lockScroll=\{false\}/);
+  assert.match(filters, /form=\{FILTER_FORM_ID\}/);
+  assert.doesNotMatch(filters, /@min-\[760px\]:absolute/);
   assert.match(filters, /@min-\[760px\]:right-3/);
   assert.equal((manager.match(/page\.items\.map\(\(row, index\)/g) ?? []).length, 1);
   assert.match(fullManager, /@min-\[760px\]:grid/);

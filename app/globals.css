@@ -100,6 +100,17 @@
   --color-on-primary-soft: #145d3b;
   --color-focus: #0b63ce;
 
+  /* One stacking scale. The layers used to be written as bare numbers in eight
+     components, so the only way to learn the order was to grep for them. */
+  --z-sticky: 30;
+  --z-header: 40;
+  --z-overlay: 50;
+  --z-install-prompt: 60;
+  --z-skip-link: 70;
+  --z-popover: 80;
+  --z-dialog: 100;
+  --z-camera: 120;
+
   --color-accent-amber: #f59e0b;
   --color-accent-amber-soft: #fef3c7;
   --color-accent-sapphire: #1d4ed8;
@@ -252,7 +263,7 @@
     font-weight: 700;
   }
 
-  @media (min-width: 1440px) {
+  @media (min-width: 1024px) {
     :root {
       --mobile-fixed-bottom-space: 0px;
     }
