@@ -5,9 +5,11 @@ import {
   reportingEndpointsHeader,
   STATIC_CONTENT_SECURITY_POLICY,
 } from './lib/security/content-security-policy';
+import { assertDeploymentRuntimeSecrets } from './lib/security/deployment-secrets';
 import { assertDeploymentSiteUrl, resolveSiteOrigin } from './lib/site-url';
 
 assertDeploymentSiteUrl();
+assertDeploymentRuntimeSecrets();
 
 const securityHeaders = [
   { key: 'Content-Security-Policy', value: STATIC_CONTENT_SECURITY_POLICY },
