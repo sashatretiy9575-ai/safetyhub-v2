@@ -15,6 +15,7 @@ import {
   ZH_PASSWORD_MAX_BYTES,
 } from '@/features/auth/zh-username-password-validation';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
+import { safeReturnPath } from '@/lib/security/redirect';
 
 type Mode = 'login' | 'register';
 type AuthResponse = {
@@ -40,6 +41,15 @@ const CAPTCHA_RETRY = '验证码验证未完成，请重新提交。';
 const UNAVAILABLE = '服务暂时不可用，请稍后重试。';
 
 function safeLanding(value: unknown) {
+  if (typeof window !== 'undefined') {
+    // Mirrors the email-code realm: a ?return= target is honoured only for the
+    // workspace the server authorized, and only through the shared validator.
+    const requested = new URLSearchParams(window.location.search).get('return');
+    const isAdminLanding = value === '/admin';
+    const returnPath = safeReturnPath(requested, isAdminLanding ? 'admin' : 'account');
+    if (returnPath && (isAdminLanding || value === '/zh/profile')) return returnPath;
+  }
+
   return value === '/admin' ||
     value === '/zh/auth/legal' ||
     value === '/zh/onboarding' ||

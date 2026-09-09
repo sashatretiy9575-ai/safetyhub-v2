@@ -8,7 +8,13 @@ import {
   isSupabaseConfigured,
 } from '@/lib/supabase/server';
 import type { AccountStatus, AppLocale, AppRole } from '@/lib/supabase/types';
-import { ADMIN_CAPABILITIES, type AdminCapability } from '@/lib/security/capabilities';
+import {
+  hasAdminCapability,
+  hasAnyAdminCapability,
+  isAdminCapability,
+  type AdminCapability,
+} from '@/lib/security/capabilities';
+import { safeRedirectPath } from '@/lib/security/redirect';
 import { resolveSiteOrigin } from '@/lib/site-url';
 
 export type AuthProfile = Readonly<{
@@ -128,7 +134,10 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
   }
 
   const row = parsed.data;
-  const capabilities = row.role === 'admin' ? [...ADMIN_CAPABILITIES] : [];
+  // The database decides what an actor may do. Unknown names are dropped so a
+  // capability added to the catalog ahead of the application cannot widen a
+  // typed check by accident.
+  const capabilities = row.capabilities.filter(isAdminCapability);
 
   return {
     user: { id: row.user_id, email: row.email },
@@ -215,32 +224,23 @@ export async function requireRole(roles: AppRole[]) {
 }
 
 export async function requireCapability(capability: AdminCapability) {
-  void capability;
   const context = await requireRole(['admin']);
+  if (!hasAdminCapability(context.capabilities, capability)) {
+    throw new AuthenticationError('Недостаточно прав', 403, 'CAPABILITY_REQUIRED');
+  }
   return context;
 }
 
 export async function requireAnyCapability(capabilities: readonly AdminCapability[]) {
-  void capabilities;
   const context = await requireRole(['admin']);
+  if (!hasAnyAdminCapability(context.capabilities, capabilities)) {
+    throw new AuthenticationError('Недостаточно прав', 403, 'CAPABILITY_REQUIRED');
+  }
   return context;
 }
 
-export function safeRedirectPath(value: string | null | undefined, fallback = '/profile') {
-  if (!value || !value.startsWith('/') || value.includes('\\')) return fallback;
-  try {
-    const base = new URL('https://safetyhub.local');
-    const resolved = new URL(value, base);
-    if (resolved.origin !== base.origin) return fallback;
-    return `${resolved.pathname}${resolved.search}${resolved.hash}`;
-  } catch {
-    return fallback;
-  }
-}
-
-export function authenticatedLandingPath(role: AppRole) {
-  return role === 'admin' ? '/admin' : '/profile';
-}
+// Re-exported so server routes and the browser login flow share one validator.
+export { safeRedirectPath };
 
 export function getSiteUrl() {
   return resolveSiteOrigin();

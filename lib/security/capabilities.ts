@@ -23,51 +23,24 @@ export const ADMIN_CAPABILITIES = [
 
 export type AdminCapability = (typeof ADMIN_CAPABILITIES)[number];
 
-export const DEFAULT_ADMIN_CAPABILITIES: readonly AdminCapability[] = [
-  'content.manage',
-  'test.manage',
-  'user.read',
-  'identity.read',
-  'identity.manage',
-  'certificate.read',
-  'certificate.issue',
-  'certificate.revoke',
-  'results.read',
-  'results.delete',
-  'results.export',
-  'site.settings.manage',
-  'notifications.read',
-];
-
-export const SUPERADMIN_ONLY_CAPABILITIES: readonly AdminCapability[] = [
-  'user.delete',
-  'role.manage',
-  'capability.manage',
-];
-
-export const CAPABILITY_LABELS: Record<AdminCapability, string> = {
-  'content.manage': 'Статьи: редактирование и публикация',
-  'test.manage': 'Тесты: редактирование и публикация',
-  'support.view': 'Поддержка: просмотр обращений',
-  'user.read': 'Пользователи: PII и список аккаунтов',
-  'user.invite': 'Пользователи: приглашение',
-  'user.suspend': 'Пользователи: блокировка и восстановление',
-  'user.delete': 'Пользователи: безвозвратное удаление',
-  'role.manage': 'Доступ: управление крупными ролями',
-  'identity.read': 'Личность: просмотр проверенных данных',
-  'identity.manage': 'Личность: проверка и отзыв',
-  'certificate.read': 'Сертификаты: просмотр и PDF',
-  'certificate.issue': 'Сертификаты: выдача и перевыпуск',
-  'certificate.revoke': 'Сертификаты: отзыв',
-  'results.read': 'Результаты: просмотр аттестаций',
-  'results.delete': 'Результаты: удаление учебной истории',
-  'results.export': 'Результаты: экспорт отчётов и ZIP',
-  'site.settings.manage': 'Сайт: телефон и WhatsApp',
-  'audit.read': 'Аудит: просмотр журнала',
-  'notifications.read': 'Уведомления администратора',
-  'capability.manage': 'Доступ: назначение полномочий',
-};
-
+/**
+ * Authoritative source of truth is the database: `get_auth_context` returns
+ * the capabilities `private.actor_has_capability` grants, and the application
+ * only ever narrows that list. Keeping a second preset here would document a
+ * restriction the product does not enforce, which is exactly the failure this
+ * module used to have.
+ */
 export function hasAdminCapability(capabilities: readonly string[], capability: AdminCapability) {
   return capabilities.includes(capability);
+}
+
+export function hasAnyAdminCapability(
+  capabilities: readonly string[],
+  required: readonly AdminCapability[],
+) {
+  return required.some((capability) => capabilities.includes(capability));
+}
+
+export function isAdminCapability(value: string): value is AdminCapability {
+  return (ADMIN_CAPABILITIES as readonly string[]).includes(value);
 }

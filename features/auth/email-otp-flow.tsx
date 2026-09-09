@@ -13,6 +13,7 @@ import {
 } from '@/features/auth/otp-rate-limit';
 import { Turnstile, type TurnstileHandle } from '@/features/auth/turnstile';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
+import { safeReturnPath } from '@/lib/security/redirect';
 import { emailOtpStartSchema, emailOtpVerifySchema } from '@/lib/validation/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -132,16 +133,18 @@ function clearStoredSendCooldown() {
 
 function safeLanding(value: unknown, locale: AppLocale) {
   if (typeof window !== 'undefined') {
-    const returnUrl = new URLSearchParams(window.location.search).get('return');
+    const requested = new URLSearchParams(window.location.search).get('return');
+    // `proxy.ts` only attaches ?return= for protected routes, so the parameter
+    // is honoured for the workspace the server just authorized and nothing else.
+    const isAdminLanding = value === '/admin';
+    const returnPath = safeReturnPath(requested, isAdminLanding ? 'admin' : 'account');
     if (
-      returnUrl &&
-      !returnUrl.startsWith('//') &&
-      returnUrl.startsWith('/') &&
-      (returnUrl.startsWith('/topics/') || returnUrl.startsWith(`/${locale}/topics/`))
+      returnPath &&
+      (isAdminLanding ||
+        value === localizePathname('/profile', locale) ||
+        value === '/profile')
     ) {
-      if (value === localizePathname('/profile', locale) || value === '/profile') {
-        return returnUrl;
-      }
+      return returnPath;
     }
   }
 

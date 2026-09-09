@@ -20,7 +20,11 @@ test('email-code verification uses the server-authorized role landing instead of
   assert.match(flow, /value === '\/admin'[\s\S]*localizePathname\('\/auth\/legal', locale\)[\s\S]*localizePathname\('\/onboarding', locale\)[\s\S]*localizePathname\('\/profile', locale\)/u);
   assert.match(flow, /router\.replace\(safeLanding\(payload\?\.redirectTo, locale\)\)/u);
   assert.doesNotMatch(flow, /router\.replace\('\/profile'\)/u);
-  assert.match(auth, /return role === 'admin' \? '\/admin' : '\/profile'/u);
+  // The landing decision lives where the onboarding state is known; the shared
+  // module only validates the `?return=` target both realms may honour.
+  assert.doesNotMatch(auth, /authenticatedLandingPath/u);
+  assert.match(route, /if \(context\.role === 'admin'\) return '\/admin';/u);
+  assert.match(flow, /safeReturnPath\(requested, isAdminLanding \? 'admin' : 'account'\)/u);
 });
 
 test('retired callback discards legacy links and direct participant workspace routes admins to the console', async () => {

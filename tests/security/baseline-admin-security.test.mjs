@@ -3,8 +3,9 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
   ADMIN_CAPABILITIES,
-  DEFAULT_ADMIN_CAPABILITIES,
   hasAdminCapability,
+  hasAnyAdminCapability,
+  isAdminCapability,
 } from '../../lib/security/capabilities.ts';
 
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
@@ -17,32 +18,34 @@ function sqlFunction(source, name) {
   return definition;
 }
 
-test('ordinary admin gets the bounded operator preset while superadmin-only powers stay excluded', () => {
-  const operatorCapabilities = [
-    'certificate.issue',
-    'certificate.read',
-    'certificate.revoke',
-    'content.manage',
-    'identity.manage',
-    'identity.read',
-    'notifications.read',
-    'results.delete',
-    'results.export',
-    'results.read',
-    'site.settings.manage',
-    'test.manage',
-    'user.read',
-  ];
-  assert.deepEqual([...DEFAULT_ADMIN_CAPABILITIES].sort(), operatorCapabilities);
+test('capability checks read the database answer instead of a hard-coded preset', async () => {
+  const server = await read('features/auth/server.ts');
+
+  // The previous version of this test compared two constants and could not fail
+  // while `requireCapability` ignored its argument. These assertions describe
+  // what the runtime actually does.
+  assert.doesNotMatch(server, /void capability;/u);
+  assert.doesNotMatch(server, /void capabilities;/u);
+  assert.doesNotMatch(server, /\[\.\.\.ADMIN_CAPABILITIES\]/u);
+  assert.match(server, /const capabilities = row\.capabilities\.filter\(isAdminCapability\);/u);
+  assert.match(
+    server,
+    /requireCapability\(capability: AdminCapability\)[\s\S]*?hasAdminCapability\(context\.capabilities, capability\)[\s\S]*?'CAPABILITY_REQUIRED'/u,
+  );
+  assert.match(
+    server,
+    /requireAnyCapability\(capabilities: readonly AdminCapability\[\]\)[\s\S]*?hasAnyAdminCapability\(context\.capabilities, capabilities\)[\s\S]*?'CAPABILITY_REQUIRED'/u,
+  );
+
   for (const capability of ADMIN_CAPABILITIES) {
-    assert.equal(
-      hasAdminCapability(DEFAULT_ADMIN_CAPABILITIES, capability),
-      operatorCapabilities.includes(capability),
-    );
+    assert.equal(hasAdminCapability([capability], capability), true);
+    assert.equal(hasAdminCapability(ADMIN_CAPABILITIES.filter((value) => value !== capability), capability), false);
+    assert.equal(isAdminCapability(capability), true);
   }
-  assert.equal(hasAdminCapability(DEFAULT_ADMIN_CAPABILITIES, 'role.manage'), false);
-  assert.equal(hasAdminCapability(DEFAULT_ADMIN_CAPABILITIES, 'capability.manage'), false);
-  assert.equal(hasAdminCapability(DEFAULT_ADMIN_CAPABILITIES, 'future.default-allow'), false);
+  assert.equal(hasAdminCapability([], 'results.read'), false);
+  assert.equal(hasAnyAdminCapability([], ['identity.read', 'identity.manage']), false);
+  assert.equal(hasAnyAdminCapability(['identity.manage'], ['identity.read', 'identity.manage']), true);
+  assert.equal(isAdminCapability('future.default-allow'), false);
 });
 
 test('database role matrix is deny-by-default and capabilities guard every mutation', async () => {

@@ -7,7 +7,6 @@ import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { requireCapability, requireRole } from '@/features/auth/server';
 import type { Json, TestRow } from '@/lib/supabase/types';
 import { courseQuestionBankSchema, type SaveTestValues } from '@/lib/validation/admin';
-import type { AdminCapability } from '@/lib/security/capabilities';
 import { cache } from 'react';
 import type {
   ActivatedCourseCatalogBatch,
@@ -779,26 +778,6 @@ export async function deleteUnusedContentAsset(assetId: string) {
   if (deleted.error || deleted.data?.id !== assetId) {
     throw deleted.error ?? new Error('CONTENT_ASSET_DELETE_INCOMPLETE');
   }
-}
-
-export async function setAdminCapabilities(
-  userId: string,
-  capabilities: AdminCapability[],
-  reason: string,
-  metadata: AdminRequestMetadata,
-) {
-  await requireRole(['admin']);
-  await requireCapability('capability.manage');
-  const result = await authenticatedRpc('set_user_capabilities_confirmed', {
-    p_target_id: userId,
-    p_capabilities: capabilities,
-    p_reason: reason,
-    ...metadataArgs(metadata),
-  });
-  if (!Array.isArray(result) || !result.every((value) => typeof value === 'string')) {
-    throw new Error('CAPABILITY_RESULT_INVALID');
-  }
-  return result as AdminCapability[];
 }
 
 function requiredString(payload: Record<string, unknown>, key: string) {
