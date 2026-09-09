@@ -59,7 +59,10 @@ test('admin shell exposes six product sections and switches chrome at the laptop
   assert.equal(h1Count(layout), 0);
   assert.match(navLink, /aria-current=\{active \? 'page' : undefined\}/);
   assert.doesNotMatch(rootLayout, /mobile-fixed-bottom-space/);
-  assert.match(publicShell, /pb-\[var\(--mobile-fixed-bottom-space\)\]/);
+  assert.match(
+    publicShell,
+    /pb-\[calc\(var\(--mobile-fixed-bottom-space\)\+var\(--pwa-banner-space,0px\)\)\]/,
+  );
 });
 
 test('canonical admin screens own one heading while retained compatibility screens only redirect', async () => {

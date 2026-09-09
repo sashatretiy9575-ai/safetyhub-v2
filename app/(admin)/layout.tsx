@@ -1,29 +1,20 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { RootDocument } from '@/components/layout/root-document';
 import { PWAProvider } from '@/components/shared/pwa-provider';
 import { DEFAULT_LOCALE } from '@/i18n/config';
-import { absoluteUrl } from '@/lib/utils';
+import { APP_VIEWPORT, pwaIdentity } from '@/lib/pwa-identity';
 import '../globals.css';
 
+// Without this the safe-area insets are zero on these screens, and the
+// mobile dock, the sticky header and the install banner all lose the
+// spacing they were written against.
+export const viewport: Viewport = APP_VIEWPORT;
+
 export const metadata: Metadata = {
-  metadataBase: new URL(absoluteUrl('/')),
   robots: { index: false, follow: false },
-  manifest: '/manifest/ru',
-  icons: {
-    icon: [
-      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
-    ],
-    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'SafetyHub',
-  },
-  other: { google: 'notranslate', 'apple-mobile-web-app-capable': 'yes' },
+  ...pwaIdentity(),
 };
 
 export default async function AdminGroupLayout({ children }: { children: ReactNode }) {

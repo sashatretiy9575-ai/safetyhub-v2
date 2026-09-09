@@ -5,6 +5,7 @@ import { AccountDeletion } from '@/features/profile/account-deletion';
 import { getProfileAvatarUrl } from '@/features/profile/server';
 import { ProfileForm } from '@/features/auth/profile-form';
 import { requireRole } from '@/features/auth/server';
+import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
 import { SignOutAction } from '@/components/shared/sign-out-action';
 import { Card, CardContent } from '@/components/ui/card';
 import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
@@ -59,6 +60,12 @@ export default async function AdminAccountPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* The user menu offers "Install app" to administrators and sends them to
+          `/admin/account#install-app`. The anchor only existed on /profile, from
+          which administrators are redirected away, so the menu item landed them
+          on a page with no such target and nothing to do. */}
+      <PwaManualInstall />
 
       <Card>
         <CardContent className="space-y-4 p-5 sm:p-6">

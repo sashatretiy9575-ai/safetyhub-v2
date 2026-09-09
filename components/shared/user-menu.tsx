@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants';
-import { usePwaInstall } from '@/components/shared/use-pwa-install';
+import { usePWA } from '@/components/shared/pwa-provider';
 import { SignOutAction } from '@/components/shared/sign-out-action';
 import { localizePathname } from '@/i18n/config';
 
@@ -28,7 +28,11 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
   const router = useRouter();
   const locale = useLocale();
   const translations = useTranslations('Shell.userMenu');
-  const { install, isInstallable, isStandalone } = usePwaInstall();
+  // Three components each ran their own copy of the install hook, so three
+  // listeners answered one browser event and could disagree about whether the
+  // app was installable. The menu renders inside PWAProvider in both private
+  // roots, so it reads the shared answer.
+  const { install, isInstallable, isStandalone } = usePWA();
   const initials = (fullName ?? email)
     .split(/[\s@]+/)
     .filter(Boolean)

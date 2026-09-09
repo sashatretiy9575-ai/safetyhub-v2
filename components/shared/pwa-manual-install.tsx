@@ -4,24 +4,12 @@ import { useEffect, useState } from 'react';
 import { CheckCircle, DownloadSimple, ShareNetwork } from '@phosphor-icons/react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { usePwaInstall } from '@/components/shared/use-pwa-install';
-
-type InstallPlatform = 'ios' | 'android' | 'desktop' | 'other';
-
-function detectInstallPlatform(): InstallPlatform {
-  const userAgent = navigator.userAgent;
-  const ios =
-    /iPad|iPhone|iPod/i.test(userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (ios) return 'ios';
-  if (/Android/i.test(userAgent)) return 'android';
-  if (window.matchMedia('(pointer: fine)').matches) return 'desktop';
-  return 'other';
-}
+import { usePWA } from '@/components/shared/pwa-provider';
+import { detectInstallPlatform, type InstallPlatform } from '@/components/shared/install-platform';
 
 export function PwaManualInstall() {
   const t = useTranslations('PwaManual');
-  const { isInstallable, install, isStandalone } = usePwaInstall();
+  const { isInstallable, install, isStandalone } = usePWA();
   const [platform, setPlatform] = useState<InstallPlatform>('other');
   const [showInstructions, setShowInstructions] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
@@ -58,9 +46,7 @@ export function PwaManualInstall() {
             {t('title')}
           </h3>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {isStandalone
-              ? t('installedDescription')
-              : t('description')}
+            {isStandalone ? t('installedDescription') : t('description')}
           </p>
         </div>
         {isStandalone ? (

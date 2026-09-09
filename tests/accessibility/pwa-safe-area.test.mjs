@@ -14,7 +14,13 @@ test('shared safe-area tokens drive the header and mobile tab reserve', async ()
 
   assert.match(css, /@theme[\s\S]*--safe-area-top:\s*env\(safe-area-inset-top, 0px\)/);
   assert.match(css, /--mobile-fixed-bottom-space:/);
-  assert.match(layout, /pb-\[var\(--mobile-fixed-bottom-space\)\]/);
+  // The install banner overlays the bottom of the page, so the reserve now
+  // covers the dock and the banner together, below the footer rather than
+  // inside <main> where the banner simply covered the footer.
+  assert.match(
+    layout,
+    /pb-\[calc\(var\(--mobile-fixed-bottom-space\)\+var\(--pwa-banner-space,0px\)\)\]/,
+  );
   assert.match(header, /pt-\[var\(--safe-area-top\)\]/);
   assert.match(header, /var\(--safe-area-left\)/);
   assert.match(tabs, /bottom-\[var\(--safe-area-bottom\)\]/);
