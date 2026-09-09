@@ -225,6 +225,7 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
           <button
             type="button"
             aria-label="Закрыть фильтры"
+            data-attestation-filters-backdrop
             className="fixed inset-0 z-[var(--z-header)] bg-black/45 @min-[760px]:hidden"
             onClick={closeFilters}
           />

@@ -310,7 +310,7 @@ export function TestEditor({
     });
   };
 
-  const save = async (publish: boolean) => {
+  const persistDraftOrPublish = async (publish: boolean) => {
     if (bankUnreadable) {
       setError(
         'Банк вопросов сейчас недоступен для чтения, поэтому сохранение выключено — иначе сохранённые вопросы были бы стёрты. Обновите базу данных и откройте курс заново.',
@@ -439,6 +439,11 @@ export function TestEditor({
     }
   };
 
+  // Named entry points: `save(true)` and `save(false)` at the call site said
+  // nothing about which of the two things they did.
+  const saveDraft = () => persistDraftOrPublish(false);
+  const publishRevision = () => persistDraftOrPublish(true);
+
   const publicationState =
     dirty && course.publicationState === 'published'
       ? 'published_with_draft_changes'
@@ -465,8 +470,8 @@ export function TestEditor({
                 : 'Черновик хранится только в памяти до отправки.'
         }
         onTogglePreview={() => setPreview((value) => !value)}
-        onSave={() => void save(false)}
-        onPublish={() => void save(true)}
+        onSave={() => void saveDraft()}
+        onPublish={() => void publishRevision()}
       />
 
       {/* Only states that change what the administrator can do are worth a line

@@ -107,15 +107,10 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
     }, QUEUE_REFRESH_DEBOUNCE_MS);
   };
 
-  // B4-45: `refreshQueue(true)` said nothing about what `true` meant at the
-  // call site.
-  const refreshQueue = (immediate = false) =>
-    immediate ? refreshQueueNow() : refreshQueueSoon();
-
   const reportUnconfirmedResult = (idempotencyKey: string) => {
     setMessage(unconfirmedResultMessage);
     setOperationDiagnostic(idempotencyKey);
-    refreshQueue(true);
+    refreshQueueNow();
   };
 
   const decide = async (item: AdminAccountApprovalItem, decision: Decision) => {
@@ -155,7 +150,7 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
             clientRequestMessage(result.error, 'Не удалось сохранить решение. Попробуйте ещё раз.'),
         );
         setOperationDiagnostic(idempotencyKey);
-        refreshQueue();
+        refreshQueueSoon();
         return;
       }
 
@@ -182,11 +177,11 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
           ? 'Доступ к обучению подтверждён.'
           : 'Заявка возвращена на уточнение.',
       );
-      refreshQueue();
+      refreshQueueSoon();
     } catch (error) {
       setMessage(clientRequestMessage(error, 'Не удалось сохранить решение. Попробуйте ещё раз.'));
       setOperationDiagnostic(idempotencyKey);
-      refreshQueue();
+      refreshQueueSoon();
     } finally {
       busyIdsRef.current.delete(item.id);
       setBusyIds(new Set(busyIdsRef.current));

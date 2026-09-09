@@ -27,8 +27,14 @@ export function useAttestationsModalFocus({
     const panel = panelRef.current;
     if (!panel) return;
     const trigger = triggerRef.current;
+    // The panel is only modal while its backdrop is on screen. Above the
+    // container's 760px breakpoint the backdrop is display:none and the panel
+    // is a popover over a table that stays usable — locking the page and
+    // trapping Tab there took both away for no reason.
+    const backdrop = document.querySelector('[data-attestation-filters-backdrop]');
+    const modal = Boolean(backdrop) && getComputedStyle(backdrop!).display !== 'none';
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    if (modal) document.body.style.overflow = 'hidden';
     const frame = requestAnimationFrame(() => {
       const initial = panel.querySelector<HTMLElement>('[data-modal-initial-focus]');
       (initial ?? panel).focus();
@@ -40,7 +46,7 @@ export function useAttestationsModalFocus({
         onClose();
         return;
       }
-      if (event.key !== 'Tab') return;
+      if (event.key !== 'Tab' || !modal) return;
       const focusable = [...panel.querySelectorAll<HTMLElement>(focusableSelector)].filter(
         (element) => !element.hidden && element.getAttribute('aria-hidden') !== 'true',
       );
@@ -63,7 +69,7 @@ export function useAttestationsModalFocus({
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       cancelAnimationFrame(frame);
-      document.body.style.overflow = previousOverflow;
+      if (modal) document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', handleKeyDown);
       trigger?.focus();
     };

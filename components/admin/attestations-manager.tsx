@@ -474,19 +474,6 @@ export function AttestationsManager({
         },
       };
     }
-    if (pending.kind === 'individual-update') {
-      const oldValue = pending.row[pending.field];
-      return {
-        title: `Изменить поле «${attestationFieldLabels[pending.field]}»`,
-        description: `Текущее: «${oldValue || 'не указано'}». Сертификаты перевыпускаются.`,
-        confirmLabel: 'Сохранить изменение',
-        input: {
-          label: `Новое значение: ${attestationFieldLabels[pending.field]}`,
-          initialValue: oldValue,
-          maxLength: attestationFieldMaxLengths[pending.field],
-        },
-      };
-    }
     if (pending.kind === 'issue') {
       const typoWarnings = findCompanyTypoWarnings(selectedRows);
       const firstWarning = typoWarnings[0];
@@ -532,7 +519,6 @@ export function AttestationsManager({
       confirm: 'Данные подтверждены',
       'confirm-issue': 'Данные подтверждены, сертификаты выданы',
       'bulk-update': 'Данные обновлены',
-      'individual-update': 'Данные обновлены',
       issue: 'Сертификаты выданы',
       export: 'Архив сформирован',
       'bulk-delete': 'Сотрудники удалены',
@@ -701,15 +687,7 @@ export function AttestationsManager({
           ? { action: 'confirm_and_issue', attestationIds, idempotencyKey }
           : pending.kind === 'bulk-update'
             ? { action: 'update', userIds, field: pending.field, value, idempotencyKey }
-            : pending.kind === 'individual-update'
-              ? {
-                  action: 'update',
-                  userIds: [pending.row.userId],
-                  field: pending.field,
-                  value,
-                  idempotencyKey,
-                }
-              : { action: 'issue', attestationIds, idempotencyKey };
+            : { action: 'issue', attestationIds, idempotencyKey };
     await runAttestationAction(body, pending.kind);
   };
 

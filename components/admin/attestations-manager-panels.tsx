@@ -51,12 +51,7 @@ type CertificateHistoryItem = {
 export type AttestationPendingAction =
   | { kind: 'confirm' }
   | { kind: 'confirm-issue' }
-  | { kind: 'bulk-update'; field: 'job' | 'organization' }
-  | {
-      kind: 'individual-update';
-      row: AdminAttestationRow;
-      field: 'name' | 'surname' | 'job' | 'organization';
-    }
+  | { kind: 'bulk-update'; field: 'organization' }
   | { kind: 'issue' }
   | { kind: 'export' }
   | { kind: 'bulk-delete' };

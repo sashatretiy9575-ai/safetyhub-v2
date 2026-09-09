@@ -1,5 +1,6 @@
 'use client';
 
+import { useUnsavedChangesGuard } from '@/components/admin/use-unsaved-changes-guard';
 import { Plus, Trash } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { AdminLocaleTabs } from '@/components/admin/admin-locale-tabs';
@@ -60,6 +61,11 @@ export function ArticleLocalizationsEditor({
     [initial],
   );
   const [items, setItems] = useState(initialMap);
+  // The two editors beside this one already refuse to leave with unsaved work.
+  // Here a stray click on the sidebar discarded a translation with no warning.
+  const [savedFingerprint, setSavedFingerprint] = useState(() => JSON.stringify(initialMap));
+  // Nothing here navigates on its own, so the approval callback is unused.
+  useUnsavedChangesGuard(JSON.stringify(items) !== savedFingerprint);
   const [activeLocale, setActiveLocale] = useState<AppLocale>('ru');
   const [preview, setPreview] = useState(false);
   const [completeRequested, setCompleteRequested] = useState(false);
@@ -117,16 +123,18 @@ export function ArticleLocalizationsEditor({
         );
         return;
       }
-      setItems((current) => ({
-        ...current,
+      const saved = {
+        ...items,
         [activeLocale]: {
-          ...current[activeLocale],
+          ...items[activeLocale],
           status: payload.status!,
           draftVersion: payload.draftVersion!,
           contentHash: payload.contentHash!,
           reviewedContentHash: payload.status === 'complete' ? payload.contentHash! : null,
         },
-      }));
+      };
+      setItems(saved);
+      setSavedFingerprint(JSON.stringify(saved));
       setMessage(
         payload.status === 'complete'
           ? 'Локализация сохранена и отмечена готовой.'
