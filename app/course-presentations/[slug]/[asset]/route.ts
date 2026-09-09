@@ -238,6 +238,10 @@ async function serveAsset(
   if (authorized instanceof Response) return authorized;
 
   if (headOnly) {
+    // A HEAD request performs the same authorization and database work as a GET
+    // and then returns before either download budget is charged, so the relay
+    // could be probed without limit.
+    await consumeCoarseQuota('presentation.probe', requestSecurityMetadata(request).ipHash);
     return new Response(null, {
       status: 200,
       headers: assetHeaders(

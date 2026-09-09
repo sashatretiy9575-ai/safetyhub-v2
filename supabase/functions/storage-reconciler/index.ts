@@ -25,8 +25,12 @@ const SHA256_PATTERN = new RegExp(`^${SHA256_SOURCE}$`);
 const STAGING_PRESENTATION_PATH_PATTERN = new RegExp(
   `^(${UUID_SOURCE})/(${UUID_SOURCE})/source\\.pdf$`,
 );
+const PRESENTATION_LOCALE_SOURCE = '(?:ru|kk|en|zh)';
+// Published presentations gained a locale segment:
+// `<course>/<locale>/<presentation>/<sha>.pdf`. The legacy two-segment shape
+// stays accepted so rows written before that rollout can still be cleaned up.
 const PUBLIC_PRESENTATION_PATH_PATTERN = new RegExp(
-  `^(${UUID_SOURCE})/(${UUID_SOURCE})/(${SHA256_SOURCE})\\.pdf$`,
+  `^(${UUID_SOURCE})/(?:(${PRESENTATION_LOCALE_SOURCE})/)?(${UUID_SOURCE})/(${SHA256_SOURCE})\\.pdf$`,
 );
 const AVATAR_OBJECT_PATTERN = new RegExp(`^(${UUID_SOURCE})/objects/(${UUID_SOURCE})\\.webp$`);
 const AVATAR_RECONCILE_STATES = new Set(['committed', 'reconcile_required', 'cancel_requested']);
@@ -153,6 +157,15 @@ function parseStorageObjectKey(value: unknown, errorCode: string) {
   return value;
 }
 
+/**
+ * Splits the claim into raw rows without validating them.
+ *
+ * Validation used to run over the whole claim before any work began, and it
+ * threw from outside the per-item handler. `thumbnail_path` is nullable, so one
+ * row the parser disliked was enough to abort the entire run — including the
+ * eight prune tasks that follow, which then never executed again. That failure
+ * was self-sustaining: nothing cleaned up the row that caused it.
+ */
 function parseStalePresentationClaim(value: unknown) {
   if (!isRecord(value) || !Array.isArray(value.items)) {
     fail('PRESENTATION_CLEANUP_CLAIM_INVALID');
@@ -160,44 +173,45 @@ function parseStalePresentationClaim(value: unknown) {
   if (value.items.length > MAX_STALE_PRESENTATIONS_PER_RUN) {
     fail('PRESENTATION_CLEANUP_CLAIM_LIMIT');
   }
-  return value.items.map((rawItem) => {
-    if (!isRecord(rawItem)) fail('PRESENTATION_CLEANUP_ITEM_INVALID');
-    const id = parseUuid(rawItem.id, 'PRESENTATION_CLEANUP_ID_INVALID');
-    const bucket = rawItem.bucket;
-    if (
-      bucket !== COURSE_PRESENTATION_STAGING_BUCKET &&
-      bucket !== COURSE_PRESENTATION_PUBLIC_BUCKET
-    ) {
-      fail('PRESENTATION_CLEANUP_BUCKET_INVALID');
-    }
-    const objectKey = parseStorageObjectKey(rawItem.path, 'PRESENTATION_CLEANUP_PATH_INVALID');
-    const thumbnailPath =
-      rawItem.thumbnailPath === null || rawItem.thumbnailPath === undefined
-        ? null
-        : parseStorageObjectKey(
-            rawItem.thumbnailPath,
-            'PRESENTATION_CLEANUP_THUMBNAIL_PATH_INVALID',
-          );
-    const sha256 = requiredText(rawItem, 'sha256', 'PRESENTATION_CLEANUP_SHA_INVALID');
-    if (!SHA256_PATTERN.test(sha256)) fail('PRESENTATION_CLEANUP_SHA_INVALID');
+  return value.items;
+}
 
-    if (bucket === COURSE_PRESENTATION_STAGING_BUCKET) {
-      const match = STAGING_PRESENTATION_PATH_PATTERN.exec(objectKey);
-      if (!match) fail('PRESENTATION_CLEANUP_PATH_INVALID');
-      if (thumbnailPath !== null && thumbnailPath !== `${match[1]}/${match[2]}/thumbnail.webp`) {
-        fail('PRESENTATION_CLEANUP_THUMBNAIL_PATH_INVALID');
-      }
-    } else {
-      const match = PUBLIC_PRESENTATION_PATH_PATTERN.exec(objectKey);
-      if (!match || match[2] !== id || match[3] !== sha256) {
-        fail('PRESENTATION_CLEANUP_PATH_INVALID');
-      }
-      if (thumbnailPath !== `${match[1]}/${match[2]}/${match[3]}-thumb.webp`) {
-        fail('PRESENTATION_CLEANUP_THUMBNAIL_PATH_INVALID');
-      }
+/** Validates one claimed row. Throwing here costs that row, not the run. */
+function parseStalePresentationItem(rawItem: unknown) {
+  if (!isRecord(rawItem)) fail('PRESENTATION_CLEANUP_ITEM_INVALID');
+  const id = parseUuid(rawItem.id, 'PRESENTATION_CLEANUP_ID_INVALID');
+  const bucket = rawItem.bucket;
+  if (
+    bucket !== COURSE_PRESENTATION_STAGING_BUCKET &&
+    bucket !== COURSE_PRESENTATION_PUBLIC_BUCKET
+  ) {
+    fail('PRESENTATION_CLEANUP_BUCKET_INVALID');
+  }
+  const objectKey = parseStorageObjectKey(rawItem.path, 'PRESENTATION_CLEANUP_PATH_INVALID');
+  const thumbnailPath =
+    rawItem.thumbnailPath === null || rawItem.thumbnailPath === undefined
+      ? null
+      : parseStorageObjectKey(rawItem.thumbnailPath, 'PRESENTATION_CLEANUP_THUMBNAIL_PATH_INVALID');
+  const sha256 = requiredText(rawItem, 'sha256', 'PRESENTATION_CLEANUP_SHA_INVALID');
+  if (!SHA256_PATTERN.test(sha256)) fail('PRESENTATION_CLEANUP_SHA_INVALID');
+
+  if (bucket === COURSE_PRESENTATION_STAGING_BUCKET) {
+    const match = STAGING_PRESENTATION_PATH_PATTERN.exec(objectKey);
+    if (!match) fail('PRESENTATION_CLEANUP_PATH_INVALID');
+    if (thumbnailPath !== null && thumbnailPath !== `${match[1]}/${match[2]}/thumbnail.webp`) {
+      fail('PRESENTATION_CLEANUP_THUMBNAIL_PATH_INVALID');
     }
-    return { id, bucket, objectKey, thumbnailPath };
-  });
+  } else {
+    const match = PUBLIC_PRESENTATION_PATH_PATTERN.exec(objectKey);
+    if (!match || match[3] !== id || match[4] !== sha256) {
+      fail('PRESENTATION_CLEANUP_PATH_INVALID');
+    }
+    const prefix = match[2] ? `${match[1]}/${match[2]}/${match[3]}` : `${match[1]}/${match[3]}`;
+    if (thumbnailPath !== `${prefix}/${match[4]}-thumb.webp`) {
+      fail('PRESENTATION_CLEANUP_THUMBNAIL_PATH_INVALID');
+    }
+  }
+  return { id, bucket, objectKey, thumbnailPath };
 }
 
 function claimArray(value: unknown, errorCode: string) {
@@ -505,11 +519,14 @@ async function reconcileStalePresentations(client: ReturnType<typeof createClien
     p_ttl_hours: 24,
     p_lease_minutes: 10,
   });
-  const items = parseStalePresentationClaim(claim);
+  const rawItems = parseStalePresentationClaim(claim);
   const cleanedIds: string[] = [];
   let failed = 0;
-  for (const item of items) {
+  for (const rawItem of rawItems) {
     try {
+      // Parsed inside the loop: a row this worker cannot understand costs one
+      // failure instead of the whole run and every prune task after it.
+      const item = parseStalePresentationItem(rawItem);
       const objectKeys = [...new Set([item.objectKey, item.thumbnailPath].filter(Boolean))];
       const { error } = await client.storage.from(item.bucket).remove(objectKeys);
       if (error) throw error;
@@ -523,7 +540,7 @@ async function reconcileStalePresentations(client: ReturnType<typeof createClien
       p_presentation_ids: cleanedIds,
     });
   }
-  return { claimed: items.length, completed: cleanedIds.length, failed };
+  return { claimed: rawItems.length, completed: cleanedIds.length, failed };
 }
 
 async function claimOne(

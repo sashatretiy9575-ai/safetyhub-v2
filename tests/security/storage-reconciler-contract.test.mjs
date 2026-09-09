@@ -607,3 +607,50 @@ test('runbook documents secure scheduling and recoverable shutdown', async () =>
   assert.match(readme, /\{userId\}\/objects\/\{operationToken\}\.webp/u);
   assert.match(readme, /## Storage reconciler/u);
 });
+
+test('a claimed row the worker cannot parse costs one row, not the whole run', async () => {
+  const source = await read('supabase/functions/storage-reconciler/index.ts');
+
+  // Validation used to run over the whole claim before any work began and threw
+  // from outside the per-item handler. `thumbnail_path` is nullable, so a single
+  // unparsable row aborted the run — and with it the eight prune tasks that
+  // follow, which then never ran again. Nothing cleaned up the offending row,
+  // so the failure sustained itself.
+  const loop = source.slice(source.indexOf('for (const rawItem of rawItems)'));
+  const parseAt = loop.indexOf('parseStalePresentationItem(rawItem)');
+  const tryAt = loop.indexOf('try {');
+  assert.ok(tryAt >= 0 && parseAt > tryAt, 'each row must be parsed inside the per-row handler');
+  assert.match(source, /catch \{\s*failed \+= 1;/u);
+  assert.doesNotMatch(source, /const items = parseStalePresentationClaim\(claim\);/u);
+});
+
+test('the published presentation path accepts the locale segment it has carried since September', async () => {
+  const source = await read('supabase/functions/storage-reconciler/index.ts');
+  assert.match(source, /PRESENTATION_LOCALE_SOURCE = '\(\?:ru\|kk\|en\|zh\)'/u);
+  assert.ok(source.includes('(?:(${PRESENTATION_LOCALE_SOURCE})/)?'));
+
+  // The shape the worker has to accept, checked directly rather than through
+  // the Deno module: the legacy two-segment key, the localized four-segment key,
+  // and nothing with an unknown locale.
+  const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+  const sha256 = '[0-9a-f]{64}';
+  const pattern = new RegExp(
+    `^(${uuid})/(?:((?:ru|kk|en|zh))/)?(${uuid})/(${sha256})${String.fromCharCode(92)}.pdf$`,
+  );
+  const course = '11111111-2222-3333-4444-555555555555';
+  const presentation = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+  const digest = 'a'.repeat(64);
+
+  const legacy = pattern.exec(`${course}/${presentation}/${digest}.pdf`);
+  assert.ok(legacy, 'legacy keys must still be cleanable');
+  assert.equal(legacy[2], undefined);
+  assert.equal(legacy[3], presentation);
+
+  const localized = pattern.exec(`${course}/kk/${presentation}/${digest}.pdf`);
+  assert.ok(localized, 'localized keys are the shape published today');
+  assert.equal(localized[2], 'kk');
+  assert.equal(localized[3], presentation);
+  assert.equal(localized[4], digest);
+
+  assert.equal(pattern.exec(`${course}/zz/${presentation}/${digest}.pdf`), null);
+});

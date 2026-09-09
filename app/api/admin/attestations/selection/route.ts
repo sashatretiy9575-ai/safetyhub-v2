@@ -7,11 +7,16 @@ import {
   resolveAdminAttestationSelection,
 } from '@/features/admin/attestations';
 import { readJsonBody } from '@/lib/security/request-body';
+import { consumeCoarseQuota } from '@/lib/security/rate-limit';
+import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 
 export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
+    // The resolver runs an arbitrary filter across the whole register, so it is
+    // metered like any other expensive administrative read.
+    await consumeCoarseQuota('admin.read.query', requestSecurityMetadata(request).ipHash);
     const parsed = adminAttestationFilterInputSchema.safeParse(
       await readJsonBody(request),
     );

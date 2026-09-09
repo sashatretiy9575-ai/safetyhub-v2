@@ -31,6 +31,13 @@ type QuotaAction =
   | 'presentation.download'
   | 'certificate.pdf'
   | 'certificate.export'
+  // A ready export archive stays downloadable for thirty minutes; without a
+  // budget the same job could be replayed for the whole window.
+  | 'certificate.export.download'
+  // A HEAD request returns before both download budgets are charged.
+  | 'presentation.probe'
+  // Administrative reads that run an unbounded filter over the register.
+  | 'admin.read.query'
   | 'admin.invite'
   | 'admin.suspend'
   | 'admin.delete'
