@@ -10,6 +10,7 @@ import { readSiteContactsUncached } from '@/lib/site-contacts';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
+import { siteContactsUpdateSchema } from '@/lib/validation/admin';
 
 export async function GET() {
   try {
@@ -24,28 +25,20 @@ export async function PATCH(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
-    const body = (await readJsonBody(request)) as Record<string, unknown> | null;
-    if (
-      !body ||
-      typeof body.phone !== 'string' ||
-      typeof body.whatsapp !== 'string' ||
-      typeof body.whatsappSameAsPhone !== 'boolean' ||
-      typeof body.expectedVersion !== 'number'
-    ) {
-      return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
-    }
+    // Authorization precedes parsing: an unauthenticated caller must not get a
+    // request body read and validated on the product's budget.
     await requireCapability('site.settings.manage');
     await consumeAdminMutationQuota(
       'site.settings.update',
       requestSecurityMetadata(request).ipHash,
     );
 
-    const settings = await updateSiteContacts({
-      phone: body.phone,
-      whatsapp: body.whatsapp,
-      whatsappSameAsPhone: body.whatsappSameAsPhone,
-      expectedVersion: body.expectedVersion,
-    });
+    const parsed = siteContactsUpdateSchema.safeParse(await readJsonBody(request));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
+    }
+
+    const settings = await updateSiteContacts(parsed.data);
     return NextResponse.json({ settings });
   } catch (error) {
     if (error instanceof SiteContactsConflictError) {

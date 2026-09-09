@@ -263,8 +263,13 @@ export async function proxy(request: NextRequest) {
   const { response, user } = await updateSession(request, requestHeaders);
 
   if (!user) {
+    // An expired session is not a sign-out. Clearing the origin cache here would
+    // unregister the service worker and force a cold start of the application
+    // every time a cookie simply aged out.
     return secure(
-      clearSafetyHubLocalSession(request, redirectWithCookies(loginUrl(request, locale), response)),
+      clearSafetyHubLocalSession(request, redirectWithCookies(loginUrl(request, locale), response), {
+        clearDeviceCache: false,
+      }),
     );
   }
 

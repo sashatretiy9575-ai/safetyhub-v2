@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LocaleFlag } from '@/components/layout/locale-flag';
 import { clearSafetyHubDeviceData } from '@/lib/safetyhub-device-data';
+import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import {
   LOCALE_COOKIE_MAX_AGE,
   LOCALE_COOKIE_NAME,
@@ -111,15 +112,18 @@ export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] })
 
     setPending(true);
     try {
-      const response = await fetch('/api/profile/locale', {
+      const result = await clientRequest('/api/profile/locale', {
         method: 'POST',
         credentials: 'same-origin',
         cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ locale: nextLocale }),
       });
-      const payload: unknown = await response.json().catch(() => null);
-      if (!response.ok || !isTransitionResult(payload) || payload.locale !== nextLocale) {
+      if (!result.ok) throw new Error('LOCALE_TRANSITION_FAILED');
+      const payload: unknown = await readClientResponseJson<unknown>(result.response).catch(
+        () => null,
+      );
+      if (!isTransitionResult(payload) || payload.locale !== nextLocale) {
         throw new Error('LOCALE_TRANSITION_FAILED');
       }
 

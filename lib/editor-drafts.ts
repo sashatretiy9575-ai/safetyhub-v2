@@ -27,7 +27,10 @@ function validSavedAt(value: unknown): value is number {
 
 function draftHeaders(storage: Storage) {
   const drafts: Array<{ key: string; savedAt: number }> = [];
-  for (let index = 0; index < storage.length; index += 1) {
+  // Walked backwards: `removeItem` renumbers the keys after the one it drops,
+  // so a forward walk skipped the entry that took the removed index. That made
+  // both the integrity sweep and the LRU limit work only some of the time.
+  for (let index = storage.length - 1; index >= 0; index -= 1) {
     const key = storage.key(index);
     if (!key?.startsWith(DRAFT_PREFIX)) continue;
     try {

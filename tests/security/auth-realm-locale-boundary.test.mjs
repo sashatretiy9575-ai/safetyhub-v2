@@ -44,6 +44,9 @@ test('realm transitions have a single server-authorized write and local cleanup'
   assert.match(cleanup, /safetyhub-email-otp-challenge/u);
   assert.match(cleanup, /safetyhub-session-hint/u);
   assert.match(cleanup, /'"cache", "storage"'/u);
+  // An expired session is redirected to the login page, not signed out: the
+  // origin cache and the service-worker registration must survive that.
+  assert.match(cleanup, /options\.clearDeviceCache === false \? '"storage"'/u);
   assert.doesNotMatch(cleanup, /headers\.set\('Clear-Site-Data',\s*'"cookies"'\)/u);
   assert.match(logout, /clearSafetyHubLocalSession\(request, response\)/u);
 });
@@ -53,6 +56,9 @@ test('protected/auth-entry route defense is realm-aware without authenticating p
   assert.match(proxy, /const isAuthEntry =[\s\S]*pathname === '\/auth'/u);
   assert.match(proxy, /if \(!isProtected && !isAuthEntry\)/u);
   assert.match(proxy, /authRealmForSessionUser\(user\) !== authRealmForLocale\(locale\)/u);
+  // Expiry redirects; only a realm mismatch or a deliberate sign-out clears the
+  // device cache along with the session.
+  assert.match(proxy, /clearDeviceCache: false/u);
   assert.match(proxy, /clearSafetyHubLocalSession/u);
   const publicBranch =
     proxy.match(/if \(!isProtected && !isAuthEntry\) \{([\s\S]*?)\n  \}/u)?.[1] ?? '';

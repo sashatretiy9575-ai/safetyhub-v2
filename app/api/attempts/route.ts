@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
     await requireUser();
     return NextResponse.json(
-      await startAttempt(parsed.data.testSlug, parsed.data.startNew, parsed.data.locale),
+      await startAttempt(parsed.data.testSlug, parsed.data.locale),
     );
   } catch (error) {
     console.error('[POST /api/attempts] Error starting attempt:', error);

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { contentMetadataDraftSchema } from '../content/content-metadata.ts';
+import { isSafeSourceUrl } from './source-url.ts';
 
 export const ARTICLE_LIMITS = {
   maxBlocks: 100,
@@ -74,26 +75,17 @@ export function isSafeArticleButtonUrl(value: string): boolean {
   }
 }
 
+/**
+ * An article block links out of running prose, so it is stricter than a
+ * bibliography entry: no encoded traversal, no explicit port, and no `wa.me`
+ * link, because a WhatsApp call to action must resolve from the current global
+ * contacts instead of being frozen into the document.
+ */
 export function isSafeArticleSourceUrl(value: string): boolean {
-  if (
-    value.length > 2_048 ||
-    controlCharacters.test(value) ||
-    value.includes('\\') ||
-    encodedTraversal.test(value)
-  ) {
-    return false;
-  }
-
+  if (!isSafeSourceUrl(value) || encodedTraversal.test(value)) return false;
   try {
     const url = new URL(value);
-    return (
-      url.protocol === 'https:' &&
-      !url.username &&
-      !url.password &&
-      !url.port &&
-      Boolean(url.hostname) &&
-      url.hostname.toLowerCase() !== 'wa.me'
-    );
+    return !url.port && url.hostname.toLowerCase() !== 'wa.me';
   } catch {
     return false;
   }

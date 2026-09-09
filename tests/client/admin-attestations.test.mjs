@@ -172,7 +172,10 @@ test('attestation list keeps personal details compact and loads the avatar only 
   assert.match(managerSurface, />Контакт</);
   assert.match(managerSurface, /mailto:\$\{history\.email\}/);
   assert.match(historyRoute, /requireCapability\('user\.read'\)/);
-  assert.match(historyRoute, /auth\.admin\.getUserById/);
+  // The address comes from the product's own disclosure rule, not from a
+  // second privileged Auth Admin lookup whose result was discarded.
+  assert.match(historyRoute, /rpc\('get_safe_user_email'/);
+  assert.doesNotMatch(historyRoute, /auth\.admin\.getUserById/);
   assert.match(
     avatarRoute,
     /requireAnyCapability\(\['identity\.read', 'identity\.manage'\]\)/,

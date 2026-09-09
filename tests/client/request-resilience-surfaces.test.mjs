@@ -19,10 +19,18 @@ test('client mutations use bounded requests and release every busy scope in fina
     },
     { file: 'components/admin/test-editor.tsx', releases: ['setBusy(false)'] },
     { file: 'features/auth/profile-form.tsx', releases: ['setBusy(false)'] },
+    // Both of these used raw `fetch` while this very gate claimed the project
+    // had no unbounded client mutations left.
+    { file: 'components/admin/site-contacts-form.tsx', releases: [] },
+    { file: 'components/layout/language-switcher.tsx', releases: [] },
   ];
   for (const { file, releases } of surfaces) {
     const source = await read(file);
-    assert.match(source, /clientRequest|createClient/u, `${file} must use the shared request path`);
+    assert.match(
+      source,
+      /clientRequest|clientFetch|createClient/u,
+      `${file} must use the shared request path`,
+    );
     assert.doesNotMatch(source, /await\s+fetch\s*\(/u, `${file} must not use unbounded fetch`);
     for (const release of releases) {
       const releaseAt = source.indexOf(release);

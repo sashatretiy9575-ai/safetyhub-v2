@@ -195,9 +195,13 @@ export function EmailOtpFlow() {
     const storedCooldown = readStoredSendCooldown();
     if (!storedAttempt && !storedCooldown) return;
 
-    setEmail(storedAttempt?.email ?? storedCooldown!.email);
+    const restoredEmail = storedAttempt?.email ?? storedCooldown!.email;
+    setEmail(restoredEmail);
     const attemptRetryAt = storedAttempt ? storedAttempt.sentAt + RESEND_DELAY_SECONDS * 1000 : 0;
-    const retryAt = Math.max(attemptRetryAt, storedCooldown?.retryAt ?? 0);
+    // A cooldown recorded for a different address says nothing about this one.
+    const cooldownRetryAt =
+      storedCooldown && storedCooldown.email === restoredEmail ? storedCooldown.retryAt : 0;
+    const retryAt = Math.max(attemptRetryAt, cooldownRetryAt);
     setSendRetryAt(retryAt);
     setRetryClock(Date.now());
     if (storedAttempt) {
@@ -421,6 +425,12 @@ export function EmailOtpFlow() {
 
   const changeEmail = () => {
     clearStoredAttempt();
+    // The send cooldown belongs to the address it was earned on. Leaving it in
+    // place made a visitor who mistyped their address wait out somebody else's
+    // timer before a code could be sent to the corrected one — and a reload
+    // then restored the wrong address from the same record.
+    clearStoredSendCooldown();
+    setSendRetryAt(0);
     setStage('email');
     setCode('');
     setSentAt(0);

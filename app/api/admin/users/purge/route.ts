@@ -32,7 +32,6 @@ export async function POST(request: Request) {
         parsed.data.userIds,
         parsed.data.reason,
         parsed.data.idempotencyKey,
-        metadata,
       ),
     );
   } catch (error) {

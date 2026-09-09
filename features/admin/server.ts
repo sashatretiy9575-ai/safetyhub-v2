@@ -246,11 +246,12 @@ export async function purgeUserAccounts(
   userIds: string[],
   reason: string,
   idempotencyKey: string,
-  metadata: AdminRequestMetadata,
 ) {
   const actor = await requireCapability('user.delete');
   if (userIds.includes(actor.user.id)) throw new Error('CANNOT_DELETE_SELF');
-  await consumeAdminMutationQuota('admin.purge', metadata.ipHash);
+  // The coarse budget is spent once per HTTP request, in the route handler.
+  // Charging it again here made the effective allowance half of what the quota
+  // policy documents.
   invalidateCertificateVerificationCache();
   const raw = (await authenticatedRpc('admin_purge_user_accounts', {
     p_idempotency_key: idempotencyKey,

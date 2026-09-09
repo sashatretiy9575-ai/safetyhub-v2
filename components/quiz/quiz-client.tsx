@@ -263,7 +263,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
   );
 
   const loadAttempt = useCallback(
-    async (startNew = false) => {
+    async () => {
       setLoading(true);
       setError('');
       setErrorCode('');
@@ -271,7 +271,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
         const result = await clientRequest('/api/attempts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ testSlug: slug, startNew, locale }),
+          body: JSON.stringify({ testSlug: slug, locale }),
         });
         if (!result.ok) {
           if (result.response) await applyResponseError(result.response);
@@ -511,9 +511,9 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     {t('openApproval')}
                   </Button>
                 ) : errorCode === 'ATTEMPT_NOT_FOUND' ? (
-                  <Button onClick={() => void loadAttempt(true)}>{t('newAttempt')}</Button>
+                  <Button onClick={() => void loadAttempt()}>{t('newAttempt')}</Button>
                 ) : (
-                  <Button variant="outline" onClick={() => void loadAttempt(false)}>
+                  <Button variant="outline" onClick={() => void loadAttempt()}>
                     {t('retry')}
                   </Button>
                 )}
@@ -623,7 +623,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-[var(--color-text-muted)]">
                     <button
                       type="button"
-                      onClick={() => void loadAttempt(true)}
+                      onClick={() => void loadAttempt()}
                       className="hover:text-[var(--color-text)] hover:underline"
                     >
                       {t('improveResult')}
@@ -647,7 +647,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   <Button
                     size="lg"
                     className="w-full max-w-xs font-bold"
-                    onClick={() => void loadAttempt(true)}
+                    onClick={() => void loadAttempt()}
                   >
                     <ArrowCounterClockwise size={18} />
                     {expired ? t('newAttempt') : t('retake')}

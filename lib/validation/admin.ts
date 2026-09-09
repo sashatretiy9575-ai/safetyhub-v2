@@ -1,9 +1,13 @@
 import { z } from 'zod';
 import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
 import { TEST_EDITOR_LIMITS, TEST_EDITOR_SLUG_PATTERN } from '@/lib/admin-test-editor';
-import { contentMetadataDraftSchema } from '@/lib/content/content-metadata';
+import {
+  contentMetadataDraftSchema,
+  publishableContentMetadataSchema,
+} from '@/lib/content/content-metadata';
 import { courseSeoSchema } from '@/lib/validation/course';
 import { isCourseIconId, type IconId } from '@/lib/course-icons';
+import { normalizePhoneE164 } from '@/lib/site-contacts-shared';
 
 export const entityIdSchema = z.string().uuid();
 export const adminActionReasonSchema = z.string().trim().min(10).max(500);
@@ -216,6 +220,22 @@ export const saveTestSchema = z
       context.addIssue({ code: 'custom', path: ['seo'], message: 'seoInvalid' });
     }
     if (value.publish) {
+      // Spreading `contentMetadataDraftSchema.shape` copies the fields but not
+      // the object-level refinement that validates them, so until now no write
+      // path checked a source link at all. A draft may hold a half-typed URL; a
+      // published revision may not.
+      const publishedMetadata = publishableContentMetadataSchema.safeParse({
+        jurisdiction: value.jurisdiction,
+        effectiveDate: value.effectiveDate,
+        sources: value.sources,
+      });
+      if (!publishedMetadata.success) {
+        for (const issue of publishedMetadata.error.issues) {
+          context.addIssue({ ...issue, path: issue.path });
+        }
+      }
+    }
+    if (value.publish) {
       const publishedVariants = z
         .array(testVariantSchema)
         .length(TEST_EDITOR_LIMITS.variantCount)
@@ -225,6 +245,31 @@ export const saveTestSchema = z
           context.addIssue({ ...issue, path: ['questionVariants', ...issue.path] });
         }
       }
+    }
+  });
+
+/**
+ * The only administrative route that validated its body by hand: four `typeof`
+ * checks with no bounds, no `.strict()`, and an `expectedVersion` that accepted
+ * a negative or fractional number. A phone number was only rejected later, deep
+ * inside the update, as an anonymous failure.
+ */
+export const siteContactsUpdateSchema = z
+  .object({
+    phone: z
+      .string()
+      .trim()
+      .max(64)
+      .refine((value) => normalizePhoneE164(value) !== null, 'Неверный номер телефона'),
+    whatsapp: z.string().trim().max(64),
+    whatsappSameAsPhone: z.boolean(),
+    expectedVersion: z.number().int().nonnegative(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.whatsappSameAsPhone) return;
+    if (normalizePhoneE164(value.whatsapp) === null) {
+      context.addIssue({ code: 'custom', path: ['whatsapp'], message: 'Неверный номер WhatsApp' });
     }
   });
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isSafeSourceUrl } from '../validation/source-url.ts';
 
 export const CONTENT_METADATA_LIMITS = Object.freeze({
   jurisdictionMax: 120,
@@ -46,7 +47,7 @@ export const contentMetadataSchema = contentMetadataDraftSchema.superRefine((val
         message: 'Укажите название источника',
       });
     }
-    if (!/^https:\/\/[^\s]+$/i.test(source.url)) {
+    if (!isSafeSourceUrl(source.url)) {
       context.addIssue({
         code: 'custom',
         path: ['sources', index, 'url'],
@@ -59,16 +60,32 @@ export const contentMetadataSchema = contentMetadataDraftSchema.superRefine((val
 export type ContentSource = z.infer<typeof contentSourceSchema>;
 export type ContentMetadata = z.infer<typeof contentMetadataSchema>;
 
+/**
+ * Reading is deliberately lenient per element. The previous version parsed the
+ * whole object and, on any failure, returned an empty one — so a single source
+ * with a typo erased the jurisdiction, the effective date and every other
+ * reference from the published page, with nothing shown to the reader and
+ * nothing logged. Unsafe links are dropped; everything valid survives.
+ */
 export function coerceContentMetadata(value: unknown): ContentMetadata {
-  const parsed = contentMetadataSchema.safeParse(value);
-  return parsed.success
-    ? parsed.data
-    : {
-        jurisdiction: '',
-        effectiveDate: '',
-        sources: [],
-      };
+  const parsed = contentMetadataDraftSchema.safeParse(value);
+  if (!parsed.success) {
+    return { jurisdiction: '', effectiveDate: '', sources: [] };
+  }
+  return {
+    ...parsed.data,
+    sources: parsed.data.sources.filter(
+      (source) => source.title.length > 0 && isSafeSourceUrl(source.url),
+    ),
+  };
 }
+
+/**
+ * The publication gate. Draft schemas stay permissive so an operator can save a
+ * half-typed reference, but a revision that goes live must carry links this
+ * product is willing to put in front of a reader.
+ */
+export const publishableContentMetadataSchema = contentMetadataSchema;
 
 export function toContentDateInput(value: string) {
   const match = value.match(/^(\d{4}-\d{2}-\d{2})/);

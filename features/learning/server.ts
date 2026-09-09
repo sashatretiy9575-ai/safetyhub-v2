@@ -132,7 +132,12 @@ function parseAttemptMutationPayload(value: Json): AttemptPayload {
   return parseRpcPayload(value);
 }
 
-export async function startAttempt(testSlug: string, _startNew = false, locale: AppLocale) {
+/**
+ * `start_test_attempt_locale` resumes the participant's open attempt or opens a
+ * new one; the caller has no say in it, which is why the former `startNew`
+ * argument was inert.
+ */
+export async function startAttempt(testSlug: string, locale: AppLocale) {
   await requireUser({ enforceLegal: true });
   const client = (await createClient()) as unknown as UntypedRpcClient;
   const { data, error } = await client.rpc('start_test_attempt_locale', {

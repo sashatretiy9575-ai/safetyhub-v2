@@ -36,7 +36,9 @@ test('quiz reveals a failed score and explains the calendar-day limit without us
   assert.match(client, /t\('errors\.catalogMaintenance'\)/);
   assert.match(client, /ATTEMPT_ROLLING_LIMIT/);
   assert.match(client, /payload\.error === 'ATTEMPT_NOT_FOUND'[\s\S]*clearQuizDraft/);
-  assert.match(client, /errorCode === 'ATTEMPT_NOT_FOUND'[\s\S]*loadAttempt\(true\)/);
+  // The former `true` argument asked for a fresh attempt; the database RPC
+  // always decided that itself, so the flag never left the browser.
+  assert.match(client, /errorCode === 'ATTEMPT_NOT_FOUND'[\s\S]*loadAttempt\(\)/);
   assert.match(client, /\{attempt\.score \?\? 0\}\/\{attempt\.total\}/);
   assert.match(client, /t\('improveResult'\)/);
   assert.doesNotMatch(client, /3 попытки|24 часа|Осталось попыток|attemptsRemaining/);

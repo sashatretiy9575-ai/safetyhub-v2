@@ -41,6 +41,7 @@ function expireCookie(response: MutableResponse, name: string) {
 export function clearSafetyHubLocalSession(
   request: Pick<NextRequest, 'cookies'>,
   response: MutableResponse,
+  options: { clearDeviceCache?: boolean } = {},
 ) {
   const authCookieNames = new Set<string>();
   for (const cookie of [...request.cookies.getAll(), ...response.cookies.getAll()]) {
@@ -53,6 +54,14 @@ export function clearSafetyHubLocalSession(
   // Quiz drafts and any SafetyHub Cache Storage entries are device-local.  A
   // client fallback clears known keys too, but this browser primitive covers
   // storage implementations the client cannot enumerate reliably.
-  response.headers.set('Clear-Site-Data', '"cache", "storage"');
+  //
+  // `"cache"` additionally unregisters the service worker and empties the
+  // origin's HTTP cache. That is right when somebody signs out, and wrong when
+  // a session simply expired: the visitor is redirected to the login page and
+  // silently pays for a cold start of the whole application.
+  response.headers.set(
+    'Clear-Site-Data',
+    options.clearDeviceCache === false ? '"storage"' : '"cache", "storage"',
+  );
   return response;
 }

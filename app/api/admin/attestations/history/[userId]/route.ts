@@ -34,20 +34,22 @@ export async function GET(
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
     const admin = createAdminClient();
-    const [{ data: revision, error: revisionError }, authResult, safeEmailResult] = await Promise.all([
+    // The address comes from `get_safe_user_email`, which applies the product's
+    // own disclosure rules. A second lookup through the Auth Admin API returned
+    // a value nothing read, while adding a privileged call and one more way for
+    // this page to fail when Supabase Auth is slow.
+    const [{ data: revision, error: revisionError }, safeEmailResult] = await Promise.all([
       admin
         .from('test_revisions')
         .select('id')
         .eq('test_id', parsed.data.testId)
         .eq('version', parsed.data.testVersion)
         .maybeSingle(),
-      admin.auth.admin.getUserById(parsed.data.userId),
       (admin as unknown as SafeEmailRpcClient).rpc('get_safe_user_email', {
         p_user_id: parsed.data.userId,
       }),
     ]);
     if (revisionError) throw revisionError;
-    if (authResult.error) throw authResult.error;
     if (safeEmailResult.error) throw safeEmailResult.error;
     const email = typeof safeEmailResult.data === 'string' ? safeEmailResult.data : null;
     if (!revision) return NextResponse.json({ email, items: [] });

@@ -11,7 +11,11 @@ export type { ProfileValues } from '@/features/profile/fields';
 
 const CONTROL_CHARACTERS = /[\p{Cc}\p{Cf}\p{Cs}]/u;
 
-const profileField = (maximum: number) =>
+/**
+ * Exported so administrative writes to the same profile columns cannot drift
+ * from the participant-facing rules.
+ */
+export const profileField = (maximum: number) =>
   z
     .string()
     .transform(normalizeProfileText)

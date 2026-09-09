@@ -230,7 +230,8 @@ test('proxy composes locale routing ahead of the existing Supabase/CSP gate', as
     /window\.location\.assign\(navigationTarget\(pathname, nextLocale\)\)/u,
   );
   assert.ok(
-    switcher.indexOf('if (!hasSessionHint())') < switcher.indexOf("fetch('/api/profile/locale'"),
+    switcher.indexOf('if (!hasSessionHint())') <
+      switcher.indexOf("clientRequest('/api/profile/locale'"),
     'guest locale navigation must precede and avoid the profile API request',
   );
 

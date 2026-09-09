@@ -18,6 +18,7 @@ import {
   type ArticleLifecycleStatus,
 } from '@/lib/validation/article';
 import { defaultContentSeo } from '@/lib/validation/content-seo';
+import { publishableContentMetadataSchema } from '@/lib/content/content-metadata';
 
 export type ArticleMutationResult = {
   id: string;
@@ -109,6 +110,15 @@ export async function saveArticleAction(input: unknown): Promise<ArticleMutation
 
 export async function publishArticleAction(input: unknown): Promise<ArticleMutationResult> {
   const article = articleDraftInputSchema.parse(input);
+  // The draft schema spreads the metadata fields without their object-level
+  // refinement, so a source link is unchecked until publication. A draft may
+  // hold a half-typed URL; a published article may not, and the public reader
+  // silently drops any reference it cannot trust.
+  publishableContentMetadataSchema.parse({
+    jurisdiction: article.jurisdiction,
+    effectiveDate: article.effectiveDate,
+    sources: article.sources,
+  });
   const actor = await requireCapability('content.manage');
   const client = (await createClient()) as unknown as ArticleRpcClient;
   const savedResponse = await client.rpc('save_article_draft_v2', {

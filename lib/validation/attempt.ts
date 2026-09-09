@@ -7,7 +7,11 @@ const isSupportedAttemptLength = (length: number) =>
 
 export const createAttemptSchema = z.object({
   testSlug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  startNew: z.boolean().optional().default(false),
+  // `startNew` was accepted here and never reached the database: the RPC decides
+  // by itself whether to resume an open attempt. The field is still tolerated so
+  // a browser running the previous bundle is not rejected mid-attempt, and it is
+  // deliberately not read.
+  startNew: z.boolean().optional(),
   locale: z.enum(['ru', 'kk', 'en', 'zh']).default('ru'),
 });
 export type CreateAttemptValues = z.infer<typeof createAttemptSchema>;

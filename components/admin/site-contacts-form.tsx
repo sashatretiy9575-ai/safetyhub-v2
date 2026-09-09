@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { CheckCircle, Phone, Warning, WhatsappLogo } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { clientFetch } from '@/lib/client-request';
 import {
   formatPhoneDisplay,
   normalizePhoneE164,
@@ -34,8 +35,11 @@ export function SiteContactsForm({ initialSettings }: { initialSettings: SiteCon
     setState('saving');
     setMessage('');
     try {
-      const response = await fetch('/api/admin/settings/contacts', {
+      // `clientFetch` keeps the 409 body, which this form needs to show the
+      // operator the settings somebody else saved first.
+      const response = await clientFetch('/api/admin/settings/contacts', {
         method: 'PATCH',
+        credentials: 'same-origin',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           phone,
