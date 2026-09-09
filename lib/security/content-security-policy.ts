@@ -3,7 +3,21 @@ type ContentSecurityPolicyOptions = Readonly<{
   development?: boolean;
   strict?: boolean;
   environment?: NodeJS.ProcessEnv;
+  reportPath?: string | null;
 }>;
+
+/**
+ * Violations are collected on the product's own origin. A same-origin path
+ * keeps the reports inside the deployment, needs no third-party endpoint, and
+ * works for both the Chromium `report-to` group and the `report-uri` fallback
+ * every other engine still implements.
+ */
+export const CSP_REPORT_PATH = '/api/security/csp-report';
+
+/** Companion `Reporting-Endpoints` header value for the `csp` group. */
+export function reportingEndpointsHeader(origin: string) {
+  return `csp="${origin.replace(/\/$/u, '')}${CSP_REPORT_PATH}"`;
+}
 
 function directive(name: string, values: string[]) {
   return `${name} ${values.join(' ')}`;
@@ -61,12 +75,17 @@ export function buildContentSecurityPolicy({
   development = process.env.NODE_ENV === 'development',
   strict = Boolean(nonce),
   environment = process.env,
+  reportPath = CSP_REPORT_PATH,
 }: ContentSecurityPolicyOptions = {}) {
   if (strict && !nonce) throw new Error('CSP_NONCE_REQUIRED');
   if (nonce && !/^[A-Za-z0-9+/_-]{16,128}={0,2}$/.test(nonce)) {
     throw new Error('CSP_NONCE_INVALID');
   }
 
+  // pdf.js compiles WebAssembly for its image codecs, which needs
+  // 'wasm-unsafe-eval'. Full 'unsafe-eval' is a development-only concession to
+  // tooling that rewrites modules on the fly.
+  const evaluation = development ? ["'wasm-unsafe-eval'", "'unsafe-eval'"] : ["'wasm-unsafe-eval'"];
   const scripts = strict
     ? [
         "'self'",
@@ -74,15 +93,10 @@ export function buildContentSecurityPolicy({
         THEME_BOOTSTRAP_CSP_HASH,
         PWA_INSTALL_BOOTSTRAP_CSP_HASH,
         "'strict-dynamic'",
-        "'unsafe-eval'",
+        ...evaluation,
         'https://challenges.cloudflare.com',
       ]
-    : [
-        "'self'",
-        "'unsafe-inline'",
-        "'unsafe-eval'",
-        'https://challenges.cloudflare.com',
-      ];
+    : ["'self'", "'unsafe-inline'", ...evaluation, 'https://challenges.cloudflare.com'];
   const styles =
     strict && !development
       ? [
@@ -93,10 +107,12 @@ export function buildContentSecurityPolicy({
         ]
       : ["'self'", "'unsafe-inline'"];
   const avatarSource = strict ? supabaseImageSource(environment) : null;
-  const storageOrigins = supabaseOrigins(environment);
+  const storageOrigins = strict ? supabaseOrigins(environment) : [];
 
   return [
     directive('default-src', ["'self'"]),
+    // Chromium reads report-to; every other engine still reads report-uri.
+    ...(reportPath ? [directive('report-to', ['csp']), directive('report-uri', [reportPath])] : []),
     directive('script-src', scripts),
     directive('script-src-attr', ["'none'"]),
     directive('style-src', styles),

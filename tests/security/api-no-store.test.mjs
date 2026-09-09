@@ -76,3 +76,64 @@ test('retired Auth callbacks and ZH WebAuthn tombstones remain behind the no-sto
   assert.match(zhRetiredHelper, /status: 410/u);
   assert.doesNotMatch(callback, /from ['"]next\/server['"]/);
 });
+
+/**
+ * `next.config.ts` applies the private cache headers to `/api/:path*`, and the
+ * gate above only walks `app/api`. Route handlers that live elsewhere — the
+ * licensed course PDF among them — were covered by neither, so a new one could
+ * ship with no cache boundary at all and nothing would notice.
+ */
+async function nonApiRouteFiles(directory = path.join(root, 'app')) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = await Promise.all(
+    entries.map(async (entry) => {
+      const absolute = path.join(directory, entry.name);
+      if (absolute === path.join(root, 'app', 'api')) return [];
+      if (entry.isDirectory()) return nonApiRouteFiles(absolute);
+      return entry.name === 'route.ts' ? [absolute] : [];
+    }),
+  );
+  return files.flat();
+}
+
+// Handlers whose response is deliberately public and CDN-cacheable. Each entry
+// is a decision, not an omission.
+const PUBLIC_CACHEABLE_HANDLERS = new Map([
+  ['app/manifest/[locale]/route.ts', 'the web app manifest is identical for every visitor'],
+  ['app/offline/[locale]/route.ts', 'the offline shell must survive in the service worker cache'],
+  [
+    'app/certificate-assets/font/route.ts',
+    'a content-addressed font served through createImmutableAssetResponse',
+  ],
+]);
+
+test('route handlers outside app/api declare an explicit cache boundary', async () => {
+  const files = await nonApiRouteFiles();
+  assert.ok(files.length > 0);
+
+  const seen = new Set();
+  for (const file of files) {
+    const relative = path.relative(root, file).split(path.sep).join('/');
+    seen.add(relative);
+    const source = await readFile(file, 'utf8');
+    const reason = PUBLIC_CACHEABLE_HANDLERS.get(relative);
+    if (reason) {
+      assert.match(
+        source,
+        /Cache-Control|createImmutableAssetResponse/,
+        `${relative} is listed as public (${reason}) but sets no cache policy`,
+      );
+      continue;
+    }
+    assert.match(
+      source,
+      // A re-export inherits the boundary of the handler it forwards to.
+      /SENSITIVE_API_CACHE_HEADERS|@\/lib\/security\/api-response|redirectFromRetiredPasswordLink|export \{ [A-Z, ]+ \} from '\.\./,
+      `${relative} must route its response through the shared cache boundary`,
+    );
+  }
+
+  for (const relative of PUBLIC_CACHEABLE_HANDLERS.keys()) {
+    assert.ok(seen.has(relative), `${relative} no longer exists; drop it from the allowlist`);
+  }
+});

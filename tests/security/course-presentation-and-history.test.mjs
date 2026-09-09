@@ -204,7 +204,10 @@ test('course material is approval-gated, private, and stays out of precache', as
   assert.match(localAsset, /const admin = createAdminClient\(\)/);
   assert.match(localAsset, /admin\.storage/);
   assert.match(localAsset, /\.from\(PRESENTATION_BUCKET\)\s*\.download/);
-  assert.match(localAsset, /'Cache-Control': 'private, no-store, max-age=0'/);
+  // The route now reuses the shared sensitive-cache header set, which adds the
+  // two CDN directives a private PDF needs on top of the browser directive.
+  assert.match(localAsset, /\.\.\.SENSITIVE_API_CACHE_HEADERS/);
+  assert.match(localAsset, /from '@\/lib\/security\/no-store'/);
   assert.match(localAsset, /'X-Robots-Tag': 'noindex, nofollow, noarchive'/);
   assert.match(localAsset, /Content-Disposition/);
   assert.match(localAsset, /attachment; filename=/);

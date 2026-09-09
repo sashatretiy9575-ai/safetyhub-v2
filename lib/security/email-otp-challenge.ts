@@ -15,8 +15,12 @@ export type EmailOtpChallengeConsumption =
   | { outcome: 'exhausted'; retryAfter: number }
   | { outcome: 'invalid' };
 
+// Anti-abuse identifiers must not be derived from the database service key:
+// rotating that key would silently invalidate every in-flight OTP challenge
+// and reset the quota counters that hold an attacker back. The variable is
+// documented in .env.example and required in every deployed environment.
 function challengeHmacSecret() {
-  const secret = process.env.RATE_LIMIT_HMAC_SECRET ?? process.env.SUPABASE_SECRET_KEY;
+  const secret = process.env.RATE_LIMIT_HMAC_SECRET;
   if (!secret || secret.length < 32) throw new Error('RATE_LIMIT_HMAC_SECRET_REQUIRED');
   return secret;
 }

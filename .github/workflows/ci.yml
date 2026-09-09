@@ -63,6 +63,11 @@ jobs:
       # The app's ZH registration Siteverify call uses the matching local-only
       # test secret independently of the Supabase Auth container.
       SAFETYHUB_TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
+      # Anti-abuse identifiers and certificate links are no longer derived from
+      # the database service key, so both secrets must exist for the disposable
+      # local run. Neither value is used anywhere but this throwaway instance.
+      RATE_LIMIT_HMAC_SECRET: local-ci-rate-limit-hmac-secret-not-a-production-value
+      CERTIFICATE_VERIFICATION_SECRET: local-ci-certificate-verification-secret-not-production
       # Optional: any Docker Hub account lifts the anonymous image-pull limit
       # that rate limits these jobs. Absent, the start step simply retries.
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}

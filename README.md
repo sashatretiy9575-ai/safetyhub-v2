@@ -31,7 +31,11 @@ npm run dev
 - Turnstile: публичный `NEXT_PUBLIC_TURNSTILE_SITE_KEY`; для ZH registration
   Vercel server-only `SAFETYHUB_TURNSTILE_SECRET_KEY`, совпадающий с secret
   widget, но без префикса `NEXT_PUBLIC_`;
-- серверные секреты: `RATE_LIMIT_HMAC_SECRET`, `CERTIFICATE_VERIFICATION_SECRET`;
+- серверные секреты: `RATE_LIMIT_HMAC_SECRET`, `CERTIFICATE_VERIFICATION_SECRET`
+  — обязательны во всех окружениях, включая локальный запуск и CI. Раньше
+  первый молча подменялся `SUPABASE_SECRET_KEY`, из-за чего ротация ключа БД
+  обнуляла счётчики квот и все начатые проверки кода, а у второго был
+  встроенный запасной ключ прямо в исходниках;
 - `CONTENT_REVALIDATE_SECRET` — минимум 32 криптографически случайных байта;
 - content runtime: `CONTENT_UPSTREAM_TIMEOUT_MS`, `CONTENT_FALLBACK_ENABLED`;
 - Storage worker: `STORAGE_RECONCILER_SECRET`;

@@ -9,6 +9,11 @@ test('auth HTML carries a unique strict CSP and baseline hardening headers', asy
   expect(firstCsp).toContain("'strict-dynamic'");
   expect(firstCsp).toContain('https://challenges.cloudflare.com');
   expect(firstCsp).toContain("frame-ancestors 'none'");
+  // pdf.js compiles WebAssembly; it does not need `eval`.
+  expect(firstCsp).toContain("'wasm-unsafe-eval'");
+  expect(firstCsp).not.toContain("'unsafe-eval'");
+  expect(firstCsp).toContain('report-uri /api/security/csp-report');
+  expect(firstHeaders['reporting-endpoints']).toContain('csp=');
   expect(firstCsp).not.toContain("script-src 'self' 'unsafe-inline'");
   expect(firstHeaders['x-content-type-options']).toBe('nosniff');
   expect(firstHeaders['referrer-policy']).toBe('no-referrer');
@@ -39,7 +44,10 @@ test('public HTML keeps the cacheable static policy', async ({ request }) => {
   const csp = response.headers()['content-security-policy'] ?? '';
   expect(csp).toContain("script-src 'self' 'unsafe-inline'");
   expect(csp).toContain("script-src-attr 'none'");
-  expect(csp).not.toContain('https://*.supabase.co');
+  // The literal wildcard never appeared in any policy, so this assertion could
+  // not fail. No public page talks to Supabase from the browser, so the real
+  // contract is that the project origin is absent entirely.
+  expect(csp).not.toContain('supabase.co');
   expect(csp).not.toContain("'nonce-");
 });
 

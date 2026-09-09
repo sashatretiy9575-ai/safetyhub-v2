@@ -24,12 +24,10 @@ function validatedSecret(value: string, variableName: string) {
 
 function verificationSecrets(environment: VerificationEnvironment = process.env) {
   const current = environment.CERTIFICATE_VERIFICATION_SECRET?.trim();
-  if (!current) {
-    if (environment.NODE_ENV === 'production') {
-      throw new Error('CERTIFICATE_VERIFICATION_SECRET_MISSING');
-    }
-    return ['safetyhub-local-verification-secret-change-before-production'];
-  }
+  // A built-in development fallback is a signing key published in the source
+  // tree: anybody could mint a verification link for any certificate id. The
+  // value is required in every environment, including local runs and CI.
+  if (!current) throw new Error('CERTIFICATE_VERIFICATION_SECRET_MISSING');
   const validCurrent = validatedSecret(current, 'CERTIFICATE_VERIFICATION_SECRET');
   const previous = environment.CERTIFICATE_VERIFICATION_PREVIOUS_SECRET?.trim();
   const validPrevious = previous

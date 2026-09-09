@@ -4,7 +4,10 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { buildContentSecurityPolicy } from '../../lib/security/content-security-policy.ts';
+import {
+  buildContentSecurityPolicy,
+  reportingEndpointsHeader,
+} from '../../lib/security/content-security-policy.ts';
 import { THEME_BOOTSTRAP, THEME_BOOTSTRAP_CSP_HASH } from '../../lib/theme.ts';
 import {
   PWA_INSTALL_BOOTSTRAP,
@@ -26,7 +29,19 @@ test('sensitive HTML uses an injection-safe nonce policy compatible with Turnsti
   assert.doesNotMatch(csp.match(/style-src [^;]*/u)?.[0] ?? '', /'unsafe-inline'/u);
   assert.match(csp, /style-src-attr 'unsafe-inline'/u);
   assert.match(csp, /https:\/\/challenges\.cloudflare\.com/u);
-  assert.doesNotMatch(csp, /connect-src [^;]*supabase/u);
+  const hostedStrictCsp = buildContentSecurityPolicy({
+    nonce,
+    development: false,
+    strict: true,
+    environment: { NEXT_PUBLIC_SUPABASE_URL: 'https://project-ref.supabase.co' },
+  });
+  // The resumable presentation upload in the admin console posts straight to
+  // Supabase Storage, so the strict policy — and only it — carries the origin.
+  assert.match(hostedStrictCsp, /connect-src [^;]*https:\/\/project-ref\.supabase\.co/u);
+  assert.match(
+    hostedStrictCsp,
+    /connect-src [^;]*https:\/\/project-ref\.storage\.supabase\.co/u,
+  );
   const hostedAvatarCsp = buildContentSecurityPolicy({
     nonce,
     development: false,
@@ -37,11 +52,22 @@ test('sensitive HTML uses an injection-safe nonce policy compatible with Turnsti
     hostedAvatarCsp,
     /img-src [^;]*https:\/\/project-ref\.supabase\.co\/storage\/v1\/object\/sign\/profile-avatars\//u,
   );
-  assert.match(csp, /script-src [^;]*'unsafe-eval'/u);
+  // pdf.js needs WebAssembly compilation, not `eval`. Full 'unsafe-eval' is a
+  // development-only concession and must never reach a deployed policy.
+  assert.match(csp, /script-src [^;]*'wasm-unsafe-eval'/u);
+  assert.doesNotMatch(csp.match(/script-src [^;]*/u)?.[0] ?? '', /'unsafe-eval'/u);
+  const developmentCsp = buildContentSecurityPolicy({ nonce, development: true, strict: true });
+  assert.match(developmentCsp, /script-src [^;]*'unsafe-eval'/u);
   assert.match(csp, /worker-src [^;]*'self'/u);
   assert.match(csp, /worker-src [^;]*blob:/u);
   assert.match(csp, /worker-src [^;]*https:\/\/challenges\.cloudflare\.com/u);
   assert.match(csp, /frame-ancestors 'none'/u);
+  assert.match(csp, /report-to csp/u);
+  assert.match(csp, /report-uri \/api\/security\/csp-report/u);
+  assert.equal(
+    reportingEndpointsHeader('https://safetyhub.kz'),
+    'csp="https://safetyhub.kz/api/security/csp-report"',
+  );
   assert.match(csp, /object-src 'none'/u);
   assert.match(csp, /base-uri 'self'/u);
   assert.match(csp, /form-action 'self'/u);
@@ -66,14 +92,28 @@ test('the strict CSP hashes exactly match the two early bootstrap scripts', () =
 });
 
 test('public CSP remains static while protected routes receive request nonces', async () => {
-  const publicCsp = buildContentSecurityPolicy({ development: false, strict: false });
+  const publicCsp = buildContentSecurityPolicy({
+    development: false,
+    strict: false,
+    // Passed explicitly: the assertion below is meaningless when the variable
+    // happens to be unset, which is exactly how it used to run.
+    environment: { NEXT_PUBLIC_SUPABASE_URL: 'https://project-ref.supabase.co' },
+  });
   assert.match(publicCsp, /script-src [^;]*'unsafe-inline'/u);
   assert.doesNotMatch(publicCsp, /'nonce-/u);
+  // No public page talks to Supabase from the browser, so the public policy
+  // must not advertise the project origin to every visitor.
   assert.doesNotMatch(publicCsp, /supabase\.co/u);
 
   const proxy = await read('proxy.ts');
   assert.match(proxy, /const isAuthEntry =[\s\S]*pathname === '\/auth'/u);
-  assert.match(proxy, /const needsNonce = isProtected \|\| isAuthEntry/u);
+  assert.match(
+    proxy,
+    /const needsNonce = isProtected \|\| isAuthEntry \|\| rendersPersonalData/u,
+  );
+  // /verify prints participant data to anybody holding the link, so it gets the
+  // nonce policy without joining the authenticated session branch.
+  assert.match(proxy, /const rendersPersonalData = pathname\.startsWith\('\/verify'\)/u);
   assert.match(proxy, /requestHeaders\.set\('x-nonce', nonce\)/u);
   assert.match(proxy, /requestHeaders\.set\('Content-Security-Policy', csp\)/u);
   assert.match(proxy, /if \(!isProtected && !isAuthEntry\) \{[\s\S]*NextResponse\.next/u);
@@ -101,6 +141,14 @@ test('all responses receive baseline browser hardening headers', async () => {
   assert.match(config, /source: '\/profile\/:path\*'/u);
   assert.match(config, /camera=\(self\)/u);
   assert.match(config, /camera=\(\)/u);
+  // FLoC was withdrawn; the token is dead weight, while the APIs that replaced
+  // it were left at their permissive defaults.
+  assert.doesNotMatch(config, /interest-cohort/u);
+  for (const feature of ['browsing-topics', 'attribution-reporting', 'display-capture', 'serial', 'bluetooth', 'hid']) {
+    assert.ok(config.includes(`'${feature}'`), `${feature} is not denied`);
+  }
+  assert.match(config, /autoplay=\(self\)/u);
+  assert.match(config, /Reporting-Endpoints/u);
   assert.match(config, /poweredByHeader: false/u);
   assert.match(config, /productionBrowserSourceMaps: false/u);
   assert.match(config, /const privateNoStoreHeaders[\s\S]*private, no-store/u);

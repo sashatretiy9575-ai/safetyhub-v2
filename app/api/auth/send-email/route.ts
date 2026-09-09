@@ -6,6 +6,7 @@ import {
   verifyStandardWebhook,
 } from '@/features/auth/send-email-hook';
 import { sendSmtpMail } from '@/lib/email/smtp';
+import { readBoundedText, RequestBodyError } from '@/lib/security/request-body';
 import { afterResponse } from '@/lib/server/after-response';
 
 export const runtime = 'nodejs';
@@ -47,17 +48,16 @@ async function deliver(transport: Transport, to: string, subject: string, html: 
       await sendSmtpMail(transport, { from: transport.from, to, subject, html });
       return;
     } catch (error) {
-      // The message holds a one-time code, so only the SMTP stage and the
-      // server reply line reach the Vercel log; that is enough to spot an outage.
+      // The message holds a one-time code, and an SMTP reply line quotes the
+      // recipient. Only the failing stage reaches the Vercel log: enough to tell
+      // an outage from a rejected login, and it carries neither the mailbox
+      // address, nor the operator login, nor the password length.
       if (attempt === SEND_ATTEMPTS) {
-        const reason = error instanceof Error ? error.message.slice(0, 80) : 'SMTP_UNKNOWN';
-        // A rejected login is nearly always a mailbox credential that no longer
-        // matches. The character count distinguishes "wrong password" from
-        // "password never reached the runtime" without exposing the value.
-        const shape = reason.startsWith('SMTP_AUTH')
-          ? ` user=${transport.user} secretChars=${transport.password.length}`
-          : '';
-        process.stderr.write(`auth send-email hook: delivery failed (${reason})${shape}\n`);
+        const stage =
+          error instanceof Error
+            ? (/^SMTP_[A-Z_]+/u.exec(error.message)?.[0] ?? 'SMTP_FAILED')
+            : 'SMTP_UNKNOWN';
+        process.stderr.write(`auth send-email hook: delivery failed (${stage})\n`);
       }
     }
   }
@@ -75,12 +75,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'SEND_EMAIL_HOOK_NOT_CONFIGURED' }, { status: 500 });
   }
 
-  const declaredLength = Number(request.headers.get('content-length') ?? '0');
-  if (declaredLength > HOOK_BODY_MAX_BYTES) {
-    return NextResponse.json({ error: 'PAYLOAD_TOO_LARGE' }, { status: 413 });
-  }
-  const body = await request.text();
-  if (new TextEncoder().encode(body).byteLength > HOOK_BODY_MAX_BYTES) {
+  // A missing, non-numeric or understated Content-Length used to let an
+  // unsigned caller stream an unbounded body into memory before the signature
+  // was ever checked. The cap now applies to the bytes actually read.
+  let body: string;
+  try {
+    body = await readBoundedText(request, HOOK_BODY_MAX_BYTES);
+  } catch (error) {
+    if (error instanceof RequestBodyError) {
+      return NextResponse.json({ error: error.code }, { status: error.status });
+    }
     return NextResponse.json({ error: 'PAYLOAD_TOO_LARGE' }, { status: 413 });
   }
 

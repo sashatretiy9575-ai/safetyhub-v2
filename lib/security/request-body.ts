@@ -53,6 +53,29 @@ async function boundedBytes(request: Request, maximumBytes: number) {
   return bytes;
 }
 
+/**
+ * Reads raw bytes through an absolute cap, including chunked requests whose
+ * `Content-Length` is absent or lying. Callers that must inspect the exact
+ * bytes — a webhook signature covers the body verbatim — use this instead of
+ * `request.text()`, which buffers whatever the client sends.
+ */
+export async function readBoundedBytes(request: Request, maximumBytes: number) {
+  if (!Number.isSafeInteger(maximumBytes) || maximumBytes < 2 || maximumBytes > 8 * 1024 * 1024) {
+    throw new Error('BODY_LIMIT_INVALID');
+  }
+  return boundedBytes(request, maximumBytes);
+}
+
+/** Reads a UTF-8 body through an absolute byte cap. */
+export async function readBoundedText(request: Request, maximumBytes: number) {
+  const bytes = await readBoundedBytes(request, maximumBytes);
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    throw new RequestBodyError('INVALID_JSON', 400);
+  }
+}
+
 /** Reads JSON through an absolute byte cap, including chunked requests. */
 export async function readJsonBody(
   request: Request,

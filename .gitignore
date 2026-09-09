@@ -33,10 +33,14 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files
+# Next.js loads .env.development, .env.production and .env.test automatically,
+# so a file that only differs from .env.local by suffix is just as dangerous.
 .env
-.env*.local
+.env.*
+!.env.example
 
 # generated reports and local scratch work
+AUDIT.md
 tmp/
 artifacts/
 *.local-notes.md

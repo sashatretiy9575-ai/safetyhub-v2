@@ -1,13 +1,20 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 import { LOCALE_PREFIXES, localizePathname } from './i18n/config';
-import { STATIC_CONTENT_SECURITY_POLICY } from './lib/security/content-security-policy';
-import { assertDeploymentSiteUrl } from './lib/site-url';
+import {
+  reportingEndpointsHeader,
+  STATIC_CONTENT_SECURITY_POLICY,
+} from './lib/security/content-security-policy';
+import { assertDeploymentSiteUrl, resolveSiteOrigin } from './lib/site-url';
 
 assertDeploymentSiteUrl();
 
 const securityHeaders = [
   { key: 'Content-Security-Policy', value: STATIC_CONTENT_SECURITY_POLICY },
+  // Chromium needs the endpoint group declared out of band; without it the
+  // policy's report-to directive is inert and nothing can be measured before
+  // tightening it.
+  { key: 'Reporting-Endpoints', value: reportingEndpointsHeader(resolveSiteOrigin()) },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -29,14 +36,56 @@ const privateNoStoreHeaders = [
   { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
 ];
 
+// Features this product never uses. The FLoC token that used to head this list
+// was withdrawn with the API itself and is no longer parsed by any engine,
+// while the browsing and attribution APIs that replaced it were left at their
+// permissive defaults.
+const DENIED_BROWSER_FEATURES = [
+  'accelerometer',
+  'ambient-light-sensor',
+  'attribution-reporting',
+  'autoplay',
+  'bluetooth',
+  'browsing-topics',
+  'display-capture',
+  'encrypted-media',
+  'gyroscope',
+  'hid',
+  'idle-detection',
+  'local-fonts',
+  'magnetometer',
+  'microphone',
+  'midi',
+  'payment',
+  'picture-in-picture',
+  'publickey-credentials-get',
+  'screen-wake-lock',
+  'serial',
+  'storage-access',
+  'usb',
+  'xr-spatial-tracking',
+];
+
+const permissionsPolicy = (camera: 'self' | 'none') =>
+  [
+    camera === 'self' ? 'camera=(self)' : 'camera=()',
+    // The avatar flow previews a captured frame, which needs autoplay on the
+    // screens that own it and nowhere else.
+    ...(camera === 'self' ? ['autoplay=(self)'] : []),
+    'geolocation=()',
+    ...DENIED_BROWSER_FEATURES.filter(
+      (feature) => !(camera === 'self' && feature === 'autoplay'),
+    ).map((feature) => `${feature}=()`),
+  ].join(', ');
+
 const restrictedPermissions = {
   key: 'Permissions-Policy',
-  value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+  value: permissionsPolicy('none'),
 };
 
 const profilePermissions = {
   key: 'Permissions-Policy',
-  value: 'camera=(self), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+  value: permissionsPolicy('self'),
 };
 
 const legacyTopicRedirects = [

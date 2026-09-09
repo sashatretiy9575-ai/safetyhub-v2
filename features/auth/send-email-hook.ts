@@ -43,6 +43,16 @@ function record(value: unknown): Record<string, unknown> | null {
  * `webhook-signature` header carries space-separated `v1,<base64 hmac>`
  * entries computed over `${id}.${timestamp}.${body}`.
  */
+/**
+ * Supabase generates a 32-byte hook secret. Anything shorter is a hand-written
+ * value, and `whsec_=` decodes to an empty HMAC key that would verify a
+ * signature anybody can compute. A weak entry is dropped rather than thrown,
+ * so one bad element of a rotation pair cannot silence the healthy one; if
+ * nothing survives the route answers SEND_EMAIL_HOOK_NOT_CONFIGURED and no
+ * unsigned call is ever accepted.
+ */
+export const MINIMUM_HOOK_SECRET_BYTES = 32;
+
 export function parseHookSecrets(configured: string | undefined) {
   return (configured ?? '')
     .split('|')
@@ -52,7 +62,8 @@ export function parseHookSecrets(configured: string | undefined) {
       const match = entry.match(/^v1,whsec_(?<key>[A-Za-z0-9+/=]+)$/u);
       if (!match?.groups?.key) throw new Error('SEND_EMAIL_HOOK_SECRET_INVALID');
       return Buffer.from(match.groups.key, 'base64');
-    });
+    })
+    .filter((secret) => secret.byteLength >= MINIMUM_HOOK_SECRET_BYTES);
 }
 
 export function verifyStandardWebhook({

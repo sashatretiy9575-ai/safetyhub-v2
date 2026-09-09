@@ -52,11 +52,15 @@ test('secret rotation accepts the previous secret but signs only with the curren
   );
 });
 
-test('production fails closed without a verification secret', () => {
-  assert.throws(
-    () => createCertificateVerificationToken(certificateId, { NODE_ENV: 'production' }),
-    /CERTIFICATE_VERIFICATION_SECRET_MISSING/,
-  );
+test('every environment fails closed without a verification secret', () => {
+  // A development fallback would be a signing key published in the source tree,
+  // so the secret is required outside production as well.
+  for (const environment of [{ NODE_ENV: 'production' }, { NODE_ENV: 'development' }, {}]) {
+    assert.throws(
+      () => createCertificateVerificationToken(certificateId, environment),
+      /CERTIFICATE_VERIFICATION_SECRET_MISSING/,
+    );
+  }
 });
 
 test('current and previous verification secrets both require at least 32 characters', () => {

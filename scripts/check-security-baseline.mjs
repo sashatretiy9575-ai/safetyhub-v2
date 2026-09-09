@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { scanForCredentials, TEXTUAL_EXTENSIONS } from './credential-scan.mjs';
 
 const repositoryRoot = process.cwd();
 const failures = [];
@@ -43,40 +44,10 @@ if (forbiddenRepositoryPaths.length > 0) {
   fail(`repository credential/config files: ${forbiddenRepositoryPaths.join(', ')}`);
 }
 
-const secretPatterns = [
-  /\bgh[pousr]_[A-Za-z0-9]{20,}\b/gu,
-  /\bgithub_pat_[A-Za-z0-9_]{20,}\b/gu,
-  /\bAKIA[0-9A-Z]{16}\b/gu,
-  /\bsb_secret_[A-Za-z0-9_-]{20,}\b/gu,
-  /\bnpm_[A-Za-z0-9]{36}\b/gu,
-  /\bsk_(?:live|test)_[A-Za-z0-9]{16,}\b/gu,
-  /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/gu,
-  /\b[0-9]{6,12}:[A-Za-z0-9_-]{30,}\b/gu,
-  /\bAIza[0-9A-Za-z_-]{35}\b/gu,
-  /\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/gu,
-  /-----BEGIN (?:RSA |OPENSSH |EC |DSA )?PRIVATE KEY-----/gu,
-];
-const textualExtensions = new Set([
-  '.cjs',
-  '.css',
-  '.html',
-  '.js',
-  '.json',
-  '.jsx',
-  '.mjs',
-  '.sql',
-  '.ts',
-  '.tsx',
-  '.txt',
-  '.yaml',
-  '.yml',
-]);
 for (const file of files) {
-  if (file !== '.env.example' && !textualExtensions.has(path.extname(file).toLowerCase())) continue;
+  if (file !== '.env.example' && !TEXTUAL_EXTENSIONS.has(path.extname(file).toLowerCase())) continue;
   const source = readFileSync(path.join(repositoryRoot, file), 'utf8');
-  if (secretPatterns.some((pattern) => pattern.test(source)))
-    fail(`credential-like value in ${file}`);
-  for (const pattern of secretPatterns) pattern.lastIndex = 0;
+  for (const reason of scanForCredentials(source)) fail(`${reason} in ${file}`);
 }
 
 const workflowFiles = files.filter(

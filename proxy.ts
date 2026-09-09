@@ -11,7 +11,10 @@ import {
   type AppLocale,
 } from './i18n/config';
 import { PROTECTED_PATTERNS } from './lib/constants';
-import { buildContentSecurityPolicy } from './lib/security/content-security-policy';
+import {
+  buildContentSecurityPolicy,
+  reportingEndpointsHeader,
+} from './lib/security/content-security-policy';
 import { rolloutFeatureEnabled } from './lib/release/rollout-flags';
 import { resolveLegalDocumentVersion, type LegalDocumentType } from './lib/legal';
 import { resolveSiteOrigin } from './lib/site-url';
@@ -200,7 +203,12 @@ export async function proxy(request: NextRequest) {
     !isAuthEntry &&
     isCdnCacheablePublicRoute(pathname) &&
     (request.method === 'GET' || request.method === 'HEAD');
-  const needsNonce = isProtected || isAuthEntry;
+  // A verification page prints a participant's name, programme and certificate
+  // number for anybody holding the link, so it deserves the injection-safe
+  // policy even though it stays a public, session-free route: it must not join
+  // the authenticated branch below, only receive the stricter header.
+  const rendersPersonalData = pathname.startsWith('/verify');
+  const needsNonce = isProtected || isAuthEntry || rendersPersonalData;
   const nonce = needsNonce ? crypto.randomUUID().replaceAll('-', '') : null;
   const csp = nonce ? buildContentSecurityPolicy({ nonce, strict: true }) : null;
   const requestHeaders = new Headers(request.headers);
@@ -216,7 +224,10 @@ export async function proxy(request: NextRequest) {
     requestHeaders.set(REQUEST_PATHNAME_HEADER_NAME, externalPathname);
   }
   const secure = <T extends NextResponse>(response: T): T => {
-    if (csp) response.headers.set('Content-Security-Policy', csp);
+    if (csp) {
+      response.headers.set('Content-Security-Policy', csp);
+      response.headers.set('Reporting-Endpoints', reportingEndpointsHeader(resolveSiteOrigin()));
+    }
     response.headers.set('Content-Language', htmlLanguage(locale));
     if (cacheablePublicRoute) {
       response.headers.set(

@@ -102,3 +102,36 @@ test('Standard Webhooks reference vectors agree with the implemented scheme', ()
   assert.match(hook, /signature\s*\n?\s*\.split\(' '\)/u);
   assert.match(hook, /entry\.startsWith\('v1,'\)/u);
 });
+
+test('delivery failures never write mailbox credentials to the platform log', () => {
+  // The failure line used to append `user=<mailbox> secretChars=<length>`, which
+  // is the operator login and the exact password length in a log anybody with
+  // deployment access can read. An SMTP reply also quotes the recipient, so the
+  // reply text itself must not be logged either.
+  assert.doesNotMatch(route, /secretChars/u);
+  assert.doesNotMatch(route, /transport\.user/u);
+  assert.doesNotMatch(route, /transport\.password/u);
+  assert.doesNotMatch(route, /error\.message\.slice/u);
+  assert.match(route, /delivery failed \(\$\{stage\}\)/u);
+  assert.match(route, /\/\^SMTP_\[A-Z_\]\+\/u\.exec\(error\.message\)/u);
+});
+
+test('the hook body is bounded by the bytes read, not by a declared length', () => {
+  // `Content-Length` is attacker-controlled and optional. Reading the body with
+  // `request.text()` first meant an unsigned caller could stream any amount of
+  // data into memory before the signature was checked.
+  assert.doesNotMatch(route, /await request\.text\(\)/u);
+  assert.match(route, /readBoundedText\(request, HOOK_BODY_MAX_BYTES\)/u);
+  assert.match(route, /RequestBodyError/u);
+});
+
+test('a webhook secret too short to be one is refused', () => {
+  // `whsec_=` decodes to an empty HMAC key, which verifies a signature anybody
+  // can compute. Supabase issues 32 bytes; anything shorter is hand-written.
+  // A weak entry is dropped rather than thrown, so it cannot silence the
+  // healthy half of a rotation pair; if nothing survives, the route answers
+  // SEND_EMAIL_HOOK_NOT_CONFIGURED and accepts no unsigned call.
+  assert.match(hook, /MINIMUM_HOOK_SECRET_BYTES = 32/u);
+  assert.match(hook, /\.filter\(\(secret\) => secret\.byteLength >= MINIMUM_HOOK_SECRET_BYTES\)/u);
+  assert.match(route, /secrets\.length === 0[\s\S]*SEND_EMAIL_HOOK_NOT_CONFIGURED/u);
+});

@@ -10,6 +10,7 @@ import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { isAppLocale, type AppLocale } from '@/i18n/config';
+import { SENSITIVE_API_CACHE_HEADERS } from '@/lib/security/no-store';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -56,9 +57,11 @@ type ServiceRpcClient = {
 
 function securityHeaders() {
   return {
-    'Cache-Control': 'private, no-store, max-age=0',
+    // `Cache-Control: private` is advisory for a shared cache. Without the two
+    // CDN directives a licensed course PDF could be retained at the edge and
+    // served to somebody who never passed the access check.
+    ...SENSITIVE_API_CACHE_HEADERS,
     'Cross-Origin-Resource-Policy': 'same-origin',
-    'Referrer-Policy': 'same-origin',
     Vary: 'Cookie',
     'X-Content-Type-Options': 'nosniff',
     'X-Robots-Tag': 'noindex, nofollow, noarchive',
@@ -82,7 +85,9 @@ function blockedResponse(status: 401 | 403 | 404 | 429 | 503, retryAfter?: numbe
 }
 
 function isAsset(value: string): value is Asset {
-  return value in ASSETS;
+  // `in` walks the prototype chain, so `constructor` and `toString` used to
+  // pass as asset names and reach the authorization path.
+  return Object.hasOwn(ASSETS, value);
 }
 
 function isSafeStoragePath(value: unknown): value is string {
