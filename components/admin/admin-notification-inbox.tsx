@@ -256,8 +256,13 @@ function parsePage(value: unknown): AdminNotificationPage | null {
   ) {
     return null;
   }
-  const items = value.items.map(parseEvent);
-  if (items.some((event) => event === null)) return null;
+  // One record this build does not recognise — a notification type shipped by a
+  // newer deployment, a legacy payload — used to blank the whole page: the
+  // administrator saw an empty inbox rather than the notifications that parsed
+  // perfectly well. Unknown records are dropped instead.
+  const items = value.items
+    .map(parseEvent)
+    .filter((event): event is NonNullable<typeof event> => event !== null);
   if (
     value.nextCursor !== null &&
     (!isRecord(value.nextCursor) ||
@@ -533,12 +538,16 @@ function useInbox() {
 function dateTime(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'время недоступно';
-  return new Intl.DateTimeFormat('ru-RU', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-    timeZone: 'Asia/Oral',
-  }).format(date);
+  return NOTIFICATION_DATE_TIME.format(date);
 }
+
+// Built once. A poll every sixty seconds used to rebuild one formatter per
+// notification, and every administrative action re-rendered the whole list.
+const NOTIFICATION_DATE_TIME = new Intl.DateTimeFormat('ru-RU', {
+  dateStyle: 'short',
+  timeStyle: 'short',
+  timeZone: 'Asia/Oral',
+});
 
 function eventPresentation(event: AdminNotificationEvent) {
   switch (event.type) {

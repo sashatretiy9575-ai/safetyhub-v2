@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
@@ -61,6 +61,9 @@ function accountIdentifier(item: AdminAccountApprovalItem) {
   return item.username ? `Логин: ${item.username}` : (item.email ?? 'Вход по логину и паролю');
 }
 
+/** Long enough to coalesce a burst of decisions into one server round trip. */
+const QUEUE_REFRESH_DEBOUNCE_MS = 1_500;
+
 export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalItem[] }) {
   const router = useRouter();
   const [reasons, setReasons] = useState<Record<string, string>>({});
@@ -78,17 +81,36 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
   const resolvedIdsRef = useRef(new Set<string>());
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const refreshQueue = (immediate = false) => {
+  // B4-14: the pending refresh survived unmount and called `router.refresh()`
+  // on a page the operator had already left.
+  useEffect(
+    () => () => {
+      if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    },
+    [],
+  );
+
+  const refreshQueueNow = () => {
     requestAdminNotificationRefresh();
-    if (immediate) {
-      router.refresh();
-      return;
-    }
+    if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+    refreshTimerRef.current = null;
+    router.refresh();
+  };
+
+  const refreshQueueSoon = () => {
+    requestAdminNotificationRefresh();
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
     refreshTimerRef.current = setTimeout(() => {
+      refreshTimerRef.current = null;
       router.refresh();
-    }, 1500);
+    }, QUEUE_REFRESH_DEBOUNCE_MS);
   };
+
+  // B4-45: `refreshQueue(true)` said nothing about what `true` meant at the
+  // call site.
+  const refreshQueue = (immediate = false) =>
+    immediate ? refreshQueueNow() : refreshQueueSoon();
 
   const reportUnconfirmedResult = (idempotencyKey: string) => {
     setMessage(unconfirmedResultMessage);

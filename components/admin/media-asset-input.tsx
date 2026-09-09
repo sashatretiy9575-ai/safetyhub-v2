@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ImageSquare, Trash, UploadSimple, X } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,17 +62,25 @@ export function MediaAssetInput({
     setPreviewFailed(false);
   }, [value]);
 
-  const load = async () => {
-    const result = await clientRequest('/api/admin/content-assets');
+  const load = useCallback(async (signal?: AbortSignal) => {
+    const result = await clientRequest('/api/admin/content-assets', {}, { signal });
+    if (signal?.aborted) return;
     const payload = await readClientResponseJson<{ items?: Asset[] }>(result.response);
+    if (signal?.aborted) return;
     if (!result.ok || !payload?.items) throw new Error('MEDIA_LIBRARY_UNAVAILABLE');
     setAssets(payload.items.filter((asset) => asset.status === 'active'));
-  };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
-    void load().catch(() => setError('Не удалось загрузить медиатеку.'));
-  }, [open]);
+    // The request outlived the dialog: closing the library left it running and
+    // its result landed on an unmounted component.
+    const controller = new AbortController();
+    void load(controller.signal).catch(() => {
+      if (!controller.signal.aborted) setError('Не удалось загрузить медиатеку.');
+    });
+    return () => controller.abort();
+  }, [load, open]);
 
   const upload = async (file: File) => {
     setBusy(true);

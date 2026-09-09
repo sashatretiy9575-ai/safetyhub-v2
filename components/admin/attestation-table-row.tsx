@@ -36,17 +36,21 @@ const CELL = '@min-[760px]:border-l @min-[760px]:border-[var(--color-border)] @m
  * for the same instant whenever they differ, which React reports as a
  * hydration mismatch and forces a client-side re-render of the whole tree.
  */
+// One formatter for the whole table rather than one per cell per render. The
+// time zone is fixed on purpose: see the note above about hydration.
+const COMPACT_DATE_TIME = new Intl.DateTimeFormat('ru-RU', {
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: 'Asia/Oral',
+});
+
 function compactDateTime(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '—';
-  return date.toLocaleString('ru-RU', {
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Asia/Oral',
-  });
+  return COMPACT_DATE_TIME.format(date);
 }
 
 export function AttestationTableRow({

@@ -111,6 +111,16 @@ export function apiError(error: unknown) {
   ) {
     return NextResponse.json({ error: 'CONFLICT' }, { status: 409 });
   }
+  // Codes the operator interface explains in its own words. They have to keep
+  // their identity: collapsing them into PROTECTED_OPERATION left the panel
+  // unable to say which of its buttons is refusing and why.
+  for (const code of [
+    'IDEMPOTENCY_KEY_REUSED',
+    'LAST_ACTIVE_ADMIN_PROTECTED',
+    'CANNOT_DELETE_SELF',
+  ]) {
+    if (message.includes(code)) return NextResponse.json({ error: code }, { status: 409 });
+  }
   if (
     message.includes('LAST_SUPERADMIN') ||
     message.includes('CANNOT_') ||

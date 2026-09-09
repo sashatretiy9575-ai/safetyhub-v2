@@ -29,16 +29,27 @@ export function formatDate(date: Date | string, locale = 'ru'): string {
   }).format(d);
 }
 
+/**
+ * Formatters are cached per locale. Constructing one is the expensive part of
+ * `Intl`, and these functions are called once per table cell on every render.
+ */
+const dateTimeFormatters = new Map<string, Intl.DateTimeFormat>();
+
 export function formatDateTime(date: Date | string, locale = 'ru'): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  return new Intl.DateTimeFormat(locale, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: SAFETYHUB_TIME_ZONE,
-  }).format(d);
+  let formatter = dateTimeFormatters.get(locale);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: SAFETYHUB_TIME_ZONE,
+    });
+    dateTimeFormatters.set(locale, formatter);
+  }
+  return formatter.format(d);
 }
 
 export function generateCertificateNumber(): string {

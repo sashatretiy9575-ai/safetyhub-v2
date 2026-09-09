@@ -167,14 +167,19 @@ function findCompanyTypoWarnings(rows: AdminAttestationRow[]) {
     typoCount: number;
   }> = [];
 
+  // Normalized once per company rather than once per pair: with 500 selected
+  // rows the inner loop repeated the same lowercasing and regex a quarter of a
+  // million times, and it runs while the operator waits for the dialog.
+  const normalized = orgs.map((org) => org.toLowerCase().replace(/[\s\-_"«»]/g, ''));
+
   for (let i = 0; i < orgs.length; i++) {
     const a = orgs[i];
     if (!a) continue;
     for (let j = i + 1; j < orgs.length; j++) {
       const b = orgs[j];
       if (!b) continue;
-      const normA = a.toLowerCase().replace(/[\s\-_"«»]/g, '');
-      const normB = b.toLowerCase().replace(/[\s\-_"«»]/g, '');
+      const normA = normalized[i] ?? '';
+      const normB = normalized[j] ?? '';
       if (
         normA !== normB &&
         (normA.includes(normB) || normB.includes(normA) || levenshteinDistance(normA, normB) <= 2)
@@ -224,10 +229,25 @@ export function AttestationsManager({
   const closeBulkActions = useCallback(() => setBulkActionsOpen(false), []);
   const idempotencyKeyRef = useRef('');
   const purgeKeysRef = useRef<string[]>([]);
+  const purgeSignatureRef = useRef('');
   const exportAbortRef = useRef<AbortController | null>(null);
+  const selectionRequestRef = useRef(0);
+  const selectionAbortRef = useRef<AbortController | null>(null);
   useEffect(() => {
     setClientReady(true);
   }, []);
+  useEffect(
+    () => () => {
+      // Leaving the page must stop the work it started: the certificate worker
+      // keeps rendering PDFs otherwise, and finishes by starting a download on
+      // a screen the operator has already left.
+      exportAbortRef.current?.abort();
+      exportAbortRef.current = null;
+      selectionAbortRef.current?.abort();
+      selectionAbortRef.current = null;
+    },
+    [],
+  );
   useEffect(() => {
     idempotencyKeyRef.current = pending ? crypto.randomUUID() : '';
   }, [pending]);
@@ -300,17 +320,35 @@ export function AttestationsManager({
     visibleIds: string[],
     successMessage: (selection: AdminAttestationSelection) => string,
   ) => {
+    // Every resolution is numbered, and only the newest one may write state.
+    // Without this the slower of two clicks won, and the row identifiers behind
+    // "delete" belonged to a company the operator was no longer looking at.
+    const requestId = selectionRequestRef.current + 1;
+    selectionRequestRef.current = requestId;
+    selectionAbortRef.current?.abort();
+    const controller = new AbortController();
+    selectionAbortRef.current = controller;
     setSelectingAll(true);
-    setMessage('');
+    setMessage('Разрешаем выборку по фильтру…');
+    // The stale selection is cleared up front: showing the previous company's
+    // count next to a new company's name is how the wrong rows get confirmed.
+    setResolvedSelection(null);
+    setSelected(new Set());
     try {
-      const result = await clientRequest('/api/admin/attestations/selection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(selectionFilters),
-      });
+      const result = await clientRequest(
+        '/api/admin/attestations/selection',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(selectionFilters),
+        },
+        { signal: controller.signal },
+      );
+      if (requestId !== selectionRequestRef.current) return null;
       const payload = await readClientResponseJson<AdminAttestationSelection | { error?: string }>(
         result.response,
       );
+      if (requestId !== selectionRequestRef.current) return null;
       if (!result.ok || !payload || !('attestationIds' in payload)) {
         // The server answers 409 when the filter matches more rows than one
         // operation may carry; that is an instruction to narrow the filter, not
@@ -324,15 +362,18 @@ export function AttestationsManager({
               ? 'Сервер вернул неполный список.'
               : clientRequestMessage(result.error, 'Не удалось выбрать строки по фильтру.'),
         );
-        return;
+        return null;
       }
       setResolvedSelection(payload);
       setSelected(new Set(visibleIds));
       setMessage(successMessage(payload));
+      return payload;
     } catch (requestError) {
+      if (requestId !== selectionRequestRef.current) return null;
       setMessage(clientRequestMessage(requestError, 'Не удалось выбрать строки по фильтру.'));
+      return null;
     } finally {
-      setSelectingAll(false);
+      if (requestId === selectionRequestRef.current) setSelectingAll(false);
     }
   };
 
@@ -356,7 +397,7 @@ export function AttestationsManager({
       return;
     }
     const groupRows = page.items.filter((row) => organizationGroupKey(row.organization) === key);
-    await resolveFilteredSelection(
+    return resolveFilteredSelection(
       { ...filters, organization },
       groupRows.map((row) => row.recordId),
       (selection) =>
@@ -516,8 +557,13 @@ export function AttestationsManager({
       chunks.push(userIds.slice(offset, offset + ADMIN_PURGE_BULK_LIMIT));
     }
     // One stable key per chunk, so a retry of the same click replays instead of
-    // deleting twice.
-    if (purgeKeysRef.current.length !== chunks.length) {
+    // deleting twice. The keys are tied to what they authorize: the database
+    // refuses a key replayed with a different request, so keying only on the
+    // chunk count meant that editing the reason and pressing delete again hit
+    // IDEMPOTENCY_KEY_REUSED forever, with no way out but a page reload.
+    const purgeSignature = `${reason}::${userIds.join(',')}`;
+    if (purgeSignatureRef.current !== purgeSignature) {
+      purgeSignatureRef.current = purgeSignature;
       purgeKeysRef.current = chunks.map(() => crypto.randomUUID());
     }
     const items: AdminAttestationMutationItem[] = [];
@@ -542,19 +588,40 @@ export function AttestationsManager({
           items?: AdminAttestationMutationItem[];
         }>(result.response);
         if (!result.ok || !payload?.items) {
+          if (payload?.error === 'IDEMPOTENCY_KEY_REUSED') {
+            // The keys no longer match what is being asked for. Dropping them
+            // lets the next attempt through instead of repeating forever.
+            purgeKeysRef.current = [];
+            purgeSignatureRef.current = '';
+          }
           const fallback =
             payload?.error === 'LAST_ACTIVE_ADMIN_PROTECTED'
               ? 'Нельзя удалить последнего администратора.'
               : payload?.error === 'CANNOT_DELETE_SELF'
                 ? 'Нельзя удалить собственный аккаунт.'
-                : 'Удаление не выполнено. Обновите страницу и проверьте список.';
+                : payload?.error === 'IDEMPOTENCY_KEY_REUSED'
+                  ? 'Запрос изменился. Нажмите «Удалить» ещё раз.'
+                  : 'Удаление не выполнено. Обновите страницу и проверьте список.';
           setError(result.ok ? fallback : clientRequestMessage(result.error, fallback));
+          if (items.length > 0) {
+            // Earlier chunks already deleted people. Reporting "nothing
+            // happened" and leaving the list untouched made the operator delete
+            // them a second time.
+            const partial = mutationSummary(items, 'bulk-delete');
+            setMessage(
+              `${partial.headline} Обработано пачек: ${index} из ${chunks.length}. Выделение сохранено — повторите удаление, чтобы завершить остальные.`,
+            );
+            setMessageReasons(partial.reasons);
+            setDetail(null);
+            router.refresh();
+          }
           return;
         }
         items.push(...payload.items);
       }
       const summary = mutationSummary(items, 'bulk-delete');
       purgeKeysRef.current = [];
+      purgeSignatureRef.current = '';
       setPending(null);
       setDetail(null);
       clearSelection();
@@ -902,6 +969,7 @@ export function AttestationsManager({
                             ? 'Снять выделение с компании'
                             : 'Выбрать всех сотрудников этой компании'
                         }
+                        disabled={selectingAll || busy}
                         onClick={() =>
                           void setOrganizationGroupSelected(row.organization, !groupFullySelected)
                         }
@@ -937,6 +1005,7 @@ export function AttestationsManager({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
+                            disabled={selectingAll || busy}
                             onSelect={() =>
                               void setOrganizationGroupSelected(row.organization, true)
                             }
@@ -944,9 +1013,19 @@ export function AttestationsManager({
                             Выбрать всю компанию
                           </DropdownMenuItem>
                           <DropdownMenuItem
+                            disabled={selectingAll || busy}
                             onSelect={() => {
-                              void setOrganizationGroupSelected(row.organization, true);
-                              setPending({ kind: 'bulk-update', field: 'organization' });
+                              // The dialog used to open before the selection had
+                              // resolved: it reported "0 чел." and the request
+                              // behind it was refused as INVALID_REQUEST.
+                              void (async () => {
+                                const selection = await setOrganizationGroupSelected(
+                                  row.organization,
+                                  true,
+                                );
+                                if (!selection) return;
+                                setPending({ kind: 'bulk-update', field: 'organization' });
+                              })();
                             }}
                           >
                             Изменить название компании
