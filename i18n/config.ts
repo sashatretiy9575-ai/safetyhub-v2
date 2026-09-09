@@ -52,14 +52,6 @@ export const OPEN_GRAPH_LOCALE_BY_LOCALE = {
   zh: 'zh_CN',
 } as const satisfies Record<AppLocale, string>;
 
-const LANGUAGE_ALIASES = {
-  ru: 'ru',
-  kk: 'kk',
-  kz: 'kk',
-  en: 'en',
-  zh: 'zh',
-} as const satisfies Record<string, AppLocale>;
-
 const NON_LOCALIZED_PREFIXES = [
   '/admin',
   '/api',
@@ -150,46 +142,6 @@ export function localizePathname(pathname: string, locale: AppLocale) {
   const routePathname = splitLocalePathname(pathname).pathname;
   if (!isLocaleRoutablePath(routePathname) || locale === DEFAULT_LOCALE) return routePathname;
   return routePathname === '/' ? `/${locale}` : `/${locale}${routePathname}`;
-}
-
-export function localeFromAcceptLanguage(value: string | null | undefined): AppLocale {
-  if (!value) return DEFAULT_LOCALE;
-
-  const candidates = value
-    .split(',')
-    .map((entry, index) => {
-      const [languageRange = '', ...parameters] = entry.trim().split(';');
-      const qualityParameter = parameters.find((parameter) => parameter.trim().startsWith('q='));
-      const parsedQuality = qualityParameter
-        ? Number.parseFloat(qualityParameter.trim().slice(2))
-        : 1;
-      return {
-        languageRange: languageRange.toLowerCase(),
-        quality: Number.isFinite(parsedQuality) ? Math.max(0, Math.min(1, parsedQuality)) : 0,
-        index,
-      };
-    })
-    .filter(({ languageRange, quality }) => languageRange !== '*' && quality > 0)
-    .sort((left, right) => right.quality - left.quality || left.index - right.index);
-
-  for (const { languageRange } of candidates) {
-    const baseLanguage = languageRange.split('-')[0] ?? '';
-    const locale = LANGUAGE_ALIASES[baseLanguage as keyof typeof LANGUAGE_ALIASES];
-    if (locale) return locale;
-  }
-
-  return DEFAULT_LOCALE;
-}
-
-export function resolvePreferredLocale(input: {
-  pathname: string;
-  localeCookie?: string | null;
-  acceptLanguage?: string | null;
-}) {
-  const path = splitLocalePathname(input.pathname);
-  if (path.hasLocalePrefix) return path.locale;
-  if (isAppLocale(input.localeCookie)) return input.localeCookie;
-  return localeFromAcceptLanguage(input.acceptLanguage);
 }
 
 export function htmlLanguage(locale: AppLocale) {

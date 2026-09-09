@@ -1,12 +1,17 @@
 import { Clock, MapPin } from '@phosphor-icons/react/dist/ssr';
 import { ContactActions } from '@/components/shared/contact-actions';
 import { Container } from '@/components/ui/container';
-import { CONTACT_DETAILS } from '@/lib/constants';
 import { getSiteContacts } from '@/lib/site-contacts';
 import { getTranslations } from 'next-intl/server';
 
 export async function ContactCta() {
-  const [contacts, t] = await Promise.all([getSiteContacts(), getTranslations('Home.contact')]);
+  const [contacts, t, shell] = await Promise.all([
+    getSiteContacts(),
+    getTranslations('Home.contact'),
+    // The city and the hours are facts, not decoration, and the footer already
+    // states them in every locale.
+    getTranslations('Shell.footer'),
+  ]);
   return (
     <section
       id="contacts"
@@ -46,7 +51,7 @@ export async function ContactCta() {
                 className="shrink-0 text-[var(--color-primary)]"
                 aria-hidden="true"
               />
-              <span className="text-[15px]">{CONTACT_DETAILS.city}</span>
+              <span className="text-[15px]">{shell('city')}</span>
             </div>
             <div className="flex min-h-11 items-center gap-2.5 border-b border-[var(--color-border)] py-2 sm:border-b-0">
               <Clock
@@ -55,7 +60,7 @@ export async function ContactCta() {
                 className="shrink-0 text-[var(--color-primary)]"
                 aria-hidden="true"
               />
-              <span className="text-[15px]">{CONTACT_DETAILS.hours}</span>
+              <span className="text-[15px]">{shell('hours')}</span>
             </div>
           </div>
         </div>

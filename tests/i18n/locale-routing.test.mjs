@@ -6,10 +6,8 @@ import {
   htmlLanguage,
   isLocaleRoutablePath,
   localeAlternates,
-  localeFromAcceptLanguage,
   localesForLanguageSwitcher,
   localizePathname,
-  resolvePreferredLocale,
   splitLocalePathname,
 } from '../../i18n/config.ts';
 
@@ -131,30 +129,16 @@ test('language switcher exposes only locale routes enabled for the active page',
   assert.match(deferredSwitcher, /<LocaleFlag locale=\{locale\}/u);
 });
 
-test('explicit URL, cookie and weighted Accept-Language detection are deterministic', () => {
-  assert.equal(localeFromAcceptLanguage('de-DE, zh-CN;q=0.9, en;q=0.8'), 'zh');
-  assert.equal(localeFromAcceptLanguage('ru;q=0.4, kk-KZ;q=0.9'), 'kk');
-  assert.equal(localeFromAcceptLanguage('fr-FR,*;q=0.5'), 'ru');
-  assert.equal(
-    resolvePreferredLocale({
-      pathname: '/zh/topics',
-      localeCookie: 'en',
-      acceptLanguage: 'kk-KZ',
-    }),
-    'zh',
-  );
-  assert.equal(
-    resolvePreferredLocale({ pathname: '/topics', localeCookie: 'en', acceptLanguage: 'kk-KZ' }),
-    'en',
-  );
-  assert.equal(
-    resolvePreferredLocale({
-      pathname: '/topics',
-      localeCookie: 'invalid',
-      acceptLanguage: 'kk-KZ',
-    }),
-    'kk',
-  );
+test('nothing negotiates a locale from Accept-Language', async () => {
+  // The prefix decides, and the unprefixed root is Russian unless the cookie the
+  // language switcher writes says otherwise. A negotiator existed, was exported,
+  // and was called by this test and by nothing else — which meant a test was the
+  // only thing keeping it alive, and a reader could reasonably believe the proxy
+  // honoured Accept-Language.
+  const config = await read('i18n/config.ts');
+  assert.doesNotMatch(config, /localeFromAcceptLanguage|resolvePreferredLocale|LANGUAGE_ALIASES/u);
+  const proxy = await read('proxy.ts');
+  assert.doesNotMatch(proxy, /accept-language/iu);
 });
 
 test('metadata helpers emit localized canonical, hreflang and Open Graph contracts', async () => {
@@ -251,5 +235,5 @@ test('proxy composes locale routing ahead of the existing Supabase/CSP gate', as
   assert.match(rootDocument, /translate="no"/u);
   assert.match(rootDocument, /className="notranslate"/u);
   assert.match(seo, /google:\s*'notranslate'/u);
-  assert.match(rootDocument, /noto-sans-sc-ui\.da2f47be\.woff2/u);
+  assert.match(rootDocument, /noto-sans-sc-ui\.b533a0e8\.woff2/u);
 });

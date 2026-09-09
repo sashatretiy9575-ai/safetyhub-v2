@@ -43,8 +43,9 @@ test('countdown derives from the deadline after a suspended tab skips interval t
 });
 
 test('retry delay is rendered compactly for seconds, minutes, and hours', () => {
-  assert.equal(formatRetryDelay(9), '9 с');
-  assert.equal(formatRetryDelay(60), '1 мин');
-  assert.equal(formatRetryDelay(125), '2 мин 5 с');
-  assert.equal(formatRetryDelay(3600), '1 ч');
+  const ru = { second: 'с', minute: 'мин', hour: 'ч' };
+  assert.equal(formatRetryDelay(9, ru), '9 с');
+  assert.equal(formatRetryDelay(60, ru), '1 мин');
+  assert.equal(formatRetryDelay(125, ru), '2 мин 5 с');
+  assert.equal(formatRetryDelay(3600, ru), '1 ч');
 });

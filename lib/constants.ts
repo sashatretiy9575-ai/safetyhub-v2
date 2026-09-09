@@ -6,11 +6,6 @@ export const BRAND = {
   country: 'Казахстан',
 } as const;
 
-export const CONTACT_DETAILS = {
-  city: 'Казахстан, г. Алматы',
-  hours: 'Пн–Пт, 09:00–18:00',
-} as const;
-
 export const ROUTES = {
   home: '/',
   topics: '/topics',

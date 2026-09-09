@@ -20,7 +20,9 @@ test('approval status uses a calm, minute-resolution status strip instead of nes
   assert.match(status, /t\('deadline', \{ deadline: dueLabel \}\)/);
   assert.doesNotMatch(status, /<Card|<CardContent/);
   assert.equal(ru.Approval.deadline, 'Ответим до {deadline}');
-  assert.equal(ru.Approval.remainingValue, '{hours} ч {minutes} мин');
+  // The spaces before the units are U+00A0: nothing in four catalogs held a
+  // number to its unit, so «ч» and «мин» wrapped to the next line on a phone.
+  assert.equal(ru.Approval.remainingValue, '{hours} ч {minutes} мин');
   assert.equal(ru.Approval.countdownHint, undefined);
 });
 

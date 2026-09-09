@@ -3,6 +3,7 @@
 import { SignIn, UserPlus } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,13 +33,10 @@ type Fields = {
 };
 type FieldErrors = Partial<Record<keyof Fields, string>>;
 
-const LOGIN_FAILURE = '用户名或密码不正确，或账户暂时无法登录。';
-const REGISTRATION_FAILURE = '无法创建账户。请检查填写内容后重试。';
-const REGISTRATION_COMPLETE = '账号已创建。请用相同的用户名和密码继续登录。';
-const AUTO_LOGIN_PENDING = '账号已创建，正在安全登录…';
-const AUTO_LOGIN_FALLBACK = `${REGISTRATION_COMPLETE} 请点击“登录”后重试。`;
-const CAPTCHA_RETRY = '验证码验证未完成，请重新提交。';
-const UNAVAILABLE = '服务暂时不可用，请稍后重试。';
+/** The subset of AuthZh that field validation needs. */
+type ValidationCopy = (
+  key: 'usernameInvalid' | 'passwordInvalid' | 'passwordConfirmationInvalid' | 'legalRequired',
+) => string;
 
 function safeLanding(value: unknown) {
   if (typeof window !== 'undefined') {
@@ -58,7 +56,7 @@ function safeLanding(value: unknown) {
     : '/zh/profile';
 }
 
-function validationErrors(mode: Mode, fields: Fields): FieldErrors {
+function validationErrors(mode: Mode, fields: Fields, copy: ValidationCopy): FieldErrors {
   const parsed =
     mode === 'login'
       ? zhUsernamePasswordLoginSchema.safeParse(fields)
@@ -69,19 +67,20 @@ function validationErrors(mode: Mode, fields: Fields): FieldErrors {
   for (const issue of parsed.error.issues) {
     const field = issue.path[0];
     if (field === 'username') {
-      errors.username = '请输入 3–32 个字符的拉丁用户名（小写字母开头）。';
+      errors.username = copy('usernameInvalid');
     } else if (field === 'password') {
-      errors.password = '密码至少 12 个字符，并同时包含大小写字母和数字。';
+      errors.password = copy('passwordInvalid');
     } else if (field === 'passwordConfirmation') {
-      errors.passwordConfirmation = '两次输入的密码不一致。';
+      errors.passwordConfirmation = copy('passwordConfirmationInvalid');
     } else if (field === 'legalAccepted') {
-      errors.legalAccepted = '请先同意使用条款和隐私政策。';
+      errors.legalAccepted = copy('legalRequired');
     }
   }
   return errors;
 }
 
 export function ZhUsernamePasswordFlow() {
+  const t = useTranslations('AuthZh');
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('login');
   const isRegistration = mode === 'register';
@@ -104,6 +103,11 @@ export function ZhUsernamePasswordFlow() {
   );
   const autoLoginPendingRef = useRef(false);
   const captchaRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+  // Two messages are built once because they are reused by the CAPTCHA
+  // recovery path below, which the Turnstile lifecycle test reads by name.
+  const REGISTRATION_COMPLETE = t('registrationComplete');
+  const AUTO_LOGIN_FALLBACK = t('autoLoginFallback', { complete: REGISTRATION_COMPLETE });
+  const CAPTCHA_RETRY = t('captchaRetry');
 
   const setAutomaticLoginPending = useCallback((pending: boolean) => {
     autoLoginPendingRef.current = pending;
@@ -159,25 +163,31 @@ export function ZhUsernamePasswordFlow() {
         setErrors({});
         setAutomaticLoginPending(true);
         setMessageKind('status');
-        setMessage(AUTO_LOGIN_PENDING);
+        setMessage(t('autoLoginPending'));
         return;
       }
       if (!result.ok || payload?.verified !== true) {
         const unavailable = payload?.error === 'ZH_AUTH_UNAVAILABLE';
         setMessageKind('error');
-        setMessage(unavailable ? UNAVAILABLE : registering ? REGISTRATION_FAILURE : LOGIN_FAILURE);
+        setMessage(
+          unavailable
+            ? t('unavailable')
+            : registering
+              ? t('registrationFailure')
+              : t('loginFailure'),
+        );
         return;
       }
       router.replace(safeLanding(payload.redirectTo));
       router.refresh();
     } catch {
       setMessageKind('error');
-      setMessage(UNAVAILABLE);
+      setMessage(t('unavailable'));
     } finally {
       if (!automaticLoginStarted) resetCaptcha();
       setBusy(false);
     }
-  }, [fields, mode, resetCaptcha, router, setAutomaticLoginPending]);
+  }, [fields, mode, resetCaptcha, router, setAutomaticLoginPending, t]);
 
   // Effects and the Turnstile callback need the latest submission closure, but
   // mutating a ref during render is not React-safe under concurrent rendering.
@@ -210,7 +220,7 @@ export function ZhUsernamePasswordFlow() {
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     if (busy || autoLoginPending || pendingCaptchaSubmitRef.current) return;
-    const nextErrors = validationErrors(mode, fields);
+    const nextErrors = validationErrors(mode, fields, t);
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       return;
@@ -241,15 +251,13 @@ export function ZhUsernamePasswordFlow() {
         <span className="mx-auto grid size-12 place-items-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
           <Icon size={24} />
         </span>
-        <h1 className="font-display text-2xl font-bold">账号访问</h1>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          中文用户使用拉丁用户名和密码访问账号。
-        </p>
+        <h1 className="font-display text-2xl font-bold">{t('title')}</h1>
+        <p className="text-sm text-[var(--color-text-muted)]">{t('description')}</p>
       </div>
 
       <div
         role="group"
-        aria-label="账号操作"
+        aria-label={t('modeGroup')}
         className="grid grid-cols-2 gap-1 rounded-[var(--radius-control)] bg-[var(--color-surface-muted)] p-1"
       >
         <button
@@ -259,7 +267,7 @@ export function ZhUsernamePasswordFlow() {
           onClick={() => chooseMode('login')}
           className={`min-h-10 rounded-[calc(var(--radius-control)-2px)] px-3 text-sm font-semibold transition-colors ${!isRegistration ? 'bg-[var(--color-surface)] text-[var(--color-text)] shadow-sm' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'}`}
         >
-          登录
+          {t('login')}
         </button>
         <button
           type="button"
@@ -268,13 +276,13 @@ export function ZhUsernamePasswordFlow() {
           onClick={() => chooseMode('register')}
           className={`min-h-10 rounded-[calc(var(--radius-control)-2px)] px-3 text-sm font-semibold transition-colors ${isRegistration ? 'bg-[var(--color-surface)] text-[var(--color-text)] shadow-sm' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'}`}
         >
-          创建访问账号
+          {t('register')}
         </button>
       </div>
 
       <form className="space-y-4" noValidate onSubmit={submit}>
         <div className="space-y-2">
-          <Label htmlFor={`zh-${mode}-username`}>拉丁用户名</Label>
+          <Label htmlFor={`zh-${mode}-username`}>{t('usernameLabel')}</Label>
           <Input
             id={`zh-${mode}-username`}
             autoComplete="username"
@@ -290,13 +298,13 @@ export function ZhUsernamePasswordFlow() {
             required
           />
           <p id="zh-username-help" className="text-xs text-[var(--color-text-muted)]">
-            3–32 个字符；以小写英文字母开头，可使用数字、点、下划线或连字符。
+            {t('usernameHint')}
           </p>
           <FieldError id={`zh-${mode}-username-error`} message={errors.username} />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor={`zh-${mode}-password`}>密码</Label>
+          <Label htmlFor={`zh-${mode}-password`}>{t('passwordLabel')}</Label>
           <Input
             id={`zh-${mode}-password`}
             type="password"
@@ -312,7 +320,7 @@ export function ZhUsernamePasswordFlow() {
           <FieldError id={`zh-${mode}-password-error`} message={errors.password} />
           {isRegistration ? (
             <p className="text-xs text-[var(--color-text-muted)]">
-              密码至少 12 个字符，最多 72 个 UTF-8 字节，并同时包含大小写字母和数字。
+              {t('passwordHint')}
             </p>
           ) : null}
         </div>
@@ -320,7 +328,9 @@ export function ZhUsernamePasswordFlow() {
         {isRegistration ? (
           <>
             <div className="space-y-2">
-              <Label htmlFor="zh-register-password-confirmation">确认密码</Label>
+              <Label htmlFor="zh-register-password-confirmation">
+                {t('passwordConfirmationLabel')}
+              </Label>
               <Input
                 id="zh-register-password-confirmation"
                 type="password"
@@ -358,15 +368,15 @@ export function ZhUsernamePasswordFlow() {
                   aria-describedby={errors.legalAccepted ? 'zh-register-legal-error' : undefined}
                 />
                 <span>
-                  我已阅读并同意{' '}
+                  {t('legalPrefix')}{' '}
                   <Link className="underline underline-offset-4" href="/zh/terms">
-                    使用条款
+                    {t('legalTerms')}
                   </Link>{' '}
-                  和{' '}
+                  {t('legalAnd')}{' '}
                   <Link className="underline underline-offset-4" href="/zh/privacy">
-                    隐私政策
+                    {t('legalPrivacy')}
                   </Link>
-                  。
+                  {t('legalSuffix')}
                 </span>
               </label>
               <FieldError id="zh-register-legal-error" message={errors.legalAccepted} />
@@ -375,7 +385,11 @@ export function ZhUsernamePasswordFlow() {
         ) : null}
 
         <Button className="min-h-11 w-full" type="submit" disabled={busy || autoLoginPending}>
-          {busy || autoLoginPending ? '请稍候…' : isRegistration ? '创建并继续' : '登录'}
+          {busy || autoLoginPending
+            ? t('submitBusy')
+            : isRegistration
+              ? t('submitRegister')
+              : t('submitLogin')}
         </Button>
       </form>
 
@@ -412,11 +426,11 @@ export function ZhUsernamePasswordFlow() {
 
       {isRegistration ? (
         <p className="text-sm leading-6 text-[var(--color-text-muted)]">
-          创建后由管理员审核。登录和审核不需要电子邮箱或电话号码。
+          {t('registerHint')}
         </p>
       ) : (
         <p className="text-sm leading-6 text-[var(--color-text-muted)]">
-          无法登录或忘记密码时，请联系管理员。管理员核验后可协助重设；没有自助找回渠道。
+          {t('loginHint')}
         </p>
       )}
     </>

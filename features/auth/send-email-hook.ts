@@ -206,6 +206,68 @@ const CODE_COPY: Record<
   },
 };
 
+/**
+ * The retirement notices, in the recipient's language.
+ *
+ * `detectLocale` has already answered for this message and the one-time-code
+ * branches above use it, but these two were written in Russian and sent the
+ * document with `lang="ru"` to everyone. The wording deliberately says the mail
+ * carries no link and no code: that is what makes a phishing copy of it stand
+ * out, so keep it in every translation, and keep supabase/templates/*.html in
+ * step with what is written here.
+ */
+const NOTICE_COPY: Record<
+  AuthEmailLocale,
+  Readonly<{
+    recoverySubject: string;
+    recoveryHeading: string;
+    recoveryLead: string;
+    recoveryHint: string;
+    inviteSubject: string;
+    inviteHeading: string;
+    inviteLead: string;
+    inviteHint: string;
+  }>
+> = {
+  en: {
+    recoverySubject: 'SafetyHub does not use passwords',
+    recoveryHeading: 'SafetyHub does not use passwords',
+    recoveryLead: 'SafetyHub has no password reset and no password setup.',
+    recoveryHint:
+      'To sign in, open SafetyHub and request a one-time code for your email. This message contains no sign-in link and no code.',
+    inviteSubject: 'Password invitations in SafetyHub are disabled',
+    inviteHeading: 'Password invitations are disabled',
+    inviteLead: 'SafetyHub uses no invitations, no passwords and no password-setup links.',
+    inviteHint:
+      'To get access, create an account or request a one-time sign-in code on the SafetyHub page. This message contains no sign-in link and no code.',
+  },
+  kk: {
+    recoverySubject: 'SafetyHub-та құпиясөз қолданылмайды',
+    recoveryHeading: 'SafetyHub-та құпиясөз қолданылмайды',
+    recoveryLead: 'SafetyHub-та құпиясөзді қалпына келтіру де, орнату да жоқ.',
+    recoveryHint:
+      'Кіру үшін SafetyHub-ты ашып, email-іңізге бір реттік код сұратыңыз. Бұл хатта кіру сілтемесі де, коды да жоқ.',
+    inviteSubject: 'SafetyHub-та құпиясөзбен шақыру өшірілген',
+    inviteHeading: 'Құпиясөзбен шақыру өшірілген',
+    inviteLead:
+      'SafetyHub-та шақырулар, құпиясөздер және құпиясөз орнату сілтемелері қолданылмайды.',
+    inviteHint:
+      'Қолжетімділік алу үшін аккаунт жасаңыз немесе SafetyHub бетінде бір реттік кіру кодын сұратыңыз. Бұл хатта кіру сілтемесі де, коды да жоқ.',
+  },
+  ru: {
+    recoverySubject: 'Пароль в SafetyHub не используется',
+    recoveryHeading: 'Пароль в SafetyHub не используется',
+    recoveryLead: 'В SafetyHub нет восстановления или установки пароля.',
+    recoveryHint:
+      'Чтобы войти, откройте SafetyHub и запросите одноразовый код на ваш email. Это письмо не содержит ссылки или кода для входа.',
+    inviteSubject: 'Приглашения с паролем в SafetyHub отключены',
+    inviteHeading: 'Приглашения с паролем отключены',
+    inviteLead: 'В SafetyHub не используются приглашения, пароли и ссылки для установки пароля.',
+    inviteHint:
+      'Для доступа создайте аккаунт или запросите одноразовый код входа на странице SafetyHub. Это письмо не содержит ссылки или кода для входа.',
+  },
+};
+
 function noticeCard(heading: string, lead: string, hint: string) {
   return [
     `      <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25">${heading}</h1>`,
@@ -240,30 +302,26 @@ export function renderAuthEmail(
           codeCard(copy.signupHeading, copy.lead, payload.token, copy.validity, copy.signupIgnore),
         ),
       };
-    case 'recovery':
+    case 'recovery': {
+      const notice = NOTICE_COPY[payload.locale];
       return {
-        subject: 'Пароль в SafetyHub не используется',
+        subject: notice.recoverySubject,
         html: page(
-          'ru',
-          noticeCard(
-            'Пароль в SafetyHub не используется',
-            'В SafetyHub нет восстановления или установки пароля.',
-            'Чтобы войти, откройте SafetyHub и запросите одноразовый код на ваш email. Это письмо не содержит ссылки или кода для входа.',
-          ),
+          payload.locale,
+          noticeCard(notice.recoveryHeading, notice.recoveryLead, notice.recoveryHint),
         ),
       };
-    case 'invite':
+    }
+    case 'invite': {
+      const notice = NOTICE_COPY[payload.locale];
       return {
-        subject: 'Приглашения с паролем в SafetyHub отключены',
+        subject: notice.inviteSubject,
         html: page(
-          'ru',
-          noticeCard(
-            'Приглашения с паролем отключены',
-            'В SafetyHub не используются приглашения, пароли и ссылки для установки пароля.',
-            'Для доступа создайте аккаунт или запросите одноразовый код входа на странице SafetyHub. Это письмо не содержит ссылки или кода для входа.',
-          ),
+          payload.locale,
+          noticeCard(notice.inviteHeading, notice.inviteLead, notice.inviteHint),
         ),
       };
+    }
     default:
       return null;
   }

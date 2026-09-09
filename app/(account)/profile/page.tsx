@@ -191,7 +191,7 @@ function CourseRow({
     item.certificateState === 'ready';
 
   return (
-    <article className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-4 py-3 first:border-t-0 md:min-h-[58px] md:grid-cols-[minmax(0,1fr)_11rem_8.5rem] md:items-center">
+    <article className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-4 py-3 first:border-t-0 md:min-h-[58px] md:grid-cols-[minmax(0,1fr)_13rem_8.5rem] md:items-center">
       <div className="min-w-0">
         <h3 className="font-semibold break-words leading-tight">{item.courseTitle}</h3>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--color-text-muted)] md:hidden">
@@ -211,7 +211,7 @@ function CourseRow({
         ) : null}
       </div>
 
-      <div className="hidden md:flex md:items-center md:gap-1.5">
+      <div className="hidden min-w-0 md:flex md:flex-wrap md:items-center md:gap-1.5">
         <Badge
           variant={
             isSpecialCertState
@@ -298,7 +298,7 @@ function LearningDashboard({
           </Button>
         </div>
         <div className="overflow-hidden rounded-2xl border bg-[var(--color-surface)]">
-          <div className="hidden min-h-10 grid-cols-[minmax(0,1fr)_11rem_8.5rem] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] md:grid">
+          <div className="hidden min-h-10 grid-cols-[minmax(0,1fr)_13rem_8.5rem] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] md:grid">
             <span>{t('course')}</span>
             <span>{t('result')}</span>
             <span className="sr-only">{t('action')}</span>

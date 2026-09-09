@@ -612,6 +612,9 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   <p className="mx-auto max-w-md rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2 text-xs text-[var(--color-text-muted)]">
                     {t('result.savedNoAnswers')}
                   </p>
+                  <p className="mx-auto max-w-md text-xs text-[var(--color-text-muted)]">
+                    {t('result.failedDescription')}
+                  </p>
                 </div>
               )}
 

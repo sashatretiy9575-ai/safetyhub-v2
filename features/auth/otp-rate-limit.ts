@@ -47,18 +47,15 @@ export function retrySecondsUntil(retryAt: number, nowMs = Date.now()) {
   return Math.max(0, Math.ceil((retryAt - nowMs) / 1000));
 }
 
-type RetryDelayLocale = 'ru' | 'kk' | 'en' | 'zh';
+export type RetryDelayUnits = Readonly<{ second: string; minute: string; hour: string }>;
 
-const RETRY_DELAY_UNITS = {
-  ru: { second: 'с', minute: 'мин', hour: 'ч' },
-  kk: { second: 'с', minute: 'мин', hour: 'сағ' },
-  en: { second: 's', minute: 'min', hour: 'h' },
-  zh: { second: '秒', minute: '分钟', hour: '小时' },
-} as const satisfies Record<RetryDelayLocale, Record<'second' | 'minute' | 'hour', string>>;
-
-export function formatRetryDelay(seconds: number, locale: RetryDelayLocale = 'ru') {
+/**
+ * The units come from AuthOtp.retryUnits, never from this module: a second copy
+ * of four translations here meant the Kazakh abbreviation for "second" was the
+ * Russian one, and nothing in the catalog tests could see it.
+ */
+export function formatRetryDelay(seconds: number, units: RetryDelayUnits) {
   const safeSeconds = Math.max(1, Math.ceil(seconds));
-  const units = RETRY_DELAY_UNITS[locale];
   if (safeSeconds < 60) return `${safeSeconds} ${units.second}`;
 
   const totalMinutes = Math.floor(safeSeconds / 60);

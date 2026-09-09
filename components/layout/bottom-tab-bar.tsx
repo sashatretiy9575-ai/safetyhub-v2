@@ -65,7 +65,9 @@ export function BottomTabBar({ accountMode }: { accountMode: AccountMode }) {
               <span className="flex h-7 items-center justify-center">
                 <Icon size={21} weight="regular" />
               </span>
-              <span className="max-w-full truncate px-0.5 text-center leading-tight">{label}</span>
+              <span className="max-w-full truncate px-0 text-center leading-tight max-[359px]:text-[9px] max-[289px]:text-[8px]">
+                {label}
+              </span>
             </Link>
           );
         })}

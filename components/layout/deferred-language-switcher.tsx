@@ -17,15 +17,20 @@ function LanguageSwitcherFallback({
   languageName: string;
 }) {
   return (
-    <button
-      type="button"
-      disabled
-      aria-label={`${label}: ${languageName}`}
-      className="inline-flex h-11 max-w-[10.5rem] items-center gap-2 rounded-[var(--radius-control)] px-2 text-left text-sm font-semibold text-[var(--color-text)]"
-    >
-      <LocaleFlag locale={locale} />
-      <span className="min-w-0 truncate">{languageName}</span>
-    </button>
+    <div className="relative shrink-0">
+      <button
+        type="button"
+        disabled
+        aria-label={`${label}: ${languageName}`}
+        className="inline-flex h-11 max-w-[10.5rem] items-center gap-2 rounded-[var(--radius-control)] px-2 text-left text-sm font-semibold text-[var(--color-text)]"
+      >
+        <LocaleFlag locale={locale} />
+        <span className="min-w-0 truncate">{languageName}</span>
+        {/* Holds the 15 px the hydrated trigger's caret occupies, without
+            pulling the icon set into the public LCP bundle. */}
+        <span aria-hidden="true" className="block size-[15px] shrink-0" />
+      </button>
+    </div>
   );
 }
 

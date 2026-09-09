@@ -30,6 +30,18 @@ type SeoOptions = {
   locale?: AppLocale;
 };
 
+/**
+ * The city, written the way each locale writes it. `BRAND.city` is Cyrillic, so
+ * the geo meta tag and the postal address in the organisation JSON-LD used to
+ * say «Алматы» on the English and Chinese pages as well.
+ */
+const LOCALIZED_CITY: Record<AppLocale, string> = {
+  ru: 'Алматы',
+  kk: 'Алматы',
+  en: 'Almaty',
+  zh: '阿拉木图',
+};
+
 export const BASE_KEYWORDS = [
   'промышленная безопасность Алматы',
   'обучение охране труда Казахстан',
@@ -123,7 +135,7 @@ export function buildMetadata({
     other: {
       google: 'notranslate',
       'geo.region': 'KZ-ALA',
-      'geo.placename': BRAND.city,
+      'geo.placename': LOCALIZED_CITY[locale],
       'geo.position': '43.2389;76.8897',
       ICBM: '43.2389, 76.8897',
     },
@@ -145,7 +157,7 @@ export function organizationJsonLd(
     description: localized?.description,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: localized?.city ?? BRAND.city,
+      addressLocality: localized?.city ?? LOCALIZED_CITY[locale],
       addressCountry: 'KZ',
     },
     contactPoint: {
@@ -266,7 +278,7 @@ export function articleJsonLd(input: {
 export function localBusinessJsonLd(
   contacts: SiteContactSettings,
   locale: AppLocale = DEFAULT_LOCALE,
-  city: string = BRAND.city,
+  city: string = LOCALIZED_CITY[DEFAULT_LOCALE],
 ) {
   return {
     '@context': 'https://schema.org',

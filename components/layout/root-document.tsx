@@ -26,7 +26,7 @@ export function RootDocument({
   // third leg of the critical path — so the first paint of every page was
   // system-font text that then reflowed into Manrope.
   if (locale === 'zh') {
-    preload('/fonts/noto-sans-sc-ui.da2f47be.woff2', {
+    preload('/fonts/noto-sans-sc-ui.b533a0e8.woff2', {
       as: 'font',
       type: 'font/woff2',
       crossOrigin: 'anonymous',

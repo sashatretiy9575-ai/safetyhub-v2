@@ -49,7 +49,7 @@ export function ThemeToggle() {
       aria-checked={isDark}
       aria-label={isDark ? translations('switchToLight') : translations('switchToDark')}
       onClick={toggleTheme}
-      className="group inline-flex size-11 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-transparent px-0 whitespace-nowrap text-[var(--color-text)] transition-[color,background-color] duration-150 hover:bg-[var(--color-surface-muted)] min-[1024px]:h-11 min-[1024px]:w-auto min-[1024px]:min-w-[6.25rem] min-[1024px]:px-2.5"
+      className="group inline-flex size-11 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-transparent px-0 whitespace-nowrap text-[var(--color-text)] transition-[color,background-color] duration-150 hover:bg-[var(--color-surface-muted)] min-[1024px]:h-11 min-[1024px]:w-[7.25rem] min-[1024px]:px-2.5"
     >
       <Sun aria-hidden="true" size={18} weight="regular" className="size-[18px] shrink-0 dark:hidden" />
       <Moon aria-hidden="true" size={18} weight="regular" className="hidden size-[18px] shrink-0 dark:block" />

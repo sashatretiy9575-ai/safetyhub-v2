@@ -1,8 +1,12 @@
 {
   "AppState": {
-    "criticalTitle": "A critical error occurred",
     "criticalDescription": "The application could not open completely. Refresh the page or return home.",
-    "digestId": "Error ID"
+    "criticalTitle": "A critical error occurred",
+    "digestId": "Error ID",
+    "errorDescription": "Some data did not load. You can try again or return to the home page.",
+    "errorTitle": "Something went wrong",
+    "notFoundDescription": "The link may be outdated or the page may have moved.",
+    "notFoundTitle": "Page not found"
   },
   "Common": {
     "retry": "Try again",

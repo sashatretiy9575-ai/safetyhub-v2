@@ -73,11 +73,12 @@ test('Chinese username/password routes are same-origin, bounded, rate-limited, a
 });
 
 test('Chinese canonical access uses only Latin username and password without client secret persistence', async () => {
-  const [flow, loginPage, registerPage, recoveryPage] = await Promise.all([
+  const [flow, loginPage, registerPage, recoveryPage, chinese] = await Promise.all([
     read('features/auth/zh-username-password-flow.tsx'),
     read('app/(account)/auth/login/page.tsx'),
     read('app/(account)/auth/register/page.tsx'),
     read('features/auth/zh-username-password-recovery-notice.tsx'),
+    read('messages/zh.json').then(JSON.parse),
   ]);
 
   assert.match(flow, /autoComplete="username"/u);
@@ -86,7 +87,10 @@ test('Chinese canonical access uses only Latin username and password without cli
   assert.match(flow, /new-password/u);
   assert.match(flow, /useRef<TurnstileHandle>\(null\)/u);
   assert.match(flow, /captchaToken,/u);
-  assert.match(flow, /管理员核验后可协助重设/u);
+  // Both screens now take their copy from the catalog, so the promise that
+  // recovery goes through an administrator is asserted where it now lives.
+  assert.match(flow, /t\('loginHint'\)/u);
+  assert.match(chinese.AuthZh.loginHint, /管理员核验后可协助重设/u);
   assert.doesNotMatch(
     flow,
     /@auth\.invalid|simplewebauthn|localStorage|sessionStorage|one-time-code|type="email"|oauth/iu,
@@ -96,7 +100,8 @@ test('Chinese canonical access uses only Latin username and password without cli
   assert.doesNotMatch(loginPage, /ZhPasskeyFlow|zhPasskey/u);
   assert.match(registerPage, /redirect\(localizePathname\('\/auth\/login', locale\)\)/u);
   assert.doesNotMatch(registerPage, /ZhUsernamePasswordFlow|ZhPasskeyFlow|zhPasskey/u);
-  assert.match(recoveryPage, /没有自助恢复渠道/u);
+  assert.match(recoveryPage, /t\('zhRecoveryDescription'\)/u);
+  assert.match(chinese.AuthOtp.zhRecoveryDescription, /没有自助恢复渠道/u);
   assert.doesNotMatch(recoveryPage, /type="email"|one-time-code|simplewebauthn/iu);
 });
 

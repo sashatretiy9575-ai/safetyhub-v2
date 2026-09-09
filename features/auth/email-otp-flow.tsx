@@ -160,6 +160,13 @@ export function EmailOtpFlow() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('AuthOtp');
+  // The countdown units used to live in a second table inside
+  // features/auth/otp-rate-limit.ts, out of reach of the catalog tests.
+  const retryUnits = {
+    second: t('retryUnits.second'),
+    minute: t('retryUnits.minute'),
+    hour: t('retryUnits.hour'),
+  };
   const legalT = useTranslations('LegalFlow');
   const errorT = useTranslations('Common.errors');
   const [stage, setStage] = useState<EmailOtpStage>('email');
@@ -445,11 +452,11 @@ export function EmailOtpFlow() {
   const visibleError =
     error === SEND_RATE_LIMITED_ERROR
       ? sendRetrySeconds > 0
-        ? t('sendLimit', { delay: formatRetryDelay(sendRetrySeconds, locale) })
+        ? t('sendLimit', { delay: formatRetryDelay(sendRetrySeconds, retryUnits) })
         : t('sendLimitExpired')
       : error === VERIFY_RATE_LIMITED_ERROR
         ? verifyRetrySeconds > 0
-          ? t('verifyLimit', { delay: formatRetryDelay(verifyRetrySeconds, locale) })
+          ? t('verifyLimit', { delay: formatRetryDelay(verifyRetrySeconds, retryUnits) })
           : t('verifyLimitExpired')
         : error;
 
@@ -534,7 +541,7 @@ export function EmailOtpFlow() {
             {busy === 'send'
               ? t('sending')
               : sendRetrySeconds > 0
-                ? t('retryIn', { delay: formatRetryDelay(sendRetrySeconds, locale) })
+                ? t('retryIn', { delay: formatRetryDelay(sendRetrySeconds, retryUnits) })
                 : t('send')}
           </Button>
           <Button
@@ -651,7 +658,7 @@ export function EmailOtpFlow() {
             {busy === 'verify'
               ? t('verifying')
               : verifyRetrySeconds > 0
-                ? t('retryIn', { delay: formatRetryDelay(verifyRetrySeconds, locale) })
+                ? t('retryIn', { delay: formatRetryDelay(verifyRetrySeconds, retryUnits) })
                 : t('verify')}
           </Button>
           {captchaWidget}
@@ -664,7 +671,7 @@ export function EmailOtpFlow() {
               onClick={requestCode}
             >
               {sendRetrySeconds > 0
-                ? t('resendIn', { delay: formatRetryDelay(sendRetrySeconds, locale) })
+                ? t('resendIn', { delay: formatRetryDelay(sendRetrySeconds, retryUnits) })
                 : t('resend')}
             </Button>
             <Button

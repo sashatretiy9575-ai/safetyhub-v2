@@ -37,7 +37,7 @@ export function ProcessTimeline() {
           {steps.map(({ icon: Icon, title, text }, index) => (
             <article
               key={title}
-              className="relative flex h-[12.5rem] flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/72 p-5 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl min-[1200px]:h-[12rem] min-[1200px]:p-6"
+              className="relative flex h-full min-h-[12.5rem] flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/72 p-5 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl min-[1200px]:min-h-[12rem] min-[1200px]:p-6"
             >
               <span
                 aria-hidden="true"

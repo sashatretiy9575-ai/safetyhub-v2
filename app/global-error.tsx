@@ -4,13 +4,8 @@ import { useEffect, useState } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { AppErrorState } from '@/components/shared/app-state';
 import { reportAppError } from '@/lib/observability';
-import {
-  BUSINESS_TIME_ZONE,
-  htmlLanguage,
-  isAppLocale,
-  splitLocalePathname,
-  type AppLocale,
-} from '@/i18n/config';
+import { BUSINESS_TIME_ZONE, htmlLanguage, type AppLocale } from '@/i18n/config';
+import { emergencyLocale } from '@/i18n/emergency-locale';
 import ruMessages from '@/messages/global-error/ru.json';
 import kkMessages from '@/messages/global-error/kk.json';
 import enMessages from '@/messages/global-error/en.json';
@@ -22,17 +17,6 @@ const MESSAGE_CATALOGS = {
   en: enMessages,
   zh: zhMessages,
 } as const;
-
-function emergencyLocale(): AppLocale {
-  if (typeof window === 'undefined') return 'ru';
-  const pathnameLocale = splitLocalePathname(window.location.pathname);
-  if (pathnameLocale.hasLocalePrefix) return pathnameLocale.locale;
-  const cookieLocale = document.cookie
-    .split(';')
-    .map((entry) => entry.trim().split('='))
-    .find(([name]) => name === 'safetyhub-locale')?.[1];
-  return isAppLocale(cookieLocale) ? cookieLocale : 'ru';
-}
 
 export default function GlobalError({
   error,
