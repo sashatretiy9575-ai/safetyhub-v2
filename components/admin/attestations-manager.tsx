@@ -897,7 +897,7 @@ export function AttestationsManager({
                           aria-hidden
                           className={`grid size-4 shrink-0 place-items-center rounded-[4px] border text-[10px] leading-none ${
                             groupFullySelected
-                              ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white'
+                              ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
                               : 'border-[var(--color-border-strong)]'
                           }`}
                         >

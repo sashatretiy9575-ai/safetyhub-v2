@@ -105,7 +105,7 @@ test('the quiz explains approval denial and sends the learner to their status', 
   assert.match(client, /const approvalAction = errorCode === 'ACCOUNT_APPROVAL_REQUIRED';/);
   assert.match(
     client,
-    /router\.push\(localizePathname\('\/profile', locale\)\)[\s\S]*t\('openApproval'\)/,
+    /<Link href=\{localizePathname\('\/profile', locale\)\}>\{t\('openApproval'\)\}<\/Link>/,
   );
 });
 

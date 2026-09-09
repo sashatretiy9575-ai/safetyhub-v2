@@ -31,7 +31,12 @@ test('quiz reveals a failed score and explains the calendar-day limit without us
 
   assert.match(client, /ATTEMPT_DAILY_LIMIT/);
   assert.match(client, /t\('errors\.dailyLimitAt', \{ availableAt \}\)/);
-  assert.match(client, /t\('errors\.dailyLimitUnknown', \{ count: 8 \}\)/);
+  // The number lives in QUIZ_POLICY; repeating it in the message meant a
+  // change to the policy left the participant reading a stale figure.
+  assert.match(
+    client,
+    /t\('errors\.dailyLimitUnknown', \{ count: QUIZ_POLICY\.attemptsPerCalendarDay \}\)/,
+  );
   assert.match(client, /COURSE_CATALOG_MAINTENANCE/);
   assert.match(client, /t\('errors\.catalogMaintenance'\)/);
   assert.match(client, /ATTEMPT_ROLLING_LIMIT/);

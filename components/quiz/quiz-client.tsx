@@ -14,6 +14,7 @@ import {
   XCircle,
 } from '@phosphor-icons/react';
 import Link from 'next/link';
+import { QUIZ_POLICY } from '@/lib/constants';
 import type { AttemptPayload } from '@/features/learning/types';
 import {
   deadlineAnchorFromServer,
@@ -40,6 +41,13 @@ import {
   localizePathname,
   type AppLocale,
 } from '@/i18n/config';
+
+/**
+ * Option letters are data, not character arithmetic. Deriving them from a code
+ * point silently produced bracket characters past the fourth option, and hid
+ * the fact that the editor allows exactly four.
+ */
+const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const;
 
 type AttemptErrorPayload = {
   error?: string;
@@ -118,7 +126,10 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           const availableAt = retryDate(payload.retryAt, locale);
           return availableAt
             ? t('errors.dailyLimitAt', { availableAt })
-            : t('errors.dailyLimitUnknown', { count: 8 });
+            : // The per-course override is not part of the attempt payload, so the
+              // project default is the honest number to show. It was previously
+              // written out as a literal 8 next to a policy that already holds it.
+              t('errors.dailyLimitUnknown', { count: QUIZ_POLICY.attemptsPerCalendarDay });
         }
         case 'ATTEMPT_NOT_FOUND':
           return t('errors.notFound');
@@ -162,6 +173,9 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
   const submissionAnswersRef = useRef<QuizAnswer[] | null>(null);
   const mountedRef = useRef(true);
   const localBackupFailedRef = useRef(false);
+  // Mirrored into state: the guard below has to re-run when the backup starts
+  // failing, and a ref write never re-runs an effect.
+  const [localBackupFailed, setLocalBackupFailed] = useState(false);
   const remainingSecondsRef = useRef<number | null>(null);
   const checkingExpiryRef = useRef(false);
 
@@ -174,6 +188,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
       currentIndexRef.current,
     );
     localBackupFailedRef.current = !written;
+    setLocalBackupFailed((current) => (current === !written ? current : !written));
     return written;
   }, []);
 
@@ -382,14 +397,15 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
   }, [attempt, refreshAttemptStatus, t]);
 
   useEffect(() => {
-    if (!localBackupFailedRef.current && !submissionLocked) return;
+    const attemptInProgress = attempt?.status === 'started' && answers.length > 0;
+    if (!localBackupFailed && !submissionLocked && !attemptInProgress) return;
     const warnAboutUnsavedAnswers = (event: BeforeUnloadEvent) => {
       event.preventDefault();
       event.returnValue = '';
     };
     window.addEventListener('beforeunload', warnAboutUnsavedAnswers);
     return () => window.removeEventListener('beforeunload', warnAboutUnsavedAnswers);
-  }, [saveState, submissionLocked]);
+  }, [answers.length, attempt?.status, localBackupFailed, submissionLocked]);
 
   const navigateToQuestion = (index: number) => {
     const activeAttempt = attemptRef.current;
@@ -481,6 +497,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
     return (
       <section className="py-16">
         <Container size="narrow">
+          <h1 className="sr-only">{title}</h1>
           <p role="status" className="text-center text-sm text-[var(--color-text-muted)]">
             {t('loading')}
           </p>
@@ -494,6 +511,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
     return (
       <section className="py-16">
         <Container size="narrow">
+          <h1 className="sr-only">{title}</h1>
           <Card>
             <CardContent className="space-y-4 p-6 text-center">
               <p role="alert">{error}</p>
@@ -503,12 +521,14 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     <Link href={localizePathname('/auth/login', locale)}>{t('signIn')}</Link>
                   </Button>
                 ) : onboardingAction ? (
-                  <Button onClick={() => router.push(localizePathname('/onboarding', locale))}>
-                    {t('completeProfile')}
+                  <Button asChild>
+                    <Link href={localizePathname('/onboarding', locale)}>
+                      {t('completeProfile')}
+                    </Link>
                   </Button>
                 ) : approvalAction ? (
-                  <Button onClick={() => router.push(localizePathname('/profile', locale))}>
-                    {t('openApproval')}
+                  <Button asChild>
+                    <Link href={localizePathname('/profile', locale)}>{t('openApproval')}</Link>
                   </Button>
                 ) : errorCode === 'ATTEMPT_NOT_FOUND' ? (
                   <Button onClick={() => void loadAttempt()}>{t('newAttempt')}</Button>
@@ -536,7 +556,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           <Card className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-soft)]">
             <CardContent className="space-y-5 p-6 text-center md:p-8">
               <span
-                className={`mx-auto grid size-14 place-items-center rounded-full ${passed ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : expired ? 'bg-[var(--color-accent-amber-soft)] text-[var(--color-accent-amber)]' : 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]'}`}
+                className={`mx-auto grid size-14 place-items-center rounded-full ${passed ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : expired ? 'bg-[var(--color-accent-amber-soft)] text-[var(--color-warning)]' : 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]'}`}
               >
                 {passed ? (
                   <CheckCircle size={32} weight="fill" />
@@ -569,7 +589,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
 
                   {!attempt.certificateId ? (
                     <div className="mx-auto flex max-w-md items-center justify-center gap-2 rounded-xl bg-[var(--color-accent-amber-soft)] px-3.5 py-2.5 text-xs font-medium text-[var(--color-text)]">
-                      <Clock size={16} className="shrink-0 text-[var(--color-accent-amber)]" />
+                      <Clock size={16} className="shrink-0 text-[var(--color-warning)]" />
                       <span>{t('result.certificateAdminIssue')}</span>
                     </div>
                   ) : null}
@@ -612,12 +632,8 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                       {t('certificate')}
                     </CertificateDownloadButton>
                   ) : (
-                    <Button
-                      size="lg"
-                      className="w-full max-w-xs font-bold"
-                      onClick={() => router.push(localizePathname('/profile', locale))}
-                    >
-                      {t('openAccount')}
+                    <Button asChild size="lg" className="w-full max-w-xs font-bold">
+                      <Link href={localizePathname('/profile', locale)}>{t('openAccount')}</Link>
                     </Button>
                   )}
                   <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-[var(--color-text-muted)]">
@@ -631,13 +647,12 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     {attempt.certificateId ? (
                       <>
                         <span>·</span>
-                        <button
-                          type="button"
-                          onClick={() => router.push(localizePathname('/profile', locale))}
+                        <Link
+                          href={localizePathname('/profile', locale)}
                           className="hover:text-[var(--color-text)] hover:underline"
                         >
                           {t('openAccount')}
-                        </button>
+                        </Link>
                       </>
                     ) : null}
                   </div>
@@ -652,13 +667,12 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     <ArrowCounterClockwise size={18} />
                     {expired ? t('newAttempt') : t('retake')}
                   </Button>
-                  <button
-                    type="button"
-                    onClick={() => router.push(localizePathname('/profile', locale))}
+                  <Link
+                    href={localizePathname('/profile', locale)}
                     className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:underline"
                   >
                     {t('openAccount')}
-                  </button>
+                  </Link>
                 </div>
               )}
             </CardContent>
@@ -693,7 +707,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     ariaLabel={timerAriaLabel}
                   />
                 </div>
-                <h1 className="font-display mt-1 text-2xl font-black">{t('review.title')}</h1>
+                <h2 className="font-display mt-1 text-2xl font-black">{t('review.title')}</h2>
                 <p className="mt-2 text-sm text-[var(--color-text-muted)]">
                   {t('review.description')}
                 </p>
@@ -807,6 +821,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
   return (
     <section className="py-8 md:py-16">
       <Container size="narrow">
+        <h1 className="sr-only">{title}</h1>
         <div className="mb-5 flex items-center justify-between gap-3">
           <Link
             href={localizePathname(`/topics/${slug}`, locale)}
@@ -855,7 +870,10 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           })}
           className="mb-4 h-2.5"
         />
-        <nav aria-label={t('questionsAria')} className="mb-7 flex justify-center gap-2">
+        <nav
+          aria-label={t('questionsAria')}
+          className="mb-7 flex flex-wrap justify-center gap-2"
+        >
           {attempt.questions.map((question, index) => {
             const answered = answers.some((answer) => answer.questionId === question.id);
             const current = index === currentIndex;
@@ -872,7 +890,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                 onClick={() => navigateToQuestion(index)}
                 className={`grid size-11 place-items-center rounded-full border-2 text-sm font-black transition-colors ${
                   current
-                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white'
+                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
                     : answered
                       ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
                       : 'border-[var(--color-border)] bg-[var(--color-surface)]'
@@ -885,7 +903,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
         </nav>
         <Card className="border-2">
           <CardContent className="space-y-6 p-4 min-[320px]:p-5 md:p-8">
-            <h1 className="font-display text-xl leading-tight font-bold">{currentQuestion.text}</h1>
+            <h2 className="font-display text-xl leading-tight font-bold">{currentQuestion.text}</h2>
             <fieldset className="space-y-3">
               <legend className="sr-only">{t('chooseAnswer')}</legend>
               {currentQuestion.options.map((option) => {
@@ -893,7 +911,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                 return (
                   <label
                     key={option.id}
-                    className={`flex min-h-12 w-full cursor-pointer items-center gap-3 rounded-xl border-2 p-3 text-left text-sm font-semibold transition-colors ${selected ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)]' : 'border-[var(--color-border)] hover:border-[var(--color-primary)]'}`}
+                    className={`flex min-h-12 w-full cursor-pointer items-center gap-3 rounded-xl border-2 p-3 text-left text-sm font-semibold transition-colors has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-[3px] has-[:focus-visible]:outline-[var(--color-focus)] ${selected ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)]' : 'border-[var(--color-border)] hover:border-[var(--color-primary)]'}`}
                   >
                     <input
                       type="radio"
@@ -904,9 +922,9 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                       className="sr-only"
                     />
                     <span
-                      className={`grid size-7 shrink-0 place-items-center rounded-full border text-xs ${selected ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white' : 'border-[var(--color-border)]'}`}
+                      className={`grid size-7 shrink-0 place-items-center rounded-full border text-xs ${selected ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-foreground)]' : 'border-[var(--color-border)]'}`}
                     >
-                      {String.fromCharCode(64 + option.position)}
+                      {OPTION_LABELS[option.position - 1] ?? String(option.position)}
                     </span>
                     {option.text}
                   </label>
@@ -955,12 +973,12 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   <Button
                     onClick={() => {
                       if (!allAnswered) {
-                        const unansweredIdx = attempt.questions.findIndex(
-                          (q) => !answers.some((a) => a.questionId === q.id),
+                        const unansweredIndex = attempt.questions.findIndex(
+                          (question) => !answers.some((answer) => answer.questionId === question.id),
                         );
-                        if (unansweredIdx !== -1) {
+                        if (unansweredIndex !== -1) {
                           setError(t('rules.answerFirst'));
-                          navigateToQuestion(unansweredIdx);
+                          navigateToQuestion(unansweredIndex);
                         }
                         return;
                       }
