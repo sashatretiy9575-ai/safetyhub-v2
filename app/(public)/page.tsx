@@ -8,6 +8,7 @@ import { Testimonials } from '@/components/marketing/testimonials';
 import { Resources } from '@/components/marketing/resources';
 import { FaqAccordion } from '@/components/marketing/faq-accordion';
 import { ContactCta } from '@/components/marketing/contact-cta';
+import { QUIZ_POLICY } from '@/lib/constants';
 import { buildMetadata } from '@/lib/seo';
 
 function HomeSectionFallback({ label }: { label: string }) {
@@ -34,7 +35,10 @@ export async function generateMetadata() {
   const t = await getTranslations('Home');
   return buildMetadata({
     title: t('metadataTitle'),
-    description: t('metadataDescription'),
+    description: t('metadataDescription', {
+      count: QUIZ_POLICY.questionCount,
+      pass: QUIZ_POLICY.passScore,
+    }),
     path: '/',
     locale: await getLocale(),
   });

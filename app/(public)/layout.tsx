@@ -7,7 +7,7 @@ import { JsonLd } from '@/components/shared/json-ld';
 import { DeferredPwaInstall } from '@/components/shared/deferred-pwa-install';
 import { PublicAccountControl } from '@/components/shared/public-account-control';
 import { DEFAULT_LOCALE } from '@/i18n/config';
-import { buildMetadata, localBusinessJsonLd, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
+import { buildMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import { getSiteContacts } from '@/lib/site-contacts';
 import '../globals.css';
 
@@ -61,8 +61,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
             description: metadata('description'),
             city: footer('city'),
           }),
-          websiteJsonLd(DEFAULT_LOCALE),
-          localBusinessJsonLd(contacts, DEFAULT_LOCALE, footer('city')),
+          websiteJsonLd(),
         ]}
       />
       <AppShell accountMode="neutral" accountControl={<PublicAccountControl />}>

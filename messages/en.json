@@ -111,15 +111,15 @@
     }
   },
   "Home": {
-    "metadataTitle": "Workplace safety training",
-    "metadataDescription": "Online training in industrial safety, occupational health and fire safety.",
+    "metadataTitle": "Occupational safety and health training online, Almaty",
+    "metadataDescription": "Online training and knowledge checks in occupational safety and health, fire safety and industrial safety. A presentation, a {count}-question test, {pass} to pass. Almaty, Mon–Fri 09:00–18:00.",
     "loadingCourses": "Loading courses",
     "loadingResources": "Loading resources",
     "hero": {
       "imageAlt": "Safety professionals review information at an industrial site",
       "eyebrow": "Almaty · online across Kazakhstan",
-      "title": "Straightforward safety training",
-      "description": "Presentations, 10 questions and your result in your account.",
+      "title": "Occupational safety and health training and knowledge checks online",
+      "description": "Courses in occupational safety and health, fire safety and industrial safety. A presentation, a {count}-question test, {pass} to pass — the score appears in your account at once and an administrator issues the certificate.",
       "courses": "Choose a course",
       "contact": "Contact us"
     },
@@ -133,30 +133,30 @@
       "empty": "Published courses will appear soon."
     },
     "benefits": {
-      "eyebrow": "Platform features",
-      "title": "Learn on your phone and keep your results",
-      "description": "Materials and tests are always within reach, and your best results stay in your account.",
+      "eyebrow": "How training runs",
+      "title": "Training from a phone, on site",
+      "description": "A worker opens the presentation and takes the knowledge check on a smartphone — no trip to a training centre and no stopped shift.",
       "slider": "Platform features",
       "item": "Benefit",
-      "mobileTitle": "Works on your phone",
-      "mobileText": "No separate app installation required.",
-      "quizTitle": "10 questions after each course",
-      "quizText": "The short knowledge check takes only a few minutes.",
-      "resultsTitle": "Results are saved",
-      "resultsText": "Your best results and certificates are available in your account."
+      "mobileTitle": "From a phone, on site",
+      "mobileText": "A browser, with no app to install.",
+      "quizTitle": "Test: {count} questions, {pass} to pass",
+      "quizText": "Up to {minutes} minutes, up to {attempts} attempts a day.",
+      "resultsTitle": "Result and certificate",
+      "resultsText": "The score is visible at once; an administrator issues the certificate."
     },
     "process": {
       "eyebrow": "How training works",
-      "title": "From choosing a course to getting your result",
-      "description": "Three clear steps. Available online in Almaty and throughout Kazakhstan.",
+      "title": "From application to an occupational safety assessment",
+      "description": "Three steps with no trip to a training centre. Almaty and all of Kazakhstan, support Mon–Fri 09:00–18:00.",
       "slider": "Training steps",
       "item": "Step",
-      "chooseTitle": "Choose a course",
-      "chooseText": "Open the programme that fits your needs.",
-      "learnTitle": "Study the material",
-      "learnText": "Complete the topic and answer {count} questions.",
-      "resultTitle": "Save your result",
-      "resultText": "The result will appear in your account."
+      "chooseTitle": "Application and approval",
+      "chooseText": "Register with the code from the e-mail; an administrator reviews the application within 24 hours.",
+      "learnTitle": "Presentation and test",
+      "learnText": "A presentation and {count} questions, {pass} correct to pass, up to {minutes} minutes.",
+      "resultTitle": "Result and certificate",
+      "resultText": "The score appears in your account at once; an administrator issues the certificate and an e-mail follows."
     },
     "contact": {
       "eyebrow": "Contacts",
@@ -165,12 +165,12 @@
     },
     "resources": {
       "eyebrow": "Useful before a test or shift",
-      "title": "Safety through clear examples",
-      "description": "Short guidance for everyday workplace situations: what to notice, how to act and when to stop, without unnecessary theory.",
+      "title": "Workplace guidance: PPE, fire, first aid",
+      "description": "Short guidance for everyday workplace situations: what to notice, how to act and when to stop, with references to the Labour Code of Kazakhstan and other acts on adilet.zan.kz.",
       "all": "Open all articles",
       "slider": "Useful safety articles",
       "item": "Article",
-      "empty": "New resources are being prepared. Check back soon."
+      "empty": "There are no articles in this language yet. Open the full blog — the Russian material is available."
     },
     "cases": {
       "eyebrow": "Use cases",
@@ -198,6 +198,7 @@
   "Course": {
     "online": "Online course",
     "credentialAwarded": "SafetyHub.kz certificate",
+    "pageHeading": "{course}: online training and knowledge check",
     "questions": "{count, plural, one {# question} other {# questions}}",
     "minutes": "{count, plural, one {# minute} other {# minutes}}",
     "minutesShort": "{count} min",
@@ -234,8 +235,8 @@
     "metadataKeyword1": "occupational safety and health courses",
     "metadataKeyword2": "occupational safety and health",
     "metadataKeyword3": "online industrial safety",
-    "title": "Safety courses",
-    "description": "Occupational safety and health, fire and industrial safety training online across Kazakhstan.",
+    "title": "Occupational safety, health and industrial safety courses",
+    "description": "Programmes for workers and specialists: a presentation, a test and a certificate in your account.",
     "eyebrow": "Safety courses · certificate upon passing",
     "available": "Available courses",
     "emptyTitle": "Courses are being prepared",
@@ -247,7 +248,7 @@
   },
   "Blog": {
     "metadataTitle": "Workplace and industrial safety articles in Kazakhstan",
-    "metadataDescription": "Practical articles on occupational health, industrial safety and fire safety in Kazakhstan.",
+    "metadataDescription": "Practical articles on occupational safety, industrial safety and fire safety in Kazakhstan: PPE, what to do in a fire, first aid and stopping dangerous work, with references to the regulations.",
     "metadataKeyword1": "workplace safety blog",
     "metadataKeyword2": "industrial safety articles",
     "loading": "Loading articles",
@@ -290,8 +291,8 @@
     "source": "Source"
   },
   "Contacts": {
-    "metadataTitle": "Contact SafetyHub",
-    "metadataDescription": "SafetyHub contact details: phone, WhatsApp, city and business hours.",
+    "metadataTitle": "Contacts: phone and WhatsApp, Almaty",
+    "metadataDescription": "SafetyHub contacts: phone and WhatsApp for questions about online occupational safety and health training, testing and the issuing of electronic certificates with QR verification.",
     "title": "Contact SafetyHub",
     "description": "We’ll recommend a programme and answer your training questions.",
     "eyebrow": "Contacts",
@@ -304,7 +305,7 @@
   },
   "Faq": {
     "metadataTitle": "Answers before you start training",
-    "metadataDescription": "Answers to common questions about SafetyHub courses, tests and accounts.",
+    "metadataDescription": "Common questions about SafetyHub courses: how to enrol, how long the test takes, how many correct answers are needed, when the certificate arrives and how to verify it by QR code.",
     "title": "Answers before you start training",
     "description": "A quick guide to courses, tests and your account. If your question is not covered, contact us and we’ll help.",
     "other": "Ask another question",
@@ -685,8 +686,8 @@
     "description": "Open the documents if needed. Continuing records acceptance of the current versions.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Use",
-    "privacyMetadataDescription": "How SafetyHub processes and protects personal data.",
-    "termsMetadataDescription": "Terms for using the SafetyHub platform and receiving certificates.",
+    "privacyMetadataDescription": "How SafetyHub processes and protects personal data: what is needed for training and a certificate, how long it is kept and how to request account deletion.",
+    "termsMetadataDescription": "Terms for using SafetyHub: access to the courses, the rules and attempt limits for the test, and how an electronic certificate is issued and verified.",
     "documentsEyebrow": "Documents",
     "versionEffective": "Version {version}. Effective from {date}",
     "references": "Regulatory and service references",

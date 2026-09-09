@@ -133,7 +133,7 @@ export function CourseMaterialActions({
                   {t('online')}
                 </p>
                 <h1 className="mt-2 text-3xl leading-tight font-black tracking-[-0.035em] sm:text-4xl">
-                  {course.title}
+                  {t('pageHeading', { course: course.title })}
                 </h1>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--color-text-muted)] sm:text-base">
                   {course.description}

@@ -25,7 +25,10 @@ test('public learning copy consistently describes ten-question tests', async () 
   assert.doesNotMatch(publicCopy, /пятью понятными вопросами/iu);
   assert.match(testimonials, /t\('managerAction'\)/u);
   assert.match(ru.Home.cases.managerAction, /десятью понятными вопросами/iu);
-  assert.match(ru.Home.hero.description, /10 вопросов/iu);
+  // The count is no longer typed into four catalogs: lib/constants.ts requires
+  // user-facing copy to derive from QUIZ_POLICY, so the hero interpolates it.
+  assert.match(ru.Home.hero.description, /\{count\} вопросов/iu);
+  assert.match(hero, /count: QUIZ_POLICY\.questionCount/u);
 });
 
 test('the local course snapshot contains only the five canonical presentation courses', async () => {

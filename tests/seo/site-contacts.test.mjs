@@ -45,10 +45,12 @@ test('public contacts are server cached and rendered into all locale SEO shells'
   assert.match(contacts, /get_site_settings/);
   assert.match(layout, /organizationJsonLd\(contacts, DEFAULT_LOCALE, \{/);
   assert.match(layout, /description: metadata\('description'\)/);
-  assert.match(layout, /city: footer\('city'\)/);
-  assert.match(layout, /localBusinessJsonLd\(contacts, DEFAULT_LOCALE, footer\('city'\)\)/);
   assert.match(localizedLayout, /organizationJsonLd\(contacts, locale, \{/);
-  assert.match(localizedLayout, /localBusinessJsonLd\(contacts, locale, footer\('city'\)\)/);
+  // No LocalBusiness. It declared exact coordinates and reception hours for an
+  // address the site never states, so the markup promised a place a visitor
+  // cannot find; the city stays in the visible footer and in PostalAddress.
+  assert.doesNotMatch(layout, /localBusinessJsonLd/u);
+  assert.doesNotMatch(localizedLayout, /localBusinessJsonLd/u);
   assert.match(seo, /telephone: contacts\.phoneDisplay/);
   assert.match(shell, /getSiteContacts/);
   assert.match(adminRoute, /invalidOriginResponse/);

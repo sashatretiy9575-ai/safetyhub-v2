@@ -5,6 +5,7 @@ import { ArrowRight, ChatCircleDots, MapPin } from '@phosphor-icons/react/dist/s
 import { Container } from '@/components/ui/container';
 import { ROUTES } from '@/lib/constants';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { QUIZ_POLICY } from '@/lib/constants';
 import { localizePathname } from '@/i18n/config';
 
 const HERO_IMAGES = {
@@ -92,7 +93,7 @@ export async function Hero() {
               {t('title')}
             </h1>
             <p className="mt-4 max-w-xl text-[14px] leading-[1.6] text-[var(--color-text-muted)] sm:text-base sm:leading-7">
-              {t('description')}
+              {t('description', { count: QUIZ_POLICY.questionCount, pass: QUIZ_POLICY.passScore })}
             </p>
 
             <div className="mt-6 grid grid-cols-1 gap-2.5 min-[340px]:grid-cols-2 sm:mt-7 sm:flex sm:flex-wrap sm:gap-3">

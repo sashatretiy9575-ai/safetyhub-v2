@@ -56,6 +56,22 @@ const HREFLANG_BY_LOCALE = {
   zh: 'zh-Hans',
 } as const satisfies Record<AppLocale, string>;
 
+/** What a search result actually shows before it truncates. */
+const TITLE_BUDGET = 60;
+
+/**
+ * One identity for the organisation across every page and every locale.
+ *
+ * The organisation appeared as three unlinked nodes — EducationalOrganization,
+ * the Article publisher and the course provider — and the LocalBusiness `@id`
+ * changed with the locale, so one company looked like four.
+ *
+ * Computed rather than declared at module scope: `absoluteUrl` resolves the
+ * deployment origin and throws when it cannot, which at module scope would move
+ * that failure to import time and freeze the origin into the module.
+ */
+const organizationId = () => absoluteUrl('/#organization');
+
 export const BASE_KEYWORDS = [
   'промышленная безопасность Алматы',
   'обучение охране труда Казахстан',
@@ -85,7 +101,11 @@ export function buildMetadata({
   locale = DEFAULT_LOCALE,
   availableLocales = APP_LOCALES,
 }: SeoOptions): Metadata {
-  const fullTitle = title ? `${title} — ${BRAND.domain}` : `${BRAND.domain}`;
+  // The suffix is worth having until it pushes the title past what a result
+  // page shows. Open Graph and Twitter keep the branded form either way —
+  // there the sixty-character budget does not apply.
+  const brandedTitle = title ? `${title} — ${BRAND.domain}` : `${BRAND.domain}`;
+  const fullTitle = title && brandedTitle.length > TITLE_BUDGET ? title : brandedTitle;
   const normalizedPath = path || '';
   const localizedPath = localizePathname(normalizedPath || '/', locale);
   const url = absoluteUrl(localizedPath);
@@ -108,11 +128,14 @@ export function buildMetadata({
       )
       .map(([language, pathname]) => [language, absoluteUrl(pathname)]),
   );
+  const keywordList = [...(locale === 'ru' ? BASE_KEYWORDS : []), ...keywords];
   return {
     metadataBase: new URL(absoluteUrl('/')),
     title: fullTitle,
     description,
-    keywords: [...(locale === 'ru' ? BASE_KEYWORDS : []), ...keywords].join(', '),
+    // An empty string is worse than no tag: it was emitted on every kk, en and
+    // zh page, which have no Russian base list to fall back on.
+    ...(keywordList.length > 0 ? { keywords: keywordList.join(', ') } : {}),
     authors: authors?.map((name) => ({ name })) ?? [{ name: BRAND.domain }],
     creator: BRAND.domain,
     publisher: BRAND.domain,
@@ -148,13 +171,22 @@ export function buildMetadata({
             openGraphLocale(candidate),
           )
         : [],
-      images: [{ url: resolvedOgImage, width: 1200, height: 630, alt: title ?? BRAND.domain }],
+      // Only the generated card has a size this code can vouch for. Article
+      // covers are 1200×800 and declaring 1200×630 for them cropped the preview;
+      // with no declaration the crawler measures the file itself.
+      images: [
+        {
+          url: resolvedOgImage,
+          ...(ogImage === '/opengraph-image' ? { width: 1200, height: 630 } : {}),
+          alt: title ?? BRAND.domain,
+        },
+      ],
       ...(publishedTime ? { publishedTime } : {}),
       ...(modifiedTime ? { modifiedTime } : {}),
     },
     twitter: {
       card: 'summary_large_image',
-      title: ogTitle ?? fullTitle,
+      title: ogTitle ?? brandedTitle,
       description: ogDescription ?? description,
       images: [resolvedOgImage],
     },
@@ -176,14 +208,18 @@ export function organizationJsonLd(
   return {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
+    // The identity is the company, not the locale of the page describing it.
+    '@id': organizationId(),
     name: BRAND.domain,
     legalName: BRAND.domain,
-    url: absoluteUrl(localizePathname('/', locale)),
+    url: absoluteUrl('/'),
     logo: absoluteUrl('/icons/icon-512x512.png'),
     description: localized?.description,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: localized?.city ?? LOCALIZED_CITY[locale],
+      // `localized.city` is the footer line — «Казахстан, г. Алматы» — written
+      // for a reader, not for a field that means the settlement alone.
+      addressLocality: LOCALIZED_CITY[locale],
       addressCountry: 'KZ',
     },
     contactPoint: {
@@ -213,14 +249,18 @@ function servedLocales(): readonly AppLocale[] {
   return rolloutFeatureEnabled('localeRoutes') ? APP_LOCALES : [DEFAULT_LOCALE];
 }
 
-export function websiteJsonLd(locale: AppLocale = DEFAULT_LOCALE) {
+export function websiteJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': absoluteUrl('/#website'),
     name: BRAND.domain,
-    url: absoluteUrl(localizePathname('/', locale)),
-    inLanguage: htmlLanguage(locale),
-    availableLanguage: servedLocales().map((candidate) => htmlLanguage(candidate)),
+    url: absoluteUrl('/'),
+    publisher: { '@id': organizationId() },
+    // One entity, one identity — so the locale of the page describing it is not
+    // part of it. Previously each locale emitted a WebSite of its own with its
+    // own url and its own inLanguage, which described four different sites.
+    inLanguage: servedLocales().map((candidate) => htmlLanguage(candidate)),
   };
 }
 
@@ -228,38 +268,37 @@ export function courseJsonLd(input: {
   name: string;
   description: string;
   url: string;
-  provider?: string;
   locale?: AppLocale;
   credentialName?: string;
-  locationName?: string;
   durationMinutes?: number;
+  image?: string;
 }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Course',
     name: input.name,
     description: input.description,
-    provider: {
-      '@type': 'EducationalOrganization',
-      name: input.provider ?? BRAND.domain,
-      sameAs: absoluteUrl(localizePathname('/', input.locale ?? DEFAULT_LOCALE)),
-    },
+    // A reference rather than a copy: the catalogue called the provider
+    // «SafetyHub» and the course page called it «SafetyHub.kz», for the same
+    // course.
+    provider: { '@id': organizationId() },
     url: input.url,
     inLanguage: htmlLanguage(input.locale ?? DEFAULT_LOCALE),
     educationalCredentialAwarded: input.credentialName,
-    courseMode: 'online',
-    ...(input.durationMinutes
-      ? {
-          hasCourseInstance: {
-            '@type': 'CourseInstance',
-            courseMode: 'online',
-            courseWorkload: `PT${input.durationMinutes}M`,
-          },
-        }
+    ...(input.image
+      ? { image: [input.image.startsWith('http') ? input.image : absoluteUrl(input.image)] }
       : {}),
-    ...(input.locationName
-      ? { locationCreated: { '@type': 'Place', name: input.locationName } }
-      : {}),
+    // The delivery mode belongs to the instance, and the instance is held
+    // online — a Place named after the office described a course nobody
+    // attends there. `offers` is deliberately absent: nothing on the page
+    // states a price, and declaring one in the markup only would be a claim
+    // the site does not make to a reader.
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'Online',
+      location: { '@type': 'VirtualLocation', url: input.url },
+      ...(input.durationMinutes ? { courseWorkload: `PT${input.durationMinutes}M` } : {}),
+    },
   };
 }
 
@@ -306,45 +345,13 @@ export function articleJsonLd(input: {
     image: [input.image.startsWith('http') ? input.image : absoluteUrl(input.image)],
     datePublished: input.datePublished,
     dateModified: input.dateModified ?? input.datePublished,
-    author: { '@type': 'Person', name: input.author },
-    publisher: {
-      '@type': 'Organization',
-      name: BRAND.domain,
-      logo: { '@type': 'ImageObject', url: absoluteUrl('/icons/icon-512x512.png') },
-    },
+    // The name is the editorial team, not a person: no article in the
+    // repository or in the database carries an author field.
+    author: { '@type': 'Organization', name: input.author, '@id': organizationId() },
+    publisher: { '@id': organizationId() },
     mainEntityOfPage: { '@type': 'WebPage', '@id': input.url },
+    isPartOf: { '@id': absoluteUrl('/#website') },
     inLanguage: htmlLanguage(input.locale ?? DEFAULT_LOCALE),
   };
 }
 
-export function localBusinessJsonLd(
-  contacts: SiteContactSettings,
-  locale: AppLocale = DEFAULT_LOCALE,
-  city: string = LOCALIZED_CITY[DEFAULT_LOCALE],
-) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    '@id': absoluteUrl(`${localizePathname('/', locale)}#org`),
-    name: BRAND.domain,
-    image: absoluteUrl('/opengraph-image'),
-    url: absoluteUrl(localizePathname('/', locale)),
-    telephone: contacts.phoneDisplay,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: city,
-      addressRegion: city,
-      addressCountry: 'KZ',
-    },
-    geo: { '@type': 'GeoCoordinates', latitude: 43.2389, longitude: 76.8897 },
-    openingHoursSpecification: [
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-        opens: '09:00',
-        closes: '18:00',
-      },
-    ],
-    areaServed: ['Almaty', 'Astana', 'Shymkent', 'Karaganda', 'Aktobe', 'Kazakhstan'],
-  };
-}

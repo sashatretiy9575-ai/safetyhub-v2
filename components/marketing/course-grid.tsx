@@ -14,30 +14,37 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { localizePathname } from '@/i18n/config';
 
 export async function CourseGrid() {
-  const [locale, t, courseT, footerT] = await Promise.all([
+  const [locale, t, courseT] = await Promise.all([
     getLocale(),
     getTranslations('Home.courses'),
     getTranslations('Course'),
-    getTranslations('Shell.footer'),
   ]);
   const topics = await getTopics(locale);
 
   return (
     <>
-      {topics.map((topic) => (
-        <JsonLd
-          key={`schema-${topic.slug}`}
-          data={courseJsonLd({
-            name: topic.title,
-            description: topic.description,
-            provider: 'SafetyHub',
-            url: absoluteUrl(localizePathname(ROUTES.topic(topic.slug), locale)),
-            locale,
-            credentialName: courseT('credentialAwarded'),
-            locationName: footerT('city'),
-          })}
-        />
-      ))}
+      {/* One list, not five loose Course nodes: the catalogue is an ordered
+          set, and a search engine reading five roots on one page cannot tell
+          which of them the page is about. */}
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          itemListElement: topics.map((topic, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: courseJsonLd({
+              name: topic.title,
+              description: topic.description,
+              url: absoluteUrl(localizePathname(ROUTES.topic(topic.slug), locale)),
+              locale,
+              credentialName: courseT('credentialAwarded'),
+              durationMinutes: topic.durationMinutes,
+              image: getCourseCoverImage(topic.slug, topic.seo.ogImage),
+            }),
+          })),
+        }}
+      />
 
       <section
         id="courses"

@@ -111,15 +111,15 @@
     }
   },
   "Home": {
-    "metadataTitle": "职业安全培训",
-    "metadataDescription": "工业安全、职业健康与消防安全在线培训。",
+    "metadataTitle": "职业安全与健康在线培训，阿拉木图",
+    "metadataDescription": "职业安全与健康、消防安全和工业安全的在线培训与知识考核。演示资料、{count} 道题的测试，{pass} 题为通过线。阿拉木图，周一至周五 09:00–18:00。",
     "loadingCourses": "正在加载课程",
     "loadingResources": "正在加载资料",
     "hero": {
       "imageAlt": "安全专业人员在生产现场核查数据",
       "eyebrow": "阿拉木图 · 哈萨克斯坦全境在线",
-      "title": "清晰易懂的安全培训",
-      "description": "演示资料、10 道题，结果保存在账户中。",
+      "title": "职业安全与健康的在线培训与知识考核",
+      "description": "职业安全与健康、消防安全和工业安全课程。演示资料、{count} 道题的测试，{pass} 题为通过线——成绩立即显示在个人中心，证书由管理员签发。",
       "courses": "选择课程",
       "contact": "联系我们"
     },
@@ -133,30 +133,30 @@
       "empty": "已发布课程即将上线。"
     },
     "benefits": {
-      "eyebrow": "平台功能",
-      "title": "手机学习，结果随时保存",
-      "description": "学习资料和测试随手可用，最佳成绩保存在账户中。",
+      "eyebrow": "培训条件",
+      "title": "在作业现场用手机学习",
+      "description": "员工用智能手机打开演示资料并完成知识考核——无需前往培训中心，也无需停工。",
       "slider": "平台功能",
       "item": "优势",
-      "mobileTitle": "支持手机使用",
-      "mobileText": "无需另行安装应用。",
-      "quizTitle": "每门课程后 10 道题",
-      "quizText": "简短测验只需几分钟。",
-      "resultsTitle": "自动保存结果",
-      "resultsText": "最佳成绩和证书可在账户中查看。"
+      "mobileTitle": "现场手机学习",
+      "mobileText": "浏览器即可，无需安装应用。",
+      "quizTitle": "测试：{count} 道题，{pass} 题通过",
+      "quizText": "最长 {minutes} 分钟，每天最多 {attempts} 次。",
+      "resultsTitle": "成绩与证书",
+      "resultsText": "成绩立即可见，证书由管理员签发。"
     },
     "process": {
       "eyebrow": "培训流程",
-      "title": "从选择课程到取得结果",
-      "description": "三个清晰步骤。阿拉木图及哈萨克斯坦全境均可在线学习。",
+      "title": "从提交申请到职业安全考核",
+      "description": "三个步骤，无需前往培训中心。阿拉木图及哈萨克斯坦全境，支持时间为周一至周五 09:00–18:00。",
       "slider": "培训步骤",
       "item": "步骤",
-      "chooseTitle": "选择课程",
-      "chooseText": "打开适合您的培训项目。",
-      "learnTitle": "学习资料",
-      "learnText": "完成主题学习并回答 {count} 道题。",
-      "resultTitle": "保存结果",
-      "resultText": "结果将显示在您的账户中。"
+      "chooseTitle": "申请与准入",
+      "chooseText": "使用邮件中的验证码注册，管理员将在 24 小时内审核申请。",
+      "learnTitle": "演示与测试",
+      "learnText": "演示资料和 {count} 道题，{pass} 题答对为通过，最长 {minutes} 分钟。",
+      "resultTitle": "成绩与证书",
+      "resultText": "成绩立即显示在个人中心，证书由管理员签发，随后会收到邮件。"
     },
     "contact": {
       "eyebrow": "联系方式",
@@ -165,12 +165,12 @@
     },
     "resources": {
       "eyebrow": "测试与上岗前实用资料",
-      "title": "用清晰案例理解安全",
-      "description": "针对日常工作场景的简短指引：应注意什么、如何行动以及何时停止，避免冗余理论。",
+      "title": "劳动保护指引：个体防护装备、火灾、急救",
+      "description": "针对日常工作场景的简短指引：应注意什么、如何行动以及何时停止，并附哈萨克斯坦劳动法典及 adilet.zan.kz 上其他法规的出处。",
       "all": "查看全部文章",
       "slider": "实用安全文章",
       "item": "文章",
-      "empty": "新资料正在准备中，请稍后再来。"
+      "empty": "暂无该语言的文章。请打开全部博客——俄语资料可供阅读。"
     },
     "cases": {
       "eyebrow": "使用场景",
@@ -198,6 +198,7 @@
   "Course": {
     "online": "在线课程",
     "credentialAwarded": "SafetyHub.kz 证书",
+    "pageHeading": "{course}：在线培训与知识考核",
     "questions": "{count, plural, other {# 道题}}",
     "minutes": "{count} 分钟",
     "minutesShort": "{count} 分钟",
@@ -234,8 +235,8 @@
     "metadataKeyword1": "职业安全与健康培训课程",
     "metadataKeyword2": "职业安全与健康",
     "metadataKeyword3": "在线工业安全",
-    "title": "安全课程",
-    "description": "面向哈萨克斯坦全境的职业安全与健康、消防安全和工业安全在线培训。",
+    "title": "职业安全与健康及工业安全课程",
+    "description": "面向工人与专业人员的培训：演示资料、测试，以及个人中心中的证书。",
     "eyebrow": "安全课程 · 考核后颁证",
     "available": "可选课程",
     "emptyTitle": "课程正在准备中",
@@ -247,7 +248,7 @@
   },
   "Blog": {
     "metadataTitle": "哈萨克斯坦职业与工业安全文章",
-    "metadataDescription": "有关哈萨克斯坦职业健康、工业安全和消防安全的实用文章。",
+    "metadataDescription": "有关哈萨克斯坦职业安全、工业安全和消防安全的实用文章：个体防护装备、火灾时的处置、急救、叫停危险作业，并附法规出处。",
     "metadataKeyword1": "职业安全博客",
     "metadataKeyword2": "工业安全文章",
     "loading": "正在加载文章",
@@ -290,8 +291,8 @@
     "source": "来源"
   },
   "Contacts": {
-    "metadataTitle": "联系 SafetyHub",
-    "metadataDescription": "SafetyHub 联系信息：电话、WhatsApp、城市和工作时间。",
+    "metadataTitle": "联系方式：电话和 WhatsApp，阿拉木图",
+    "metadataDescription": "SafetyHub 联系方式：关于职业安全与健康在线培训、考核以及带二维码验证的电子证书签发问题，可通过电话和 WhatsApp 咨询。",
     "title": "联系 SafetyHub",
     "description": "我们会推荐合适的项目并解答培训问题。",
     "eyebrow": "联系方式",
@@ -304,7 +305,7 @@
   },
   "Faq": {
     "metadataTitle": "培训开始前的常见问题",
-    "metadataDescription": "关于 SafetyHub 课程、测试和账户的常见问题解答。",
+    "metadataDescription": "关于 SafetyHub 课程的常见问题：如何报名、测试时长、需要答对多少题、证书何时发放，以及如何通过二维码验证证书。",
     "title": "培训开始前的常见问题",
     "description": "简要了解课程、测试和账户。如未找到所需答案，请联系我们。",
     "other": "咨询其他问题",
@@ -685,8 +686,8 @@
     "description": "如有需要可打开文件。继续会记录对当前版本的接受。",
     "privacy": "隐私政策",
     "terms": "使用条款",
-    "privacyMetadataDescription": "SafetyHub 如何处理和保护个人数据。",
-    "termsMetadataDescription": "SafetyHub 平台使用及获取证书的条款。",
+    "privacyMetadataDescription": "SafetyHub 如何处理和保护个人数据：培训与证书需要哪些信息、保存多长时间，以及如何申请删除账户。",
+    "termsMetadataDescription": "SafetyHub 使用条款：课程访问、测试规则与尝试次数，以及电子证书的签发与验证方式。",
     "documentsEyebrow": "文件",
     "versionEffective": "版本 {version}，自 {date} 起生效",
     "references": "法规与服务链接",

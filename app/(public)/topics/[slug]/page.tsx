@@ -7,6 +7,7 @@ import { breadcrumbsJsonLd, buildMetadata, courseJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { TopicSourcesCard } from '@/components/topics/topic-sources-card';
 import { localizePathname } from '@/i18n/config';
+import { getCourseCoverImage } from '@/lib/course-cover-images';
 import { resolveCourseIcon } from '@/lib/course-icons';
 
 export const revalidate = 300;
@@ -19,21 +20,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
 
   const locale = await getLocale();
-  const [topic, t] = await Promise.all([getTopicBySlug(slug, locale), getTranslations('Topics')]);
+  const [topic, t, courseT] = await Promise.all([
+    getTopicBySlug(slug, locale),
+    getTranslations('Topics'),
+    getTranslations('Course'),
+  ]);
   if (!topic)
     // Without this the layout's canonical is inherited and a missing course
     // declares itself to be the home page.
     return { robots: { index: false, follow: false }, alternates: { canonical: null } };
 
+  // An editor who filled in the SEO title is trusted; when the field is empty
+  // `defaultContentSeo` copies the course name verbatim, and a title that is one
+  // trade name plus the brand is not what anyone searches for.
+  const usesRawTitle = topic.seo.title === topic.title;
+  const seoTitle = usesRawTitle ? courseT('pageHeading', { course: topic.title }) : topic.seo.title;
   return buildMetadata({
-    title: topic.seo.title,
+    title: seoTitle,
     description: topic.seo.description,
-    ogTitle: topic.seo.ogTitle,
+    ogTitle: usesRawTitle ? seoTitle : topic.seo.ogTitle,
     ogDescription: topic.seo.ogDescription,
     ogImage: topic.seo.ogImage || '/opengraph-image',
     noindex: !topic.seo.indexable,
     path: `/topics/${slug}`,
-    type: 'article',
+    // A course page is a catalogue entry, not a publication: `article` asks for
+    // article:published_time it cannot supply and contradicts the Course graph
+    // on the same page.
+    type: 'website',
     keywords: [topic.title, t('seoKeyword')],
     locale,
     // Only the locales this document was actually published in. Announcing all
@@ -44,11 +57,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function TopicPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [locale, t, courseT, footerT] = await Promise.all([
+  const [locale, t, courseT] = await Promise.all([
     getLocale(),
     getTranslations('Topics'),
     getTranslations('Course'),
-    getTranslations('Shell.footer'),
   ]);
 
   const topic = await getTopicBySlug(slug, locale);
@@ -75,8 +87,8 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
             url: absoluteUrl(localizePathname(`/topics/${topic.slug}`, locale)),
             locale,
             credentialName: courseT('credentialAwarded'),
-            locationName: footerT('city'),
             durationMinutes: topic.durationMinutes,
+            image: getCourseCoverImage(topic.slug, topic.seo.ogImage),
           }),
           breadcrumbsJsonLd([
             { name: t('breadcrumbHome'), url: absoluteUrl(localizePathname('/', locale)) },

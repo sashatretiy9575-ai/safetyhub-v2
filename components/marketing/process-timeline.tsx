@@ -9,7 +9,15 @@ export function ProcessTimeline() {
   const t = useTranslations('Home.process');
   const steps = [
     { icon: BookOpenText, title: t('chooseTitle'), text: t('chooseText') },
-    { icon: ListChecks, title: t('learnTitle'), text: t('learnText', { count: QUIZ_POLICY.questionCount }) },
+    {
+      icon: ListChecks,
+      title: t('learnTitle'),
+      text: t('learnText', {
+        count: QUIZ_POLICY.questionCount,
+        pass: QUIZ_POLICY.passScore,
+        minutes: QUIZ_POLICY.durationMinutes,
+      }),
+    },
     { icon: CheckCircle, title: t('resultTitle'), text: t('resultText') },
   ] as const;
   return (

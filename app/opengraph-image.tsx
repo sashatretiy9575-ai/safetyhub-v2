@@ -41,8 +41,12 @@ export default function OpenGraphImage() {
         SafetyHub.kz
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
-        <div style={{ maxWidth: 980, fontSize: 68, lineHeight: 1.06, fontWeight: 900 }}>
-          SafetyHub.kz
+        {/* One card serves all four locales, so it cannot carry a sentence in
+            any of them — the brand was simply printed twice instead. Latin
+            proper nouns and language codes read the same everywhere; a card
+            that actually describes the offer would have to be per-locale. */}
+        <div style={{ maxWidth: 980, fontSize: 60, lineHeight: 1.06, fontWeight: 900 }}>
+          Almaty · Kazakhstan
         </div>
         <div style={{ fontSize: 28, color: '#d7f5e1' }}>RU · KK · EN · ZH</div>
       </div>

@@ -11,10 +11,28 @@ import { absoluteUrl } from '@/lib/utils';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Certificate');
+  const title = t('verifyMetadataTitle');
+  const description = t('verifyMetadataDescription');
   return {
     metadataBase: new URL(absoluteUrl('/')),
-    title: t('verifyMetadataTitle'),
-    description: t('verifyMetadataDescription'),
+    title,
+    description,
+    // This link is sent to an employer in a messenger, so it needs a preview —
+    // and the preview has to stay impersonal: the generic card, never anything
+    // from the certificate itself.
+    openGraph: {
+      type: 'website',
+      siteName: 'SafetyHub.kz',
+      title,
+      description,
+      images: [{ url: absoluteUrl('/opengraph-image'), width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [absoluteUrl('/opengraph-image')],
+    },
     robots: { index: false, follow: false },
     // The parent layout's canonical would otherwise apply here, pointing a
     // per-certificate page at «/» and putting it in the home page's hreflang

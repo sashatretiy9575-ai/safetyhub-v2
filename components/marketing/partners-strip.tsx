@@ -4,12 +4,21 @@ import { SectionHeading } from '@/components/marketing/_shared/section-heading';
 import { SectionShell } from '@/components/marketing/_shared/section-shell';
 import { MarketingSlider } from '@/components/ui/marketing-slider';
 import { useTranslations } from 'next-intl';
+import { QUIZ_POLICY } from '@/lib/constants';
 
 export function PartnersStrip() {
   const t = useTranslations('Home.benefits');
   const benefits = [
     { icon: DeviceMobile, image: '/images/generated/benefit-mobile-v2.webp', title: t('mobileTitle'), text: t('mobileText') },
-    { icon: ListChecks, image: '/images/generated/benefit-quiz-v2.webp', title: t('quizTitle'), text: t('quizText') },
+    {
+      icon: ListChecks,
+      image: '/images/generated/benefit-quiz-v2.webp',
+      title: t('quizTitle', { count: QUIZ_POLICY.questionCount, pass: QUIZ_POLICY.passScore }),
+      text: t('quizText', {
+        minutes: QUIZ_POLICY.durationMinutes,
+        attempts: QUIZ_POLICY.attemptsPerCalendarDay,
+      }),
+    },
     { icon: UserCircle, image: '/images/generated/benefit-results-v2.webp', title: t('resultsTitle'), text: t('resultsText') },
   ] as const;
   return (

@@ -13,6 +13,9 @@ import '../globals.css';
 export const viewport: Viewport = APP_VIEWPORT;
 
 export const metadata: Metadata = {
+  // The (admin) group is its own root layout and none of its twenty-two pages
+  // exports metadata, so without this the browser tab had no name at all.
+  title: { default: 'Админка SafetyHub', template: '%s — Админка SafetyHub' },
   robots: { index: false, follow: false },
   ...pwaIdentity(),
 };

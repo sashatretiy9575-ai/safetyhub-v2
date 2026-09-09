@@ -78,7 +78,7 @@ test('locale-aware PWA resources are precached and Chinese font loading is route
       read('scripts/subset-cjk-ui-font.py'),
     ]);
   const font = await stat(
-    new URL('../../public/fonts/noto-sans-sc-ui.b533a0e8.woff2', import.meta.url),
+    new URL('../../public/fonts/noto-sans-sc-ui.b5829052.woff2', import.meta.url),
   );
 
   assert.match(worker, /OFFLINE_URLS/u);
@@ -86,7 +86,7 @@ test('locale-aware PWA resources are precached and Chinese font loading is route
   assert.match(worker, /Object\.keys\(OFFLINE_URLS\).*`\/manifest\/\$\{locale\}`/su);
   assert.match(worker, /CACHE_PREFIX\}v9/u);
   assert.match(rootDocument, /locale === 'zh'/u);
-  assert.match(rootDocument, /\/fonts\/noto-sans-sc-ui\.b533a0e8\.woff2/u);
+  assert.match(rootDocument, /\/fonts\/noto-sans-sc-ui\.b5829052\.woff2/u);
   // The Chinese branch used to be the only one with a preload, so ru and kk
   // discovered their own font a full round trip late and repainted into it.
   assert.match(rootDocument, /\/fonts\/manrope-latin\.[0-9a-f]+\.woff2/u);

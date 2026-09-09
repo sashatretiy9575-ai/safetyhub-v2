@@ -4,7 +4,7 @@ import { AppShell } from '@/components/layout/app-shell';
 import { JsonLd } from '@/components/shared/json-ld';
 import { DeferredPwaInstall } from '@/components/shared/deferred-pwa-install';
 import { PublicAccountControl } from '@/components/shared/public-account-control';
-import { localBusinessJsonLd, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import { getSiteContacts } from '@/lib/site-contacts';
 import { setPhysicalLocale } from '../locale-context';
 
@@ -37,8 +37,7 @@ export default async function LocalizedPublicLayout({
             description: metadata('description'),
             city: footer('city'),
           }),
-          websiteJsonLd(locale),
-          localBusinessJsonLd(contacts, locale, footer('city')),
+          websiteJsonLd(),
         ]}
       />
       <AppShell accountMode="neutral" accountControl={<PublicAccountControl />}>
