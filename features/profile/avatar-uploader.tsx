@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/button';
 import {
   AVATAR_MAX_ZOOM,
   AVATAR_MIN_ZOOM,
+  AVATAR_HEIGHT,
+  AVATAR_WIDTH,
   DEFAULT_AVATAR_CROP,
   compressAvatar,
   drawAvatarCrop,
@@ -67,7 +69,7 @@ function CropPreview({
 
   useEffect(() => {
     if (!image || !canvasRef.current) return;
-    drawAvatarCrop(image, canvasRef.current, crop, 360, 360);
+    drawAvatarCrop(image, canvasRef.current, crop);
   }, [crop, image]);
 
   const pointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -123,8 +125,8 @@ function CropPreview({
   return (
     <canvas
       ref={canvasRef}
-      width={360}
-      height={360}
+      width={AVATAR_WIDTH}
+      height={AVATAR_HEIGHT}
       className="aspect-square h-auto w-full touch-none rounded-2xl bg-[var(--color-surface-muted)] object-cover"
       aria-label={previewLabel}
       onPointerDown={pointerDown}

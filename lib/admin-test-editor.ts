@@ -18,6 +18,9 @@ export const TEST_EDITOR_LIMITS = Object.freeze({
   durationMin: 1,
   durationMax: 120,
   passScoreMin: 1,
+  // The pass score is expressed out of the question count, so the two move
+  // together by definition.
+  passScoreMax: 10,
   attemptsPerDayMin: 1,
   attemptsPerDayMax: 50,
   questionTextMin: 3,
@@ -28,6 +31,10 @@ export const TEST_EDITOR_LIMITS = Object.freeze({
   presentationMaxBytes: 25 * 1024 * 1024,
   presentationMaxPages: 200,
 });
+
+/** Every question an operator has to fill in: three variants of ten. */
+export const TEST_EDITOR_TOTAL_QUESTIONS =
+  TEST_EDITOR_LIMITS.variantCount * TEST_EDITOR_LIMITS.questionCount;
 
 export const TEST_EDITOR_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
@@ -150,41 +157,73 @@ export function validateTestEditor(
   const warnings: Record<string, string> = {};
   const title = test.title.trim();
   if (title.length < TEST_EDITOR_LIMITS.titleMin) {
-    addError(errors, 'test-title', 'Введите название — минимум 3 символа.');
+    addError(
+      errors,
+      'test-title',
+      `Введите название — минимум ${TEST_EDITOR_LIMITS.titleMin} символа.`,
+    );
   } else if (title.length > TEST_EDITOR_LIMITS.titleMax) {
-    addError(errors, 'test-title', 'Сократите название до 180 символов.');
+    addError(
+      errors,
+      'test-title',
+      `Сократите название до ${TEST_EDITOR_LIMITS.titleMax} символов.`,
+    );
   }
   const normalizedSlug = test.slug.trim().toLowerCase();
   if (!TEST_EDITOR_SLUG_PATTERN.test(normalizedSlug)) {
     addError(errors, 'test-slug', 'Используйте латинские буквы, цифры и дефисы.');
   } else if (normalizedSlug.length > TEST_EDITOR_LIMITS.slugMax) {
-    addError(errors, 'test-slug', 'Сократите slug до 80 символов.');
+    addError(errors, 'test-slug', `Сократите slug до ${TEST_EDITOR_LIMITS.slugMax} символов.`);
   }
   if (test.description.trim().length > TEST_EDITOR_LIMITS.descriptionMax) {
-    addError(errors, 'test-description', 'Сократите описание до 1000 символов.');
+    addError(
+      errors,
+      'test-description',
+      `Сократите описание до ${TEST_EDITOR_LIMITS.descriptionMax} символов.`,
+    );
   }
   if (!isCourseIconId(test.icon ?? 'shield-check')) {
     addError(errors, 'test-icon', 'Выберите корректную иконку курса.');
   }
-  if (!Number.isInteger(test.displayOrder) || test.displayOrder < 1 || test.displayOrder > 10_000) {
+  if (
+    !Number.isInteger(test.displayOrder) ||
+    test.displayOrder < TEST_EDITOR_LIMITS.displayOrderMin ||
+    test.displayOrder > TEST_EDITOR_LIMITS.displayOrderMax
+  ) {
     addError(errors, 'test-display-order', 'Укажите положительный порядок курса.');
   }
   if (
     !Number.isInteger(test.durationMinutes) ||
-    test.durationMinutes < 1 ||
-    test.durationMinutes > 120
+    test.durationMinutes < TEST_EDITOR_LIMITS.durationMin ||
+    test.durationMinutes > TEST_EDITOR_LIMITS.durationMax
   ) {
-    addError(errors, 'test-duration', 'Укажите целое число от 1 до 120.');
+    addError(
+      errors,
+      'test-duration',
+      `Укажите целое число от ${TEST_EDITOR_LIMITS.durationMin} до ${TEST_EDITOR_LIMITS.durationMax}.`,
+    );
   }
-  if (!Number.isInteger(test.passScore) || test.passScore < 1 || test.passScore > 10) {
-    addError(errors, 'test-pass-score', 'Проходной балл должен быть от 1 до 10.');
+  if (
+    !Number.isInteger(test.passScore) ||
+    test.passScore < TEST_EDITOR_LIMITS.passScoreMin ||
+    test.passScore > TEST_EDITOR_LIMITS.passScoreMax
+  ) {
+    addError(
+      errors,
+      'test-pass-score',
+      `Проходной балл должен быть от ${TEST_EDITOR_LIMITS.passScoreMin} до ${TEST_EDITOR_LIMITS.passScoreMax}.`,
+    );
   }
   if (
     !Number.isInteger(test.attemptsPerCalendarDay) ||
-    test.attemptsPerCalendarDay < 1 ||
-    test.attemptsPerCalendarDay > 50
+    test.attemptsPerCalendarDay < TEST_EDITOR_LIMITS.attemptsPerDayMin ||
+    test.attemptsPerCalendarDay > TEST_EDITOR_LIMITS.attemptsPerDayMax
   ) {
-    addError(errors, 'test-attempt-limit', 'Укажите целое число от 1 до 50.');
+    addError(
+      errors,
+      'test-attempt-limit',
+      `Укажите целое число от ${TEST_EDITOR_LIMITS.attemptsPerDayMin} до ${TEST_EDITOR_LIMITS.attemptsPerDayMax}.`,
+    );
   }
   if (test.attemptResetTimezone !== 'Asia/Oral') {
     addError(errors, 'test-timezone', 'Для каталога используется часовой пояс Asia/Oral.');

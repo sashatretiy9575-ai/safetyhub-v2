@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   serializeTestEditorPayload,
   TEST_EDITOR_LIMITS,
+  TEST_EDITOR_TOTAL_QUESTIONS,
   validateTestEditor,
 } from '@/lib/admin-test-editor';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
@@ -143,6 +144,22 @@ function FieldWarning({ id, message }: { id: string; message?: string }) {
   ) : null;
 }
 
+// Russian has three plural forms; the previous condition had two, so anything
+// but a single error read "исправьте 2 ошибок".
+const RU_PLURAL_RULES = new Intl.PluralRules('ru-RU');
+const ERROR_NOUNS: Record<Intl.LDMLPluralRule, string> = {
+  zero: 'ошибок',
+  one: 'ошибку',
+  two: 'ошибки',
+  few: 'ошибки',
+  many: 'ошибок',
+  other: 'ошибки',
+};
+
+function errorNoun(count: number) {
+  return ERROR_NOUNS[RU_PLURAL_RULES.select(count)];
+}
+
 export function TestEditor({
   initial,
   initialPublicationNotice = null,
@@ -179,7 +196,9 @@ export function TestEditor({
   const dirty = snapshot !== savedSnapshot;
   const approveNavigation = useUnsavedChangesGuard(dirty);
   const validation = useMemo(() => validateTestEditor(course), [course]);
-  const draftValidation = useMemo(() => validateTestEditor(course, { publish: false }), [course]);
+  // The draft-mode validation is only consulted when saving, so it is run
+  // there rather than on every keystroke: it walks 3 variants x 10 questions
+  // x 4 options and parses two Zod schemas.
   const validationMessages = useMemo(
     () => [...new Set(Object.values(validation.fieldErrors))],
     [validation.fieldErrors],
@@ -299,10 +318,12 @@ export function TestEditor({
       return;
     }
     setValidationAttempted(true);
-    const effectiveValidation = publish ? validation : draftValidation;
+    const effectiveValidation = publish
+      ? validation
+      : validateTestEditor(course, { publish: false });
     if (!effectiveValidation.valid) {
       setError(
-        'Исправьте отмеченные поля. Для публикации нужны готовая PDF-презентация и 30 заполненных вопросов.',
+        `Исправьте отмеченные поля. Для публикации нужны готовая PDF-презентация и ${TEST_EDITOR_TOTAL_QUESTIONS} заполненных вопросов.`,
       );
       if (effectiveValidation.firstInvalidVariantIndex !== null)
         setActiveVariant(effectiveValidation.firstInvalidVariantIndex);
@@ -346,15 +367,29 @@ export function TestEditor({
       if (!result.ok || !payload?.id || !payload.contentHash || !payload.draftVersion) {
         throw new Error(payload?.error ?? 'COURSE_SAVE_FAILED');
       }
-      let next: TestEditorPayload = {
-        ...course,
+      // Only the fields the server owns are merged back, on top of whatever the
+      // form holds now. Replacing the whole object with the snapshot taken when
+      // the request started silently discarded every edit made while it ran.
+      const savedFields = {
         id: payload.id,
         draftVersion: payload.draftVersion ?? course.draftVersion,
         contentHash: payload.contentHash ?? course.contentHash,
-        publicationState: 'draft' as const,
+        // Saving a draft does not withdraw a published course. The state is
+        // whether the published revision still matches what was just saved.
+        publicationState:
+          course.publicationState === 'published' &&
+          course.revisionHistory?.find((revision) => revision.current)?.contentHash ===
+            payload.contentHash
+            ? ('published' as const)
+            : course.publicationState === 'published'
+              ? ('draft' as const)
+              : (course.publicationState ?? ('never_published' as const)),
       };
-      setCourse(next);
-      setSavedSnapshot(serializeTestEditorPayload(next));
+      setCourse((current) => ({ ...current, ...savedFields }));
+      setSavedSnapshot(
+        serializeTestEditorPayload({ ...course, ...savedFields } as TestEditorPayload),
+      );
+      let next: TestEditorPayload = { ...course, ...savedFields };
       if (publish) {
         const publication = await clientRequest(
           `/api/admin/courses/${encodeURIComponent(payload.id)}/localizations/publish`,
@@ -386,7 +421,8 @@ export function TestEditor({
         }
         next = { ...next, publicationState: 'published' };
       }
-      setCourse(next);
+      const publishedFields = { publicationState: next.publicationState };
+      setCourse((current) => ({ ...current, ...publishedFields }));
       setSavedSnapshot(serializeTestEditorPayload(next));
       if (!course.id) {
         approveNavigation();
@@ -418,7 +454,7 @@ export function TestEditor({
           publicationState === 'published' || publicationState === 'published_with_draft_changes'
         }
         hasDraftChanges={publicationState === 'published_with_draft_changes'}
-        progress={`${validation.completedCount}/30`}
+        progress={`${validation.completedCount}/${TEST_EDITOR_TOTAL_QUESTIONS}`}
         liveMessage={
           bankUnreadable
             ? 'Только просмотр: банк вопросов недоступен, сохранение выключено.'
@@ -443,7 +479,7 @@ export function TestEditor({
         >
           {bankUnreadable
             ? 'Банк вопросов сейчас прочитать нельзя, поэтому сохранение и публикация выключены: иначе сохранённые вопросы были бы стёрты. Остальные поля курса показаны только для просмотра. Обновите базу данных и откройте курс заново.'
-            : 'Сохранённого банка вопросов нет или он неполный — заполните 30 вопросов заново. Текущая опубликованная редакция работает, пока вы не опубликуете новую.'}
+            : `Сохранённого банка вопросов нет или он неполный — заполните ${TEST_EDITOR_TOTAL_QUESTIONS} вопросов заново. Текущая опубликованная редакция работает, пока вы не опубликуете новую.`}
         </p>
       ) : null}
 
@@ -494,7 +530,10 @@ export function TestEditor({
           </CardContent>
         </Card>
       ) : (
-        <>
+        // Disabled while a save is running. The action bar used to grey out only
+        // its own buttons, so the form stayed editable and anything typed during
+        // the request was overwritten when the response came back.
+        <fieldset disabled={busy} className="contents">
           <Card>
             <CardHeader>
               <CardTitle>1. Основные сведения</CardTitle>
@@ -876,7 +915,9 @@ export function TestEditor({
                 </div>
                 <div className="rounded-xl bg-[var(--color-surface-muted)] p-3">
                   <p className="text-xs text-[var(--color-text-subtle)]">Вопросы</p>
-                  <p className="mt-1 font-bold">{validation.completedCount}/30 заполнено</p>
+                  <p className="mt-1 font-bold">
+                    {validation.completedCount}/{TEST_EDITOR_TOTAL_QUESTIONS} заполнено
+                  </p>
                 </div>
                 <div className="rounded-xl bg-[var(--color-surface-muted)] p-3">
                   <p className="text-xs text-[var(--color-text-subtle)]">Политика</p>
@@ -897,7 +938,7 @@ export function TestEditor({
               >
                 {validation.valid
                   ? 'Курс готов к публикации новой неизменяемой редакции.'
-                  : `Публикация заблокирована: исправьте ${validationMessages.length} ${validationMessages.length === 1 ? 'ошибку' : 'ошибок'}.`}
+                  : `Публикация заблокирована: исправьте ${validationMessages.length} ${errorNoun(validationMessages.length)}.`}
               </div>
               {!validation.valid && validationAttempted ? (
                 <ul className="list-disc space-y-1 pl-5 text-sm text-[var(--color-danger)]">
@@ -941,39 +982,39 @@ export function TestEditor({
                   </span>
                 </summary>
                 <div className="mt-4">
-              {course.revisionHistory.length > 0 ? (
-                <ol className="space-y-3">
-                  {course.revisionHistory.map((revision) => (
-                    <li
-                      key={revision.id}
-                      className="rounded-xl border border-[var(--color-border)] p-3"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="font-bold">Редакция {revision.version}</p>
-                        {revision.current ? <Badge variant="sapphire">Текущая</Badge> : null}
-                      </div>
-                      <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                        Опубликована {formatDateTime(revision.publishedAt, 'ru-RU')}
-                      </p>
-                      <p
-                        className="mt-1 truncate font-mono text-xs text-[var(--color-text-subtle)]"
-                        title={revision.contentHash}
-                      >
-                        SHA-256 контента: {revision.contentHash}
-                      </p>
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <p className="text-sm text-[var(--color-text-muted)]">
-                  Опубликованных редакций пока нет.
-                </p>
-              )}
+                  {course.revisionHistory.length > 0 ? (
+                    <ol className="space-y-3">
+                      {course.revisionHistory.map((revision) => (
+                        <li
+                          key={revision.id}
+                          className="rounded-xl border border-[var(--color-border)] p-3"
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="font-bold">Редакция {revision.version}</p>
+                            {revision.current ? <Badge variant="sapphire">Текущая</Badge> : null}
+                          </div>
+                          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                            Опубликована {formatDateTime(revision.publishedAt, 'ru-RU')}
+                          </p>
+                          <p
+                            className="mt-1 truncate font-mono text-xs text-[var(--color-text-subtle)]"
+                            title={revision.contentHash}
+                          >
+                            SHA-256 контента: {revision.contentHash}
+                          </p>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="text-sm text-[var(--color-text-muted)]">
+                      Опубликованных редакций пока нет.
+                    </p>
+                  )}
                 </div>
               </details>
             </CardContent>
           </Card>
-        </>
+        </fieldset>
       )}
     </EditorShell>
   );

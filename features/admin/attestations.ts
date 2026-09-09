@@ -8,6 +8,7 @@ import { invalidateCertificateVerificationCache } from '@/features/certificates/
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { ADMIN_ATTESTATION_BULK_LIMIT } from '@/lib/constants';
+import { exclusiveRangeEnd, inclusiveRangeStart } from '@/features/admin/date-range';
 import type {
   AdminAttestationMutationItem,
   AdminAttestationFilters,
@@ -304,14 +305,6 @@ function param(params: RawAdminAttestationSearchParams, key: string) {
   return (Array.isArray(value) ? value[0] : value) ?? '';
 }
 
-function dateBoundary(value: string, end: boolean) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-  const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.valueOf())) return null;
-  if (end) date.setUTCDate(date.getUTCDate() + 1);
-  return date.toISOString();
-}
-
 export function encodeAdminAttestationCursor(cursor: AdminAttestationQuery['cursor']) {
   return cursor ? Buffer.from(JSON.stringify(cursor), 'utf8').toString('base64url') : '';
 }
@@ -344,8 +337,8 @@ export function parseAdminAttestationQuery(
     testId: testId.success ? testId.data : null,
     resultState: resultState.success ? resultState.data : null,
     certificateState: certificateState.success ? certificateState.data : null,
-    from: dateBoundary(param(params, 'from'), false),
-    to: dateBoundary(param(params, 'to'), true),
+    from: inclusiveRangeStart(param(params, 'from')),
+    to: exclusiveRangeEnd(param(params, 'to')),
     sort: sort.success ? sort.data : 'completed_desc',
     pageSize: pageSize.success ? pageSize.data : ADMIN_ATTESTATION_DEFAULT_PAGE_SIZE,
     cursor: parseCursor(param(params, 'cursor')),

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { requireAnyCapability, requireCapability, requireRole } from '@/features/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import type { AccountStatus, AppRole } from '@/lib/supabase/types';
+import { exclusiveRangeEnd, inclusiveRangeStart } from '@/features/admin/date-range';
 import type {
   AdminAccessUser,
   AdminAccountApprovalItem,
@@ -280,14 +281,6 @@ function enumValue<T extends string>(value: string | undefined, values: readonly
   return value && values.includes(value as T) ? (value as T) : null;
 }
 
-function dateBoundary(value: string | undefined, endExclusive: boolean) {
-  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-  const instant = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(instant.getTime())) return null;
-  if (endExclusive) instant.setUTCDate(instant.getUTCDate() + 1);
-  return instant.toISOString();
-}
-
 function cursorDate(params: RawAdminSearchParams, key = 'cursorAt') {
   const value = first(params, key);
   return value && !Number.isNaN(Date.parse(value)) ? new Date(value).toISOString() : null;
@@ -324,8 +317,8 @@ export function parseAdminAuditQuery(params: RawAdminSearchParams): AdminAuditQu
     actor: boundedText(params, 'actor'),
     target: boundedText(params, 'target'),
     action: boundedText(params, 'action'),
-    from: dateBoundary(first(params, 'from'), false),
-    to: dateBoundary(first(params, 'to'), true),
+    from: inclusiveRangeStart(first(params, 'from')),
+    to: exclusiveRangeEnd(first(params, 'to')),
     cursorAt: cursor.at,
     cursorId: cursor.id,
   };

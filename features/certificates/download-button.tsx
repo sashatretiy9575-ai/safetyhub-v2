@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check, DownloadSimple, SpinnerGap } from '@phosphor-icons/react';
 import { Button, type ButtonProps } from '@/components/ui/button';
@@ -13,6 +13,16 @@ import {
   type CertificateRenderMetadata,
 } from '@/lib/pdf/certificate-client-contract';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
+
+/**
+ * Deliberately twice the shared client default: this request resolves a
+ * certificate and its assets, and a learner on a phone in a workshop should
+ * not be told it failed because the network was slow.
+ */
+const CERTIFICATE_METADATA_TIMEOUT_MS = 30_000;
+
+/** How long the button keeps saying the file was saved. */
+const DOWNLOADED_STATE_RESET_MS = 4_000;
 
 export function CertificateDownloadButton({
   certificateId,
@@ -32,11 +42,26 @@ export function CertificateDownloadButton({
   const [status, setStatus] = useState<'idle' | 'busy' | 'downloaded'>('idle');
   const [message, setMessage] = useState('');
   const abortRef = useRef<AbortController | null>(null);
+  const resetTimerRef = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      abortRef.current?.abort();
+      abortRef.current = null;
+      if (resetTimerRef.current !== null) window.clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    },
+    [],
+  );
 
   const download = async () => {
     if (status === 'busy') {
       abortRef.current?.abort();
       return;
+    }
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
     }
     const controller = new AbortController();
     abortRef.current = controller;
@@ -46,7 +71,7 @@ export function CertificateDownloadButton({
       const result = await clientRequest(
         `/api/certificates/${certificateId}/metadata`,
         { headers: { Accept: 'application/json' } },
-        { timeoutMs: 30_000, signal: controller.signal },
+        { timeoutMs: CERTIFICATE_METADATA_TIMEOUT_MS, signal: controller.signal },
       );
       if (!result.ok) {
         setMessage(localizedClientRequestMessage(result.error, t('downloadFailed'), errorT));
@@ -58,7 +83,10 @@ export function CertificateDownloadButton({
       const { downloadCertificateInBrowser } = await import('@/lib/pdf/certificate-client');
       await downloadCertificateInBrowser(metadata, { signal: controller.signal });
       setStatus('downloaded');
-      setTimeout(() => setStatus('idle'), 4000);
+      resetTimerRef.current = window.setTimeout(() => {
+        resetTimerRef.current = null;
+        setStatus('idle');
+      }, DOWNLOADED_STATE_RESET_MS);
     } catch (error) {
       if (controller.signal.aborted) {
         setMessage(t('cancelled'));

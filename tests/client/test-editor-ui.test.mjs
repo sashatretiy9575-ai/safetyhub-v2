@@ -123,7 +123,7 @@ test('course editor exposes presentation, policy, three variants, stable ids and
   assert.match(component, /Array\.from\(\{ length: TEST_EDITOR_LIMITS\.optionCount \}/);
   assert.match(component, /correctOptionId/);
   assert.match(component, /crypto\.randomUUID\(\)/);
-  assert.match(component, /30 заполненных вопросов/);
+  assert.match(component, /\$\{TEST_EDITOR_TOTAL_QUESTIONS\} заполненных вопросов/);
   assert.match(component, /attemptResetTimezone: 'Asia\/Oral'/);
   assert.match(component, /clientRequest\('\/api\/admin\/courses'/);
   assert.match(component, /router\.replace\(`\/admin\/courses\//);

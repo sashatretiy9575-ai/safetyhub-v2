@@ -101,8 +101,9 @@ export function AdminEditor({
   initialPublicationNotice?: 'incomplete' | 'failed' | null;
 }) {
   const router = useRouter();
-  const editorIdRef = useRef(initialData?.id ?? 'new');
-  const initialBlocks = articleBlocksSchema.safeParse(initialData?.blocks ?? []);
+  const editorIdRef = useRef(initialData?.id ?? '');
+  const [restoredAt, setRestoredAt] = useState<Date | null>(null);
+
   const [articleId, setArticleId] = useState(initialData?.id ?? null);
   const [draftVersion, setDraftVersion] = useState(initialData?.draftVersion);
   const [originalSlug, setOriginalSlug] = useState(initialData?.originalSlug ?? null);
@@ -123,10 +124,12 @@ export function AdminEditor({
     toContentDateInput(initialData?.effectiveDate ?? ''),
   );
   const [sources, setSources] = useState<ContentSource[]>(initialData?.sources ?? []);
-  const [blocks, setBlocks] = useState<ArticleBlock[]>(
-    initialBlocks.success ? initialBlocks.data : [],
-  );
-  const [, setStatus] = useState<ArticleLifecycleStatus>(initialData?.status ?? 'draft');
+  const [blocks, setBlocks] = useState<ArticleBlock[]>(() => {
+    // Parsed once, lazily. In the component body this full recursive parse ran
+    // on every render to produce a value only the first render reads.
+    const parsed = articleBlocksSchema.safeParse(initialData?.blocks ?? []);
+    return parsed.success ? parsed.data : [];
+  });
   const [publicationState, setPublicationState] = useState<ArticlePublicationState>(
     initialData?.publicationState ?? 'never_published',
   );
@@ -145,11 +148,14 @@ export function AdminEditor({
   const [saveState, setSaveState] = useState<'saved' | 'unsaved' | 'saving'>('saved');
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [draftReady, setDraftReady] = useState(false);
+  const autosaveInFlightRef = useRef(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+  // Only computed while the preview is open: it parses every block through Zod,
+  // and the preview is closed by default.
   const previewBlocks = useMemo(
-    () => blocks.filter((block) => articleBlockSchema.safeParse(block).success),
-    [blocks],
+    () => (preview ? blocks.filter((block) => articleBlockSchema.safeParse(block).success) : []),
+    [blocks, preview],
   );
   const documentFingerprint = useMemo(
     () =>
@@ -200,6 +206,23 @@ export function AdminEditor({
   );
 
   useEffect(() => {
+    if (!editorIdRef.current) {
+      // A brand new article gets its own key for this tab. The shared literal
+      // 'new' meant two tabs, or a later attempt after abandoning one draft,
+      // silently loaded each other's text.
+      const sessionKey = 'safetyhub:article-editor-new';
+      let identifier = '';
+      try {
+        identifier = window.sessionStorage.getItem(sessionKey) ?? '';
+        if (!identifier) {
+          identifier = `new:${crypto.randomUUID()}`;
+          window.sessionStorage.setItem(sessionKey, identifier);
+        }
+      } catch {
+        identifier = `new:${crypto.randomUUID()}`;
+      }
+      editorIdRef.current = identifier;
+    }
     const stored = readEditorDraft(
       window.localStorage,
       'article',
@@ -220,6 +243,9 @@ export function AdminEditor({
       setEffectiveDate(draft.effectiveDate);
       setSources(draft.sources.map((source) => ({ ...source })));
       setBlocks(structuredClone(draft.blocks));
+      // Restoring without saying so meant the operator could open a published
+      // article and be shown an older local draft as if it were the server copy.
+      setRestoredAt(new Date(stored.savedAt));
     }
     setDraftReady(true);
     // The server snapshot is intentionally compared only once during hydration.
@@ -266,7 +292,6 @@ export function AdminEditor({
     setDraftVersion(result.draftVersion);
     setOriginalSlug(result.slug);
     setSlug(result.slug);
-    setStatus(result.status);
     setPublicationState(
       result.status === 'draft'
         ? publishedContentHash
@@ -307,6 +332,10 @@ export function AdminEditor({
     if (!canAutosave || busy) return;
     let cancelled = false;
     const timeout = window.setTimeout(() => {
+      // Two autosaves in flight carry the same draftVersion, and the slower
+      // response overwrites the newer draft.
+      if (autosaveInFlightRef.current) return;
+      autosaveInFlightRef.current = true;
       setSaveState('saving');
       void persist()
         .then((result) => {
@@ -318,6 +347,9 @@ export function AdminEditor({
         })
         .catch(() => {
           if (!cancelled) setSaveState('unsaved');
+        })
+        .finally(() => {
+          autosaveInFlightRef.current = false;
         });
     }, 1_500);
     return () => {
@@ -396,7 +428,6 @@ export function AdminEditor({
         setSaveState('saved');
         clearEditorDraft(window.localStorage, 'article', editorIdRef.current);
         if (result.publicationError) {
-          setStatus(result.status);
           setPublicationState(
             result.status === 'published'
               ? 'published_with_draft_changes'
@@ -416,7 +447,6 @@ export function AdminEditor({
           router.refresh();
           return;
         }
-        setStatus('published');
         setPublishedContentHash(result.contentHash);
         setPublicationState('published');
         finishNavigation(result.slug);
@@ -429,7 +459,6 @@ export function AdminEditor({
         expectedContentHash: saved.contentHash,
       });
       setDraftVersion(result.draftVersion);
-      setStatus(result.status);
       if (result.status === 'published') {
         setPublishedContentHash(result.contentHash);
         setPublicationState('published');
@@ -499,15 +528,20 @@ export function AdminEditor({
         }
         hasDraftChanges={displayedPublicationState === 'published_with_draft_changes'}
         liveMessage={
-          saveState === 'saving'
-            ? 'Сохраняем изменения'
-            : saveState === 'unsaved'
-              ? 'Есть несохранённые изменения'
-              : savedAt
-                ? `Сохранено в ${savedAt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`
-                : initialData
-                  ? 'Сохранено на сервере'
-                  : 'Черновик ещё не сохранён'
+          restoredAt
+            ? // Restoring a local draft without saying so meant the operator
+              // could open a published article and be shown older text as if it
+              // were the server copy.
+              `Восстановлен локальный черновик от ${restoredAt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`
+            : saveState === 'saving'
+              ? 'Сохраняем изменения'
+              : saveState === 'unsaved'
+                ? 'Есть несохранённые изменения'
+                : savedAt
+                  ? `Сохранено в ${savedAt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`
+                  : initialData
+                    ? 'Сохранено на сервере'
+                    : 'Черновик ещё не сохранён'
         }
         onTogglePreview={() => setPreview((current) => !current)}
         onSave={() => void handleSave()}

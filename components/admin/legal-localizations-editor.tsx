@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { AdminLocaleTabs } from '@/components/admin/admin-locale-tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -67,11 +67,33 @@ function LegalVersionEditor({
   const [error, setError] = useState('');
 
   // A bundle publication updates the parent copy of both selected legal
-  // versions. Keep this editor's local draft in sync so its badges and
-  // immutable controls reflect that atomic result without a page reload.
+  // versions. Keep this editor's badges and immutable controls in sync with
+  // that atomic result without a page reload.
+  //
+  // Only the server-owned fields are taken. The previous version rebuilt the
+  // whole local draft on every parent update — including after each save, since
+  // the parent re-creates its items array — which threw the operator back to the
+  // Russian tab and replaced the text they were editing with the Russian body.
+  // Translating a document meant losing the work every time it was saved.
+  const versionKeyRef = useRef<string | null>(null);
   useEffect(() => {
     const next = structuredClone(initial);
-    const nextActive = next.localizations.find((item) => item.locale === 'ru') ?? next.localizations[0];
+    const versionKey = `${next.documentType}:${next.version}`;
+    const sameVersion = versionKeyRef.current === versionKey;
+    versionKeyRef.current = versionKey;
+    if (sameVersion) {
+      setVersion((current) => ({
+        ...next,
+        localizations: next.localizations.map((incoming) => {
+          const local = current.localizations.find((item) => item.locale === incoming.locale);
+          // Keep whatever is being edited; take the status the server decided.
+          return local ? { ...incoming, body: local.body } : incoming;
+        }),
+      }));
+      return;
+    }
+    const nextActive =
+      next.localizations.find((item) => item.locale === 'ru') ?? next.localizations[0];
     setVersion(next);
     setActiveLocale(nextActive?.locale ?? 'ru');
     setBodyText(JSON.stringify(nextActive?.body ?? {}, null, 2));
