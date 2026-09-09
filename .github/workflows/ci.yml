@@ -68,6 +68,10 @@ jobs:
       # local run. Neither value is used anywhere but this throwaway instance.
       RATE_LIMIT_HMAC_SECRET: local-ci-rate-limit-hmac-secret-not-a-production-value
       CERTIFICATE_VERIFICATION_SECRET: local-ci-certificate-verification-secret-not-production
+      # Supabase Auth refuses to boot without a well-formed send-email hook
+      # secret (config.toml declares it as env()). Base64 of the literal
+      # "local-ci-send-email-hook-secret!" — a throwaway for this container.
+      SUPABASE_SEND_EMAIL_HOOK_SECRETS: v1,whsec_bG9jYWwtY2ktc2VuZC1lbWFpbC1ob29rLXNlY3JldCE=
       # Optional: any Docker Hub account lifts the anonymous image-pull limit
       # that rate limits these jobs. Absent, the start step simply retries.
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -204,6 +208,10 @@ jobs:
       # Cloudflare documents this as the public always-pass test secret. It is
       # scoped to the disposable local GoTrue container, never production.
       SUPABASE_AUTH_CAPTCHA_SECRET: 1x0000000000000000000000000000000AA
+      # Supabase Auth refuses to boot without a well-formed send-email hook
+      # secret (config.toml declares it as env()). Base64 of the literal
+      # "local-ci-send-email-hook-secret!" — a throwaway for this container.
+      SUPABASE_SEND_EMAIL_HOOK_SECRETS: v1,whsec_bG9jYWwtY2ktc2VuZC1lbWFpbC1ob29rLXNlY3JldCE=
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0

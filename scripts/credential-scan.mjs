@@ -16,6 +16,7 @@ export const ALLOWED_CREDENTIAL_LITERALS = [
   '3x0000000000000000000000000000000AA',
   'local-ci-rate-limit-hmac-secret-not-a-production-value',
   'local-ci-certificate-verification-secret-not-production',
+  'v1,whsec_bG9jYWwtY2ktc2VuZC1lbWFpbC1ob29rLXNlY3JldCE=',
 ];
 
 export const SECRET_PATTERNS = [
