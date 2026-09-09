@@ -5,7 +5,6 @@ type PageHeaderProps = {
   eyebrow?: string;
   title: string;
   description?: string;
-  actions?: React.ReactNode;
   className?: string;
   variant?: 'default' | 'compact' | 'contact';
 };
@@ -14,7 +13,6 @@ export function PageHeader({
   eyebrow,
   title,
   description,
-  actions,
   className,
   variant = 'default',
 }: PageHeaderProps) {
@@ -45,7 +43,6 @@ export function PageHeader({
               <p className="max-w-2xl text-pretty text-[15px] leading-[1.55] text-[var(--color-text-muted)] sm:text-base md:text-lg">{description}</p>
             )}
           </div>
-          {actions && <div className="flex flex-wrap items-center gap-3">{actions}</div>}
         </div>
       </Container>
     </header>

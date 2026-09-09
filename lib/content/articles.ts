@@ -69,9 +69,6 @@ function listArticleFiles() {
   return fs.readdirSync(articlesDir).filter((file) => file.endsWith('.json'));
 }
 
-export function parseArticleBlocks(value: unknown): ArticleBlock[] {
-  return articleBlocksSchema.parse(value);
-}
 
 function publicCoverImage(value: unknown) {
   const parsed = articleCoverImageSchema.safeParse(value);

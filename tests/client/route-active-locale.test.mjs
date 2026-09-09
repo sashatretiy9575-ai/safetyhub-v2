@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { isRouteActive, normalizeRoutePath } from '../../lib/navigation.js';
+import { isRouteActive, normalizeRoutePath } from '../../lib/navigation.ts';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');

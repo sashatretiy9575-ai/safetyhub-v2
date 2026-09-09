@@ -185,7 +185,7 @@ function ProfileAvatar({
  * to a given person by reading two badges. The row, the card and the bulk panel
  * now all agree on one answer.
  */
-export function nextAttestationStep(
+function nextAttestationStep(
   row: AdminAttestationRow,
   permissions: AttestationPermissions,
 ): { label: string; action: AttestationPendingAction } | null {

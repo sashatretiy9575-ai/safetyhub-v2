@@ -1,21 +1,7 @@
-import type { AccountStatus, AppLocale, AppRole } from '@/lib/supabase/types';
-import type { AdminCapability } from '@/lib/security/capabilities';
+import type { AccountStatus, AppLocale } from '@/lib/supabase/types';
 import type { ContentSource } from '@/lib/content/content-metadata';
 import type { ContentSeo } from '@/lib/validation/content-seo';
 import type { IconId } from '@/lib/course-icons';
-
-/**
- * Minimal account-management payload allowed across the Server/Client boundary.
- * Detailed profile, verified identity, activity and certificate data stay server-only.
- */
-export type AdminUserListItem = {
-  id: string;
-  email: string | null;
-  label: string;
-  role: AppRole;
-  capabilities: AdminCapability[];
-  status: AccountStatus;
-};
 
 /** Minimal PII read model for the capability-gated manual learner-approval queue. */
 export type AdminAccountApprovalItem = {
@@ -53,48 +39,12 @@ export type AdminPage<T> = {
   nextCursor: AdminPageCursor | null;
 };
 
-export type AdminAccessUser = {
-  id: string;
-  email: string | null;
-  label: string;
-  capabilities: AdminCapability[];
-};
-
-export type AuthAdminOutboxItem = {
-  id: string;
-  operationType: 'invite' | 'suspend' | 'restore';
-  state: 'prepared' | 'external_succeeded' | 'committed' | 'retryable' | 'rolled_back' | 'failed';
-  actorUserId: string;
-  actorLabel: string;
-  targetId: string | null;
-  targetLabel: string;
-  attempts: number;
-  lastError: string | null;
-  originalReason: string | null;
-  correlationId: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
 export type AdminDataFailure = {
   state: 'failed';
   correlationId: string;
 };
 
 export type AdminDataResult<T> = { state: 'ready'; data: T } | AdminDataFailure;
-
-export type AdminDataSummary = {
-  users: number | null;
-  activeUsers: number | null;
-  suspendedUsers: number | null;
-  attempts: number | null;
-  passedAttempts: number | null;
-  activeCertificates: number | null;
-  revokedCertificates: number | null;
-  auditEvents24h: number | null;
-  tests: number | null;
-  generatedAt: string;
-};
 
 export type AdminAttestationIdentityState = 'pending' | 'verified' | 'changed' | 'revoked';
 

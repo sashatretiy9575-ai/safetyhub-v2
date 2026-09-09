@@ -139,10 +139,6 @@ export function clientRequestMessage(error: unknown, fallback: string) {
   }
 }
 
-export function isClientTransportFailure(error: unknown) {
-  const kind = classifyClientRequestFailure(error).kind;
-  return kind === 'offline' || kind === 'timeout' || kind === 'network' || kind === 'aborted';
-}
 
 export async function readClientResponseJson<T>(
   response: Response | undefined,

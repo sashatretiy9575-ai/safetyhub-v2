@@ -56,9 +56,6 @@ function topicSeo(value: unknown, title: string, description: string): ContentSe
   return parsed.success ? parsed.data : defaultContentSeo(title, description);
 }
 
-export function estimateTopicReadTime(topic: { durationMinutes?: number }) {
-  return Math.max(1, topic.durationMinutes ?? 15);
-}
 
 const courseSnapshotsDir = path.join(process.cwd(), 'content', 'snapshots', 'courses');
 let lastKnownTopics: Topic[] | null = null;

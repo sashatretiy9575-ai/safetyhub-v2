@@ -135,7 +135,10 @@ function auditFilterParams(query: ReturnType<typeof parseAdminAuditQuery>) {
   return params;
 }
 
+// The page is mounted at two paths, so every link it builds has to keep the
+// reader on the one they actually opened.
 function auditPageHref(
+  basePath: string,
   query: ReturnType<typeof parseAdminAuditQuery>,
   cursorToken: string,
   trail: readonly string[],
@@ -149,21 +152,27 @@ function auditPageHref(
   const serialized = serializeAdminTrail(trail);
   if (serialized) params.set(ADMIN_TRAIL_PARAM, serialized);
   const encoded = params.toString();
-  return encoded ? `/admin/settings/history?${encoded}` : '/admin/settings/history';
+  return encoded ? `${basePath}?${encoded}` : basePath;
 }
 
-function quickFilterHref(query: ReturnType<typeof parseAdminAuditQuery>, action: string) {
+function quickFilterHref(
+  basePath: string,
+  query: ReturnType<typeof parseAdminAuditQuery>,
+  action: string,
+) {
   const params = auditFilterParams(query);
   params.delete('action');
   if (action) params.set('action', action);
   const encoded = params.toString();
-  return encoded ? `/admin/settings/history?${encoded}` : '/admin/settings/history';
+  return encoded ? `${basePath}?${encoded}` : basePath;
 }
 
 export default async function AuditPage({
   searchParams,
+  basePath = '/admin/audit',
 }: {
   searchParams: Promise<RawAdminSearchParams>;
+  basePath?: string;
 }) {
   const params = await searchParams;
   const query = parseAdminAuditQuery(params);
@@ -212,7 +221,7 @@ export default async function AuditPage({
           return (
             <Link
               key={value || 'all'}
-              href={quickFilterHref(query, value)}
+              href={quickFilterHref(basePath, query, value)}
               aria-current={active ? 'true' : undefined}
               className={`inline-flex min-h-11 items-center rounded-full px-3 font-semibold transition-colors ${
                 active
@@ -257,7 +266,7 @@ export default async function AuditPage({
         </Button>
         {hasFilters ? (
           <Button asChild type="button" size="sm" variant="outline" className="h-11">
-            <Link href="/admin/settings/history">Сбросить</Link>
+            <Link href={basePath}>Сбросить</Link>
           </Button>
         ) : null}
       </form>
@@ -425,15 +434,16 @@ export default async function AuditPage({
             visible={auditResult.data.items.length}
             pageIndex={trail.length}
             pageSize={ADMIN_PAGE_SIZE}
-            firstHref={auditPageHref(query, '', [])}
+            firstHref={auditPageHref(basePath, query, '', [])}
             previousHref={
               previousToken === null
                 ? null
-                : auditPageHref(query, previousToken, trail.slice(0, -1))
+                : auditPageHref(basePath, query, previousToken, trail.slice(0, -1))
             }
             nextHref={
               auditResult.data.hasMore && auditResult.data.nextCursor
                 ? auditPageHref(
+                    basePath,
                     query,
                     `${auditResult.data.nextCursor.at}|${auditResult.data.nextCursor.id}`,
                     appendAdminTrail(trail, currentToken),

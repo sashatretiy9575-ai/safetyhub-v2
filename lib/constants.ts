@@ -18,7 +18,6 @@ export const ROUTES = {
   adminAccount: '/admin/account',
   signIn: '/auth/login',
   signUp: '/auth/register',
-  resetPassword: '/auth/reset-password',
   contacts: '/contacts',
   faq: '/faq',
   privacy: '/privacy',
@@ -49,11 +48,6 @@ export const QUIZ_POLICY = {
   passPercent: Math.round((DEFAULT_PASS_SCORE / DEFAULT_QUESTION_COUNT) * 100),
 } as const;
 
-/** @deprecated Use QUIZ_POLICY for new code. */
-export const QUIZ = {
-  defaultPassPercent: QUIZ_POLICY.passPercent,
-  defaultQuestionCount: QUIZ_POLICY.questionCount,
-} as const;
 
 /**
  * How many accounts one purge request may carry.

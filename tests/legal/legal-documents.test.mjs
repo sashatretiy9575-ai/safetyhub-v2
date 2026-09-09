@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
+import path from 'node:path';
 import test from 'node:test';
+
+const root = path.resolve(import.meta.dirname, '../..');
 import {
   legalDocumentHref,
   legalEffectiveDateInAppTimezone,
@@ -70,8 +73,6 @@ test('current legal copies accurately disclose the minimal ZH username-password 
     termsPage,
     privacySource,
     termsSource,
-    privacyComponent,
-    termsComponent,
     localizedView,
     legal,
     footer,
@@ -82,8 +83,6 @@ test('current legal copies accurately disclose the minimal ZH username-password 
     read('app/(public)/terms/page.tsx'),
     read('content/legal/privacy/1.4.ru.json'),
     read('content/legal/terms/2.4.ru.json'),
-    read('components/legal/privacy-policy-v1-4.tsx'),
-    read('components/legal/terms-policy-v2-4.tsx'),
     read('components/legal/localized-legal-document.tsx'),
     read('lib/legal.ts'),
     read('components/layout/footer.tsx'),
@@ -150,9 +149,14 @@ test('current legal copies accurately disclose the minimal ZH username-password 
     assert.doesNotMatch(source, /mailto:/);
     assert.doesNotMatch(source, /tel:/);
   }
-  for (const component of [privacyComponent, termsComponent]) {
-    assert.match(component, /LocalizedLegalDocumentView/);
-    assert.match(component, /bodySourceSha256/);
+  // The 1.4 and 2.4 renderings are gone: no route mounted them, and they
+  // assembled the document by hand instead of going through the loader that
+  // validates it. 1.2 and 2.2 remain because the live pages render them.
+  for (const removed of [
+    'components/legal/privacy-policy-v1-4.tsx',
+    'components/legal/terms-policy-v2-4.tsx',
+  ]) {
+    await assert.rejects(access(path.join(root, removed)));
   }
   for (const locale of ['ru', 'kk', 'en', 'zh']) {
     const [privacyCopy, termsCopy] = await Promise.all([

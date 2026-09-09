@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { AttemptPolicyError, parseAttemptRpcError } from './policy-error.ts';
+import { AttemptPolicyError, parseAttemptRpcError } from '../../features/learning/policy-error.ts';
 
 test('legacy rolling-deploy limit preserves its domain code and exact retry timestamp', () => {
   const error = parseAttemptRpcError({

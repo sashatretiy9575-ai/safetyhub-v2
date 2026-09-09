@@ -3,14 +3,13 @@ import 'server-only';
 import { randomUUID } from 'node:crypto';
 import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
 import { z } from 'zod';
-import { requireAnyCapability, requireCapability } from '@/features/auth/server';
+import { requireCapability } from '@/features/auth/server';
 import { invalidateCertificateVerificationCache } from '@/features/certificates/server';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { ADMIN_ATTESTATION_BULK_LIMIT } from '@/lib/constants';
 import { exclusiveRangeEnd, inclusiveRangeStart } from '@/features/admin/date-range';
 import type {
-  AdminAttestationMutationItem,
   AdminAttestationFilters,
   AdminAttestationPage,
   AdminAttestationSelection,
@@ -433,48 +432,6 @@ export async function resolveAdminAttestationSelection(
   );
 }
 
-export async function confirmAdminIdentities(userIds: string[]) {
-  await requireCapability('identity.manage');
-  const result = mutationItemsSchema.parse(
-    await rpc('confirm_admin_identities', { p_user_ids: uuidArraySchema.parse(userIds) }),
-  ) satisfies AdminAttestationMutationItem[];
-  invalidateCertificateVerificationCache();
-  return result;
-}
-
-export async function updateAdminParticipants(
-  userIds: string[],
-  field: 'name' | 'surname' | 'job' | 'organization',
-  value: string,
-) {
-  await requireCapability('identity.manage');
-  const ids = uuidArraySchema.min(1).parse(userIds);
-  if ((field === 'name' || field === 'surname') && ids.length !== 1) {
-    throw new Error('INDIVIDUAL_NAME_UPDATE_REQUIRED');
-  }
-  const normalized = z.string().trim().min(1).max(200).parse(value).normalize('NFC');
-  const result = mutationItemsSchema.parse(
-    await rpc('bulk_update_participants', {
-      p_user_ids: ids,
-      p_field: field,
-      p_value: normalized,
-    }),
-  ) satisfies AdminAttestationMutationItem[];
-  invalidateCertificateVerificationCache();
-  return result;
-}
-
-export async function issueAdminCertificates(attestationIds: string[]) {
-  await requireCapability('certificate.issue');
-  const result = mutationItemsSchema.parse(
-    await rpc('issue_certificates', {
-      p_attestation_ids: uuidArraySchema.min(1).parse(attestationIds),
-    }),
-  ) satisfies AdminAttestationMutationItem[];
-  invalidateCertificateVerificationCache();
-  return result;
-}
-
 export type AdminAttestationAction =
   | { action: 'confirm'; targetIds: string[] }
   | {
@@ -507,8 +464,4 @@ export async function executeAdminAttestationAction(
     replayed: z.boolean().parse(envelope.replayed),
     items: mutationItemsSchema.parse(raw),
   };
-}
-
-export async function requireAttestationReadAccess() {
-  return requireAnyCapability(['results.read', 'identity.read', 'certificate.read']);
 }

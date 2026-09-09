@@ -115,19 +115,6 @@ test('dangerous operator payloads are bounded, reasoned and idempotent', async (
   assert.match(manager, /crypto\.randomUUID\(\)/);
 });
 
-test('confirmation dialog has browser-native modal and accessible cancel semantics', async () => {
-  const dialog = await read('components/admin/admin-action-dialog.tsx');
-  assert.match(dialog, /<dialog/);
-  assert.match(dialog, /\.showModal\(\)/);
-  assert.match(dialog, /aria-labelledby=\{titleId\}/);
-  assert.match(dialog, /aria-describedby=\{descriptionId\}/);
-  assert.match(dialog, /aria-busy=\{busy \|\| undefined\}/);
-  assert.match(dialog, /onCancel=\{\(event\) =>/);
-  assert.match(dialog, /type="button"[\s\S]+onClick=\{cancel\}/);
-  assert.match(dialog, /minLength=\{10\}/);
-  assert.match(dialog, /maxLength=\{500\}/);
-});
-
 test('role assignment is one bounded contract and the capability matrix stays absent', async () => {
   await assert.rejects(access(path.join(root, 'components/admin/user-manager.tsx')));
   await assert.rejects(access(path.join(root, 'components/admin/capability-manager.tsx')));

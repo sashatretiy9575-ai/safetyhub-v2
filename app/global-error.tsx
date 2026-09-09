@@ -39,7 +39,6 @@ export default function GlobalError({
             <AppErrorState
               title={messages.AppState.criticalTitle}
               description={messages.AppState.criticalDescription}
-              error={error}
               diagnostic={diagnostic}
               onRetry={reset}
               retryLabel={messages.Common.retry}
