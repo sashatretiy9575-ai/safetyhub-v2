@@ -56,7 +56,7 @@ export default async function TopicsPage() {
               className="grid items-stretch gap-4 min-[1200px]:grid-cols-3 sm:grid-cols-2 lg:gap-5"
               aria-label={t('catalogAria')}
             >
-              {topics.map((topic) => (
+              {topics.map((topic, index) => (
                 <CourseCard
                   key={topic.slug}
                   slug={topic.slug}
@@ -66,7 +66,10 @@ export default async function TopicsPage() {
                   durationMinutes={topic.durationMinutes}
                   questionCount={topic.questionCount}
                   pageCount={topic.presentation?.pageCount}
-                  priority={false}
+                  // The first cover is this page's LCP element. Marked lazy it
+                  // was only requested after layout, on a page whose whole
+                  // purpose is that grid.
+                  priority={index === 0}
                 />
               ))}
             </div>

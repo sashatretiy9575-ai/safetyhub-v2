@@ -1,0 +1,2094 @@
+{
+  "schemaVersion": 1,
+  "batchId": "staged-2026-09-01",
+  "manifestHash": "99cf98f5d61b232887669886368a383b5be22c6a60d7f51e9c8bd9bbda7b095b",
+  "legalVersions": [
+    {
+      "documentType": "privacy",
+      "version": "1.1",
+      "bodyRevision": "privacy-1.1",
+      "effectiveAt": "2026-08-13T00:00:00.000Z",
+      "isCurrent": false,
+      "localizations": [
+        {
+          "locale": "ru",
+          "title": "Политика конфиденциальности",
+          "body": {
+            "bodyRevision": "privacy-1.1"
+          },
+          "bodyHash": "a48369d376fa21595763ec6709496b0bf64219dc65d8dd1483cc731a864f7e7b",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "documentType": "privacy",
+      "version": "1.2",
+      "bodyRevision": "privacy-1.2",
+      "effectiveAt": "2026-08-31T00:00:00.000Z",
+      "isCurrent": false,
+      "localizations": [
+        {
+          "locale": "en",
+          "title": "Privacy Policy",
+          "body": {
+            "sections": [
+              {
+                "id": "privacy-scope",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://adilet.zan.kz/rus/docs/Z1300000094",
+                    "label": "official portal “Adilet”"
+                  }
+                ],
+                "heading": "Scope and grounds",
+                "paragraphs": [
+                  "Policy applies to the PWA SafetyHub.kz site, account, courses, tests, certificates and administrative functions. Data is processed to provide access to training, conduct profile verification, perform testing, issue and verify certificates, respond to requests, protect the service and comply with applicable legal requirements.",
+                  "Inferred grounds are user consent, compliance with accepted terms and conditions and legal requirements to the extent applicable. Their sufficiency for each scenario must be confirmed by the operator during a local legal review. The general regulatory starting point is the Law of the Republic of Kazakhstan “On Personal Data and Their Protection” on the official portal “Adilet”."
+                ]
+              },
+              {
+                "id": "privacy-data",
+                "items": [
+                  "Account and access: email, confirmation status, account and session service identifiers and auth/PKCE-cookie. Login and email confirmation are performed using a one-time code from the letter (email OTP). Password, SMS code and phone number are not used for authentication.",
+                  "Profile and verification: first name, last name, position, organization, contact number with selected country code, square profile photo, status and time of manual verification by the administrator. The number is needed only as a contact for verification and support, is not used for login and is not transmitted to the SMS provider.",
+                  "Training: Course and test version, answers completed, attempt time and status, best score, and issued, superseded, or revoked certificate metadata.",
+                  "Consents: document type, version, date of acceptance and source of action (“profile”).",
+                  "Security and administration: reasons and history of privileged actions, correlation/request ID, abbreviated user-agent, as well as HMAC hash of an enlarged network address for limits and investigation of abuse.",
+                  "Contacts: address and content of the message, if the user writes to support."
+                ],
+                "links": [],
+                "heading": "What data is processed",
+                "paragraphs": [
+                  "The photo is stored as one private compressed WebP file in Supabase Storage. The original and intermediate frame are not saved, there is no public access to the avatar, facial recognition and automatic biometric identification are not performed. The camera stream does not leave the device: only the selected and processed frame is sent to the server.",
+                  "Public verification of a certificate via an unpredictable link can show the owner's name, certificate number and status, test name, result and issue date. Do not post such a link if you do not want to share this information."
+                ]
+              },
+              {
+                "id": "privacy-approval",
+                "items": [],
+                "links": [],
+                "heading": "Manual profile check",
+                "paragraphs": [
+                  "After explicitly accepting the current documents, the user fills out the profile and submits it for manual review. The usual benchmark for review is up to 24 hours from the date of submission; This is a waiting period and is not an automatic approval or guarantee of access to a course at any given time.",
+                  "While the status is “under review” or “rejected,” the system does not open course materials and questions, does not allow you to start the test, and does not issue a certificate. The administrator sees the application in the back office and makes a decision; if rejected, the reason may be shown and the user can correct the profile and reapply."
+                ]
+              },
+              {
+                "id": "privacy-storage",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://www.cloudflare.com/turnstile-privacy-policy/",
+                    "label": "policy Turnstile"
+                  }
+                ],
+                "heading": "Cookie and local storage",
+                "paragraphs": [
+                  "Necessary cookies are used to log in using an email code, update a session, PKCE-restore and protect closed routes. localStorage can store the theme, hide the installation prompt PWA, incomplete test answers and, for the administrator, the local editor draft. This data remains in the selected browser until the user or application deletes it. Advertising cookies and behavioral advertising are not used in the current version of the application.",
+                  "If Cloudflare Turnstile is enabled, its technical data and storage are processed by Cloudflare for security checks according to policy Turnstile ."
+                ]
+              },
+              {
+                "id": "privacy-processors",
+                "items": [
+                  "Supabase - Auth, PostgreSQL, private Storage, short-lived signed links and delivery of email codes. See DPA and available regions.",
+                  "Vercel - hosting, CDN, serverless execution and technical logs. See privacy notice and DPA.",
+                  "Cloudflare - only optional anti-bot check Turnstile when it is enabled in the configuration."
+                ],
+                "links": [
+                  {
+                    "url": "https://supabase.com/legal/customer-resources/data-processing-addendum",
+                    "label": "DPA"
+                  },
+                  {
+                    "url": "https://supabase.com/docs/guides/platform/regions",
+                    "label": "available regions"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/privacy-notice",
+                    "label": "privacy notice"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/dpa",
+                    "label": "DPA"
+                  }
+                ],
+                "heading": "Suppliers and cross-border processing",
+                "paragraphs": [
+                  "The storage region and access locations of providers depend on the selected regions, deployment settings and their current subprocessors; The code does not guarantee storage only in Kazakhstan. Before production launch, the operator must fix the actual regions, contracts and acceptable mechanism for cross-border transfer."
+                ]
+              },
+              {
+                "id": "privacy-retention",
+                "items": [],
+                "links": [],
+                "heading": "Storage periods and disposal",
+                "paragraphs": [
+                  "Account details, profile, contact number, photo, completed attempts, best score, certificates, consents and associated administrative audit are stored for as long as the account exists. Raw attempts and audits do not have an automatic deletion period during this period.",
+                  "When you permanently delete an account, the application deletes the Auth account, profile, photo, answers and attempts, top scores, verified data, certificates and associated audits. A public QR check of a remote certificate then returns “Document not found”. A copy of PDF that has already been downloaded to someone else’s device cannot be physically deleted. Vendor backups can be updated based on their technical cycle.",
+                  "PDF-certificates and ZIP-archives are created upon request and are not permanently written to either PostgreSQL or Storage. The photograph is not included in the PDF, ZIP or QR check. A corporate report with certification data can be provided to an authorized representative of the user's company to confirm training."
+                ]
+              },
+              {
+                "id": "privacy-rights",
+                "items": [],
+                "links": [
+                  {
+                    "url": "#legal-contacts",
+                    "label": "contacts according to the document"
+                  }
+                ],
+                "heading": "Rights and Appeals",
+                "paragraphs": [
+                  "To the extent provided by applicable law, the user may request information about processing and a copy of the data, correction, restriction or termination of processing, withdrawal of consent and deletion of the account. Some records may be retained where a mandatory legal basis requires it; the operator must explain that decision.",
+                  "To send a request or check the status of a manual review, use the document contacts. Identity verification may be required to secure your account. If the answer is not satisfactory, the user has the right to appeal to the competent authority or court in the manner prescribed by applicable law."
+                ]
+              },
+              {
+                "id": "privacy-security",
+                "items": [],
+                "links": [],
+                "heading": "Document Security and Changes",
+                "paragraphs": [
+                  "The application uses one-time code login from email, differentiation of roles and powers, RLS, frequency limiting of operations, verification of the source of administrative requests, protective browser headers, audit of critical actions and encrypted transport. The code from the letter cannot be transferred to other persons; no measure eliminates risk completely.",
+                  "A new significant version is published under a new number and date. The accepted version remains available via the versioned link in the profile; re-consent is requested if the current version has not yet been accepted."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Phone",
+                  "WhatsApp",
+                  "Write"
+                ],
+                "links": [],
+                "heading": "Contacts according to the document",
+                "paragraphs": [
+                  "Call or write to WhatsApp. For written requests, save the chat correspondence."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "fa04423820ad253a2cc392af8837f8c0422e6e33586485ea56ec898b446b9c46",
+          "status": "published"
+        },
+        {
+          "locale": "kk",
+          "title": "Құпиялық саясаты",
+          "body": {
+            "sections": [
+              {
+                "id": "privacy-scope",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://adilet.zan.kz/rus/docs/Z1300000094",
+                    "label": "«Әділет» ресми порталы"
+                  }
+                ],
+                "heading": "Қолдану аясы мен негіздері",
+                "paragraphs": [
+                  "Саясат PWA SafetyHub.kz сайтына, тіркелгіге, курстарға, сынақтарға, сертификаттарға және әкімшілік функцияларға қолданылады. Деректер оқуға қолжетімділікті қамтамасыз ету, профильді тексеру, тестілеуді орындау, сертификаттарды шығару және тексеру, сұрауларға жауап беру, қызметті қорғау және қолданыстағы заң талаптарын орындау үшін өңделеді.",
+                  "Болжалды негіздер – пайдаланушының келісімі, қабылданған шарттар мен заңды талаптарға сәйкестігі. Әрбір сценарий үшін олардың жеткіліктілігін жергілікті заңдық тексеру кезінде оператор растауы керек. Жалпы нормативтік бастау «Әділет» ресми порталындағы «Дербес деректер және оларды қорғау туралы» Қазақстан Республикасының Заңы болып табылады."
+                ]
+              },
+              {
+                "id": "privacy-data",
+                "items": [
+                  "Тіркелгі және кіру: электрондық пошта, растау күйі, тіркелгі және сеанс қызметінің идентификаторлары және аутентификация/PKCE-cookie. Жүйеге кіру және электрондық поштаны растау хаттың бір реттік коды (электрондық пошта OTP) арқылы жүзеге асырылады. Құпия сөз, SMS коды және телефон нөмірі аутентификация үшін пайдаланылмайды.",
+                  "Профиль және тексеру: аты-жөні, тегі, лауазымы, ұйымы, таңдалған ел коды бар байланыс нөмірі, төртбұрышты профиль фотосы, әкімшінің қолмен тексеру күйі және уақыты. Нөмір тек тексеру және қолдау көрсету үшін контакт ретінде қажет, кіру үшін пайдаланылмайды және SMS провайдеріне берілмейді.",
+                  "Тренинг: Курс және сынақ нұсқасы, аяқталған жауаптар, әрекет уақыты мен күйі, ең жақсы ұпай және берілген, ауыстырылған немесе жойылған сертификат метадеректері.",
+                  "Келісімдер: құжат түрі, нұсқасы, қабылданған күні және әрекет көзі («профиль»).",
+                  "Қауіпсіздік және әкімшілік: артықшылықты әрекеттердің себептері мен тарихы, корреляция/сұраныс идентификаторы, қысқартылған пайдаланушы-агент, сондай-ақ шектеулер мен теріс пайдалануды тергеу үшін кеңейтілген желі мекенжайының HMAC хэші.",
+                  "Контактілер: егер пайдаланушы қолдау қызметіне жазса, хабарламаның мекенжайы мен мазмұны."
+                ],
+                "links": [],
+                "heading": "Қандай деректер өңделеді",
+                "paragraphs": [
+                  "Фотосурет Supabase жадында бір жеке қысылған WebP файлы ретінде сақталады. Түпнұсқа және аралық кадр сақталмайды, аватарға жалпы қолжетімділік жоқ, бет-әлпетті тану және автоматты биометриялық сәйкестендіру орындалмайды. Камера ағыны құрылғыдан шықпайды: серверге тек таңдалған және өңделген кадр жіберіледі.",
+                  "Болжалды емес сілтеме арқылы сертификатты жалпыға ортақ тексеру иесінің атын, сертификат нөмірін және күйін, сынақ атауын, нәтижесін және берілген күнін көрсете алады. Бұл ақпаратты бөліскіңіз келмесе, мұндай сілтемені орналастырмаңыз."
+                ]
+              },
+              {
+                "id": "privacy-approval",
+                "items": [],
+                "links": [],
+                "heading": "Профильді қолмен тексеру",
+                "paragraphs": [
+                  "Ағымдағы құжаттарды нақты қабылдағаннан кейін пайдаланушы профильді толтырады және оны қолмен қарауға жібереді. Қарап шығудың әдеттегі эталоны – берілген күннен бастап 24 сағатқа дейін; Бұл күту кезеңі және кез келген уақытта курсқа кіруді автоматты түрде мақұлдау немесе кепілдеме болып табылмайды.",
+                  "Күй «қарауда» немесе «қабылданбады» болғанда, жүйе курс материалдары мен сұрақтарын ашпайды, сынақты бастауға мүмкіндік бермейді және сертификат бермейді. Әкімші өтінімді бэк-офисте көріп, шешім қабылдайды; қабылданбаған жағдайда, себебі көрсетіліп, пайдаланушы профильді түзеп, қайта өтініш бере алады."
+                ]
+              },
+              {
+                "id": "privacy-storage",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://www.cloudflare.com/turnstile-privacy-policy/",
+                    "label": "саясаты Turnstile"
+                  }
+                ],
+                "heading": "Cookie және жергілікті сақтау",
+                "paragraphs": [
+                  "Қажетті cookie файлдары электрондық пошта кодын пайдаланып жүйеге кіру, сеансты жаңарту, PKCE-жабық маршруттарды қалпына келтіру және қорғау үшін пайдаланылады. localStorage тақырыпты сақтай алады, орнату нұсқауын PWA, толық емес сынақ жауаптарын және әкімші үшін жергілікті редактор жобасын жасыра алады. Бұл деректер пайдаланушы немесе қолданба оны жоймайынша таңдалған шолғышта қалады. Қолданбаның ағымдағы нұсқасында жарнамалық cookie файлдары мен мінез-құлық жарнамасы пайдаланылмайды.",
+                  "Cloudflare Turnstile қосылса, оның техникалық деректері мен сақтауы Turnstile саясатына сәйкес қауіпсіздік тексерулері үшін Cloudflare арқылы өңделеді."
+                ]
+              },
+              {
+                "id": "privacy-processors",
+                "items": [
+                  "Supabase - Auth, PostgreSQL, жеке жад, қысқа мерзімді қол қойылған сілтемелер және электрондық пошта кодтарын жеткізу. DPA және қолжетімді аймақтарды қараңыз.",
+                  "Vercel - хостинг, CDN, серверсіз орындау және техникалық журналдар. Құпиялық туралы ескертуді және DPA қараңыз.",
+                  "Cloudflare - конфигурацияда қосылған кезде ғана қосымша анти-ботты тексеру Turnstile."
+                ],
+                "links": [
+                  {
+                    "url": "https://supabase.com/legal/customer-resources/data-processing-addendum",
+                    "label": "DPA"
+                  },
+                  {
+                    "url": "https://supabase.com/docs/guides/platform/regions",
+                    "label": "қолжетімді аймақтар"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/privacy-notice",
+                    "label": "privacy notice"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/dpa",
+                    "label": "DPA"
+                  }
+                ],
+                "heading": "Жеткізушілер және трансшекаралық өңдеу",
+                "paragraphs": [
+                  "Жад аймағы мен провайдерлердің қатынасу орындары таңдалған аймақтарға, орналастыру параметрлеріне және олардың ағымдағы ішкі процессорларына байланысты; Код тек Қазақстанда ғана сақтауға кепілдік бермейді. Өндірісті іске қоспас бұрын оператор нақты аймақтарды, шарттарды және трансшекаралық тасымалдаудың қолайлы механизмін бекітуі керек."
+                ]
+              },
+              {
+                "id": "privacy-retention",
+                "items": [],
+                "links": [],
+                "heading": "Сақтау мерзімдері және кәдеге жарату",
+                "paragraphs": [
+                  "Тіркелгі мәліметтері, профиль, байланыс нөмірі, фотосурет, аяқталған әрекеттер, ең жақсы ұпай, сертификаттар, келісімдер және тиісті әкімшілік аудит тіркелгі бар болғанша сақталады. Бұл кезеңде өңделмеген әрекеттер мен аудиттердің автоматты түрде жою мерзімі болмайды.",
+                  "Есептік жазбаны біржола жойған кезде, қолданба Auth тіркелгісін, профильді, фотосуретті, жауаптар мен әрекеттерді, ең жоғары ұпайларды, тексерілген деректерді, сертификаттарды және қатысты аудиттерді жояды. Қашықтағы сертификатты жалпыға ортақ QR тексеруі \"Құжат табылмады\" деп қайтарады. Басқа біреудің құрылғысына жүктеп алынған PDF көшірмесін физикалық түрде жою мүмкін емес. Жеткізушінің сақтық көшірмелерін олардың техникалық циклі негізінде жаңартуға болады.",
+                  "PDF-сертификаттар және ZIP-мұрағаттар сұрау бойынша жасалады және PostgreSQL немесе Сақтау орнына біржола жазылмайды. Фотосурет PDF, ZIP немесе QR тексеруіне қосылмаған. Сертификаттау деректері бар корпоративтік есеп оқытуды растау үшін пайдаланушы компаниясының уәкілетті өкіліне ұсынылуы мүмкін."
+                ]
+              },
+              {
+                "id": "privacy-rights",
+                "items": [],
+                "links": [
+                  {
+                    "url": "#legal-contacts",
+                    "label": "контактілер құжатқа сәйкес"
+                  }
+                ],
+                "heading": "Құқықтар мен апелляциялар",
+                "paragraphs": [
+                  "Пайдаланушы қолданыстағы құқықта көзделген көлемде деректердің өңделуі туралы ақпарат пен деректер көшірмесін, түзетуді, өңдеуді шектеуді немесе тоқтатуды, келісімді кері қайтаруды және аккаунтты жоюды сұрай алады. Міндетті заңдық негіз болған жағдайда кейбір жазбалар сақталуы мүмкін; оператор мұндай шешімді түсіндіруге тиіс.",
+                  "Сұрау жіберу немесе қолмен қарау күйін тексеру үшін құжат контактілерін пайдаланыңыз. Тіркелгіңізді қорғау үшін жеке басыңызды растау қажет болуы мүмкін. Жауап қанағаттанарлық болмаса, пайдаланушы қолданыстағы заңнамада белгіленген тәртіппен құзыретті органға немесе сотқа шағымдануға құқылы."
+                ]
+              },
+              {
+                "id": "privacy-security",
+                "items": [],
+                "links": [],
+                "heading": "Құжат қауіпсіздігі және өзгертулер",
+                "paragraphs": [
+                  "Қолданба электрондық поштадан бір реттік кодты логинді, рөлдер мен өкілеттіктерді саралауды, RLS, операцияларды жиілікті шектеуді, әкімшілік сұраулар көзін тексеруді, браузердің қорғау тақырыптарын, маңызды әрекеттер аудитін және шифрланған тасымалдауды пайдаланады. Хаттағы кодты басқа тұлғаларға беруге болмайды; ешбір шара тәуекел толығымен жоймайды.",
+                  "Жаңа маңызды нұсқа жаңа нөмір мен күнмен жарияланады. Қабылданған нұсқа профильдегі нұсқаланған сілтеме арқылы қолжетімді болып қалады; егер ағымдағы нұсқа әлі қабылданбаса, қайта келісім сұралады."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Телефон",
+                  "WhatsApp",
+                  "Жазыңыз"
+                ],
+                "links": [],
+                "heading": "Құжатқа сәйкес байланыстар",
+                "paragraphs": [
+                  "WhatsApp нөміріне қоңырау шалыңыз немесе жазыңыз. Жазбаша сұраулар үшін чат корреспонденциясын сақтаңыз."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "aaa1010975f00a9a4f92939bd4bd27c5b6d448eadd243db2e7be825a95343438",
+          "status": "published"
+        },
+        {
+          "locale": "ru",
+          "title": "Политика конфиденциальности",
+          "body": {
+            "bodyRevision": "privacy-1.2"
+          },
+          "bodyHash": "f883332ed9a6e2e2de32addd6c2d9a4f7bb4b67d4a22f1c2e9fd758c26bc77bf",
+          "status": "published"
+        },
+        {
+          "locale": "zh",
+          "title": "隐私政策",
+          "body": {
+            "sections": [
+              {
+                "id": "privacy-scope",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://adilet.zan.kz/rus/docs/Z1300000094",
+                    "label": "官方门户“Adilet”"
+                  }
+                ],
+                "heading": "范围和依据",
+                "paragraphs": [
+                  "政策适用于PWA SafetyHub.kz 网站、帐户、课程、测试、证书和管理功能。处理数据的目的是提供培训、进行个人资料验证、执行测试、颁发和验证证书、响应请求、保护服务并遵守适用的法律要求。",
+                  "推断依据是用户同意、遵守可接受的条款和条件以及适用范围内的法律要求。它们对于每种情况的充分性必须由运营商在当地法律审查期间确认。一般监管起点是官方门户网站“Adilet”上的哈萨克斯坦共和国《个人数据及其保护法》。"
+                ]
+              },
+              {
+                "id": "privacy-data",
+                "items": [
+                  "帐户和访问：电子邮件、确认状态、帐户和会话服务标识符以及 auth/PKCE-cookie。使用信件中的一次性代码（电子邮件OTP）进行登录和电子邮件确认。密码、短信代码和电话号码不用于身份验证。",
+                  "个人资料和验证：名字、姓氏、职位、组织、带有所选国家代码的联系电话、方形个人资料照片、管理员手动验证的状态和时间。该号码仅用作验证和支持的联系人，不用于登录，也不会传输给 SMS 提供商。",
+                  "培训：课程和测试版本、完成的答案、尝试时间和状态、最佳成绩以及颁发、取代或撤销的证书元数据。",
+                  "同意：文档类型、版本、接受日期和行动来源（“个人资料”）。",
+                  "安全和管理：特权操作的原因和历史记录、关联/请求 ID、缩写用户代理，以及用于限制和滥用调查的扩大网络地址的 HMAC 哈希。",
+                  "联系人：消息的地址和内容（如果用户写信寻求支持）。"
+                ],
+                "links": [],
+                "heading": "处理哪些数据",
+                "paragraphs": [
+                  "照片作为一个私有压缩WebP 文件存储在Supabase 存储中。不保存原始帧和中间帧，不公开访问头像，不执行面部识别和自动生物特征识别。相机流不会离开设备：仅将选定和处理的帧发送到服务器。",
+                  "通过不可预测的链接对证书进行公开验证，可以显示所有者的姓名、证书编号和状态、测试名称、结果和颁发日期。如果您不想分享此信息，请勿发布此类链接。"
+                ]
+              },
+              {
+                "id": "privacy-approval",
+                "items": [],
+                "links": [],
+                "heading": "手动配置文件检查",
+                "paragraphs": [
+                  "明确接受当前文档后，用户填写个人资料并提交以供人工审核。通常的审核基准是自提交之日起最多24小时；这是一个等待期，而不是自动批准或保证在任何给定时间访问课程。",
+                  "状态为“审核中”或“已拒绝”时，系统不会开放课程材料和问题，不允许您开始测试，也不会颁发证书。管理员在后台查看申请并做出决定；如果被拒绝，可能会显示原因，用户可以更正个人资料并重新申请。"
+                ]
+              },
+              {
+                "id": "privacy-storage",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://www.cloudflare.com/turnstile-privacy-policy/",
+                    "label": "政策Turnstile"
+                  }
+                ],
+                "heading": "Cookie 和本地存储",
+                "paragraphs": [
+                  "必要的cookie用于使用电子邮件代码登录、更新会话、PKCE-恢复和保护封闭路由。 localStorage 可以存储主题、隐藏安装提示PWA、不完整的测试答案以及对于管理员来说，本地编辑器草稿。该数据保留在所选浏览器中，直到用户或应用程序将其删除。当前版本的应用程序不使用广告 cookie 和行为广告。",
+                  "如果启用CloudflareTurnstile，其技术数据和存储将由Cloudflare根据策略Turnstile进行安全检查。"
+                ]
+              },
+              {
+                "id": "privacy-processors",
+                "items": [
+                  "Supabase - 身份验证、PostgreSQL、私人存储、短期签名链接和电子邮件代码传送。请参阅 DPA 和可用区域。",
+                  "Vercel - 托管、CDN、无服务器执行和技术日志。请参阅隐私声明和 DPA。",
+                  "Cloudflare - 仅在配置中启用时可选的反机器人检查Turnstile。"
+                ],
+                "links": [
+                  {
+                    "url": "https://supabase.com/legal/customer-resources/data-processing-addendum",
+                    "label": "DPA"
+                  },
+                  {
+                    "url": "https://supabase.com/docs/guides/platform/regions",
+                    "label": "可用区域"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/privacy-notice",
+                    "label": "privacy notice"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/dpa",
+                    "label": "DPA"
+                  }
+                ],
+                "heading": "供应商及跨境加工",
+                "paragraphs": [
+                  "提供商的存储区域和访问位置取决于所选区域、部署设置及其当前子处理器；该代码不保证仅存储在哈萨克斯坦。在投产前，运营商必须确定实际的区域、合同和可接受的跨境转移机制。"
+                ]
+              },
+              {
+                "id": "privacy-retention",
+                "items": [],
+                "links": [],
+                "heading": "储存期限和处置",
+                "paragraphs": [
+                  "只要帐户存在，帐户详细信息、个人资料、联系电话、照片、已完成的尝试、最佳成绩、证书、同意书和相关的管理审核都会被存储。在此期间，原始尝试和审核没有自动删除期限。",
+                  "当您永久删除帐户时，应用程序将删除身份验证帐户、个人资料、照片、答案和尝试、最高分、验证数据、证书和相关审核。远程证书的公共QR检查然后返回“未找到文档”。已下载到其他人设备上的PDF副本无法物理删除。供应商备份可以根据其技术周期进行更新。",
+                  "PDF-证书和ZIP-存档是根据请求创建的，并且不会永久写入PostgreSQL 或存储。该照片不包含在 PDF、ZIP 或 QR 支票中。可以向用户公司的授权代表提供包含认证数据的公司报告以确认培训。"
+                ]
+              },
+              {
+                "id": "privacy-rights",
+                "items": [],
+                "links": [
+                  {
+                    "url": "#legal-contacts",
+                    "label": "根据文档联系"
+                  }
+                ],
+                "heading": "权利和上诉",
+                "paragraphs": [
+                  "在适用法律规定的范围内，用户可以请求处理信息和数据副本，以及更正、限制或停止处理、撤回同意和删除账户。如存在强制性的法律依据，某些记录可能会继续保留；运营者必须说明该决定。",
+                  "要发送请求或检查手动审核的状态，请使用文档联系人。可能需要身份验证来保护您的帐户。如果答复不令人满意，用户有权按照适用法律规定的方式向主管机关或法院提出申诉。"
+                ]
+              },
+              {
+                "id": "privacy-security",
+                "items": [],
+                "links": [],
+                "heading": "文件安全和变更",
+                "paragraphs": [
+                  "该应用程序使用电子邮件一次性代码登录、角色和权力区分、RLS、操作频率限制、管理请求来源验证、保护性浏览器标头、关键操作审核和加密传输。信件中的代码不能转让给其他人；没有任何措施可以完全消除风险。",
+                  "新的重要版本以新的编号和日期发布。已接受的版本仍然可以通过配置文件中的版本链接获取；如果当前版本尚未被接受，则需要重新同意。"
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "电话",
+                  "WhatsApp",
+                  "写入"
+                ],
+                "links": [],
+                "heading": "根据文档联系方式",
+                "paragraphs": [
+                  "致电或写入WhatsApp。对于书面请求，请保存聊天信件。"
+                ]
+              }
+            ]
+          },
+          "bodyHash": "bd0bdfda6be8c254afb21410d2cd1ec5144d7a004b14785298b329b594955d79",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "documentType": "privacy",
+      "version": "1.3",
+      "bodyRevision": "privacy-1.3",
+      "effectiveAt": "2026-09-01T00:00:00.000Z",
+      "isCurrent": true,
+      "localizations": [
+        {
+          "locale": "en",
+          "title": "Privacy Policy",
+          "body": {
+            "sections": [
+              {
+                "id": "privacy-scope",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://adilet.zan.kz/rus/docs/Z1300000094",
+                    "label": "Law of the Republic of Kazakhstan “On Personal Data and Their Protection” on the “Adilet” portal"
+                  }
+                ],
+                "heading": "Scope and grounds",
+                "paragraphs": [
+                  "The policy applies to the site and PWA SafetyHub.kz, four language versions, account, courses, tests, certificates and administrative functions. Data is processed to provide access to training, conduct manual profile verification, perform testing, issue and verify certificates, respond to requests, protect the service and comply with applicable legal requirements.",
+                  "Inferred grounds are user consent, compliance with accepted terms and conditions and legal requirements to the extent applicable. Their sufficiency for each scenario must be confirmed by the operator during a local legal review. The general regulatory starting point is the Law of the Republic of Kazakhstan “On Personal Data and Their Protection”."
+                ]
+              },
+              {
+                "id": "privacy-authentication",
+                "items": [],
+                "links": [],
+                "heading": "Account, login and recovery",
+                "paragraphs": [
+                  "For Russian, Kazakh and English versions, login and email confirmation are performed using a one-time six-digit code from the letter. Password, SMS code and contact phone number are not used as a login factor.",
+                  "For the Chinese version, email, SMS, a password and a username are not required. Sign-in uses a discoverable WebAuthn passkey with mandatory user verification on the device. Biometric data and the device PIN are not transmitted to SafetyHub and are not stored by SafetyHub: verification is performed by the operating system or the user's authenticator.",
+                  "For technical compatibility, the Chinese account is assigned an internal opaque synthetic Auth identifier. It is not the user's address, is not used for mail, and is never shown to the user or administrator, nor included in a public or administrative response, Telegram message, analytics, or application log.",
+                  "For a passkey, the credential ID, public key, signature counter, declared transports and credential state are processed. A one-time challenge receipt remains valid for no more than 5 minutes. The recovery code is shown once; only its salted and peppered digest is stored. After use, the recovery code is invalidated immediately. An administrator may perform a reasoned, auditable reset and issue a one-time passkey re-enrollment code."
+                ]
+              },
+              {
+                "id": "privacy-profile-learning",
+                "items": [],
+                "links": [],
+                "heading": "Profile, verification and training",
+                "paragraphs": [
+                  "The profile contains first name, last name, position, organization, contact number with selected country code, square photo, preferred locale, status and time of manual verification by the administrator. The contact number is needed only for verification and support; it is not an authentication factor and is not transmitted to the SMS provider.",
+                  "The photo is stored as one private compressed WebP file in Supabase Storage. The original and intermediate frame are not saved, there is no public access to the avatar, facial recognition and automatic biometric identification are not performed. The camera stream does not leave the device: only the selected and processed frame is sent to the server.",
+                  "After explicitly accepting the current documents, the profile is sent for manual review. While the status is “under review”, “rejected” or the profile is not completed, the system does not open course materials and questions, does not allow you to create, resume or complete an attempt, and does not issue a certificate. The decision is made by the administrator only in the web admin panel; Telegram does not make decisions and does not change the status of the application.",
+                  "For training, the locale and version of the course and test, completed answers, time and status of attempt, best result, and metadata of the issued, replaced or revoked certificate are saved. For consents, the document type and version, copy locale, acceptance date, and source of action are stored."
+                ]
+              },
+              {
+                "id": "privacy-notifications",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://telegram.org/privacy",
+                    "label": "Telegram Privacy Policy"
+                  }
+                ],
+                "heading": "Administrative notifications and Telegram",
+                "paragraphs": [
+                  "Events about a new application, course completion and system error are atomically recorded in the internal administrator inbox. An additional information copy can be sent by a bot to a private Telegram group. Telegram unavailability does not cancel the business transaction and does not hide the event in the internal inbox.",
+                  "An application message contains only the first name, last name, locale, time and a link to the application queue. A course-completion message contains only the first name, last name, course title, passed or failed result, score and time. A system alert contains a stable machine code, time, correlation ID and a link to the admin panel.",
+                  "In Telegram it is prohibited to transmit email, phone number, position, organization, photo, documents, answers, credential metadata, challenge, recovery data and synthetic Auth identifier. Telegram messages do not contain approve or reject buttons and cannot change account status."
+                ]
+              },
+              {
+                "id": "privacy-storage",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://www.cloudflare.com/turnstile-privacy-policy/",
+                    "label": "Privacy Policy Cloudflare Turnstile"
+                  }
+                ],
+                "heading": "Cookie and local storage",
+                "paragraphs": [
+                  "Necessary cookies are used for logging in, updating HttpOnly session, PKCE-recovering email OTP, protecting closed routes and saving the selected locale. localStorage can store the theme, hide the installation prompt PWA, incomplete test answers and, for the administrator, the local editor draft. This data remains in the selected browser until the user or application deletes it. Advertising cookies and behavioral advertising are not used.",
+                  "If Cloudflare Turnstile is enabled, its technical data and storage are processed by Cloudflare for security checks."
+                ]
+              },
+              {
+                "id": "privacy-processors",
+                "items": [
+                  "Supabase - Auth, PostgreSQL, private Storage, short-lived signed links, email code delivery, Edge Functions and notification delivery queue.",
+                  "Vercel - hosting, CDN, serverless execution and technical logs.",
+                  "Cloudflare - optional anti-bot check Turnstile, when it is enabled in the configuration.",
+                  "Telegram Bot API - delivery of strictly minimized information messages to a private administrative group."
+                ],
+                "links": [
+                  {
+                    "url": "https://supabase.com/legal/customer-resources/data-processing-addendum",
+                    "label": "Supabase DPA"
+                  },
+                  {
+                    "url": "https://supabase.com/docs/guides/platform/regions",
+                    "label": "Regions Supabase"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/privacy-notice",
+                    "label": "Vercel Privacy Notice"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/dpa",
+                    "label": "Vercel DPA"
+                  },
+                  {
+                    "url": "https://telegram.org/privacy",
+                    "label": "Telegram Privacy Policy"
+                  }
+                ],
+                "heading": "Suppliers and cross-border processing",
+                "paragraphs": [
+                  "The storage region and access locations of providers depend on the selected regions, deployment settings and their current subprocessors; The code does not guarantee storage only in Kazakhstan. Before production publication, the operator must record the actual regions, contracts and acceptable cross-border transfer mechanism."
+                ]
+              },
+              {
+                "id": "privacy-retention",
+                "items": [],
+                "links": [],
+                "heading": "Storage periods and disposal",
+                "paragraphs": [
+                  "Account and profile data, credential passkey, contact number, photo, completed attempts, best score, certificates, consents and associated administrative audit are stored as long as the account exists or until the individual credential is reset. The used recovery digest is immediately invalidated; A short-lived challenge receipt expires in no later than 5 minutes.",
+                  "Successful Telegram delivery lines are stored for 30 days, administrative inbox events - 90 days; history audit is not reduced by these deadlines. Delivery errors contain only a limited category and technical identifiers, rather than a full external response.",
+                  "When an account is permanently deleted, the application deletes the Auth account, profile, photograph, answers and attempts, best results, verified data, credentials and recovery digests, certificates and associated audit records within the implemented deletion cascade. Public QR verification of a deleted certificate then returns “Document not found”. A PDF copy already downloaded to another device cannot be physically deleted from that device. Provider backups may be updated according to their technical cycle."
+                ]
+              },
+              {
+                "id": "privacy-certificates",
+                "items": [],
+                "links": [],
+                "heading": "Certificates, reports and public inspection",
+                "paragraphs": [
+                  "The server returns only the authorized limited metadata, template version, and already signed verification URL. PDF-certificate, administrative PDF-report and ZIP are collected only in the user’s or administrator’s browser; their bytes are not created by the backend route and are not stored in PostgreSQL or Storage. The photograph is not included in the PDF, ZIP or QR check.",
+                  "Public verification of a certificate using an unpredictable signed link can reveal the owner's name, certificate number and status, localized test name, result, and issue date. Do not post such a link if you do not want to share this information. A corporate report with certification data can be provided to an authorized representative of the user's company to confirm training."
+                ]
+              },
+              {
+                "id": "privacy-rights",
+                "items": [],
+                "links": [],
+                "heading": "Rights and Appeals",
+                "paragraphs": [
+                  "To the extent provided by applicable law, the user may request information about processing and a copy of the data, correction, restriction or termination of processing, withdrawal of consent and deletion of the account. Some records may be retained where a mandatory legal basis requires it; the operator must explain that decision.",
+                  "To send a request or check the status of a manual review, use the contacts on the document. Identity verification may be required to secure your account. If the answer is not satisfactory, the user has the right to appeal to the competent authority or court in the manner prescribed by applicable law."
+                ]
+              },
+              {
+                "id": "privacy-security-localization",
+                "items": [],
+                "links": [],
+                "heading": "Security, localization and document changes",
+                "paragraphs": [
+                  "The application verifies the WebAuthn origin, challenge and signature, requires user verification, uses one-time email codes, separates roles and capabilities, applies RLS and operation rate limits, sends protective browser headers, audits critical actions and uses encrypted transport. The email code, passkey session and recovery code must not be shared with anyone else; no measure eliminates risk completely.",
+                  "The Russian copy is the canonical source for localization. Copies of KK, EN and ZH are automatically translated, back-translated and automatically checked without human linguistic or legal approval. All four copies are published as one version, have separate immutable hashes and the same structure; residual risk semantic or legal discrepancies in automatic translation remain.",
+                  "A new significant edition is published under a new number and date. The accepted version remains available via the versioned link in the profile; separate consent is requested if the current version has not yet been accepted."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Phone",
+                  "WhatsApp",
+                  "Write"
+                ],
+                "links": [],
+                "heading": "Contacts according to the document",
+                "paragraphs": [
+                  "Call or write to WhatsApp. For written requests, save the chat correspondence."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "1cc7d494173316d65cd9de9dfb6232bfe2dbd0d49f8041fed664e10e0b91576d",
+          "status": "published"
+        },
+        {
+          "locale": "kk",
+          "title": "Құпиялық саясаты",
+          "body": {
+            "sections": [
+              {
+                "id": "privacy-scope",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://adilet.zan.kz/rus/docs/Z1300000094",
+                    "label": "«Әділет» порталында «Дербес деректер және оларды қорғау туралы» Қазақстан Республикасының Заңы"
+                  }
+                ],
+                "heading": "Қолдану аясы мен негіздері",
+                "paragraphs": [
+                  "Саясат сайтқа және PWA SafetyHub.kz төрт тіл нұсқасына, тіркелгіге, курстарға, сынақтарға, сертификаттарға және әкімшілік функцияларға қолданылады. Деректер оқуға қолжетімділікті қамтамасыз ету, профильді қолмен тексеру, тестілеуді орындау, сертификаттарды шығару және тексеру, сұрауларға жауап беру, қызметті қорғау және қолданыстағы заң талаптарын орындау үшін өңделеді.",
+                  "Болжамдалған негіздер – пайдаланушының келісімі, қабылданған шарттар мен талаптарға сәйкестігі және қолданылатын көлемдегі заң талаптары. Әрбір сценарий үшін олардың жеткіліктілігін жергілікті заңдық тексеру кезінде оператор растауы керек. Жалпы нормативтік бастапқы нүкте «Дербес деректер және оларды қорғау туралы» Қазақстан Республикасының Заңы болып табылады."
+                ]
+              },
+              {
+                "id": "privacy-authentication",
+                "items": [],
+                "links": [],
+                "heading": "Тіркелгі, кіру және қалпына келтіру",
+                "paragraphs": [
+                  "Орыс, қазақ және ағылшын тілдеріндегі нұсқалар үшін логин мен электрондық поштаны растау хаттан бір реттік алты таңбалы код арқылы жүзеге асырылады. Құпия сөз, SMS коды және байланыс телефон нөмірі кіру факторы ретінде пайдаланылмайды.",
+                  "Қытай тіліндегі нұсқада email, SMS, құпия сөз және username талап етілмейді. Кіру discoverable WebAuthn passkey арқылы, құрылғыда пайдаланушыны міндетті тексерумен орындалады. Биометриялық деректер мен құрылғының PIN коды SafetyHub-қа берілмейді және SafetyHub-та сақталмайды: тексеруді операциялық жүйе немесе пайдаланушының authenticator-ы орындайды.",
+                  "Техникалық үйлесімділік үшін қытай тіркелгісіне ішкі мөлдір емес синтетикалық аутентификация идентификаторы тағайындалады. Бұл пайдаланушының мекенжайы емес, пошта үшін пайдаланылмайды және ешқашан пайдаланушыға немесе әкімшіге көрсетілмейді, сондай-ақ жалпыға ортақ немесе әкімшілік жауапқа, Telegram хабарламасына, аналитикаға немесе қолданбалар журналына қосылмайды.",
+                  "Passkey үшін credential ID, ашық кілт, қолтаңба есептегіші, мәлімделген transports және credential күйі өңделеді. Бір реттік challenge receipt-тің жарамдылық мерзімі 5 минуттан аспайды. Recovery code бір рет көрсетіледі; оның salt және pepper қолданылған digest-і ғана сақталады. Пайдаланылғаннан кейін recovery code дереу жарамсыз етіледі. Әкімші негіздемесін көрсетіп, аудитке тіркелетін reset жасап, passkey-ді қайта тіркеуге арналған бір реттік код бере алады."
+                ]
+              },
+              {
+                "id": "privacy-profile-learning",
+                "items": [],
+                "links": [],
+                "heading": "Профиль, тексеру және оқыту",
+                "paragraphs": [
+                  "Профильде аты-жөні, тегі, лауазымы, ұйымы, таңдалған ел коды бар байланыс нөмірі, шаршы фотосурет, қалаған тіл, әкімші қолмен тексерудің күйі және уақыты бар. Байланыс нөмірі тек тексеру және қолдау көрсету үшін қажет; бұл аутентификация факторы емес және SMS провайдеріне жіберілмейді.",
+                  "Фотосурет Supabase жадында бір жеке қысылған WebP файлы ретінде сақталады. Түпнұсқа және аралық кадр сақталмайды, аватарға жалпы қолжетімділік жоқ, бет-әлпетті тану және автоматты биометриялық сәйкестендіру орындалмайды. Камера ағыны құрылғыдан шықпайды: серверге тек таңдалған және өңделген кадр жіберіледі.",
+                  "Ағымдағы құжаттарды нақты қабылдағаннан кейін профиль қолмен қарауға жіберіледі. Күй «қарауда», «қабылданбаған» немесе профиль аяқталмаған кезде, жүйе курс материалдары мен сұрақтарын ашпайды, әрекетті жасауға, жалғастыруға немесе аяқтауға мүмкіндік бермейді және сертификат бермейді. Шешімді әкімші тек веб-әкімші панелінде қабылдайды; Telegram шешім қабылдамайды және өтінімнің күйін өзгертпейді.",
+                  "Оқыту үшін курс пен сынақтың тілі мен нұсқасы, аяқталған жауаптар, әрекеттің уақыты мен күйі, ең жақсы нәтиже және берілген, ауыстырылған немесе күші жойылған сертификаттың метадеректері сақталады. Келісім үшін құжат түрі мен нұсқасы, көшірме тілі, қабылдау күні және әрекет көзі сақталады."
+                ]
+              },
+              {
+                "id": "privacy-notifications",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://telegram.org/privacy",
+                    "label": "Telegram құпиялылық саясаты"
+                  }
+                ],
+                "heading": "Әкімшілік хабарландырулар және Telegram",
+                "paragraphs": [
+                  "Жаңа қолданба, курсты аяқтау және жүйе қатесі туралы оқиғалар ішкі әкімшінің кіріс жәшігінде атомдық түрде жазылады. Қосымша ақпарат көшірмесін бот жеке Telegram тобына жібере алады. Telegram-дың қолжетімсіздігі іскерлік транзакциядан бас тартпайды және оқиғаны ішкі кіріс жәшігінде жасырмайды.",
+                  "Өтінім туралы хабарламада тек аты, тегі, локаль, уақыт және өтінімдер кезегіне сілтеме болады. Курсты аяқтау туралы хабарламада тек аты, тегі, курс атауы, passed немесе failed нәтижесі, ұпайы және уақыты болады. System alert құрамында тұрақты machine code, уақыт, correlation ID және әкімші панеліне сілтеме болады.",
+                  "Telegram-да электрондық поштаны, телефон нөмірін, лауазымды, ұйымды, фотосуретті, құжаттарды, жауаптарды, тіркелгі деректері метадеректерін, сынақты, қалпына келтіру деректерін және синтетикалық аутентификация идентификаторын жіберуге тыйым салынады. Telegram хабарламаларында мақұлдау немесе қабылдамау түймелері жоқ және тіркелгі күйін өзгерте алмайды."
+                ]
+              },
+              {
+                "id": "privacy-storage",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://www.cloudflare.com/turnstile-privacy-policy/",
+                    "label": "Құпиялылық саясаты Cloudflare Turnstile"
+                  }
+                ],
+                "heading": "Cookie және жергілікті сақтау",
+                "paragraphs": [
+                  "Қажетті cookie файлдары жүйеге кіру, HttpOnly сеансын жаңарту, PKCE-электрондық поштаны OTP қалпына келтіру, жабық маршруттарды қорғау және таңдалған тілді сақтау үшін пайдаланылады. localStorage тақырыпты сақтай алады, орнату нұсқауын PWA, толық емес сынақ жауаптарын және әкімші үшін жергілікті редактор жобасын жасыра алады. Бұл деректер пайдаланушы немесе қолданба оны жоймайынша таңдалған шолғышта қалады. Жарнамалық cookie файлдары мен мінез-құлық жарнамасы пайдаланылмайды.",
+                  "Cloudflare Turnstile қосылса, оның техникалық деректері мен сақтауы қауіпсіздік тексерулері үшін Cloudflare арқылы өңделеді."
+                ]
+              },
+              {
+                "id": "privacy-processors",
+                "items": [
+                  "Supabase - Auth, PostgreSQL, жеке жад, қысқа мерзімді қол қойылған сілтемелер, электрондық пошта кодын жеткізу, Edge функциялары және хабарландыруларды жеткізу кезегі.",
+                  "Vercel - хостинг, CDN, серверсіз орындау және техникалық журналдар.",
+                  "Cloudflare - конфигурацияда қосылған кезде, қосымша анти-ботты тексеру Turnstile.",
+                  "Telegram Bot API - жеке әкімшілік топқа қатаң түрде азайтылған ақпараттық хабарламаларды жеткізу."
+                ],
+                "links": [
+                  {
+                    "url": "https://supabase.com/legal/customer-resources/data-processing-addendum",
+                    "label": "Supabase DPA"
+                  },
+                  {
+                    "url": "https://supabase.com/docs/guides/platform/regions",
+                    "label": "Аймақтар Supabase"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/privacy-notice",
+                    "label": "Vercel Privacy Notice"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/dpa",
+                    "label": "Vercel DPA"
+                  },
+                  {
+                    "url": "https://telegram.org/privacy",
+                    "label": "Telegram құпиялылық саясаты"
+                  }
+                ],
+                "heading": "Жеткізушілер және трансшекаралық өңдеу",
+                "paragraphs": [
+                  "Жад аймағы мен провайдерлердің қатынасу орындары таңдалған аймақтарға, орналастыру параметрлеріне және олардың ағымдағы ішкі процессорларына байланысты; Код тек Қазақстанда ғана сақтауға кепілдік бермейді. Өндірісті жариялау алдында оператор нақты аймақтарды, келісім-шарттарды және трансшекаралық тасымалдаудың қолайлы механизмін жазуы керек."
+                ]
+              },
+              {
+                "id": "privacy-retention",
+                "items": [],
+                "links": [],
+                "heading": "Сақтау мерзімдері және кәдеге жарату",
+                "paragraphs": [
+                  "Тіркелгі және профиль деректері, тіркелгі деректерінің рұқсат кілті, байланыс нөмірі, фотосурет, аяқталған әрекеттер, ең жақсы ұпай, сертификаттар, келісімдер және байланысты әкімшілік аудит тіркелгі бар болғанша немесе жеке тіркелгі деректері бастапқы қалпына келтірілгенге дейін сақталады. Пайдаланылған қалпына келтіру дайджесті дереу жарамсыз болып табылады; Қысқа мерзімді шақыру түбіртегі 5 минуттан кешіктірмей аяқталады.",
+                  "сәтті Telegram жеткізу желілері 30 күн сақталады, әкімшілік кіріс жәшігіндегі оқиғалар - 90 күн; тарих аудиті осы мерзімдерге дейін қысқартылмайды. Жеткізу қателері толық сыртқы жауаптан гөрі шектеулі санатты және техникалық идентификаторларды ғана қамтиды.",
+                  "Аккаунт біржола жойылғанда, қолданба Auth аккаунтын, профильді, фотосуретті, жауаптар мен әрекеттерді, үздік нәтижелерді, расталған деректерді, credentials пен recovery digests-ті, сертификаттарды және іске асырылған жою каскады шегіндегі байланысты аудитті жояды. Жойылған сертификатты жария QR арқылы тексеру одан кейін «Құжат табылмады» нәтижесін қайтарады. Басқа құрылғыға жүктеліп қойған PDF көшірмесін физикалық түрде жою мүмкін емес. Жеткізушілердің резервтік көшірмелері олардың техникалық цикліне сәйкес жаңартылуы мүмкін."
+                ]
+              },
+              {
+                "id": "privacy-certificates",
+                "items": [],
+                "links": [],
+                "heading": "Сертификаттар, есептер және қоғамдық тексеру",
+                "paragraphs": [
+                  "Сервер тек рұқсат етілген шектеулі метадеректерді, үлгі нұсқасын және қол қойылған растау URL мекенжайын қайтарады. PDF-сертификат, әкімшілік PDF-есеп және ZIP тек пайдаланушының немесе әкімшінің шолғышында жиналады; олардың байттары серверлік маршрут арқылы жасалмайды және PostgreSQL немесе Сақтау қоймасында сақталмайды. Фотосурет PDF, ZIP немесе QR тексеруіне қосылмаған.",
+                  "Болжауға болмайтын қол қойылған сілтеме арқылы сертификатты жалпыға ортақ тексеру иесінің атын, сертификат нөмірін және күйін, локализацияланған сынақ атауын, нәтижесін және берілген күнін көрсете алады. Бұл ақпаратты бөліскіңіз келмесе, мұндай сілтемені орналастырмаңыз. Сертификаттау деректері бар корпоративтік есеп оқытуды растау үшін пайдаланушы компаниясының уәкілетті өкіліне ұсынылуы мүмкін."
+                ]
+              },
+              {
+                "id": "privacy-rights",
+                "items": [],
+                "links": [],
+                "heading": "Құқықтар мен апелляциялар",
+                "paragraphs": [
+                  "Пайдаланушы қолданыстағы құқықта көзделген көлемде деректердің өңделуі туралы ақпарат пен деректер көшірмесін, түзетуді, өңдеуді шектеуді немесе тоқтатуды, келісімді кері қайтаруды және аккаунтты жоюды сұрай алады. Міндетті заңдық негіз болған жағдайда кейбір жазбалар сақталуы мүмкін; оператор мұндай шешімді түсіндіруге тиіс.",
+                  "Сұрау жіберу немесе қолмен қарау күйін тексеру үшін құжаттағы контактілерді пайдаланыңыз. Тіркелгіңізді қорғау үшін жеке басыңызды растау қажет болуы мүмкін. Жауап қанағаттанарлық болмаса, пайдаланушы қолданыстағы заңнамада белгіленген тәртіппен құзыретті органға немесе сотқа шағымдануға құқылы."
+                ]
+              },
+              {
+                "id": "privacy-security-localization",
+                "items": [],
+                "links": [],
+                "heading": "Қауіпсіздік, локализация және құжат өзгерістері",
+                "paragraphs": [
+                  "Қолданба WebAuthn origin, challenge және қолтаңбасын тексеруді, міндетті user verification-ды, бір реттік email кодтарын, рөлдер мен өкілеттіктерді ажыратуды, RLS, операциялар жиілігін шектеуді, қорғаныш browser headers-ті, маңызды әрекеттер аудитін және шифрланған тасымалды қолданады. Email кодын, passkey session-ды және recovery code-ты басқа адамдарға беруге болмайды; ешбір шара тәуекелді толық жоймайды.",
+                  "Орысша көшірме локализацияның канондық көзі болып табылады. KK, EN және ZH көшірмелері адамның лингвистикалық немесе заңдық рұқсатынсыз автоматты түрде аударылады, кері аударылады және автоматты түрде тексеріледі. Барлық төрт көшірме бір нұсқа ретінде жарияланады, бөлек өзгермейтін хэштері және құрылымы бірдей; қалдық тәуекел автоматты аудармада семантикалық немесе заңды сәйкессіздіктер қалады.",
+                  "Жаңа маңызды басылым жаңа нөмірмен және күнмен жарияланады. Қабылданған нұсқа профильдегі нұсқаланған сілтеме арқылы қолжетімді болып қалады; егер ағымдағы нұсқа әлі қабылданбаса, бөлек келісім сұралады."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Телефон",
+                  "WhatsApp",
+                  "Жазыңыз"
+                ],
+                "links": [],
+                "heading": "Құжатқа сәйкес байланыстар",
+                "paragraphs": [
+                  "WhatsApp нөміріне қоңырау шалыңыз немесе жазыңыз. Жазбаша сұраулар үшін чат корреспонденциясын сақтаңыз."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "9581abd1cb10a103f909c22c85c2060f90873cc6000911ddb9dc1005e9c7c461",
+          "status": "published"
+        },
+        {
+          "locale": "ru",
+          "title": "Политика конфиденциальности",
+          "body": {
+            "sections": [
+              {
+                "id": "privacy-scope",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://adilet.zan.kz/rus/docs/Z1300000094",
+                    "label": "Закон Республики Казахстан «О персональных данных и их защите» на портале «Әділет»"
+                  }
+                ],
+                "heading": "Область действия и основания",
+                "paragraphs": [
+                  "Политика относится к сайту и PWA SafetyHub.kz, четырём языковым версиям, аккаунту, курсам, тестам, сертификатам и административным функциям. Данные обрабатываются, чтобы предоставить доступ к обучению, провести ручную проверку профиля, выполнить тестирование, выдать и проверить сертификат, ответить на обращение, защитить сервис и выполнить применимые требования закона.",
+                  "Предполагаемые основания — согласие пользователя, исполнение принятых условий и требования закона в той мере, в которой они применимы. Их достаточность для каждого сценария должен подтвердить оператор при локальной юридической проверке. Общая нормативная отправная точка — Закон Республики Казахстан «О персональных данных и их защите»."
+                ]
+              },
+              {
+                "id": "privacy-authentication",
+                "items": [],
+                "links": [],
+                "heading": "Аккаунт, вход и восстановление",
+                "paragraphs": [
+                  "Для русской, казахской и английской версий вход и подтверждение email выполняются одноразовым шестизначным кодом из письма. Пароль, SMS-код и контактный телефон как фактор входа не используются.",
+                  "Для китайской версии email, SMS, пароль и username не требуются. Вход выполняется с discoverable WebAuthn passkey и обязательной проверкой пользователя на устройстве. Биометрические данные и PIN устройства не передаются SafetyHub и не сохраняются SafetyHub: проверку выполняет операционная система или authenticator пользователя.",
+                  "Для технической совместимости китайскому аккаунту присваивается внутренний непрозрачный synthetic Auth identifier. Он не является адресом пользователя, не используется для почты и никогда не показывается пользователю или администратору, не включается в публичный или административный ответ, Telegram-сообщение, аналитику или журнал приложения.",
+                  "Для passkey обрабатываются credential ID, открытый ключ, счётчик подписи, заявленные transports и состояние credential. Одноразовые challenge receipts действуют не более 5 минут. Recovery code показывается один раз; хранится только его salted и peppered digest. После использования recovery code немедленно инвалидируется. Администратор может выполнить обоснованный аудируемый reset и выдать одноразовый код повторной регистрации passkey."
+                ]
+              },
+              {
+                "id": "privacy-profile-learning",
+                "items": [],
+                "links": [],
+                "heading": "Профиль, проверка и обучение",
+                "paragraphs": [
+                  "Профиль содержит имя, фамилию, должность, организацию, контактный номер с выбранным кодом страны, квадратную фотографию, предпочтительную локаль, статус и время ручной проверки администратором. Контактный номер нужен только для проверки и поддержки; он не является фактором аутентификации и не передаётся SMS-провайдеру.",
+                  "Фотография хранится как один приватный сжатый WebP-файл в Supabase Storage. Оригинал и промежуточный кадр не сохраняются, публичного доступа к аватару нет, распознавание лица и автоматическая биометрическая идентификация не выполняются. Поток камеры не покидает устройство: на сервер отправляется только выбранный и обработанный кадр.",
+                  "После явного принятия актуальных документов профиль отправляется на ручную проверку. Пока статус «на проверке», «отклонено» или профиль не заполнен, система не открывает материалы и вопросы курса, не позволяет создать, возобновить или завершить попытку и не выдаёт сертификат. Решение принимает администратор только в веб-админке; Telegram не принимает решений и не меняет статус заявки.",
+                  "Для обучения сохраняются локаль и версия курса и теста, завершённые ответы, время и статус попытки, лучший результат, а также метаданные выданного, заменённого или отозванного сертификата. Для согласий сохраняются тип и версия документа, локаль копии, дата принятия и источник действия."
+                ]
+              },
+              {
+                "id": "privacy-notifications",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://telegram.org/privacy",
+                    "label": "Политика конфиденциальности Telegram"
+                  }
+                ],
+                "heading": "Административные уведомления и Telegram",
+                "paragraphs": [
+                  "События о новой заявке, завершении курса и системной ошибке атомарно записываются во внутренний inbox администратора. Дополнительная информационная копия может отправляться ботом в приватную Telegram-группу. Недоступность Telegram не отменяет бизнес-операцию и не скрывает событие во внутреннем inbox.",
+                  "Сообщение о заявке содержит только имя, фамилию, локаль, время и ссылку на очередь заявок. Сообщение о завершении курса содержит только имя, фамилию, название курса, результат passed или failed, счёт и время. System alert содержит стабильный machine code, время, correlation ID и ссылку в админку.",
+                  "В Telegram запрещено передавать email, телефон, должность, организацию, фотографию, документы, ответы, credential metadata, challenge, recovery data и synthetic Auth identifier. Telegram-сообщения не содержат кнопок одобрения или отклонения и не могут изменить состояние аккаунта."
+                ]
+              },
+              {
+                "id": "privacy-storage",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://www.cloudflare.com/turnstile-privacy-policy/",
+                    "label": "Политика конфиденциальности Cloudflare Turnstile"
+                  }
+                ],
+                "heading": "Cookie и локальное хранилище",
+                "paragraphs": [
+                  "Необходимые cookie используются для входа, обновления HttpOnly-сессии, PKCE-восстановления email OTP, защиты закрытых маршрутов и сохранения выбранной локали. В localStorage могут сохраняться тема оформления, скрытие подсказки установки PWA, незавершённые ответы теста и, для администратора, локальный черновик редактора. Эти данные остаются в выбранном браузере, пока пользователь или приложение их не удалит. Рекламные cookie и поведенческая реклама не используются.",
+                  "Если включён Cloudflare Turnstile, его технические данные и storage обрабатываются Cloudflare для проверки безопасности."
+                ]
+              },
+              {
+                "id": "privacy-processors",
+                "items": [
+                  "Supabase — Auth, PostgreSQL, приватный Storage, краткоживущие подписанные ссылки, доставка email-кодов, Edge Functions и очередь доставки уведомлений.",
+                  "Vercel — hosting, CDN, serverless-выполнение и технические логи.",
+                  "Cloudflare — опциональная anti-bot проверка Turnstile, когда она включена в конфигурации.",
+                  "Telegram Bot API — доставка строго минимизированных информационных сообщений в приватную административную группу."
+                ],
+                "links": [
+                  {
+                    "url": "https://supabase.com/legal/customer-resources/data-processing-addendum",
+                    "label": "Supabase DPA"
+                  },
+                  {
+                    "url": "https://supabase.com/docs/guides/platform/regions",
+                    "label": "Регионы Supabase"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/privacy-notice",
+                    "label": "Vercel Privacy Notice"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/dpa",
+                    "label": "Vercel DPA"
+                  },
+                  {
+                    "url": "https://telegram.org/privacy",
+                    "label": "Политика конфиденциальности Telegram"
+                  }
+                ],
+                "heading": "Поставщики и трансграничная обработка",
+                "paragraphs": [
+                  "Регион хранения и места доступа поставщиков зависят от выбранных регионов, deployment-настроек и их актуальных subprocessors; код не гарантирует хранение только в Казахстане. До production-публикации оператор должен зафиксировать фактические регионы, договоры и допустимый механизм трансграничной передачи."
+                ]
+              },
+              {
+                "id": "privacy-retention",
+                "items": [],
+                "links": [],
+                "heading": "Сроки хранения и удаление",
+                "paragraphs": [
+                  "Данные аккаунта и профиля, credential passkey, контактный номер, фотография, завершённые попытки, лучший результат, сертификаты, согласия и связанный административный аудит хранятся, пока существует аккаунт или пока отдельный credential не сброшен. Использованный recovery digest инвалидируется сразу; короткоживущий challenge receipt истекает не позднее чем через 5 минут.",
+                  "Успешные строки доставки Telegram хранятся 30 дней, события административного inbox — 90 дней; audit history этими сроками не сокращается. Ошибки доставки содержат только ограниченную категорию и технические идентификаторы, а не полный внешний ответ.",
+                  "При окончательном удалении аккаунта приложение удаляет Auth-аккаунт, профиль, фотографию, ответы и попытки, лучшие результаты, подтверждённые данные, credentials и recovery digests, сертификаты и связанный аудит в пределах реализованного каскада удаления. Публичная QR-проверка удалённого сертификата после этого возвращает «Документ не найден». Уже скачанную на чужое устройство копию PDF физически удалить невозможно. Резервные копии поставщиков могут обновляться по их техническому циклу."
+                ]
+              },
+              {
+                "id": "privacy-certificates",
+                "items": [],
+                "links": [],
+                "heading": "Сертификаты, отчёты и публичная проверка",
+                "paragraphs": [
+                  "Сервер возвращает только авторизованные ограниченные метаданные, версию шаблона и уже подписанный verification URL. PDF-сертификат, административный PDF-отчёт и ZIP собираются только в браузере пользователя или администратора; их bytes не создаются backend route и не сохраняются в PostgreSQL или Storage. Фотография не включается в PDF, ZIP или QR-проверку.",
+                  "Публичная проверка сертификата по непредсказуемой подписанной ссылке может показать имя владельца, номер и статус сертификата, локализованное название теста, результат и дату выдачи. Не публикуйте такую ссылку, если не хотите делиться этими сведениями. Корпоративный отчёт с данными аттестации может быть передан уполномоченному представителю компании пользователя для подтверждения обучения."
+                ]
+              },
+              {
+                "id": "privacy-rights",
+                "items": [],
+                "links": [],
+                "heading": "Права и обращения",
+                "paragraphs": [
+                  "Пользователь может запросить сведения об обработке и копию данных, исправление, ограничение или прекращение обработки, отзыв согласия и удаление аккаунта — в объёме, предусмотренном применимым правом. Некоторые записи могут быть сохранены, если для этого есть обязательное основание; оператор должен объяснить такое решение.",
+                  "Чтобы отправить запрос или уточнить статус ручной проверки, используйте контакты по документу. Для защиты аккаунта может потребоваться подтверждение личности. Если ответ не устраивает, пользователь вправе обратиться в компетентный орган или суд в порядке, установленном применимым законодательством."
+                ]
+              },
+              {
+                "id": "privacy-security-localization",
+                "items": [],
+                "links": [],
+                "heading": "Безопасность, локализации и изменения документа",
+                "paragraphs": [
+                  "Приложение использует проверку origin, challenge и подписи WebAuthn, обязательный user verification, одноразовые email-коды, разграничение ролей и полномочий, RLS, ограничение частоты операций, защитные browser headers, аудит критических действий и шифрованный транспорт. Код из письма, passkey session и recovery code нельзя передавать другим лицам; ни одна мера не исключает риск полностью.",
+                  "Русская копия является каноническим источником для локализации. Копии KK, EN и ZH автоматически переведены, обратно переведены и автоматически проверены без human linguistic или legal approval. Все четыре копии публикуются как одна версия, имеют отдельные неизменяемые hashes и одинаковую структуру; остаточный риск смыслового или юридического расхождения автоматического перевода сохраняется.",
+                  "Новая существенная редакция публикуется под новым номером и датой. Принятая версия остаётся доступной по versioned-ссылке в профиле; отдельное согласие запрашивается, если текущая версия ещё не принята."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Телефон",
+                  "WhatsApp",
+                  "Написать"
+                ],
+                "links": [],
+                "heading": "Контакты по документу",
+                "paragraphs": [
+                  "Позвоните или напишите в WhatsApp. Для письменного обращения сохраните переписку в чате."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "e6f27426d8f276b7c47057c6c981629aa80e3f21d1929f0e5e04a4c7a61b245d",
+          "status": "published"
+        },
+        {
+          "locale": "zh",
+          "title": "隐私政策",
+          "body": {
+            "sections": [
+              {
+                "id": "privacy-scope",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://adilet.zan.kz/rus/docs/Z1300000094",
+                    "label": "哈萨克斯坦共和国“关于个人数据及其保护”的法律，在“Adilet”门户网站上"
+                  }
+                ],
+                "heading": "范围和依据",
+                "paragraphs": [
+                  "该政策适用于网站和PWA SafetyHub.kz、四种语言版本、帐户、课程、测试、证书和管理功能。处理数据的目的是提供培训、进行手动配置文件验证、执行测试、颁发和验证证书、响应请求、保护服务并遵守适用的法律要求。",
+                  "推断依据是用户同意、遵守已接受的条款和条件以及适用范围内的法律要求。它们对于每种情况的充分性必须由运营商在当地法律审查期间确认。一般监管起点是哈萨克斯坦共和国《个人数据及其保护法》。"
+                ]
+              },
+              {
+                "id": "privacy-authentication",
+                "items": [],
+                "links": [],
+                "heading": "帐号、登录和恢复",
+                "paragraphs": [
+                  "对于俄语、哈萨克语和英语版本，使用信件中的一次性六位代码进行登录和电子邮件确认。密码、短信代码和联系电话号码不用作登录因素。",
+                  "中文版不需要电子邮件、短信、密码或用户名。登录使用 discoverable WebAuthn passkey，并要求在设备上完成用户验证。生物识别数据和设备 PIN 不会传输给 SafetyHub，也不会由 SafetyHub 存储：验证由操作系统或用户的 authenticator 完成。",
+                  "为了技术兼容性，中国账户被分配了一个内部不透明的合成身份验证标识符。它不是用户的地址，不用于邮件，并且永远不会向用户或管理员显示，也不包含在公共或管理响应、Telegram 消息、分析或应用程序日志中。",
+                  "对于 passkey，系统会处理凭证 ID、公钥、签名计数器、已声明的 transports 和凭证状态。一次性 challenge receipt 的有效期不超过 5 分钟。恢复码仅显示一次；系统只存储其经过 salt 和 pepper 处理的摘要。恢复码使用后立即失效。管理员可在说明理由并留下审计记录后执行重置，并签发一次性 passkey 重新注册代码。"
+                ]
+              },
+              {
+                "id": "privacy-profile-learning",
+                "items": [],
+                "links": [],
+                "heading": "简介、验证和培训",
+                "paragraphs": [
+                  "配置文件包含名字、姓氏、职位、组织、带有所选国家/地区代码的联系电话、方形照片、首选区域设置、管理员手动验证的状态和时间。联系电话仅用于验证和支持；它不是身份验证因素，也不会传输到 SMS 提供商。",
+                  "照片作为一个私有压缩WebP 文件存储在Supabase 存储中。不保存原始帧和中间帧，不公开访问头像，不执行面部识别和自动生物特征识别。相机流不会离开设备：仅将选定和处理的帧发送到服务器。",
+                  "在明确接受当前文档后，个人资料会提交给管理员进行人工审核。当状态为“待审核”、“已拒绝”或个人资料未完成时，系统不开放课程材料和题目，不允许创建、恢复或完成考试尝试，也不颁发证书。决定只能由管理员在 Web 管理后台作出；Telegram 不作决定，也不改变申请状态。",
+                  "对于培训，保存课程和测试的区域设置和版本、完成的答案、尝试的时间和状态、最佳结果以及已颁发、替换或撤销证书的元数据。对于同意，将存储文档类型和版本、复制区域设置、接受日期和操作来源。"
+                ]
+              },
+              {
+                "id": "privacy-notifications",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://telegram.org/privacy",
+                    "label": "Telegram 隐私政策"
+                  }
+                ],
+                "heading": "行政通知和电报",
+                "paragraphs": [
+                  "新申请、课程完成和系统错误事件会以原子方式写入管理员内部收件箱。机器人还可向私有 Telegram 群组发送一份仅供参考的信息副本。Telegram 不可用不会回滚业务操作，也不会使内部收件箱中的事件不可见。",
+                  "申请通知仅包含名字、姓氏、语言、时间和申请队列链接。课程完成通知仅包含名字、姓氏、课程名称、passed 或 failed 结果、分数和时间。System alert 仅包含稳定的 machine code、时间、correlation ID 和管理后台链接。",
+                  "在 Telegram 中，禁止传输电子邮件、电话号码、职位、组织、照片、文档、答案、凭证元数据、质询、恢复数据和合成身份验证标识符。 Telegram 消息不包含批准或拒绝按钮，并且无法更改帐户状态。"
+                ]
+              },
+              {
+                "id": "privacy-storage",
+                "items": [],
+                "links": [
+                  {
+                    "url": "https://www.cloudflare.com/turnstile-privacy-policy/",
+                    "label": "隐私政策 Cloudflare Turnstile"
+                  }
+                ],
+                "heading": "Cookie 和本地存储",
+                "paragraphs": [
+                  "必要的 cookie 用于登录、更新 HttpOnly 会话、PKCE-恢复电子邮件OTP、保护封闭路由和保存所选区域设置。 localStorage 可以存储主题、隐藏安装提示PWA、不完整的测试答案，以及对于管理员来说，本地编辑器草稿。该数据保留在所选浏览器中，直到用户或应用程序将其删除。不使用广告 cookie 和行为广告。",
+                  "如果Cloudflare Turnstile 启用，则其技术数据和存储由Cloudflare 进行安全检查。"
+                ]
+              },
+              {
+                "id": "privacy-processors",
+                "items": [
+                  "Supabase - 身份验证、PostgreSQL、私有存储、短期签名链接、电子邮件代码传递、边缘功能和通知传递队列。",
+                  "Vercel - 托管、CDN、无服务器执行和技术日志。",
+                  "Cloudflare - 可选的反机器人检查 Turnstile（在配置中启用时）。",
+                  "Telegram Bot API - 向私人管理组传送严格最小化的信息消息。"
+                ],
+                "links": [
+                  {
+                    "url": "https://supabase.com/legal/customer-resources/data-processing-addendum",
+                    "label": "Supabase DPA"
+                  },
+                  {
+                    "url": "https://supabase.com/docs/guides/platform/regions",
+                    "label": "地区 Supabase"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/privacy-notice",
+                    "label": "Vercel Privacy Notice"
+                  },
+                  {
+                    "url": "https://vercel.com/legal/dpa",
+                    "label": "Vercel DPA"
+                  },
+                  {
+                    "url": "https://telegram.org/privacy",
+                    "label": "Telegram 隐私政策"
+                  }
+                ],
+                "heading": "供应商及跨境加工",
+                "paragraphs": [
+                  "提供商的存储区域和访问位置取决于所选区域、部署设置及其当前子处理器；该代码不保证仅存储在哈萨克斯坦。在产品发布前，运营者必须记录实际区域、合同和可接受的跨境转移机制。"
+                ]
+              },
+              {
+                "id": "privacy-retention",
+                "items": [],
+                "links": [],
+                "heading": "储存期限和处置",
+                "paragraphs": [
+                  "账户及个人资料数据、passkey 凭证、联系电话、照片、已完成的尝试、最佳成绩、证书、同意记录及相关管理审计，在账户存续期间保存；单个凭证则保存至其被重置为止。已使用的 recovery digest 立即失效；短期 challenge receipt 最迟在 5 分钟内过期。",
+                  "成功的 Telegram 发送行存储 30 天，管理收件箱事件 - 90 天；历史审计不会因这些截止日期而减少。交付错误仅包含有限的类别和技术标识符，而不是完整的外部响应。",
+                  "账户被永久删除时，应用会在已实现的级联删除范围内删除 Auth 账户、个人资料、照片、答案和尝试、最佳成绩、已验证数据、凭证和 recovery digests、证书及相关审计记录。被删除证书的公开 QR 验证随后返回“未找到文档”。已经下载到其他设备的 PDF 副本无法从该设备上被实际删除。供应商备份可按其技术周期更新。"
+                ]
+              },
+              {
+                "id": "privacy-certificates",
+                "items": [],
+                "links": [],
+                "heading": "证书、报告和公众检查",
+                "paragraphs": [
+                  "服务器只返回经授权的有限元数据、模板版本和已签名的 verification URL。PDF 证书、管理 PDF 报告和 ZIP 仅在用户或管理员的浏览器中生成；backend route 不生成这些文件的 bytes，PostgreSQL 或 Storage 也不保存这些 bytes。照片不会包含在 PDF、ZIP 或 QR 验证结果中。",
+                  "使用不可预测的签名链接对证书进行公开验证可以泄露所有者的姓名、证书编号和状态、本地化测试名称、结果和颁发日期。如果您不想分享此信息，请勿发布此类链接。可以向用户公司的授权代表提供包含认证数据的公司报告以确认培训。"
+                ]
+              },
+              {
+                "id": "privacy-rights",
+                "items": [],
+                "links": [],
+                "heading": "权利和上诉",
+                "paragraphs": [
+                  "在适用法律规定的范围内，用户可以请求处理信息和数据副本，以及更正、限制或停止处理、撤回同意和删除账户。如存在强制性的法律依据，某些记录可能会继续保留；运营者必须说明该决定。",
+                  "要发送请求或检查手动审核的状态，请使用文档上的联系人。可能需要身份验证来保护您的帐户。如果答复不令人满意，用户有权按照适用法律规定的方式向主管机关或法院提出申诉。"
+                ]
+              },
+              {
+                "id": "privacy-security-localization",
+                "items": [],
+                "links": [],
+                "heading": "安全、本地化和文档更改",
+                "paragraphs": [
+                  "应用会校验 WebAuthn origin、challenge 和签名，强制执行 user verification，并使用一次性电子邮件代码、角色与权限隔离、RLS、操作频率限制、浏览器安全响应头、关键操作审计和加密传输。不得向他人透露邮件验证码、passkey session 或 recovery code；任何措施都无法完全消除风险。",
+                  "​​俄语副本是本地化的规范来源。 KK、EN 和 ZH 的副本会自动翻译、回译和自动检查，无需人类语言或法律批准。所有四个副本均作为一个版本发布，具有单独的不可变哈希值和相同的结构；自动翻译中仍然存在残余的风险语义或法律差异。",
+                  "新的重要版本以新的编号和日期发布。已接受的版本仍然可以通过配置文件中的版本链接获取；如果当前版本尚未被接受，则需要单独同意。"
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "电话",
+                  "WhatsApp",
+                  "写入"
+                ],
+                "links": [],
+                "heading": "根据文档联系方式",
+                "paragraphs": [
+                  "致电或写入WhatsApp。对于书面请求，请保存聊天信件。"
+                ]
+              }
+            ]
+          },
+          "bodyHash": "d524aaecb25b45d7ef382ab2e1ef3f4e10ac899b40a532347f1fff6c87783146",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "documentType": "terms",
+      "version": "2.1",
+      "bodyRevision": "terms-2.1",
+      "effectiveAt": "2026-08-13T00:00:00.000Z",
+      "isCurrent": false,
+      "localizations": [
+        {
+          "locale": "ru",
+          "title": "Условия использования",
+          "body": {
+            "bodyRevision": "terms-2.1"
+          },
+          "bodyHash": "5c3817b403a5d52a142f3b6f94b88299565e0a657db2bad4120d72b52c84d51b",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "documentType": "terms",
+      "version": "2.2",
+      "bodyRevision": "terms-2.2",
+      "effectiveAt": "2026-08-31T00:00:00.000Z",
+      "isCurrent": false,
+      "localizations": [
+        {
+          "locale": "en",
+          "title": "Terms of Use",
+          "body": {
+            "sections": [
+              {
+                "id": "terms-acceptance",
+                "items": [],
+                "links": [],
+                "heading": "Acceptance and subject to conditions",
+                "paragraphs": [
+                  "These terms govern the use of the site and PWA SafetyHub.kz materials, account, tests, certificates and their verification functions. After logging in using the email code, the user separately accepts the current Terms and the associated Privacy Policy version 1.2; only this explicit action records consent.",
+                  "If the user does not agree, they should not register or continue to work with private features. The current implementation does not contain payment; When paid services appear, prices, returns and separate commercial terms must be published before payment."
+                ]
+              },
+              {
+                "id": "terms-account",
+                "items": [
+                  "The user specifies a valid email. Login is performed using a one-time code from the letter (email OTP); Password and SMS login are not provided. You cannot transfer the code, session or account to another person.",
+                  "Before accessing the course materials, questions, test and certificate, your first name, last name, position, organization, your own current photograph and a contact number with the selected country code are required. The number is used only to communicate with the user, and not for authentication or sending SMS.",
+                  "The completed profile is sent to the administrator for manual verification. The usual benchmark for a decision is up to 24 hours from the date of dispatch; This is not automatic approval or a guaranteed period of access. While your application is pending or rejected, private learning features are not available.",
+                  "If rejected, the user can see the specified reason, correct the data and resubmit the profile. To clarify the status, you can call or write to the administrator through the contacts at the bottom of the document.",
+                  "The displayed profile does not replace the verified certificate data. The name, title, and organization for the certificate are separately validated and stored as a version.",
+                  "If compromise, abuse or violation of the terms is suspected, access may be temporarily limited while maintaining legal recourse."
+                ],
+                "links": [],
+                "heading": "Account, profile and manual verification",
+                "paragraphs": []
+              },
+              {
+                "id": "terms-learning",
+                "items": [],
+                "links": [
+                  {
+                    "url": "#legal-contacts",
+                    "label": "contacts according to the document"
+                  }
+                ],
+                "heading": "Training, tests and attempts",
+                "paragraphs": [
+                  "After the profile is approved, the user gains access to the course materials and test. Each test option contains 10 questions with four answer options; For a successful result, you need to answer at least 7 questions correctly, that is, score 70%. You have 15 minutes to try. A maximum of 8 new attempts per calendar day are allowed per course in the Asia/Oral time zone. Answers, time, status and result of the attempt are recorded; the interface shows one best result.",
+                  "It is prohibited to use bots, extract or distribute answer keys, interfere with the operation of the service, circumvent restrictions, or take the test for another person. Errors in the material should be submitted through the document contacts."
+                ]
+              },
+              {
+                "id": "terms-certificates",
+                "items": [],
+                "links": [],
+                "heading": "Certificates and their verification",
+                "paragraphs": [
+                  "An electronic certificate confirms the passing best result of a specific version of the online test for confirmed user data. The first issue is performed explicitly by the administrator. If the result is strictly higher, the certificate is automatically replaced with a new one; correction of confirmed data may also cause a reissue. The administrator has the right to revoke the document indicating the reason. QR shows the status “Effective”, “Revoked” or “Document Not Found”.",
+                  "PDF and ZIP are created only during downloading and are not permanently stored in the database or Storage. The administrator can transfer the general report and certificates of its participants to the authorized representative of the company. The user downloads only his own valid PDF.",
+                  "The certificate itself is not declared to be a government license, hazardous work permit, or a substitute for mandatory training, instruction, medical examination, or employer certification. The applicability of the document to a specific industry and regulatory requirement must be separately confirmed by employer or a competent person."
+                ]
+              },
+              {
+                "id": "terms-content",
+                "items": [],
+                "links": [],
+                "heading": "Materials and permitted uses",
+                "paragraphs": [
+                  "Materials are intended for informational training. They can be read and used for personal preparation; Bulk copying, resale, removal of attribution, malicious scanning and creation of false certificates are prohibited.",
+                  "Regulatory information subject to change. The date of review and sources of material, when indicated, are helpful in assessing relevance but are not a substitute for official wording and professional advice for a specific work situation."
+                ]
+              },
+              {
+                "id": "terms-availability",
+                "items": [],
+                "links": [],
+                "heading": "Availability and responsibility",
+                "paragraphs": [
+                  "Service depends on Supabase, Vercel, user network and, when enabled, Cloudflare Turnstile. The operator strives to maintain functionality and security, but does not promise continuous availability or the absence of all errors. Planned changes and emergency protective restrictions are possible.",
+                  "Nothing in the terms limits the user's rights or the operator's liability where such limitation is prohibited by law. The scope of liability and the claims procedure should be finally verified by a local lawyer after filling in the operator's details."
+                ]
+              },
+              {
+                "id": "terms-termination",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.2",
+                    "label": "Privacy Policy version 1.2"
+                  }
+                ],
+                "heading": "Termination of Use and Data",
+                "paragraphs": [
+                  "The user can stop using and permanently delete the account. This deletes the profile, photo, attempts, certificates and associated audits, and the QR-check of the previous document stops. An external PDF that has already been downloaded cannot be physically recalled from the device. Categories, providers and removal procedures are described in Privacy Policy version 1.2."
+                ]
+              },
+              {
+                "id": "terms-changes",
+                "items": [],
+                "links": [
+                  {
+                    "url": "#legal-contacts",
+                    "label": "contacts according to the document"
+                  }
+                ],
+                "heading": "Changes and communication",
+                "paragraphs": [
+                  "Significant changes receive a new number and date. The accepted version remains available via the versioned link in the profile, and for the new version the interface requests separate acceptance. Send questions and complaints through the contacts on the document."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Phone",
+                  "WhatsApp",
+                  "Write"
+                ],
+                "links": [],
+                "heading": "Contacts according to the document",
+                "paragraphs": [
+                  "Call or write to WhatsApp. For written requests, save the chat correspondence."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "1354e114b17ec0bd4b92f262e47f45bcc40c00d1eea0185a465c106b16d187d7",
+          "status": "published"
+        },
+        {
+          "locale": "kk",
+          "title": "Пайдалану шарттары",
+          "body": {
+            "sections": [
+              {
+                "id": "terms-acceptance",
+                "items": [],
+                "links": [],
+                "heading": "Қабылдау және шарттарға сәйкес",
+                "paragraphs": [
+                  "Бұл шарттар сайтты және PWA SafetyHub.kz материалдарын, есептік жазбаны, сынақтарды, сертификаттарды және олардың тексеру функцияларын пайдалануды реттейді. Электрондық пошта кодын пайдаланып жүйеге кіргеннен кейін пайдаланушы ағымдағы Шарттарды және оған қатысты Құпиялық саясатының 1.2 нұсқасын бөлек қабылдайды; тек осы нақты әрекет келісімді жазады.",
+                  "Пайдаланушы келіспесе, олар тіркелмеуі немесе жеке мүмкіндіктермен жұмыс істеуді жалғастырмауы керек. Ағымдағы іске асыру төлемді қамтымайды; Ақылы қызметтер пайда болған кезде бағалар, қайтарулар және бөлек коммерциялық шарттар төлем алдында жариялануы керек."
+                ]
+              },
+              {
+                "id": "terms-account",
+                "items": [
+                  "Пайдаланушы жарамды электрондық поштаны көрсетеді. Жүйеге кіру хаттан бір реттік кодты қолдану арқылы жүзеге асырылады (электрондық пошта OTP); Құпия сөз және SMS логин берілмейді. Кодты, сеансты немесе тіркелгіні басқа адамға тасымалдай алмайсыз.",
+                  "Курс материалдарына, сұрақтарға, тестілеуге және сертификатқа қол жеткізбес бұрын аты-жөніңіз, тегіңіз, лауазымыңыз, ұйымыңыз, ағымдағы фотосуретіңіз және таңдалған ел коды бар байланыс телефоныңыз қажет. Нөмір аутентификация немесе SMS жіберу үшін емес, пайдаланушымен байланысу үшін ғана пайдаланылады.",
+                  "Аяқталған профиль әкімшіге қолмен тексеру үшін жіберіледі. Шешім қабылдаудың әдеттегі эталоны жөнелтілген күннен бастап 24 сағатқа дейін; Бұл автоматты мақұлдау немесе қол жеткізудің кепілдік мерзімі емес. Өтінім күтілуде немесе қабылданбаған кезде, жеке оқыту мүмкіндіктері қолжетімді емес.",
+                  "Қабылданбаған жағдайда, пайдаланушы көрсетілген себепті көріп, деректерді түзетіп, профильді қайта жібере алады. Күйді нақтылау үшін құжаттың төменгі жағындағы контактілер арқылы әкімшіге қоңырау шалуға немесе жазуға болады.",
+                  "Көрсетілген профиль тексерілген сертификат деректерін алмастырмайды. Куәліктің аты, тақырыбы және ұйымы бөлек расталады және нұсқа ретінде сақталады.",
+                  "Аккаунттың немесе credential-дың компрометациясына, теріс пайдалануға не шарттардың бұзылуына күдік болса, заңда көзделген жүгіну тәсілдері сақтала отырып, қолжетімділік уақытша шектелуі мүмкін."
+                ],
+                "links": [],
+                "heading": "Тіркелгі, профиль және қолмен тексеру",
+                "paragraphs": []
+              },
+              {
+                "id": "terms-learning",
+                "items": [],
+                "links": [
+                  {
+                    "url": "#legal-contacts",
+                    "label": "контактілер құжатқа сәйкес"
+                  }
+                ],
+                "heading": "Жаттығулар, сынақтар және әрекеттер",
+                "paragraphs": [
+                  "Профиль бекітілгеннен кейін пайдаланушы курс материалдарына және сынаққа қол жеткізе алады. Әрбір тест нұсқасында төрт жауап нұсқасы бар 10 сұрақ бар; Табысты нәтижеге жету үшін кем дегенде 7 сұраққа дұрыс жауап беру керек, яғни 70% ұпай жинау керек. Сізде әрекет ету үшін 15 минут бар. Asia/Oral уақыт белдеуінде бір курсқа күнтізбелік күнде ең көбі 8 жаңа әрекетке рұқсат етіледі. Әрекеттің жауаптары, уақыты, күйі және нәтижесі жазылады; интерфейс бір жақсы нәтижені көрсетеді.",
+                  "Боттарды пайдалануға, жауап кілттерін шығаруға немесе таратуға, қызметтің жұмысына кедергі келтіруге, шектеулерді айналып өтуге немесе басқа адам үшін тест тапсыруға тыйым салынады. Материалдағы қателер құжат контактілері арқылы берілуі керек."
+                ]
+              },
+              {
+                "id": "terms-certificates",
+                "items": [],
+                "links": [],
+                "heading": "Сертификаттар және оларды тексеру",
+                "paragraphs": [
+                  "Электрондық сертификат расталған пайдаланушы деректеріне арналған онлайн сынақтың нақты нұсқасының ең жақсы нәтижесін растайды. Бірінші мәселені әкімші нақты орындайды. Егер нәтиже қатаң түрде жоғары болса, сертификат автоматты түрде жаңасымен ауыстырылады; расталған деректерді түзету де қайта шығаруды тудыруы мүмкін. Әкімші себебін көрсете отырып, құжатты кері қайтарып алуға құқылы. QR \"Күшіне\", \"Қайтарылды\" немесе \"Құжат табылмады\" күйін көрсетеді.",
+                  "PDF және ZIP тек жүктеп алу кезінде жасалады және дерекқорда немесе Жадта біржола сақталмайды. Әкімші оның қатысушыларының жалпы есебі мен куәліктерін серіктестіктің уәкілетті өкіліне бере алады. Пайдаланушы тек өзінің жарамды PDF жүктеп алады.",
+                  "Сертификаттың өзі мемлекеттік лицензия, қауіпті жұмыстарға рұқсат немесе міндетті оқытуды, нұсқаманы, медициналық тексеруді не жұмыс беруші өткізетін аттестаттауды алмастыратын құжат емес. Құжаттың нақты салаға және нормативтік талапқа қолданылуын жұмыс беруші немесе құзыретті маман бөлек растауға тиіс."
+                ]
+              },
+              {
+                "id": "terms-content",
+                "items": [],
+                "links": [],
+                "heading": "Материалдар және рұқсат етілген пайдаланулар",
+                "paragraphs": [
+                  "Материалдар ақпараттық оқытуға арналған. Оларды оқуға және жеке дайындық үшін пайдалануға болады; Жаппай көшіруге, қайта сатуға, атрибуцияны жоюға, зиянды сканерлеуге және жалған сертификаттарды жасауға тыйым салынады.",
+                  "Нормативтік ақпарат өзгертілуі мүмкін. Қарау күні мен материал көздері көрсетілген кезде, өзектілігін бағалауға көмектеседі, бірақ нақты жұмыс жағдайына арналған ресми тұжырымдар мен кәсіби кеңестерді алмастыра алмайды."
+                ]
+              },
+              {
+                "id": "terms-availability",
+                "items": [],
+                "links": [],
+                "heading": "Қол жетімділік және жауапкершілік",
+                "paragraphs": [
+                  "Қызмет Supabase, Vercel, пайдаланушы желісіне және қосылған кезде Cloudflare Turnstileге байланысты. Оператор функционалдылық пен қауіпсіздікті сақтауға тырысады, бірақ үздіксіз қол жетімділікті немесе барлық қателердің болмауын уәде етпейді. Жоспарланған өзгерістер мен төтенше қорғаныс шектеулері мүмкін.",
+                  "Шарттағы ешнәрсе пайдаланушының құқықтарын немесе мұндай шектеуге заңмен тыйым салынған жағдайда оператордың жауапкершілігін шектемейді. Жауапкершілік ауқымы мен шағымдарды қарау тәртібін оператордың мәліметтерін толтырғаннан кейін жергілікті заңгер түпкілікті тексеруі керек."
+                ]
+              },
+              {
+                "id": "terms-termination",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.2",
+                    "label": "Құпиялық саясатының 1.2 нұсқасы"
+                  }
+                ],
+                "heading": "Пайдалануды және деректерді тоқтату",
+                "paragraphs": [
+                  "Пайдаланушы пайдалануды тоқтатып, есептік жазбаны біржола жоя алады. Бұл профильді, фотосуретті, әрекеттерді, сертификаттарды және байланысты тексерулерді жояды және алдыңғы құжатты QR-тексеру тоқтайды. Жүктеп алынған сыртқы PDF құрылғыдан физикалық түрде шақыру мүмкін емес. Санаттар, провайдерлер және жою процедуралары Құпиялық саясатының 1.2 нұсқасында сипатталған."
+                ]
+              },
+              {
+                "id": "terms-changes",
+                "items": [],
+                "links": [
+                  {
+                    "url": "#legal-contacts",
+                    "label": "контактілер құжатқа сәйкес"
+                  }
+                ],
+                "heading": "Өзгерістер мен байланыс",
+                "paragraphs": [
+                  "Маңызды өзгерістер жаңа нөмір мен күнді алады. Қабылданған нұсқа профильдегі нұсқаланған сілтеме арқылы қолжетімді болып қалады, ал жаңа нұсқа үшін интерфейс бөлек қабылдауды сұрайды. Құжаттағы контактілер арқылы сұрақтар мен шағымдарды жіберіңіз."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Телефон",
+                  "WhatsApp",
+                  "Жазыңыз"
+                ],
+                "links": [],
+                "heading": "Құжатқа сәйкес байланыстар",
+                "paragraphs": [
+                  "WhatsApp нөміріне қоңырау шалыңыз немесе жазыңыз. Жазбаша сұраулар үшін чат корреспонденциясын сақтаңыз."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "e36bc55954bf2777b2134a6d89306f24901aedfe2c08f0daaf3bea098c2e71af",
+          "status": "published"
+        },
+        {
+          "locale": "ru",
+          "title": "Условия использования",
+          "body": {
+            "bodyRevision": "terms-2.2"
+          },
+          "bodyHash": "8e2acc8d4733edb6cbcaadc0fb9afd4598248444a515032d0a03fea288f7bf95",
+          "status": "published"
+        },
+        {
+          "locale": "zh",
+          "title": "使用条款",
+          "body": {
+            "sections": [
+              {
+                "id": "terms-acceptance",
+                "items": [],
+                "links": [],
+                "heading": "接受并受条件限制",
+                "paragraphs": [
+                  "这些条款管辖本网站和PWA SafetyHub.kz 材料、帐户、测试、证书及其验证功能的使用。使用电子邮件代码登录后，用户分别接受当前条款和相关的隐私政策1.2版；只有这种明确的行为才会记录同意。",
+                  "如果用户不同意，则不应注册或继续使用私有功能。目前的实现不包含付费；当付费服务出现时，价格、退货和单独的商业条款必须在付款前公布。"
+                ]
+              },
+              {
+                "id": "terms-account",
+                "items": [
+                  "用户指定了有效的电子邮件。使用信件中的一次性代码（电子邮件OTP）进行登录；不提供密码和短信登录。您不能将代码、会话或帐户转让给他人。",
+                  "在访问课程材料、问题、测试和证书之前，需要您的名字、姓氏、职位、组织、您自己当前的照片以及带有所选国家/地区代码的联系电话。该号码仅用于与用户通信，不用于身份验证或发送短信。",
+                  "完成的个人资料将发送给管理员进行手动验证。通常的决策基准是自发送之日起 24 小时内；这不是自动批准或保证访问期限。当您的申请正在等待或被拒绝时，私人学习功能将不可用。",
+                  "如果被拒绝，用户可以看到指定的原因，更正数据并重新提交个人资料。要澄清状态，您可以通过文档底部的联系人致电或写信给管理员。",
+                  "显示的配置文件不会替换已验证的证书数据。证书的名称、标题和组织单独验证并存储为版本。",
+                  "如怀疑账户或凭证已泄露、存在滥用或违反条款，在保留法律规定的申诉途径的同时，访问权限可能会被暂时限制。"
+                ],
+                "links": [],
+                "heading": "帐户、个人资料和手动验证",
+                "paragraphs": []
+              },
+              {
+                "id": "terms-learning",
+                "items": [],
+                "links": [
+                  {
+                    "url": "#legal-contacts",
+                    "label": "根据文档联系"
+                  }
+                ],
+                "heading": "培训、测试和尝试",
+                "paragraphs": [
+                  "个人资料获得批准后，用户可以访问课程材料和测试。每个测试选项包含 10 个问题和四个答案选项；要获得成功的结果，您需要至少正确回答 7 个问题，即得分 70%。您有 15 分钟的时间尝试。在 Asia/Oral 时区，每门课程每个日历日最多允许 8 次新尝试。记录尝试的答案、时间、状态和结果；界面显示一种最佳结果。",
+                  "禁止使用机器人、提取或分发答案密钥、干扰服务运行、规避限制或替他人参加考试。材料中的错误应通过文档联系人提交。"
+                ]
+              },
+              {
+                "id": "terms-certificates",
+                "items": [],
+                "links": [],
+                "heading": "证书及其验证",
+                "paragraphs": [
+                  "电子证书确认已确认用户数据的特定版本在线测试的通过最佳结果。第一个问题是由管理员明确执行的。如果结果严格更高，则自动更换新证书；更正已确认的数据也可能导致重新发行。管理员有权撤销该文件并注明原因。 QR 显示状态“有效”、“已撤销”或“未找到文档”。",
+                  "PDF 和 ZIP 仅在下载过程中创建，不会永久存储在数据库或存储中。管理人可以将参与者的综合报告和证书转交给公司的授权代表。用户仅下载他自己的有效PDF。",
+                  "证书本身不是政府许可证、危险作业许可证，也不能替代强制培训、安全交底、体检或用人单位组织的考核认证。该证书是否适用于特定行业和监管要求，必须由用人单位或具备相应能力的专业人员另行确认。"
+                ]
+              },
+              {
+                "id": "terms-content",
+                "items": [],
+                "links": [],
+                "heading": "材料和允许用途",
+                "paragraphs": [
+                  "材料用于信息培训。它们可以阅读并用于个人准备；禁止批量复制、转售、删除归属、恶意扫描和制作虚假证书。",
+                  "监管信息可能会发生变化。审查日期和材料来源（如注明）有助于评估相关性，但不能替代针对特定工作情况的官方措辞和专业建议。"
+                ]
+              },
+              {
+                "id": "terms-availability",
+                "items": [],
+                "links": [],
+                "heading": "可用性和责任",
+                "paragraphs": [
+                  "服务取决于Supabase、Vercel、用户网络以及启用后的Cloudflare Turnstile。运营商努力维护功能和安全性，但不承诺持续可用性或不存在所有错误。有计划的改变和紧急保护限制是可能的。",
+                  "如果法律禁止限制用户的权利或运营商的责任，则本条款中的任何内容均不限制。责任范围和索赔程序应在填写运营商详细信息后由当地律师最终核实。"
+                ]
+              },
+              {
+                "id": "terms-termination",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.2",
+                    "label": "隐私政策版本 1.2"
+                  }
+                ],
+                "heading": "使用和数据终止",
+                "paragraphs": [
+                  "用户可以停止使用并永久删除该帐户。这将删除个人资料、照片、尝试、证书和相关审核，并且停止对先前文档的QR检查。已下载的外部PDF无法从设备中实际调用。隐私政策 1.2 版中描述了类别、提供商和删除程序。"
+                ]
+              },
+              {
+                "id": "terms-changes",
+                "items": [],
+                "links": [
+                  {
+                    "url": "#legal-contacts",
+                    "label": "根据文档联系"
+                  }
+                ],
+                "heading": "变更与沟通",
+                "paragraphs": [
+                  "重大更改会收到新的编号和日期。已接受的版本仍然可以通过配置文件中的版本链接获取，并且对于新版本，该界面请求单独接受。通过文档中的联系人发送问题和投诉。"
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "电话",
+                  "WhatsApp",
+                  "写入"
+                ],
+                "links": [],
+                "heading": "根据文档联系方式",
+                "paragraphs": [
+                  "致电或写入WhatsApp。对于书面请求，请保存聊天信件。"
+                ]
+              }
+            ]
+          },
+          "bodyHash": "06783dd2a3dafbc53c323f05d7c57ff888d7f14e017cd746bd7b230eae08ff76",
+          "status": "published"
+        }
+      ]
+    },
+    {
+      "documentType": "terms",
+      "version": "2.3",
+      "bodyRevision": "terms-2.3",
+      "effectiveAt": "2026-09-01T00:00:00.000Z",
+      "isCurrent": true,
+      "localizations": [
+        {
+          "locale": "en",
+          "title": "Terms of Use",
+          "body": {
+            "sections": [
+              {
+                "id": "terms-acceptance",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.3",
+                    "label": "Privacy Policy version 1.3"
+                  }
+                ],
+                "heading": "Acceptance and subject to conditions",
+                "paragraphs": [
+                  "These terms and conditions govern the use of the site and PWA SafetyHub.kz, four language versions, materials, account, tests, certificates and their verification functions. Upon successful authentication, the user separately accepts the current Terms and Conditions version 2.3 and the associated Privacy Policy version 1.3; only this explicit action records consent.",
+                  "If the user does not agree, they should not register or continue to work with private features. The current implementation does not contain payment; When paid services appear, prices, returns and separate commercial terms must be published before payment."
+                ]
+              },
+              {
+                "id": "terms-account",
+                "items": [
+                  "In RU, KK and EN, the user provides a valid email address and signs in with a one-time six-digit email OTP. In ZH, the user registers a discoverable passkey and signs in without email, SMS, a password or a username. The contact phone number is not an authentication factor in any locale.",
+                  "Biometric verification or PIN verification is performed by the operating system or device authenticator and is not transmitted to SafetyHub. The email code, passkey session, recovery code, session and account must not be transferred to another person.",
+                  "Synthetic Auth identifier of the Chinese account is an internal technical value, is not the user’s email and is not shown to him anywhere. The user should not attempt to use it as an address, username, or recovery method.",
+                  "The recovery code is shown once and is intended only for one-time registration of a new passkey. It is invalidated after use. A reasoned administrator reset creates a new one-time re-enrollment code and is recorded in the audit log.",
+                  "Before accessing the course materials, questions, test and certificate, your first name, last name, position, organization, your own current photograph and a contact number with the selected country code are required. The number is used only for communication, not for authentication or SMS.",
+                  "The completed profile is sent to the administrator for manual verification. The usual benchmark for a decision is up to 24 hours from the date of dispatch; This is not automatic approval or a guaranteed period of access. While your application is pending, rejected, or your profile is incomplete, private learning features are not available.",
+                  "If the application is rejected, the user can see the stated reason, correct the data and resubmit the profile. The displayed profile does not replace verified certificate data: the name, job title and organization used on the certificate are verified separately and stored as a versioned snapshot.",
+                  "If compromise, abuse or violation of the terms is suspected, access may be temporarily limited while maintaining legal recourse."
+                ],
+                "links": [],
+                "heading": "Account, login, recovery and manual verification",
+                "paragraphs": []
+              },
+              {
+                "id": "terms-learning",
+                "items": [],
+                "links": [],
+                "heading": "Training, tests and attempts",
+                "paragraphs": [
+                  "After the profile is approved, the user receives access to the localized course materials and test. Each published version contains three hidden variants; each variant contains 10 questions with four answer options and one correct answer. To pass, the user must answer at least 7 questions correctly, which is a score of 70%. Each attempt lasts 15 minutes. No more than 8 new attempts per course may be started in a calendar day in the Asia/Oral time zone. A resumed attempt remains in the locale selected when it was created.",
+                  "It is prohibited to use bots, extract or distribute answer keys, interfere with the operation of the service, circumvent restrictions, or take the test for another person. Errors in the material should be submitted through the document contacts."
+                ]
+              },
+              {
+                "id": "terms-notifications",
+                "items": [],
+                "links": [],
+                "heading": "Administrative events and Telegram",
+                "paragraphs": [
+                  "Application, course completion and system alert are displayed in the internal administrator inbox. A minimized information copy can be sent to a private Telegram group. Telegram unavailability does not cancel registration, course results or other confirmed actions.",
+                  "Telegram does not make decisions, does not approve or reject applications, and does not change account status. The decision on the application can only be made by an authorized administrator in the web admin panel. The Telegram message does not contain email, phone number, position, organization, photograph, documents, answers, credentials, recovery data or synthetic Auth identifier."
+                ]
+              },
+              {
+                "id": "terms-certificates",
+                "items": [],
+                "links": [],
+                "heading": "Certificates and their verification",
+                "paragraphs": [
+                  "An electronic certificate confirms the passing best result of a specific locale and version of the online test for verified user data. The first issue is performed explicitly by the administrator. If the result is strictly higher, the certificate is automatically replaced with a new one; correction of confirmed data may also cause a reissue. The administrator has the right to revoke the document indicating the reason. QR shows the status “Effective”, “Revoked” or “Document Not Found”.",
+                  "The server returns only authorized limited metadata and a signed verification URL. The PDF-certificate, the administrative PDF-report and ZIP are collected only in the browser and are not permanently stored in the database or Storage. The user downloads only his own valid certificate; the administrator can transfer the general report and certificates of its participants to the authorized representative of the company.",
+                  "The certificate itself is not declared to be a government license, hazardous work permit, or a substitute for mandatory training, instruction, medical examination, or employer certification. The applicability of the document to a specific industry and regulatory requirement must be separately confirmed by employer or a competent person."
+                ]
+              },
+              {
+                "id": "terms-content-localization",
+                "items": [],
+                "links": [],
+                "heading": "Materials, localizations and acceptable uses",
+                "paragraphs": [
+                  "Materials are intended for informational training. They can be read and used for personal preparation; Bulk copying, resale, removal of attribution, malicious scanning and creation of false certificates are prohibited.",
+                  "Regulatory information subject to change. The date of review and sources of material, when indicated, are helpful in assessing relevance but are not a substitute for official wording and professional advice for a specific work situation.",
+                  "The Russian copy is the canonical source for localization. Copies of KK, EN and ZH are automatically translated, back-translated and automatically checked without human linguistic or legal approval. All four copies belong to the same version, have separate immutable hashes and the same structure; the user accepts the residual risk semantic or legal discrepancy of the automatic translation and may request clarification before acceptance."
+                ]
+              },
+              {
+                "id": "terms-availability",
+                "items": [],
+                "links": [],
+                "heading": "Availability and responsibility",
+                "paragraphs": [
+                  "The service depends on Supabase, Vercel, the user's network, the Telegram Bot API for optional external notification delivery, and, when enabled, Cloudflare Turnstile. The operator strives to maintain functionality and security, but does not promise continuous availability or the absence of all errors. Planned changes and emergency protective restrictions are possible.",
+                  "Nothing in the terms limits the user's rights or the operator's liability where such limitation is prohibited by law. The scope of liability and the claims procedure should be finally verified by a local lawyer after filling in the operator's details."
+                ]
+              },
+              {
+                "id": "terms-termination",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.3",
+                    "label": "Privacy Policy version 1.3"
+                  }
+                ],
+                "heading": "Termination of Use and Data",
+                "paragraphs": [
+                  "The user can stop using and permanently delete the account. This deletes the profile, photo, attempts, credentials, recovery digests, certificates, and associated audits within the implemented deletion cascade, and the QR check of the previous document is terminated. An external PDF that has already been downloaded cannot be physically recalled from the device. Categories, providers and removal procedures are described in Privacy Policy version 1.3."
+                ]
+              },
+              {
+                "id": "terms-changes",
+                "items": [],
+                "links": [],
+                "heading": "Changes and communication",
+                "paragraphs": [
+                  "Significant changes receive a new number and date. The accepted version remains available via the versioned link in the profile, and for the new version the interface requests separate acceptance. Send questions and complaints through the contacts on the document."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Phone",
+                  "WhatsApp",
+                  "Write"
+                ],
+                "links": [],
+                "heading": "Contacts according to the document",
+                "paragraphs": [
+                  "Call or write to WhatsApp. For written requests, save the chat correspondence."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "cb00b9bf5d023e2c7f7f31c067e1695db8ba51b1bb5ee00d17b613ee41f4df80",
+          "status": "published"
+        },
+        {
+          "locale": "kk",
+          "title": "Пайдалану шарттары",
+          "body": {
+            "sections": [
+              {
+                "id": "terms-acceptance",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.3",
+                    "label": "Құпиялық саясатының 1.3 нұсқасы"
+                  }
+                ],
+                "heading": "Қабылдау және шарттарға сәйкес",
+                "paragraphs": [
+                  "Осы шарттар мен шарттар сайтты және PWA SafetyHub.kz, төрт тіл нұсқасын, материалдарды, есептік жазбаны, сынақтарды, сертификаттарды және олардың тексеру функцияларын пайдалануды реттейді. Сәтті аутентификациядан кейін пайдаланушы ағымдағы Шарттар мен шарттардың 2.3 нұсқасын және оған қатысты Құпиялық саясатының 1.3 нұсқасын бөлек қабылдайды; тек осы нақты әрекет келісімді жазады.",
+                  "Пайдаланушы келіспесе, олар тіркелмеуі немесе жеке мүмкіндіктермен жұмыс істеуді жалғастырмауы керек. Ағымдағы іске асыру төлемді қамтымайды; Ақылы қызметтер пайда болған кезде бағалар, қайтарулар және бөлек коммерциялық шарттар төлем алдында жариялануы керек."
+                ]
+              },
+              {
+                "id": "terms-account",
+                "items": [
+                  "RU, KK және EN-де пайдаланушы жарамды электрондық поштаны көрсетеді және бір реттік алты санды OTP электрондық поштасын пайдаланып жүйеге кіреді. ZH жүйесінде пайдаланушы анықталатын рұқсат кілтін тіркейді және электрондық пошта, SMS, құпия сөз немесе пайдаланушы аты жоқ жүйеге кіреді. Байланыс телефонының нөмірі кез келген тілде кіру факторы болып табылмайды.",
+                  "Биометриялық тексеруді немесе PIN тексеруін операциялық жүйе не құрылғының authenticator-ы орындайды; бұл деректер SafetyHub-қа берілмейді. Email кодын, passkey session-ды, recovery code-ты, сессияны немесе аккаунтты басқа адамға беруге болмайды.",
+                  "Қытай тіркелгісінің синтетикалық аутентификация идентификаторы ішкі техникалық мән болып табылады, ол пайдаланушының электрондық поштасы емес және оған еш жерде көрсетілмейді. Пайдаланушы оны мекенжай, пайдаланушы аты немесе қалпына келтіру әдісі ретінде пайдалануға әрекет жасамауы керек.",
+                  "Recovery code бір рет көрсетіледі және тек жаңа passkey-ді бір реттік тіркеуге арналған. Пайдаланылғаннан кейін ол жарамсыз етіледі. Негіздемесі көрсетілген әкімші reset-і жаңа бір реттік re-enrollment code жасайды және аудитке тіркеледі.",
+                  "Курс материалдарына, сұрақтарға, тестілеуге және сертификатқа қол жеткізбес бұрын атыңыз, тегіңіз, лауазымыңыз, ұйымыңыз, ағымдағы фотосуретіңіз және таңдалған ел коды бар байланыс телефоныңыз қажет. Нөмір аутентификация немесе SMS үшін емес, тек байланыс үшін пайдаланылады.",
+                  "Аяқталған профиль әкімшіге қолмен тексеру үшін жіберіледі. Шешім қабылдаудың әдеттегі эталоны жөнелтілген күннен бастап 24 сағатқа дейін; Бұл автоматты мақұлдау немесе қол жеткізудің кепілдік мерзімі емес. Өтінім күтілуде, қабылданбаған немесе профиліңіз толық емес болса, жеке оқыту мүмкіндіктері қолжетімді емес.",
+                  "Өтінім қабылданбаған жағдайда пайдаланушы көрсетілген себепті көріп, деректерді түзетіп, профильді қайта жібере алады. Көрсетілетін профиль сертификат үшін расталған деректерді алмастырмайды: сертификаттағы аты, лауазымы және ұйымы бөлек тексеріліп, нұсқа ретінде сақталады.",
+                  "Аккаунттың немесе credential-дың компрометациясына, теріс пайдалануға не шарттардың бұзылуына күдік болса, заңда көзделген жүгіну тәсілдері сақтала отырып, қолжетімділік уақытша шектелуі мүмкін."
+                ],
+                "links": [],
+                "heading": "Тіркелгі, кіру, қалпына келтіру және қолмен тексеру",
+                "paragraphs": []
+              },
+              {
+                "id": "terms-learning",
+                "items": [],
+                "links": [],
+                "heading": "Жаттығулар, сынақтар және әрекеттер",
+                "paragraphs": [
+                  "Профиль бекітілгеннен кейін пайдаланушы локализацияланған курс материалдарына және сынаққа рұқсат алады. Әрбір жарияланған нұсқада үш жасырын нұсқа бар; әр нұсқада төрт жауап және бір дұрыс жауап бар 10 сұрақ бар. Табысты нәтижеге жету үшін кем дегенде 7 сұраққа дұрыс жауап беру керек, яғни 70% ұпай жинау керек. Сізде әрекет ету үшін 15 минут бар. Asia/Oral уақыт белдеуінде бір курсқа күнтізбелік күнде ең көбі 8 жаңа әрекетке рұқсат етіледі. Жалғастырылған әрекет жасалған кезде таңдалған тілде қалады.",
+                  "Боттарды пайдалануға, жауап кілттерін шығаруға немесе таратуға, қызметтің жұмысына кедергі келтіруге, шектеулерді айналып өтуге немесе басқа адам үшін тест тапсыруға тыйым салынады. Материалдағы қателер құжат контактілері арқылы берілуі керек."
+                ]
+              },
+              {
+                "id": "terms-notifications",
+                "items": [],
+                "links": [],
+                "heading": "Әкімшілік оқиғалар және Telegram",
+                "paragraphs": [
+                  "Өтінім, курсты аяқтау оқиғасы және system alert әкімшінің ішкі inbox-ында көрсетіледі. Минимизацияланған ақпараттық көшірме жеке Telegram тобына жіберілуі мүмкін. Telegram қолжетімсіздігі тіркеуді, курс нәтижесін немесе басқа расталған әрекетті кері қайтармайды.",
+                  "Telegram шешім қабылдамайды, өтінімдерді мақұлдамайды немесе қабылдамайды және тіркелгі күйін өзгертпейді. Өтінім бойынша шешімді веб-әкімші панеліндегі уәкілетті әкімші ғана қабылдай алады. Telegram хабарламасында электрондық пошта, телефон нөмірі, лауазым, ұйым, фотосурет, құжаттар, жауаптар, тіркелгі деректері, қалпына келтіру деректері немесе синтетикалық аутентификация идентификаторы жоқ."
+                ]
+              },
+              {
+                "id": "terms-certificates",
+                "items": [],
+                "links": [],
+                "heading": "Сертификаттар және оларды тексеру",
+                "paragraphs": [
+                  "Электрондық сертификат расталған пайдаланушы деректері бойынша онлайн-тесттің нақты локалі мен нұсқасындағы ең жақсы өту нәтижесін растайды. Алғашқы сертификатты әкімші тікелей береді. Нәтиже қатаң түрде жоғары болғанда сертификат автоматты түрде жаңасымен ауыстырылады; расталған деректерді түзету де қайта шығаруға әкелуі мүмкін. Әкімші себебін көрсете отырып құжаттың күшін жоя алады. QR «Қолданыста», «Күші жойылған» немесе «Құжат табылмады» күйін көрсетеді.",
+                  "Сервер тек рұқсат етілген шектеулі метадеректер мен қол қойылған verification URL қайтарады. PDF сертификат, әкімшілік PDF есеп және ZIP тек браузерде жиналады және дерекқорда немесе Storage-та тұрақты сақталмайды. Пайдаланушы тек өзінің қолданыстағы сертификатын жүктейді; әкімші компанияның уәкілетті өкіліне сол компания қатысушыларының жиынтық есебі мен сертификаттарын бере алады.",
+                  "Сертификаттың өзі мемлекеттік лицензия, қауіпті жұмыстарға рұқсат немесе міндетті оқытуды, нұсқаманы, медициналық тексеруді не жұмыс беруші өткізетін аттестаттауды алмастыратын құжат емес. Құжаттың нақты салаға және нормативтік талапқа қолданылуын жұмыс беруші немесе құзыретті маман бөлек растауға тиіс."
+                ]
+              },
+              {
+                "id": "terms-content-localization",
+                "items": [],
+                "links": [],
+                "heading": "Материалдар, локализациялар және қолайлы пайдаланулар",
+                "paragraphs": [
+                  "Материалдар ақпараттық оқытуға арналған. Оларды оқуға және жеке дайындық үшін пайдалануға болады; Жаппай көшіруге, қайта сатуға, атрибуцияны жоюға, зиянды сканерлеуге және жалған сертификаттарды жасауға тыйым салынады.",
+                  "Нормативтік ақпарат өзгертілуі мүмкін. Қарау күні мен материал көздері көрсетілген кезде, өзектілігін бағалауға көмектеседі, бірақ нақты жұмыс жағдайына арналған ресми тұжырымдар мен кәсіби кеңестерді алмастыра алмайды.",
+                  "Орысша көшірме локализацияның канондық көзі болып табылады. KK, EN және ZH көшірмелері адамның лингвистикалық немесе заңдық рұқсатынсыз автоматты түрде аударылады, кері аударылады және автоматты түрде тексеріледі. Барлық төрт көшірме бірдей нұсқаға жатады, бөлек өзгермейтін хэштері және құрылымы бірдей; пайдаланушы автоматты аударманың қалдық тәуекел семантикалық немесе заңды сәйкессіздігін қабылдайды және қабылдау алдында түсіндіруді сұрай алады."
+                ]
+              },
+              {
+                "id": "terms-availability",
+                "items": [],
+                "links": [],
+                "heading": "Қол жетімділік және жауапкершілік",
+                "paragraphs": [
+                  "Қызмет Supabase, Vercel, пайдаланушы желісіне, қосымша сыртқы хабарландыруды жеткізуге арналған Telegram Bot API интерфейсіне және қосылған кезде Cloudflare Turnstile тәуелді. Оператор функционалдылық пен қауіпсіздікті сақтауға тырысады, бірақ үздіксіз қол жетімділікті немесе барлық қателердің болмауын уәде етпейді. Жоспарланған өзгерістер мен төтенше қорғаныс шектеулері мүмкін.",
+                  "Шарттағы ешнәрсе пайдаланушының құқықтарын немесе мұндай шектеуге заңмен тыйым салынған жағдайда оператордың жауапкершілігін шектемейді. Жауапкершілік ауқымы мен шағымдарды қарау тәртібін оператордың мәліметтерін толтырғаннан кейін жергілікті заңгер түпкілікті тексеруі керек."
+                ]
+              },
+              {
+                "id": "terms-termination",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.3",
+                    "label": "Құпиялық саясатының 1.3 нұсқасы"
+                  }
+                ],
+                "heading": "Пайдалануды және деректерді тоқтату",
+                "paragraphs": [
+                  "Пайдаланушы сервисті пайдалануды тоқтатып, аккаунтын біржола жоя алады. Іске асырылған жою каскады шегінде профиль, фотосурет, әрекеттер, credentials, recovery digests, сертификаттар және байланысты аудит жойылады, ал бұрынғы құжаттың QR тексеруі тоқтатылады. Сыртқы құрылғыға жүктеліп қойған PDF-ті ол құрылғыдан физикалық түрде кері қайтарып алу немесе жою мүмкін емес. Деректер санаттары, жеткізушілер және жою тәртібі Құпиялық саясатының 1.3 нұсқасында сипатталған."
+                ]
+              },
+              {
+                "id": "terms-changes",
+                "items": [],
+                "links": [],
+                "heading": "Өзгерістер мен байланыс",
+                "paragraphs": [
+                  "Маңызды өзгерістер жаңа нөмір мен күнді алады. Қабылданған нұсқа профильдегі нұсқаланған сілтеме арқылы қолжетімді болып қалады, ал жаңа нұсқа үшін интерфейс бөлек қабылдауды сұрайды. Құжаттағы контактілер арқылы сұрақтар мен шағымдарды жіберіңіз."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Телефон",
+                  "WhatsApp",
+                  "Жазыңыз"
+                ],
+                "links": [],
+                "heading": "Құжатқа сәйкес байланыстар",
+                "paragraphs": [
+                  "WhatsApp нөміріне қоңырау шалыңыз немесе жазыңыз. Жазбаша сұраулар үшін чат корреспонденциясын сақтаңыз."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "b00feb7167f880c5dd665c86abc8b095a0c6cde3d823a7ce81ada3a9f7bcee3d",
+          "status": "published"
+        },
+        {
+          "locale": "ru",
+          "title": "Условия использования",
+          "body": {
+            "sections": [
+              {
+                "id": "terms-acceptance",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.3",
+                    "label": "Политика конфиденциальности версии 1.3"
+                  }
+                ],
+                "heading": "Принятие и предмет условий",
+                "paragraphs": [
+                  "Эти условия регулируют использование сайта и PWA SafetyHub.kz, четырёх языковых версий, материалов, аккаунта, тестов, сертификатов и функций их проверки. После успешной аутентификации пользователь отдельно принимает актуальные Условия версии 2.3 и связанную Политику конфиденциальности версии 1.3; только это явное действие фиксирует согласие.",
+                  "Если пользователь не согласен, он не должен регистрироваться или продолжать работу с закрытыми функциями. Текущая реализация не содержит оплаты; при появлении платных услуг цена, возвраты и отдельные коммерческие условия должны быть опубликованы до оплаты."
+                ]
+              },
+              {
+                "id": "terms-account",
+                "items": [
+                  "В RU, KK и EN пользователь указывает действующий email и входит по одноразовому шестизначному email OTP. В ZH пользователь регистрирует discoverable passkey и входит без email, SMS, пароля и username. Контактный телефон ни в одной локали не является фактором входа.",
+                  "Биометрическая проверка или PIN выполняются операционной системой или authenticator устройства и не передаются SafetyHub. Нельзя передавать другому лицу email-код, passkey session, recovery code, сессию или аккаунт.",
+                  "Synthetic Auth identifier китайского аккаунта является внутренним техническим значением, не является email пользователя и нигде ему не показывается. Пользователь не должен пытаться использовать его как адрес, username или способ восстановления.",
+                  "Recovery code показывается один раз и предназначен только для одноразовой регистрации нового passkey. После использования он инвалидируется. Обоснованный reset администратора создаёт новый одноразовый re-enrollment code и фиксируется в аудите.",
+                  "Перед доступом к материалам курса, вопросам, тесту и сертификату обязательны имя, фамилия, должность, организация, собственная актуальная фотография и контактный номер с выбранным кодом страны. Номер используется только для связи, а не для аутентификации или SMS.",
+                  "Заполненный профиль отправляется на ручную проверку администратору. Обычный ориентир решения — до 24 часов с момента отправки; это не автоматическое одобрение и не гарантированный срок доступа. Пока заявка ожидает решения, отклонена или профиль не заполнен, закрытые учебные функции недоступны.",
+                  "При отклонении пользователь может увидеть указанную причину, исправить данные и отправить профиль повторно. Отображаемый профиль не заменяет подтверждённые данные сертификата: имя, должность и организация для сертификата проходят отдельную проверку и сохраняются как версия.",
+                  "При подозрении на компрометацию, злоупотребление или нарушение условий доступ может быть временно ограничен с сохранением предусмотренных законом способов обращения."
+                ],
+                "links": [],
+                "heading": "Аккаунт, вход, восстановление и ручная проверка",
+                "paragraphs": []
+              },
+              {
+                "id": "terms-learning",
+                "items": [],
+                "links": [],
+                "heading": "Обучение, тесты и попытки",
+                "paragraphs": [
+                  "После одобрения профиля пользователь получает доступ к локализованным материалам курса и тесту. Каждая опубликованная версия содержит три скрытых варианта; каждый вариант содержит 10 вопросов с четырьмя ответами и одним правильным ответом. Для успешного результата нужно правильно ответить минимум на 7 вопросов, то есть набрать 70%. На попытку отводится 15 минут. Для одного курса разрешено не более 8 новых попыток за календарный день в часовом поясе Asia/Oral. Возобновляемая попытка остаётся на локали, выбранной при её создании.",
+                  "Запрещено использовать ботов, извлекать или распространять ключи ответов, вмешиваться в работу сервиса, обходить ограничения либо проходить тест за другого человека. Ошибки в материале следует направлять через контакты по документу."
+                ]
+              },
+              {
+                "id": "terms-notifications",
+                "items": [],
+                "links": [],
+                "heading": "Административные события и Telegram",
+                "paragraphs": [
+                  "Заявка, завершение курса и system alert отображаются во внутреннем inbox администратора. Минимизированная информационная копия может отправляться в приватную Telegram-группу. Недоступность Telegram не отменяет регистрацию, результат курса или другое подтверждённое действие.",
+                  "Telegram не принимает решений, не одобряет и не отклоняет заявки и не меняет состояние аккаунта. Решение по заявке принимается только авторизованным администратором в веб-админке. Telegram-сообщение не содержит email, телефона, должности, организации, фотографии, документов, ответов, credentials, recovery data или synthetic Auth identifier."
+                ]
+              },
+              {
+                "id": "terms-certificates",
+                "items": [],
+                "links": [],
+                "heading": "Сертификаты и их проверка",
+                "paragraphs": [
+                  "Электронный сертификат подтверждает проходной лучший результат конкретной локали и версии онлайн-теста для подтверждённых данных пользователя. Первую выдачу выполняет администратор явно. При строго более высоком результате сертификат автоматически заменяется новым; исправление подтверждённых данных также может вызвать перевыпуск. Администратор вправе отозвать документ с указанием причины. QR показывает статус «Действует», «Отозван» или «Документ не найден».",
+                  "Сервер возвращает только авторизованные ограниченные метаданные и подписанный verification URL. PDF-сертификат, административный PDF-отчёт и ZIP собираются только в браузере и не хранятся постоянно в базе или Storage. Пользователь скачивает только собственный действующий сертификат; администратор может передать уполномоченному представителю компании общий отчёт и сертификаты её участников.",
+                  "Сертификат сам по себе не объявляется государственной лицензией, разрешением на опасные работы или заменой обязательного обучения, инструктажа, медосмотра либо аттестации работодателя. Применимость документа к конкретной отрасли и нормативному требованию должен отдельно подтвердить работодатель или компетентный специалист."
+                ]
+              },
+              {
+                "id": "terms-content-localization",
+                "items": [],
+                "links": [],
+                "heading": "Материалы, локализации и допустимое использование",
+                "paragraphs": [
+                  "Материалы предназначены для информационного обучения. Их можно читать и использовать для личной подготовки; массовое копирование, перепродажа, удаление обозначений авторства, вредоносное сканирование и создание ложных сертификатов запрещены.",
+                  "Нормативные сведения могут меняться. Дата проверки и источники материала, когда они указаны, помогают оценить актуальность, но не заменяют официальную редакцию акта и профессиональную консультацию для конкретной производственной ситуации.",
+                  "Русская копия является каноническим источником для локализации. Копии KK, EN и ZH автоматически переведены, обратно переведены и автоматически проверены без human linguistic или legal approval. Все четыре копии относятся к одной версии, имеют отдельные неизменяемые hashes и одинаковую структуру; пользователь принимает остаточный риск смыслового или юридического расхождения автоматического перевода и может запросить разъяснение до принятия."
+                ]
+              },
+              {
+                "id": "terms-availability",
+                "items": [],
+                "links": [],
+                "heading": "Доступность и ответственность",
+                "paragraphs": [
+                  "Сервис зависит от Supabase, Vercel, сети пользователя, Telegram Bot API для необязательной внешней доставки уведомлений и, при включении, Cloudflare Turnstile. Оператор стремится поддерживать работоспособность и безопасность, но не обещает непрерывную доступность или отсутствие всех ошибок. Плановые изменения и экстренные защитные ограничения возможны.",
+                  "Ничто в условиях не ограничивает права пользователя и ответственность оператора там, где такое ограничение запрещено законом. Объём ответственности и порядок претензий должны быть окончательно проверены местным юристом после заполнения реквизитов оператора."
+                ]
+              },
+              {
+                "id": "terms-termination",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.3",
+                    "label": "Политика конфиденциальности версии 1.3"
+                  }
+                ],
+                "heading": "Прекращение использования и данные",
+                "paragraphs": [
+                  "Пользователь может прекратить использование и безвозвратно удалить аккаунт. При этом удаляются профиль, фотография, попытки, credentials, recovery digests, сертификаты и связанный аудит в пределах реализованного каскада удаления, а QR-проверка прежнего документа прекращается. Уже скачанный внешний PDF физически отозвать с устройства нельзя. Категории, поставщики и порядок удаления описаны в Политике конфиденциальности версии 1.3."
+                ]
+              },
+              {
+                "id": "terms-changes",
+                "items": [],
+                "links": [],
+                "heading": "Изменения и связь",
+                "paragraphs": [
+                  "Существенные изменения получают новый номер и дату. Принятая версия остаётся доступной по versioned-ссылке в профиле, а для новой версии интерфейс запрашивает отдельное принятие. Вопросы и претензии направляйте через контакты по документу."
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "Телефон",
+                  "WhatsApp",
+                  "Написать"
+                ],
+                "links": [],
+                "heading": "Контакты по документу",
+                "paragraphs": [
+                  "Позвоните или напишите в WhatsApp. Для письменного обращения сохраните переписку в чате."
+                ]
+              }
+            ]
+          },
+          "bodyHash": "654fb155a0631e2de6236811fc3bf3cfb9b3f3afc91591b40eac1591385148a1",
+          "status": "published"
+        },
+        {
+          "locale": "zh",
+          "title": "使用条款",
+          "body": {
+            "sections": [
+              {
+                "id": "terms-acceptance",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.3",
+                    "label": "隐私政策版本 1.3"
+                  }
+                ],
+                "heading": "接受并受条件限制",
+                "paragraphs": [
+                  "这些条款和条件管辖本网站和PWA SafetyHub.kz、四种语言版本、材料、帐户、测试、证书及其验证功能的使用。身份验证成功后，用户分别接受当前的条款和条件2.3版以及相关的隐私政策1.3版；只有这种明确的行为才会记录同意。",
+                  "如果用户不同意，则不应注册或继续使用私有功能。目前的实现不包含付费；当付费服务出现时，价格、退货和单独的商业条款必须在付款前公布。"
+                ]
+              },
+              {
+                "id": "terms-account",
+                "items": [
+                  "在 RU、KK 和 EN 中，用户提供有效的电子邮件地址，并使用一次性六位 email OTP 登录。在 ZH 中，用户注册 discoverable passkey，无需电子邮件、短信、密码或用户名即可登录。联系电话在任何语言版本中都不是身份验证因素。",
+                  "生物识别验证或 PIN 验证由操作系统或设备 authenticator 完成，相关数据不会传输给 SafetyHub。不得将 email 验证码、passkey session、recovery code、会话或账户转让给他人。",
+                  "中国账户的 Synthetic Auth identifier 是内部技术值，不是用户的电子邮件，也绝不会向用户显示。用户不得尝试将其用作地址、username 或恢复方式。",
+                  "Recovery code 仅显示一次，只能用于一次性注册新的 passkey。使用后立即失效。说明理由的管理员重置会生成新的、一次性的 re-enrollment code，并记录到审计日志中。",
+                  "在访问课程材料、问题、测试和证书之前，需要您的名字、姓氏、职位、组织、您当前的照片以及带有所选国家/地区代码的联系电话。该号码仅用于通信，不用于身份验证或短信。",
+                  "完成的个人资料将发送给管理员进行手动验证。通常的决策基准是自发送之日起 24 小时内；这不是自动批准或保证访问期限。当您的申请正在等待、被拒绝或您的个人资料不完整时，私人学习功能将不可用。",
+                  "申请被拒绝后，用户可以查看给出的理由、更正数据并重新提交个人资料。页面显示的个人资料不能替代已验证的证书数据：证书上的姓名、职位和组织信息会单独核验，并作为一个版本化快照保存。",
+                  "如怀疑账户或凭证已泄露、存在滥用或违反条款，在保留法律规定的申诉途径的同时，访问权限可能会被暂时限制。"
+                ],
+                "links": [],
+                "heading": "账号、登录、恢复及手动验证",
+                "paragraphs": []
+              },
+              {
+                "id": "terms-learning",
+                "items": [],
+                "links": [],
+                "heading": "培训、测试和尝试",
+                "paragraphs": [
+                  "个人资料获批后，用户可以访问本地化课程材料和测试。每个已发布版本包含三个隐藏变体；每个变体有 10 道题、四个答案选项，其中一个为正确答案。要通过测试，必须至少正确回答 7 道题，即达到 70%。每次尝试限时 15 分钟。在 Asia/Oral 时区内，每门课程每个日历日最多可开始 8 次新尝试。恢复未完成的尝试时，仍使用创建该尝试时确定的语言。",
+                  "禁止使用机器人、提取或分发答案密钥、干扰服务运行、规避限制或替他人参加考试。材料中的错误应通过文档联系人提交。"
+                ]
+              },
+              {
+                "id": "terms-notifications",
+                "items": [],
+                "links": [],
+                "heading": "管理活动和电报",
+                "paragraphs": [
+                  "申请、课程完成和系统警报显示在内部管理员收件箱中。可以将最小化的信息副本发送到私人 Telegram 群组。 Telegram 无法使用并不会取消注册、课程结果或其他已确认的操作。",
+                  "Telegram 不做决定，不批准或拒绝申请，也不改变账户状态。申请的决定只能由网络管理面板中的授权管理员做出。 Telegram 消息不包含电子邮件、电话号码、职位、组织、照片、文档、答案、凭证、恢复数据或合成身份验证标识符。"
+                ]
+              },
+              {
+                "id": "terms-certificates",
+                "items": [],
+                "links": [],
+                "heading": "证书及其验证",
+                "paragraphs": [
+                  "电子证书确认：对于已验证的用户数据，用户在特定语言和特定版本的在线测试中取得了最佳及格成绩。首次签发由管理员明确执行。只有取得严格更高的成绩时，证书才会自动替换为新证书；更正已验证的数据也可能触发重新签发。管理员可在注明理由后撤销证书。QR 验证显示“有效”“已撤销”或“未找到文档”状态。",
+                  "服务器只返回经授权的有限元数据和已签名的 verification URL。PDF 证书、管理 PDF 报告和 ZIP 仅在浏览器中生成，不会永久存储在数据库或 Storage 中。用户只能下载自己的有效证书；管理员可以向公司的授权代表提供该公司参与者的汇总报告和证书。",
+                  "证书本身不是政府许可证、危险作业许可证，也不能替代强制培训、安全交底、体检或用人单位组织的考核认证。该证书是否适用于特定行业和监管要求，必须由用人单位或具备相应能力的专业人员另行确认。"
+                ]
+              },
+              {
+                "id": "terms-content-localization",
+                "items": [],
+                "links": [],
+                "heading": "材料、本地化和可接受的用途",
+                "paragraphs": [
+                  "材料用于信息培训。它们可以阅读并用于个人准备；禁止批量复制、转售、删除归属、恶意扫描和制作虚假证书。",
+                  "监管信息可能会发生变化。审查日期和材料来源（如注明）有助于评估相关性，但不能替代针对特定工作情况的官方措辞和专业建议。",
+                  "俄语副本是本地化的规范来源。 KK、EN 和 ZH 的副本会自动翻译、回译和自动检查，无需人类语言或法律批准。所有四个副本都属于同一版本，具有单独的不可变哈希值和相同的结构；用户接受自动翻译的残余风险语义或法律差异，并可以在接受之前要求澄清。"
+                ]
+              },
+              {
+                "id": "terms-availability",
+                "items": [],
+                "links": [],
+                "heading": "可用性和责任",
+                "paragraphs": [
+                  "该服务取决于Supabase、Vercel、用户网络、用于可选外部通知传送的 Telegram Bot API，以及启用后的Cloudflare Turnstile。运营商努力维护功能和安全性，但不承诺持续可用性或不存在所有错误。有计划的改变和紧急保护限制是可能的。",
+                  "如果法律禁止限制用户的权利或运营商的责任，则本条款中的任何内容均不限制。责任范围和索赔程序应在填写运营商详细信息后由当地律师最终核实。"
+                ]
+              },
+              {
+                "id": "terms-termination",
+                "items": [],
+                "links": [
+                  {
+                    "url": "/privacy?version=1.3",
+                    "label": "隐私政策版本 1.3"
+                  }
+                ],
+                "heading": "使用和数据终止",
+                "paragraphs": [
+                  "用户可以停止使用服务并永久删除账户。在已实现的级联删除范围内，个人资料、照片、尝试、credentials、recovery digests、证书及相关审计记录会被删除，原证书的 QR 验证也会停止。已经下载到外部设备的 PDF 无法从该设备上被实际收回或删除。数据类别、供应商和删除流程见隐私政策 1.3 版。"
+                ]
+              },
+              {
+                "id": "terms-changes",
+                "items": [],
+                "links": [],
+                "heading": "变更与沟通",
+                "paragraphs": [
+                  "重大更改会收到新的编号和日期。已接受的版本仍然可以通过配置文件中的版本链接获取，并且对于新版本，该界面请求单独接受。通过文档中的联系人发送问题和投诉。"
+                ]
+              },
+              {
+                "id": "legal-contacts",
+                "items": [
+                  "电话",
+                  "WhatsApp",
+                  "写入"
+                ],
+                "links": [],
+                "heading": "根据文档联系方式",
+                "paragraphs": [
+                  "致电或写入WhatsApp。对于书面请求，请保存聊天信件。"
+                ]
+              }
+            ]
+          },
+          "bodyHash": "67b337eec6b5e325b0c1e9bc0eb7bcb2880d1e9b84cea21d1fa7d6e5c94690c6",
+          "status": "published"
+        }
+      ]
+    }
+  ]
+}

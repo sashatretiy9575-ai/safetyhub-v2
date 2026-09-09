@@ -1,14 +1,19 @@
-'use client';
-
 import * as React from 'react';
-import * as LabelPrimitive from '@radix-ui/react-label';
 import { cn } from '@/lib/utils';
 
+/**
+ * A plain <label>.
+ *
+ * This used to wrap @radix-ui/react-label, whose only addition over the native
+ * element is forwarding a click to the labelled control — which the browser
+ * does on its own. The dependency also forced 'use client' on every page that
+ * renders a form label.
+ */
 export const Label = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
+  HTMLLabelElement,
+  React.LabelHTMLAttributes<HTMLLabelElement>
 >(({ className, ...props }, ref) => (
-  <LabelPrimitive.Root
+  <label
     ref={ref}
     className={cn(
       'text-sm font-medium leading-none text-[var(--color-text)] peer-disabled:cursor-not-allowed peer-disabled:opacity-60',
@@ -17,4 +22,4 @@ export const Label = React.forwardRef<
     {...props}
   />
 ));
-Label.displayName = LabelPrimitive.Root.displayName;
+Label.displayName = 'Label';

@@ -30,7 +30,10 @@ test('public legal documents use immutable local data and static physical routes
   ]);
 
   assert.match(loader, /path\.join\(process\.cwd\(\), 'content', 'legal'\)/u);
-  assert.match(loader, /'content',[\s\S]*?'snapshots',[\s\S]*?'localizations',[\s\S]*?'manifest\.json'/u);
+  assert.match(loader, // The legal pages read a narrow projection now: the full manifest is 1.41 MB
+    // and Next's tracer copies whatever a route references into its function,
+    // so even naming it as a fallback put it back in all eight of them.
+    /'content',[\s\S]*?'snapshots',[\s\S]*?'localizations',[\s\S]*?'legal-manifest\.json'/u);
   assert.match(loader, /export function getStaticLegalDocument/);
   assert.match(loader, /export function staticLegalVersions/);
   assert.match(loader, /hasLegacyRussianLegalRenderer/);

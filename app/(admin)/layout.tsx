@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { RootDocument } from '@/components/layout/root-document';
 import { PWAProvider } from '@/components/shared/pwa-provider';
+import { pickClientNamespaces } from '@/i18n/client-namespaces';
 import { DEFAULT_LOCALE } from '@/i18n/config';
 import { APP_VIEWPORT, pwaIdentity } from '@/lib/pwa-identity';
 import '../globals.css';
@@ -24,7 +25,7 @@ export default async function AdminGroupLayout({ children }: { children: ReactNo
   setRequestLocale(DEFAULT_LOCALE);
   const messages = await getMessages();
   return (
-    <RootDocument locale={DEFAULT_LOCALE} messages={messages}>
+    <RootDocument locale={DEFAULT_LOCALE} messages={pickClientNamespaces(messages)}>
       <PWAProvider>{children}</PWAProvider>
     </RootDocument>
   );

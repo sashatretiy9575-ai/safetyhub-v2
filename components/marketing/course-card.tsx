@@ -49,7 +49,9 @@ export function CourseCard({
             src={coverImage}
             alt=""
             fill
-            sizes="(min-width: 1200px) 33vw, (min-width: 640px) 50vw, 100vw"
+            // The grid is capped at 1280 px, so above that the slot stops growing with
+            // the viewport and a vw hint overstates it.
+            sizes="(min-width: 1280px) 416px, (min-width: 1200px) 33vw, (min-width: 640px) 50vw, 100vw"
             priority={priority}
             loading={priority ? undefined : 'lazy'}
             placeholder="blur"

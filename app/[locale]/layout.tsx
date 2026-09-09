@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { RootDocument } from '@/components/layout/root-document';
+import { pickClientNamespaces } from '@/i18n/client-namespaces';
 import { LOCALE_PREFIXES, isAppLocale, type AppLocale } from '@/i18n/config';
 import { buildMetadata } from '@/lib/seo';
 import '../globals.css';
@@ -67,7 +68,7 @@ export default async function LocalizedRootLayout({
   const messages = await getMessages();
 
   return (
-    <RootDocument locale={locale} messages={messages}>
+    <RootDocument locale={locale} messages={pickClientNamespaces(messages)}>
       {children}
     </RootDocument>
   );

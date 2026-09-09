@@ -561,6 +561,19 @@ export function buildLocalizedPublishedSnapshot({
   };
   const manifest = { ...projection, manifestHash: canonicalHash(projection) };
   files.set('manifest.json', Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`, 'utf8'));
+  // A projection for the legal pages. They need six documents out of a file
+  // that also carries every course, article, quiz variant and answer option,
+  // and Next's tracer bundles whatever a route reads into its function.
+  const legalProjection = {
+    schemaVersion: manifest.schemaVersion,
+    batchId: manifest.batchId,
+    manifestHash: manifest.manifestHash,
+    legalVersions: manifest.legalVersions,
+  };
+  files.set(
+    'legal-manifest.json',
+    Buffer.from(`${JSON.stringify(legalProjection, null, 2)}\n`, 'utf8'),
+  );
   return { manifest, files };
 }
 
@@ -640,7 +653,7 @@ export async function validateLocalizedPublishedSnapshot({
       fail('LOCALIZED_SNAPSHOT_REVIEW_BINDING_INVALID');
     }
   }
-  const expectedFiles = new Set(['manifest.json']);
+  const expectedFiles = new Set(['manifest.json', 'legal-manifest.json']);
   const presentationAssets = new Map();
   let assetCount = 0;
   for (const course of manifest.courses) {

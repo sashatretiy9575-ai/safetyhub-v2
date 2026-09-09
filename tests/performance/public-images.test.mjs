@@ -16,7 +16,8 @@ test('blog streams its data grid behind a route-specific skeleton', async () => 
     /<Suspense fallback=\{<ArticleGridSkeleton label=\{t\('loading'\)\} \/>\}>/,
   );
   assert.match(source, /async function ArticlesGrid\(\)/);
-  assert.match(source, /priority=\{false\}/);
+  // The featured card is the LCP element of this page; the rest stay lazy.
+  assert.match(source, /priority=\{index === 0\}/);
   assert.match(articleCard, /placeholder="blur"/);
 });
 

@@ -24,7 +24,11 @@ const PRECACHE_URLS = [
 
 // Content-hashed Next.js chunks already have an immutable HTTP cache policy.
 // Duplicating them in Cache Storage makes old deploys accumulate indefinitely.
-const STATIC_PREFIXES = ['/icons/', '/images/', '/fonts/'];
+// `/images/` matches nothing in practice: <Image> requests go to the optimizer
+// at /_next/image?url=…, and only unoptimized markup would hit /images/ direct.
+// `/_next/static` stays out on purpose — content-hashed chunks already have an
+// immutable HTTP cache, and duplicating them here makes old deploys pile up.
+const STATIC_PREFIXES = ['/icons/', '/images/', '/fonts/', '/_next/image'];
 const PRIVATE_PATH =
   /^\/(?:[a-z]{2}\/)?(?:api|auth|admin|profile|account|onboarding|callback)(?:\/|$)/;
 const AUTH_CALLBACK_PATH = /^\/(?:[a-z]{2}\/)?(?:auth\/)?callback(?:\/|$)/;
@@ -224,9 +228,17 @@ self.addEventListener('fetch', (event) => {
 
   const cachePromise = caches.open(CACHE_VERSION);
   const cachedPromise = cachePromise.then((cache) => freshCachedResponse(cache, request));
-  const networkPromise = fetch(request).then(async (response) => {
+  // The response is handed back the moment it arrives. Storing it — and the
+  // full walk of the cache that follows, which reads and re-dates every entry —
+  // used to be awaited first, so every icon, image and font on a cold cache was
+  // delayed by work the page does not need.
+  const networkPromise = fetch(request).then((response) => {
     if (response.ok && response.type === 'basic') {
-      await putRuntimeResponse(await cachePromise, request, response);
+      event.waitUntil(
+        cachePromise
+          .then((cache) => putRuntimeResponse(cache, request, response.clone()))
+          .catch(() => undefined),
+      );
     }
     return response;
   });

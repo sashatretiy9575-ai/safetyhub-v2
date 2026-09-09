@@ -324,9 +324,16 @@ export function AccountApprovalQueue({ items }: { items: AdminAccountApprovalIte
               ) : null}
 
               {item.avatarAvailable ? (
+                // One request per row, all at once, against an admin-only
+                // endpoint — and with no dimensions the list reflowed as each
+                // one landed.
                 <img
                   src={`/api/admin/attestations/avatar/${item.id}`}
                   alt={`Фото профиля: ${label}`}
+                  width={64}
+                  height={64}
+                  loading="lazy"
+                  decoding="async"
                   className="size-14 rounded-2xl border border-[var(--color-border)] object-cover sm:size-16"
                 />
               ) : (

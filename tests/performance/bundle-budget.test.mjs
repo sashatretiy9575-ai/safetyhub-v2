@@ -48,7 +48,19 @@ test('bundle accounting deduplicates shared chunks and isolates the leaf route e
 test('approved production budgets fail closed at the first byte over a limit', () => {
   assert.deepEqual(
     BUNDLE_BUDGETS.map(({ label }) => label),
-    ['home', 'localized home', 'admin employees', 'profile', 'onboarding', 'course detail'],
+    [
+      'home',
+      'localized home',
+      'admin employees',
+      'profile',
+      'onboarding',
+      'course detail',
+      // Four routes heavier than any of the above had no ceiling at all.
+      'admin course editor',
+      'admin article editor',
+      'auth login',
+      'course test',
+    ],
   );
   assert.equal(CSS_BUDGET, 20 * 1_024);
   for (const budget of BUNDLE_BUDGETS) {

@@ -97,13 +97,24 @@ const snapshotManifestSchema = z
 export type LocalizedLegalDocument = z.infer<typeof localizedLegalDocumentSchema>;
 
 const legalContentDirectory = path.join(process.cwd(), 'content', 'legal');
-const localizationSnapshotPath = path.join(
+/**
+ * A projection of the localization snapshot holding only the legal documents.
+ *
+ * The full manifest is 1.41 MB and also carries every course, article, quiz
+ * variant and answer option; a legal page needs six documents out of it, and
+ * Next's file tracer copies whatever a route reads into that route's deployed
+ * function. The path is spelled out in one call on purpose: assembling it from
+ * a directory constant makes the tracer treat the read as dynamic and bundle
+ * the entire directory, presentation PDFs included.
+ */
+const localizationLegalSnapshotPath = path.join(
   process.cwd(),
   'content',
   'snapshots',
   'localizations',
-  'manifest.json',
+  'legal-manifest.json',
 );
+
 
 const documentCache = new Map<string, LocalizedLegalDocument | null>();
 let snapshotManifest: z.infer<typeof snapshotManifestSchema> | null | undefined;
@@ -152,7 +163,12 @@ function readLocalDocument(
 
 function readSnapshotManifest(): z.infer<typeof snapshotManifestSchema> | null {
   if (snapshotManifest !== undefined) return snapshotManifest;
-  snapshotManifest = snapshotManifestSchema.safeParse(readJson(localizationSnapshotPath)).data ?? null;
+  // Only the projection. Naming the full manifest here as a fallback would put
+  // it back into all eight functions — the tracer follows the reference, not
+  // the branch — which is the whole cost this avoids. A snapshot without the
+  // projection falls back to the checked-in files under content/legal.
+  snapshotManifest =
+    snapshotManifestSchema.safeParse(readJson(localizationLegalSnapshotPath)).data ?? null;
   return snapshotManifest;
 }
 

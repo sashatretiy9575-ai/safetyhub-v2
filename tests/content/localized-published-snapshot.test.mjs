@@ -266,7 +266,9 @@ test('published localization snapshot is complete, immutable and contains no ans
   assert.equal(built.manifest.counts.articleLocalizationCount, 40);
   assert.equal(built.manifest.counts.legalLocalizationCount, 16);
   assert.equal(built.manifest.counts.localizedPresentationAssetCount, 15);
-  assert.equal(built.files.size, 31);
+  // 31 plus the narrow legal projection: the legal pages read six documents and
+  // used to load the whole 1.41 MB manifest to reach them.
+  assert.equal(built.files.size, 32);
   assert.doesNotMatch(
     JSON.stringify(built.manifest),
     /"(?:correctOption(?:Id|Ids)?|answerKey(?:s)?)"\s*:/iu,

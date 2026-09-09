@@ -67,9 +67,15 @@ function CropPreview({
     };
   }, [file, onError]);
 
+  // A pointermove can fire far more often than the display refreshes — on a
+  // 120 Hz phone, several times per frame — and each one redrew the whole
+  // canvas. Coalescing to one draw per frame keeps the drag smooth and the
+  // work proportional to what is actually shown.
   useEffect(() => {
     if (!image || !canvasRef.current) return;
-    drawAvatarCrop(image, canvasRef.current, crop);
+    const canvas = canvasRef.current;
+    const frame = requestAnimationFrame(() => drawAvatarCrop(image, canvas, crop));
+    return () => cancelAnimationFrame(frame);
   }, [crop, image]);
 
   const pointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {

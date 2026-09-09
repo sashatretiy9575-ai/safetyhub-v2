@@ -57,6 +57,43 @@ export const BUNDLE_BUDGETS = [
     initial: 225 * KIB,
     route: 20 * KIB,
   },
+  {
+    // The heaviest client page in the project — the block editor, the
+    // localization tabs and the presentation uploader in one route. It had no
+    // ceiling at all, which is how it reached four hundred kilobytes.
+    label: 'admin course editor',
+    manifest: 'server/app/(admin)/admin/courses/[id]/page_client-reference-manifest.js',
+    buildManifest: 'server/app/(admin)/admin/courses/[id]/page/build-manifest.json',
+    pageEntry: '[project]/app/(admin)/admin/courses/[id]/page',
+    initial: 440 * KIB,
+    route: 200 * KIB,
+  },
+  {
+    label: 'admin article editor',
+    manifest: 'server/app/(admin)/admin/articles/[slug]/edit/page_client-reference-manifest.js',
+    buildManifest: 'server/app/(admin)/admin/articles/[slug]/edit/page/build-manifest.json',
+    pageEntry: '[project]/app/(admin)/admin/articles/[slug]/edit/page',
+    initial: 350 * KIB,
+    route: 115 * KIB,
+  },
+  {
+    // Every unauthenticated visitor who signs in passes through here.
+    label: 'auth login',
+    manifest: 'server/app/(account)/auth/login/page_client-reference-manifest.js',
+    buildManifest: 'server/app/(account)/auth/login/page/build-manifest.json',
+    pageEntry: '[project]/app/(account)/auth/login/page',
+    initial: 310 * KIB,
+    route: 85 * KIB,
+  },
+  {
+    // The screen a learner sits on for fifteen minutes, often on a phone.
+    label: 'course test',
+    manifest: 'server/app/(account)/topics/[slug]/test/page_client-reference-manifest.js',
+    buildManifest: 'server/app/(account)/topics/[slug]/test/page/build-manifest.json',
+    pageEntry: '[project]/app/(account)/topics/[slug]/test/page',
+    initial: 260 * KIB,
+    route: 40 * KIB,
+  },
 ];
 
 /**
@@ -192,11 +229,12 @@ export async function checkBundleBudgets({
     };
     const violations = budgetViolations(measured, result);
     failed ||= violations.length > 0;
+    const share = (used, limit) => `${Math.round((used / limit) * 100)}%`;
     console.log(
       `${violations.length ? 'FAIL' : 'PASS'} ${result.label}: ` +
-        `initial ${kib(measured.initial)}/${kib(result.initial)}, ` +
-        `route ${kib(measured.route)}/${kib(result.route)}, ` +
-        `CSS ${kib(measured.css)}/${kib(CSS_BUDGET)}`,
+        `initial ${kib(measured.initial)}/${kib(result.initial)} (${share(measured.initial, result.initial)}), ` +
+        `route ${kib(measured.route)}/${kib(result.route)} (${share(measured.route, result.route)}), ` +
+        `CSS ${kib(measured.css)}/${kib(CSS_BUDGET)} (${share(measured.css, CSS_BUDGET)})`,
     );
   }
   if (failed) throw new Error('Production bundle budget exceeded');

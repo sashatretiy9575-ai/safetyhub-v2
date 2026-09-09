@@ -49,7 +49,7 @@ export function PartnersStrip() {
                 src={image}
                 alt=""
                 fill
-                sizes="(max-width: 599px) 82vw, (max-width: 1199px) 46vw, 33vw"
+                sizes="(min-width: 1280px) 416px, (max-width: 599px) 82vw, (max-width: 1199px) 46vw, 33vw"
                 quality={78}
                 loading="lazy"
                 className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.025]"

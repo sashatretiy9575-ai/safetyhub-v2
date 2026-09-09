@@ -8,6 +8,7 @@ import { PWAProvider } from '@/components/shared/pwa-provider';
 import { UserMenu } from '@/components/shared/user-menu';
 import { CspNonceProvider } from '@/features/auth/csp-nonce';
 import { getAuthContext } from '@/features/auth/server';
+import { pickClientNamespaces } from '@/i18n/client-namespaces';
 import { REQUEST_PATHNAME_HEADER_NAME } from '@/i18n/config';
 import { loadMessages } from '@/i18n/messages';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
@@ -48,7 +49,7 @@ export default async function AccountLayout({ children }: { children: ReactNode 
   const avatarUrl = auth?.profile.avatar_updated_at ? '/api/profile/avatar' : null;
 
   return (
-    <RootDocument locale={locale} messages={messages}>
+    <RootDocument locale={locale} messages={pickClientNamespaces(messages)}>
       <CspNonceProvider nonce={nonce}>
         <PWAProvider>
           <AppShell

@@ -13,20 +13,29 @@ const HERO_IMAGES = {
   mobile: '/images/generated/hero-safetyhub-mobile-v2.webp',
 } as const;
 
+// Each branch of the <picture> gets the sizes that actually apply to it. The
+// combined media query was correct on the <img> and absent from the <source>,
+// so at desktop widths the browser had a srcSet with no sizes, assumed 100vw,
+// picked the 1920w candidate — and then the preload, which did carry sizes,
+// asked for a different one. The LCP image was fetched twice.
+const MOBILE_SIZES = 'calc(100vw - 2rem)';
+const DESKTOP_SIZES = '56vw';
+
 function HeroPicture({ alt }: { alt: string }) {
   const common = {
     alt,
     fill: true,
     priority: true,
     quality: 82,
-    sizes: '(max-width: 1023px) calc(100vw - 2rem), 56vw',
   } as const;
   const { props: mobileImageProps } = getImageProps({
     ...common,
+    sizes: MOBILE_SIZES,
     src: HERO_IMAGES.mobile,
   });
   const { props: desktopImageProps } = getImageProps({
     ...common,
+    sizes: DESKTOP_SIZES,
     src: HERO_IMAGES.desktop,
   });
 
@@ -34,23 +43,24 @@ function HeroPicture({ alt }: { alt: string }) {
     as: 'image',
     fetchPriority: 'high',
     imageSrcSet: mobileImageProps.srcSet,
-    imageSizes: common.sizes,
+    imageSizes: MOBILE_SIZES,
     media: '(max-width: 1023px)',
   });
   preload(desktopImageProps.src, {
     as: 'image',
     fetchPriority: 'high',
     imageSrcSet: desktopImageProps.srcSet,
-    imageSizes: common.sizes,
+    imageSizes: DESKTOP_SIZES,
     media: '(min-width: 1024px)',
   });
 
   return (
     <picture>
-      <source media="(min-width: 1024px)" srcSet={desktopImageProps.srcSet} />
+      <source media="(min-width: 1024px)" srcSet={desktopImageProps.srcSet} sizes={DESKTOP_SIZES} />
       <img
         {...mobileImageProps}
         alt={alt}
+        sizes={MOBILE_SIZES}
         fetchPriority="high"
         className="object-cover object-center"
       />

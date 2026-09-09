@@ -70,7 +70,8 @@ async function ArticlesGrid() {
           title={article.title}
           description={article.description}
           coverImage={article.coverImage}
-          priority={false}
+          // The featured card is the LCP element here for the same reason.
+          priority={index === 0}
           featured={index === 0}
         />
       ))}

@@ -116,9 +116,34 @@ const nextConfig: NextConfig = {
       './node_modules/@img/sharp-linux-x64/**/*',
       './node_modules/@img/sharp-libvips-linux-x64/**/*',
     ],
+    // Same reason, same payload: these two also call sharp, and without the
+    // shared library the function throws on its first upload.
+    '/api/admin/content-assets': [
+      './node_modules/@img/sharp-linux-x64/**/*',
+      './node_modules/@img/sharp-libvips-linux-x64/**/*',
+    ],
+    '/api/admin/courses/*/presentation/finalize': [
+      './node_modules/@img/sharp-linux-x64/**/*',
+      './node_modules/@img/sharp-libvips-linux-x64/**/*',
+    ],
     '/certificate-assets/font': [
       './lib/pdf/assets/noto-sans-latin-cyrillic.ttf',
       './lib/pdf/assets/NotoSansCJKsc-Regular-b2e9d66e.otf',
+    ],
+  },
+  // The course snapshot is read with readdirSync, so the file tracer bundles
+  // everything in the directory into every function that reads the catalogue:
+  // five presentation PDFs, five thumbnails and the page manifests, none of
+  // which any server route opens. They are only read by scripts.
+  //
+  // Verify on Linux, not on Windows: Next does not normalise separators here,
+  // so on win32 these globs match nothing and the check passes for the wrong
+  // reason.
+  outputFileTracingExcludes: {
+    '*': [
+      './content/snapshots/courses/**/presentation.pdf',
+      './content/snapshots/courses/**/thumbnail.webp',
+      './content/snapshots/courses/**/presentation-manifest.json',
     ],
   },
   async redirects() {
@@ -240,7 +265,10 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    qualities: [70, 72, 75, 76, 78, 80, 82, 90],
+    // Only these are asked for: 75 is next/image's own default, and 76, 78
+    // and 82 are the values the components pass. Every other entry was an
+    // extra variant the optimizer would happily cache and nothing requests.
+    qualities: [75, 76, 78, 82],
   },
   experimental: {
     optimizePackageImports: ['@phosphor-icons/react', '@radix-ui/react-dropdown-menu'],
