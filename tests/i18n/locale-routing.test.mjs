@@ -251,5 +251,5 @@ test('proxy composes locale routing ahead of the existing Supabase/CSP gate', as
   assert.match(rootDocument, /translate="no"/u);
   assert.match(rootDocument, /className="notranslate"/u);
   assert.match(seo, /google:\s*'notranslate'/u);
-  assert.match(rootDocument, /noto-sans-sc-ui\.f113fe63\.woff2/u);
+  assert.match(rootDocument, /noto-sans-sc-ui\.da2f47be\.woff2/u);
 });

@@ -18,10 +18,15 @@ const CJK_FONT_PATH = path.join(
   'lib',
   'pdf',
   'assets',
-  'NotoSansCJKsc-Regular-Sans2.004.otf',
+  'NotoSansCJKsc-Regular-b2e9d66e.otf',
 );
-const CJK_FONT_BYTES = 16_437_364;
-const CJK_FONT_ETAG = '"2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"';
+// The full Noto Sans CJK SC is 16.4 MB, and this file travels to the
+// browser: generateCertificateInBrowser fetches it before it can draw a
+// single glyph. It is now the subset built by
+// scripts/subset-cjk-certificate-font.py — GB/T 2312 plus everything the
+// Chinese content uses, plus Latin and Cyrillic for names.
+const CJK_FONT_BYTES = 3_553_936;
+const CJK_FONT_ETAG = '"b2e9d66e497b1e69e5066b8bec9433d5026aa593918d4625a03555817047f993"';
 
 type FontDescriptor = {
   locale: 'ru' | 'kk' | 'en' | 'zh';
@@ -60,7 +65,7 @@ const FONT_REQUESTS = new Map<string, FontDescriptor>([
     },
   ],
   [
-    '?locale=zh&v=Sans2.004',
+    '?locale=zh&v=Sans2.005',
     {
       locale: 'zh',
       path: CJK_FONT_PATH,

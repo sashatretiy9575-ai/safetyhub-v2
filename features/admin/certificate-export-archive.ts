@@ -69,7 +69,7 @@ export async function createCertificateExportMetadata(
     requested: result.requested,
     total: result.total,
     eligible: items.length,
-    reportFontUrl: `/certificate-assets/font?locale=${items.some((item) => item.locale === 'zh') ? 'zh&v=Sans2.004' : 'ru&v=1'}`,
+    reportFontUrl: `/certificate-assets/font?locale=${items.some((item) => item.locale === 'zh') ? 'zh&v=Sans2.005' : 'ru&v=1'}`,
     skipped: result.skipped,
     items,
     archivePolicy: {

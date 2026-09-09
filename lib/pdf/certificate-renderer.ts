@@ -7,7 +7,10 @@ import {
 import { normalizePdfText } from './certificate.ts';
 
 const MAX_TEMPLATE_BYTES = 2 * 1024 * 1024;
-const MAX_FONT_BYTES = 24 * 1024 * 1024;
+// The largest font this can be asked for is the Simplified Chinese subset
+// at 3.5 MB. The ceiling was 24 MB, chosen to let the unsubsetted 16.4 MB
+// original through; there is nothing left that needs the room.
+const MAX_FONT_BYTES = 6 * 1024 * 1024;
 
 type Labels = Readonly<{
   documentTitle: string;

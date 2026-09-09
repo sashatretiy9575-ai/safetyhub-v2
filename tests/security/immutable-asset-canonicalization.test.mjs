@@ -13,26 +13,26 @@ const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8
 test('immutable asset queries must match the complete canonical raw query', () => {
   const base = 'https://safetyhub.kz/certificate-assets/font';
   assert.equal(
-    hasExactCanonicalSearch(`${base}?locale=zh&v=Sans2.004`, '?locale=zh&v=Sans2.004'),
+    hasExactCanonicalSearch(`${base}?locale=zh&v=Sans2.005`, '?locale=zh&v=Sans2.005'),
     true,
   );
   assert.equal(
-    hasExactCanonicalSearch(`${base}?v=Sans2.004&locale=zh`, '?locale=zh&v=Sans2.004'),
+    hasExactCanonicalSearch(`${base}?v=Sans2.005&locale=zh`, '?locale=zh&v=Sans2.005'),
     false,
   );
   assert.equal(
-    hasExactCanonicalSearch(`${base}?locale=zh&v=Sans2.004&x=1`, '?locale=zh&v=Sans2.004'),
+    hasExactCanonicalSearch(`${base}?locale=zh&v=Sans2.005&x=1`, '?locale=zh&v=Sans2.005'),
     false,
   );
   assert.equal(
-    hasExactCanonicalSearch(`${base}?locale=zh&locale=zh&v=Sans2.004`, '?locale=zh&v=Sans2.004'),
+    hasExactCanonicalSearch(`${base}?locale=zh&locale=zh&v=Sans2.004`, '?locale=zh&v=Sans2.005'),
     false,
   );
   assert.equal(
-    hasExactCanonicalSearch(`${base}?locale=%7A%68&v=Sans2.004`, '?locale=zh&v=Sans2.004'),
+    hasExactCanonicalSearch(`${base}?locale=%7A%68&v=Sans2.004`, '?locale=zh&v=Sans2.005'),
     false,
   );
-  assert.equal(hasExactCanonicalSearch(base, '?locale=zh&v=Sans2.004'), false);
+  assert.equal(hasExactCanonicalSearch(base, '?locale=zh&v=Sans2.005'), false);
   assert.equal(hasExactCanonicalSearch('https://safetyhub.kz/api/content-assets/id', ''), true);
   assert.equal(
     hasExactCanonicalSearch('https://safetyhub.kz/api/content-assets/id?x=1', ''),
@@ -91,15 +91,15 @@ test('font route serves only deployment-bundled pinned fonts and content assets 
     read('next.config.ts'),
   ]);
 
-  assert.match(fontRoute, /NotoSansCJKsc-Regular-Sans2\.004\.otf/);
-  assert.match(fontRoute, /CJK_FONT_BYTES = 16_437_364/);
-  assert.match(fontRoute, /2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b/);
+  assert.match(fontRoute, /NotoSansCJKsc-Regular-b2e9d66e\.otf/);
+  assert.match(fontRoute, /CJK_FONT_BYTES = 3_553_936/);
+  assert.match(fontRoute, /b2e9d66e497b1e69e5066b8bec9433d5026aa593918d4625a03555817047f993/);
   assert.match(fontRoute, /fs\.readFile\(descriptor\.path\)/);
   assert.match(fontRoute, /hasExactCanonicalSearch\(request\.url, candidate\)/);
   assert.doesNotMatch(fontRoute, /fetch\(|raw\.githubusercontent|upstream/);
   assert.match(
     nextConfig,
-    /'\/certificate-assets\/font':[\s\S]*NotoSansCJKsc-Regular-Sans2\.004\.otf/,
+    /'\/certificate-assets\/font':[\s\S]*NotoSansCJKsc-Regular-b2e9d66e\.otf/,
   );
   assert.ok(
     contentRoute.indexOf("hasExactCanonicalSearch(request.url, '')") <
@@ -115,12 +115,12 @@ test('font route serves only deployment-bundled pinned fonts and content assets 
 
 test('deployment-bundled Simplified Chinese certificate font is hash-pinned and covers representative identity text', async () => {
   const bytes = await readFile(
-    new URL('../../lib/pdf/assets/NotoSansCJKsc-Regular-Sans2.004.otf', import.meta.url),
+    new URL('../../lib/pdf/assets/NotoSansCJKsc-Regular-b2e9d66e.otf', import.meta.url),
   );
-  assert.equal(bytes.byteLength, 16_437_364);
+  assert.equal(bytes.byteLength, 3_553_936);
   assert.equal(
     createHash('sha256').update(bytes).digest('hex'),
-    '2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b',
+    'b2e9d66e497b1e69e5066b8bec9433d5026aa593918d4625a03555817047f993',
   );
   assert.equal(bytes.subarray(0, 4).toString('ascii'), 'OTTO');
 

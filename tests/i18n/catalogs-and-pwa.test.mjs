@@ -71,15 +71,28 @@ test('locale-aware PWA resources are precached and Chinese font loading is route
       read('scripts/subset-cjk-ui-font.py'),
     ]);
   const font = await stat(
-    new URL('../../public/fonts/noto-sans-sc-ui.f113fe63.woff2', import.meta.url),
+    new URL('../../public/fonts/noto-sans-sc-ui.da2f47be.woff2', import.meta.url),
   );
 
   assert.match(worker, /OFFLINE_URLS/u);
   assert.match(worker, /offlineUrlForPathname/u);
   assert.match(worker, /Object\.keys\(OFFLINE_URLS\).*`\/manifest\/\$\{locale\}`/su);
-  assert.match(worker, /CACHE_PREFIX\}v8/u);
+  assert.match(worker, /CACHE_PREFIX\}v9/u);
   assert.match(rootDocument, /locale === 'zh'/u);
-  assert.match(rootDocument, /\/fonts\/noto-sans-sc-ui\.f113fe63\.woff2/u);
+  assert.match(rootDocument, /\/fonts\/noto-sans-sc-ui\.da2f47be\.woff2/u);
+  // The Chinese branch used to be the only one with a preload, so ru and kk
+  // discovered their own font a full round trip late and repainted into it.
+  assert.match(rootDocument, /\/fonts\/manrope-latin\.[0-9a-f]+\.woff2/u);
+  assert.match(rootDocument, /locale === 'ru' \|\| locale === 'kk'/u);
+  // The Chinese face stays unranged on purpose: the zh stack replaces
+  // --font-sans wholesale, so this font is what draws the Latin brand name and
+  // the digits on those pages too.
+  const chineseFace = styles.slice(styles.indexOf("'SafetyHub Noto Sans SC'"));
+  assert.doesNotMatch(chineseFace.slice(0, chineseFace.indexOf('}')), /unicode-range/u);
+  // The subset has to be cut from the content as well as the shell catalog:
+  // the zh stack replaces --font-sans wholesale, so it renders article
+  // bodies too.
+  assert.match(subsetScript, /CONTENT_SOURCES = sorted\(ROOT\.glob/u);
   assert.match(styles, /html\[data-locale='zh'\]/u);
   assert.match(styles, /format\('woff2'\)/u);
   assert.match(subsetScript, /--flavor=woff2/u);

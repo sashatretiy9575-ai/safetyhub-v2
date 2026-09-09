@@ -183,9 +183,9 @@ test('certificate payload and filenames preserve multilingual participant data s
   ]);
   assert.match(certificate, /\.normalize\('NFC'\)/);
   assert.match(assets, /noto-sans-latin-cyrillic\.ttf/);
-  assert.match(assets, /NotoSansCJKsc-Regular-Sans2\.004\.otf/);
-  assert.match(assets, /CJK_FONT_BYTES = 16_437_364/);
-  assert.match(assets, /2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b/);
+  assert.match(assets, /NotoSansCJKsc-Regular-b2e9d66e\.otf/);
+  assert.match(assets, /CJK_FONT_BYTES = 3_553_936/);
+  assert.match(assets, /b2e9d66e497b1e69e5066b8bec9433d5026aa593918d4625a03555817047f993/);
   assert.match(assets, /fs\.readFile\(descriptor\.path\)/);
   assert.doesNotMatch(assets, /fetch\(|raw\.githubusercontent|upstream/);
   assert.match(renderer, /organization: 'Компания'/);

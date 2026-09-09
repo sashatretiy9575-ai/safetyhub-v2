@@ -57,7 +57,7 @@ export type CertificateWorkerProgress = Readonly<{
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const CERTIFICATE_NUMBER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,95}$/u;
-const SAFE_ASSET_PATH_PATTERN = /^\/certificate-assets\/font\?locale=(?:ru|zh)&v=(?:1|Sans2\.004)$/u;
+const SAFE_ASSET_PATH_PATTERN = /^\/certificate-assets\/font\?locale=(?:ru|zh)&v=(?:1|Sans2\.005)$/u;
 
 function assertString(value: unknown, code: string, maxLength: number): asserts value is string {
   if (typeof value !== 'string' || value.length < 1 || value.length > maxLength) {
@@ -106,7 +106,7 @@ export function assertCertificateRenderMetadata(
   assertString(item.titleSnapshot, 'CERTIFICATE_TITLE_INVALID', 240);
   assertString(item.templateUrl, 'CERTIFICATE_TEMPLATE_URL_INVALID', 256);
   assertString(item.fontUrl, 'CERTIFICATE_FONT_URL_INVALID', 256);
-  const expectedFontUrl = `/certificate-assets/font?locale=${item.locale}&v=${item.locale === 'zh' ? 'Sans2.004' : '1'}`;
+  const expectedFontUrl = `/certificate-assets/font?locale=${item.locale}&v=${item.locale === 'zh' ? 'Sans2.005' : '1'}`;
   if (
     item.templateUrl !== `/certificates/template-v${item.templateVersion}.pdf` ||
     item.fontUrl !== expectedFontUrl

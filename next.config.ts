@@ -115,7 +115,7 @@ const nextConfig: NextConfig = {
     ],
     '/certificate-assets/font': [
       './lib/pdf/assets/noto-sans-latin-cyrillic.ttf',
-      './lib/pdf/assets/NotoSansCJKsc-Regular-Sans2.004.otf',
+      './lib/pdf/assets/NotoSansCJKsc-Regular-b2e9d66e.otf',
     ],
   },
   async redirects() {
@@ -133,9 +133,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // This is a content-addressed UI font. It is safe to cache indefinitely;
-        // publishing a changed font must use a new filename.
-        source: '/fonts/noto-sans-sc-ui.f113fe63.woff2',
+        // Every font under /fonts is content-addressed, so it is safe to cache
+        // indefinitely; publishing a changed font must use a new filename. The
+        // rule used to name a single file, which left the four Manrope subsets
+        // on the /public default of `max-age=0, must-revalidate` — four
+        // conditional requests on every navigation, for the site's body text.
+        source: '/fonts/:file([a-z0-9-]+\\.[0-9a-f]+\\.woff2)',
         headers: [
           {
             key: 'Cache-Control',

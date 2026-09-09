@@ -83,7 +83,7 @@ test('worker graph dynamically loads heavy libraries and contains no Node runtim
   assert.match(worker, /CERTIFICATE_RENDER_CONCURRENCY/);
   assert.match(worker, /type: 'progress'/);
   assert.match(worker, /type: 'cancel'/);
-  assert.match(renderer, /MAX_FONT_BYTES = 24 \* 1024 \* 1024/);
+  assert.match(renderer, /MAX_FONT_BYTES = 6 \* 1024 \* 1024/);
   assert.doesNotMatch(
     `${client}\n${worker}\n${renderer}\n${report}\n${archive}`,
     /node:(?:fs|path|crypto)/,
@@ -178,7 +178,7 @@ test('browser renderer embeds the full pinned CJK font for a Chinese identity an
     filename: 'SH-2026-ZH-张伟.pdf',
     locale: 'zh',
     titleSnapshot: '工业安全与劳动保护',
-    fontUrl: '/certificate-assets/font?locale=zh&v=Sans2.004',
+    fontUrl: '/certificate-assets/font?locale=zh&v=Sans2.005',
     fullName: '张伟',
     position: '安全工程师',
     organization: '哈萨克斯坦安全技术有限公司',
@@ -186,7 +186,7 @@ test('browser renderer embeds the full pinned CJK font for a Chinese identity an
   };
   const [template, font] = await Promise.all([
     readFile(new URL('../../public/certificates/template-v1.pdf', import.meta.url)),
-    readFile(new URL('../../lib/pdf/assets/NotoSansCJKsc-Regular-Sans2.004.otf', import.meta.url)),
+    readFile(new URL('../../lib/pdf/assets/NotoSansCJKsc-Regular-b2e9d66e.otf', import.meta.url)),
   ]);
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (input) => {

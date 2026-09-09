@@ -125,7 +125,7 @@ export async function getCertificateDownloadPayload(
 }
 
 function certificateFontUrl(locale: CertificateLocale) {
-  const version = locale === 'zh' ? 'Sans2.004' : '1';
+  const version = locale === 'zh' ? 'Sans2.005' : '1';
   return `/certificate-assets/font?locale=${locale}&v=${version}`;
 }
 

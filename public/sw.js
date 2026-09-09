@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'safetyhub-static-';
-const CACHE_VERSION = `${CACHE_PREFIX}v8`;
+const CACHE_VERSION = `${CACHE_PREFIX}v9`;
 const OFFLINE_URL = '/offline.html';
 const OFFLINE_URLS = {
   ru: '/offline/ru',

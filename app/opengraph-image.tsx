@@ -44,7 +44,7 @@ export default function OpenGraphImage() {
         <div style={{ maxWidth: 980, fontSize: 68, lineHeight: 1.06, fontWeight: 900 }}>
           SafetyHub.kz
         </div>
-        <div style={{ fontSize: 28, color: '#d7f5e1' }}>RU · KK · EN · 中文</div>
+        <div style={{ fontSize: 28, color: '#d7f5e1' }}>RU · KK · EN · ZH</div>
       </div>
     </div>,
     size,
