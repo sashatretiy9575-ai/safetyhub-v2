@@ -8,6 +8,7 @@ declare
   v_role text;
   v_definition text;
   v_key uuid := gen_random_uuid();
+  v_direct_audits integer;
 begin
   if not has_function_privilege(
        'authenticated',
@@ -153,6 +154,46 @@ begin
     where user_id = v_target and product_role = 'participant' and role = 'user'
   ) then
     raise exception 'demotion did not move both role columns';
+  end if;
+
+  -- Authorization reads product_role, so a write that touches only that column
+  -- is the escalation worth recording. The audit trigger used to be declared
+  -- `after update of role` and never fired for it at all (B1-47). The count is
+  -- taken around this one statement: an `exists` over the whole trail matches
+  -- rows the earlier assignments left behind and proves nothing.
+  -- The supported paths raise `safetyhub.skip_role_audit` with a transaction
+  -- lifetime. Production gives every RPC its own transaction, so the flag never
+  -- outlives the call; this whole file is one transaction, so it would suppress
+  -- everything after the demotion above unless it is lowered here.
+  perform set_config('safetyhub.skip_role_audit', '', true);
+
+  select count(*) into v_direct_audits
+    from public.admin_audit_log
+   where target_user_id = v_target and action = 'role.changed_directly';
+
+  update public.user_roles
+     set product_role = 'admin'::public.product_role
+   where user_id = v_target;
+
+  if (select count(*) from public.admin_audit_log
+       where target_user_id = v_target and action = 'role.changed_directly')
+     <> v_direct_audits + 1 then
+    raise exception 'a bare product_role change left no audit trail';
+  end if;
+  if not exists (
+    select 1 from public.admin_audit_log
+    where target_user_id = v_target
+      and action = 'role.changed_directly'
+      and after_data ->> 'productRole' = 'admin'
+      and before_data ->> 'productRole' = 'participant'
+  ) then
+    raise exception 'the audit record does not carry both product_role sides';
+  end if;
+  if not exists (
+    select 1 from public.user_roles
+    where user_id = v_target and product_role = 'admin' and role = 'user'
+  ) then
+    raise exception 'the legacy sync trigger overwrote a direct product_role write';
   end if;
 end;
 $test$;
