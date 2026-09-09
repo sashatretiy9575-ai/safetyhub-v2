@@ -33,7 +33,9 @@ test('Russian admin exposes four locale statuses and localized previews', async 
       read('proxy.ts'),
     ]);
 
-  assert.match(contract, /\[\s*'ru',\s*'kk',\s*'en',\s*'zh',?\s*\]/u);
+  // The list lives in i18n/config.ts now; every schema that used to restate
+  // it reads APP_LOCALES, so a fifth locale cannot be half-added.
+  assert.match(contract, /ADMIN_CONTENT_LOCALES = APP_LOCALES;/u);
   for (const label of ['Не заполнено', 'Черновик', 'Готово', 'Опубликовано']) {
     assert.match(contract, new RegExp(label, 'u'));
   }
@@ -173,7 +175,7 @@ test('localized presentations bind locale metadata to immutable final object pat
     read('features/admin/types.ts'),
   ]);
 
-  assert.match(upload, /locale:\s*z\.enum\(\['ru', 'kk', 'en', 'zh'\]\)/u);
+  assert.match(upload, /locale: z\.enum\(APP_LOCALES\)/u);
   assert.match(upload, /locale:\s*body\.data\.locale/u);
   assert.match(upload, /const prefix = `\$\{actor\.user\.id\}\/\$\{uploadId\}`/u);
   assert.match(finalize, /presentationRecord\.locale !== body\.data\.locale/u);

@@ -40,11 +40,11 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
-    const parsed = requestSchema.safeParse(await readJsonBody(request));
-    if (!parsed.success) return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     await requireCapability('results.export');
     await requireCapability('certificate.read');
     await consumeCoarseQuota('certificate.export', requestSecurityMetadata(request).ipHash);
+    const parsed = requestSchema.safeParse(await readJsonBody(request));
+    if (!parsed.success) return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     const client = (await createClient()) as unknown as RpcClient;
     const response = await client.rpc('create_certificate_export_job', {
       p_attestation_ids: parsed.data.attestationIds,

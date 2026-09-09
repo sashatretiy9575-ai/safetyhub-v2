@@ -6,7 +6,7 @@ import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
 import { PROFILE_FIELD_LIMITS } from '@/features/profile/fields';
-import { requireCapability } from '@/features/auth/server';
+import { requireAnyCapability, requireCapability } from '@/features/auth/server';
 import {
   ADMIN_ATTESTATION_BULK_LIMIT,
   executeAdminAttestationAction,
@@ -59,6 +59,11 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
+    // Which capability this needs depends on the action, so the body has to be
+    // read first — but only by somebody who holds at least one of them. Without
+    // this an anonymous caller could make the server read and validate a body
+    // for free; the precise check still happens below.
+    await requireAnyCapability(['certificate.issue', 'identity.manage']);
     const parsed = actionSchema.safeParse(await readJsonBody(request));
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });

@@ -19,15 +19,15 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
-    const parsed = requestSchema.safeParse(await readJsonBody(request, 512));
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
-    }
     await requireCapability('content.manage');
     await consumeAdminMutationQuota(
       'content.article.mutate',
       requestSecurityMetadata(request).ipHash,
     );
+    const parsed = requestSchema.safeParse(await readJsonBody(request, 512));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
+    }
     return NextResponse.json(await importApprovedInitialArticles(parsed.data.confirmation), {
       status: 201,
     });

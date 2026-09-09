@@ -1,3 +1,4 @@
+import { APP_LOCALES } from '@/i18n/config';
 import { z } from 'zod';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from '@/lib/security/api-response';
@@ -9,7 +10,7 @@ import { readJsonBody } from '@/lib/security/request-body';
 import { createClient } from '@/lib/supabase/server';
 import { clearSafetyHubLocalSession } from '@/lib/supabase/session-cleanup';
 
-const requestSchema = z.object({ locale: z.enum(['ru', 'kk', 'en', 'zh']) }).strict();
+const requestSchema = z.object({ locale: z.enum(APP_LOCALES) }).strict();
 
 /**
  * Kept at this URL for already-open bundles. The server, not the request

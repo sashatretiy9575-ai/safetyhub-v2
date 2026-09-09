@@ -10,7 +10,11 @@ export type IdentityVerificationStatus = 'unverified' | 'verified' | 'revoked';
 export type CertificateIssueSource = 'manual' | 'score_improvement' | 'identity_correction';
 export type LegalDocumentType = 'privacy' | 'terms';
 export type LegalAcceptanceSource = 'registration' | 'profile';
-export type AppLocale = 'ru' | 'kk' | 'en' | 'zh';
+// The locales are declared once, in i18n/config.ts; this file re-exports the
+// type so the database row types can name it without restating the list.
+import type { AppLocale } from '@/i18n/config';
+
+export type { AppLocale };
 export type AccountApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
 /** Registration only creates the credential; the profile form requests review. */
 export type ZhUsernamePasswordRegistrationResult = Readonly<{

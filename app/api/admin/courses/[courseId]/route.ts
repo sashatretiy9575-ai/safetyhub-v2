@@ -13,13 +13,13 @@ export async function DELETE(request: Request, context: { params: Promise<{ cour
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
     const { courseId } = await context.params;
+    await requireCapability('test.manage');
+    await consumeAdminMutationQuota('admin.test.mutate', requestSecurityMetadata(request).ipHash);
     const parsedCourseId = entityIdSchema.safeParse(courseId);
     const parsed = deleteCourseSchema.safeParse(await readJsonBody(request));
     if (!parsedCourseId.success || !parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
-    await requireCapability('test.manage');
-    await consumeAdminMutationQuota('admin.test.mutate', requestSecurityMetadata(request).ipHash);
     await deleteCourse(parsedCourseId.data, parsed.data.expectedVersion);
     return NextResponse.json({ ok: true });
   } catch (error) {

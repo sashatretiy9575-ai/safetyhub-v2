@@ -1,3 +1,4 @@
+import { APP_LOCALES } from '@/i18n/config';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 import { PDFDocument } from 'pdf-lib';
@@ -19,12 +20,14 @@ const THUMBNAIL_MAX_BYTES = 5 * 1024 * 1024;
 
 const PUBLIC_BUCKET = 'course-presentations';
 const paramsSchema = z.object({ courseId: z.string().uuid() });
-const bodySchema = z.object({
-  presentationId: z.string().uuid(),
-  locale: z.enum(['ru', 'kk', 'en', 'zh']),
-  sha256: z.string().regex(/^[0-9a-f]{64}$/u),
-  pageCount: z.number().int().min(1).max(200),
-});
+const bodySchema = z
+  .object({
+    presentationId: z.string().uuid(),
+    locale: z.enum(APP_LOCALES),
+    sha256: z.string().regex(/^[0-9a-f]{64}$/u),
+    pageCount: z.number().int().min(1).max(200),
+  })
+  .strict();
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 
 type ServiceRpcClient = {

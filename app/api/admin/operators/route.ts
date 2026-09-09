@@ -13,13 +13,13 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
+    await requireCapability('role.manage');
+    const metadata = requestSecurityMetadata(request);
+    await consumeAdminMutationQuota('admin.access.mutate', metadata.ipHash);
     const parsed = operatorRoleByEmailSchema.safeParse(await readJsonBody(request));
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
-    await requireCapability('role.manage');
-    const metadata = requestSecurityMetadata(request);
-    await consumeAdminMutationQuota('admin.access.mutate', metadata.ipHash);
     return NextResponse.json(
       await setProductRoleByEmail(
         parsed.data.email,

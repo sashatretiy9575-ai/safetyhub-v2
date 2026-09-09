@@ -1,3 +1,4 @@
+import { APP_LOCALES } from '@/i18n/config';
 import { z } from 'zod';
 
 export const ADMIN_NOTIFICATION_EVENT_TYPES = [
@@ -51,7 +52,7 @@ const eventEnvelopeSchema = z.object({
 const approvalRequestedLegacyBaseShape = {
   name: singleLineTextSchema,
   surname: singleLineTextSchema,
-  locale: z.enum(['ru', 'kk', 'en', 'zh']),
+  locale: z.enum(APP_LOCALES),
   requestedAt: timestampSchema,
   adminPath: adminPathSchema,
 };
@@ -60,7 +61,7 @@ const approvalRequestedPayloadSchema = z.union([
   z
     .object({
       schemaVersion: z.literal(2),
-      locale: z.enum(['ru', 'kk', 'en', 'zh']),
+      locale: z.enum(APP_LOCALES),
       requestedAt: timestampSchema,
       adminPath: adminPathSchema,
     })
@@ -101,7 +102,7 @@ const courseCompletedPayloadSchema = z
     userId: uuidSchema,
     name: blankableLineSchema,
     surname: blankableLineSchema,
-    locale: z.enum(['ru', 'kk', 'en', 'zh']),
+    locale: z.enum(APP_LOCALES),
     courseTitle: singleLineTextSchema,
     result: z.enum(['passed', 'failed']),
     score: z.number().int().min(0).max(1000),

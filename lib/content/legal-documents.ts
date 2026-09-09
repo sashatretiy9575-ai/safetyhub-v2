@@ -1,3 +1,4 @@
+import { APP_LOCALES } from '@/i18n/config';
 import 'server-only';
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -49,7 +50,7 @@ const localizedLegalDocumentSchema = z
   .object({
     type: z.enum(['privacy', 'terms']),
     version: z.string().min(1).max(32),
-    locale: z.enum(['ru', 'kk', 'en', 'zh']),
+    locale: z.enum(APP_LOCALES),
     title: z.string().min(3).max(200),
     body: legalBodySchema,
     bodyHash: z.string().regex(/^[0-9a-f]{64}$/u),
@@ -61,7 +62,7 @@ const localLegalDocumentSourceSchema = z
   .object({
     documentType: z.enum(['privacy', 'terms']),
     version: z.string().min(1).max(32),
-    locale: z.enum(['ru', 'kk', 'en', 'zh']),
+    locale: z.enum(APP_LOCALES),
     title: z.string().min(3).max(200),
     body: z.unknown(),
     bodySourceSha256: z.string().regex(/^[0-9a-f]{64}$/u),
@@ -71,7 +72,7 @@ const localLegalDocumentSourceSchema = z
 
 const snapshotLocalizationSchema = z
   .object({
-    locale: z.enum(['ru', 'kk', 'en', 'zh']),
+    locale: z.enum(APP_LOCALES),
     title: z.string().min(3).max(200),
     body: z.unknown(),
     bodyHash: z.string().regex(/^[0-9a-f]{64}$/u),

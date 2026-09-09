@@ -1,3 +1,4 @@
+import { APP_LOCALES } from '@/i18n/config';
 import { z } from 'zod';
 import { QUIZ_POLICY } from '@/lib/constants';
 
@@ -12,7 +13,7 @@ export const createAttemptSchema = z.object({
   // a browser running the previous bundle is not rejected mid-attempt, and it is
   // deliberately not read.
   startNew: z.boolean().optional(),
-  locale: z.enum(['ru', 'kk', 'en', 'zh']).default('ru'),
+  locale: z.enum(APP_LOCALES).default('ru'),
 });
 export type CreateAttemptValues = z.infer<typeof createAttemptSchema>;
 

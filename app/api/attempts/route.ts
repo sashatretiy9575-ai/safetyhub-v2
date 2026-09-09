@@ -11,12 +11,12 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
+    await requireUser();
     const parsed = createAttemptSchema.safeParse(await readJsonBody(request));
     if (!parsed.success) {
       console.error('[POST /api/attempts] Invalid body:', parsed.error);
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
-    await requireUser();
     return NextResponse.json(
       await startAttempt(parsed.data.testSlug, parsed.data.locale),
     );

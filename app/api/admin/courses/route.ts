@@ -12,6 +12,8 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
+    await requireCapability('test.manage');
+    await consumeAdminMutationQuota('admin.test.mutate', requestSecurityMetadata(request).ipHash);
     const parsed = saveTestSchema.safeParse(await readJsonBody(request, 512 * 1024));
     if (!parsed.success) {
       return NextResponse.json(
@@ -19,8 +21,6 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    await requireCapability('test.manage');
-    await consumeAdminMutationQuota('admin.test.mutate', requestSecurityMetadata(request).ipHash);
     const result = await saveTest(parsed.data);
     if (!result || typeof result.id !== 'string') {
       throw new Error('COURSE_MUTATION_RESULT_INVALID');

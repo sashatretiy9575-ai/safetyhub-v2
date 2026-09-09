@@ -12,14 +12,14 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
+    await requireCapability('test.manage');
+    await consumeAdminMutationQuota('admin.test.mutate', requestSecurityMetadata(request).ipHash);
     const parsed = activateCourseCatalogBatchSchema.safeParse(
       await readJsonBody(request, 16 * 1024),
     );
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
-    await requireCapability('test.manage');
-    await consumeAdminMutationQuota('admin.test.mutate', requestSecurityMetadata(request).ipHash);
     return NextResponse.json(
       await activateCourseCatalogBatch(parsed.data.batchId, parsed.data.idempotencyKey),
     );

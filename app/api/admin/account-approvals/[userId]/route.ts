@@ -11,15 +11,19 @@ import { readJsonBody } from '@/lib/security/request-body';
 
 const paramsSchema = z.object({ userId: z.string().uuid() });
 const bodySchema = z.discriminatedUnion('decision', [
-  z.object({
-    idempotencyKey: z.string().uuid(),
-    decision: z.literal('approved'),
-  }),
-  z.object({
-    idempotencyKey: z.string().uuid(),
-    decision: z.literal('rejected'),
-    reason: z.string().trim().min(3).max(500),
-  }),
+  z
+    .object({
+      idempotencyKey: z.string().uuid(),
+      decision: z.literal('approved'),
+    })
+    .strict(),
+  z
+    .object({
+      idempotencyKey: z.string().uuid(),
+      decision: z.literal('rejected'),
+      reason: z.string().trim().min(3).max(500),
+    })
+    .strict(),
 ]);
 
 type ApprovalDecisionRpcClient = {

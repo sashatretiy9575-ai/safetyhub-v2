@@ -1,3 +1,4 @@
+import { APP_LOCALES } from '@/i18n/config';
 import 'server-only';
 
 import { z } from 'zod';
@@ -73,7 +74,7 @@ const attemptPayloadSchema = z
     revisionId: z.string().uuid(),
     testSlug: z.string(),
     title: z.string(),
-    locale: z.enum(['ru', 'kk', 'en', 'zh']),
+    locale: z.enum(APP_LOCALES),
     status: z.enum(['started', 'completed', 'passed', 'failed', 'expired']),
     score: z.number().int().nonnegative().nullable(),
     total: z

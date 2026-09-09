@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AppLocale } from '@/lib/supabase/types';
+import { APP_LOCALES, type AppLocale } from '@/i18n/config';
 import type { ArticleBlock } from '@/lib/content/articles';
 import type { ContentSource } from '@/lib/content/content-metadata';
 import type { ContentSeo } from '@/lib/validation/content-seo';
@@ -7,12 +7,8 @@ import { articleBlocksWriteSchema } from '@/lib/validation/article';
 import { contentMetadataSchema } from '@/lib/content/content-metadata';
 import { contentSeoSchema } from '@/lib/validation/content-seo';
 
-export const ADMIN_CONTENT_LOCALES = [
-  'ru',
-  'kk',
-  'en',
-  'zh',
-] as const satisfies readonly AppLocale[];
+/** The content locales are the application locales; there is only one list. */
+export const ADMIN_CONTENT_LOCALES = APP_LOCALES;
 
 export const ADMIN_LOCALE_LABELS: Record<AppLocale, string> = {
   ru: 'Русский',

@@ -42,11 +42,11 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
+    await requireCapability('results.export');
     const parsed = exportSchema.safeParse(await readJsonBody(request));
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
-    await requireCapability('results.export');
     await requireCapability('certificate.read');
     await consumeCoarseQuota('certificate.export', requestSecurityMetadata(request).ipHash);
 

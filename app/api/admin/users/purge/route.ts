@@ -20,13 +20,13 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
+    await requireCapability('user.delete');
+    const metadata = requestSecurityMetadata(request);
+    await consumeAdminMutationQuota('admin.purge', metadata.ipHash);
     const parsed = purgeUsersSchema.safeParse(await readJsonBody(request, 32 * 1024));
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
-    await requireCapability('user.delete');
-    const metadata = requestSecurityMetadata(request);
-    await consumeAdminMutationQuota('admin.purge', metadata.ipHash);
     return NextResponse.json(
       await purgeUserAccounts(
         parsed.data.userIds,

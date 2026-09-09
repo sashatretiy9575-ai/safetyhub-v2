@@ -1,3 +1,4 @@
+import { APP_LOCALES } from '@/i18n/config';
 import 'server-only';
 
 import { cache } from 'react';
@@ -63,7 +64,7 @@ const authContextRowSchema = z.object({
   profile_organization: z.string(),
   profile_phone_country_iso2: z.string().nullable(),
   profile_phone_e164: z.string().nullable(),
-  profile_preferred_locale: z.enum(['ru', 'kk', 'en', 'zh']),
+  profile_preferred_locale: z.enum(APP_LOCALES),
   profile_avatar_updated_at: z.string().nullable(),
   profile_onboarding_completed_at: z.string().nullable(),
   profile_identity_state: z.enum(['pending', 'verified', 'changed', 'revoked']),

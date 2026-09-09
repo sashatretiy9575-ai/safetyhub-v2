@@ -18,15 +18,15 @@ export async function POST(request: Request) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
-    const parsed = legalBundlePublicationSchema.safeParse(await readJsonBody(request, 4 * 1024));
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
-    }
     await requireCapability('content.manage');
     await consumeAdminMutationQuota(
       'content.article.mutate',
       requestSecurityMetadata(request).ipHash,
     );
+    const parsed = legalBundlePublicationSchema.safeParse(await readJsonBody(request, 4 * 1024));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
+    }
     return NextResponse.json(
       await publishLegalLocalizationBundle(parsed.data.privacyVersion, parsed.data.termsVersion),
     );

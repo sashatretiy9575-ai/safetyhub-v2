@@ -12,12 +12,12 @@ export async function DELETE(request: Request, context: { params: Promise<{ asse
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
     const { assetId } = await context.params;
+    await requireCapability('content.manage');
+    await consumeAdminMutationQuota('admin.test.mutate', requestSecurityMetadata(request).ipHash);
     const parsedAssetId = entityIdSchema.safeParse(assetId);
     if (!parsedAssetId.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
-    await requireCapability('content.manage');
-    await consumeAdminMutationQuota('admin.test.mutate', requestSecurityMetadata(request).ipHash);
     await deleteUnusedContentAsset(parsedAssetId.data);
     return NextResponse.json({ ok: true });
   } catch (error) {

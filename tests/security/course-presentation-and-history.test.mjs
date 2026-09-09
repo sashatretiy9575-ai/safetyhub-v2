@@ -21,7 +21,7 @@ test('presentation upload uses a signed path-bound TUS grant and immutable priva
   assert.match(grant, /createSignedUploadUrl\(pdfPath/);
   assert.match(grant, /createSignedUploadUrl\(thumbnailPath/);
   assert.match(grant, /course-presentations-staging/);
-  assert.match(grant, /locale: z\.enum\(\['ru', 'kk', 'en', 'zh'\]\)/);
+  assert.match(grant, /locale: z\.enum\(APP_LOCALES\)/);
   assert.match(grant, /locale: body\.data\.locale/);
   assert.match(grant, /const uploadId = presentationId/);
   assert.match(client, /new tus\.Upload/);

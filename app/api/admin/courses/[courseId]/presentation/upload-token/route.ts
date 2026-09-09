@@ -1,3 +1,4 @@
+import { APP_LOCALES } from '@/i18n/config';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { NextResponse } from '@/lib/security/api-response';
@@ -12,14 +13,16 @@ import { TEST_EDITOR_LIMITS } from '@/lib/admin-test-editor';
 
 const STAGING_BUCKET = 'course-presentations-staging';
 const paramsSchema = z.object({ courseId: z.string().uuid() });
-const bodySchema = z.object({
-  locale: z.enum(['ru', 'kk', 'en', 'zh']),
-  filename: z.string().trim().min(1).max(240),
-  mimeType: z.literal('application/pdf'),
-  byteSize: z.number().int().positive().max(TEST_EDITOR_LIMITS.presentationMaxBytes),
-  sha256: z.string().regex(/^[0-9a-f]{64}$/u),
-  pageCount: z.number().int().min(1).max(TEST_EDITOR_LIMITS.presentationMaxPages),
-});
+const bodySchema = z
+  .object({
+    locale: z.enum(APP_LOCALES),
+    filename: z.string().trim().min(1).max(240),
+    mimeType: z.literal('application/pdf'),
+    byteSize: z.number().int().positive().max(TEST_EDITOR_LIMITS.presentationMaxBytes),
+    sha256: z.string().regex(/^[0-9a-f]{64}$/u),
+    pageCount: z.number().int().min(1).max(TEST_EDITOR_LIMITS.presentationMaxPages),
+  })
+  .strict();
 
 function resumableEndpoint() {
   const configured = process.env.NEXT_PUBLIC_SUPABASE_URL;
