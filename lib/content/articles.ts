@@ -300,6 +300,22 @@ type LocalizedArticleRpcClient = {
   }>;
 };
 
+// The RPC refuses a page above one hundred: an unbounded page would let one
+// anonymous request pull the whole table. The budget is the second half of that
+// guard — a listing this long means something is wrong upstream, and walking it
+// forever would be worse than truncating it.
+const ARTICLE_PAGE_SIZE = 100;
+const ARTICLE_PAGE_BUDGET = 50;
+
+/** The keyset the RPC expects, or null when the row cannot supply one. */
+function articlePageCursor(value: unknown) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const row = value as Record<string, unknown>;
+  return typeof row.publishedAt === 'string' && typeof row.id === 'string'
+    ? { p_before_published_at: row.publishedAt, p_before_id: row.id }
+    : null;
+}
+
 const lastKnownLocalizedArticles = new Map<AppLocale, Omit<Article, 'blocks'>[]>();
 const lastKnownLocalizedArticlesBySlug = new Map<string, Article | null>();
 
@@ -342,10 +358,36 @@ async function getLocalizedArticlesFromSource(locale: AppLocale) {
     return fallbackForUnavailableLocalizedContent(locale, getLegacyArticles, () => Promise.resolve([]));
   }
   try {
-    const { data, error, status } = await (supabase as unknown as LocalizedArticleRpcClient).rpc(
-      'list_published_articles_locale',
-      { p_locale: locale, p_limit: 50 },
-    );
+    // One request for fifty rows used to be the whole listing, so the blog and
+    // the sitemap ended at the fiftieth published article. The RPC has always
+    // carried a keyset; it just was never walked.
+    const items: Json[] = [];
+    let cursor: { p_before_published_at: string; p_before_id: string } | null = null;
+    let error: { code?: string; message?: string } | null = null;
+    let status = 200;
+
+    for (let page = 0; page < ARTICLE_PAGE_BUDGET; page += 1) {
+      const response = await (supabase as unknown as LocalizedArticleRpcClient).rpc(
+        'list_published_articles_locale',
+        { p_locale: locale, p_limit: ARTICLE_PAGE_SIZE, ...(cursor ?? {}) },
+      );
+      error = response.error;
+      status = response.status;
+      if (error) break;
+
+      const raw =
+        response.data && typeof response.data === 'object' && !Array.isArray(response.data)
+          ? response.data
+          : null;
+      const batch = raw && 'items' in raw && Array.isArray(raw.items) ? raw.items : [];
+      items.push(...batch);
+
+      // A short page is the last page; a full one may still have a successor.
+      if (batch.length < ARTICLE_PAGE_SIZE) break;
+      cursor = articlePageCursor(batch.at(-1));
+      if (!cursor) break;
+    }
+
     if (error) {
       return fallbackAfterContentFailure({
         configured: true,
@@ -355,8 +397,6 @@ async function getLocalizedArticlesFromSource(locale: AppLocale) {
         status,
       });
     }
-    const raw = data && typeof data === 'object' && !Array.isArray(data) ? data : null;
-    const items = raw && 'items' in raw && Array.isArray(raw.items) ? raw.items : [];
     const articles = items.flatMap((item) => {
       if (!item || typeof item !== 'object' || Array.isArray(item)) return [];
       const article = localizedArticleSummary(item as Record<string, unknown>, locale);
