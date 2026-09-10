@@ -72,9 +72,13 @@ test('public learning choices stay concise and action-first while FAQ starts col
   assert.match(courseCard, /grid-cols-2/);
   assert.match(courseCard, /col-span-2/);
   assert.doesNotMatch(courseCard, /[\u0400-\u04ff]/u);
-  assert.doesNotMatch(courseCard, /description:\s*string|\{description\}|line-clamp-3/);
-  assert.doesNotMatch(courseGrid, /description=\{topic\.description\}/);
-  assert.doesNotMatch(courseCatalog, /description=\{topic\.description\}/);
+  // The owner asked for the course description back on the card (September
+  // 2026): a title with two chips read as an empty card. Two clamped lines,
+  // no more.
+  assert.match(courseCard, /line-clamp-2 text-sm[^"]*">\s*\{description\}/);
+  assert.doesNotMatch(courseCard, /line-clamp-3/);
+  assert.match(courseGrid, /description=\{topic\.description\}/);
+  assert.match(courseCatalog, /description=\{topic\.description\}/);
 
   const detailTags = [...faq.matchAll(/<details[\s\S]*?>/g)].map(([tag]) => tag);
   assert.ok(detailTags.length > 0);

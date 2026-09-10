@@ -9,6 +9,8 @@ import { CARD_BLUR_PLACEHOLDER } from '@/components/marketing/_shared/card-blur-
 type CourseCardProps = {
   slug: string;
   title: string;
+  /** One or two lines about the course; the title alone read as an empty card. */
+  description?: string;
   coverImage?: string;
   icon?: string;
   durationMinutes: number;
@@ -20,6 +22,7 @@ type CourseCardProps = {
 export function CourseCard({
   slug,
   title,
+  description,
   coverImage,
   icon,
   durationMinutes,
@@ -83,6 +86,11 @@ export function CourseCard({
         <h3 className="line-clamp-2 text-[17px] leading-[1.3] font-bold tracking-[-0.02em] sm:text-lg">
           {title}
         </h3>
+        {description ? (
+          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[var(--color-text-muted)]">
+            {description}
+          </p>
+        ) : null}
 
         <div
           data-course-card-actions

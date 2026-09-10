@@ -54,6 +54,7 @@ export default async function TopicsPage() {
                   key={topic.slug}
                   slug={topic.slug}
                   title={topic.title}
+                  description={topic.description}
                   icon={topic.icon}
                   coverImage={getCourseCoverImage(topic.slug, topic.seo.ogImage)}
                   durationMinutes={topic.durationMinutes}
