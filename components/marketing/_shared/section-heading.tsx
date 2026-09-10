@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 
 type SectionHeadingProps = {
   id: string;
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   description?: string;
   action?: ReactNode;
@@ -26,16 +26,18 @@ export function SectionHeading({
       )}
     >
       <div className="max-w-3xl">
-        <p className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] text-[var(--color-text-subtle)] uppercase sm:text-xs">
-          <span
-            aria-hidden="true"
-            className="h-px w-5 rounded-full bg-[var(--color-primary)] sm:w-6"
-          />
-          {eyebrow}
-        </p>
+        {eyebrow ? (
+          <p className="mb-2.5 inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] text-[var(--color-text-subtle)] uppercase sm:text-xs">
+            <span
+              aria-hidden="true"
+              className="h-px w-5 rounded-full bg-[var(--color-primary)] sm:w-6"
+            />
+            {eyebrow}
+          </p>
+        ) : null}
         <h2
           id={id}
-          className="mt-2.5 max-w-2xl text-[24px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[30px] sm:leading-[1.18] lg:text-[38px]"
+          className="max-w-2xl text-[24px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[30px] sm:leading-[1.18] lg:text-[38px]"
         >
           {title}
         </h2>

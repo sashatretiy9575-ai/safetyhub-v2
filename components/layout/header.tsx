@@ -3,13 +3,14 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { PhoneCall } from '@phosphor-icons/react/dist/ssr/PhoneCall';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/ssr/WhatsappLogo';
 import Link from 'next/link';
+import { AccountIconLink } from '@/components/layout/account-icon-link';
 import { ACCOUNT_NAV_ITEMS, type AccountMode } from '@/components/layout/navigation-items';
 import { HeaderNav } from '@/components/layout/header-nav';
+import { headerTooltipClass } from '@/components/layout/header-tooltip';
 import { DeferredLanguageSwitcher } from '@/components/layout/deferred-language-switcher';
 import { Logo } from '@/components/shared/logo';
 import { ContactLink } from '@/components/shared/contact-link';
 import { DeferredThemeToggle } from '@/components/layout/deferred-theme-toggle';
-import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants';
 import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
 import { localesForLanguageSwitcher, localizePathname } from '@/i18n/config';
@@ -19,8 +20,7 @@ import type { SiteContactSettings } from '@/lib/site-contacts-shared';
 const contactActionClass =
   'group relative inline-flex size-11 shrink-0 items-center justify-center transition-[color,background-color] duration-150';
 
-const tooltipClass =
-  'pointer-events-none absolute left-1/2 top-[calc(100%+0.625rem)] z-50 -translate-x-1/2 whitespace-nowrap rounded-[var(--radius-control)] bg-[var(--color-text)] px-2.5 py-1.5 text-xs font-semibold text-[var(--color-bg)] opacity-0 shadow-[var(--shadow-pop)] transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100';
+const tooltipClass = headerTooltipClass;
 
 export async function Header({
   accountMode,
@@ -67,76 +67,68 @@ export async function Header({
 
         <HeaderNav locale={explicitLocale} />
 
-        <div className="flex-1" />
+        {/* One right-hand group rather than a flex spacer: the spacer cost a
+            second flex gap, and at 320 px the header has no width to spare. */}
+        <div className="ml-auto flex items-center gap-2 min-[1024px]:gap-3">
+          {switcherLocales.length > 1 ? (
+            <DeferredLanguageSwitcher
+              locales={switcherLocales}
+              locale={locale}
+              label={translations('language.label')}
+              languageName={translations(`language.${locale}`)}
+            />
+          ) : null}
 
-        {switcherLocales.length > 1 ? (
-          <DeferredLanguageSwitcher
-            locales={switcherLocales}
-            locale={locale}
-            label={translations('language.label')}
-            languageName={translations(`language.${locale}`)}
-          />
-        ) : null}
+          <div className="flex items-center gap-1 min-[1024px]:gap-2">
+            <div
+              role="group"
+              aria-label={translations('quickContact')}
+              className="hidden h-11 items-center overflow-visible min-[1024px]:flex"
+            >
+              <ContactLink
+                kind="phone"
+                contacts={contacts}
+                aria-label={translations('call', { phone: contacts.phoneDisplay })}
+                aria-describedby="header-phone-tooltip"
+                className={`${contactActionClass} rounded-[var(--radius-control)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]`}
+              >
+                <PhoneCall size={20} weight="regular" aria-hidden="true" />
+                <span id="header-phone-tooltip" role="tooltip" className={tooltipClass}>
+                  {translations('call', { phone: contacts.phoneDisplay })}
+                </span>
+              </ContactLink>
+              <span aria-hidden="true" className="mx-0.5 h-5 w-px bg-[var(--color-border)]" />
+              <ContactLink
+                kind="whatsapp"
+                contacts={contacts}
+                aria-label={translations('whatsapp')}
+                aria-describedby="header-whatsapp-tooltip"
+                className={`${contactActionClass} rounded-[var(--radius-control)] text-[var(--color-primary)] hover:bg-[var(--color-surface-muted)]`}
+              >
+                <WhatsappLogo size={21} weight="regular" aria-hidden="true" />
+                <span id="header-whatsapp-tooltip" role="tooltip" className={tooltipClass}>
+                  {translations('whatsapp')}
+                </span>
+              </ContactLink>
+            </div>
 
-        <div className="hidden items-center gap-2 min-[1024px]:flex">
-          <div
-            role="group"
-            aria-label={translations('quickContact')}
-            className="flex h-11 items-center overflow-visible"
-          >
-            <ContactLink
-              kind="phone"
-              contacts={contacts}
-              aria-label={translations('call', { phone: contacts.phoneDisplay })}
-              aria-describedby="header-phone-tooltip"
-              className={`${contactActionClass} rounded-[var(--radius-control)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]`}
-            >
-              <PhoneCall size={20} weight="regular" aria-hidden="true" />
-              <span id="header-phone-tooltip" role="tooltip" className={tooltipClass}>
-                {translations('call', { phone: contacts.phoneDisplay })}
-              </span>
-            </ContactLink>
-            <span aria-hidden="true" className="mx-0.5 h-5 w-px bg-[var(--color-border)]" />
-            <ContactLink
-              kind="whatsapp"
-              contacts={contacts}
-              aria-label={translations('whatsapp')}
-              aria-describedby="header-whatsapp-tooltip"
-              className={`${contactActionClass} rounded-[var(--radius-control)] text-[var(--color-primary)] hover:bg-[var(--color-surface-muted)]`}
-            >
-              <WhatsappLogo size={21} weight="regular" aria-hidden="true" />
-              <span id="header-whatsapp-tooltip" role="tooltip" className={tooltipClass}>
-                {translations('whatsapp')}
-              </span>
-            </ContactLink>
+            <DeferredThemeToggle />
+
+            {/* One round, avatar-sized account slot at every width: a guest sees
+                the account icon, a signed-in visitor the avatar menu in the same
+                place. Below 1024 px the header used to show a text button for
+                guests and nothing at all once signed in. */}
+            {accountMode === 'authenticated' ? (
+              accountMenu
+            ) : (
+              (accountControl ?? (
+                <AccountIconLink
+                  href={localizePathname(accountItem.href, locale)}
+                  label={translations(accountItem.messageKey)}
+                />
+              ))
+            )}
           </div>
-
-          <DeferredThemeToggle />
-
-          {accountMode === 'authenticated' ? (
-            accountMenu
-          )
-            : (accountControl ?? (
-                <Button asChild variant="outline" size="sm" className="shadow-none">
-                  <Link href={localizePathname(accountItem.href, locale)} prefetch={false}>
-                    {translations(accountItem.messageKey)}
-                  </Link>
-                </Button>
-              ))}
-        </div>
-
-        <div className="flex items-center gap-1 min-[1024px]:hidden">
-          <DeferredThemeToggle />
-          {/* Below 1024 px the header showed a theme toggle and nothing else:
-              signing in was reachable only through the dock, and only after the
-              client bundle had loaded. */}
-          {accountMode === 'authenticated' ? null : (
-            <Button asChild variant="outline" size="sm" className="shadow-none">
-              <Link href={localizePathname(accountItem.href, locale)} prefetch={false}>
-                {translations(accountItem.messageKey)}
-              </Link>
-            </Button>
-          )}
         </div>
       </div>
     </header>

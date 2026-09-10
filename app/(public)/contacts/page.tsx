@@ -33,30 +33,15 @@ export default async function ContactsPage() {
   ] as const;
   return (
     <>
-      <PageHeader
-        title={t('title')}
-        description={t('description')}
-        eyebrow={t('eyebrow')}
-        variant="contact"
-        className="[&>div:last-child>p]:text-[15px] sm:[&>div:last-child>p]:text-base"
-      />
+      {/* The heading is the whole introduction: the eyebrow repeated the menu
+          item and the sentence under it was the same one the home page used. */}
+      <PageHeader title={t('title')} variant="contact" />
 
-      <section aria-labelledby="contact-options-heading" className="py-8 sm:py-11 lg:py-14">
+      <section aria-label={t('title')} className="py-8 sm:py-11 lg:py-14">
         <Container size="wide">
           <div className="grid gap-7 lg:grid-cols-[minmax(0,0.76fr)_minmax(25rem,1.24fr)] lg:items-start lg:gap-10">
-            <div>
-              <h2
-                id="contact-options-heading"
-                className="text-[20px] leading-tight font-bold tracking-[-0.02em] sm:text-2xl"
-              >
-                {t('method')}
-              </h2>
-              <p className="mt-2 max-w-lg text-sm leading-5 text-[var(--color-text-muted)] sm:text-[15px] sm:leading-6">
-                {t('hint')}
-              </p>
-              <div className="mt-5 max-w-xl">
-                <ContactActions contacts={contacts} />
-              </div>
+            <div className="max-w-xl">
+              <ContactActions contacts={contacts} />
             </div>
 
             <dl className="grid overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/76 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl sm:grid-cols-2">

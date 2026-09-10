@@ -158,6 +158,7 @@ test('server returns export metadata while the browser worker creates reports an
   assert.match(worker, /createStreamingZipArchive/);
   assert.match(client, /CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS/);
   assert.match(client, /showSaveFilePicker/);
+  assert.match(client, /groupCertificateExportByOrganization/);
   assert.match(client, /stream: true/);
   assert.match(client, /type: 'chunk-ack'/);
   assert.match(worker, /waitForChunkAcknowledgement/);

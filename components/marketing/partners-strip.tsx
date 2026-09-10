@@ -9,7 +9,12 @@ import { QUIZ_POLICY } from '@/lib/constants';
 export function PartnersStrip() {
   const t = useTranslations('Home.benefits');
   const benefits = [
-    { icon: DeviceMobile, image: '/images/generated/benefit-mobile-v2.webp', title: t('mobileTitle'), text: t('mobileText') },
+    {
+      icon: DeviceMobile,
+      image: '/images/generated/benefit-mobile-v2.webp',
+      title: t('mobileTitle'),
+      text: t('mobileText'),
+    },
     {
       icon: ListChecks,
       image: '/images/generated/benefit-quiz-v2.webp',
@@ -19,7 +24,12 @@ export function PartnersStrip() {
         attempts: QUIZ_POLICY.attemptsPerCalendarDay,
       }),
     },
-    { icon: UserCircle, image: '/images/generated/benefit-results-v2.webp', title: t('resultsTitle'), text: t('resultsText') },
+    {
+      icon: UserCircle,
+      image: '/images/generated/benefit-results-v2.webp',
+      title: t('resultsTitle'),
+      text: t('resultsText'),
+    },
   ] as const;
   return (
     <SectionShell
@@ -27,18 +37,9 @@ export function PartnersStrip() {
       aria-labelledby="benefits-heading"
       className="bg-[var(--color-surface-muted)]/28 py-10 sm:py-14 lg:py-16"
     >
-      <SectionHeading
-        id="benefits-heading"
-        eyebrow={t('eyebrow')}
-        title={t('title')}
-        description={t('description')}
-      />
+      <SectionHeading id="benefits-heading" eyebrow={t('eyebrow')} title={t('title')} />
 
-      <MarketingSlider
-        label={t('slider')}
-        itemLabel={t('item')}
-        className="mt-7 sm:mt-10"
-      >
+      <MarketingSlider label={t('slider')} itemLabel={t('item')} className="mt-7 sm:mt-10">
         {benefits.map(({ icon: Icon, image, title, text }, index) => (
           <article
             key={title}

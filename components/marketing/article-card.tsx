@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { ArrowRight, BookOpenText } from '@phosphor-icons/react/dist/ssr';
+import { ArrowRight } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
@@ -71,10 +71,6 @@ export function ArticleCard({
       <div
         className={cn('flex min-w-0 flex-1 flex-col p-5 sm:p-6', featured && 'min-[1100px]:p-8')}
       >
-        <p className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.13em] text-[var(--color-primary)] uppercase sm:text-xs">
-          <BookOpenText size={16} weight="bold" aria-hidden="true" />
-          {t('cardEyebrow')}
-        </p>
         <h3
           className={cn(
             'text-[18px] leading-[1.28] font-bold tracking-[-0.02em] text-balance transition-colors group-hover:text-[var(--color-primary-hover)] sm:text-xl',

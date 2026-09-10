@@ -9,6 +9,7 @@ import {
   type CertificateRenderMetadata,
   type CertificateWorkerProgress,
 } from './certificate-client-contract.ts';
+import { groupCertificateExportByOrganization } from './certificate-export-groups.ts';
 import type {
   CertificateWorkerRequest,
   CertificateWorkerResponse,
@@ -22,7 +23,9 @@ type WritableDestination = Readonly<{
 
 /** File System Access streams also accept positional commands. */
 type SeekableDestination = Readonly<{
-  write(command: { type: 'truncate'; size: number } | { type: 'seek'; position: number }): Promise<void>;
+  write(
+    command: { type: 'truncate'; size: number } | { type: 'seek'; position: number },
+  ): Promise<void>;
 }>;
 
 function writtenByteLength(data: BufferSource | Blob | string) {
@@ -226,10 +229,7 @@ export async function downloadCertificateInBrowser(
 
   const { generateCertificateInBrowser } = await import('./certificate-renderer.ts');
   const bytes = await generateCertificateInBrowser(metadata, options.signal);
-  downloadBlob(
-    new Blob([bytes.slice().buffer], { type: 'application/pdf' }),
-    metadata.filename,
-  );
+  downloadBlob(new Blob([bytes.slice().buffer], { type: 'application/pdf' }), metadata.filename);
 }
 
 function archivePartFilename(filename: string, part: number, count: number) {
@@ -243,12 +243,10 @@ async function renderArchiveInMainThread(
   options: WorkerOptions & { destination?: WritableDestination },
 ): Promise<Uint8Array | null> {
   const { createStreamingZipArchive } = await import('./certificate-archive.ts');
-  const { generateCertificateInBrowser, loadCertificateFontBytes, resolveAssetUrl } = await import(
-    './certificate-renderer.ts'
-  );
-  const { certificateReportRows, generateCertificateReportInBrowser } = await import(
-    './certificate-report.ts'
-  );
+  const { generateCertificateInBrowser, loadCertificateFontBytes, resolveAssetUrl } =
+    await import('./certificate-renderer.ts');
+  const { certificateReportRows, generateCertificateReportInBrowser } =
+    await import('./certificate-report.ts');
   const { certificateFilename } = await import('./certificate.ts');
 
   async function* entriesGenerator(): AsyncGenerator<{ name: string; bytes: Uint8Array }> {
@@ -328,51 +326,32 @@ async function renderArchiveInMainThread(
   return resultBytes;
 }
 
-export async function downloadCertificateExportInBrowser(
-  metadata: CertificateExportMetadata,
-  options: WorkerOptions & { fileHandle?: CertificateArchiveFileHandle | null } = {},
-) {
-  assertCertificateExportMetadata(metadata);
-  if (options.fileHandle) {
-    if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
-    const destination = await options.fileHandle.createWritable();
-    const rewindable = createRewindableDestination(destination);
-    const taskId = crypto.randomUUID();
-    try {
-      await runWorker(
-        { type: 'render-archive', taskId, metadata, stream: true },
-        { ...options, destination: rewindable.proxy },
-      );
-    } catch (workerError) {
-      if (options.signal?.aborted) {
-        await destination.abort(workerError).catch(() => undefined);
-        throw workerError;
-      }
-      // Retrying on top of a partially written file would produce a broken
-      // archive, so a file that cannot be rewound is abandoned instead.
-      if (!(await rewindable.rewind())) {
-        await destination.abort(workerError).catch(() => undefined);
-        throw workerError;
-      }
-      try {
-        await renderArchiveInMainThread(metadata, {
-          ...options,
-          destination: rewindable.proxy,
-        });
-      } catch (fallbackError) {
-        await destination.abort(fallbackError).catch(() => undefined);
-        throw fallbackError;
-      }
+/** Chrome coalesces programmatic downloads fired back to back; a short pause
+ * between archives keeps every file. */
+async function pauseBetweenDownloads(signal: AbortSignal | undefined) {
+  await new Promise<void>((resolve) => {
+    const timer = setTimeout(done, 300);
+    function done() {
+      signal?.removeEventListener('abort', done);
+      clearTimeout(timer);
+      resolve();
     }
-    return { archives: 1, streamed: true } as const;
-  }
+    signal?.addEventListener('abort', done, { once: true });
+  });
+}
 
+/** Renders one export as ≤100-certificate archives and hands each to the browser. */
+async function renderBufferedArchiveParts(
+  metadata: CertificateExportMetadata,
+  options: WorkerOptions,
+): Promise<number> {
   const partCount = Math.max(
     1,
     Math.ceil(metadata.items.length / CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS),
   );
   for (let partIndex = 0; partIndex < partCount; partIndex += 1) {
     if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
+    if (partIndex > 0) await pauseBetweenDownloads(options.signal);
     const items = metadata.items.slice(
       partIndex * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS,
       (partIndex + 1) * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS,
@@ -418,5 +397,73 @@ export async function downloadCertificateExportInBrowser(
       partMetadata.filename,
     );
   }
-  return { archives: partCount, streamed: false } as const;
+  return partCount;
+}
+
+export async function downloadCertificateExportInBrowser(
+  metadata: CertificateExportMetadata,
+  options: WorkerOptions & {
+    fileHandle?: CertificateArchiveFileHandle | null;
+    /** `organization`: one archive per company, named after it. */
+    groupBy?: 'none' | 'organization';
+  } = {},
+) {
+  assertCertificateExportMetadata(metadata);
+  if (options.fileHandle) {
+    if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
+    const destination = await options.fileHandle.createWritable();
+    const rewindable = createRewindableDestination(destination);
+    const taskId = crypto.randomUUID();
+    try {
+      await runWorker(
+        { type: 'render-archive', taskId, metadata, stream: true },
+        { ...options, destination: rewindable.proxy },
+      );
+    } catch (workerError) {
+      if (options.signal?.aborted) {
+        await destination.abort(workerError).catch(() => undefined);
+        throw workerError;
+      }
+      // Retrying on top of a partially written file would produce a broken
+      // archive, so a file that cannot be rewound is abandoned instead.
+      if (!(await rewindable.rewind())) {
+        await destination.abort(workerError).catch(() => undefined);
+        throw workerError;
+      }
+      try {
+        await renderArchiveInMainThread(metadata, {
+          ...options,
+          destination: rewindable.proxy,
+        });
+      } catch (fallbackError) {
+        await destination.abort(fallbackError).catch(() => undefined);
+        throw fallbackError;
+      }
+    }
+    return { archives: 1, streamed: true, companies: 1 } as const;
+  }
+
+  // Operators file certificates by company, so a mixed selection leaves the
+  // browser as one archive per company. The metadata was fetched once for the
+  // whole selection; only the rendering is split.
+  const groups =
+    options.groupBy === 'organization'
+      ? groupCertificateExportByOrganization(metadata)
+      : [{ key: '', organization: null, metadata }];
+  let archives = 0;
+  let completedBefore = 0;
+  for (const [index, group] of groups.entries()) {
+    if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
+    if (index > 0) await pauseBetweenDownloads(options.signal);
+    archives += await renderBufferedArchiveParts(group.metadata, {
+      signal: options.signal,
+      onProgress: (progress) =>
+        options.onProgress?.({
+          completed: completedBefore + progress.completed,
+          total: metadata.items.length,
+        }),
+    });
+    completedBefore += group.metadata.items.length;
+  }
+  return { archives, streamed: false, companies: groups.length } as const;
 }

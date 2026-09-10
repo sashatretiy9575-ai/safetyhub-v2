@@ -1,5 +1,3 @@
-import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr';
-import Link from 'next/link';
 import { CourseCard } from '@/components/marketing/course-card';
 import { SectionHeading } from '@/components/marketing/_shared/section-heading';
 import { Container } from '@/components/ui/container';
@@ -52,21 +50,10 @@ export async function CourseGrid() {
         className="scroll-mt-24 py-10 sm:py-14 lg:py-16"
       >
         <Container size="wide">
-          <SectionHeading
-            id="courses-heading"
-            eyebrow={t('eyebrow')}
-            title={t('title')}
-            description={t('description')}
-            action={
-              <Link
-                href={localizePathname(ROUTES.topics, locale)}
-                className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 px-4 text-sm font-semibold text-[var(--color-text)] backdrop-blur-xl transition hover:border-[var(--color-primary)]/45 hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-on-primary-soft)]"
-              >
-                {t('all')}
-                <ArrowUpRight size={17} weight="bold" aria-hidden="true" />
-              </Link>
-            }
-          />
+          {/* The slider below already shows every published course, so the
+              "all courses" link and the filler sentence under the heading
+              only repeated it. */}
+          <SectionHeading id="courses-heading" eyebrow={t('eyebrow')} title={t('title')} />
 
           {topics.length > 0 ? (
             <MarketingSlider label={t('slider')} itemLabel={t('item')} className="mt-7 sm:mt-10">

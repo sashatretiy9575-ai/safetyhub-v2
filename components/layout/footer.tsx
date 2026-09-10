@@ -42,9 +42,6 @@ export async function Footer({
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-[1.15fr_.7fr_1fr] md:gap-10">
           <div className="max-w-md">
             <Logo inverse />
-            <p className="mt-3 max-w-sm text-[15px] leading-6 text-white/68">
-              {translations('footer.description')}
-            </p>
             <ContactLink
               kind="whatsapp"
               contacts={contacts}

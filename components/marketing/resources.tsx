@@ -40,11 +40,7 @@ export async function Resources() {
         />
 
         {posts.length > 0 ? (
-          <MarketingSlider
-            label={t('slider')}
-            itemLabel={t('item')}
-            className="mt-6 sm:mt-8"
-          >
+          <MarketingSlider label={t('slider')} itemLabel={t('item')} className="mt-6 sm:mt-8">
             {posts.map((post) => (
               <ArticleCard
                 key={post.slug}

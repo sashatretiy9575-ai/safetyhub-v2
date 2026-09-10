@@ -277,68 +277,65 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
     [applyResponseError, applyTerminalAttempt, t, tErrors, transportMessage],
   );
 
-  const loadAttempt = useCallback(
-    async () => {
-      setLoading(true);
-      setError('');
-      setErrorCode('');
-      try {
-        const result = await clientRequest('/api/attempts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ testSlug: slug, locale }),
-        });
-        if (!result.ok) {
-          if (result.response) await applyResponseError(result.response);
-          else {
-            setErrorCode('REQUEST_FAILED');
-            setError(transportMessage(result.error));
-          }
-          return;
+  const loadAttempt = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    setErrorCode('');
+    try {
+      const result = await clientRequest('/api/attempts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ testSlug: slug, locale }),
+      });
+      if (!result.ok) {
+        if (result.response) await applyResponseError(result.response);
+        else {
+          setErrorCode('REQUEST_FAILED');
+          setError(transportMessage(result.error));
         }
-
-        const payload = await readClientResponseJson<AttemptPayload>(result.response);
-        if (!payload) throw new Error('INVALID_ATTEMPT_RESPONSE');
-        if (payload.locale !== locale) {
-          window.location.replace(
-            localizePathname(`/topics/${payload.testSlug}/test`, payload.locale),
-          );
-          return;
-        }
-        attemptRef.current = payload;
-        setAttempt(payload);
-        setReviewing(false);
-        setReviewConfirmed(false);
-        setSubmissionLocked(false);
-        submissionAnswersRef.current = null;
-
-        if (payload.status === 'started') {
-          const localDraft =
-            typeof window === 'undefined'
-              ? null
-              : readQuizDraft(window.localStorage, payload.attemptId);
-          const restored = restoreQuizDraft(payload.attemptId, payload.questions, localDraft);
-          answersRef.current = restored.answers;
-          currentIndexRef.current = restored.currentIndex;
-          setAnswers(restored.answers);
-          setCurrentIndex(restored.currentIndex);
-          setSaveState(restored.answers.length > 0 ? 'saved' : 'idle');
-          persistDraft(payload.attemptId);
-        } else {
-          answersRef.current = [];
-          setAnswers([]);
-          setSaveState('idle');
-          if (typeof window !== 'undefined') clearQuizDraft(window.localStorage, payload.attemptId);
-        }
-      } catch (requestError) {
-        setErrorCode('REQUEST_FAILED');
-        setError(localizedClientRequestMessage(requestError, t('errors.loadFailed'), tErrors));
-      } finally {
-        if (mountedRef.current) setLoading(false);
+        return;
       }
-    },
-    [applyResponseError, locale, persistDraft, slug, t, tErrors, transportMessage],
-  );
+
+      const payload = await readClientResponseJson<AttemptPayload>(result.response);
+      if (!payload) throw new Error('INVALID_ATTEMPT_RESPONSE');
+      if (payload.locale !== locale) {
+        window.location.replace(
+          localizePathname(`/topics/${payload.testSlug}/test`, payload.locale),
+        );
+        return;
+      }
+      attemptRef.current = payload;
+      setAttempt(payload);
+      setReviewing(false);
+      setReviewConfirmed(false);
+      setSubmissionLocked(false);
+      submissionAnswersRef.current = null;
+
+      if (payload.status === 'started') {
+        const localDraft =
+          typeof window === 'undefined'
+            ? null
+            : readQuizDraft(window.localStorage, payload.attemptId);
+        const restored = restoreQuizDraft(payload.attemptId, payload.questions, localDraft);
+        answersRef.current = restored.answers;
+        currentIndexRef.current = restored.currentIndex;
+        setAnswers(restored.answers);
+        setCurrentIndex(restored.currentIndex);
+        setSaveState(restored.answers.length > 0 ? 'saved' : 'idle');
+        persistDraft(payload.attemptId);
+      } else {
+        answersRef.current = [];
+        setAnswers([]);
+        setSaveState('idle');
+        if (typeof window !== 'undefined') clearQuizDraft(window.localStorage, payload.attemptId);
+      }
+    } catch (requestError) {
+      setErrorCode('REQUEST_FAILED');
+      setError(localizedClientRequestMessage(requestError, t('errors.loadFailed'), tErrors));
+    } finally {
+      if (mountedRef.current) setLoading(false);
+    }
+  }, [applyResponseError, locale, persistDraft, slug, t, tErrors, transportMessage]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -579,7 +576,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
               {passed ? (
                 <>
                   <div className="py-2">
-                    <strong className="text-5xl font-black tabular-nums tracking-tight">
+                    <strong className="text-5xl font-black tracking-tight tabular-nums">
                       {attempt.score ?? 0} / {attempt.total}
                     </strong>
                     <p className="mt-1.5 text-sm font-medium text-[var(--color-text-muted)]">
@@ -603,7 +600,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                 </div>
               ) : (
                 <div className="space-y-2 py-2">
-                  <strong className="text-5xl font-black tabular-nums tracking-tight">
+                  <strong className="text-5xl font-black tracking-tight tabular-nums">
                     {attempt.score ?? 0}/{attempt.total}
                   </strong>
                   <p className="mt-1 text-sm font-medium text-[var(--color-text-muted)]">
@@ -873,9 +870,12 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           })}
           className="mb-4 h-2.5"
         />
+        {/* Five 44 px targets plus four 8 px gaps make 15.75rem: phones get a
+            5 + 5 block instead of a ragged 7 + 3. From `sm` the cap lifts and
+            all ten sit in one row. Keep the cap in step with `size-11`/`gap-2`. */}
         <nav
           aria-label={t('questionsAria')}
-          className="mb-7 flex flex-wrap justify-center gap-2"
+          className="mx-auto mb-7 flex max-w-[15.75rem] flex-wrap justify-center gap-2 sm:max-w-none"
         >
           {attempt.questions.map((question, index) => {
             const answered = answers.some((answer) => answer.questionId === question.id);
@@ -977,7 +977,8 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     onClick={() => {
                       if (!allAnswered) {
                         const unansweredIndex = attempt.questions.findIndex(
-                          (question) => !answers.some((answer) => answer.questionId === question.id),
+                          (question) =>
+                            !answers.some((answer) => answer.questionId === question.id),
                         );
                         if (unansweredIndex !== -1) {
                           setError(t('rules.answerFirst'));

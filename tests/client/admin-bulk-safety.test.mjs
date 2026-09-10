@@ -19,7 +19,7 @@ test('only the newest selection may decide what gets deleted', () => {
   // company's total beside a new company's name is how the wrong rows get
   // confirmed.
   const resolver = manager.slice(manager.indexOf('const resolveFilteredSelection'));
-  const clearAt = resolver.indexOf('setResolvedSelection(null)');
+  const clearAt = resolver.indexOf('dropResolvedSelection(key)');
   const requestAt = resolver.indexOf("'/api/admin/attestations/selection'");
   assert.ok(clearAt > 0 && clearAt < requestAt, 'the previous selection is dropped up front');
 });

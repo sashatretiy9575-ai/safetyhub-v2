@@ -145,7 +145,13 @@ test('public article composition is wide, single-column, readable, and related',
   assert.doesNotMatch(page, /dateModified: article\.reviewedAt/);
   assert.match(page, /<ArticleSources[\s\S]+label=\{t\('sources'/);
   assert.match(page, /t\('sources', \{ count: article\.sources\?\.length \?\? 0 \}\)/);
-  assert.match(page, /<RelatedArticles[\s\S]+articles=\{relatedArticles\}[\s\S]+locale=\{locale\}/);
+  // The related block no longer carries its own "all articles" link (the top of
+  // the page has one), so it needs no locale either.
+  assert.match(
+    page,
+    /<RelatedArticles[\s\S]+articles=\{relatedArticles\}[\s\S]+title=\{t\('relatedTitle'\)\}/,
+  );
+  assert.doesNotMatch(page, /allLabel=/);
   assert.match(renderer, /data-article-cta/);
   assert.match(renderer, /ARTICLE_WHATSAPP_ACTION_URL/);
   assert.match(renderer, /<ContactLink kind="whatsapp" contacts=\{contacts\}/);
@@ -188,7 +194,10 @@ test('stored content and admin editing use the same runtime block contract', asy
   assert.doesNotMatch(content, /blocks as unknown as ArticleBlock/);
   assert.match(editPage, /articleBlocksSchema\.safeParse\(data\.blocks\)/);
   assert.match(editor, /<ContentBlockEditor mode="article"/);
-  assert.match(editor, /hasDraftChanges=\{displayedPublicationState === 'published_with_draft_changes'\}/u);
+  assert.match(
+    editor,
+    /hasDraftChanges=\{displayedPublicationState === 'published_with_draft_changes'\}/u,
+  );
   assert.match(editor, /publishedContentHash === result\.contentHash/);
   assert.match(editPage, /live\.data\.content_hash === data\.content_hash/);
   assert.doesNotMatch(

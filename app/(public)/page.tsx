@@ -60,7 +60,7 @@ export default async function HomePage() {
         <Resources />
       </Suspense>
       <Testimonials />
-      <FaqAccordion />
+      <FaqAccordion withContact={false} />
       <ContactCta />
     </>
   );

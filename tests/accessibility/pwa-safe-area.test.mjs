@@ -41,18 +41,18 @@ test('deferred install banner stays compact above the mobile bar and reserves te
   assert.match(deferredInstall, /ssr: false/);
   assert.match(installSurface, /<PWAProvider>/);
   assert.match(installSurface, /<PWAInstallOverlay \/>/);
-  // The banner is docked onto the mobile tab bar, not floated above it.
+  // The card floats 5 px above the mobile tab bar, rounded on every side, and
+  // is read against the dock's insets and width.
   assert.match(
     overlay,
-    /bottom-\[calc\(var\(--safe-area-bottom\)\+var\(--mobile-tab-height\)\)\]/,
+    /bottom-\[calc\(var\(--safe-area-bottom\)\+var\(--mobile-tab-height\)\+5px\)\]/,
   );
+  assert.match(overlay, /rounded-\[var\(--radius-dock\)\] border /);
   assert.match(overlay, /max-w-\[32\.5rem\]/);
-  // The dismissal, session cap and delay must stay wired up.
-  assert.match(overlay, /setIsDismissed\(hasActiveDismissal\(\) \|\| alreadyShownThisSession\(\)\)/);
-  assert.doesNotMatch(overlay, /void hasActiveDismissal/);
+  // No delay, session cap or stored dismissal: the owner wants the card on
+  // every phone visit until the app is installed.
+  assert.doesNotMatch(overlay, /hasActiveDismissal|alreadyShownThisSession|PROMPT_DELAY_MS/);
   assert.match(overlay, /--pwa-banner-space/);
-  assert.match(overlay, /PROMPT_DELAY_MS = 15_000/);
-  assert.match(overlay, /30 \* 24 \* 60 \* 60/);
   assert.match(overlay, /splitLocalePathname\(pathname\)\.pathname/);
   assert.match(overlay, /routePathname\.startsWith\('\/admin'\)/);
   assert.match(overlay, /pointer: coarse/);

@@ -27,7 +27,6 @@
       "authenticated": "Profile"
     },
     "footer": {
-      "description": "Practical online training in workplace, fire and industrial safety for employees and teams.",
       "navigation": "Footer navigation",
       "sections": "Sections",
       "contact": "Contact us",
@@ -71,10 +70,14 @@
   },
   "Pwa": {
     "title": "Install SafetyHub",
-    "description": "Launch quickly from your phone",
+    "description": "Open courses and tests from your phone screen, like an app.",
     "install": "Install",
     "installing": "Opening…",
-    "dismiss": "Dismiss installation suggestion"
+    "dismiss": "Dismiss installation suggestion",
+    "iosHint": "In Safari tap <share>Share</share>, then <add>Add to Home Screen</add>.",
+    "howTo": "How to install",
+    "gotIt": "Got it",
+    "later": "Later"
   },
   "Offline": {
     "title": "You’re offline",
@@ -119,15 +122,13 @@
       "imageAlt": "Safety professionals review information at an industrial site",
       "eyebrow": "Almaty · online across Kazakhstan",
       "title": "Occupational safety and health training and knowledge checks online",
-      "description": "Courses in occupational safety and health, fire safety and industrial safety. A presentation, a {count}-question test, {pass} to pass — the score appears in your account at once and an administrator issues the certificate.",
+      "description": "A presentation, a {count}-question test and a certificate — online, with no trip to a training centre.",
       "courses": "Choose a course",
-      "contact": "Contact us"
+      "contact": "Contacts"
     },
     "courses": {
       "eyebrow": "Training programmes",
       "title": "Safety courses for professionals and teams",
-      "description": "Choose a subject and learn at your own pace.",
-      "all": "All courses",
       "slider": "Training programmes",
       "item": "Course",
       "empty": "Published courses will appear soon."
@@ -135,20 +136,19 @@
     "benefits": {
       "eyebrow": "How training runs",
       "title": "Training from a phone, on site",
-      "description": "A worker opens the presentation and takes the knowledge check on a smartphone — no trip to a training centre and no stopped shift.",
       "slider": "Platform features",
       "item": "Benefit",
       "mobileTitle": "From a phone, on site",
       "mobileText": "A browser, with no app to install.",
       "quizTitle": "Test: {count} questions, {pass} to pass",
       "quizText": "Up to {minutes} minutes, up to {attempts} attempts a day.",
-      "resultsTitle": "Result and certificate",
+      "resultsTitle": "Certificate after the test",
       "resultsText": "The score is visible at once; an administrator issues the certificate."
     },
     "process": {
       "eyebrow": "How training works",
       "title": "From application to an occupational safety assessment",
-      "description": "Three steps with no trip to a training centre. Almaty and all of Kazakhstan, support Mon–Fri 09:00–18:00.",
+      "description": "Three steps with no trip to a training centre.",
       "slider": "Training steps",
       "item": "Step",
       "chooseTitle": "Application and approval",
@@ -159,14 +159,12 @@
       "resultText": "The score appears in your account at once; an administrator issues the certificate and an e-mail follows."
     },
     "contact": {
-      "eyebrow": "Contacts",
-      "title": "Tell us what you need",
-      "description": "We’ll recommend a programme and answer your training questions."
+      "title": "Tell us what you need"
     },
     "resources": {
       "eyebrow": "Useful before a test or shift",
       "title": "Workplace guidance: PPE, fire, first aid",
-      "description": "Short guidance for everyday workplace situations: what to notice, how to act and when to stop, with references to the Labour Code of Kazakhstan and other acts on adilet.zan.kz.",
+      "description": "Short guides: PPE, fire, first aid, test preparation.",
       "all": "Open all articles",
       "slider": "Useful safety articles",
       "item": "Article",
@@ -175,9 +173,7 @@
     "cases": {
       "eyebrow": "Use cases",
       "title": "How people use SafetyHub",
-      "description": "Anonymous typical scenarios without company names, personal details or promotional figures.",
       "slider": "Use cases",
-      "type": "Typical scenario",
       "task": "Need",
       "action": "Action",
       "result": "Result",
@@ -237,7 +233,6 @@
     "metadataKeyword3": "online industrial safety",
     "title": "Occupational safety, health and industrial safety courses",
     "description": "Programmes for workers and specialists: a presentation, a test and a certificate in your account.",
-    "eyebrow": "Safety courses · certificate upon passing",
     "available": "Available courses",
     "emptyTitle": "Courses are being prepared",
     "emptyDescription": "The catalogue will appear here soon.",
@@ -256,10 +251,8 @@
     "emptyDescription": "Practical safety articles will appear here soon.",
     "listAria": "Safety articles",
     "title": "Occupational and industrial safety articles",
-    "description": "Clear guidance for real workplace situations, from the first shift and PPE to fire alarms, first aid and test preparation.",
-    "eyebrow": "Practical SafetyHub guides",
+    "description": "Real workplace situations in plain words: PPE, fire alarms, first aid, test preparation.",
     "listTitle": "Article list",
-    "cardEyebrow": "Practical guide",
     "read": "Read article",
     "editorial": "SafetyHub editorial team",
     "breadcrumbsHome": "Home",
@@ -268,7 +261,6 @@
     "sourcesEmpty": "No regulatory sources are listed for this version of the material.",
     "continueEyebrow": "Keep reading",
     "relatedTitle": "More practical guidance",
-    "all": "All articles",
     "readTime": "{count, plural, one {# minute read} other {# minutes read}}",
     "back": "Back to blog",
     "allArticles": "All articles",
@@ -294,12 +286,8 @@
     "metadataTitle": "Contacts: phone and WhatsApp, Almaty",
     "metadataDescription": "SafetyHub contacts: phone and WhatsApp for questions about online occupational safety and health training, testing and the issuing of electronic certificates with QR verification.",
     "title": "Contact SafetyHub",
-    "description": "We’ll recommend a programme and answer your training questions.",
-    "eyebrow": "Contacts",
     "city": "City",
     "hours": "Business hours",
-    "method": "A convenient way to get in touch",
-    "hint": "For a faster reply, include the course topic and approximate number of participants.",
     "call": "Call",
     "chat": "Chat with us"
   },
@@ -307,7 +295,7 @@
     "metadataTitle": "Answers before you start training",
     "metadataDescription": "Common questions about SafetyHub courses: how to enrol, how long the test takes, how many correct answers are needed, when the certificate arrives and how to verify it by QR code.",
     "title": "Answers before you start training",
-    "description": "A quick guide to courses, tests and your account. If your question is not covered, contact us and we’ll help.",
+    "description": "A quick guide to courses, tests and your account.",
     "other": "Ask another question",
     "phoneQuestion": "Can I complete training on my phone?",
     "phoneAnswer": "Yes. Materials, tests and your account work on phones, tablets and computers. You do not need to install a separate app.",
@@ -438,7 +426,6 @@
     "cancel": "Cancel",
     "dashboardTitle": "My account",
     "userFallback": "User",
-    "toCourses": "Go to courses",
     "myData": "My details",
     "settings": "Account settings",
     "companyMissing": "company not provided",
@@ -453,7 +440,6 @@
     "coursesSummary": "Passed {passed} of {total} · {certificates} certificates",
     "course": "Course",
     "result": "Result",
-    "certificate": "Certificate",
     "action": "Action",
     "coursesEmpty": "No courses have been published yet.",
     "allCourses": "All courses",

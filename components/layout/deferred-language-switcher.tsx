@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { LocaleFlag } from '@/components/layout/locale-flag';
-import type { AppLocale } from '@/i18n/config';
+import { LOCALE_SHORT_LABEL_BY_LOCALE, type AppLocale } from '@/i18n/config';
 
 type LanguageSwitcherComponent =
   typeof import('@/components/layout/language-switcher').LanguageSwitcher;
@@ -22,13 +22,13 @@ function LanguageSwitcherFallback({
         type="button"
         disabled
         aria-label={`${label}: ${languageName}`}
-        className="inline-flex h-11 max-w-[10.5rem] items-center gap-2 rounded-[var(--radius-control)] px-2 text-left text-sm font-semibold text-[var(--color-text)]"
+        className="inline-flex h-11 items-center gap-1 rounded-[var(--radius-control)] px-1.5 text-sm font-semibold text-[var(--color-text)]"
       >
         <LocaleFlag locale={locale} />
-        <span className="min-w-0 truncate">{languageName}</span>
+        <span>{LOCALE_SHORT_LABEL_BY_LOCALE[locale]}</span>
         {/* Holds the 15 px the hydrated trigger's caret occupies, without
             pulling the icon set into the public LCP bundle. */}
-        <span aria-hidden="true" className="block size-[15px] shrink-0" />
+        <span aria-hidden="true" className="hidden size-[15px] shrink-0 min-[340px]:block" />
       </button>
     </div>
   );

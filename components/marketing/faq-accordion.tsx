@@ -16,9 +16,12 @@ export async function getFaqData() {
 
 export async function FaqAccordion({
   withHeader = true,
+  withContact = true,
   headingLevel = 2,
 }: {
   withHeader?: boolean;
+  /** The home page renders the contact block right below, so it hides this link. */
+  withContact?: boolean;
   headingLevel?: 1 | 2;
 }) {
   const [contacts, t, faqData] = await Promise.all([
@@ -45,13 +48,9 @@ export async function FaqAccordion({
         >
           {withHeader ? (
             <div className="max-w-xl lg:pt-2">
-              <p className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] text-[var(--color-text-subtle)] uppercase sm:text-xs">
-                <span aria-hidden="true" className="h-px w-5 bg-[var(--color-primary)]" />
-                FAQ
-              </p>
               <Heading
                 id="faq-heading"
-                className="mt-2 text-[22px] leading-[1.22] font-bold tracking-[-0.025em] text-balance sm:text-[28px] lg:text-[36px]"
+                className="text-[22px] leading-[1.22] font-bold tracking-[-0.025em] text-balance sm:text-[28px] lg:text-[36px]"
               >
                 {t('title')}
               </Heading>
@@ -81,14 +80,18 @@ export async function FaqAccordion({
               ))}
             </div>
 
-            <ContactLink
-              kind="whatsapp"
-              contacts={contacts}
-              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] px-4 text-sm font-bold text-[var(--color-primary)] transition hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)]"
-            >
-              <WhatsappLogo size={20} weight="fill" aria-hidden="true" />
-              {t('other')}
-            </ContactLink>
+            {/* The home page places the contact block right under this
+                section, so a WhatsApp link here duplicated it; /faq keeps it. */}
+            {withContact ? (
+              <ContactLink
+                kind="whatsapp"
+                contacts={contacts}
+                className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] px-4 text-sm font-bold text-[var(--color-primary)] transition hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)]"
+              >
+                <WhatsappLogo size={20} weight="fill" aria-hidden="true" />
+                {t('other')}
+              </ContactLink>
+            ) : null}
           </div>
         </div>
       </Container>

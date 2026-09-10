@@ -66,9 +66,13 @@ const CHINESE_STACK = ['SafetyHub Noto Sans SC', 'SafetyHub Kazakh'];
 async function charactersIn(patterns) {
   const characters = new Set();
   const visit = (value) => {
-    if (typeof value === 'string') for (const character of value) characters.add(character);
+    // next-intl rich-text tags such as `<share>…</share>` are markup the
+    // renderer consumes, never glyphs a font is asked to draw.
+    if (typeof value === 'string')
+      for (const character of value.replace(/<\/?[a-z][a-z0-9]*>/gu, '')) characters.add(character);
     else if (Array.isArray(value)) for (const item of value) visit(item);
-    else if (value && typeof value === 'object') for (const item of Object.values(value)) visit(item);
+    else if (value && typeof value === 'object')
+      for (const item of Object.values(value)) visit(item);
   };
   for (const pattern of patterns) {
     for await (const file of glob(pattern, { cwd: root })) {

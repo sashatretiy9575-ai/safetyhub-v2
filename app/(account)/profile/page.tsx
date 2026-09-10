@@ -187,51 +187,54 @@ function CourseRow({
 }) {
   const isIssued = item.certificateState === 'issued' && item.certificateId;
   const isSpecialCertState =
-    item.certificateState === 'pending_identity' ||
-    item.certificateState === 'ready';
+    item.certificateState === 'pending_identity' || item.certificateState === 'ready';
+  // One status expression: under the title on phones, in the result column on
+  // wider screens. The hidden copy is display:none, so it is not announced twice.
+  const status = (
+    <>
+      <Badge
+        variant={
+          isSpecialCertState
+            ? certificateVariant(item.certificateState)
+            : resultVariant(item.resultState)
+        }
+      >
+        {isSpecialCertState ? certificateLabel(item.certificateState, t) : resultLabel(item, t)}
+      </Badge>
+      {isSpecialCertState && item.resultState === 'passed' ? (
+        <Badge variant="outline" className="text-[11px] text-[var(--color-text-muted)]">
+          {resultLabel(item, t)}
+        </Badge>
+      ) : null}
+      {!item.isCurrent ? (
+        <span className="text-xs text-[var(--color-text-muted)]">{t('archive')}</span>
+      ) : null}
+    </>
+  );
 
   return (
     <div
       role="row"
-      className="grid min-w-0 gap-3 border-t border-[var(--color-border)] px-4 py-3 first:border-t-0 md:min-h-[58px] md:grid-cols-[minmax(0,1fr)_13rem_8.5rem] md:items-center"
+      // Phones: title and status on the left, one compact button on the right.
+      // From `md` the same row becomes the three-column table whose header
+      // template below must stay identical to this one.
+      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-[var(--color-border)] px-4 py-3 first:border-t-0 md:min-h-[58px] md:grid-cols-[minmax(0,1fr)_13rem_minmax(8.5rem,auto)]"
     >
       <div role="cell" className="min-w-0">
-        <h3 className="font-semibold break-words leading-tight">{item.courseTitle}</h3>
-        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--color-text-muted)] md:hidden">
-          <Badge
-            variant={
-              isSpecialCertState
-                ? certificateVariant(item.certificateState)
-                : resultVariant(item.resultState)
-            }
-          >
-            {isSpecialCertState ? certificateLabel(item.certificateState, t) : resultLabel(item, t)}
-          </Badge>
-          {!item.isCurrent ? <span>· {t('archive')}</span> : null}
-        </div>
-        {!item.isCurrent ? (
-          <p className="hidden text-xs text-[var(--color-text-muted)] md:block">{t('archive')}</p>
-        ) : null}
+        <h3 className="leading-tight font-semibold break-words">{item.courseTitle}</h3>
+        <div className="mt-1 flex flex-wrap items-center gap-1.5 md:hidden">{status}</div>
       </div>
 
       <div role="cell" className="hidden min-w-0 md:flex md:flex-wrap md:items-center md:gap-1.5">
-        <Badge
-          variant={
-            isSpecialCertState
-              ? certificateVariant(item.certificateState)
-              : resultVariant(item.resultState)
-          }
-        >
-          {isSpecialCertState ? certificateLabel(item.certificateState, t) : resultLabel(item, t)}
-        </Badge>
-        {isSpecialCertState && item.resultState === 'passed' ? (
-          <Badge variant="outline" className="text-[11px] text-[var(--color-text-muted)]">
-            {resultLabel(item, t)}
-          </Badge>
-        ) : null}
+        {status}
       </div>
 
-      <div role="cell" className="w-full">
+      {/* `grid` turns the download control's inline-flex wrapper into a
+          stretched grid item, so its `w-full` button is as wide as the link
+          buttons. The width bounds keep every row's button the same size while
+          a temporary label ("Preparing PDF…") or an error line never pushes the
+          title aside. */}
+      <div role="cell" className="grid max-w-44 min-w-28">
         {isIssued ? (
           <CertificateDownloadButton certificateId={item.certificateId!} className="w-full">
             {t('download')}
@@ -294,11 +297,6 @@ function LearningDashboard({
               })}
             </p>
           </div>
-          <Button asChild size="sm" variant="outline">
-            <Link href={localizePathname('/topics', locale)}>
-              {t('allCourses')} <ArrowRight />
-            </Link>
-          </Button>
         </div>
         <div className="overflow-hidden rounded-2xl border bg-[var(--color-surface)]">
           {rows.length ? (
@@ -308,7 +306,8 @@ function LearningDashboard({
             <div role="table" aria-labelledby="my-courses-title">
               <div
                 role="row"
-                className="hidden min-h-10 grid-cols-[minmax(0,1fr)_13rem_8.5rem] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] md:grid"
+                // Keep this template identical to CourseRow's `md:` template.
+                className="hidden min-h-10 grid-cols-[minmax(0,1fr)_13rem_minmax(8.5rem,auto)] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] md:grid"
               >
                 <span role="columnheader">{t('course')}</span>
                 <span role="columnheader">{t('result')}</span>
@@ -386,11 +385,16 @@ export default async function ProfilePage() {
       <Container size="content" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-3xl font-black md:text-4xl">{t('dashboardTitle')}</h1>
-          <Button asChild>
-            <Link href={canAccessLearning ? localizePathname('/topics', locale) : '#my-data'}>
-              {canAccessLearning ? t('toCourses') : t('myData')} <ArrowRight />
-            </Link>
-          </Button>
+          {/* An approved learner already has the next-step card and the course
+              table below: a third link to the catalogue up here was clutter.
+              Before approval the only useful action is the data section. */}
+          {canAccessLearning ? null : (
+            <Button asChild>
+              <Link href="#my-data">
+                {t('myData')} <ArrowRight />
+              </Link>
+            </Button>
+          )}
         </div>
 
         {!context.hasCurrentLegalAcceptance ? (
@@ -426,22 +430,38 @@ export default async function ProfilePage() {
           <CardContent className="p-0">
             <details
               className="group"
-              open={!profile.onboardingCompletedAt || context.approval.state === 'rejected' || !context.profile.phone_e164 || !profile.organization}
+              open={
+                !profile.onboardingCompletedAt ||
+                context.approval.state === 'rejected' ||
+                !context.profile.phone_e164 ||
+                !profile.organization
+              }
             >
               <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden md:px-6">
                 {/* The status badge stays outside the heading: it would otherwise
-                    join the section's accessible name. */}
-                <h2 className="font-display min-w-0 text-lg font-bold">
-                  <span className="block">
-                    {t('myData')}
-                    {!context.profile.phone_e164 || !profile.organization ? ` (${t('actionRequired').replace(/:$/, '')})` : ''}
-                  </span>
-                  <span className="block truncate text-sm leading-normal font-normal text-[var(--color-text-muted)]">
-                    {fullName} · {profile.organization || t('companyMissing')}
-                  </span>
-                </h2>
+                    join the section's accessible name. Below 420 px it moves
+                    under the subtitle, because beside the caret it left the
+                    heading a 60 px column and three broken lines. */}
+                <div className="min-w-0">
+                  <h2 className="font-display min-w-0 text-lg font-bold">
+                    <span className="block">
+                      {t('myData')}
+                      {!context.profile.phone_e164 || !profile.organization
+                        ? ` (${t('actionRequired').replace(/:$/, '')})`
+                        : ''}
+                    </span>
+                    <span className="block truncate text-sm leading-normal font-normal text-[var(--color-text-muted)]">
+                      {fullName} · {profile.organization || t('companyMissing')}
+                    </span>
+                  </h2>
+                  <Badge variant={approval.variant} className="mt-1.5 min-[420px]:hidden">
+                    {approval.label}
+                  </Badge>
+                </div>
                 <span className="flex shrink-0 items-center gap-2">
-                  <Badge variant={approval.variant}>{approval.label}</Badge>
+                  <Badge variant={approval.variant} className="hidden min-[420px]:inline-flex">
+                    {approval.label}
+                  </Badge>
                   <CaretDown className="transition-transform group-open:rotate-180" />
                 </span>
               </summary>

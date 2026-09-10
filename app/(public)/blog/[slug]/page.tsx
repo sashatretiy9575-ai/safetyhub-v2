@@ -2,13 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { notFound, permanentRedirect } from 'next/navigation';
-import {
-  ArrowLeft,
-  ArrowRight,
-  CalendarBlank,
-  Clock,
-  UserCircle,
-} from '@phosphor-icons/react/dist/ssr';
+import { ArrowLeft, CalendarBlank, Clock, UserCircle } from '@phosphor-icons/react/dist/ssr';
 import type { Metadata } from 'next';
 import {
   ArticleRenderer,
@@ -95,7 +89,15 @@ function TocLinks({ items }: { items: ArticleTocItem[] }) {
   );
 }
 
-function ArticleSources({ article, label, empty }: { article: Article; label: string; empty: string }) {
+function ArticleSources({
+  article,
+  label,
+  empty,
+}: {
+  article: Article;
+  label: string;
+  empty: string;
+}) {
   const sourceCount = article.sources?.length ?? 0;
 
   return (
@@ -138,16 +140,12 @@ function ArticleSources({ article, label, empty }: { article: Article; label: st
 
 function RelatedArticles({
   articles,
-  locale,
   eyebrow,
   title,
-  allLabel,
 }: {
   articles: Omit<Article, 'blocks'>[];
-  locale: AppLocale;
   eyebrow: string;
   title: string;
-  allLabel: string;
 }) {
   if (articles.length === 0) return null;
   return (
@@ -155,24 +153,18 @@ function RelatedArticles({
       aria-labelledby="related-articles-title"
       className="mt-16 border-t border-[var(--color-border)] pt-10 md:mt-20 md:pt-12"
     >
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs font-bold tracking-[0.18em] text-[var(--color-primary)] uppercase">
-            {eyebrow}
-          </p>
-          <h2
-            id="related-articles-title"
-            className="font-display mt-1 text-2xl font-bold md:text-3xl"
-          >
-            {title}
-          </h2>
-        </div>
-        <Link
-          href={localizePathname('/blog', locale)}
-          className="inline-flex min-h-11 items-center gap-1 rounded-full bg-[var(--color-primary-soft)] px-4 font-bold text-[var(--color-primary-hover)] transition hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-foreground)]"
+      {/* The "all articles" link at the top of the page already leads back to
+          the blog; a second one down here only repeated it. */}
+      <div>
+        <p className="text-xs font-bold tracking-[0.18em] text-[var(--color-primary)] uppercase">
+          {eyebrow}
+        </p>
+        <h2
+          id="related-articles-title"
+          className="font-display mt-1 text-2xl font-bold md:text-3xl"
         >
-          {allLabel} <ArrowRight aria-hidden="true" size={16} />
-        </Link>
+          {title}
+        </h2>
       </div>
       <div className="mt-6 grid items-stretch gap-5 md:grid-cols-3">
         {articles.map((related) => (
@@ -255,14 +247,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
             className="mx-auto mt-4 grid max-w-[70rem] items-stretch gap-6 overflow-hidden rounded-[30px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-card)] sm:p-7 md:mt-7 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)] lg:gap-10 lg:p-9"
           >
             <header className="flex min-w-0 flex-col justify-center text-left">
-              <p className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] text-[var(--color-primary)] uppercase sm:text-xs">
-                <span
-                  className="size-2 rounded-full bg-[var(--color-primary)]"
-                  aria-hidden="true"
-                />
-                {t('cardEyebrow')}
-              </p>
-              <h1 className="font-display mt-3 text-[30px] leading-[1.16] font-black tracking-[-0.035em] text-balance sm:text-[38px] lg:text-[48px]">
+              <h1 className="font-display text-[30px] leading-[1.16] font-black tracking-[-0.035em] text-balance sm:text-[38px] lg:text-[48px]">
                 {article.title}
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-pretty text-[var(--color-text-muted)] sm:text-lg">
@@ -346,10 +331,8 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
 
           <RelatedArticles
             articles={relatedArticles}
-            locale={locale}
             eyebrow={t('continueEyebrow')}
             title={t('relatedTitle')}
-            allLabel={t('all')}
           />
         </Container>
       </article>

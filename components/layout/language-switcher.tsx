@@ -17,6 +17,7 @@ import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import {
   LOCALE_COOKIE_MAX_AGE,
   LOCALE_COOKIE_NAME,
+  LOCALE_SHORT_LABEL_BY_LOCALE,
   isAppLocale,
   localizePathname,
   type AppLocale,
@@ -30,9 +31,7 @@ const SESSION_HINT = 'safetyhub-session-hint';
 const ACTIVE_QUIZ_ROUTE = /^\/(?:kk\/|en\/|zh\/)?topics\/[^/]+\/test(?:\/|$)/u;
 
 function hasSessionHint() {
-  return document.cookie
-    .split(';')
-    .some((cookie) => cookie.trim() === SESSION_HINT + '=1');
+  return document.cookie.split(';').some((cookie) => cookie.trim() === SESSION_HINT + '=1');
 }
 
 function setLocalePreference(locale: AppLocale) {
@@ -49,9 +48,7 @@ function setLocalePreference(locale: AppLocale) {
 
 function navigationTarget(pathname: string, locale: AppLocale) {
   const localizedPathname = localizePathname(pathname, locale);
-  return window.location.search
-    ? localizedPathname + window.location.search
-    : localizedPathname;
+  return window.location.search ? localizedPathname + window.location.search : localizedPathname;
 }
 
 function isTransitionResult(value: unknown): value is LocaleTransitionResult {
@@ -157,14 +154,17 @@ export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] })
             aria-label={`${translations('label')}: ${translations(locale)}`}
             aria-describedby={status ? 'language-switcher-status' : undefined}
             disabled={pending}
-            className="inline-flex h-11 max-w-[10.5rem] items-center gap-2 rounded-[var(--radius-control)] px-2 text-left text-sm font-semibold text-[var(--color-text)] transition-colors hover:bg-[var(--color-surface-muted)] focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] disabled:cursor-wait disabled:opacity-60"
+            className="inline-flex h-11 items-center gap-1 rounded-[var(--radius-control)] px-1.5 text-sm font-semibold text-[var(--color-text)] transition-colors hover:bg-[var(--color-surface-muted)] focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] disabled:cursor-wait disabled:opacity-60"
           >
             <LocaleFlag locale={locale} />
-            <span className="min-w-0 truncate">{translations(locale)}</span>
+            {/* The flag plus the short code is the whole visible control; the
+                full language name stays in the accessible label and the menu.
+                The caret is the one thing the 320 px header can do without. */}
+            <span>{LOCALE_SHORT_LABEL_BY_LOCALE[locale]}</span>
             <CaretDown
               size={15}
               weight="bold"
-              className="shrink-0 text-[var(--color-text-subtle)]"
+              className="hidden shrink-0 text-[var(--color-text-subtle)] min-[340px]:block"
               aria-hidden="true"
             />
           </button>
@@ -182,10 +182,13 @@ export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] })
                 key={candidate}
                 value={candidate}
                 disabled={pending || quizLocked}
-                className="min-h-11 gap-2.5 py-2.5 pr-3 text-[var(--color-text)] data-[state=checked]:bg-[var(--color-primary-soft)] data-[state=checked]:font-semibold"
+                // The owner wants one label per language: the flag and the short
+                // code, as in the trigger. The full name stays the accessible name.
+                aria-label={translations(candidate)}
+                className="min-h-11 gap-2.5 py-2.5 pr-4 text-[var(--color-text)] data-[state=checked]:bg-[var(--color-primary-soft)] data-[state=checked]:font-semibold"
               >
                 <LocaleFlag locale={candidate} />
-                <span>{translations(candidate)}</span>
+                <span>{LOCALE_SHORT_LABEL_BY_LOCALE[candidate]}</span>
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>

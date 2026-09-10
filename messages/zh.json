@@ -27,7 +27,6 @@
       "authenticated": "个人资料"
     },
     "footer": {
-      "description": "面向员工和团队的职业安全、消防安全与工业安全实用在线培训。",
       "navigation": "页脚导航",
       "sections": "栏目",
       "contact": "联系我们",
@@ -71,10 +70,14 @@
   },
   "Pwa": {
     "title": "安装 SafetyHub",
-    "description": "从手机主屏幕快速启动",
+    "description": "像应用一样从手机主屏幕打开课程和测试。",
     "install": "安装",
     "installing": "正在打开…",
-    "dismiss": "关闭安装提示"
+    "dismiss": "关闭安装提示",
+    "iosHint": "在 Safari 中点击<share>分享</share>，然后选择<add>添加到主屏幕</add>。",
+    "howTo": "安装方法",
+    "gotIt": "知道了",
+    "later": "稍后"
   },
   "Offline": {
     "title": "网络连接已断开",
@@ -119,15 +122,13 @@
       "imageAlt": "安全专业人员在生产现场核查数据",
       "eyebrow": "阿拉木图 · 哈萨克斯坦全境在线",
       "title": "职业安全与健康的在线培训与知识考核",
-      "description": "职业安全与健康、消防安全和工业安全课程。演示资料、{count} 道题的测试，{pass} 题为通过线——成绩立即显示在个人中心，证书由管理员签发。",
+      "description": "演示资料、{count} 道题的测试和证书——在线完成，无需前往培训中心。",
       "courses": "选择课程",
       "contact": "联系我们"
     },
     "courses": {
       "eyebrow": "培训项目",
       "title": "面向专业人员和团队的安全课程",
-      "description": "选择方向，按适合自己的节奏学习。",
-      "all": "全部课程",
       "slider": "培训项目",
       "item": "课程",
       "empty": "已发布课程即将上线。"
@@ -135,20 +136,19 @@
     "benefits": {
       "eyebrow": "培训条件",
       "title": "在作业现场用手机学习",
-      "description": "员工用智能手机打开演示资料并完成知识考核——无需前往培训中心，也无需停工。",
       "slider": "平台功能",
       "item": "优势",
       "mobileTitle": "现场手机学习",
       "mobileText": "浏览器即可，无需安装应用。",
       "quizTitle": "测试：{count} 道题，{pass} 题通过",
       "quizText": "最长 {minutes} 分钟，每天最多 {attempts} 次。",
-      "resultsTitle": "成绩与证书",
+      "resultsTitle": "考核后颁证",
       "resultsText": "成绩立即可见，证书由管理员签发。"
     },
     "process": {
       "eyebrow": "培训流程",
       "title": "从提交申请到职业安全考核",
-      "description": "三个步骤，无需前往培训中心。阿拉木图及哈萨克斯坦全境，支持时间为周一至周五 09:00–18:00。",
+      "description": "三个步骤，无需前往培训中心。",
       "slider": "培训步骤",
       "item": "步骤",
       "chooseTitle": "申请与准入",
@@ -159,14 +159,12 @@
       "resultText": "成绩立即显示在个人中心，证书由管理员签发，随后会收到邮件。"
     },
     "contact": {
-      "eyebrow": "联系方式",
-      "title": "告诉我们您的需求",
-      "description": "我们会推荐合适的项目并解答培训问题。"
+      "title": "告诉我们您的需求"
     },
     "resources": {
       "eyebrow": "测试与上岗前实用资料",
       "title": "劳动保护指引：个体防护装备、火灾、急救",
-      "description": "针对日常工作场景的简短指引：应注意什么、如何行动以及何时停止，并附哈萨克斯坦劳动法典及 adilet.zan.kz 上其他法规的出处。",
+      "description": "简短指引：个体防护装备、火灾报警、急救与测试准备。",
       "all": "查看全部文章",
       "slider": "实用安全文章",
       "item": "文章",
@@ -175,9 +173,7 @@
     "cases": {
       "eyebrow": "使用场景",
       "title": "SafetyHub 的使用方式",
-      "description": "匿名典型场景，不含公司名称、个人信息或宣传数字。",
       "slider": "使用场景",
-      "type": "典型场景",
       "task": "需求",
       "action": "操作",
       "result": "结果",
@@ -237,7 +233,6 @@
     "metadataKeyword3": "在线工业安全",
     "title": "职业安全与健康及工业安全课程",
     "description": "面向工人与专业人员的培训：演示资料、测试，以及个人中心中的证书。",
-    "eyebrow": "安全课程 · 考核后颁证",
     "available": "可选课程",
     "emptyTitle": "课程正在准备中",
     "emptyDescription": "课程目录即将显示在这里。",
@@ -256,10 +251,8 @@
     "emptyDescription": "实用安全文章即将上线。",
     "listAria": "安全文章",
     "title": "职业安全与工业安全文章",
-    "description": "用简单语言说明真实工作场景：从首次上岗和个体防护装备，到火灾报警、急救与测试准备。",
-    "eyebrow": "SafetyHub 实用资料",
+    "description": "用简单语言说明真实工作场景：个体防护装备、火灾报警、急救与测试准备。",
     "listTitle": "文章列表",
-    "cardEyebrow": "实用指南",
     "read": "阅读文章",
     "editorial": "SafetyHub 编辑团队",
     "breadcrumbsHome": "首页",
@@ -268,7 +261,6 @@
     "sourcesEmpty": "此版本资料暂未列出法规来源。",
     "continueEyebrow": "继续阅读",
     "relatedTitle": "更多实用内容",
-    "all": "浏览全部文章",
     "readTime": "阅读约 {count} 分钟",
     "back": "返回文章列表",
     "allArticles": "全部文章",
@@ -294,12 +286,8 @@
     "metadataTitle": "联系方式：电话和 WhatsApp，阿拉木图",
     "metadataDescription": "SafetyHub 联系方式：关于职业安全与健康在线培训、考核以及带二维码验证的电子证书签发问题，可通过电话和 WhatsApp 咨询。",
     "title": "联系 SafetyHub",
-    "description": "我们会推荐合适的项目并解答培训问题。",
-    "eyebrow": "联系方式",
     "city": "城市",
     "hours": "工作时间",
-    "method": "便捷的联系方式",
-    "hint": "为便于快速回复，请注明课程主题和大致参加人数。",
     "call": "拨打电话",
     "chat": "在线咨询"
   },
@@ -307,7 +295,7 @@
     "metadataTitle": "培训开始前的常见问题",
     "metadataDescription": "关于 SafetyHub 课程的常见问题：如何报名、测试时长、需要答对多少题、证书何时发放，以及如何通过二维码验证证书。",
     "title": "培训开始前的常见问题",
-    "description": "简要了解课程、测试和账户。如未找到所需答案，请联系我们。",
+    "description": "简要了解课程、测试和账户。",
     "other": "咨询其他问题",
     "phoneQuestion": "可以使用手机完成培训吗？",
     "phoneAnswer": "可以。学习资料、测试和账户均适配手机、平板电脑和电脑，无需安装单独应用。",
@@ -438,7 +426,6 @@
     "cancel": "取消",
     "dashboardTitle": "个人中心",
     "userFallback": "用户",
-    "toCourses": "前往课程",
     "myData": "我的资料",
     "settings": "账户设置",
     "companyMissing": "未填写单位",
@@ -453,7 +440,6 @@
     "coursesSummary": "已通过 {passed}/{total} · 证书 {certificates} 份",
     "course": "课程",
     "result": "结果",
-    "certificate": "证书",
     "action": "操作",
     "coursesEmpty": "暂未发布课程。",
     "allCourses": "全部课程",

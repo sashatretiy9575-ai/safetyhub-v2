@@ -7,15 +7,16 @@ const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8
 const overlay = await read('components/shared/pwa-install-overlay.tsx');
 const shell = await read('components/layout/app-shell.tsx');
 
-test('the banner waits for the delay and for a real interaction', () => {
-  // Both gates were initialised to `true`, which made the fifteen-second timer
-  // and the three input listeners dead code: the banner appeared during
-  // hydration and pushed 160 px into the layout with no user input, so the
-  // whole shift counted against CLS.
-  assert.match(overlay, /const \[delayElapsed, setDelayElapsed\] = React\.useState\(false\)/u);
-  assert.match(overlay, /const \[hasInteracted, setHasInteracted\] = React\.useState\(false\)/u);
-  assert.match(overlay, /PROMPT_DELAY_MS/u);
-  assert.match(overlay, /window\.addEventListener\('pointerdown', interact/u);
+test('the banner shows on every phone visit until the app is installed', () => {
+  // The owner's decision (September 2026): no delay, no once-per-session cap
+  // and no thirty-day memory after a close. The card is `fixed`, so it does
+  // not move the content it floats over; closing it hides it for that page
+  // view only. Standalone launches, admin screens and a running test stay
+  // free of it.
+  assert.doesNotMatch(overlay, /PROMPT_DELAY_MS|localStorage|sessionStorage/u);
+  assert.match(overlay, /const \[isDismissed, setIsDismissed\] = React\.useState\(false\)/u);
+  assert.match(overlay, /!isStandalone/u);
+  assert.match(overlay, /routeAllowsAutomaticPrompt\(pathname\)/u);
 });
 
 test('the phone test matches the range where the dock exists', () => {

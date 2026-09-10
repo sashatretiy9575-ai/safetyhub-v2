@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
+import { AccountIconLink } from '@/components/layout/account-icon-link';
 import { localizePathname, type AppLocale } from '@/i18n/config';
 import { ROUTES } from '@/lib/constants';
 
@@ -35,23 +34,17 @@ export function PublicAccountControl() {
   }, []);
 
   if (!hasSessionHint) {
-    return (
-      <Button asChild variant="outline" size="sm" className="shadow-none">
-        <Link href={localizePathname(ROUTES.signIn, locale)} prefetch={false}>
-          {t('guest')}
-        </Link>
-      </Button>
-    );
+    return <AccountIconLink href={localizePathname(ROUTES.signIn, locale)} label={t('guest')} />;
   }
 
   return (
     <div className="flex items-center gap-2">
-      <Button asChild variant="outline" size="sm" className="shadow-none">
-        <Link href={localizePathname(ROUTES.profile, locale)} prefetch={false}>
-          {t('authenticated')}
-        </Link>
-      </Button>
-      <DeferredSignOutAction compact />
+      <AccountIconLink href={localizePathname(ROUTES.profile, locale)} label={t('authenticated')} />
+      {/* The header is 52 px tall and shared with the language switcher below
+          1024 px; sign-out lives on the profile page and in the dock there. */}
+      <div className="hidden min-[1024px]:block">
+        <DeferredSignOutAction compact />
+      </div>
     </div>
   );
 }

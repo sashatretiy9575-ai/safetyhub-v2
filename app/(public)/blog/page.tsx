@@ -23,10 +23,7 @@ export async function generateMetadata() {
 
 function ArticleGridSkeleton({ label }: { label: string }) {
   return (
-    <div
-      className="grid gap-5 min-[1100px]:grid-cols-3 sm:grid-cols-2 lg:gap-6"
-      aria-label={label}
-    >
+    <div className="grid gap-5 min-[1100px]:grid-cols-3 sm:grid-cols-2 lg:gap-6" aria-label={label}>
       {Array.from({ length: 3 }, (_, index) => (
         <div
           key={index}
@@ -50,12 +47,7 @@ async function ArticlesGrid() {
   const articles = await getArticles(locale);
 
   if (articles.length === 0) {
-    return (
-      <EmptyState
-        title={t('emptyTitle')}
-        description={t('emptyDescription')}
-      />
-    );
+    return <EmptyState title={t('emptyTitle')} description={t('emptyDescription')} />;
   }
 
   return (
@@ -89,12 +81,7 @@ export default async function BlogPage() {
           { name: t('breadcrumbsBlog'), url: absoluteUrl(localizePathname('/blog', locale)) },
         ])}
       />
-      <PageHeader
-        title={t('title')}
-        description={t('description')}
-        eyebrow={t('eyebrow')}
-        variant="compact"
-      />
+      <PageHeader title={t('title')} description={t('description')} variant="compact" />
 
       <section className="py-9 sm:py-12 lg:py-16">
         <Container size="wide">

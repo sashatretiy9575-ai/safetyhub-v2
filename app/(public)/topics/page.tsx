@@ -32,12 +32,7 @@ export default async function TopicsPage() {
           { name: t('breadcrumbCourses'), url: absoluteUrl(localizePathname('/topics', locale)) },
         ])}
       />
-      <PageHeader
-        title={t('title')}
-        description={t('description')}
-        eyebrow={t('eyebrow')}
-        variant="compact"
-      />
+      <PageHeader title={t('title')} description={t('description')} variant="compact" />
 
       <section aria-labelledby="topics-catalog-heading" className="py-7 sm:py-10 lg:py-12">
         <Container size="wide">
@@ -47,9 +42,7 @@ export default async function TopicsPage() {
           {topics.length === 0 ? (
             <div className="rounded-[24px] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 p-6 text-left backdrop-blur-xl">
               <p className="font-bold">{t('emptyTitle')}</p>
-              <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-                {t('emptyDescription')}
-              </p>
+              <p className="mt-2 text-sm text-[var(--color-text-muted)]">{t('emptyDescription')}</p>
             </div>
           ) : (
             <div

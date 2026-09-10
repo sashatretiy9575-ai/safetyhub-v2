@@ -16,6 +16,7 @@ import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
 import { ADMIN_ATTESTATION_BULK_LIMIT } from '@/lib/constants';
 import { AdminOverlay } from '@/components/admin/admin-overlay';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
+import { organizationArchiveFilename } from '@/lib/pdf/certificate-export-groups';
 import {
   assertCertificateExportMetadata,
   type CertificateExportMetadata,
@@ -111,6 +112,38 @@ function organizationGroupKey(value: string) {
 
 function unique(values: string[]) {
   return [...new Set(values)];
+}
+
+/** Server-resolved selections are kept one per company band (or `'*'` for the
+ * whole filter), so a second company adds to the first instead of replacing it. */
+const ALL_FILTERED_KEY = '*';
+
+type ResolvedSelectionEntry = {
+  key: string;
+  label: string;
+  selection: AdminAttestationSelection;
+};
+
+function unionAttestationSelections(list: AdminAttestationSelection[]): AdminAttestationSelection {
+  const [first] = list;
+  if (list.length === 1 && first) return first;
+  const recordIds = unique(list.flatMap((selection) => selection.recordIds));
+  const userIds = unique(list.flatMap((selection) => selection.userIds));
+  const sum = (pick: (selection: AdminAttestationSelection) => number) =>
+    list.reduce((total, selection) => total + pick(selection), 0);
+  // Bands are disjoint by company key, so the counters add up exactly.
+  return {
+    recordIds,
+    attestationIds: unique(list.flatMap((selection) => selection.attestationIds)),
+    userIds,
+    certificateIds: unique(list.flatMap((selection) => selection.certificateIds)),
+    total: recordIds.length,
+    uniquePeople: userIds.length,
+    pendingIdentity: sum((selection) => selection.pendingIdentity),
+    ready: sum((selection) => selection.ready),
+    issued: sum((selection) => selection.issued),
+    exportable: sum((selection) => selection.exportable),
+  };
 }
 
 function organizationHref(filters: FilterSnapshot, organization: string) {
@@ -209,9 +242,15 @@ export function AttestationsManager({
   const router = useRouter();
   const [clientReady, setClientReady] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [resolvedSelection, setResolvedSelection] = useState<AdminAttestationSelection | null>(
-    null,
+  const [resolvedSelections, setResolvedSelections] = useState<ResolvedSelectionEntry[]>([]);
+  const resolvedSelection = useMemo(
+    () =>
+      resolvedSelections.length === 0
+        ? null
+        : unionAttestationSelections(resolvedSelections.map((entry) => entry.selection)),
+    [resolvedSelections],
   );
+  const allFilteredSelected = resolvedSelections.some((entry) => entry.key === ALL_FILTERED_KEY);
   const [selectingAll, setSelectingAll] = useState(false);
   const [pending, setPending] = useState<AttestationPendingAction | null>(null);
   const [busy, setBusy] = useState(false);
@@ -305,16 +344,40 @@ export function AttestationsManager({
     };
   }, [resolvedSelection, selectedCount, selectedRows, userIds.length]);
 
+  // How many company archives an export would produce; null when the server
+  // aggregate ("all rows by filter") cannot say.
+  const exportCompanies = useMemo<number | null>(() => {
+    if (allFilteredSelected) return filters.organization ? 1 : null;
+    const keys = new Set<string>();
+    for (const entry of resolvedSelections) {
+      if (entry.selection.exportable > 0) keys.add(entry.key);
+    }
+    for (const row of selectedRows) {
+      if (row.certificateState === 'issued' && Boolean(row.certificateId)) {
+        keys.add(organizationGroupKey(row.organization));
+      }
+    }
+    return keys.size;
+  }, [allFilteredSelected, filters.organization, resolvedSelections, selectedRows]);
+
   const setRowSelected = (row: AdminAttestationRow, checked: boolean) => {
     // "All rows matching the filter" arrives from the server as aggregates and
     // cannot be narrowed here, so touching one checkbox drops it entirely.
     // Silently, this turned «Выбрано: 480» into the size of one page.
-    if (resolvedSelection) {
+    // A company band is narrowed the same way, but only that company's band.
+    const rowKey = organizationGroupKey(row.organization);
+    const rowEntry = resolvedSelections.find((entry) => entry.key === rowKey);
+    if (allFilteredSelected && resolvedSelection) {
       setMessage(
         `Выборка по фильтру (${resolvedSelection.total}) снята: изменение одной строки оставляет только строки этой страницы.`,
       );
+      setResolvedSelections([]);
+    } else if (rowEntry) {
+      setMessage(
+        `Выборка компании «${rowEntry.label || 'не указана'}» (${rowEntry.selection.total}) снята: изменение одной строки оставляет только строки этой страницы.`,
+      );
+      setResolvedSelections((current) => current.filter((entry) => entry.key !== rowKey));
     }
-    setResolvedSelection(null);
     setSelected((current) => {
       const next = new Set(current);
       if (checked) next.add(row.recordId);
@@ -323,7 +386,20 @@ export function AttestationsManager({
     });
   };
 
+  const dropResolvedSelection = (key: string) => {
+    if (key === ALL_FILTERED_KEY) {
+      setResolvedSelections([]);
+      setSelected(new Set());
+      return;
+    }
+    setResolvedSelections((current) =>
+      current.filter((entry) => entry.key !== key && entry.key !== ALL_FILTERED_KEY),
+    );
+  };
+
   const resolveFilteredSelection = async (
+    key: string,
+    label: string,
     selectionFilters: FilterSnapshot,
     visibleIds: string[],
     successMessage: (selection: AdminAttestationSelection) => string,
@@ -338,10 +414,10 @@ export function AttestationsManager({
     selectionAbortRef.current = controller;
     setSelectingAll(true);
     setMessage('Разрешаем выборку по фильтру…');
-    // The stale selection is cleared up front: showing the previous company's
+    // The stale entry for this key is cleared up front: showing the previous
     // count next to a new company's name is how the wrong rows get confirmed.
-    setResolvedSelection(null);
-    setSelected(new Set());
+    // Other companies already selected stay.
+    dropResolvedSelection(key);
     try {
       const result = await clientRequest(
         '/api/admin/attestations/selection',
@@ -372,8 +448,25 @@ export function AttestationsManager({
         );
         return null;
       }
-      setResolvedSelection(payload);
-      setSelected(new Set(visibleIds));
+      const others = resolvedSelections.filter(
+        (entry) => entry.key !== key && entry.key !== ALL_FILTERED_KEY,
+      );
+      const combinedTotal =
+        others.reduce((total, entry) => total + entry.selection.total, 0) + payload.total;
+      if (key !== ALL_FILTERED_KEY && combinedTotal > ADMIN_ATTESTATION_BULK_LIMIT) {
+        setMessage(
+          `Вместе с «${label || 'не указана'}» выборка превысит ${ADMIN_ATTESTATION_BULK_LIMIT} строк. Снимите часть компаний.`,
+        );
+        return null;
+      }
+      setResolvedSelections(
+        key === ALL_FILTERED_KEY
+          ? [{ key, label, selection: payload }]
+          : [...others, { key, label, selection: payload }],
+      );
+      setSelected((current) =>
+        key === ALL_FILTERED_KEY ? new Set(visibleIds) : new Set([...current, ...visibleIds]),
+      );
       setMessage(successMessage(payload));
       return payload;
     } catch (requestError) {
@@ -385,16 +478,21 @@ export function AttestationsManager({
     }
   };
 
-  const setOrganizationGroupSelected = async (organization: string, checked: boolean) => {
+  const setOrganizationGroupSelected = async (
+    organization: string,
+    checked: boolean,
+    mode: 'add' | 'replace' = 'add',
+  ) => {
     const key = organizationGroupKey(organization);
     if (!checked) {
       // Unticking one company must not wipe an unrelated selection. A resolved
       // "all filtered rows" selection is server-side and cannot be narrowed, so
-      // that one is still dropped whole.
-      if (resolvedSelection) {
+      // that one is still dropped whole; a company band drops only itself.
+      if (allFilteredSelected) {
         clearSelection();
         return;
       }
+      setResolvedSelections((current) => current.filter((entry) => entry.key !== key));
       setSelected((current) => {
         const next = new Set(current);
         for (const item of page.items) {
@@ -404,8 +502,17 @@ export function AttestationsManager({
       });
       return;
     }
+    // Companies accumulate, so a mixed export can leave the browser as one
+    // archive per company. Renaming a company is the one action that must
+    // never spill over into other selected companies, hence `replace`.
+    if (mode === 'replace') {
+      setResolvedSelections([]);
+      setSelected(new Set());
+    }
     const groupRows = page.items.filter((row) => organizationGroupKey(row.organization) === key);
     return resolveFilteredSelection(
+      key,
+      organization,
       { ...filters, organization },
       groupRows.map((row) => row.recordId),
       (selection) =>
@@ -421,6 +528,8 @@ export function AttestationsManager({
       return;
     }
     await resolveFilteredSelection(
+      ALL_FILTERED_KEY,
+      '',
       filters,
       page.items.map((row) => row.recordId),
       (selection) => `Выбраны все строки по текущему фильтру: ${selection.total}.`,
@@ -429,7 +538,7 @@ export function AttestationsManager({
 
   const clearSelection = () => {
     setSelected(new Set());
-    setResolvedSelection(null);
+    setResolvedSelections([]);
     setMessage('');
     setMessageReasons([]);
     setBulkActionsOpen(false);
@@ -441,7 +550,7 @@ export function AttestationsManager({
       return;
     }
     setSelected(new Set([row.recordId]));
-    setResolvedSelection(null);
+    setResolvedSelections([]);
     setPending(action);
     setError('');
     setBulkActionsOpen(false);
@@ -501,12 +610,19 @@ export function AttestationsManager({
           selectionSummary.people >= 5 ? `УДАЛИТЬ ${selectionSummary.people}` : undefined,
       };
     }
+    const companies = exportCompanies;
     return {
       title: 'Скачать пакет документов',
-      description: `Сертификатов в ZIP: ${selectionSummary.exportable} из ${selectionSummary.total} + сводный отчёт.`,
-      confirmLabel: 'Сформировать ZIP',
+      description:
+        companies === null
+          ? `Сертификатов: ${selectionSummary.exportable} из ${selectionSummary.total}. Архивы формируются по одному на компанию, в каждом — сертификаты и сводный отчёт.`
+          : companies > 1
+            ? `Сертификатов: ${selectionSummary.exportable} из ${selectionSummary.total}. Будет сформировано ${companies} ZIP — по одному на компанию, в каждом свой сводный отчёт. Браузер может запросить разрешение на скачивание нескольких файлов.`
+            : `Сертификатов в ZIP: ${selectionSummary.exportable} из ${selectionSummary.total} + сводный отчёт.`,
+      confirmLabel:
+        companies !== null && companies > 1 ? `Сформировать ${companies} ZIP` : 'Сформировать ZIP',
     };
-  }, [pending, selectedRows, selectionSummary]);
+  }, [exportCompanies, pending, selectedRows, selectionSummary]);
 
   const mutationSummary = (
     items: AdminAttestationMutationItem[],
@@ -695,7 +811,7 @@ export function AttestationsManager({
   const runConfirmIssueDirect = async (row: AdminAttestationRow) => {
     if (!row.attestationId) return;
     setSelected(new Set([row.recordId]));
-    setResolvedSelection(null);
+    setResolvedSelections([]);
     setPending(null);
     setDetail(null);
     setBulkActionsOpen(false);
@@ -720,11 +836,20 @@ export function AttestationsManager({
       // `showSaveFilePicker` creates the .zip on disk before a single
       // certificate is rendered, so any later failure leaves a 0-byte file that
       // Windows reports as a damaged archive. Small exports therefore stay on
-      // the buffered path, which only ever hands over a finished blob.
+      // the buffered path, which only ever hands over a finished blob. So do
+      // exports spanning several companies: each company gets its own archive,
+      // and the picker can name only one file per click.
+      const multiCompany = exportCompanies === null || exportCompanies > 1;
+      const [onlyEntry] = resolvedSelections;
+      const singleCompany =
+        resolvedSelections.length === 1 && onlyEntry && onlyEntry.key !== ALL_FILTERED_KEY
+          ? onlyEntry.label
+          : filters.organization;
       const fileHandle =
-        recordIds.length > 100
+        recordIds.length > 100 && !multiCompany
           ? await requestCertificateArchiveFileHandle(
-              `safetyhub-certificates-${new Date().toISOString().slice(0, 10)}.zip`,
+              organizationArchiveFilename(singleCompany) ??
+                `safetyhub-certificates-${new Date().toISOString().slice(0, 10)}.zip`,
             )
           : null;
       let metadataResponse: Response | undefined;
@@ -783,6 +908,7 @@ export function AttestationsManager({
       assertCertificateExportMetadata(metadata);
       const result = await downloadCertificateExportInBrowser(metadata, {
         fileHandle,
+        groupBy: 'organization',
         signal: controller.signal,
         onProgress: (progress) => {
           setExportProgress(progress);
@@ -791,10 +917,16 @@ export function AttestationsManager({
           );
         },
       });
+      const skippedNote =
+        metadata.skipped.length > 0
+          ? ` Без действующего сертификата: ${metadata.skipped.length}.`
+          : '';
       setMessage(
         result.streamed
-          ? 'ZIP сформирован в браузере и записан в выбранный файл.'
-          : `ZIP сформирован в браузере и передан на скачивание${result.archives > 1 ? ` (${result.archives} частей по 100 сертификатов максимум)` : ''}.`,
+          ? `ZIP сформирован в браузере и записан в выбранный файл.${skippedNote}`
+          : result.companies > 1
+            ? `Сформировано ${result.archives} ZIP по ${result.companies} компаниям и передано на скачивание.${skippedNote}`
+            : `ZIP сформирован в браузере и передан на скачивание${result.archives > 1 ? ` (${result.archives} частей по 100 сертификатов максимум)` : ''}.${skippedNote}`,
       );
     } catch (requestError) {
       if (
@@ -824,7 +956,7 @@ export function AttestationsManager({
         selectedCount={selectedCount}
         totalFiltered={page.total}
         pageSize={page.items.length}
-        isAllFilteredSelected={Boolean(resolvedSelection)}
+        isAllFilteredSelected={allFilteredSelected}
         selectingAll={selectingAll}
         onSelectAllFiltered={selectAllFiltered}
         onClearSelection={clearSelection}
@@ -866,7 +998,7 @@ export function AttestationsManager({
       >
         <div
           role="row"
-          className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-20 hidden min-h-9 items-center gap-x-2 bg-[var(--color-surface-muted)] px-1.5 min-[1024px]:top-0 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] @min-[760px]:grid @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px]"
+          className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-20 hidden min-h-9 items-center gap-x-2 bg-[var(--color-surface-muted)] px-1.5 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] min-[1024px]:top-0 @min-[760px]:grid @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px]"
         >
           {/* An `sr-only` cell is absolutely positioned and therefore leaves the
               grid flow, which shifted every visible heading one column to the
@@ -1008,6 +1140,7 @@ export function AttestationsManager({
                                 const selection = await setOrganizationGroupSelected(
                                   row.organization,
                                   true,
+                                  'replace',
                                 );
                                 if (!selection) return;
                                 setPending({ kind: 'bulk-update', field: 'organization' });

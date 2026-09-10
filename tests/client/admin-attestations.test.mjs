@@ -138,6 +138,12 @@ test('attestation screen is responsive and exposes selection, filters, and confi
   assert.doesNotMatch(manager, /action: 'revoke'/);
   assert.match(manager, /\/api\/admin\/users\/purge/);
   assert.match(manager, /\/api\/admin\/attestations\/export/);
+  // Several company bands accumulate and leave the browser as one archive per
+  // company; the metadata is still fetched once for the whole selection.
+  assert.match(manager, /unionAttestationSelections/);
+  assert.match(manager, /groupBy: 'organization'/);
+  assert.match(manager, /по одному на компанию/);
+  assert.match(manager, /setOrganizationGroupSelected\(\s*row\.organization,\s*true,\s*'replace',/);
   assert.doesNotMatch(manager, /window\.confirm/);
   assert.doesNotMatch(`${page}\n${manager}`, /количеств[ао] попыт/iu);
   assert.doesNotMatch(`${page}\n${manager}`, /истори[яю] попыт/iu);
@@ -181,10 +187,7 @@ test('attestation list keeps personal details compact and loads the avatar only 
   // second privileged Auth Admin lookup whose result was discarded.
   assert.match(historyRoute, /rpc\('get_safe_user_email'/);
   assert.doesNotMatch(historyRoute, /auth\.admin\.getUserById/);
-  assert.match(
-    avatarRoute,
-    /requireAnyCapability\(\['identity\.read', 'identity\.manage'\]\)/,
-  );
+  assert.match(avatarRoute, /requireAnyCapability\(\['identity\.read', 'identity\.manage'\]\)/);
   assert.match(avatarRoute, /rpc\('get_profile_avatar_manifest'/);
   assert.match(avatarRoute, /isOwnedAvatarObjectKey\(/);
   assert.match(avatarRoute, /createSignedUrl\(manifest\.data\.objectKey, 10 \* 60\)/);
@@ -198,7 +201,10 @@ test('admin navigation makes employees the primary operational workspace', async
     read('app/(admin)/admin/page.tsx'),
     read('lib/security/capabilities.ts'),
   ]);
-  assert.match(layout, /actor\.capabilities\.includes\('results\.read'\)[\s\S]*'\/admin\/employees'/);
+  assert.match(
+    layout,
+    /actor\.capabilities\.includes\('results\.read'\)[\s\S]*'\/admin\/employees'/,
+  );
   assert.match(
     layout,
     /actor\.capabilities\.includes\('results\.delete'\)[\s\S]*'\/admin\/employees\/directory'/,

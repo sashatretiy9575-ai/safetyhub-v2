@@ -52,6 +52,18 @@ export const OPEN_GRAPH_LOCALE_BY_LOCALE = {
   zh: 'zh_CN',
 } as const satisfies Record<AppLocale, string>;
 
+/**
+ * The compact label the header switcher shows next to the flag. The full
+ * language name remains the accessible label. Kazakh reads as KZ rather than
+ * the ISO `kk`: that is how the country's signage and products label it.
+ */
+export const LOCALE_SHORT_LABEL_BY_LOCALE = {
+  ru: 'RU',
+  kk: 'KZ',
+  en: 'EN',
+  zh: 'ZH',
+} as const satisfies Record<AppLocale, string>;
+
 const NON_LOCALIZED_PREFIXES = [
   '/admin',
   '/api',

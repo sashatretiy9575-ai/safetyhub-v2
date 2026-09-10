@@ -19,7 +19,11 @@ test('public shell uses neutral glass chrome and the 1024px navigation breakpoin
   assert.match(css, /@media \(forced-colors: active\)/);
   assert.match(header, /glass-strong/);
   assert.match(header, /min-\[1024px\]:flex/);
-  assert.match(header, /min-\[1024px\]:hidden/);
+  // The account slot renders once, at every width, so the header carries no
+  // mobile-only block any more: the quick-contact group is the only part of
+  // the right cluster gated to 1024 px and up.
+  assert.doesNotMatch(header, /min-\[1024px\]:hidden/);
+  assert.match(header, /<AccountIconLink/);
   assert.match(tabs, /rounded-\[var\(--radius-dock\)\]/);
   // The owner asked for the quiet dock back: one weight for every icon, the
   // small dot, and a neutral surface tint rather than a green pill.

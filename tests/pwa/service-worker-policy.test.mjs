@@ -104,7 +104,9 @@ test('offline action, splash, shortcuts, and automatic install prompt match thei
   );
   assert.match(overlay, /isInstallable/);
   assert.match(overlay, /routeAllowsAutomaticPrompt/);
-  assert.match(overlay, /alreadyShownThisSession/);
+  // The card is shown on every phone visit until the app is installed (owner
+  // decision, September 2026): no session cap, no stored dismissal.
+  assert.doesNotMatch(overlay, /alreadyShownThisSession|hasActiveDismissal/);
   assert.doesNotMatch(overlay, /getIOSBrowser/);
 });
 
