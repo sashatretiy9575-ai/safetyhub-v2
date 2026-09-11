@@ -65,21 +65,46 @@ test('profile uses one dashboard contract and keeps attempt analytics hidden', a
   assert.doesNotMatch(form, /\/api\/identity|supabase\/client/);
 });
 
-test('account deletion is explicit, irreversible, and hands off to durable cleanup', async () => {
-  const [control, route, auth, cleanup] = await Promise.all([
+test('account deletion is explicit, irreversible, and completes inside the request', async () => {
+  const [control, route, auth, cleanup, sweep, otpRequest, migration] = await Promise.all([
     read('features/profile/account-deletion.tsx'),
     read('app/api/profile/account/route.ts'),
     read('features/auth/server.ts'),
     read('lib/supabase/session-cleanup.ts'),
+    read('features/auth/pending-self-deletion.ts'),
+    read('app/api/auth/email-otp/request/route.ts'),
+    read('supabase/migrations/20260912100000_immediate_self_account_purge.sql'),
   ]);
   assert.match(control, /confirmation !== confirmationPhrase/);
   assert.match(control, /body: JSON\.stringify\(\{ confirmation: API_CONFIRMATION \}\)/);
   assert.match(control, /useTranslations\('AccountDeletion'\)/);
   assert.match(control, /t\('description'\)/);
-  assert.match(route, /rpc\('begin_user_account_purge'/);
+  // The staged worker only marked the account and nothing ever ran the purge:
+  // the auth user survived and a later sign-in with the same email failed on
+  // the first profile read. The owner's decision is one transaction, now.
+  assert.match(route, /rpc\('self_purge_user_account'/);
+  assert.doesNotMatch(route, /rpc\('begin_user_account_purge'|rpc\('purge_user_account'/);
   assert.match(route, /requireAccountDeletionUser\(\)/);
   assert.doesNotMatch(route, /p_target_id:\s*(?:body|request|params|searchParams)/);
-  assert.doesNotMatch(route, /storage\.from|\.remove\(|rpc\('purge_user_account'/);
+  // Storage bytes are not part of the transaction: swept best-effort after it.
+  assert.match(route, /removeAvatarPrefix\(admin, context\.user\.id\)\.catch/);
+  assert.doesNotMatch(route, /storage\.from|\.remove\(/);
+  assert.match(route, /LAST_ACTIVE_ADMIN_PROTECTED/);
+  assert.match(
+    migration,
+    /grant execute on function public\.self_purge_user_account\(uuid\) to service_role;/,
+  );
+  assert.match(migration, /message = 'LAST_ACTIVE_ADMIN_PROTECTED'/);
+  assert.match(migration, /'user\.self_purged'/);
+  // Accounts the old path left pending are finished before an OTP goes out,
+  // so the sign-in creates a brand-new account rather than reviving the old one.
+  assert.match(sweep, /rpc\('purge_pending_self_deletion'/);
+  assert.match(migration, /and control\.deletion_pending\s*\n\s*order by/);
+  assert.ok(
+    otpRequest.indexOf('await finishPendingSelfDeletion(parsed.data.email)') <
+      otpRequest.indexOf('auth.signInWithOtp({'),
+    'the sweep runs before the provider creates or resends for the address',
+  );
 
   // Normal application authorization remains fail-closed after phase one.
   assert.match(
@@ -97,10 +122,11 @@ test('account deletion is explicit, irreversible, and hands off to durable clean
   assert.doesNotMatch(deletionGuard, /deletionPending|DELETION_PENDING/);
   assert.equal(route.match(/p_target_id: context\.user\.id/g)?.length, 1);
 
-  assert.match(route, /pendingPurge\(data, context\.user\.id\)/);
-  assert.match(route, /NextResponse\.json\(pending, \{ status: 202 \}\)/);
-  assert.match(route, /tombstoneId/);
-  assert.match(route, /cleanupNotBefore/);
+  assert.match(route, /purgeOutcome\(data, context\.user\.id\)/);
+  assert.match(route, /NextResponse\.json\(\{ deleted: true \}, \{ status: 200 \}\)/);
+  assert.doesNotMatch(route, /tombstoneId|cleanupNotBefore/);
+  assert.match(control, /receipt\?\.deleted !== true/);
+  assert.match(control, /\?accountDeleted=1/);
   assert.match(route, /clearSafetyHubLocalSession\(request, response\)/);
   assert.match(cleanup, /safetyhub-session-hint/);
   assert.match(cleanup, /Clear-Site-Data/);

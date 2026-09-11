@@ -703,14 +703,16 @@
     "confirmation": "删除",
     "action": "删除账户",
     "title": "永久删除",
-    "description": "该请求会立即关闭访问权限，并在后台清理个人资料、照片、测试尝试、结果、证书和相关数据。二维码证书验证将停止工作。已保存到其他设备的 PDF 无法删除。",
+    "description": "账户、个人资料、照片、测试尝试、结果和证书会立即且不可恢复地删除。二维码证书验证将停止工作。已保存到其他设备的 PDF 无法删除。",
     "prompt": "请输入“{confirmation}”以确认",
-    "deleting": "正在发送删除请求…",
-    "deletingShort": "正在发送…",
+    "deleting": "正在删除账户…",
+    "deletingShort": "正在删除…",
     "deleteForever": "永久删除",
     "cancel": "取消",
-    "failed": "无法发送删除请求。",
-    "requested": "删除请求已接受。访问已关闭，服务器会在后台继续清理。"
+    "failed": "无法删除账户。",
+    "done": "账户已删除。如需再次使用 SafetyHub，请重新注册。",
+    "busy": "账户正在进行其他操作，请稍后再试。",
+    "lastAdmin": "无法删除最后一位管理员。"
   },
   "AppState": {
     "loading": "正在准备内容…",

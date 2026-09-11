@@ -8,6 +8,7 @@ import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 import { consumeCoarseQuota } from '@/lib/security/rate-limit';
 import { authProviderRetryAfter } from '@/features/auth/otp-rate-limit';
 import { emailOtpRedirectUrl } from '@/features/auth/email-otp-locale';
+import { finishPendingSelfDeletion } from '@/features/auth/pending-self-deletion';
 import { resolveSiteOrigin } from '@/lib/site-url';
 import {
   issueEmailOtpChallenge,
@@ -54,6 +55,11 @@ export async function POST(request: Request) {
     const security = requestSecurityMetadata(request);
     await consumeCoarseQuota('auth.otp.start', security.ipHash);
     const locale = parsed.data.locale ?? 'ru';
+
+    // A self-deletion the old staged path never finished still owns this
+    // email. Finish it now, so the sign-in below creates a brand-new account
+    // instead of reviving one the database refuses to serve.
+    await finishPendingSelfDeletion(parsed.data.email);
 
     // Both public entry pages are one passwordless email-code gateway. Let the
     // provider create an unknown address so a login attempt never turns into a

@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 type LoginPageProps = {
   searchParams: Promise<{
-    deletionRequested?: string | string[];
+    accountDeleted?: string | string[];
     realmChanged?: string | string[];
     signedOut?: string | string[];
   }>;
@@ -37,12 +37,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <Container size="narrow">
         <Card className="mx-auto max-w-md">
           <CardContent className="space-y-6 p-4 min-[320px]:p-6 md:p-8">
-            {query.deletionRequested === '1' ? (
+            {query.accountDeleted === '1' ? (
               <p
                 role="status"
                 className="rounded-[var(--radius-control)] bg-[var(--color-surface-muted)] px-3 py-2 text-sm text-[var(--color-text-muted)]"
               >
-                {deletionTranslations('requested')}
+                {deletionTranslations('done')}
               </p>
             ) : null}
             {query.realmChanged === '1' ? (

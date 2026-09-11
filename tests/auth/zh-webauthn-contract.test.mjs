@@ -211,7 +211,7 @@ test('Chinese registration verifies its separate Turnstile token before allocati
   assert.match(turnstile, /window\.turnstile\.reset\(widgetId\)/u);
   assert.doesNotMatch(flow, /useSearchParams/u);
   assert.match(loginPage, /searchParams: Promise/u);
-  assert.match(loginPage, /deletionRequested/u);
+  assert.match(loginPage, /accountDeleted/u);
   assert.doesNotMatch(loginPage, /registrationComplete/u);
   assert.match(environment, /SAFETYHUB_TURNSTILE_SECRET_KEY=1x0{31}AA/u);
 });

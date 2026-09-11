@@ -28,6 +28,7 @@ begin
     and private.audit_event_allowed('test.passed')
     and private.audit_event_allowed('certificate.issued')
     and private.audit_event_allowed('user.self_delete_requested')
+    and private.audit_event_allowed('user.self_purged')
     and private.audit_event_allowed('user.purged')
     and private.audit_event_allowed('role.changed')
     and private.audit_event_allowed('role.changed_directly')

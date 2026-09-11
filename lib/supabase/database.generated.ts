@@ -4798,6 +4798,7 @@ export type Database = {
         }
         Returns: Json
       }
+      purge_pending_self_deletion: { Args: { p_email: string }; Returns: Json }
       purge_user_account: { Args: { p_target_id: string }; Returns: Json }
       read_course_question_bank_v4: {
         Args: { p_actor_id: string; p_test_id: string }
@@ -5069,6 +5070,7 @@ export type Database = {
         Args: { p_limit?: number; p_query: string }
         Returns: string[]
       }
+      self_purge_user_account: { Args: { p_target_id: string }; Returns: Json }
       set_article_status: {
         Args: {
           p_article_id: string

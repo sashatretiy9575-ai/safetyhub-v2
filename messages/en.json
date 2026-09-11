@@ -703,14 +703,16 @@
     "confirmation": "DELETE",
     "action": "Delete account",
     "title": "Permanent deletion",
-    "description": "This request immediately closes access and starts background cleanup of your profile, photo, attempts, results, certificates and related data. QR certificate verification will stop working. PDFs already saved to other devices cannot be removed.",
+    "description": "Your account, profile, photo, attempts, results and certificates are deleted immediately and permanently. QR certificate verification will stop working. PDFs already saved to other devices cannot be removed.",
     "prompt": "Type {confirmation} to confirm",
-    "deleting": "Sending the deletion request…",
-    "deletingShort": "Sending…",
+    "deleting": "Deleting the account…",
+    "deletingShort": "Deleting…",
     "deleteForever": "Delete permanently",
     "cancel": "Cancel",
-    "failed": "Could not send the deletion request.",
-    "requested": "Your deletion request was accepted. Access is closed while server cleanup continues in the background."
+    "failed": "Could not delete the account.",
+    "done": "Your account has been deleted. To use SafetyHub again, register anew.",
+    "busy": "Another operation on this account is in progress. Try again in a minute.",
+    "lastAdmin": "The last active administrator cannot be deleted."
   },
   "AppState": {
     "loading": "Preparing content…",

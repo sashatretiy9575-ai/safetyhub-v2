@@ -12,9 +12,9 @@ import { localizePathname, type AppLocale } from '@/i18n/config';
 import { clearSafetyHubDeviceData } from '@/lib/safetyhub-device-data';
 
 const API_CONFIRMATION = 'DELETE_ACCOUNT';
-type PendingDeletionReceipt = {
-  pending?: unknown;
-  cleanupNotBefore?: unknown;
+type DeletionReceipt = {
+  deleted?: unknown;
+  error?: unknown;
 };
 
 export function AccountDeletion() {
@@ -38,17 +38,25 @@ export function AccountDeletion() {
         body: JSON.stringify({ confirmation: API_CONFIRMATION }),
         cache: 'no-store',
       });
-      const receipt = await readClientResponseJson<PendingDeletionReceipt>(result.response);
+      const receipt = await readClientResponseJson<DeletionReceipt>(result.response);
       if (!result.ok) {
-        setMessage(localizedClientRequestMessage(result.error, t('failed'), tErrors));
+        // The two refusals the owner can act on get their own wording; the
+        // rest is the generic failure.
+        setMessage(
+          receipt?.error === 'LAST_ACTIVE_ADMIN_PROTECTED'
+            ? t('lastAdmin')
+            : receipt?.error === 'ACCOUNT_BUSY'
+              ? t('busy')
+              : localizedClientRequestMessage(result.error, t('failed'), tErrors),
+        );
         return;
       }
-      if (receipt?.pending !== true || typeof receipt.cleanupNotBefore !== 'string') {
+      if (receipt?.deleted !== true) {
         setMessage(t('failed'));
         return;
       }
       await clearSafetyHubDeviceData();
-      window.location.assign(`${localizePathname('/auth/login', locale)}?deletionRequested=1`);
+      window.location.assign(`${localizePathname('/auth/login', locale)}?accountDeleted=1`);
     } catch (error) {
       setMessage(localizedClientRequestMessage(error, t('failed'), tErrors));
     } finally {

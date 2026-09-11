@@ -117,16 +117,18 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const localMigrations = inventory;
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
+  // 12 September 2026: production carries every local migration, including
+  // the immediate self-service purge; nothing is pending.
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 79);
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 80);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 78);
-  assert.equal(receipt.pendingCount, 1);
-  assert.equal(receipt.expectedBaseCount, 78);
-  assert.equal(receipt.expectedPendingCount, 1);
-  assert.equal(receipt.expectedTotalCount, 79);
+  assert.equal(receipt.matchedCount, 80);
+  assert.equal(receipt.pendingCount, 0);
+  assert.equal(receipt.expectedBaseCount, 80);
+  assert.equal(receipt.expectedPendingCount, 0);
+  assert.equal(receipt.expectedTotalCount, 80);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),
