@@ -28,7 +28,7 @@ type HintIcon = typeof Export;
 /** One inline "tap this" chip inside the iOS hint sentence. */
 function hintChip(Icon: HintIcon) {
   const Chip = (chunks: React.ReactNode) => (
-    <span className="inline-flex items-center gap-1 font-semibold whitespace-nowrap text-[var(--color-text)]">
+    <span className="inline-flex items-center gap-1 font-semibold whitespace-nowrap text-[var(--color-bg)]">
       <Icon size={14} weight="bold" aria-hidden="true" className="text-[var(--color-primary)]" />
       {chunks}
     </span>
@@ -118,9 +118,11 @@ export function PWAInstallOverlay() {
 
   return (
     <aside
-      // A rounded card 5 px above the mobile dock: same side insets, same max
-      // width and the same glass as the tab bar, so the two read as one family.
-      className="fixed right-[max(.625rem,var(--safe-area-right))] bottom-[calc(var(--safe-area-bottom)+var(--mobile-tab-height)+5px)] left-[max(.625rem,var(--safe-area-left))] z-[60] mx-auto max-w-[32.5rem] rounded-[var(--radius-dock)] border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] p-4 pb-3 text-[var(--color-text)] shadow-[inset_0_1px_var(--glass-highlight),var(--shadow-pop)] backdrop-blur-xl"
+      // A rounded card 5 px above the mobile dock, same side insets and max
+      // width as the tab bar. Its colours are the page's inverted: a dark card
+      // on the light theme, a light card on the dark one, so it never melts
+      // into the dock or the page behind it.
+      className="fixed right-[max(.625rem,var(--safe-area-right))] bottom-[calc(var(--safe-area-bottom)+var(--mobile-tab-height)+5px)] left-[max(.625rem,var(--safe-area-left))] z-[60] mx-auto max-w-[32.5rem] rounded-[var(--radius-dock)] border border-[var(--color-bg)]/12 bg-[var(--color-text)] p-4 pb-3 text-[var(--color-bg)] shadow-[var(--shadow-pop)]"
       role="region"
       aria-live="polite"
       aria-labelledby="pwa-install-title"
@@ -137,7 +139,7 @@ export function PWAInstallOverlay() {
           <p id="pwa-install-title" className="font-display text-[15px] leading-tight font-bold">
             {translations('title')}
           </p>
-          <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">
+          <p className="mt-1 text-xs leading-relaxed text-[var(--color-bg)]/70">
             {ios
               ? translations.rich('iosHint', {
                   share: hintChip(Export),
@@ -149,7 +151,7 @@ export function PWAInstallOverlay() {
         <button
           type="button"
           onClick={dismiss}
-          className="-mt-1.5 -mr-1.5 grid size-11 shrink-0 place-items-center rounded-full text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]"
+          className="-mt-1.5 -mr-1.5 grid size-11 shrink-0 place-items-center rounded-full text-[var(--color-bg)]/70 transition-colors hover:bg-[var(--color-bg)]/10 hover:text-[var(--color-bg)]"
           aria-label={translations('dismiss')}
         >
           <X size={18} aria-hidden="true" />
@@ -159,13 +161,13 @@ export function PWAInstallOverlay() {
       {showInstructions ? (
         <ol
           id="pwa-install-steps"
-          className="mt-3 space-y-1.5 border-t border-[var(--color-border)] pt-3 text-xs leading-relaxed text-[var(--color-text-muted)]"
+          className="mt-3 space-y-1.5 border-t border-[var(--color-bg)]/12 pt-3 text-xs leading-relaxed text-[var(--color-bg)]/70"
         >
           {steps.map((step, index) => (
             <li key={step} className="flex gap-2.5">
               <span
                 aria-hidden="true"
-                className="grid size-5 shrink-0 place-items-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-bold text-[var(--color-primary)]"
+                className="grid size-5 shrink-0 place-items-center rounded-full bg-[var(--color-bg)]/12 text-[10px] font-bold text-[var(--color-bg)]"
               >
                 {index + 1}
               </span>
@@ -185,7 +187,7 @@ export function PWAInstallOverlay() {
               onClick={() => setShowInstructions((current) => !current)}
               aria-expanded={showInstructions}
               aria-controls="pwa-install-steps"
-              className="min-h-11 flex-1 text-sm"
+              className="min-h-11 flex-1 border-[var(--color-bg)]/30 text-sm text-[var(--color-bg)] hover:bg-[var(--color-bg)]/10"
             >
               {translations('howTo')}
             </Button>
@@ -217,7 +219,7 @@ export function PWAInstallOverlay() {
               size="sm"
               variant="ghost"
               onClick={dismiss}
-              className="min-h-11 shrink-0 text-sm"
+              className="min-h-11 shrink-0 text-sm text-[var(--color-bg)]/85 hover:bg-[var(--color-bg)]/10"
             >
               {translations('later')}
             </Button>
