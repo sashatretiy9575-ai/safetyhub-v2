@@ -40,12 +40,15 @@ export async function Footer({
     <footer className="border-t border-white/10 bg-[var(--color-footer)] text-[var(--color-footer-foreground)]">
       <Container size="wide" className="py-7 md:py-10">
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-[1.15fr_.7fr_1fr] md:gap-10">
-          <div className="max-w-md">
+          {/* The brand line and the WhatsApp button are both inline boxes; with
+              the paragraph between them gone they shared one line. A column
+              keeps the button under the logo at every width. */}
+          <div className="flex max-w-md flex-col items-start gap-4">
             <Logo inverse />
             <ContactLink
               kind="whatsapp"
               contacts={contacts}
-              className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-[var(--color-primary)]/60 bg-[var(--color-primary)]/15 px-4 text-[15px] font-semibold text-white transition-[color,background-color,border-color] duration-150 hover:bg-[var(--color-primary)]/25 focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
+              className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-[var(--color-primary)]/60 bg-[var(--color-primary)]/15 px-4 text-[15px] font-semibold text-white transition-[color,background-color,border-color] duration-150 hover:bg-[var(--color-primary)]/25 focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
             >
               <WhatsappLogo
                 size={20}
