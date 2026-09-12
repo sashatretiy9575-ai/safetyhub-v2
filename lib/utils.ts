@@ -1,8 +1,38 @@
 import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge } from 'tailwind-merge';
 import { resolveSiteOrigin } from '@/lib/site-url';
 
 const SAFETYHUB_TIME_ZONE = 'Asia/Oral';
+
+/**
+ * tailwind-merge only knows Tailwind's own font sizes. The fluid steps from
+ * globals.css (`text-h2`, `text-micro`, ...) looked like text colours to it,
+ * so `cn('text-micro', 'text-[var(--color-text)]')` silently dropped the
+ * size, and the dock captions rendered at 16 px.
+ */
+const twMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      'font-size': [
+        {
+          text: [
+            'display',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'title',
+            'lead',
+            'prose',
+            'body-sm',
+            'caption',
+            'micro',
+          ],
+        },
+      ],
+    },
+  },
+});
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
