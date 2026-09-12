@@ -16,6 +16,9 @@ test('public Supabase reads have a bounded abortable upstream deadline', async (
   assert.match(upstream, /AbortSignal\.any/);
   assert.match(upstream, /clearTimeout\(timeout\)/);
   assert.match(upstream, /name = 'TimeoutError'/);
+  // A production build waits longer than a visitor: a timeout there fails the release.
+  assert.match(upstream, /phase === 'phase-production-build'/u);
+  assert.match(upstream, /BUILD_CONTENT_DEADLINE_MS = 15_000/u);
 });
 
 test('article and topic reads share tagged, time-bounded caches with bounded stale state', async () => {

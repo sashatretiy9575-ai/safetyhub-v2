@@ -9,6 +9,10 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: './e2e',
+  // The responsive sweep is a separate tool (E2E_SWEEP=1, 126 page checks).
+  // Collected without it, every check is a skipped test and the release gate
+  // rightly refuses skipped tests, so it stays out of ordinary runs.
+  testIgnore: process.env.E2E_SWEEP === '1' ? [] : ['**/responsive-sweep.spec.ts'],
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,

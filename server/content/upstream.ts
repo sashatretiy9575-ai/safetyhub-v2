@@ -3,6 +3,11 @@ import 'server-only';
 const DEFAULT_CONTENT_DEADLINE_MS = 4_000;
 const MIN_CONTENT_DEADLINE_MS = 1_000;
 const MAX_CONTENT_DEADLINE_MS = 10_000;
+// `next build` renders every page against the database in Mumbai from Vercel's
+// build machines, many requests at once. The visitor budget above failed whole
+// production releases there (twice on 13 September 2026); no visitor waits on a
+// build, so it gets a longer deadline.
+const BUILD_CONTENT_DEADLINE_MS = 15_000;
 
 export class ContentUpstreamTimeoutError extends Error {
   readonly code = 'ETIMEDOUT';
@@ -13,10 +18,17 @@ export class ContentUpstreamTimeoutError extends Error {
   }
 }
 
-export function contentUpstreamDeadlineMs(value = process.env.CONTENT_UPSTREAM_TIMEOUT_MS) {
+export function contentUpstreamDeadlineMs(
+  value = process.env.CONTENT_UPSTREAM_TIMEOUT_MS,
+  phase = process.env.NEXT_PHASE,
+) {
   const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return DEFAULT_CONTENT_DEADLINE_MS;
-  return Math.min(MAX_CONTENT_DEADLINE_MS, Math.max(MIN_CONTENT_DEADLINE_MS, parsed));
+  const deadline = Number.isFinite(parsed)
+    ? Math.min(MAX_CONTENT_DEADLINE_MS, Math.max(MIN_CONTENT_DEADLINE_MS, parsed))
+    : DEFAULT_CONTENT_DEADLINE_MS;
+  return phase === 'phase-production-build'
+    ? Math.max(deadline, BUILD_CONTENT_DEADLINE_MS)
+    : deadline;
 }
 
 export async function contentUpstreamFetch(

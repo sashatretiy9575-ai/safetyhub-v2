@@ -274,7 +274,10 @@ async function createZhLoadTestUser(admin, index, legal) {
   // 20260903120000_zh_full_profile_admission it leaves the account at
   // profile_incomplete, and the learner reaches pending by submitting the same
   // form as every other locale.
-  if (completed.data?.userId !== user.id || completed.data?.approvalState !== 'profile_incomplete') {
+  if (
+    completed.data?.userId !== user.id ||
+    completed.data?.approvalState !== 'profile_incomplete'
+  ) {
     throw new Error(`zh username registration ${index + 1}: COMPLETION_CONTRACT_MISMATCH`);
   }
 
@@ -362,7 +365,6 @@ function buildSyntheticDomainData(users, revisions, timestamp) {
         updated_at: timestamp,
       });
     });
-
   });
 
   return { attempts, attestations };
@@ -764,6 +766,19 @@ async function main() {
       'Canonical pozharnaya-bezopasnost revision is required before destructive load seeding',
     );
   }
+  // Courses are opened by hand since 12 September 2026: an approved learner
+  // without a grant can neither open a presentation nor start a test.
+  const courseIds = [...new Set(revisions.map((revision) => revision.test_id))];
+  await insertChunks(
+    admin,
+    'course_access_grants',
+    createdUsers.flatMap((user) =>
+      courseIds.map((testId) => ({ user_id: user.id, test_id: testId })),
+    ),
+  );
+  process.stdout.write(
+    `LOAD_PREP_COURSE_ACCESS=grants:${createdUsers.length * courseIds.length}\n`,
+  );
   const synthetic = buildSyntheticDomainData(createdUsers, revisions, now);
   await insertChunks(admin, 'test_attempts', synthetic.attempts);
   await insertChunks(admin, 'attestations', synthetic.attestations);
