@@ -1840,6 +1840,7 @@ export type Database = {
         Args: { p_delivery_id?: string; p_reason: string }
         Returns: number
       }
+      request_storage_reconcile: { Args: never; Returns: number }
       require_active_user: { Args: never; Returns: string }
       require_any_capability: {
         Args: { p_capabilities: string[] }
@@ -4231,6 +4232,10 @@ export type Database = {
         }
         Returns: Json
       }
+      configure_storage_reconciler_vault: {
+        Args: { p_reconciler_secret: string; p_reconciler_url: string }
+        Returns: Json
+      }
       confirm_admin_identities: {
         Args: { p_user_ids: string[] }
         Returns: Json
@@ -4495,6 +4500,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
+      get_profile_avatar_manifests: {
+        Args: { p_user_ids: string[] }
+        Returns: Json
+      }
       get_profile_avatar_upload_operation: {
         Args: { p_operation_token: string; p_user_id: string }
         Returns: Json
@@ -4602,6 +4611,10 @@ export type Database = {
           p_limit?: number
           p_query?: string
         }
+        Returns: Json
+      }
+      list_admin_article_drafts: {
+        Args: { p_limit?: number; p_query?: string }
         Returns: Json
       }
       list_admin_attestations_page: {

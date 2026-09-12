@@ -56,7 +56,7 @@ export async function GET(
 
     const { data, error } = await admin
       .from('certificates')
-      .select('*')
+      .select('id,certificate_number,score,total,issued_at,revoked_at,revoke_reason')
       .eq('user_id', parsed.data.userId)
       .eq('revision_id', revision.id)
       .order('issued_at', { ascending: false })

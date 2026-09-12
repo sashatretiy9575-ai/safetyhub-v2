@@ -7,6 +7,7 @@ import { pickClientNamespaces } from '@/i18n/client-namespaces';
 import { DEFAULT_LOCALE } from '@/i18n/config';
 import { APP_VIEWPORT, pwaIdentity } from '@/lib/pwa/identity';
 import '../globals.css';
+import { resolveSiteOrigin } from '@/lib/site-url';
 
 // Without this the safe-area insets are zero on these screens, and the
 // mobile dock, the sticky header and the install banner all lose the
@@ -14,6 +15,7 @@ import '../globals.css';
 export const viewport: Viewport = APP_VIEWPORT;
 
 export const metadata: Metadata = {
+  metadataBase: new URL(resolveSiteOrigin()),
   // The (admin) group is its own root layout and none of its twenty-two pages
   // exports metadata, so without this the browser tab had no name at all.
   title: { default: 'Админка SafetyHub', template: '%s — Админка SafetyHub' },

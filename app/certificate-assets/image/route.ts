@@ -1,7 +1,7 @@
 import { requireUser } from '@/server/auth/session';
 import {
   decodeCertificateImage,
-  readCertificateSettingsWithImages,
+  readCertificateImagesCached,
   type CertificateImageKind,
 } from '@/server/certificates/settings';
 import { createApiResponse } from '@/lib/security/api-response';
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
       headers: { 'Cache-Control': 'private, no-store' },
     });
   }
-  const settings = await readCertificateSettingsWithImages();
+  const settings = await readCertificateImagesCached();
   const dataUrl =
     kind === 'stamp'
       ? settings.stampPng
@@ -58,7 +58,8 @@ export async function GET(request: Request) {
     headers: {
       'Content-Type': 'image/png',
       'Content-Length': String(bytes.byteLength),
-      'Cache-Control': 'private, max-age=86400',
+      // The URL carries the settings version, so the bytes never change under it.
+      'Cache-Control': 'private, max-age=31536000, immutable',
       'X-Content-Type-Options': 'nosniff',
     },
   });

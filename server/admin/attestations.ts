@@ -5,6 +5,8 @@ import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
 import * as z from 'zod';
 import { requireCapability } from '@/server/auth/session';
 import { invalidateCertificateVerificationCache } from '@/server/certificates/issuance';
+import { revalidateTag, unstable_cache } from 'next/cache';
+import { createAdminClient } from '@/server/supabase/admin';
 import { createClient } from '@/server/supabase/server';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 import { ADMIN_ATTESTATION_BULK_LIMIT } from '@/lib/constants';
@@ -406,9 +408,39 @@ export async function getAdminAttestationsPage(
   }
 }
 
+export const ADMIN_WORK_QUEUE_CACHE_TAG = 'admin:work-queue:v1';
+export const ADMIN_ATTESTATION_FILTERS_CACHE_TAG = 'admin:attestation-filters:v1';
+
+async function serviceRpc(name: Parameters<UntypedRpcClient['rpc']>[0]) {
+  return unwrapRpcMutationResponse(
+    await (createAdminClient() as unknown as UntypedRpcClient).rpc(name, {}),
+  );
+}
+
+// Both answers are the same for every operator, and both scan the attestation
+// view in full. They are read through the service role from a short server
+// cache and refreshed as soon as an action changes the underlying rows; the
+// capability check stays in the callers below.
+const readAdminAttestationFiltersCached = unstable_cache(
+  () => serviceRpc('get_admin_attestation_filters'),
+  ['admin-attestation-filters-v1'],
+  { revalidate: 60, tags: [ADMIN_ATTESTATION_FILTERS_CACHE_TAG] },
+);
+const readAdminWorkQueueCached = unstable_cache(
+  () => serviceRpc('get_admin_work_queue'),
+  ['admin-work-queue-v1'],
+  { revalidate: 30, tags: [ADMIN_WORK_QUEUE_CACHE_TAG] },
+);
+
+/** Call after any change to attestations, identities, certificates or accounts. */
+export function invalidateAdminAttestationReads() {
+  revalidateTag(ADMIN_WORK_QUEUE_CACHE_TAG, { expire: 0 });
+  revalidateTag(ADMIN_ATTESTATION_FILTERS_CACHE_TAG, { expire: 0 });
+}
+
 export async function getAdminAttestationFilters(): Promise<AdminAttestationFilters> {
   await requireCapability('results.read');
-  return filtersSchema.parse(await rpc('get_admin_attestation_filters', {}));
+  return filtersSchema.parse(await readAdminAttestationFiltersCached());
 }
 
 export async function getAdminWorkQueue(): Promise<AdminDataResult<AdminWorkQueue>> {
@@ -416,7 +448,7 @@ export async function getAdminWorkQueue(): Promise<AdminDataResult<AdminWorkQueu
   try {
     return {
       state: 'ready',
-      data: workQueueSchema.parse(await rpc('get_admin_work_queue', {})),
+      data: workQueueSchema.parse(await readAdminWorkQueueCached()),
     };
   } catch (error) {
     return loadFailure(error);
@@ -456,6 +488,7 @@ export async function executeAdminAttestationAction(
     p_reason: null,
   });
   const envelope = record(raw);
+  invalidateAdminAttestationReads();
   if (action.action === 'issue' || action.action === 'confirm_and_issue') {
     invalidateCertificateVerificationCache();
   }

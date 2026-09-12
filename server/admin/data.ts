@@ -13,6 +13,7 @@ import type {
   AdminPage,
   LearningHistoryTarget,
 } from '@/lib/admin/types';
+import { resolveAvatarUrls } from '@/server/profile/avatar-manifests';
 
 export const ADMIN_PAGE_SIZE = 25;
 
@@ -315,7 +316,19 @@ export async function getPendingAccountApprovalPage(
       p_cursor_due_at: query.cursorAt,
       p_cursor_user_id: query.cursorId,
     });
-    return { state: 'ready', data: pageEnvelope(adminAccountApprovalItemSchema).parse(data) };
+    const page = pageEnvelope(adminAccountApprovalItemSchema).parse(data);
+    // One manifest read and one batch signing for the whole page, instead of
+    // an admin-only avatar request per row that cost three round-trips each.
+    const avatarUrls = await resolveAvatarUrls(
+      page.items.filter((item) => item.avatarAvailable).map((item) => item.id),
+    );
+    return {
+      state: 'ready',
+      data: {
+        ...page,
+        items: page.items.map((item) => ({ ...item, avatarUrl: avatarUrls.get(item.id) ?? null })),
+      },
+    };
   } catch (error) {
     return loadFailure(error);
   }

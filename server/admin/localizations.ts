@@ -23,6 +23,7 @@ import { createAdminClient } from '@/server/supabase/admin';
 import { createClient } from '@/server/supabase/server';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 import type { AppLocale, Json } from '@/lib/supabase/types';
+import { LEGAL_CURRENT_CACHE_TAG } from '@/server/legal';
 
 type RpcError = { code?: string; message: string };
 type UntypedRpcClient = {
@@ -156,19 +157,19 @@ export async function getCourseEditorLocalizations(
   courseId: string,
 ): Promise<CourseLocalizationEditorItem[]> {
   const actor = await requireCapability('test.manage');
-  const payload = editorEnvelopeSchema(courseEditorRowSchema, 'courseId').parse(
-    await authenticatedRpc('get_course_editor_localizations', {
+  const admin = createAdminClient();
+  // The editor rows and the published revision pointer are independent reads.
+  const [rawPayload, current] = await Promise.all([
+    authenticatedRpc('get_course_editor_localizations', {
       p_actor_id: actor.user.id,
       p_test_id: courseId,
     }),
-  ) as { courseId: string; localizations: z.infer<typeof courseEditorRowSchema>[] };
-
-  const admin = createAdminClient();
-  const current = await admin
-    .from('tests')
-    .select('current_revision_id')
-    .eq('id', courseId)
-    .maybeSingle();
+    admin.from('tests').select('current_revision_id').eq('id', courseId).maybeSingle(),
+  ]);
+  const payload = editorEnvelopeSchema(courseEditorRowSchema, 'courseId').parse(rawPayload) as {
+    courseId: string;
+    localizations: z.infer<typeof courseEditorRowSchema>[];
+  };
   if (current.error) throw current.error;
   const published = current.data?.current_revision_id
     ? await admin
@@ -563,6 +564,7 @@ export async function publishLegalLocalizationBundle(privacyVersion: string, ter
       p_terms_version: termsVersion,
     }),
   );
+  revalidateTag(LEGAL_CURRENT_CACHE_TAG, { expire: 0 });
   revalidatePath('/admin/settings/legal');
   revalidatePath('/privacy');
   revalidatePath('/terms');

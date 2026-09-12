@@ -21,7 +21,7 @@ export async function GET(request: Request, context: { params: Promise<{ assetId
   const admin = createAdminClient();
   const asset = await admin
     .from('content_assets')
-    .select('*')
+    .select('sha256,storage_key,byte_size')
     .eq('id', parsed.data)
     .eq('status', 'active')
     .maybeSingle();

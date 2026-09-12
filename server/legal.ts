@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { unstable_cache } from 'next/cache';
 import { createAdminClient } from '@/server/supabase/admin';
 import {
   legalEffectiveDateInAppTimezone,
@@ -39,16 +40,28 @@ function validatedCurrentPolicy(row: CurrentLegalRow | undefined, type: LegalDoc
  * deployment window in which a compiled pointer could disagree with the
  * version the acceptance RPC considers current.
  */
+export const LEGAL_CURRENT_CACHE_TAG = 'legal:current:v1';
+
+// Two rows that change only when an administrator publishes a bundle, read on
+// every profile render, legal page and sign-in: cached, invalidated by tag.
+const readCurrentLegalRows = unstable_cache(
+  async (): Promise<CurrentLegalRow[]> => {
+    const { data, error } = await createAdminClient()
+      .from('legal_document_versions')
+      .select('document_type,version,body_revision,effective_at')
+      .eq('is_current', true)
+      .limit(3);
+    if (error || !Array.isArray(data) || data.length !== 2) {
+      throw new Error('LEGAL_CURRENT_VERSION_UNAVAILABLE');
+    }
+    return data as CurrentLegalRow[];
+  },
+  ['legal-current-v1'],
+  { revalidate: 60 * 60, tags: [LEGAL_CURRENT_CACHE_TAG] },
+);
+
 export async function getCurrentLegalPolicies(): Promise<CurrentLegalPolicies> {
-  const { data, error } = await createAdminClient()
-    .from('legal_document_versions')
-    .select('document_type,version,body_revision,effective_at')
-    .eq('is_current', true)
-    .limit(3);
-  if (error || !Array.isArray(data) || data.length !== 2) {
-    throw new Error('LEGAL_CURRENT_VERSION_UNAVAILABLE');
-  }
-  const rows = data as CurrentLegalRow[];
+  const rows = await readCurrentLegalRows();
   return {
     privacy: validatedCurrentPolicy(
       rows.find((row) => row.document_type === 'privacy'),

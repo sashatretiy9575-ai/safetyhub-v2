@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { revalidateTag, unstable_cache } from 'next/cache';
 import * as z from 'zod';
 import { requireCapability } from '@/server/auth/session';
 import type { CertificateBranding } from '@/lib/pdf/certificate-client-contract';
@@ -151,6 +152,7 @@ export async function updateCertificateSettings(
   }
   const parsed = certificateSettingsSchema.safeParse(payload);
   if (!parsed.success) throw new Error('CERTIFICATE_SETTINGS_RESPONSE_INVALID');
+  revalidateTag(CERTIFICATE_SETTINGS_CACHE_TAG, { expire: 0 });
   return parsed.data;
 }
 
@@ -191,6 +193,36 @@ export function certificateBranding(
   };
 }
 
+export const CERTIFICATE_SETTINGS_CACHE_TAG = 'certificate:settings:v1';
+
+/**
+ * Service-role read without the image bytes, cached until the administrator
+ * saves the settings again. Every certificate download and export reads this;
+ * the previous version pulled three base64 PNGs out of Postgres each time and
+ * used only the `has*` booleans.
+ */
+const readCertificateBrandingCached = unstable_cache(
+  async (): Promise<CertificateSettings> => {
+    const client = createAdminClient() as unknown as RpcClient;
+    const { data, error } = await client.rpc('get_certificate_settings', {
+      p_include_images: false,
+    });
+    if (error) throw error;
+    const parsed = certificateSettingsSchema.safeParse(data);
+    if (!parsed.success) throw new Error('CERTIFICATE_SETTINGS_INVALID');
+    return parsed.data;
+  },
+  ['certificate-branding-v1'],
+  { revalidate: 60 * 60, tags: [CERTIFICATE_SETTINGS_CACHE_TAG] },
+);
+
+/** The uploaded PNGs, cached per settings version until the next save. */
+export const readCertificateImagesCached = unstable_cache(
+  async (): Promise<CertificateSettingsWithImages> => readCertificateSettingsWithImages(),
+  ['certificate-images-v1'],
+  { revalidate: 60 * 60, tags: [CERTIFICATE_SETTINGS_CACHE_TAG] },
+);
+
 export async function loadCertificateBranding(): Promise<CertificateBranding> {
-  return certificateBranding(await readCertificateSettingsWithImages());
+  return certificateBranding(await readCertificateBrandingCached());
 }

@@ -16,6 +16,8 @@ export type AdminAccountApprovalItem = {
   phoneCountryIso2: string | null;
   phoneE164: string | null;
   avatarAvailable: boolean;
+  /** Signed URL for the submitted photo, resolved once per page; null without a photo. */
+  avatarUrl: string | null;
   requestedAt: string;
   dueAt: string;
 };

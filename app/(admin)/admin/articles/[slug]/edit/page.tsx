@@ -20,18 +20,24 @@ export default async function EditArticlePage({
   const admin = createAdminClient();
   const { data, error } = await admin
     .from('article_drafts')
-    .select('*')
+    .select(
+      'article_id,slug,title,description,cover_image,created_at,updated_at,blocks,draft_version,content_hash,seo,jurisdiction,effective_date,sources',
+    )
     .eq('slug', slug)
     .maybeSingle();
   if (error) throw error;
   if (!data) notFound();
   const blocks = articleBlocksSchema.safeParse(data.blocks);
   if (!blocks.success) throw new Error('ARTICLE_BLOCKS_INVALID');
-  const live = await admin
-    .from('articles')
-    .select('status,is_published,published_at,current_revision_id,content_hash')
-    .eq('id', data.article_id)
-    .maybeSingle();
+  // The live row and the translations both hang off the article id.
+  const [live, localizations] = await Promise.all([
+    admin
+      .from('articles')
+      .select('status,is_published,published_at,current_revision_id,content_hash')
+      .eq('id', data.article_id)
+      .maybeSingle(),
+    getArticleEditorLocalizations(data.article_id),
+  ]);
   if (live.error) throw live.error;
   if (!live.data) notFound();
   const lifecycleStatus: ArticleLifecycleStatus = live.data.status;
@@ -66,7 +72,6 @@ export default async function EditArticlePage({
     }),
     blocks: blocks.data,
   };
-  const localizations = await getArticleEditorLocalizations(data.article_id);
   return (
     <AdminEditor
       initialData={article}

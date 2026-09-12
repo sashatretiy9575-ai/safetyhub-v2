@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { NotFoundNotice } from '@/components/shared/not-found-notice';
+import { resolveSiteOrigin } from '@/lib/site-url';
 
 /**
  * The not-found convention resolves last and overrides the layouts above it.
@@ -9,6 +10,7 @@ import { NotFoundNotice } from '@/components/shared/not-found-notice';
  * under `dynamicParams = false`.
  */
 export const metadata: Metadata = {
+  metadataBase: new URL(resolveSiteOrigin()),
   robots: { index: false, follow: false },
   alternates: { canonical: null },
 };

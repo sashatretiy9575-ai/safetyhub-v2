@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
-import { isAuthApiError, isAuthSessionMissingError } from '@supabase/supabase-js';
+import { AuthInvalidJwtError, isAuthApiError, isAuthSessionMissingError } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { AuthRealm } from '@/i18n/config';
 import type { Database } from '@/lib/supabase/types';
@@ -47,6 +47,8 @@ export function authRealmForSessionUser(
  */
 export function isDefinitiveAuthFailure(error: unknown) {
   if (isAuthSessionMissingError(error)) return true;
+  // A token that fails local signature or expiry validation is not a session.
+  if (error instanceof AuthInvalidJwtError) return true;
   if (isAuthApiError(error)) {
     const status = typeof error.status === 'number' ? error.status : 0;
     return status >= 400 && status < 500 && status !== 408 && status !== 429;
@@ -91,10 +93,16 @@ export async function updateSession(request: NextRequest, forwardedHeaders?: Hea
     },
   );
 
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  // The session JWT is verified locally against the project signing keys
+  // (the JWKS is cached by the client), so a protected request no longer
+  // pays an Auth round-trip before the page even starts. An expiring session
+  // is still refreshed through setAll. Until the project moves to asymmetric
+  // signing keys, getClaims falls back to asking the Auth server — the same
+  // behaviour as before, never a regression.
+  const { data, error } = await supabase.auth.getClaims();
+  const user = data
+    ? { id: data.claims.sub, email: data.claims.email, app_metadata: data.claims.app_metadata }
+    : null;
 
   return { response, user, error, supabase };
 }

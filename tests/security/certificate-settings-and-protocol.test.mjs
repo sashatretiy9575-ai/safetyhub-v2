@@ -38,7 +38,7 @@ test('the booklet and the protocol are drawn from one settings row that browsers
   assert.match(image, /requireUser\(\{ enforceLegal: false \}\)/u);
   assert.match(image, /status: 401/u);
   assert.match(image, /String\(settings\.version\) !== version/u);
-  assert.match(image, /'Cache-Control': 'private, max-age=86400'/u);
+  assert.match(image, /'Cache-Control': 'private, max-age=31536000, immutable'/u);
 });
 
 test('every certificate is a two-sided booklet drawn with the current settings', async () => {

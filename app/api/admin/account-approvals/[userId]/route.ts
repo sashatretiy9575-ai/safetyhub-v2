@@ -8,6 +8,7 @@ import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result
 import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { requestSecurityMetadata } from '@/server/security/request-metadata';
 import { readJsonBody } from '@/lib/security/request-body';
+import { invalidateAdminAttestationReads } from '@/server/admin/attestations';
 
 const paramsSchema = z.object({ userId: z.string().uuid() });
 const bodySchema = z.discriminatedUnion('decision', [
@@ -73,7 +74,9 @@ export async function POST(request: Request, context: { params: Promise<{ userId
       },
     );
     void actor;
-    return NextResponse.json(unwrapRpcMutationResponse(response));
+    const receipt = unwrapRpcMutationResponse(response);
+    invalidateAdminAttestationReads();
+    return NextResponse.json(receipt);
   } catch (error) {
     return apiError(error);
   }

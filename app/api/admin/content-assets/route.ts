@@ -25,7 +25,7 @@ export async function GET() {
     await requireCapability('content.manage');
     const { data, error } = await createAdminClient()
       .from('content_assets')
-      .select('*')
+      .select('id,width,height,byte_size,original_filename,status,created_at')
       .order('created_at', { ascending: false })
       .limit(200);
     if (error) throw error;

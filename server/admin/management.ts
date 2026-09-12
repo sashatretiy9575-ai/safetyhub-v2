@@ -24,6 +24,7 @@ import { removeAvatarPrefix } from '@/server/supabase/avatar-prefix-cleanup';
 import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
 import { CONTENT_CACHE_TAG, TOPICS_CACHE_TAG } from '@/lib/content/cache-policy';
 import { invalidateCertificateVerificationCache } from '@/server/certificates/issuance';
+import { invalidateAdminAttestationReads } from '@/server/admin/attestations';
 
 type RpcError = { message: string; code?: string };
 type UntypedRpcClient = {
@@ -253,6 +254,7 @@ export async function purgeUserAccounts(
   // Charging it again here made the effective allowance half of what the quota
   // policy documents.
   invalidateCertificateVerificationCache();
+  invalidateAdminAttestationReads();
   const raw = (await authenticatedRpc('admin_purge_user_accounts', {
     p_idempotency_key: idempotencyKey,
     p_target_ids: userIds,
@@ -286,47 +288,62 @@ export async function purgeUserAccounts(
   };
 }
 
-export type AdminTestRow = TestRow & {
+/** What the course catalogue in the admin lists; the JSON columns stay in the database. */
+export type AdminTestRow = Readonly<{
+  id: string;
+  slug: string;
+  title: string;
+  status: TestRow['status'];
+  updated_at: string;
   has_draft_changes: boolean;
   draft_version: number | null;
-};
+}>;
 
 export async function listTests(): Promise<AdminTestRow[]> {
   await requireCapability('test.manage');
   const admin = createAdminClient();
+  // Neither the saved question bank nor the course JSON is needed to list
+  // courses; both are the heaviest columns on these tables.
   const { data, error } = await admin
     .from('tests')
-    .select('*')
-    .order('updated_at', { ascending: false });
+    .select('id,slug,title,status,updated_at,current_revision_id,content_hash')
+    .in('status', ['draft', 'published'])
+    .order('updated_at', { ascending: false })
+    .limit(200);
   if (error) throw error;
   const testIds = (data ?? []).map((test) => test.id);
   const drafts = testIds.length
-    ? await admin.from('course_drafts').select('*').in('test_id', testIds)
+    ? await admin
+        .from('course_drafts')
+        .select('test_id,slug,title,draft_version,content_hash,updated_at')
+        .in('test_id', testIds)
     : { data: [], error: null };
   if (drafts.error) throw drafts.error;
   const draftByTest = new Map((drafts.data ?? []).map((draft) => [draft.test_id, draft]));
   return (data ?? []).map((test) => {
     const draft = draftByTest.get(test.id);
-    if (!draft) return { ...test, has_draft_changes: false, draft_version: null };
+    if (!draft) {
+      return {
+        id: test.id,
+        slug: test.slug,
+        title: test.title,
+        status: test.status,
+        updated_at: test.updated_at,
+        has_draft_changes: false,
+        draft_version: null,
+      };
+    }
     return {
-      ...test,
+      id: test.id,
+      slug: draft.slug,
+      title: draft.title,
+      status: test.status,
+      updated_at: draft.updated_at,
       has_draft_changes:
         test.status === 'published' &&
         Boolean(test.current_revision_id) &&
         draft.content_hash !== test.content_hash,
       draft_version: draft.draft_version,
-      slug: draft.slug,
-      title: draft.title,
-      description: draft.description,
-      icon: draft.icon,
-      seo: draft.seo,
-      duration_minutes: draft.duration_minutes,
-      pass_score: draft.pass_score,
-      jurisdiction: draft.jurisdiction,
-      effective_date: draft.effective_date,
-      sources: draft.sources,
-      content_hash: draft.content_hash,
-      updated_at: draft.updated_at,
     };
   });
 }
@@ -389,15 +406,19 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
   }
   if (!testResult.data || !draftResult.data) return null;
 
+  // The presentation row and the audited question-bank read are independent.
   const presentationId = draftResult.data.presentation_id;
-  const presentationResult = presentationId
-    ? await admin
-        .from('course_presentations')
-        .select('id,locale,page_count,sha256,byte_size,status')
-        .eq('id', presentationId)
-        .eq('course_id', testResult.data.id)
-        .maybeSingle()
-      : { data: null, error: null };
+  const [presentationResult, questionBank] = await Promise.all([
+    presentationId
+      ? admin
+          .from('course_presentations')
+          .select('id,locale,page_count,sha256,byte_size,status')
+          .eq('id', presentationId)
+          .eq('course_id', testResult.data.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+    readCourseQuestionBank(testId, actor.user.id),
+  ]);
   if (presentationResult.error) throw presentationResult.error;
 
   const presentation = presentationResult.data;
@@ -423,7 +444,6 @@ export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed 
 
   const test = testResult.data;
   const draft = draftResult.data;
-  const questionBank = await readCourseQuestionBank(testId, actor.user.id);
 
   return {
     id: test.id,
@@ -600,6 +620,7 @@ export async function deleteAdminLearningHistory(
     })) as AdminLearningHistoryDeletion;
   } finally {
     invalidateCertificateVerificationCache();
+    invalidateAdminAttestationReads();
     revalidatePath('/admin/employees');
     revalidatePath('/admin/results');
   }
@@ -653,6 +674,7 @@ export async function activateCourseCatalogBatch(batchId: string, idempotencyKey
     // committed. Purging projections is safe even for a rejected activation.
     invalidateTestContent();
     invalidateCertificateVerificationCache();
+    invalidateAdminAttestationReads();
     revalidatePath('/admin/courses');
     revalidatePath('/admin/results');
   }

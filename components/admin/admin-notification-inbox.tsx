@@ -25,7 +25,7 @@ import { AdminOverlay } from '@/components/admin/admin-overlay';
 // measured around half a second on production. Four of those a minute ran
 // against the operator's own navigations for a badge that is never urgent;
 // admin actions still refresh the inbox immediately through the event below.
-const POLL_INTERVAL_MS = 60_000;
+const POLL_INTERVAL_MS = 120_000;
 const MAX_BACKOFF_MS = 120_000;
 const REQUEST_TIMEOUT_MS = 10_000;
 export const ADMIN_NOTIFICATION_REFRESH_EVENT = 'safetyhub:admin-action-complete';

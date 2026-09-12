@@ -12,9 +12,17 @@ export default async function EditCoursePage({
   searchParams: Promise<{ publication?: string }>;
 }) {
   const [{ id }, query] = await Promise.all([params, searchParams]);
-  const seed = await getTestEditorSeed(id);
+  // The editor seed and the translations are independent reads; a missing
+  // course still answers 404 even if the translation read fails first.
+  const [seedResult, localizationsResult] = await Promise.allSettled([
+    getTestEditorSeed(id),
+    getCourseEditorLocalizations(id),
+  ]);
+  if (seedResult.status === 'rejected') throw seedResult.reason;
+  const seed = seedResult.value;
   if (!seed) notFound();
-  const localizations = await getCourseEditorLocalizations(id);
+  if (localizationsResult.status === 'rejected') throw localizationsResult.reason;
+  const localizations = localizationsResult.value;
   return (
     <section className="space-y-6">
       <h1 className="font-display text-3xl font-bold">Новая редакция курса</h1>

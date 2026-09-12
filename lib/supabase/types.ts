@@ -645,6 +645,7 @@ export type Database = {
         Returns: Json;
       };
       get_profile_avatar_manifest: { Args: { p_user_id: string }; Returns: Json };
+      get_profile_avatar_manifests: { Args: { p_user_ids: string[] }; Returns: Json };
       get_my_profile_avatar_manifest: { Args: Record<PropertyKey, never>; Returns: Json };
       claim_profile_avatar_reconciliation: {
         Args: { p_worker_id: string; p_limit?: number };
@@ -863,6 +864,11 @@ export type Database = {
       list_admin_attestations_page: JsonRpc;
       get_admin_attestation_filters: { Args: Record<PropertyKey, never>; Returns: Json };
       get_admin_work_queue: { Args: Record<PropertyKey, never>; Returns: Json };
+      list_admin_article_drafts: { Args: { p_query: string | null; p_limit: number }; Returns: Json };
+      configure_storage_reconciler_vault: {
+        Args: { p_reconciler_url: string; p_reconciler_secret: string };
+        Returns: Json;
+      };
       get_admin_learning_history: {
         Args: { p_actor_id: string; p_target_user_id: string };
         Returns: Json;

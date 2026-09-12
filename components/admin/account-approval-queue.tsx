@@ -100,11 +100,11 @@ const QUEUE_REFRESH_DEBOUNCE_MS = 1_500;
 function Avatar({ item, size }: { item: AdminAccountApprovalItem; size: 48 | 96 }) {
   const label = fullName(item);
   const box = size === 48 ? 'size-12 rounded-xl text-lg' : 'size-24 rounded-2xl text-3xl';
-  return item.avatarAvailable ? (
-    // One request per row, all at once, against an admin-only endpoint — and
-    // with no dimensions the list reflowed as each one landed.
+  return item.avatarUrl ? (
+    // The signed URL arrives with the page, so the list makes no extra requests
+    // — and with fixed dimensions it no longer reflows as photos land.
     <img
-      src={`/api/admin/attestations/avatar/${item.id}`}
+      src={item.avatarUrl}
       alt={`Фото профиля: ${label}`}
       width={size}
       height={size}

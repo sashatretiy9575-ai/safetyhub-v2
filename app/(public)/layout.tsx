@@ -13,7 +13,6 @@ import { getSiteContacts } from '@/server/site-contacts';
 import '../globals.css';
 
 export const revalidate = 300;
-export const preferredRegion = 'fra1';
 
 export const viewport: Viewport = {
   themeColor: '#f7f8fa',

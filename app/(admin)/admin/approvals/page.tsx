@@ -39,11 +39,13 @@ export default async function AdminApprovalsPage({
 }) {
   const params = await searchParams;
   const query = parseAdminAccountApprovalQuery(params);
-  const result = await getPendingAccountApprovalPage(query);
   // Approval opens the ticked courses only, so the queue needs the catalogue.
   // A failed catalogue read leaves the queue readable but not approvable,
-  // which the queue explains itself.
-  const courses = await listAdminCourseOptions().catch(() => []);
+  // which the queue explains itself. Both reads travel to the database at once.
+  const [result, courses] = await Promise.all([
+    getPendingAccountApprovalPage(query),
+    listAdminCourseOptions().catch(() => []),
+  ]);
   const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
   const currentToken =
     query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';

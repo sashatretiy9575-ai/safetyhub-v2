@@ -8,6 +8,7 @@ import {
   PencilSimple,
   Plus,
 } from '@phosphor-icons/react/dist/ssr';
+import * as z from 'zod';
 import { requireCapability } from '@/server/auth/session';
 import { createAdminClient } from '@/server/supabase/admin';
 import type { ArticleLifecycleStatus } from '@/lib/validation/article';
@@ -18,6 +19,25 @@ import { Input } from '@/components/ui/input';
 import { AdminFilterSelect } from '@/components/admin/admin-filter-select';
 
 type SearchParams = { q?: string; status?: string };
+
+type ArticleListRpcClient = {
+  rpc(
+    name: 'list_admin_article_drafts',
+    args: { p_query: string | null; p_limit: number },
+  ): PromiseLike<{ data: unknown; error: { message: string } | null }>;
+};
+
+const articleListSchema = z.array(
+  z.object({
+    id: z.string().uuid(),
+    slug: z.string(),
+    title: z.string(),
+    status: z.enum(['draft', 'published']),
+    isPublished: z.boolean(),
+    updatedAt: z.string(),
+    hasDraftChanges: z.boolean(),
+  }),
+);
 type ArticleRow = {
   id: string;
   slug: string;
@@ -44,34 +64,24 @@ export default async function AdminArticlesPage({
   const selectedStatus = ['draft', 'published'].includes(params.status ?? '')
     ? params.status!
     : 'all';
-  const admin = createAdminClient();
-  let request = admin.from('article_drafts').select('*').order('updated_at', { ascending: false });
-  if (query) request = request.ilike('title', `%${query.replace(/[%_]/g, '\\$&')}%`);
-  const { data: drafts, error } = await request.limit(200);
-  if (error) throw error;
-  const articleIds = (drafts ?? []).map((draft) => draft.article_id);
-  const live = articleIds.length
-    ? await admin.from('articles').select('*').in('id', articleIds)
-    : { data: [], error: null };
-  if (live.error) throw live.error;
-  const liveById = new Map((live.data ?? []).map((article) => [article.id, article]));
-  let articles = (drafts ?? []).flatMap((draft) => {
-    const article = liveById.get(draft.article_id);
-    if (!article) return [];
-    if (article.status !== 'draft' && article.status !== 'published') return [];
-    return [
-      {
-        id: article.id,
-        slug: draft.slug,
-        title: draft.title,
-        status: article.status,
-        is_published: article.is_published,
-        updated_at: draft.updated_at,
-        hasDraftChanges:
-          article.status === 'published' && article.content_hash !== draft.content_hash,
-      } satisfies ArticleRow,
-    ];
+  const admin = createAdminClient() as unknown as ArticleListRpcClient;
+  const { data, error } = await admin.rpc('list_admin_article_drafts', {
+    p_query: query || null,
+    p_limit: 200,
   });
+  if (error) throw error;
+  let articles = articleListSchema.parse(data).map(
+    (row) =>
+      ({
+        id: row.id,
+        slug: row.slug,
+        title: row.title,
+        status: row.status,
+        is_published: row.isPublished,
+        updated_at: row.updatedAt,
+        hasDraftChanges: row.hasDraftChanges,
+      }) satisfies ArticleRow,
+  );
   if (selectedStatus !== 'all') {
     articles = articles.filter((article) => article.status === selectedStatus);
   }

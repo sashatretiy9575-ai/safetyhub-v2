@@ -14,6 +14,7 @@ import { loadMessages } from '@/i18n/messages';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 import { APP_VIEWPORT, pwaIdentity } from '@/lib/pwa/identity';
 import '../globals.css';
+import { resolveSiteOrigin } from '@/lib/site-url';
 
 // The install block lives on /profile, so this group must carry the full PWA
 // identity too: without a manifest link here, iOS "Add to Home Screen" from
@@ -24,6 +25,7 @@ import '../globals.css';
 export const viewport: Viewport = APP_VIEWPORT;
 
 export const metadata: Metadata = {
+  metadataBase: new URL(resolveSiteOrigin()),
   title: 'SafetyHub',
   robots: { index: false, follow: false },
   ...pwaIdentity(),
