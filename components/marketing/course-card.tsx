@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { resolveCourseIcon } from '@/lib/course-icons';
 import { useLocale, useTranslations } from 'next-intl';
 import { localizePathname } from '@/i18n/config';
-import { CARD_BLUR_PLACEHOLDER } from '@/components/marketing/_shared/card-blur-placeholder';
+import { CARD_BLUR_PLACEHOLDER } from '@/components/marketing/shared/card-blur-placeholder';
 
 type CourseCardProps = {
   slug: string;

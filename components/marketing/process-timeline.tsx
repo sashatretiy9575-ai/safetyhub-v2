@@ -1,5 +1,5 @@
 import { BookOpenText, CheckCircle, ListChecks } from '@phosphor-icons/react/dist/ssr';
-import { SectionHeading } from '@/components/marketing/_shared/section-heading';
+import { SectionHeading } from '@/components/marketing/shared/section-heading';
 import { Container } from '@/components/ui/container';
 import { MarketingSlider } from '@/components/ui/marketing-slider';
 import { QUIZ_POLICY } from '@/lib/constants';

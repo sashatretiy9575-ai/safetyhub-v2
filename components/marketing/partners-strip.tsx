@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { DeviceMobile, ListChecks, UserCircle } from '@phosphor-icons/react/dist/ssr';
-import { SectionHeading } from '@/components/marketing/_shared/section-heading';
-import { SectionShell } from '@/components/marketing/_shared/section-shell';
+import { SectionHeading } from '@/components/marketing/shared/section-heading';
+import { SectionShell } from '@/components/marketing/shared/section-shell';
 import { MarketingSlider } from '@/components/ui/marketing-slider';
 import { useTranslations } from 'next-intl';
 import { QUIZ_POLICY } from '@/lib/constants';

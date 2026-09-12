@@ -589,25 +589,6 @@ test('claims are leased just in time and failures go through durable retry RPCs'
   assert.match(worker, /console\.error\('STORAGE_RECONCILER_FAILED', \{\s*code: machineCode/u);
 });
 
-test('runbook documents secure scheduling and recoverable shutdown', async () => {
-  const readme = await read('docs/operations.md');
-
-  assert.match(readme, /Supabase Functions secrets/u);
-  assert.match(readme, /Supabase Vault/u);
-  assert.match(readme, /Секрет нельзя помещать прямо в cron SQL/u);
-  assert.match(
-    readme,
-    /два полных пустых сканирования с интервалом не менее двух минут[\s\S]*ещё два таких сканирования/u,
-  );
-  assert.match(readme, /Для аварийной остановки сначала отключается расписание/u);
-  assert.match(
-    readme,
-    /Нельзя вручную удалять operation rows, tombstones, manifests или Storage prefixes/u,
-  );
-  assert.match(readme, /\{userId\}\/objects\/\{operationToken\}\.webp/u);
-  assert.match(readme, /## Storage reconciler/u);
-});
-
 test('a claimed row the worker cannot parse costs one row, not the whole run', async () => {
   const source = await read('supabase/functions/storage-reconciler/index.ts');
 

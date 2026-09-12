@@ -228,7 +228,6 @@ test('Chinese learners follow the same profile, review and photo admission as ev
     queue,
     data,
     appTypes,
-    documentation,
   ] = await Promise.all([
     read('supabase/migrations/20260903120000_zh_full_profile_admission.sql'),
     read('supabase/tests/zh_minimal_pending_approval.sql'),
@@ -240,7 +239,6 @@ test('Chinese learners follow the same profile, review and photo admission as ev
     read('components/admin/account-approval-queue.tsx'),
     read('features/admin/data.ts'),
     read('lib/supabase/types.ts'),
-    read('docs/zh-username-password-auth.md'),
   ]);
 
   // Registration creates the credential and the legal acceptance, nothing else.
@@ -304,6 +302,4 @@ test('Chinese learners follow the same profile, review and photo admission as ev
   // The login stays visible to the reviewer next to the ordinary details.
   assert.match(queue, /item\.username/u);
   assert.match(data, /username: z[\s\S]*?\.regex/u);
-  assert.match(documentation, /profile_incomplete/u);
-  assert.match(documentation, /certificate remains `pending_identity`/u);
 });

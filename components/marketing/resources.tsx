@@ -1,7 +1,7 @@
 import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 import { ArticleCard } from '@/components/marketing/article-card';
-import { SectionHeading } from '@/components/marketing/_shared/section-heading';
+import { SectionHeading } from '@/components/marketing/shared/section-heading';
 import { Container } from '@/components/ui/container';
 import { MarketingSlider } from '@/components/ui/marketing-slider';
 import { ROUTES } from '@/lib/constants';

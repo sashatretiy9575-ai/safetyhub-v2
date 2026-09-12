@@ -218,11 +218,10 @@ test('migration-list parser rejects malformed and unbounded CLI output', () => {
 });
 
 test('release scripts keep legacy fallback read-only and post-migration exact type gate separate', async () => {
-  const [contentSync, migrationGate, packageJson, runbook] = await Promise.all([
+  const [contentSync, migrationGate, packageJson] = await Promise.all([
     readFile('scripts/content-sync-linked.mjs', 'utf8'),
     readFile('scripts/check-linked-release-migrations.mjs', 'utf8'),
     readFile('package.json', 'utf8').then(JSON.parse),
-    readFile('docs/release-i18n-zh-telegram.md', 'utf8'),
   ]);
   assert.match(contentSync, /LEGACY_RU_CONTENT_PULL_REQUIRES_CHECK_ONLY/u);
   assert.match(contentSync, /begin isolation level repeatable read read only/u);
@@ -238,6 +237,4 @@ test('release scripts keep legacy fallback read-only and post-migration exact ty
     packageJson.scripts['db:types:check'],
     'node scripts/generate-supabase-types.mjs --linked --check',
   );
-  assert.match(runbook, /db:migrations:check-preflight/u);
-  assert.match(runbook, /db:types:check[\s\S]*after.*migrations|после применения migrations/iu);
 });

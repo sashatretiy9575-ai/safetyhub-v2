@@ -11,7 +11,7 @@ test('header, page headers, catalogs, and marketing share the 1280px rail', asyn
     read('components/ui/page-header.tsx'),
     read('app/(public)/blog/page.tsx'),
     read('app/(public)/topics/page.tsx'),
-    read('components/marketing/_shared/section-shell.tsx'),
+    read('components/marketing/shared/section-shell.tsx'),
   ]);
 
   assert.match(container, /wide: 'max-w-\[1280px\]'/);

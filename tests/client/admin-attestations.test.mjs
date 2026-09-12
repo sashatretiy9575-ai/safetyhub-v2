@@ -188,11 +188,11 @@ test('attestation list keeps personal details compact and loads the avatar only 
   const contactRoute = await read('app/api/admin/attestations/contact/[userId]/route.ts');
   assert.match(managerSurface, /\/api\/admin\/attestations\/contact\/\$\{row\.userId\}/);
   assert.match(managerSurface, />Телефон</);
-  assert.match(managerSurface, /tel:\$\{contact\.phoneE164\}/);
+  assert.match(managerSurface, /phoneHref\(contact\.phoneE164\)/);
   assert.match(managerSurface, /formatPhoneDisplay\(contact\.phoneE164\)/);
   assert.match(
     managerSurface,
-    /https:\/\/wa\.me\/\$\{contact\.phoneE164\.replace\(\/\\D\/g, ''\)\}/,
+    /whatsappChatHref\(contact\.phoneE164\)/,
   );
   assert.match(managerSurface, /target="_blank"\s+rel="noopener noreferrer"/);
   assert.match(managerSurface, /Написать в WhatsApp/);

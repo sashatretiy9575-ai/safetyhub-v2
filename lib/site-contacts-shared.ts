@@ -58,10 +58,21 @@ export function coerceSiteContactSettings(value: unknown): SiteContactSettings |
   });
 }
 
+/** A dial link for any E.164 number: the company line or a learner's phone. */
+export function phoneHref(e164: string) {
+  return `tel:${e164}`;
+}
+
+/** A WhatsApp chat link for any E.164 number, with an optional prefilled message. */
+export function whatsappChatHref(e164: string, text?: string) {
+  const base = `https://wa.me/${e164.replace(/\D/g, '')}`;
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base;
+}
+
 export function contactPhoneHref(settings: SiteContactSettings) {
-  return `tel:${settings.phoneE164}`;
+  return phoneHref(settings.phoneE164);
 }
 
 export function contactWhatsappHref(settings: SiteContactSettings) {
-  return `https://wa.me/${settings.whatsappE164.replace(/\D/g, '')}`;
+  return whatsappChatHref(settings.whatsappE164);
 }

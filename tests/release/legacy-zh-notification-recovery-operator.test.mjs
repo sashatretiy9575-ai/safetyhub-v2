@@ -130,12 +130,10 @@ test('legacy-ZH recovery rejects malformed or over-bounded RPC results before wr
   }
 });
 
-test('recovery package command and operator documentation preserve the service-only safety boundary', async () => {
-  const [source, packageSource, operations, notifications] = await Promise.all([
+test('recovery package command preserves the service-only safety boundary', async () => {
+  const [source, packageSource] = await Promise.all([
     readFile('scripts/recover-legacy-zh-approval-deliveries.mjs', 'utf8'),
     readFile('package.json', 'utf8'),
-    readFile('docs/operations.md', 'utf8'),
-    readFile('docs/notifications-and-telegram.md', 'utf8'),
   ]);
   const packageJson = JSON.parse(packageSource);
 
@@ -151,7 +149,5 @@ test('recovery package command and operator documentation preserve the service-o
   assert.match(source, /rpcName: RPC_NAME/u);
   assert.match(source, /parameters: \{ p_limit: request\.limit \}/u);
   assert.doesNotMatch(source, /notification_deliveries|notification_events|from\(/u);
-  assert.match(operations, /notifications:legacy-zh:recover/u);
-  assert.match(notifications, /notifications:legacy-zh:recover/u);
   assert.doesNotMatch(source, /console\.(?:log|error)\([^\n]*(?:serviceKey|stdinSecret|reason)/u);
 });

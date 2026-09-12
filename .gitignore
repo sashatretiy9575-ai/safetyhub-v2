@@ -1,71 +1,71 @@
 # dependencies
-node_modules
+node_modules/
 .pnp
 .pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
 
-# testing
-coverage
-playwright-report/
-test-results/
-blob-report/
-
-# next.js
+# builds and caches
 .next/
 .next*/
 out/
-build
+build/
+.turbo/
+.swc/
+.eslintcache
+*.tsbuildinfo
+next-env.d.ts
+node_modules/.cache/
 
-# misc
-.DS_Store
-*.pem
-Thumbs.db
+# tests
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# env files (Next.js also loads .env.development, .env.production and .env.test)
+.env
+.env.*
+!.env.example
+
+# logs
 *.log
-
-# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
-# Next.js loads .env.development, .env.production and .env.test automatically,
-# so a file that only differs from .env.local by suffix is just as dangerous.
-.env
-.env.*
-!.env.example
-
-# generated reports and local scratch work
-AUDIT.md
-tmp/
-artifacts/
-*.local-notes.md
-*.progress.md
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
 # supabase
-.branches
-.temp
 supabase/.branches
 supabase/.temp
 supabase/.temp-old-project-untrusted
 
-# vercel
+# hosting and tooling
 .vercel
+.claude/
+.next-docs/
+AGENTS.md
+CLAUDE.md
+
+# local notes, reports and scratch work
+AUDIT.md
+*.local-notes.md
+*.progress.md
+tmp/
+artifacts/
+content/extracted/
 
 # editors
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
+*.swp
+*.swo
+*~
 
-# project-specific
-content/extracted/
-"тест safetyhub"/
-.claude/
+# OS
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.pem

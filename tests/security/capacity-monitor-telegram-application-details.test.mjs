@@ -5,12 +5,11 @@ import test from 'node:test';
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 
 test('new approval notifications are generic no-PII v2 while legacy payload parsers remain bounded', async () => {
-  const [legacyMigration, migration, dispatcher, documentation, serializationMigration] =
+  const [legacyMigration, migration, dispatcher, serializationMigration] =
     await Promise.all([
       read('supabase/migrations/20260902110000_capacity_telegram_application_details.sql'),
       read('supabase/migrations/20260902180000_generic_approval_notifications.sql'),
       read('supabase/functions/telegram-dispatcher/index.ts'),
-      read('docs/notifications-and-telegram.md'),
       read('supabase/migrations/20260902140000_runtime_feature_flag_serialization.sql'),
     ]);
 
@@ -51,18 +50,14 @@ test('new approval notifications are generic no-PII v2 while legacy payload pars
   assert.match(dispatcher, /approvalKind: 'legacy_blank_zh'/u);
   assert.match(dispatcher, /function parseLeaseClaim/u);
   assert.doesNotMatch(dispatcher, /reply_markup|callback_query|bot_command/iu);
-  assert.match(documentation, /telegram_application_details/u);
-  assert.match(documentation, /schema-v2 generic envelope/u);
-  assert.match(documentation, /dead → retry → delivered/u);
 });
 
 test('prototype capacity monitor remains aggregate-only, bounded, service-only, and alert-only', async () => {
-  const [migration, worker, appTypes, generatedTypes, operations] = await Promise.all([
+  const [migration, worker, appTypes, generatedTypes] = await Promise.all([
     read('supabase/migrations/20260902110000_capacity_telegram_application_details.sql'),
     read('supabase/functions/storage-reconciler/index.ts'),
     read('lib/supabase/types.ts'),
     read('lib/supabase/database.generated.ts'),
-    read('docs/operations.md'),
   ]);
 
   assert.match(migration, /create table private\.capacity_monitor_snapshots/u);
@@ -86,5 +81,4 @@ test('prototype capacity monitor remains aggregate-only, bounded, service-only, 
   assert.match(appTypes, /collect_capacity_monitor_snapshot:/u);
   assert.match(appTypes, /set_capacity_monitor_monthly_active_learner_budget:/u);
   assert.match(generatedTypes, /collect_capacity_monitor_snapshot:/u);
-  assert.match(operations, /It is not a\r?\n+signup, approval or learning-access cap/u);
 });

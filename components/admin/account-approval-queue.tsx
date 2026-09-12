@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { requestAdminNotificationRefresh } from '@/components/admin/admin-notification-inbox';
 import type { AdminAccountApprovalItem } from '@/features/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
-import { formatPhoneDisplay } from '@/lib/site-contacts-shared';
+import { formatPhoneDisplay, phoneHref, whatsappChatHref } from '@/lib/site-contacts-shared';
 
 type Decision = 'approved' | 'rejected';
 
@@ -83,8 +83,7 @@ export function whatsappGreeting(item: AdminAccountApprovalItem) {
 
 export function whatsappHref(item: AdminAccountApprovalItem) {
   if (!item.phoneE164) return null;
-  const digits = item.phoneE164.replace(/\D/g, '');
-  return `https://wa.me/${digits}?text=${encodeURIComponent(whatsappGreeting(item))}`;
+  return whatsappChatHref(item.phoneE164, whatsappGreeting(item));
 }
 
 function courseWord(count: number) {
@@ -692,7 +691,7 @@ export function AccountApprovalQueue({
                         {item.phoneE164 ? (
                           <a
                             className="font-semibold tabular-nums underline underline-offset-4"
-                            href={`tel:${item.phoneE164}`}
+                            href={phoneHref(item.phoneE164)}
                           >
                             {formatPhoneDisplay(item.phoneE164)}
                           </a>

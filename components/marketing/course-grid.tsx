@@ -1,5 +1,5 @@
 import { CourseCard } from '@/components/marketing/course-card';
-import { SectionHeading } from '@/components/marketing/_shared/section-heading';
+import { SectionHeading } from '@/components/marketing/shared/section-heading';
 import { Container } from '@/components/ui/container';
 import { MarketingSlider } from '@/components/ui/marketing-slider';
 import { JsonLd } from '@/components/shared/json-ld';

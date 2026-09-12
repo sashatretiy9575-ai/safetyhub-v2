@@ -13,7 +13,7 @@ import { X } from '@phosphor-icons/react/dist/csr/X';
 import type { AdminAttestationRow } from '@/features/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { formatDateTime } from '@/lib/utils';
-import { formatPhoneDisplay } from '@/lib/site-contacts-shared';
+import { formatPhoneDisplay, phoneHref, whatsappChatHref } from '@/lib/site-contacts-shared';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -666,7 +666,7 @@ export function AttestationDetailDrawer({
                     ) : contact.phoneE164 ? (
                       <a
                         className="font-semibold tabular-nums underline underline-offset-4"
-                        href={`tel:${contact.phoneE164}`}
+                        href={phoneHref(contact.phoneE164)}
                       >
                         {formatPhoneDisplay(contact.phoneE164)}
                       </a>
@@ -699,7 +699,7 @@ export function AttestationDetailDrawer({
               // what keeps that tab from reaching back into the admin window.
               <Button asChild variant="outline" className="w-full">
                 <a
-                  href={`https://wa.me/${contact.phoneE164.replace(/\D/g, '')}`}
+                  href={whatsappChatHref(contact.phoneE164)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

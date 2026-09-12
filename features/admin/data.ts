@@ -42,11 +42,7 @@ export type LearningHistoryTargetQuery = {
 type ReadRpcClient = {
   rpc(
     name:
-      | 'get_admin_data_summary'
-      | 'list_admin_users_page'
       | 'list_admin_audit_page'
-      | 'list_admin_access_users_page'
-      | 'list_admin_access_outbox_page'
       | 'list_pending_account_approval_page'
       | 'list_learning_history_targets_page'
       | 'list_admin_operators_page'

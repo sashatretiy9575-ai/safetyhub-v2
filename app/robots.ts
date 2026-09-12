@@ -32,8 +32,6 @@ export default function robots(): MetadataRoute.Robots {
           '/admin',
           '/admin/*',
           ...PRIVATE_PATHS,
-          // Internal certificate-archive diagnostic harness, not a product page.
-          '/zip-harness',
           ...LOCALE_PREFIXES.flatMap((locale) =>
             PRIVATE_PATHS.map((pathname) => `/${locale}${pathname}`),
           ),

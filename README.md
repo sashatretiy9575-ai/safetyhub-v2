@@ -64,10 +64,3 @@ npm run test:e2e:release    # release Playwright matrix
 npm run verify:release      # application + database + authenticated E2E
 ```
 
-## Документация
-
-- [Архитектура](docs/architecture.md)
-- [Эксплуатация](docs/operations.md)
-- [Backup и restore](docs/backup-restore.md)
-- [Deployment и домен](docs/deployment.md)
-- [Тестирование](docs/testing.md)

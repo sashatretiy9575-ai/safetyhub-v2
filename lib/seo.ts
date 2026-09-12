@@ -38,9 +38,9 @@ type SeoOptions = {
 };
 
 /**
- * The city, written the way each locale writes it. `BRAND.city` is Cyrillic, so
- * the geo meta tag and the postal address in the organisation JSON-LD used to
- * say «Алматы» on the English and Chinese pages as well.
+ * The city, written the way each locale writes it: the geo meta tag and the
+ * postal address in the organisation JSON-LD used to say «Алматы» on the
+ * English and Chinese pages as well.
  */
 const LOCALIZED_CITY: Record<AppLocale, string> = {
   ru: 'Алматы',

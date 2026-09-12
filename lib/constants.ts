@@ -1,9 +1,6 @@
 export const BRAND = {
   name: 'SafetyHub',
   domain: 'SafetyHub.kz',
-  tagline: 'Онлайн-обучение по охране труда и промышленной безопасности',
-  city: 'Алматы',
-  country: 'Казахстан',
 } as const;
 
 export const ROUTES = {

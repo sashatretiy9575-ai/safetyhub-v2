@@ -95,12 +95,12 @@ test('the queue ticks courses per application and reaches the applicant on Whats
   // WhatsApp opens with the greeting already typed.
   assert.match(
     queue,
-    /wa\.me\/\$\{digits\}\?text=\$\{encodeURIComponent\(whatsappGreeting\(item\)\)\}/u,
+    /whatsappChatHref\(item\.phoneE164, whatsappGreeting\(item\)\)/u,
   );
   assert.match(queue, /Вы оставляли заявку на обучение на сайте safetyhub\.kz/u);
   assert.match(queue, /target="_blank"\s+rel="noopener noreferrer"/u);
   assert.match(queue, /formatPhoneDisplay\(item\.phoneE164\)/u);
-  assert.match(queue, /href=\{`tel:\$\{item\.phoneE164\}`\}/u);
+  assert.match(queue, /href=\{phoneHref\(item\.phoneE164\)\}/u);
 });
 
 test('the employee card edits the open courses through a capability-gated endpoint', async () => {
