@@ -36,7 +36,7 @@ export function AdminPagination({
       aria-label="Постраничная навигация"
       className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-4"
     >
-      <p className="text-xs text-[var(--color-text-muted)]">
+      <p className="text-sm text-[var(--color-text-muted)]">
         Показаны{' '}
         <strong className="text-[var(--color-text)] tabular-nums">
           {rangeStart}–{rangeEnd}
@@ -46,7 +46,7 @@ export function AdminPagination({
 
       <div className="flex items-center gap-1.5">
         {pageIndex > 0 ? (
-          <Button asChild size="sm" variant="ghost" className="h-8 px-2 text-xs">
+          <Button asChild size="sm" variant="ghost" className="min-h-11 px-3 text-sm">
             <Link href={firstHref} prefetch={false}>
               В начало
             </Link>
@@ -54,34 +54,34 @@ export function AdminPagination({
         ) : null}
 
         {previousHref ? (
-          <Button asChild size="sm" variant="outline" className="h-8 gap-1 px-2 text-xs">
+          <Button asChild size="sm" variant="outline" className="min-h-11 gap-1 px-3 text-sm">
             <Link href={previousHref} prefetch={false} rel="prev">
-              <CaretLeft aria-hidden size={13} weight="bold" />
+              <CaretLeft aria-hidden size={15} weight="bold" />
               Назад
             </Link>
           </Button>
         ) : (
-          <span className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--color-border)] px-2 text-xs text-[var(--color-text-subtle)]">
-            <CaretLeft aria-hidden size={13} weight="bold" />
+          <span className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-[var(--color-border)] px-3 text-sm text-[var(--color-text-subtle)]">
+            <CaretLeft aria-hidden size={15} weight="bold" />
             Назад
           </span>
         )}
 
-        <span className="px-1.5 text-xs font-semibold tabular-nums" aria-current="page">
+        <span className="px-2 text-sm font-semibold tabular-nums" aria-current="page">
           {currentPage} / {totalPages}
         </span>
 
         {nextHref ? (
-          <Button asChild size="sm" variant="outline" className="h-8 gap-1 px-2 text-xs">
+          <Button asChild size="sm" variant="outline" className="min-h-11 gap-1 px-3 text-sm">
             <Link href={nextHref} prefetch={false} rel="next">
               Вперёд
-              <CaretRight aria-hidden size={13} weight="bold" />
+              <CaretRight aria-hidden size={15} weight="bold" />
             </Link>
           </Button>
         ) : (
-          <span className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--color-border)] px-2 text-xs text-[var(--color-text-subtle)]">
+          <span className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-[var(--color-border)] px-3 text-sm text-[var(--color-text-subtle)]">
             Вперёд
-            <CaretRight aria-hidden size={13} weight="bold" />
+            <CaretRight aria-hidden size={15} weight="bold" />
           </span>
         )}
       </div>

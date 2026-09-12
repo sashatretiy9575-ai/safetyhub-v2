@@ -23,7 +23,7 @@ export function Logo({ className, inverse = false }: LogoProps) {
       <span
         data-logo-wordmark
         className={cn(
-          'text-[17px] font-extrabold tracking-[-0.035em] min-[1024px]:text-lg',
+          'text-[15px] font-extrabold tracking-[-0.035em] min-[400px]:text-[17px] min-[1024px]:text-lg',
           inverse ? 'text-white' : 'text-[var(--color-text)]',
         )}
       >

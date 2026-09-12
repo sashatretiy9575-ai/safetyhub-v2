@@ -58,7 +58,9 @@ test('materials and course editors keep primary content central and protect draf
     read('components/admin/editor-action-bar.tsx'),
     read('components/admin/use-unsaved-changes-guard.ts'),
   ]);
-  assert.match(materials, /\['all', 'Все'\]/);
+  // The status filter is a select on the same line as the search, like the
+  // courses sheet, instead of a second row of tabs.
+  assert.match(materials, /<option value="">Все<\/option>/);
   assert.match(materials, /Черновики/);
   assert.match(materials, /Опубликованные/);
   assert.match(articleEditor, /setTimeout\(\(\) => \{[\s\S]+\}, 1_500\)/);

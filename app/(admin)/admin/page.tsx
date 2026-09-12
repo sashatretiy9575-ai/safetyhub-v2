@@ -74,21 +74,21 @@ export default async function AdminWorkPage() {
       ) : (
         <nav
           aria-label="Рабочие очереди"
-          className="grid overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] sm:grid-cols-2 lg:grid-cols-4"
+          className="grid overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] sm:grid-cols-2"
         >
           {queueItems.map(({ key, label, href, count, icon: Icon }) => (
             <Link
               key={key}
               href={href}
-              className="group grid min-h-14 min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto_auto] items-center gap-3 border-b px-3 py-2 transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:border-r sm:border-b-0 sm:last:border-r-0"
+              // Four tiles in one row truncated their own labels on a laptop;
+              // two per row leave room for the words and the number.
+              className="group grid min-h-16 min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_auto_auto] items-center gap-3 border-b px-4 py-3 transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:[&:nth-child(odd)]:border-r sm:[&:nth-last-child(-n+2)]:border-b-0"
             >
-              <span className="grid size-9 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                <Icon size={18} />
+              <span className="grid size-11 place-items-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                <Icon size={22} />
               </span>
-              <span className="min-w-0">
-                <span className="block truncate text-sm font-semibold">{label}</span>
-              </span>
-              <strong className="text-xl font-black tabular-nums">{count}</strong>
+              <span className="min-w-0 text-base font-bold break-words">{label}</span>
+              <strong className="text-2xl font-black tabular-nums">{count}</strong>
               <CaretRight
                 aria-hidden
                 size={16}

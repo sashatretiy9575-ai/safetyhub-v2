@@ -55,7 +55,7 @@ export async function Header({
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--color-bg)]/96 pt-[var(--safe-area-top)] pr-[max(.5rem,var(--safe-area-right))] pb-2 pl-[max(.5rem,var(--safe-area-left))] backdrop-blur-xl min-[1024px]:pr-[max(1.5rem,var(--safe-area-right))] min-[1024px]:pb-0 min-[1024px]:pl-[max(1.5rem,var(--safe-area-left))] min-[1280px]:pr-[max(2rem,var(--safe-area-right))] min-[1280px]:pl-[max(2rem,var(--safe-area-left))]">
-      <div className="glass-strong mx-auto flex h-[52px] w-full max-w-[1280px] items-center gap-2 rounded-[18px] px-3 min-[1024px]:h-16 min-[1024px]:gap-3 min-[1024px]:rounded-[var(--radius-group)] min-[1024px]:px-5">
+      <div className="glass-strong mx-auto flex h-12 w-full max-w-[1280px] items-center gap-1.5 rounded-[18px] px-2 min-[400px]:h-[52px] min-[400px]:gap-2 min-[400px]:px-3 min-[1024px]:h-16 min-[1024px]:gap-3 min-[1024px]:rounded-[var(--radius-group)] min-[1024px]:px-5">
         <Link
           href={localizePathname(ROUTES.home, locale)}
           prefetch={false}
@@ -118,16 +118,14 @@ export async function Header({
                 the account icon, a signed-in visitor the avatar menu in the same
                 place. Below 1024 px the header used to show a text button for
                 guests and nothing at all once signed in. */}
-            {accountMode === 'authenticated' ? (
-              accountMenu
-            ) : (
-              (accountControl ?? (
-                <AccountIconLink
-                  href={localizePathname(accountItem.href, locale)}
-                  label={translations(accountItem.messageKey)}
-                />
-              ))
-            )}
+            {accountMode === 'authenticated'
+              ? accountMenu
+              : (accountControl ?? (
+                  <AccountIconLink
+                    href={localizePathname(accountItem.href, locale)}
+                    label={translations(accountItem.messageKey)}
+                  />
+                ))}
           </div>
         </div>
       </div>

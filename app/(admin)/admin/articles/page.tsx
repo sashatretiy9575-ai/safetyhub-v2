@@ -1,7 +1,13 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { Article, ArrowSquareOut, PencilSimple, Plus } from '@phosphor-icons/react/dist/ssr';
+import {
+  Article,
+  ArrowSquareOut,
+  MagnifyingGlass,
+  PencilSimple,
+  Plus,
+} from '@phosphor-icons/react/dist/ssr';
 import { requireCapability } from '@/features/auth/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { ArticleLifecycleStatus } from '@/lib/validation/article';
@@ -9,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { AdminFilterSelect } from '@/components/admin/admin-filter-select';
 
 type SearchParams = { q?: string; status?: string };
 type ArticleRow = {
@@ -69,29 +76,23 @@ export default async function AdminArticlesPage({
     articles = articles.filter((article) => article.status === selectedStatus);
   }
 
-  const tabs = [
-    ['all', 'Все'],
-    ['draft', 'Черновики'],
-    ['published', 'Опубликованные'],
-  ] as const;
-
   return (
     <section className="space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-display text-3xl font-bold">Материалы</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Черновики и опубликованные статьи в одном списке. Найдено: {articles.length}.
-          </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h1 className="font-display text-2xl font-bold sm:text-3xl">Материалы</h1>
+          <span className="rounded-full bg-[var(--color-surface-muted)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-text-muted)] tabular-nums">
+            {articles.length}
+          </span>
         </div>
-        <Button asChild>
+        <Button asChild size="sm">
           <Link href="/admin/articles/new">
             <Plus /> Новая статья
           </Link>
         </Button>
       </div>
 
-      <form className="flex flex-col gap-2 rounded-xl border bg-[var(--color-surface)] p-3 sm:flex-row">
+      <form className="flex gap-2 rounded-xl border bg-[var(--color-surface)] p-2.5 sm:p-3">
         <Input
           name="q"
           defaultValue={query}
@@ -99,35 +100,20 @@ export default async function AdminArticlesPage({
           aria-label="Поиск по названию статьи"
           className="min-w-0 flex-1"
         />
-        {selectedStatus !== 'all' ? (
-          <input type="hidden" name="status" value={selectedStatus} />
-        ) : null}
-        <Button type="submit" size="sm">
-          Найти
+        <AdminFilterSelect
+          name="status"
+          defaultValue={selectedStatus === 'all' ? '' : selectedStatus}
+          aria-label="Статус материала"
+        >
+          <option value="">Все</option>
+          <option value="draft">Черновики</option>
+          <option value="published">Опубликованные</option>
+        </AdminFilterSelect>
+        <Button type="submit" size="sm" className="min-h-11 shrink-0" aria-label="Найти">
+          <MagnifyingGlass aria-hidden size={18} className="min-[400px]:hidden" />
+          <span className="hidden min-[400px]:inline">Найти</span>
         </Button>
       </form>
-
-      <nav aria-label="Статусы материалов" className="flex gap-2 overflow-x-auto pb-1">
-        {tabs.map(([value, label]) => {
-          const search = new URLSearchParams();
-          if (query) search.set('q', query);
-          if (value !== 'all') search.set('status', value);
-          return (
-            <Link
-              key={value}
-              href={`/admin/articles${search.size ? `?${search}` : ''}`}
-              aria-current={selectedStatus === value ? 'page' : undefined}
-              className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-semibold ${
-                selectedStatus === value
-                  ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
-                  : 'bg-[var(--color-surface)]'
-              }`}
-            >
-              {label}
-            </Link>
-          );
-        })}
-      </nav>
 
       {articles.length ? (
         <div className="overflow-hidden rounded-2xl border bg-[var(--color-surface)]">
@@ -143,26 +129,34 @@ export default async function AdminArticlesPage({
             return (
               <article
                 key={item.id}
-                className="grid gap-2 border-t p-3 first:border-t-0 min-[760px]:min-h-[60px] min-[760px]:grid-cols-[minmax(0,2fr)_11rem_8rem_auto] min-[760px]:items-center min-[760px]:gap-3 min-[760px]:px-4"
+                // Phone: title and actions on one line, status and date on the
+                // next; the desktop sheet keeps its columns.
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 border-t px-3 py-2.5 first:border-t-0 min-[760px]:min-h-16 min-[760px]:grid-cols-[minmax(0,2fr)_11rem_8rem_auto] min-[760px]:gap-3 min-[760px]:px-4"
               >
                 <div className="min-w-0">
                   {/* The title is the primary way into the editor: an icon-only
                       "…" button was the only affordance before, and its glyph
                       read as "more", not "edit". */}
                   <h2 className="font-semibold break-words">
-                    <Link href={editHref} className="hover:text-[var(--color-primary)] hover:underline">
+                    <Link
+                      href={editHref}
+                      className="hover:text-[var(--color-primary)] hover:underline"
+                    >
                       {item.title}
                     </Link>
                   </h2>
                   <p className="truncate text-xs text-[var(--color-text-muted)]">/{item.slug}</p>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="col-span-2 flex flex-wrap items-center gap-1.5 min-[760px]:col-span-1">
                   <Badge variant={item.status === 'published' ? 'success' : 'warning'}>
                     {statusLabel[item.status]}
                   </Badge>
                   {item.hasDraftChanges ? <Badge variant="default">Есть черновик</Badge> : null}
+                  <span className="text-xs text-[var(--color-text-muted)] tabular-nums min-[760px]:hidden">
+                    <time dateTime={item.updated_at}>{updated.toLocaleDateString('ru-RU')}</time>
+                  </span>
                 </div>
-                <div className="text-xs text-[var(--color-text-muted)] tabular-nums">
+                <div className="hidden text-xs text-[var(--color-text-muted)] tabular-nums min-[760px]:block">
                   <time dateTime={item.updated_at}>
                     {updated.toLocaleDateString('ru-RU')}
                     <span className="ml-1.5 text-[var(--color-text-subtle)]">
@@ -170,7 +164,7 @@ export default async function AdminArticlesPage({
                     </span>
                   </time>
                 </div>
-                <div className="flex items-center justify-start gap-1.5 min-[760px]:justify-end">
+                <div className="col-start-2 row-start-1 flex items-center justify-end gap-1.5 min-[760px]:col-start-4">
                   {item.status === 'published' ? (
                     <Button
                       asChild
@@ -192,7 +186,7 @@ export default async function AdminArticlesPage({
                   <Button asChild size="sm" variant="outline" className="h-9 px-2.5 text-xs">
                     <Link href={editHref} aria-label={`Редактировать: ${item.title}`}>
                       <PencilSimple aria-hidden />
-                      Изменить
+                      <span className="hidden min-[400px]:inline">Изменить</span>
                     </Link>
                   </Button>
                 </div>

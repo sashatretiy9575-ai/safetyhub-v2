@@ -515,8 +515,7 @@ export function AttestationsManager({
       organization,
       { ...filters, organization },
       groupRows.map((row) => row.recordId),
-      (selection) =>
-        `Выбрана компания «${organization || 'не указана'}»: ${selection.total} строк.`,
+      () => '',
     );
   };
 
@@ -532,7 +531,7 @@ export function AttestationsManager({
       '',
       filters,
       page.items.map((row) => row.recordId),
-      (selection) => `Выбраны все строки по текущему фильтру: ${selection.total}.`,
+      () => '',
     );
   };
 
@@ -1103,10 +1102,10 @@ export function AttestationsManager({
                         >
                           {groupFullySelected ? '✓' : ''}
                         </span>
-                        <span className="min-w-0 break-words">
+                        <span className="min-w-0 text-base font-bold break-words @min-[760px]:text-sm @min-[760px]:font-semibold">
                           {row.organization || 'Компания не указана'}
                         </span>
-                        <span className="shrink-0 font-medium text-[var(--color-text-muted)] tabular-nums">
+                        <span className="shrink-0 text-sm font-medium text-[var(--color-text-muted)] tabular-nums">
                           {row.organizationGroupCount}
                         </span>
                       </button>
