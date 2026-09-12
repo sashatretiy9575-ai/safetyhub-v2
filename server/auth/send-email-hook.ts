@@ -4,13 +4,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 
 export type AuthEmailLocale = 'ru' | 'kk' | 'en';
 export type AuthEmailActionType =
-  | 'signup'
-  | 'magiclink'
-  | 'recovery'
-  | 'invite'
-  | 'email_change'
-  | 'reauthentication'
-  | 'email';
+  'signup' | 'magiclink' | 'recovery' | 'invite' | 'email_change' | 'reauthentication' | 'email';
 
 export type SendEmailHookPayload = Readonly<{
   email: string;
@@ -97,23 +91,35 @@ export function verifyStandardWebhook({
   return secrets.some((secret) => {
     const expected = createHmac('sha256', secret).update(signedContent).digest();
     return presented.some(
-      (candidate) => candidate.length === expected.length && timingSafeEqual(candidate, expected),
+      (candidate) => candidate.length === expected.length && timingSafeEqual(expected, candidate),
     );
   });
 }
 
-function detectLocale(userMetadata: unknown, redirectTo: unknown): AuthEmailLocale {
-  const metadataLocale = record(userMetadata)?.locale;
-  if (metadataLocale === 'en' || metadataLocale === 'kk') return metadataLocale;
+function isAuthEmailLocale(value: unknown): value is AuthEmailLocale {
+  return value === 'ru' || value === 'kk' || value === 'en';
+}
+
+/**
+ * The language of the sign-in page the person is looking at right now. The
+ * request route puts it into `redirect_to` as `?email_locale=` (and the path
+ * prefix says the same), so it wins over `user_metadata.locale`, which Auth
+ * froze at the very first sign-in and which the profile never updates.
+ */
+export function detectLocale(userMetadata: unknown, redirectTo: unknown): AuthEmailLocale {
   if (typeof redirectTo === 'string') {
     try {
-      const pathname = new URL(redirectTo).pathname;
-      if (pathname.startsWith('/en/')) return 'en';
-      if (pathname.startsWith('/kk/')) return 'kk';
+      const url = new URL(redirectTo);
+      const requested = url.searchParams.get('email_locale');
+      if (isAuthEmailLocale(requested)) return requested;
+      if (url.pathname.startsWith('/en/')) return 'en';
+      if (url.pathname.startsWith('/kk/')) return 'kk';
     } catch {
       // A malformed redirect never changes the default locale.
     }
   }
+  const metadataLocale = record(userMetadata)?.locale;
+  if (metadataLocale === 'en' || metadataLocale === 'kk') return metadataLocale;
   return 'ru';
 }
 
@@ -145,11 +151,26 @@ const CARD_OPEN =
   '<div style="max-width:520px;margin:0 auto;padding:32px 20px"><div style="border-radius:20px;background:#ffffff;padding:32px;box-shadow:0 8px 30px rgba(23,61,43,.08)">';
 const CARD_CLOSE = '</div></div>';
 
-function page(lang: AuthEmailLocale, body: string) {
+function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+function page(lang: AuthEmailLocale, title: string, preheader: string, body: string) {
   return [
     '<!doctype html>',
     `<html lang="${lang}">`,
+    '  <head>',
+    '    <meta charset="utf-8">',
+    '    <meta name="viewport" content="width=device-width, initial-scale=1">',
+    `    <title>${escapeHtml(title)}</title>`,
+    '  </head>',
     '  <body style="margin:0;background:#f4f7f5;color:#173d2b;font-family:Arial,sans-serif">',
+    // Mail clients show this line next to the subject; it stays invisible in the body.
+    `    <div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:#f4f7f5">${escapeHtml(preheader)}</div>`,
     `    ${CARD_OPEN}`,
     body,
     `    ${CARD_CLOSE}`,
@@ -169,102 +190,104 @@ function codeCard(heading: string, lead: string, token: string, validity: string
   ].join('\n');
 }
 
+/**
+ * Sign-in and sign-up codes. Mirrors supabase/templates/{magic-link,confirmation}.html
+ * and the subjects in supabase/config.toml; keep all three in step.
+ */
 const CODE_COPY: Record<
   AuthEmailLocale,
   Readonly<{
+    loginSubject: string;
+    signupSubject: string;
+    preheader: string;
     loginHeading: string;
     signupHeading: string;
-    lead: string;
+    loginLead: string;
+    signupLead: string;
     validity: string;
-    loginIgnore: string;
-    signupIgnore: string;
+    ignore: string;
   }>
 > = {
   en: {
-    loginHeading: 'Your SafetyHub code',
-    signupHeading: 'Create your SafetyHub account',
-    lead: 'Enter this one-time code in SafetyHub:',
-    validity: 'The code is valid for one hour and can only be used once. Do not share it.',
-    loginIgnore: 'If you did not request this code, ignore this email.',
-    signupIgnore: 'If you are not creating an account, ignore this email.',
+    loginSubject: 'SafetyHub: your sign-in code',
+    signupSubject: 'SafetyHub: your sign-up code',
+    preheader: 'Valid for 1 hour.',
+    loginHeading: 'Your sign-in code',
+    signupHeading: 'Welcome to SafetyHub',
+    loginLead: 'Enter this code in SafetyHub to sign in:',
+    signupLead: 'Enter this code in SafetyHub to finish signing up:',
+    validity:
+      'The code works for 1 hour and only once. Don’t share it — SafetyHub staff will never ask for it.',
+    ignore: 'If you didn’t request a code, just delete this email — nothing will happen.',
   },
   kk: {
-    loginHeading: 'SafetyHub кодыңыз',
-    signupHeading: 'SafetyHub аккаунтын жасау',
-    lead: 'Осы бір реттік кодты SafetyHub-та енгізіңіз:',
-    validity: 'Код бір сағат жарамды және бір рет қана қолданылады. Оны ешкімге айтпаңыз.',
-    loginIgnore: 'Егер кодты сұратпаған болсаңыз, бұл хатты елемеңіз.',
-    signupIgnore: 'Егер аккаунт жасамасаңыз, бұл хатты елемеңіз.',
+    loginSubject: 'SafetyHub: кіру коды',
+    signupSubject: 'SafetyHub: тіркелу коды',
+    preheader: 'Код 1 сағат жарамды.',
+    loginHeading: 'Кіру кодыңыз',
+    signupHeading: 'SafetyHub-қа қош келдіңіз',
+    loginLead: 'SafetyHub-қа кіру үшін осы кодты енгізіңіз:',
+    signupLead: 'Тіркелуді аяқтау үшін осы кодты SafetyHub-та енгізіңіз:',
+    validity:
+      'Код 1 сағат жарамды және бір рет қана қолданылады. Оны ешкімге айтпаңыз — SafetyHub қызметкерлері кодты сұрамайды.',
+    ignore: 'Егер кодты сұратпаған болсаңыз, бұл хатты жай ғана өшіріңіз — ештеңе болмайды.',
   },
   ru: {
-    loginHeading: 'Код SafetyHub',
-    signupHeading: 'Создание аккаунта SafetyHub',
-    lead: 'Введите этот одноразовый код в SafetyHub:',
-    validity: 'Код действует один час и используется только один раз. Никому его не сообщайте.',
-    loginIgnore: 'Если вы не запрашивали код, просто проигнорируйте это письмо.',
-    signupIgnore: 'Если вы не создаёте аккаунт, просто проигнорируйте это письмо.',
+    loginSubject: 'SafetyHub: код для входа',
+    signupSubject: 'SafetyHub: код для регистрации',
+    preheader: 'Код действует 1 час.',
+    loginHeading: 'Ваш код для входа',
+    signupHeading: 'Добро пожаловать в SafetyHub',
+    loginLead: 'Введите этот код в SafetyHub, чтобы войти:',
+    signupLead: 'Введите этот код в SafetyHub, чтобы завершить регистрацию:',
+    validity:
+      'Код действует 1 час и подходит только один раз. Никому его не сообщайте — сотрудники SafetyHub его не спрашивают.',
+    ignore: 'Если вы не запрашивали код, просто удалите это письмо — ничего не произойдёт.',
   },
 };
 
 /**
- * The retirement notices, in the recipient's language.
- *
- * `detectLocale` has already answered for this message and the one-time-code
- * branches above use it, but these two were written in Russian and sent the
- * document with `lang="ru"` to everyone. The wording deliberately says the mail
- * carries no link and no code: that is what makes a phishing copy of it stand
- * out, so keep it in every translation, and keep supabase/templates/*.html in
- * step with what is written here.
+ * The retirement notices, in the recipient's language. The wording
+ * deliberately says the mail carries no link and no code: that is what makes
+ * a phishing copy of it stand out, so keep it in every translation, and keep
+ * supabase/templates/{recovery,invite}.html in step with what is written here.
  */
 const NOTICE_COPY: Record<
   AuthEmailLocale,
   Readonly<{
+    preheader: string;
     recoverySubject: string;
-    recoveryHeading: string;
     recoveryLead: string;
-    recoveryHint: string;
     inviteSubject: string;
-    inviteHeading: string;
     inviteLead: string;
-    inviteHint: string;
+    hint: string;
   }>
 > = {
   en: {
-    recoverySubject: 'SafetyHub does not use passwords',
-    recoveryHeading: 'SafetyHub does not use passwords',
-    recoveryLead: 'SafetyHub has no password reset and no password setup.',
-    recoveryHint:
-      'To sign in, open SafetyHub and request a one-time code for your email. This message contains no sign-in link and no code.',
-    inviteSubject: 'Password invitations in SafetyHub are disabled',
-    inviteHeading: 'Password invitations are disabled',
-    inviteLead: 'SafetyHub uses no invitations, no passwords and no password-setup links.',
-    inviteHint:
-      'To get access, create an account or request a one-time sign-in code on the SafetyHub page. This message contains no sign-in link and no code.',
+    preheader: 'No link and no code inside.',
+    recoverySubject: 'SafetyHub signs you in without a password',
+    recoveryLead: 'SafetyHub has no passwords, so there is nothing to reset or set up.',
+    inviteSubject: 'SafetyHub does not send invitations',
+    inviteLead: 'SafetyHub has no invitations, passwords or password-setup links.',
+    hint: 'To sign in, open SafetyHub and request a one-time code for your email. This message has no link and no code: a similar email with a link is a fake.',
   },
   kk: {
-    recoverySubject: 'SafetyHub-та құпиясөз қолданылмайды',
-    recoveryHeading: 'SafetyHub-та құпиясөз қолданылмайды',
-    recoveryLead: 'SafetyHub-та құпиясөзді қалпына келтіру де, орнату да жоқ.',
-    recoveryHint:
-      'Кіру үшін SafetyHub-ты ашып, email-іңізге бір реттік код сұратыңыз. Бұл хатта кіру сілтемесі де, коды да жоқ.',
-    inviteSubject: 'SafetyHub-та құпиясөзбен шақыру өшірілген',
-    inviteHeading: 'Құпиясөзбен шақыру өшірілген',
-    inviteLead:
-      'SafetyHub-та шақырулар, құпиясөздер және құпиясөз орнату сілтемелері қолданылмайды.',
-    inviteHint:
-      'Қолжетімділік алу үшін аккаунт жасаңыз немесе SafetyHub бетінде бір реттік кіру кодын сұратыңыз. Бұл хатта кіру сілтемесі де, коды да жоқ.',
+    preheader: 'Хатта сілтеме де, код та жоқ.',
+    recoverySubject: 'SafetyHub-қа кіру құпиясөзсіз',
+    recoveryLead:
+      'SafetyHub-та құпиясөз жоқ, сондықтан оны қалпына келтірудің де, орнатудың да қажеті жоқ.',
+    inviteSubject: 'SafetyHub-та шақырулар қолданылмайды',
+    inviteLead: 'SafetyHub-та шақырулар, құпиясөздер және оларды орнату сілтемелері жоқ.',
+    hint: 'Кіру үшін SafetyHub-ты ашып, поштаңызға бір реттік код сұратыңыз. Бұл хатта сілтеме де, код та жоқ: сілтемесі бар ұқсас хат келсе, ол жалған.',
   },
   ru: {
-    recoverySubject: 'Пароль в SafetyHub не используется',
-    recoveryHeading: 'Пароль в SafetyHub не используется',
-    recoveryLead: 'В SafetyHub нет восстановления или установки пароля.',
-    recoveryHint:
-      'Чтобы войти, откройте SafetyHub и запросите одноразовый код на ваш email. Это письмо не содержит ссылки или кода для входа.',
-    inviteSubject: 'Приглашения с паролем в SafetyHub отключены',
-    inviteHeading: 'Приглашения с паролем отключены',
-    inviteLead: 'В SafetyHub не используются приглашения, пароли и ссылки для установки пароля.',
-    inviteHint:
-      'Для доступа создайте аккаунт или запросите одноразовый код входа на странице SafetyHub. Это письмо не содержит ссылки или кода для входа.',
+    preheader: 'В письме нет ни ссылки, ни кода.',
+    recoverySubject: 'В SafetyHub вход без пароля',
+    recoveryLead:
+      'Пароль в SafetyHub не используется, поэтому восстанавливать или задавать его не нужно.',
+    inviteSubject: 'Приглашения в SafetyHub не используются',
+    inviteLead: 'В SafetyHub нет приглашений, паролей и ссылок для их установки.',
+    hint: 'Чтобы войти, откройте SafetyHub и запросите одноразовый код на свою почту. В этом письме нет ни ссылки, ни кода — если вам пришло похожее письмо со ссылкой, это подделка.',
   },
 };
 
@@ -285,43 +308,48 @@ export function renderAuthEmail(
   payload: Pick<SendEmailHookPayload, 'actionType' | 'token' | 'locale'>,
 ): Readonly<{ subject: string; html: string }> | null {
   const copy = CODE_COPY[payload.locale];
+  const notice = NOTICE_COPY[payload.locale];
   switch (payload.actionType) {
     case 'magiclink':
       return {
-        subject: 'SafetyHub',
+        subject: copy.loginSubject,
         html: page(
           payload.locale,
-          codeCard(copy.loginHeading, copy.lead, payload.token, copy.validity, copy.loginIgnore),
+          copy.loginSubject,
+          copy.preheader,
+          codeCard(copy.loginHeading, copy.loginLead, payload.token, copy.validity, copy.ignore),
         ),
       };
     case 'signup':
       return {
-        subject: 'SafetyHub',
+        subject: copy.signupSubject,
         html: page(
           payload.locale,
-          codeCard(copy.signupHeading, copy.lead, payload.token, copy.validity, copy.signupIgnore),
+          copy.signupSubject,
+          copy.preheader,
+          codeCard(copy.signupHeading, copy.signupLead, payload.token, copy.validity, copy.ignore),
         ),
       };
-    case 'recovery': {
-      const notice = NOTICE_COPY[payload.locale];
+    case 'recovery':
       return {
         subject: notice.recoverySubject,
         html: page(
           payload.locale,
-          noticeCard(notice.recoveryHeading, notice.recoveryLead, notice.recoveryHint),
+          notice.recoverySubject,
+          notice.preheader,
+          noticeCard(notice.recoverySubject, notice.recoveryLead, notice.hint),
         ),
       };
-    }
-    case 'invite': {
-      const notice = NOTICE_COPY[payload.locale];
+    case 'invite':
       return {
         subject: notice.inviteSubject,
         html: page(
           payload.locale,
-          noticeCard(notice.inviteHeading, notice.inviteLead, notice.inviteHint),
+          notice.inviteSubject,
+          notice.preheader,
+          noticeCard(notice.inviteSubject, notice.inviteLead, notice.hint),
         ),
       };
-    }
     default:
       return null;
   }

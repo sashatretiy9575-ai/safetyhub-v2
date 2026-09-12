@@ -4,8 +4,15 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const route = await readFile('app/api/auth/send-email/route.ts', 'utf8');
+const drain = await readFile('app/api/auth/send-email/drain/route.ts', 'utf8');
 const hook = await readFile('server/auth/send-email-hook.ts', 'utf8');
 const smtp = await readFile('server/email/smtp.ts', 'utf8');
+const transport = await readFile('server/email/transport.ts', 'utf8');
+const outbox = await readFile('server/email/auth-email-outbox.ts', 'utf8');
+const migration = await readFile(
+  'supabase/migrations/20260912182000_auth_email_outbox_and_otp_gateway.sql',
+  'utf8',
+);
 const config = await readFile('supabase/config.toml', 'utf8');
 const exampleEnvironment = await readFile('.env.example', 'utf8');
 
@@ -28,6 +35,83 @@ test('the hook route answers before relaying and never trusts an unsigned call',
   assert.doesNotMatch(route, /console\./u);
   assert.doesNotMatch(smtp, /console\./u);
   assert.doesNotMatch(hook, /console\./u);
+  assert.doesNotMatch(outbox, /console\./u);
+  assert.doesNotMatch(transport, /console\./u);
+  assert.doesNotMatch(drain, /console\./u);
+});
+
+test('every message is recorded before the hook answers, and a replay is a duplicate, not a second email', () => {
+  // The first 200 acknowledges action types SafetyHub never emails; the
+  // final one is the acceptance and comes after the row is stored.
+  assert.ok(
+    route.indexOf('await enqueueAuthEmail(') <
+      route.lastIndexOf("NextResponse.json({}, { status: 200 })"),
+    'the outbox row must exist before Auth is told the message was accepted',
+  );
+  assert.match(route, /SEND_EMAIL_QUEUE_UNAVAILABLE[\s\S]*?status: 503, headers: \{ 'Retry-After': '2' \}/u);
+  assert.match(route, /if \(!queued\.duplicate\) \{/u);
+  assert.match(route, /export const maxDuration = 60/u);
+  assert.match(migration, /create table private\.auth_email_outbox/u);
+  assert.match(migration, /webhook_id text not null unique/u);
+  assert.match(migration, /on conflict \(webhook_id\) do nothing/u);
+  // The code is erased the moment the row is sent or abandoned.
+  assert.match(migration, /set status = 'sent',\s*\n\s*token = null/u);
+  assert.match(migration, /set status = 'failed',\s*\n\s*token = null/u);
+  assert.match(migration, /for update skip locked/u);
+  assert.match(migration, /'AUTH_EMAIL_DEAD'/u);
+  assert.match(migration, /cron\.schedule\(\s*\n\s*'safetyhub-auth-email-drain',\s*\n\s*'\*\/2 \* \* \* \*'/u);
+  assert.match(migration, /cron\.schedule\(\s*\n\s*'safetyhub-auth-email-prune',\s*\n\s*'45 4 \* \* \*'/u);
+  assert.match(migration, /revoke all on table private\.auth_email_outbox[\s\S]*?service_role/u);
+});
+
+test('the drain is a bearer-protected batch with bounded parallelism that backs off on a throttled mailbox', () => {
+  assert.match(drain, /matchesBearerSecret\(request\.headers\.get\('authorization'\), secret\)/u);
+  assert.match(drain, /AUTH_EMAIL_DRAIN_NOT_CONFIGURED[\s\S]*?status: 503/u);
+  assert.match(drain, /export const maxDuration = 60/u);
+  assert.match(drain, /DRAIN_BATCH = 10/u);
+  assert.match(drain, /DRAIN_CONCURRENCY = 3/u);
+  assert.match(drain, /@\/lib\/security\/api-response/u);
+  assert.doesNotMatch(drain, /from 'next\/server'/u);
+  assert.match(outbox, /IMMEDIATE_RETRY_DELAYS_MS = \[1_000, 4_000\]/u);
+  assert.match(outbox, /if \(error instanceof EmailThrottledError\) \{\s*\n\s*throttled = true;/u);
+  assert.match(outbox, /rpc\('defer_auth_email'/u);
+  assert.match(outbox, /rpc\('complete_auth_email'/u);
+  assert.match(outbox, /rpc\('fail_auth_email'/u);
+  assert.match(smtp, /THROTTLE_REPLY = \/\^\(\?:421\|45\[012\]\)/u);
+  // One connection, EHLO and AUTH per session; the drain reuses it per worker.
+  assert.match(smtp, /export async function openSmtpSession/u);
+  assert.match(smtp, /'RSET', 'RSET'/u);
+  assert.match(transport, /SAFETYHUB_EMAIL_TRANSPORT/u);
+  assert.match(transport, /tls === 'none' && process\.env\.NODE_ENV === 'production' && process\.env\.VERCEL === '1'/u);
+  assert.match(transport, /api\.resend\.com\/emails/u);
+  assert.match(transport, /api\.postmarkapp\.com\/email/u);
+});
+
+test('the email language follows the page the person is on, not the metadata frozen at first sign-in', () => {
+  const detect = hook.slice(
+    hook.indexOf('export function detectLocale'),
+    hook.indexOf('export function parseSendEmailHookPayload'),
+  );
+  assert.ok(
+    detect.indexOf("searchParams.get('email_locale')") < detect.indexOf('record(userMetadata)'),
+    'the redirect marker must be read before the user metadata',
+  );
+  assert.match(detect, /pathname\.startsWith\('\/en\/'\)/u);
+  assert.match(hook, /loginSubject: 'SafetyHub: код для входа'/u);
+  assert.match(hook, /loginSubject: 'SafetyHub: кіру коды'/u);
+  assert.match(hook, /loginSubject: 'SafetyHub: your sign-in code'/u);
+  assert.match(hook, /<meta charset="utf-8">/u);
+  assert.match(hook, /display:none;max-height:0;overflow:hidden/u);
+  for (const phrase of [
+    'SafetyHub: your sign-in code',
+    'SafetyHub: кіру коды',
+    'SafetyHub: код для входа',
+    'SafetyHub: your sign-up code',
+    'SafetyHub: тіркелу коды',
+    'SafetyHub: код для регистрации',
+  ]) {
+    assert.ok(config.includes(phrase), `config.toml subject lacks: ${phrase}`);
+  }
 });
 
 test('signature verification follows Standard Webhooks with a time window', () => {
@@ -42,20 +126,23 @@ test('rendered templates match the Supabase templates copy for every locale', as
   const magicLink = await readFile('supabase/templates/magic-link.html', 'utf8');
   const confirmation = await readFile('supabase/templates/confirmation.html', 'utf8');
   for (const phrase of [
-    'Your SafetyHub code',
-    'SafetyHub кодыңыз',
-    'Код SafetyHub',
-    'Enter this one-time code in SafetyHub:',
-    'Осы бір реттік кодты SafetyHub-та енгізіңіз:',
-    'Введите этот одноразовый код в SafetyHub:',
+    'Your sign-in code',
+    'Кіру кодыңыз',
+    'Ваш код для входа',
+    'Enter this code in SafetyHub to sign in:',
+    'SafetyHub-қа кіру үшін осы кодты енгізіңіз:',
+    'Введите этот код в SafetyHub, чтобы войти:',
+    'SafetyHub staff will never ask for it',
+    'SafetyHub қызметкерлері кодты сұрамайды',
+    'сотрудники SafetyHub его не спрашивают',
   ]) {
     assert.ok(magicLink.includes(phrase), `magic-link template lacks: ${phrase}`);
     assert.ok(hook.includes(phrase), `hook renderer lacks: ${phrase}`);
   }
   for (const phrase of [
-    'Create your SafetyHub account',
-    'SafetyHub аккаунтын жасау',
-    'Создание аккаунта SafetyHub',
+    'Welcome to SafetyHub',
+    'SafetyHub-қа қош келдіңіз',
+    'Добро пожаловать в SafetyHub',
   ]) {
     assert.ok(confirmation.includes(phrase), `confirmation template lacks: ${phrase}`);
     assert.ok(hook.includes(phrase), `hook renderer lacks: ${phrase}`);
@@ -77,16 +164,22 @@ test('the SMTP client speaks implicit TLS with AUTH PLAIN and base64 bodies', ()
 });
 
 test('the hook and SMTP environment is documented for deployments', () => {
-  for (const name of [
-    'SUPABASE_SEND_EMAIL_HOOK_SECRETS',
-    'SAFETYHUB_SMTP_HOST',
-    'SAFETYHUB_SMTP_PORT',
-    'SAFETYHUB_SMTP_USER',
-    'SAFETYHUB_SMTP_PASSWORD',
-    'SAFETYHUB_SMTP_FROM',
-  ]) {
+  const readers = {
+    SUPABASE_SEND_EMAIL_HOOK_SECRETS: route,
+    SAFETYHUB_SMTP_HOST: transport,
+    SAFETYHUB_SMTP_PORT: transport,
+    SAFETYHUB_SMTP_USER: transport,
+    SAFETYHUB_SMTP_PASSWORD: transport,
+    SAFETYHUB_SMTP_FROM: transport,
+    SAFETYHUB_SMTP_TLS: transport,
+    SAFETYHUB_EMAIL_TRANSPORT: transport,
+    SAFETYHUB_EMAIL_HTTP_PROVIDER: transport,
+    SAFETYHUB_EMAIL_HTTP_API_KEY: transport,
+    AUTH_EMAIL_DRAIN_SECRET: drain,
+  };
+  for (const [name, reader] of Object.entries(readers)) {
     assert.match(exampleEnvironment, new RegExp(`^${name}=`, 'mu'));
-    assert.ok(route.includes(name), `route ignores ${name}`);
+    assert.ok(reader.includes(name), `nothing reads ${name}`);
   }
 });
 
@@ -108,12 +201,16 @@ test('delivery failures never write mailbox credentials to the platform log', ()
   // is the operator login and the exact password length in a log anybody with
   // deployment access can read. An SMTP reply also quotes the recipient, so the
   // reply text itself must not be logged either.
-  assert.doesNotMatch(route, /secretChars/u);
-  assert.doesNotMatch(route, /transport\.user/u);
-  assert.doesNotMatch(route, /transport\.password/u);
-  assert.doesNotMatch(route, /error\.message\.slice/u);
-  assert.match(route, /delivery failed \(\$\{stage\}\)/u);
-  assert.match(route, /\/\^SMTP_\[A-Z_\]\+\/u\.exec\(error\.message\)/u);
+  for (const source of [route, drain, outbox]) {
+    assert.doesNotMatch(source, /secretChars/u);
+    assert.doesNotMatch(source, /transport\.user/u);
+    assert.doesNotMatch(source, /transport\.password/u);
+    assert.doesNotMatch(source, /error\.message\.slice/u);
+  }
+  assert.match(outbox, /delivery failed \(\$\{stage\}\)/u);
+  assert.match(transport, /\/\^\(\?:SMTP\|HTTP\)_\[A-Z0-9_\]\+\/u\.exec\(error\.message\)/u);
+  // The HTTP providers' response bodies quote the recipient; they are never read.
+  assert.match(transport, /response\.body\?\.cancel\(\)/u);
 });
 
 test('the hook body is bounded by the bytes read, not by a declared length', () => {

@@ -197,6 +197,57 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_email_outbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: string
+          kind: string
+          last_error: string | null
+          lease_token: string | null
+          lease_until: string | null
+          locale: string
+          next_attempt_at: string
+          recipient: string
+          sent_at: string | null
+          status: string
+          token: string | null
+          webhook_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          kind: string
+          last_error?: string | null
+          lease_token?: string | null
+          lease_until?: string | null
+          locale: string
+          next_attempt_at?: string
+          recipient: string
+          sent_at?: string | null
+          status?: string
+          token?: string | null
+          webhook_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          last_error?: string | null
+          lease_token?: string | null
+          lease_until?: string | null
+          locale?: string
+          next_attempt_at?: string
+          recipient?: string
+          sent_at?: string | null
+          status?: string
+          token?: string | null
+          webhook_id?: string
+        }
+        Relationships: []
+      }
       avatar_upload_operations: {
         Row: {
           artifacts_cleared_at: string | null
@@ -1836,6 +1887,7 @@ export type Database = {
         }
         Returns: Json
       }
+      request_auth_email_drain: { Args: never; Returns: number }
       request_notification_dispatch: {
         Args: { p_delivery_id?: string; p_reason: string }
         Returns: number
@@ -4055,6 +4107,19 @@ export type Database = {
         Args: { p_operation_id: string; p_user_id: string }
         Returns: Json
       }
+      auth_email_outbox_summary: { Args: never; Returns: Json }
+      begin_email_otp_request: {
+        Args: { p_email: string; p_email_hash: string; p_ip_hash: string }
+        Returns: Json
+      }
+      begin_email_otp_verify: {
+        Args: {
+          p_challenge_hash: string
+          p_email_hash: string
+          p_ip_hash: string
+        }
+        Returns: Json
+      }
       begin_initial_course_import: {
         Args: {
           p_actor_id: string
@@ -4110,6 +4175,15 @@ export type Database = {
         }
         Returns: Json
       }
+      claim_auth_email_outbox: {
+        Args: {
+          p_lease_seconds?: number
+          p_limit?: number
+          p_only_id?: string
+          p_worker_id: string
+        }
+        Returns: Json
+      }
       claim_course_presentation_download_lease: {
         Args: { p_actor_id: string; p_lease_seconds?: number }
         Returns: Json
@@ -4138,6 +4212,10 @@ export type Database = {
       collect_capacity_monitor_snapshot: {
         Args: { p_force?: boolean }
         Returns: Json
+      }
+      complete_auth_email: {
+        Args: { p_id: string; p_lease_token: string }
+        Returns: boolean
       }
       complete_course_presentation_cleanup: {
         Args: { p_presentation_ids: string[] }
@@ -4223,6 +4301,10 @@ export type Database = {
         }
         Returns: Json
       }
+      configure_auth_email_drain_vault: {
+        Args: { p_drain_secret: string; p_drain_url: string }
+        Returns: Json
+      }
       configure_notification_dispatch_vault: {
         Args: {
           p_dispatch_secret: string
@@ -4277,6 +4359,14 @@ export type Database = {
             }
             Returns: Json
           }
+      defer_auth_email: {
+        Args: {
+          p_id: string
+          p_lease_token: string
+          p_retry_after_seconds?: number
+        }
+        Returns: boolean
+      }
       delete_admin_learning_history: {
         Args: {
           p_actor_id: string
@@ -4311,6 +4401,16 @@ export type Database = {
         Returns: string
       }
       enforce_email_otp_access_token: { Args: { event: Json }; Returns: Json }
+      enqueue_auth_email: {
+        Args: {
+          p_kind: string
+          p_locale: string
+          p_recipient: string
+          p_token: string
+          p_webhook_id: string
+        }
+        Returns: Json
+      }
       execute_admin_attestation_action: {
         Args: {
           p_action: string
@@ -4319,6 +4419,15 @@ export type Database = {
           p_reason?: string
           p_target_ids: string[]
           p_value?: string
+        }
+        Returns: Json
+      }
+      fail_auth_email: {
+        Args: {
+          p_error: string
+          p_id: string
+          p_lease_token: string
+          p_retry_after_seconds?: number
         }
         Returns: Json
       }
@@ -4851,6 +4960,7 @@ export type Database = {
         Args: { p_limit?: number }
         Returns: number
       }
+      prune_auth_email_outbox: { Args: { p_limit?: number }; Returns: number }
       prune_certificate_export_jobs: {
         Args: { p_limit?: number }
         Returns: number

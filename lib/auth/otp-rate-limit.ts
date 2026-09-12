@@ -1,14 +1,63 @@
 export const OTP_RETRY_FALLBACK_SECONDS = 60;
 export const OTP_MAX_RETRY_SECONDS = 60 * 60;
+/** Mirrors `[auth.rate_limit] email_sent` in supabase/config.toml. */
+export const DEFAULT_PROVIDER_EMAILS_PER_HOUR = 40;
 
-type AuthProviderRateLimitError = { code?: string } | null;
+export type AuthProviderThrottleCode = 'ADDRESS_COOLDOWN' | 'PROVIDER_BUSY' | 'RATE_LIMITED';
 
-export function authProviderRetryAfter(_error: AuthProviderRateLimitError) {
-  // Supabase uses the same provider code for the per-address resend interval
-  // and the project email bucket, while the SDK does not expose the bucket's
-  // reset timestamp. Use the safe minimum cooldown instead of falsely locking
-  // the browser for a full hour; a later 429 will extend it by another minute.
-  return OTP_RETRY_FALLBACK_SECONDS;
+export type AuthProviderThrottle = Readonly<{
+  code: AuthProviderThrottleCode;
+  retryAfter: number;
+}>;
+
+type AuthProviderRateLimitError = { code?: string; message?: string; status?: number } | null;
+
+/** The configured hourly email budget, or the default when the variable is absent or malformed. */
+export function providerEmailsPerHour(value: string | undefined) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 100_000
+    ? parsed
+    : DEFAULT_PROVIDER_EMAILS_PER_HOUR;
+}
+
+/**
+ * Supabase answers 429 for three different reasons, and only one of them is
+ * "you, personally, asked too fast". Telling them apart is what lets the form
+ * say something true instead of "wait a minute" on every refusal:
+ *
+ * - `over_email_send_rate_limit` with "after N seconds" is the per-address
+ *   resend interval (`max_frequency`): the person already has a code on the
+ *   way and may ask again in N seconds.
+ * - the same code without a number is the project-wide hourly email bucket:
+ *   everybody is waiting for it to refill, and one slot frees up every
+ *   3600 / email_sent seconds. The SDK exposes no reset timestamp.
+ * - `over_request_rate_limit` is the general request limit of the Auth API.
+ */
+export function classifyAuthProviderError(
+  error: AuthProviderRateLimitError,
+  emailsPerHour = DEFAULT_PROVIDER_EMAILS_PER_HOUR,
+): AuthProviderThrottle {
+  const message = typeof error?.message === 'string' ? error.message : '';
+  const cooldown = /after (\d{1,5}) seconds?/iu.exec(message);
+  if (cooldown && error?.code === 'over_email_send_rate_limit') {
+    return {
+      code: 'ADDRESS_COOLDOWN',
+      retryAfter: Math.min(OTP_MAX_RETRY_SECONDS, Math.max(1, Number(cooldown[1]))),
+    };
+  }
+  if (error?.code === 'over_email_send_rate_limit') {
+    return {
+      code: 'PROVIDER_BUSY',
+      retryAfter: Math.min(
+        OTP_MAX_RETRY_SECONDS,
+        Math.max(OTP_RETRY_FALLBACK_SECONDS, Math.ceil(3600 / Math.max(1, emailsPerHour))),
+      ),
+    };
+  }
+  if (error?.code === 'over_request_rate_limit') {
+    return { code: 'PROVIDER_BUSY', retryAfter: OTP_RETRY_FALLBACK_SECONDS };
+  }
+  return { code: 'RATE_LIMITED', retryAfter: OTP_RETRY_FALLBACK_SECONDS };
 }
 
 function positiveSeconds(value: unknown) {
@@ -39,7 +88,12 @@ export function normalizeOtpRetryAfter(
 }
 
 export function isOtpRateLimited(errorCode: unknown, responseStatus: unknown) {
-  return errorCode === 'RATE_LIMITED' || responseStatus === 429;
+  return (
+    errorCode === 'RATE_LIMITED' ||
+    errorCode === 'PROVIDER_BUSY' ||
+    errorCode === 'ADDRESS_COOLDOWN' ||
+    responseStatus === 429
+  );
 }
 
 export function retrySecondsUntil(retryAt: number, nowMs = Date.now()) {

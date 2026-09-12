@@ -66,15 +66,17 @@ test('profile uses one dashboard contract and keeps attempt analytics hidden', a
 });
 
 test('account deletion is explicit, irreversible, and completes inside the request', async () => {
-  const [control, route, auth, cleanup, sweep, otpRequest, migration] = await Promise.all([
-    read('components/profile/account-deletion.tsx'),
-    read('app/api/profile/account/route.ts'),
-    read('server/auth/session.ts'),
-    read('lib/supabase/session-cleanup.ts'),
-    read('server/auth/pending-self-deletion.ts'),
-    read('app/api/auth/email-otp/request/route.ts'),
-    read('supabase/migrations/20260912100000_immediate_self_account_purge.sql'),
-  ]);
+  const [control, route, auth, cleanup, sweep, otpRequest, migration, gateway] =
+    await Promise.all([
+      read('components/profile/account-deletion.tsx'),
+      read('app/api/profile/account/route.ts'),
+      read('server/auth/session.ts'),
+      read('lib/supabase/session-cleanup.ts'),
+      read('server/auth/pending-self-deletion.ts'),
+      read('app/api/auth/email-otp/request/route.ts'),
+      read('supabase/migrations/20260912100000_immediate_self_account_purge.sql'),
+      read('supabase/migrations/20260912182000_auth_email_outbox_and_otp_gateway.sql'),
+    ]);
   assert.match(control, /confirmation !== confirmationPhrase/);
   assert.match(control, /body: JSON\.stringify\(\{ confirmation: API_CONFIRMATION \}\)/);
   assert.match(control, /useTranslations\('AccountDeletion'\)/);
@@ -98,13 +100,19 @@ test('account deletion is explicit, irreversible, and completes inside the reque
   assert.match(migration, /'user\.self_purged'/);
   // Accounts the old path left pending are finished before an OTP goes out,
   // so the sign-in creates a brand-new account rather than reviving the old one.
-  assert.match(sweep, /rpc\('purge_pending_self_deletion'/);
+  // The database side of the sweep now lives inside the OTP gateway call and
+  // never blocks the sign-in; the route only sweeps leftover avatar bytes.
+  assert.match(gateway, /v_purge := public\.purge_pending_self_deletion\(p_email\);/);
+  assert.match(gateway, /exception when others then\s*\n\s*v_purge := null;/);
+  assert.match(sweep, /removeAvatarPrefix\(admin, userId\)/);
+  assert.doesNotMatch(sweep, /purge_pending_self_deletion/);
   assert.match(migration, /and control\.deletion_pending\s*\n\s*order by/);
   assert.ok(
-    otpRequest.indexOf('await finishPendingSelfDeletion(parsed.data.email)') <
+    otpRequest.indexOf('await beginEmailOtpRequest(security.ipHash, parsed.data.email)') <
       otpRequest.indexOf('auth.signInWithOtp({'),
     'the sweep runs before the provider creates or resends for the address',
   );
+  assert.match(otpRequest, /sweepPurgedAccountStorage\(purgedUserId\)/);
 
   // Normal application authorization remains fail-closed after phase one.
   assert.match(

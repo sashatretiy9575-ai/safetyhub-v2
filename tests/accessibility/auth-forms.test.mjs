@@ -79,8 +79,8 @@ test('registration start is neutral about whether the email already has an accou
     read('messages/ru.json'),
   ]);
 
-  assert.match(flow, /setStatus\(t\('sentStatus'\)\)/u);
-  assert.match(JSON.parse(ruMessages).AuthOtp.sentStatus, /код отправлен/iu);
+  assert.match(flow, /setStatus\(t\('sentTo', \{ email: normalizedEmail \}\)\)/u);
+  assert.match(JSON.parse(ruMessages).AuthOtp.sentTo, /код отправлен на \{email\}/iu);
   assert.match(
     requestRoute,
     /setEmailOtpChallengeCookie\([\s\S]*NextResponse\.json\(\{ sent: true \}, \{ status: 202 \}\)/u,

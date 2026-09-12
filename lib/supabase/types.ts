@@ -677,6 +677,53 @@ export type Database = {
         Args: { p_challenge_hash: string; p_email_hash: string };
         Returns: Json;
       };
+      begin_email_otp_request: {
+        Args: { p_ip_hash: string; p_email: string; p_email_hash: string };
+        Returns: Json;
+      };
+      begin_email_otp_verify: {
+        Args: { p_ip_hash: string; p_challenge_hash: string; p_email_hash: string };
+        Returns: Json;
+      };
+      enqueue_auth_email: {
+        Args: {
+          p_webhook_id: string;
+          p_recipient: string;
+          p_locale: string;
+          p_kind: string;
+          p_token: string;
+        };
+        Returns: Json;
+      };
+      claim_auth_email_outbox: {
+        Args: {
+          p_worker_id: string;
+          p_limit?: number;
+          p_lease_seconds?: number;
+          p_only_id?: string | null;
+        };
+        Returns: Json;
+      };
+      complete_auth_email: { Args: { p_id: string; p_lease_token: string }; Returns: boolean };
+      fail_auth_email: {
+        Args: {
+          p_id: string;
+          p_lease_token: string;
+          p_error: string;
+          p_retry_after_seconds?: number;
+        };
+        Returns: Json;
+      };
+      defer_auth_email: {
+        Args: { p_id: string; p_lease_token: string; p_retry_after_seconds?: number };
+        Returns: boolean;
+      };
+      prune_auth_email_outbox: { Args: { p_limit?: number }; Returns: number };
+      auth_email_outbox_summary: { Args: Record<PropertyKey, never>; Returns: Json };
+      configure_auth_email_drain_vault: {
+        Args: { p_drain_url: string; p_drain_secret: string };
+        Returns: Json;
+      };
       complete_email_otp_challenge: {
         Args: { p_challenge_hash: string; p_email_hash: string };
         Returns: boolean;
@@ -864,7 +911,10 @@ export type Database = {
       list_admin_attestations_page: JsonRpc;
       get_admin_attestation_filters: { Args: Record<PropertyKey, never>; Returns: Json };
       get_admin_work_queue: { Args: Record<PropertyKey, never>; Returns: Json };
-      list_admin_article_drafts: { Args: { p_query: string | null; p_limit: number }; Returns: Json };
+      list_admin_article_drafts: {
+        Args: { p_query: string | null; p_limit: number };
+        Returns: Json;
+      };
       configure_storage_reconciler_vault: {
         Args: { p_reconciler_url: string; p_reconciler_secret: string };
         Returns: Json;

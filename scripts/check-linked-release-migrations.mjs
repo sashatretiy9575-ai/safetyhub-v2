@@ -139,6 +139,10 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
     filename: '20260912180000_admin_reads_and_schedules.sql',
     sha256: 'd4ef996f9e1218864267a9ab2b1c801fd3cbad778aa43d4f97e2f45e67349824',
   }),
+  Object.freeze({
+    filename: '20260912182000_auth_email_outbox_and_otp_gateway.sql',
+    sha256: '91893b9e12ea5926bbde47096f52464ae9e1c2c680f98cbd3d4c1c9aa4219520',
+  }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;

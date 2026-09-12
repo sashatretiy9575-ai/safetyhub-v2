@@ -94,16 +94,23 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
   assert.match(route, /isSameOriginRequest\(request\)/u);
   assert.match(route, /readJsonBody\(request\)/u);
   assert.match(route, /NEXT_PUBLIC_TURNSTILE_SITE_KEY/u);
-  assert.match(route, /consumeCoarseQuota\('auth\.otp\.start', security\.ipHash\)/u);
-  assert.doesNotMatch(route, /auth\.otp\.start\.email|requestSubjectHash/u);
+  // Quota, address cooldown and the self-deletion sweep are one round-trip
+  // that runs before Auth is asked; the receipt is still issued only after.
+  assert.match(route, /await beginEmailOtpRequest\(security\.ipHash, parsed\.data\.email\)/u);
+  assert.doesNotMatch(route, /consumeCoarseQuota|auth\.otp\.start\.email|requestSubjectHash/u);
+  assert.ok(
+    route.indexOf('await beginEmailOtpRequest(') < route.indexOf('auth.signInWithOtp({'),
+    'the gateway call must precede the provider send',
+  );
+  assert.match(route, /throttledResponse\('ADDRESS_COOLDOWN', gate\.retryAfter\)/u);
   assert.match(route, /createEphemeralAuthClient\(\)\.auth\.signInWithOtp\(/u);
   assert.match(route, /shouldCreateUser: true/u);
   assert.doesNotMatch(route, /shouldCreateUser: parsed\.data\.intent/u);
   assert.match(route, /captchaToken: parsed\.data\.captchaToken/u);
   assert.match(route, /const locale = parsed\.data\.locale \?\? 'ru'/u);
   assert.match(route, /emailRedirectTo: emailOtpRedirectUrl\(resolveSiteOrigin\(\), locale\)/u);
-  assert.match(route, /authProviderRetryAfter\(error\)/u);
-  assert.match(route, /\{ error: 'RATE_LIMITED', retryAfter \}/u);
+  assert.match(route, /classifyAuthProviderError\(\s*error,\s*providerEmailsPerHour\(process\.env\.SUPABASE_AUTH_EMAIL_SENT_PER_HOUR\)/u);
+  assert.match(route, /\{ error: code, retryAfter \}/u);
   assert.match(route, /'Retry-After': String\(retryAfter\)/u);
   assert.match(route, /challengeToken = await issueEmailOtpChallenge\(parsed\.data\.email\)/u);
   assert.ok(
@@ -128,6 +135,7 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
   assert.match(challenge, /sameSite: 'lax'/u);
   assert.match(challenge, /EMAIL_OTP_CHALLENGE_MAX_AGE_SECONDS = 3600/u);
   assert.match(challenge, /rpc\('issue_email_otp_challenge'/u);
+  assert.match(challenge, /rpc\('begin_email_otp_request', \{/u);
   assert.match(migration, /create table private\.email_otp_challenges/u);
   assert.match(migration, /max_attempts smallint not null default 6/u);
   assert.match(migration, /expires_at <= issued_at \+ interval '1 hour'/u);
@@ -145,7 +153,7 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
   }
   assert.match(generatedTypes, /email_otp_challenges: \{[\s\S]*challenge_hash: string/u);
   assert.match(config, /\[auth\][\s\S]*?enable_signup = true/u);
-  assert.match(config, /\[auth\.rate_limit\][\s\S]*?email_sent = 30/u);
+  assert.match(config, /\[auth\.rate_limit\][\s\S]*?email_sent = 40/u);
   assert.match(config, /\[auth\.captcha\][\s\S]*?enabled = true/u);
   assert.match(config, /\[auth\.captcha\][\s\S]*?provider = "turnstile"/u);
   assert.match(config, /secret = "env\(SUPABASE_AUTH_CAPTCHA_SECRET\)"/u);
@@ -178,13 +186,11 @@ test('email OTP verification spends only its bound receipt before provider proof
 
   assert.match(route, /isSameOriginRequest\(request\)/u);
   assert.match(route, /readJsonBody\(request\)/u);
-  assert.match(route, /consumeCoarseQuota\('auth\.otp\.verify', security\.ipHash\)/u);
-  assert.doesNotMatch(route, /auth\.otp\.verify\.email|requestSubjectHash/u);
+  assert.match(route, /beginEmailOtpVerify\(security\.ipHash, challengeToken, parsed\.data\.email\)/u);
+  assert.doesNotMatch(route, /consumeCoarseQuota|auth\.otp\.verify\.email|requestSubjectHash/u);
   assert.match(route, /readEmailOtpChallengeCookie\(request\)/u);
-  assert.match(route, /consumeEmailOtpChallengeAttempt\(challengeToken, parsed\.data\.email\)/u);
   assert.ok(
-    route.indexOf('await consumeEmailOtpChallengeAttempt(') <
-      route.indexOf('verifier.auth.verifyOtp({'),
+    route.indexOf('await beginEmailOtpVerify(') < route.indexOf('verifier.auth.verifyOtp({'),
     'the challenge attempt must be consumed before provider verification',
   );
   assert.match(
@@ -219,8 +225,8 @@ test('email OTP verification spends only its bound receipt before provider proof
   );
   assert.doesNotMatch(route, /supabase\.auth\.updateUser/u);
   assert.match(route, /supabase\.auth\.signOut\(\{ scope: 'local' \}\)/u);
-  assert.match(route, /authProviderRetryAfter\(error\)/u);
-  assert.match(route, /\{ error: 'RATE_LIMITED', retryAfter \}/u);
+  assert.match(route, /classifyAuthProviderError\(error\)/u);
+  assert.match(route, /throttledResponse\('RATE_LIMITED', challenge\.retryAfter\)/u);
   assert.match(route, /'Retry-After': String\(retryAfter\)/u);
   assert.doesNotMatch(
     route,
@@ -228,7 +234,8 @@ test('email OTP verification spends only its bound receipt before provider proof
   );
   assert.match(ephemeralClient, /persistSession: false/u);
   assert.match(ephemeralClient, /detectSessionInUrl: false/u);
-  assert.match(challenge, /rpc\('consume_email_otp_challenge_attempt'/u);
+  assert.match(challenge, /rpc\('begin_email_otp_verify', \{/u);
+  assert.match(challenge, /reason === 'rate_limited'[\s\S]*?throw new RateLimitError/u);
   assert.match(challenge, /rpc\('complete_email_otp_challenge'/u);
   assert.match(migration, /create function public\.consume_email_otp_challenge_attempt/u);
   assert.match(migration, /create function public\.complete_email_otp_challenge/u);

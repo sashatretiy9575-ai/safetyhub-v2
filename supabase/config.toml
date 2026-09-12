@@ -19,6 +19,8 @@ port = 54323
 [inbucket]
 enabled = true
 port = 54324
+# Plain SMTP for the app's send-email hook on a local stand (SAFETYHUB_SMTP_TLS=none).
+smtp_port = 54325
 
 [storage]
 enabled = true
@@ -36,8 +38,9 @@ minimum_password_length = 12
 password_requirements = "lower_upper_letters_digits"
 
 [auth.rate_limit]
-# Keep Supabase below the Plesk mailbox ceiling of 50 messages/hour.
-email_sent = 30
+# The Plesk mailbox takes about 50 messages/hour; ten stay in reserve for the
+# outbox retries. Mirror any change in SUPABASE_AUTH_EMAIL_SENT_PER_HOUR.
+email_sent = 40
 
 [auth.captcha]
 enabled = true
@@ -54,19 +57,19 @@ otp_length = 6
 otp_expiry = 3600
 
 [auth.email.template.magic_link]
-subject = "SafetyHub"
+subject = "{{ if (eq .RedirectTo \"https://safetyhub.kz/en/auth/login?email_locale=en\") }}SafetyHub: your sign-in code{{ else if (eq .RedirectTo \"https://safetyhub.kz/kk/auth/login?email_locale=kk\") }}SafetyHub: кіру коды{{ else if (eq .RedirectTo \"https://safetyhub.kz/auth/login?email_locale=ru\") }}SafetyHub: код для входа{{ else if eq .Data.locale \"en\" }}SafetyHub: your sign-in code{{ else if eq .Data.locale \"kk\" }}SafetyHub: кіру коды{{ else }}SafetyHub: код для входа{{ end }}"
 content_path = "./supabase/templates/magic-link.html"
 
 [auth.email.template.confirmation]
-subject = "SafetyHub"
+subject = "{{ if (eq .RedirectTo \"https://safetyhub.kz/en/auth/login?email_locale=en\") }}SafetyHub: your sign-up code{{ else if (eq .RedirectTo \"https://safetyhub.kz/kk/auth/login?email_locale=kk\") }}SafetyHub: тіркелу коды{{ else if (eq .RedirectTo \"https://safetyhub.kz/auth/login?email_locale=ru\") }}SafetyHub: код для регистрации{{ else if eq .Data.locale \"en\" }}SafetyHub: your sign-up code{{ else if eq .Data.locale \"kk\" }}SafetyHub: тіркелу коды{{ else }}SafetyHub: код для регистрации{{ end }}"
 content_path = "./supabase/templates/confirmation.html"
 
 [auth.email.template.recovery]
-subject = "Пароль в SafetyHub не используется"
+subject = "{{ if eq .Data.locale \"en\" }}SafetyHub signs you in without a password{{ else if eq .Data.locale \"kk\" }}SafetyHub-қа кіру құпиясөзсіз{{ else }}В SafetyHub вход без пароля{{ end }}"
 content_path = "./supabase/templates/recovery.html"
 
 [auth.email.template.invite]
-subject = "Приглашения с паролем в SafetyHub отключены"
+subject = "{{ if eq .Data.locale \"en\" }}SafetyHub does not send invitations{{ else if eq .Data.locale \"kk\" }}SafetyHub-та шақырулар қолданылмайды{{ else }}Приглашения в SafetyHub не используются{{ end }}"
 content_path = "./supabase/templates/invite.html"
 
 # This runs before every Auth access token is issued. The target function is

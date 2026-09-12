@@ -5,34 +5,18 @@ import {
   renderAuthEmail,
   verifyStandardWebhook,
 } from '@/server/auth/send-email-hook';
-import { sendSmtpMail } from '@/server/email/smtp';
+import { deliverAuthEmailNow, enqueueAuthEmail } from '@/server/email/auth-email-outbox';
+import { resolveEmailTransport, type EmailTransport } from '@/server/email/transport';
 import { readBoundedText, RequestBodyError } from '@/lib/security/request-body';
 import { afterResponse } from '@/server/http/after-response';
 
 export const runtime = 'nodejs';
+// The first delivery attempt runs after the response; a slow mailbox must
+// not be cut off by the default function budget.
+export const maxDuration = 60;
 
 const HOOK_BODY_MAX_BYTES = 64 * 1024;
-const SEND_ATTEMPTS = 2;
-
-type Transport = Readonly<{
-  host: string;
-  port: number;
-  user: string;
-  password: string;
-  from: string;
-}>;
-
-function smtpTransport(): Transport | null {
-  const host = process.env.SAFETYHUB_SMTP_HOST?.trim();
-  const user = process.env.SAFETYHUB_SMTP_USER?.trim();
-  const password = process.env.SAFETYHUB_SMTP_PASSWORD?.trim();
-  const from = process.env.SAFETYHUB_SMTP_FROM?.trim() || user;
-  const port = Number(process.env.SAFETYHUB_SMTP_PORT ?? '465');
-  if (!host || !user || !password || !from || !Number.isInteger(port) || port <= 0) {
-    return null;
-  }
-  return { host, port, user, password, from };
-}
+const WEBHOOK_ID_MAX_LENGTH = 200;
 
 function hookSecrets() {
   try {
@@ -42,35 +26,20 @@ function hookSecrets() {
   }
 }
 
-async function deliver(transport: Transport, to: string, subject: string, html: string) {
-  for (let attempt = 1; attempt <= SEND_ATTEMPTS; attempt += 1) {
-    try {
-      await sendSmtpMail(transport, { from: transport.from, to, subject, html });
-      return;
-    } catch (error) {
-      // The message holds a one-time code, and an SMTP reply line quotes the
-      // recipient. Only the failing stage reaches the Vercel log: enough to tell
-      // an outage from a rejected login, and it carries neither the mailbox
-      // address, nor the operator login, nor the password length.
-      if (attempt === SEND_ATTEMPTS) {
-        const stage =
-          error instanceof Error
-            ? (/^SMTP_[A-Z_]+/u.exec(error.message)?.[0] ?? 'SMTP_FAILED')
-            : 'SMTP_UNKNOWN';
-        process.stderr.write(`auth send-email hook: delivery failed (${stage})\n`);
-      }
-    }
-  }
+function deliver(id: string, transport: EmailTransport) {
+  return deliverAuthEmailNow(id, transport);
 }
 
 /**
  * Supabase Auth "Send Email" hook. Auth waits only a few seconds for this
- * endpoint, so the SMTP hand-off to the mailbox provider runs after the 200
- * response instead of inside the user's OTP request.
+ * endpoint, so the message is recorded in the outbox, the hook answers 200,
+ * and the hand-off to the mailbox provider runs after the response. A
+ * message the mailbox refuses stays queued for the drain instead of being
+ * lost behind a "code sent" screen; a replayed webhook id is a duplicate.
  */
 export async function POST(request: Request) {
   const secrets = hookSecrets();
-  const transport = smtpTransport();
+  const transport = resolveEmailTransport();
   if (secrets.length === 0 || !transport) {
     return NextResponse.json({ error: 'SEND_EMAIL_HOOK_NOT_CONFIGURED' }, { status: 500 });
   }
@@ -88,14 +57,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'PAYLOAD_TOO_LARGE' }, { status: 413 });
   }
 
+  const webhookId = request.headers.get('webhook-id');
   const verified = verifyStandardWebhook({
     secrets,
-    id: request.headers.get('webhook-id'),
+    id: webhookId,
     timestamp: request.headers.get('webhook-timestamp'),
     signature: request.headers.get('webhook-signature'),
     body,
   });
-  if (!verified) {
+  if (!verified || !webhookId || webhookId.length > WEBHOOK_ID_MAX_LENGTH) {
     return NextResponse.json({ error: 'INVALID_SIGNATURE' }, { status: 401 });
   }
 
@@ -106,9 +76,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
   }
 
-  const email = renderAuthEmail(payload);
-  if (email) {
-    afterResponse(() => deliver(transport, payload.email, email.subject, email.html));
+  // Action types SafetyHub never emails are acknowledged and dropped.
+  if (!renderAuthEmail(payload)) return NextResponse.json({}, { status: 200 });
+  const kind = payload.actionType as 'signup' | 'magiclink' | 'recovery' | 'invite';
+
+  let queued: Awaited<ReturnType<typeof enqueueAuthEmail>>;
+  try {
+    queued = await enqueueAuthEmail({
+      webhookId,
+      recipient: payload.email,
+      locale: payload.locale,
+      kind,
+      token: payload.token,
+    });
+  } catch {
+    // Auth retries 503 with the same webhook id; a 200 here would tell the
+    // person the code was sent while nothing remembers it.
+    return NextResponse.json(
+      { error: 'SEND_EMAIL_QUEUE_UNAVAILABLE' },
+      { status: 503, headers: { 'Retry-After': '2' } },
+    );
+  }
+  if (!queued.duplicate) {
+    const queuedId = queued.id;
+    afterResponse(() => deliver(queuedId, transport));
   }
   return NextResponse.json({}, { status: 200 });
 }

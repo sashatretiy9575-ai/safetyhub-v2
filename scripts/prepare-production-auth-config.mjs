@@ -51,18 +51,18 @@ const expectedConfigurationLineChanges = Object.freeze([
 // Updating either value is an intentional release-review step. These hashes pin
 // exactly the committed localhost source and the only permitted production copy.
 export const expectedSourceConfigurationSha256 =
-  '178f954eee7d3325d54c3416229873cb902ae0c5d4000cbdbf7e31b8b40b6c56';
+  'ee444db64e3318378949519e99ebbee94f8417ab338b0d970251bb0e9a5efc3d';
 export const expectedProductionConfigurationSha256 =
-  '78f7729e3f1e2a15290225493fe9fd7c595be64e1f5cd98aab13941688f69569';
+  'fa3438677982bc6efe1cea18e95299a9a21a71547a8328dd7367bd369a043742';
 export const expectedTemplateSha256 = Object.freeze({
   'supabase/templates/magic-link.html':
-    '976d1b1ff5338672607c88b9fcd105d551725f7689631357745eef16f7fda236',
+    'b9d092510c757fa277720a375b0899b1bf51f6f353f6f4ee725d9b30bbfbe3c9',
   'supabase/templates/confirmation.html':
-    'b3788d8f2450ad69d0fed5e814d623aaa7542489d268b00e2635127b98561089',
+    '9db5bed658d7bc938fa2eac3cebb22bc2aeac0e39aa4c76fd125cc7a665b7775',
   'supabase/templates/recovery.html':
-    'e9879969f6f2f1fecc5c3f20708d180733760523e08cbe4726b384603f841317',
+    'bf2f4ae62fb550ac40b41269fe5b9d83d221030e5b18a848783785f73db95ab4',
   'supabase/templates/invite.html':
-    '1d050c0cd78d364a57bf26a7a13f286018211cdd778593148672a2146f808f08',
+    '79cd6833d3b1d4e55dc841bd2d10c00deed37716d020cbb065258b3b926657ce',
 });
 
 export class ProductionAuthConfigPreparationError extends Error {

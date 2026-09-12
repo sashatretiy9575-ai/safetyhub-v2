@@ -33,6 +33,10 @@ type StoredCooldown = {
   retryAt: number;
 };
 type FieldErrors = Partial<Record<'email' | 'code' | 'captcha' | 'legal', string>>;
+// Which of the three provider refusals the last 429 was, so the message says
+// something true: the address already has a code on the way, everybody is
+// waiting for the hourly email budget, or this network asked too often.
+type SendThrottleKind = 'quota' | 'busy' | 'cooldown';
 
 const ATTEMPT_TTL_MS = 60 * 60 * 1000;
 const RESEND_DELAY_SECONDS = 60;
@@ -141,9 +145,7 @@ function safeLanding(value: unknown, locale: AppLocale) {
     const returnPath = safeReturnPath(requested, isAdminLanding ? 'admin' : 'account');
     if (
       returnPath &&
-      (isAdminLanding ||
-        value === localizePathname('/profile', locale) ||
-        value === '/profile')
+      (isAdminLanding || value === localizePathname('/profile', locale) || value === '/profile')
     ) {
       return returnPath;
     }
@@ -179,6 +181,7 @@ export function EmailOtpFlow() {
   const [retryClock, setRetryClock] = useState(0);
   const [busy, setBusy] = useState<BusyAction>(null);
   const [error, setError] = useState('');
+  const [sendThrottle, setSendThrottle] = useState<SendThrottleKind>('quota');
   const [status, setStatus] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [captchaVersion, setCaptchaVersion] = useState(0);
@@ -277,6 +280,13 @@ export function EmailOtpFlow() {
           setSendRetryAt(retryAt);
           setRetryClock(Date.now());
           storeSendCooldown(normalizedEmail, retryAt);
+          setSendThrottle(
+            errorCode === 'PROVIDER_BUSY'
+              ? 'busy'
+              : errorCode === 'ADDRESS_COOLDOWN'
+                ? 'cooldown'
+                : 'quota',
+          );
           setError(SEND_RATE_LIMITED_ERROR);
           return;
         }
@@ -303,7 +313,7 @@ export function EmailOtpFlow() {
       setSendRetryAt(nextRetryAt);
       setRetryClock(nextSentAt);
       setStage('code');
-      setStatus(t('sentStatus'));
+      setStatus(t('sentTo', { email: normalizedEmail }));
       storeAttempt(normalizedEmail, nextSentAt);
       storeSendCooldown(normalizedEmail, nextRetryAt);
     } catch (requestError) {
@@ -439,6 +449,7 @@ export function EmailOtpFlow() {
     // then restored the wrong address from the same record.
     clearStoredSendCooldown();
     setSendRetryAt(0);
+    setSendThrottle('quota');
     setStage('email');
     setCode('');
     setSentAt(0);
@@ -453,7 +464,11 @@ export function EmailOtpFlow() {
   const visibleError =
     error === SEND_RATE_LIMITED_ERROR
       ? sendRetrySeconds > 0
-        ? t('sendLimit', { delay: formatRetryDelay(sendRetrySeconds, retryUnits) })
+        ? sendThrottle === 'busy'
+          ? `${t('serviceBusy', { delay: formatRetryDelay(sendRetrySeconds, retryUnits) })} ${t('serviceBusyHint')}`
+          : sendThrottle === 'cooldown'
+            ? t('addressCooldown', { delay: formatRetryDelay(sendRetrySeconds, retryUnits) })
+            : t('sendLimit', { delay: formatRetryDelay(sendRetrySeconds, retryUnits) })
         : t('sendLimitExpired')
       : error === VERIFY_RATE_LIMITED_ERROR
         ? verifyRetrySeconds > 0
@@ -646,7 +661,11 @@ export function EmailOtpFlow() {
               </span>
             </label>
             {fieldErrors.legal ? (
-              <p id="email-otp-legal-error" role="alert" className="text-xs text-[var(--color-danger)]">
+              <p
+                id="email-otp-legal-error"
+                role="alert"
+                className="text-xs text-[var(--color-danger)]"
+              >
                 {t('legalRequired')}
               </p>
             ) : null}

@@ -9,28 +9,31 @@ import { clearSafetyHubLocalSession } from '@/lib/supabase/session-cleanup';
 import { emailOtpVerifySchema } from '@/lib/validation/auth';
 import { readJsonBody } from '@/lib/security/request-body';
 import { requestSecurityMetadata } from '@/server/security/request-metadata';
-import { consumeCoarseQuota } from '@/server/security/rate-limit';
-import { authProviderRetryAfter } from '@/lib/auth/otp-rate-limit';
+import { classifyAuthProviderError } from '@/lib/auth/otp-rate-limit';
 import { localizedAccountPath } from '@/lib/auth/email-otp-locale';
 import type { EmailOtpLocale } from '@/lib/auth/email-otp-locale';
 import { getCurrentLegalPolicies, type CurrentLegalPolicies } from '@/server/legal';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 import {
+  beginEmailOtpVerify,
   clearEmailOtpChallengeCookie,
   completeEmailOtpChallenge,
-  consumeEmailOtpChallengeAttempt,
   readEmailOtpChallengeCookie,
 } from '@/server/security/email-otp-challenge';
 
-type AuthProviderError = { code?: string; status?: number } | null;
+type AuthProviderError = { code?: string; message?: string; status?: number } | null;
+
+function throttledResponse(code: string, retryAfter: number) {
+  return NextResponse.json(
+    { error: code, retryAfter },
+    { status: 429, headers: { 'Retry-After': String(retryAfter) } },
+  );
+}
 
 function verificationFailure(error: AuthProviderError) {
   if (error?.status === 429) {
-    const retryAfter = authProviderRetryAfter(error);
-    return NextResponse.json(
-      { error: 'RATE_LIMITED', retryAfter },
-      { status: 429, headers: { 'Retry-After': String(retryAfter) } },
-    );
+    const throttle = classifyAuthProviderError(error);
+    return throttledResponse(throttle.code, throttle.retryAfter);
   }
   if (!error?.status || error.status >= 500) {
     return NextResponse.json({ error: 'OTP_UNAVAILABLE' }, { status: 503 });
@@ -40,13 +43,6 @@ function verificationFailure(error: AuthProviderError) {
 
 function invalidChallengeResponse() {
   return NextResponse.json({ error: 'OTP_CODE_INVALID' }, { status: 400 });
-}
-
-function exhaustedChallengeResponse(retryAfter: number) {
-  return NextResponse.json(
-    { error: 'RATE_LIMITED', retryAfter },
-    { status: 429, headers: { 'Retry-After': String(retryAfter) } },
-  );
 }
 
 function landingPath(
@@ -103,24 +99,28 @@ export async function POST(request: NextRequest) {
     }
 
     const security = requestSecurityMetadata(request);
-    await consumeCoarseQuota('auth.otp.verify', security.ipHash);
     const locale = parsed.data.locale ?? 'ru';
     const challengeToken = readEmailOtpChallengeCookie(request);
     if (!challengeToken) {
       return clearEmailOtpChallengeCookie(invalidChallengeResponse());
     }
 
+    // The network quota and one attempt of the browser's receipt are one
+    // round-trip; a quota refusal is a 429 through apiError.
     let challenge;
     try {
-      challenge = await consumeEmailOtpChallengeAttempt(challengeToken, parsed.data.email);
-    } catch {
-      return NextResponse.json({ error: 'OTP_UNAVAILABLE' }, { status: 503 });
+      challenge = await beginEmailOtpVerify(security.ipHash, challengeToken, parsed.data.email);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'OTP_CHALLENGE_UNAVAILABLE') {
+        return NextResponse.json({ error: 'OTP_UNAVAILABLE' }, { status: 503 });
+      }
+      throw error;
     }
     if (challenge.outcome === 'invalid') {
       return clearEmailOtpChallengeCookie(invalidChallengeResponse());
     }
     if (challenge.outcome === 'exhausted') {
-      return clearEmailOtpChallengeCookie(exhaustedChallengeResponse(challenge.retryAfter));
+      return clearEmailOtpChallengeCookie(throttledResponse('RATE_LIMITED', challenge.retryAfter));
     }
 
     const verifier = createEphemeralAuthClient();

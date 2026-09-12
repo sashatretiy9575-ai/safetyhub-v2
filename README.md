@@ -57,6 +57,8 @@ scripts/ tests/ e2e/   инструменты, node-тесты, Playwright
 | `npm run verify:release:local`, `npm run verify:release` | релизные гейты (приложение + база + e2e) |
 | `npm run content:pull:linked`, `npm run content:parity:check` | сверка контента с боевой базой |
 | `npm run db:migrations:check-preflight`, `npm run db:push` | миграции в боевую базу |
+| `npm run test:load:email-otp` | 100 одновременных запросов кода на локальном стенде (очередь писем, Mailpit) |
+| `npm run auth:email-drain:vault:configure` | URL и секрет дренажа писем в Vault боевой базы |
 
 ## Переменные окружения
 
@@ -67,7 +69,11 @@ scripts/ tests/ e2e/   инструменты, node-тесты, Playwright
 - Turnstile: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `SUPABASE_AUTH_CAPTCHA_SECRET`, `SAFETYHUB_TURNSTILE_SECRET_KEY`.
 - Серверные секреты: `RATE_LIMIT_HMAC_SECRET`, `CERTIFICATE_VERIFICATION_SECRET` (обязательны везде),
   `CONTENT_REVALIDATE_SECRET` — минимум 32 случайных символа, `STORAGE_RECONCILER_SECRET`.
-- Почта: `SUPABASE_SEND_EMAIL_HOOK_SECRETS`, `SAFETYHUB_SMTP_HOST/PORT/USER/PASSWORD/FROM`.
+- Почта: `SUPABASE_SEND_EMAIL_HOOK_SECRETS`, `SAFETYHUB_SMTP_HOST/PORT/USER/PASSWORD/FROM`,
+  `SAFETYHUB_SMTP_TLS` (`implicit`, локально `none` для Mailpit), `SAFETYHUB_EMAIL_TRANSPORT`
+  (`smtp` или `http` + `SAFETYHUB_EMAIL_HTTP_PROVIDER/API_KEY`), `AUTH_EMAIL_DRAIN_SECRET`
+  (дренаж очереди писем, тот же секрет кладётся в Vault), `SUPABASE_AUTH_EMAIL_SENT_PER_HOUR`
+  (зеркало `email_sent` из `supabase/config.toml`).
 - E2E: `E2E_ADMIN_EMAIL`, `E2E_PARTICIPANT_EMAIL`, `E2E_*_STORAGE_STATE`.
 
 Секреты никогда не получают префикс `NEXT_PUBLIC_`, не попадают в git и в логи.
@@ -95,3 +101,6 @@ Push в `main` собирает production на Vercel (регион `bom1`). М
 отдельно: `npm run db:migrations:check-preflight -- --expected-project-ref <ref>`,
 затем `npx supabase db push --linked` с `SUPABASE_DB_PASSWORD` в окружении оболочки.
 Конфиг Supabase Auth готовится командой `npm run auth:config:prepare:production`.
+Письма входа ставятся в очередь `private.auth_email_outbox`; после первого выката
+дренаж включается один раз: `npm run auth:email-drain:vault:configure` с
+`AUTH_EMAIL_DRAIN_SECRET`, равным значению на Vercel.

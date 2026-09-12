@@ -1,29 +1,40 @@
 import { NextResponse } from '@/lib/security/api-response';
 import { apiError } from '@/server/auth/api-error';
 import { isSameOriginRequest } from '@/server/http/request-origin';
+import { afterResponse } from '@/server/http/after-response';
 import { createEphemeralAuthClient } from '@/server/supabase/ephemeral-auth';
 import { emailOtpStartSchema } from '@/lib/validation/auth';
 import { readJsonBody } from '@/lib/security/request-body';
 import { requestSecurityMetadata } from '@/server/security/request-metadata';
-import { consumeCoarseQuota } from '@/server/security/rate-limit';
-import { authProviderRetryAfter } from '@/lib/auth/otp-rate-limit';
+import { classifyAuthProviderError, providerEmailsPerHour } from '@/lib/auth/otp-rate-limit';
 import { emailOtpRedirectUrl } from '@/lib/auth/email-otp-locale';
-import { finishPendingSelfDeletion } from '@/server/auth/pending-self-deletion';
+import { sweepPurgedAccountStorage } from '@/server/auth/pending-self-deletion';
 import { resolveSiteOrigin } from '@/lib/site-url';
 import {
+  beginEmailOtpRequest,
   issueEmailOtpChallenge,
   setEmailOtpChallengeCookie,
 } from '@/server/security/email-otp-challenge';
 
-type AuthProviderError = { code?: string; status?: number } | null;
+type AuthProviderError = { code?: string; message?: string; status?: number } | null;
+
+function throttledResponse(code: string, retryAfter: number) {
+  return NextResponse.json(
+    { error: code, retryAfter },
+    { status: 429, headers: { 'Retry-After': String(retryAfter) } },
+  );
+}
 
 function providerFailure(error: AuthProviderError) {
   if (error?.status === 429) {
-    const retryAfter = authProviderRetryAfter(error);
-    return NextResponse.json(
-      { error: 'RATE_LIMITED', retryAfter },
-      { status: 429, headers: { 'Retry-After': String(retryAfter) } },
+    // The three provider refusals get three different messages on the form:
+    // "your code is already on its way", "everybody is waiting for the hourly
+    // budget" and the plain network quota.
+    const throttle = classifyAuthProviderError(
+      error,
+      providerEmailsPerHour(process.env.SUPABASE_AUTH_EMAIL_SENT_PER_HOUR),
     );
+    return throttledResponse(throttle.code, throttle.retryAfter);
   }
   if (error?.code === 'captcha_failed') {
     return NextResponse.json({ error: 'CAPTCHA_FAILED' }, { status: 400 });
@@ -53,13 +64,19 @@ export async function POST(request: Request) {
     }
 
     const security = requestSecurityMetadata(request);
-    await consumeCoarseQuota('auth.otp.start', security.ipHash);
     const locale = parsed.data.locale ?? 'ru';
 
-    // A self-deletion the old staged path never finished still owns this
-    // email. Finish it now, so the sign-in below creates a brand-new account
-    // instead of reviving one the database refuses to serve.
-    await finishPendingSelfDeletion(parsed.data.email);
+    // One round-trip settles the network quota (a refusal is a 429 through
+    // apiError), the one-code-per-minute cooldown of the address, and a
+    // self-deletion the old staged path never finished for this email, so the
+    // sign-in below creates a brand-new account instead of reviving one the
+    // database refuses to serve.
+    const gate = await beginEmailOtpRequest(security.ipHash, parsed.data.email);
+    if (!gate.allowed) return throttledResponse('ADDRESS_COOLDOWN', gate.retryAfter);
+    if (gate.purgedUserId) {
+      const purgedUserId = gate.purgedUserId;
+      afterResponse(() => void sweepPurgedAccountStorage(purgedUserId));
+    }
 
     // Both public entry pages are one passwordless email-code gateway. Let the
     // provider create an unknown address so a login attempt never turns into a

@@ -2,6 +2,7 @@ import 'server-only';
 
 import { createHmac, randomBytes } from 'node:crypto';
 import type { NextRequest, NextResponse as FrameworkNextResponse } from 'next/server';
+import { RateLimitError } from '@/server/security/rate-limit';
 import { createAdminClient } from '@/server/supabase/admin';
 
 const EMAIL_OTP_CHALLENGE_COOKIE = 'safetyhub-email-otp-challenge';
@@ -14,6 +15,17 @@ export type EmailOtpChallengeConsumption =
   | { outcome: 'allowed'; attemptsRemaining: number }
   | { outcome: 'exhausted'; retryAfter: number }
   | { outcome: 'invalid' };
+
+export type EmailOtpRequestGate =
+  | { allowed: true; purgedUserId: string | null }
+  | { allowed: false; reason: 'address_cooldown'; retryAfter: number };
+
+type GatewayRpcClient = {
+  rpc(
+    name: 'begin_email_otp_request' | 'begin_email_otp_verify',
+    args: Record<string, unknown>,
+  ): PromiseLike<{ data: unknown; error: { message: string } | null }>;
+};
 
 // Anti-abuse identifiers must not be derived from the database service key:
 // rotating that key would silently invalidate every in-flight OTP challenge
@@ -39,9 +51,11 @@ function challengeHashes(token: string, email: string) {
 }
 
 function jsonRecord(value: unknown): JsonRecord | null {
-  return value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as JsonRecord)
-    : null;
+  return value && typeof value === 'object' && !Array.isArray(value) ? (value as JsonRecord) : null;
+}
+
+function retryAfterSeconds(value: unknown) {
+  return Math.max(1, Math.ceil(Number(value) || 1));
 }
 
 function cookieOptions() {
@@ -76,6 +90,42 @@ export function clearEmailOtpChallengeCookie(response: FrameworkNextResponse) {
   return response;
 }
 
+/**
+ * Everything that must be settled before Auth is asked to send a code, in one
+ * round-trip: the network quota (a refusal surfaces as RateLimitError), the
+ * one-code-per-minute cooldown of the address, and the sweep of a
+ * self-deletion the old staged path left half-done for this email.
+ */
+export async function beginEmailOtpRequest(
+  ipHash: string,
+  email: string,
+): Promise<EmailOtpRequestGate> {
+  const normalizedEmail = email.trim().toLowerCase();
+  const client = createAdminClient() as unknown as GatewayRpcClient;
+  const { data, error } = await client.rpc('begin_email_otp_request', {
+    p_ip_hash: ipHash,
+    p_email: normalizedEmail,
+    p_email_hash: challengeHash('email', normalizedEmail),
+  });
+  if (error) throw new Error('OTP_UNAVAILABLE');
+  const payload = jsonRecord(data);
+  if (payload?.allowed === true) {
+    return {
+      allowed: true,
+      purgedUserId: typeof payload.purgedUserId === 'string' ? payload.purgedUserId : null,
+    };
+  }
+  if (payload?.reason === 'address_cooldown') {
+    return {
+      allowed: false,
+      reason: 'address_cooldown',
+      retryAfter: retryAfterSeconds(payload.retryAfter),
+    };
+  }
+  // Anything else is the network quota; an unknown shape fails closed the same way.
+  throw new RateLimitError(retryAfterSeconds(payload?.retryAfter));
+}
+
 export async function issueEmailOtpChallenge(email: string) {
   const token = randomBytes(32).toString('base64url');
   const hashes = challengeHashes(token, email);
@@ -88,12 +138,20 @@ export async function issueEmailOtpChallenge(email: string) {
   return token;
 }
 
-export async function consumeEmailOtpChallengeAttempt(
+/**
+ * The network quota and one attempt of the browser's receipt, in one
+ * round-trip. A quota refusal surfaces as RateLimitError before the receipt
+ * is touched.
+ */
+export async function beginEmailOtpVerify(
+  ipHash: string,
   token: string,
   email: string,
 ): Promise<EmailOtpChallengeConsumption> {
   const hashes = challengeHashes(token, email);
-  const { data, error } = await createAdminClient().rpc('consume_email_otp_challenge_attempt', {
+  const client = createAdminClient() as unknown as GatewayRpcClient;
+  const { data, error } = await client.rpc('begin_email_otp_verify', {
+    p_ip_hash: ipHash,
     p_challenge_hash: hashes.challengeHash,
     p_email_hash: hashes.emailHash,
   });
@@ -105,11 +163,11 @@ export async function consumeEmailOtpChallengeAttempt(
       attemptsRemaining: Math.max(0, Math.floor(Number(payload.attemptsRemaining) || 0)),
     };
   }
+  if (payload?.reason === 'rate_limited') {
+    throw new RateLimitError(retryAfterSeconds(payload.retryAfter));
+  }
   if (payload?.reason === 'exhausted') {
-    return {
-      outcome: 'exhausted',
-      retryAfter: Math.max(1, Math.ceil(Number(payload.retryAfter) || 1)),
-    };
+    return { outcome: 'exhausted', retryAfter: retryAfterSeconds(payload.retryAfter) };
   }
   return { outcome: 'invalid' };
 }
