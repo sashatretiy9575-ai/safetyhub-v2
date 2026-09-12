@@ -104,3 +104,11 @@ Push в `main` собирает production на Vercel (регион `bom1`). М
 Письма входа ставятся в очередь `private.auth_email_outbox`; после первого выката
 дренаж включается один раз: `npm run auth:email-drain:vault:configure` с
 `AUTH_EMAIL_DRAIN_SECRET`, равным значению на Vercel.
+
+Старые деплои Vercel удаляет workflow `prune-vercel-deployments` после каждого
+успешного деплоя: остаются три последних успешных production-деплоя и тот, что
+сейчас открыт на домене. Незавершённая сборка не трогается, а упавший деплой новее
+последнего успешного ждёт следующего. Нужен секрет репозитория `VERCEL_TOKEN` —
+токен Vercel со scope `relirdghs-projects`. План без удаления:
+`npm run deployments:prune -- --dry-run` с `VERCEL_TOKEN`, `VERCEL_PROJECT=safetyhub-v2`
+и `VERCEL_TEAM_SLUG=relirdghs-projects` в окружении.

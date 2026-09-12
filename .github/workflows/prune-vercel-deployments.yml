@@ -1,0 +1,47 @@
+name: Prune Vercel deployments
+
+# Vercel keeps every deployment forever. After each successful deployment this
+# keeps the three newest successful production deployments, plus whatever the
+# production domains serve, and deletes the rest. A build still running, or a
+# failed deployment newer than the last successful one, waits for the next run.
+on:
+  deployment_status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: safetyhub-prune-vercel-deployments
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    name: prune-vercel-deployments
+    if: github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_PROJECT: safetyhub-v2
+      VERCEL_TEAM_SLUG: relirdghs-projects
+
+    steps:
+      - name: Report a missing token
+        if: env.VERCEL_TOKEN == ''
+        run: echo "::warning::Repository secret VERCEL_TOKEN is not set, so no deployment was deleted."
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        if: env.VERCEL_TOKEN != ''
+        with:
+          ref: main
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        if: env.VERCEL_TOKEN != ''
+        with:
+          node-version: 24
+
+      - name: Delete all but the three newest successful deployments
+        if: env.VERCEL_TOKEN != ''
+        run: node scripts/prune-vercel-deployments.mjs --keep=3
