@@ -152,6 +152,10 @@
   --color-surface: #ffffff;
   --color-surface-muted: #f0f2f5;
   --color-surface-soft: #e9edf1;
+  /* The company band in the employee list: a grey strip in both themes, apart
+     from the rows of people without being white or dark. */
+  --color-band: #d5dae1;
+  --color-band-foreground: #171a1f;
   --color-surface-elevated: #ffffff;
   --color-border: #dde1e6;
   --color-border-strong: #c5cbd3;
@@ -273,6 +277,8 @@
     --color-surface: #14171b;
     --color-surface-muted: #1a1e23;
     --color-surface-soft: #20252b;
+    --color-band: #5b626c;
+    --color-band-foreground: #f4f6f8;
     --color-surface-elevated: #1b1f24;
     --color-border: #2b3037;
     --color-border-strong: #3a414a;

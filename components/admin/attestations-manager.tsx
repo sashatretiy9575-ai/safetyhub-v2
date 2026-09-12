@@ -1009,13 +1009,12 @@ export function AttestationsManager({
             return (
               <Fragment key={row.recordId}>
                 {showGroup ? (
-                  // The company band is drawn in the page's inverted colours, a
-                  // dark strip on the light theme and a light one on the dark
-                  // theme like the install card, so it is never taken for one
-                  // more person in the list.
+                  // The company band is a grey strip in both themes, so it is
+                  // never taken for one more person in the list and does not glare
+                  // the way a white strip did on the dark theme.
                   <div
                     role="row"
-                    className="mt-2 rounded-xl bg-[var(--color-text)] text-[var(--color-bg)] first:mt-0 @min-[760px]:mt-0 @min-[760px]:rounded-none"
+                    className="mt-2 rounded-xl bg-[var(--color-band)] text-[var(--color-band-foreground)] first:mt-0 @min-[760px]:mt-0 @min-[760px]:rounded-none"
                   >
                     <div
                       role="cell"
@@ -1033,7 +1032,7 @@ export function AttestationsManager({
                             return next;
                           })
                         }
-                        className="grid size-11 shrink-0 place-items-center rounded-lg text-[var(--color-bg)]/70 transition-colors hover:bg-[var(--color-bg)]/10 hover:text-[var(--color-bg)] @min-[760px]:size-9"
+                        className="grid size-11 shrink-0 place-items-center rounded-lg text-[var(--color-band-foreground)]/70 transition-colors hover:bg-[var(--color-band-foreground)]/10 hover:text-[var(--color-band-foreground)] @min-[760px]:size-9"
                       >
                         <CaretDown
                           size={16}
@@ -1059,14 +1058,14 @@ export function AttestationsManager({
                         onClick={() =>
                           void setOrganizationGroupSelected(row.organization, !groupFullySelected)
                         }
-                        className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg px-1.5 text-left transition-colors hover:bg-[var(--color-bg)]/10 @min-[760px]:min-h-9"
+                        className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg px-1.5 text-left transition-colors hover:bg-[var(--color-band-foreground)]/10 @min-[760px]:min-h-9"
                       >
                         <span
                           aria-hidden
                           className={`text-micro grid size-[1.125rem] shrink-0 place-items-center rounded-[5px] border-2 leading-none ${
                             groupFullySelected
                               ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
-                              : 'border-[var(--color-bg)]/60'
+                              : 'border-[var(--color-band-foreground)]/60'
                           }`}
                         >
                           {groupFullySelected ? '✓' : ''}
@@ -1074,7 +1073,7 @@ export function AttestationsManager({
                         <span className="min-w-0 text-base font-bold break-words @min-[760px]:text-sm">
                           {row.organization || 'Компания не указана'}
                         </span>
-                        <span className="shrink-0 rounded-full bg-[var(--color-bg)]/15 px-2 py-0.5 text-xs font-semibold tabular-nums">
+                        <span className="shrink-0 rounded-full bg-[var(--color-band-foreground)]/15 px-2 py-0.5 text-xs font-semibold tabular-nums">
                           {row.organizationGroupCount}
                         </span>
                       </button>
@@ -1084,7 +1083,7 @@ export function AttestationsManager({
                           size="icon"
                           variant="ghost"
                           disabled={selectingAll || busy}
-                          className="size-11 text-[var(--color-bg)]/70 hover:bg-[var(--color-bg)]/10 hover:text-[var(--color-bg)] @min-[760px]:size-9"
+                          className="size-11 text-[var(--color-band-foreground)]/70 hover:bg-[var(--color-band-foreground)]/10 hover:text-[var(--color-band-foreground)] @min-[760px]:size-9"
                           aria-label={`Изменить название компании: ${row.organization || 'не указана'}`}
                           title="Изменить название компании"
                           onClick={() => {
