@@ -8,10 +8,12 @@ import { DotsThree } from '@phosphor-icons/react/dist/csr/DotsThree';
 import { DownloadSimple } from '@phosphor-icons/react/dist/csr/DownloadSimple';
 import { FloppyDisk } from '@phosphor-icons/react/dist/csr/FloppyDisk';
 import { Trash } from '@phosphor-icons/react/dist/csr/Trash';
+import { WhatsappLogo } from '@phosphor-icons/react/dist/csr/WhatsappLogo';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import type { AdminAttestationRow } from '@/features/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { formatDateTime } from '@/lib/utils';
+import { formatPhoneDisplay } from '@/lib/site-contacts-shared';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -238,7 +240,9 @@ export function AttestationRowActions({
         ) : null}
         <DropdownMenuItem onSelect={openDetails}>Открыть карточку сотрудника</DropdownMenuItem>
         {permissions.canManageIdentity && !row.courseDeleted ? (
-          <DropdownMenuItem onSelect={openDetails}>Исправить имя, должность, компанию</DropdownMenuItem>
+          <DropdownMenuItem onSelect={openDetails}>
+            Исправить имя, должность, компанию
+          </DropdownMenuItem>
         ) : null}
         {permissions.canDeleteUser ? (
           <>
@@ -505,20 +509,59 @@ export function AttestationDetailDrawer({
   onAction: (row: AdminAttestationRow, action: AttestationPendingAction) => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [history, setHistory] = useState<
-    | {
-        state: 'idle' | 'loading' | 'failed';
-        email: string | null;
-        items: CertificateHistoryItem[];
-      }
-    | { state: 'ready'; email: string | null; items: CertificateHistoryItem[] }
-  >({ state: 'idle', email: null, items: [] });
+  const [history, setHistory] = useState<{
+    state: 'idle' | 'loading' | 'failed' | 'ready';
+    items: CertificateHistoryItem[];
+  }>({ state: 'idle', items: [] });
+  // The address and phone are asked for the moment the card opens, for every
+  // row: the administrator's first question about a person is how to reach
+  // them, and the WhatsApp button below needs the number before anything else.
+  const [contact, setContact] = useState<{
+    state: 'idle' | 'loading' | 'failed' | 'ready';
+    email: string | null;
+    phoneE164: string | null;
+  }>({ state: 'idle', email: null, phoneE164: null });
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (row && dialog && !dialog.open) dialog.showModal();
     if (!row && dialog?.open) dialog.close();
   }, [row]);
+
+  useEffect(() => {
+    if (!row || !permissions.canReadUser) {
+      setContact({ state: 'idle', email: null, phoneE164: null });
+      return;
+    }
+    const controller = new AbortController();
+    setContact({ state: 'loading', email: null, phoneE164: null });
+    void (async () => {
+      const result = await clientRequest(
+        `/api/admin/attestations/contact/${row.userId}`,
+        {},
+        { signal: controller.signal },
+      );
+      if (controller.signal.aborted) return;
+      const payload = await readClientResponseJson<{
+        email?: string | null;
+        phoneE164?: string | null;
+      }>(result.response);
+      if (!result.ok || !payload) {
+        setContact({ state: 'failed', email: null, phoneE164: null });
+        return;
+      }
+      setContact({
+        state: 'ready',
+        email: payload.email ?? null,
+        phoneE164: payload.phoneE164 ?? null,
+      });
+    })().catch(() => {
+      if (!controller.signal.aborted) {
+        setContact({ state: 'failed', email: null, phoneE164: null });
+      }
+    });
+    return () => controller.abort();
+  }, [permissions.canReadUser, row]);
 
   useEffect(() => {
     if (
@@ -529,11 +572,11 @@ export function AttestationDetailDrawer({
       !permissions.canReadCertificate ||
       !permissions.canReadUser
     ) {
-      setHistory({ state: 'idle', email: null, items: [] });
+      setHistory({ state: 'idle', items: [] });
       return;
     }
     const controller = new AbortController();
-    setHistory({ state: 'loading', email: null, items: [] });
+    setHistory({ state: 'loading', items: [] });
     void (async () => {
       const params = new URLSearchParams({
         testId: row.testId!,
@@ -546,16 +589,15 @@ export function AttestationDetailDrawer({
       );
       if (controller.signal.aborted) return;
       const payload = await readClientResponseJson<{
-        email?: string | null;
         items?: CertificateHistoryItem[];
       }>(result.response);
       if (!result.ok || !payload?.items) {
-        setHistory({ state: 'failed', email: null, items: [] });
+        setHistory({ state: 'failed', items: [] });
         return;
       }
-      setHistory({ state: 'ready', email: payload.email ?? null, items: payload.items });
+      setHistory({ state: 'ready', items: payload.items });
     })().catch(() => {
-      if (!controller.signal.aborted) setHistory({ state: 'failed', email: null, items: [] });
+      if (!controller.signal.aborted) setHistory({ state: 'failed', items: [] });
     });
     return () => controller.abort();
   }, [permissions.canReadCertificate, permissions.canReadUser, row]);
@@ -614,13 +656,34 @@ export function AttestationDetailDrawer({
                   <dd className="break-words">{row.organization || 'Не указана'}</dd>
                 </div>
                 <div>
+                  <dt className="text-xs text-[var(--color-text-subtle)]">Телефон</dt>
+                  <dd className="break-all">
+                    {contact.state === 'loading' ? (
+                      'Загружается…'
+                    ) : contact.state === 'failed' ? (
+                      'Временно недоступен'
+                    ) : contact.phoneE164 ? (
+                      <a
+                        className="font-semibold tabular-nums underline underline-offset-4"
+                        href={`tel:${contact.phoneE164}`}
+                      >
+                        {formatPhoneDisplay(contact.phoneE164)}
+                      </a>
+                    ) : (
+                      'Не указан'
+                    )}
+                  </dd>
+                </div>
+                <div>
                   <dt className="text-xs text-[var(--color-text-subtle)]">Контакт</dt>
                   <dd className="break-all">
-                    {history.state === 'loading' ? (
+                    {contact.state === 'loading' ? (
                       'Загружается…'
-                    ) : history.state === 'ready' && history.email ? (
-                      <a className="underline underline-offset-4" href={`mailto:${history.email}`}>
-                        {history.email}
+                    ) : contact.state === 'failed' ? (
+                      'Временно недоступен'
+                    ) : contact.email ? (
+                      <a className="underline underline-offset-4" href={`mailto:${contact.email}`}>
+                        {contact.email}
                       </a>
                     ) : (
                       'Не указан'
@@ -629,6 +692,21 @@ export function AttestationDetailDrawer({
                 </div>
               </dl>
             </div>
+
+            {contact.phoneE164 ? (
+              // A new tab, so the card stays open behind the chat. `noopener` is
+              // what keeps that tab from reaching back into the admin window.
+              <Button asChild variant="outline" className="w-full">
+                <a
+                  href={`https://wa.me/${contact.phoneE164.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <WhatsappLogo size={18} aria-hidden="true" />
+                  Написать в WhatsApp
+                </a>
+              </Button>
+            ) : null}
 
             <dl className="grid gap-3 rounded-2xl border p-4 text-sm sm:grid-cols-2">
               <div>

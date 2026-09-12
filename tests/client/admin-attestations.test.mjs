@@ -181,7 +181,26 @@ test('attestation list keeps personal details compact and loads the avatar only 
   assert.match(panels, /Компания/);
   assert.doesNotMatch(panels, /onEdit\('(?:name|surname|job|organization)'\)/);
   assert.match(managerSurface, />Контакт</);
-  assert.match(managerSurface, /mailto:\$\{history\.email\}/);
+  assert.match(managerSurface, /mailto:\$\{contact\.email\}/);
+  // The card shows the phone and a WhatsApp button as soon as it opens, for
+  // every row, so the number and the address come from their own endpoint
+  // rather than riding on the certificate history that a deleted course lacks.
+  const contactRoute = await read('app/api/admin/attestations/contact/[userId]/route.ts');
+  assert.match(managerSurface, /\/api\/admin\/attestations\/contact\/\$\{row\.userId\}/);
+  assert.match(managerSurface, />Телефон</);
+  assert.match(managerSurface, /tel:\$\{contact\.phoneE164\}/);
+  assert.match(managerSurface, /formatPhoneDisplay\(contact\.phoneE164\)/);
+  assert.match(
+    managerSurface,
+    /https:\/\/wa\.me\/\$\{contact\.phoneE164\.replace\(\/\\D\/g, ''\)\}/,
+  );
+  assert.match(managerSurface, /target="_blank"\s+rel="noopener noreferrer"/);
+  assert.match(managerSurface, /Написать в WhatsApp/);
+  assert.match(contactRoute, /requireCapability\('user\.read'\)/);
+  assert.match(contactRoute, /rpc\('get_safe_user_email'/);
+  assert.match(contactRoute, /\.from\('profiles'\)/);
+  assert.match(contactRoute, /select\('phone_e164, phone_country_iso2'\)/);
+  assert.match(contactRoute, /@\/lib\/security\/api-response/);
   assert.match(historyRoute, /requireCapability\('user\.read'\)/);
   // The address comes from the product's own disclosure rule, not from a
   // second privileged Auth Admin lookup whose result was discarded.
