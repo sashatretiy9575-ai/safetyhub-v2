@@ -20,7 +20,8 @@ test('small and icon actions keep a 44px target and destructive editor actions c
   assert.match(signOutAction, /clientRequest\('\/api\/auth\/logout'/);
   assert.doesNotMatch(userMenu, /supabase\/client|auth\.signOut/);
   assert.match(editor, /<ContentBlockEditor mode="article"/);
-  assert.match(contentEditor, /window\.confirm\(`Удалить блок/);
+  assert.match(contentEditor, /confirmDialog\(\{[\s\S]*?title: `Удалить блок/);
+  assert.doesNotMatch(contentEditor, /window\.confirm/);
   assert.match(contentEditor, /className="text-\[var\(--color-danger\)\]"/);
 });
 

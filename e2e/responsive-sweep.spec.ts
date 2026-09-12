@@ -64,10 +64,14 @@ function measure(): Geometry {
   const root = document.documentElement;
   const width = window.innerWidth;
   const overflowing: string[] = [];
+  // Decorative blobs and slider tracks live inside clipped or scrolling
+  // ancestors on purpose; only an element that can actually widen the page counts.
   const skip = (element: Element) =>
     element.closest('.sr-only, [data-marketing-carousel-controls], [role="list"][tabindex]') !==
       null ||
-    element.closest('.overflow-x-auto, [style*="overflow-x"]') !== null ||
+    element.closest(
+      '.overflow-x-auto, .overflow-hidden, .overflow-x-hidden, .overflow-clip, [style*="overflow"]',
+    ) !== null ||
     element.closest('.snap-x') !== null;
   let smallestFont = Number.POSITIVE_INFINITY;
   for (const element of Array.from(document.body.querySelectorAll('*'))) {
@@ -143,8 +147,14 @@ test.describe('responsive sweep', () => {
             33,
           );
         }
+        // A deliberate 404 page is reported by Chrome as a failed resource load.
+        const expectedStatus = response?.status() === 404;
         expect(
-          errors.filter((entry) => !/supabase|challenges\.cloudflare|net::ERR_FAILED/u.test(entry)),
+          errors.filter(
+            (entry) =>
+              !/supabase|challenges\.cloudflare|net::ERR_FAILED/u.test(entry) &&
+              !(expectedStatus && /status of 404/u.test(entry)),
+          ),
           `${route} logged console errors`,
         ).toEqual([]);
       });

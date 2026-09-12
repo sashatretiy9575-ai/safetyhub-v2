@@ -595,6 +595,8 @@
     "back": "返回",
     "draftSaved": "草稿已保存在此设备",
     "leaveWithoutDraft": "本地草稿不可用。仍要离开吗？",
+    "leaveAnyway": "仍然离开",
+    "stay": "留下",
     "toCourse": "返回课程",
     "timerExpired": "客户端计时已结束，正在向服务器确认状态。",
     "questionsAria": "测试题目",

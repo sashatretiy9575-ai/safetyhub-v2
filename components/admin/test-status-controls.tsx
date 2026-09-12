@@ -22,6 +22,7 @@ export function TestStatusControls({
   const [busy, setBusy] = useState(false);
   const [unpublishOpen, setUnpublishOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [error, setError] = useState('');
   const change = async (next: 'draft' | 'published') => {
     setBusy(true);
     try {
@@ -31,9 +32,10 @@ export function TestStatusControls({
         body: JSON.stringify({ status: next }),
       });
       if (!result.ok) {
-        window.alert(clientRequestMessage(result.error, 'Не удалось изменить статус курса.'));
+        setError(clientRequestMessage(result.error, 'Не удалось изменить статус курса.'));
         return;
       }
+      setUnpublishOpen(false);
       router.refresh();
     } finally {
       setBusy(false);
@@ -49,7 +51,7 @@ export function TestStatusControls({
         body: JSON.stringify({ expectedVersion }),
       });
       if (!result.ok) {
-        window.alert(clientRequestMessage(result.error, 'Не удалось удалить курс.'));
+        setError(clientRequestMessage(result.error, 'Не удалось удалить курс.'));
         return;
       }
       setDeleteOpen(false);
@@ -71,7 +73,9 @@ export function TestStatusControls({
             disabled={busy}
           >
             <Archive aria-hidden="true" />
-            <span className="sr-only"><NotePencil /></span>
+            <span className="sr-only">
+              <NotePencil />
+            </span>
           </Button>
         ) : null}
         <Button
@@ -90,18 +94,23 @@ export function TestStatusControls({
         title="Снять курс с публикации?"
         description="Курс перейдёт в статус черновика и временно перестанет быть доступен учащимся на портале."
         busy={busy}
-        onOpenChange={setUnpublishOpen}
-        onConfirm={async () => {
-          await change('draft');
-          setUnpublishOpen(false);
+        error={error}
+        onOpenChange={(open) => {
+          setUnpublishOpen(open);
+          if (!open) setError('');
         }}
+        onConfirm={() => void change('draft')}
       />
       <DestructiveDialog
         open={deleteOpen}
         title="Удалить курс?"
         description="Курс, материалы, вопросы, попытки и аттестации будут удалены. Уже выданные сертификаты сохранятся и продолжат проверяться."
         busy={busy}
-        onOpenChange={setDeleteOpen}
+        error={error}
+        onOpenChange={(open) => {
+          setDeleteOpen(open);
+          if (!open) setError('');
+        }}
         onConfirm={() => void removeCourse()}
       />
     </>

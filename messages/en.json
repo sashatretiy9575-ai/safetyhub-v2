@@ -595,6 +595,8 @@
     "back": "Go back",
     "draftSaved": "Draft saved on this device",
     "leaveWithoutDraft": "Your answers couldn’t be saved on this device. Leave anyway?",
+    "leaveAnyway": "Leave anyway",
+    "stay": "Stay",
     "toCourse": "Back to course",
     "timerExpired": "Time’s up. Checking the result…",
     "questionsAria": "Test questions",

@@ -20,6 +20,7 @@ import { Container } from '@/components/ui/container';
 import { AuthenticationError, requireAnyCapability } from '@/server/auth/session';
 import { ADMIN_CAPABILITIES } from '@/lib/security/capabilities';
 import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
+import { ConfirmDialogHost } from '@/components/admin/confirm-dialog';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   let actor: Awaited<ReturnType<typeof requireAnyCapability>>;
@@ -57,6 +58,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <AdminNotificationInboxProvider enabled={notificationsEnabled}>
+      <ConfirmDialogHost />
       <div
         data-admin-shell
         className="min-h-dvh bg-[var(--color-bg)] lg:grid lg:grid-cols-[13.5rem_minmax(0,1fr)]"

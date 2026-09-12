@@ -39,6 +39,7 @@ import {
 import { clearEditorDraft, readEditorDraft, writeEditorDraft } from '@/lib/admin/editor-drafts';
 import { ArticleLocalizationsEditor } from '@/components/admin/article-localizations-editor';
 import type { ArticleLocalizationEditorItem } from '@/lib/admin/localization-contract';
+import { confirmDialog } from '@/components/admin/confirm-dialog';
 
 type ArticleLocalDraft = {
   id: string | null;
@@ -398,7 +399,13 @@ export function AdminEditor({
     // page down is the step worth confirming.
     if (
       nextStatus === 'draft' &&
-      !window.confirm('Снять статью с публикации и оставить её черновиком?')
+      !(await confirmDialog({
+        title: 'Снять статью с публикации?',
+        description:
+          'Статья станет черновиком и исчезнет с сайта до следующей публикации. Черновик и история редакций сохранятся.',
+        confirmLabel: 'Снять с публикации',
+        busyLabel: 'Снимаем…',
+      }))
     ) {
       return;
     }

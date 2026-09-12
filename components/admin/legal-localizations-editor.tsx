@@ -16,6 +16,7 @@ import {
 } from '@/lib/admin/localization-contract';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import type { AppLocale } from '@/lib/supabase/types';
+import { confirmDialog } from '@/components/admin/confirm-dialog';
 
 type MutationResponse = {
   locale?: AppLocale;
@@ -348,8 +349,8 @@ function LegalVersionEditor({
 
         <div className="border-t border-[var(--color-border)] pt-4">
           <p className="text-sm text-[var(--color-text-muted)]">
-            Сохраните и отметьте готовыми четыре языка. Публикация выполняется только общим
-            пакетом Privacy + Terms выше на странице.
+            Сохраните и отметьте готовыми четыре языка. Публикация выполняется только общим пакетом
+            Privacy + Terms выше на странице.
           </p>
         </div>
         {message ? (
@@ -429,9 +430,13 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
       return;
     }
     if (
-      !window.confirm(
-        `Опубликовать пакет Privacy ${selectedPrivacy.version} и Terms ${selectedTerms.version}?`,
-      )
+      !(await confirmDialog({
+        title: 'Опубликовать пакет документов?',
+        description: `Privacy ${selectedPrivacy.version} и Terms ${selectedTerms.version} станут действующими: каждому пользователю при следующем входе будет предложено принять их.`,
+        tone: 'primary',
+        confirmLabel: 'Опубликовать',
+        busyLabel: 'Публикуем…',
+      }))
     ) {
       return;
     }
@@ -568,10 +573,15 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
                 value={privacyBundleVersion}
                 onChange={(event) => setPrivacyBundleVersion(event.target.value)}
               >
-                {readyVersions.privacy.length === 0 ? <option value="">Нет готовых версий</option> : null}
+                {readyVersions.privacy.length === 0 ? (
+                  <option value="">Нет готовых версий</option>
+                ) : null}
                 {readyVersions.privacy.map((item) => (
                   <option key={item.version} value={item.version}>
-                    {item.version} · {new Date(item.effectiveAt).toLocaleDateString('ru-RU', { timeZone: 'Asia/Oral' })}
+                    {item.version} ·{' '}
+                    {new Date(item.effectiveAt).toLocaleDateString('ru-RU', {
+                      timeZone: 'Asia/Oral',
+                    })}
                   </option>
                 ))}
               </select>
@@ -589,7 +599,10 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
                 ) : null}
                 {compatibleTerms.map((item) => (
                   <option key={item.version} value={item.version}>
-                    {item.version} · {new Date(item.effectiveAt).toLocaleDateString('ru-RU', { timeZone: 'Asia/Oral' })}
+                    {item.version} ·{' '}
+                    {new Date(item.effectiveAt).toLocaleDateString('ru-RU', {
+                      timeZone: 'Asia/Oral',
+                    })}
                   </option>
                 ))}
               </select>

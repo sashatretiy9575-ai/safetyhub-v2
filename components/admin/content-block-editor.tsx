@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { ArticleBlockInput } from '@/lib/validation/article';
 import { MediaAssetInput } from '@/components/admin/media-asset-input';
+import { confirmDialog } from '@/components/admin/confirm-dialog';
 
 const BLOCK_LABELS: Record<ArticleBlockInput['type'], string> = {
   paragraph: 'Абзац',
@@ -136,73 +137,80 @@ export function ContentBlockEditor({
               Блок {index + 1} · {BLOCK_LABELS[block.type]}
             </legend>
             <div className="flex items-center gap-0.5 sm:gap-1">
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              draggable
-              aria-label={`Перетащить блок ${index + 1}`}
-              className="cursor-grab active:cursor-grabbing"
-              onDragStart={(event) => {
-                setDraggedIndex(index);
-                event.dataTransfer.effectAllowed = 'move';
-                event.dataTransfer.setData('text/plain', String(index));
-              }}
-              onDragEnd={() => setDraggedIndex(null)}
-            >
-              <DotsSixVertical />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              disabled={index === 0}
-              aria-label="Переместить блок выше"
-              onClick={() => move(index, -1)}
-            >
-              <ArrowUp />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              disabled={index === blocks.length - 1}
-              aria-label="Переместить блок ниже"
-              onClick={() => move(index, 1)}
-            >
-              <ArrowDown />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              aria-label="Дублировать блок"
-              onClick={() =>
-                onChange([
-                  ...blocks.slice(0, index + 1),
-                  structuredClone(block),
-                  ...blocks.slice(index + 1),
-                ])
-              }
-            >
-              <Copy />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="text-[var(--color-danger)]"
-              aria-label="Удалить блок"
-              disabled={blocks.length === 1}
-              onClick={() =>
-                window.confirm(`Удалить блок ${index + 1}?`) &&
-                onChange(blocks.filter((_, blockIndex) => blockIndex !== index))
-              }
-            >
-              <Trash />
-            </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                draggable
+                aria-label={`Перетащить блок ${index + 1}`}
+                className="cursor-grab active:cursor-grabbing"
+                onDragStart={(event) => {
+                  setDraggedIndex(index);
+                  event.dataTransfer.effectAllowed = 'move';
+                  event.dataTransfer.setData('text/plain', String(index));
+                }}
+                onDragEnd={() => setDraggedIndex(null)}
+              >
+                <DotsSixVertical />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                disabled={index === 0}
+                aria-label="Переместить блок выше"
+                onClick={() => move(index, -1)}
+              >
+                <ArrowUp />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                disabled={index === blocks.length - 1}
+                aria-label="Переместить блок ниже"
+                onClick={() => move(index, 1)}
+              >
+                <ArrowDown />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label="Дублировать блок"
+                onClick={() =>
+                  onChange([
+                    ...blocks.slice(0, index + 1),
+                    structuredClone(block),
+                    ...blocks.slice(index + 1),
+                  ])
+                }
+              >
+                <Copy />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="text-[var(--color-danger)]"
+                aria-label="Удалить блок"
+                disabled={blocks.length === 1}
+                onClick={async () => {
+                  if (
+                    await confirmDialog({
+                      title: `Удалить блок ${index + 1}?`,
+                      description:
+                        'Содержимое блока исчезнет из черновика. Вернуть его можно только набрав заново.',
+                    })
+                  ) {
+                    onChange(blocks.filter((_, blockIndex) => blockIndex !== index));
+                  }
+                }}
+              >
+                <Trash />
+              </Button>
+            </div>
           </div>
-        </div>
 
           {block.type === 'paragraph' || block.type === 'quote' ? (
             <Textarea
@@ -529,7 +537,10 @@ export function ContentBlockEditor({
         </fieldset>
       ))}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2" aria-label="Добавить блок">
+      <div
+        className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4"
+        aria-label="Добавить блок"
+      >
         {allowedTypes.map((type) => (
           <Button
             key={type}

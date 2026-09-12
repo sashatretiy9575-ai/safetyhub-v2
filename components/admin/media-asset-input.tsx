@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { formatContentImagePreparation, prepareContentImage } from '@/lib/content/image';
+import { confirmDialog } from '@/components/admin/confirm-dialog';
 
 type Asset = {
   id: string;
@@ -112,7 +113,14 @@ export function MediaAssetInput({
 
   const remove = async (asset: Asset) => {
     if (asset.usageCount !== 0 || value === asset.url) return;
-    if (!window.confirm('Удалить неиспользуемое изображение из медиатеки?')) return;
+    if (
+      !(await confirmDialog({
+        title: 'Удалить изображение из медиатеки?',
+        description: 'Файл не используется ни в одной статье и будет удалён из хранилища.',
+      }))
+    ) {
+      return;
+    }
     setBusy(true);
     setError('');
     try {

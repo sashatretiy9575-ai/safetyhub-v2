@@ -4,11 +4,25 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { AdminOverlay } from '@/components/admin/admin-overlay';
 
+const DEFAULT_ACKNOWLEDGEMENT = 'Да, удалить без возможности восстановления';
+
+/**
+ * The one confirmation dialog of the admin panel. It started as the deletion
+ * dialog with its "yes, delete" checkbox; the same surface now also asks
+ * about publishing, unpublishing and leaving an editor, so the tone, the
+ * labels and the checkbox are parameters, and an error from the action is
+ * shown inside instead of a browser alert.
+ */
 export function DestructiveDialog({
   open,
   title,
   description,
   busy = false,
+  tone = 'danger',
+  confirmLabel,
+  busyLabel,
+  acknowledgement = DEFAULT_ACKNOWLEDGEMENT,
+  error,
   onOpenChange,
   onConfirm,
 }: {
@@ -16,14 +30,26 @@ export function DestructiveDialog({
   title: string;
   description: string;
   busy?: boolean;
+  /** `danger` for anything that removes data, `primary` for publishing and similar. */
+  tone?: 'danger' | 'primary';
+  confirmLabel?: string;
+  busyLabel?: string;
+  /** Checkbox text the person must tick first; `null` removes the checkbox. */
+  acknowledgement?: string | null;
+  /** What went wrong on the last attempt, read out by assistive technology. */
+  error?: string | null;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
 }) {
   const titleId = useId();
   const descriptionId = useId();
   const checkboxRef = useRef<HTMLInputElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [confirmed, setConfirmed] = useState(false);
+  const needsAcknowledgement = acknowledgement !== null;
+  const resolvedConfirmLabel = confirmLabel ?? (tone === 'danger' ? 'Удалить' : 'Продолжить');
+  const resolvedBusyLabel = busyLabel ?? (tone === 'danger' ? 'Удаляем…' : 'Выполняем…');
 
   useEffect(() => {
     if (!open) {
@@ -31,7 +57,7 @@ export function DestructiveDialog({
       return;
     }
     const previous = document.activeElement as HTMLElement | null;
-    checkboxRef.current?.focus();
+    (checkboxRef.current ?? confirmRef.current)?.focus();
     const keydown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !busy) {
         event.preventDefault();
@@ -87,17 +113,28 @@ export function DestructiveDialog({
             {description}
           </p>
 
-          <label className="mt-5 flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] p-3 text-sm font-semibold">
-            <input
-              ref={checkboxRef}
-              type="checkbox"
-              checked={confirmed}
-              disabled={busy}
-              className="mt-0.5 size-5 shrink-0 accent-[var(--color-danger)]"
-              onChange={(event) => setConfirmed(event.target.checked)}
-            />
-            <span>Да, удалить без возможности восстановления</span>
-          </label>
+          {needsAcknowledgement ? (
+            <label className="mt-5 flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] p-3 text-sm font-semibold">
+              <input
+                ref={checkboxRef}
+                type="checkbox"
+                checked={confirmed}
+                disabled={busy}
+                className="mt-0.5 size-5 shrink-0 accent-[var(--color-danger)]"
+                onChange={(event) => setConfirmed(event.target.checked)}
+              />
+              <span>{acknowledgement}</span>
+            </label>
+          ) : null}
+
+          {error ? (
+            <p
+              role="alert"
+              className="mt-4 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] p-3 text-sm font-medium text-[var(--color-danger)]"
+            >
+              {error}
+            </p>
+          ) : null}
 
           <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button
@@ -109,12 +146,14 @@ export function DestructiveDialog({
               Отмена
             </Button>
             <Button
+              ref={confirmRef}
               type="button"
-              variant="danger"
-              disabled={!confirmed || busy}
+              variant={tone === 'danger' ? 'danger' : 'primary'}
+              disabled={(needsAcknowledgement && !confirmed) || busy}
+              aria-busy={busy || undefined}
               onClick={onConfirm}
             >
-              {busy ? 'Удаляем…' : 'Удалить'}
+              {busy ? resolvedBusyLabel : resolvedConfirmLabel}
             </Button>
           </div>
         </div>

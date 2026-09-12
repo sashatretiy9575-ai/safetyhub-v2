@@ -178,6 +178,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
   // Mirrored into state: the guard below has to re-run when the backup starts
   // failing, and a ref write never re-runs an effect.
   const [localBackupFailed, setLocalBackupFailed] = useState(false);
+  const [leavePromptOpen, setLeavePromptOpen] = useState(false);
   const remainingSecondsRef = useRef<number | null>(null);
   const checkingExpiryRef = useRef(false);
 
@@ -835,8 +836,9 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           <Link
             href={localizePathname(`/topics/${slug}`, locale)}
             onClick={(event) => {
-              if (localBackupFailedRef.current && !window.confirm(t('leaveWithoutDraft'))) {
+              if (localBackupFailedRef.current) {
                 event.preventDefault();
+                setLeavePromptOpen(true);
               }
             }}
             className="inline-flex min-h-11 items-center gap-1 text-sm font-bold text-[var(--color-text-muted)]"
@@ -855,6 +857,39 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
             </span>
           </div>
         </div>
+        {leavePromptOpen ? (
+          <div
+            role="alertdialog"
+            aria-labelledby="quiz-leave-title"
+            className="mb-5 rounded-2xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] p-4"
+          >
+            <p id="quiz-leave-title" className="text-sm font-semibold">
+              {t('leaveWithoutDraft')}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  setLeavePromptOpen(false);
+                  router.push(localizePathname(`/topics/${slug}`, locale));
+                }}
+              >
+                {t('leaveAnyway')}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                autoFocus
+                onClick={() => setLeavePromptOpen(false)}
+              >
+                {t('stay')}
+              </Button>
+            </div>
+          </div>
+        ) : null}
         {remainingSeconds === 0 && (
           <div
             role="status"

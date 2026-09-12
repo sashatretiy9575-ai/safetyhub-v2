@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { TEST_EDITOR_LIMITS } from '@/lib/admin/course-test-editor';
 import type { AppLocale } from '@/lib/supabase/types';
+import { confirmDialog } from '@/components/admin/confirm-dialog';
 
 type UploadGrant = {
   presentationId: string;
@@ -331,7 +332,16 @@ export function CoursePresentationInput({
   };
 
   const remove = async () => {
-    if (!value || !window.confirm('Удалить эту неиспользуемую версию презентации?')) return;
+    if (!value) return;
+    if (
+      !(await confirmDialog({
+        title: 'Удалить версию презентации?',
+        description:
+          'Эта версия не используется ни черновиком, ни опубликованной редакцией и будет удалена из хранилища.',
+      }))
+    ) {
+      return;
+    }
     setBusy(true);
     setError('');
     try {

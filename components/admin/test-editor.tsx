@@ -32,6 +32,7 @@ import { EditorActionBar } from '@/components/admin/editor-action-bar';
 import { EditorShell } from '@/components/admin/editor-shell';
 import { useUnsavedChangesGuard } from '@/components/admin/use-unsaved-changes-guard';
 import { cn, formatDateTime } from '@/lib/utils';
+import { confirmDialog } from '@/components/admin/confirm-dialog';
 
 type PublicationState = NonNullable<TestEditorPayload['publicationState']>;
 const PUBLICATION_LABEL: Record<PublicationState, string> = {
@@ -338,7 +339,19 @@ export function TestEditor({
       );
       return;
     }
-    if (publish && !window.confirm('Опубликовать новую неизменяемую редакцию курса?')) return;
+    if (
+      publish &&
+      !(await confirmDialog({
+        title: 'Опубликовать новую редакцию курса?',
+        description:
+          'Опубликованная редакция неизменяема: учащиеся сразу увидят её, а дальнейшие правки создадут следующую редакцию.',
+        tone: 'primary',
+        confirmLabel: 'Опубликовать',
+        busyLabel: 'Публикуем…',
+      }))
+    ) {
+      return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -774,9 +787,7 @@ export function TestEditor({
                     type="button"
                     size="icon"
                     variant={activeQuestion === index ? 'primary' : 'outline'}
-                    aria-controls={
-                      activeQuestion === index ? `question-panel-${index}` : undefined
-                    }
+                    aria-controls={activeQuestion === index ? `question-panel-${index}` : undefined}
                     aria-expanded={activeQuestion === index}
                     aria-label={`Вопрос ${index + 1}`}
                     className={cn(

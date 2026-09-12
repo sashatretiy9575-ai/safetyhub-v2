@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { CourseContent } from '@/lib/validation/course';
+import { confirmDialog } from '@/components/admin/confirm-dialog';
 
 function entityId(prefix: string) {
   return `${prefix}-${crypto.randomUUID()}`;
@@ -82,10 +83,18 @@ export function CourseContentEditor({
               className="text-[var(--color-danger)]"
               disabled={value.modules.length === 1}
               aria-label="Удалить модуль"
-              onClick={() =>
-                window.confirm('Удалить модуль и все его уроки?') &&
-                onChange({ modules: value.modules.filter((_, index) => index !== moduleIndex) })
-              }
+              onClick={async () => {
+                if (
+                  await confirmDialog({
+                    title: 'Удалить модуль?',
+                    description: 'Модуль и все его уроки исчезнут из черновика курса.',
+                  })
+                ) {
+                  onChange({
+                    modules: value.modules.filter((_, index) => index !== moduleIndex),
+                  });
+                }
+              }}
             >
               <Trash />
             </Button>
@@ -172,12 +181,18 @@ export function CourseContentEditor({
                   className="text-[var(--color-danger)]"
                   disabled={module.lessons.length === 1}
                   aria-label="Удалить урок"
-                  onClick={() =>
-                    window.confirm('Удалить урок?') &&
-                    updateModule(moduleIndex, {
-                      lessons: module.lessons.filter((_, index) => index !== lessonIndex),
-                    })
-                  }
+                  onClick={async () => {
+                    if (
+                      await confirmDialog({
+                        title: 'Удалить урок?',
+                        description: 'Текст и блоки урока исчезнут из черновика курса.',
+                      })
+                    ) {
+                      updateModule(moduleIndex, {
+                        lessons: module.lessons.filter((_, index) => index !== lessonIndex),
+                      });
+                    }
+                  }}
                 >
                   <Trash />
                 </Button>

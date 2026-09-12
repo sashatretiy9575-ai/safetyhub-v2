@@ -100,7 +100,7 @@ test('destructive content deletion is transactional and preserves certificate sn
     /function public\.delete_article[\s\S]+perform private\.enforce_actor_quota\('content\.article\.mutate'\);[\s\S]+begin[\s\S]+select \* into v_article[\s\S]+exception when others/,
   );
   assert.match(dialog, /Да, удалить без возможности восстановления/);
-  assert.match(dialog, /disabled=\{!confirmed \|\| busy\}/);
+  assert.match(dialog, /disabled=\{\(needsAcknowledgement && !confirmed\) \|\| busy\}/);
   assert.match(courseServer, /authenticatedRpc\('delete_course'/);
   assert.match(articleActions, /rpc\('delete_article'/);
   assert.match(attestationTypes, /'deleted-course-certificate'/);
