@@ -109,6 +109,7 @@ Push в `main` собирает production на Vercel (регион `bom1`). М
 успешного деплоя и раз в час: остаются три последних успешных production-деплоя и тот, что
 сейчас открыт на домене. Незавершённая сборка не трогается, а упавший деплой новее
 последнего успешного ждёт следующего. Нужен секрет репозитория `VERCEL_TOKEN` —
-токен Vercel со scope `relirdghs-projects`. План без удаления:
+токен Vercel со scope `relirdghs-projects` (сейчас он сохранён под именем `NAME`).
+План без удаления:
 `npm run deployments:prune -- --dry-run` с `VERCEL_TOKEN`, `VERCEL_PROJECT=safetyhub-v2`
 и `VERCEL_TEAM_SLUG=relirdghs-projects` в окружении.

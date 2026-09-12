@@ -229,7 +229,7 @@ test('the workflow prunes after every successful deployment and on demand, from 
   assert.ok(workflow.includes("- cron: '17 * * * *'"));
   assert.ok(workflow.includes("github.event_name != 'deployment_status'"));
   assert.ok(workflow.includes("github.event.deployment_status.state == 'success'"));
-  assert.ok(workflow.includes('VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}'));
+  assert.ok(workflow.includes('VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.NAME }}'));
   assert.ok(workflow.includes('ref: main'));
   assert.ok(workflow.includes('contents: read'));
   assert.ok(workflow.includes('node scripts/prune-vercel-deployments.mjs --keep=3'));

@@ -25,7 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      # The owner saved the token as the repository secret NAME (13 September 2026).
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.NAME }}
       VERCEL_PROJECT: safetyhub-v2
       VERCEL_TEAM_SLUG: relirdghs-projects
 
