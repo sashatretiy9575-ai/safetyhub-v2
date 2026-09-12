@@ -20,7 +20,11 @@ import { resolveLegalDocumentVersion, type LegalDocumentType } from './lib/legal
 import { resolveSiteOrigin } from './lib/site-url';
 import { clearSafetyHubLocalSession } from './lib/supabase/session-cleanup';
 import { isSupabaseAuthCookieName } from './lib/supabase/auth-cookie-options';
-import { authRealmForSessionUser, updateSession } from './lib/supabase/middleware';
+import {
+  authRealmForSessionUser,
+  isDefinitiveAuthFailure,
+  updateSession,
+} from './lib/supabase/middleware';
 
 function hasSupabaseAuthCookie(request: NextRequest): boolean {
   return request.cookies.getAll().some((cookie) => isSupabaseAuthCookieName(cookie.name));
@@ -268,16 +272,27 @@ export async function proxy(request: NextRequest) {
     return finish(NextResponse.next({ request: { headers: requestHeaders } }));
   }
 
-  const { response, user } = await updateSession(request, requestHeaders);
+  const { response, user, error } = await updateSession(request, requestHeaders);
 
   if (!user) {
+    // A transient failure — the Auth server unreachable or slow, a 5xx, a
+    // rate limit, a cold start right after a deploy — is not a verdict on the
+    // session. Keep the cookies and let the page ask again; before this every
+    // release signed people out.
+    if (error && !isDefinitiveAuthFailure(error)) {
+      return finish(response);
+    }
     // An expired session is not a sign-out. Clearing the origin cache here would
     // unregister the service worker and force a cold start of the application
     // every time a cookie simply aged out.
     return secure(
-      clearSafetyHubLocalSession(request, redirectWithCookies(loginUrl(request, locale), response), {
-        clearDeviceCache: false,
-      }),
+      clearSafetyHubLocalSession(
+        request,
+        redirectWithCookies(loginUrl(request, locale), response),
+        {
+          clearDeviceCache: false,
+        },
+      ),
     );
   }
 

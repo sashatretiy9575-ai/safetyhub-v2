@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
+import { isAuthApiError, isAuthSessionMissingError } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { AuthRealm } from '@/i18n/config';
 import type { Database } from './types';
@@ -37,6 +38,22 @@ export function authRealmForSessionUser(
   return null;
 }
 
+/**
+ * Only Supabase's own verdict on the session — missing, expired beyond
+ * refresh, revoked — may end it. A network failure, a 5xx from the Auth
+ * server, a rate limit or a cold start right after a deploy also leave
+ * `getUser()` without a user, and treating those as a sign-out threw people
+ * out of their account after every release.
+ */
+export function isDefinitiveAuthFailure(error: unknown) {
+  if (isAuthSessionMissingError(error)) return true;
+  if (isAuthApiError(error)) {
+    const status = typeof error.status === 'number' ? error.status : 0;
+    return status >= 400 && status < 500 && status !== 408 && status !== 429;
+  }
+  return false;
+}
+
 export async function updateSession(request: NextRequest, forwardedHeaders?: Headers) {
   const nextResponse = () => {
     const headers = new Headers(forwardedHeaders ?? request.headers);
@@ -48,7 +65,7 @@ export async function updateSession(request: NextRequest, forwardedHeaders?: Hea
 
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !publishableKey) {
-    return { response, user: null, supabase: null as never };
+    return { response, user: null, error: null, supabase: null as never };
   }
 
   const supabase = createServerClient<Database>(
@@ -76,7 +93,8 @@ export async function updateSession(request: NextRequest, forwardedHeaders?: Hea
 
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
 
-  return { response, user, supabase };
+  return { response, user, error, supabase };
 }
