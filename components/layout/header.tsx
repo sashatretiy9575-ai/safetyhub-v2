@@ -118,14 +118,16 @@ export async function Header({
                 the account icon, a signed-in visitor the avatar menu in the same
                 place. Below 1024 px the header used to show a text button for
                 guests and nothing at all once signed in. */}
-            {accountMode === 'authenticated'
-              ? accountMenu
-              : (accountControl ?? (
-                  <AccountIconLink
-                    href={localizePathname(accountItem.href, locale)}
-                    label={translations(accountItem.messageKey)}
-                  />
-                ))}
+            {accountMode === 'authenticated' ? (
+              accountMenu
+            ) : (
+              (accountControl ?? (
+                <AccountIconLink
+                  href={localizePathname(accountItem.href, locale)}
+                  label={translations(accountItem.messageKey)}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>

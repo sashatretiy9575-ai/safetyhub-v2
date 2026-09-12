@@ -133,7 +133,7 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
 export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260912170000_certificate_settings_and_purge_receipts.sql',
-    sha256: '0b1a82c895b62ac06372aa416ad70e71089958e9fce65537f0d6f4b5733d8811',
+    sha256: 'dde05d00b28521c7c857be471a65cdaa12daf39844bfe36fa408e9149212a866',
   }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
