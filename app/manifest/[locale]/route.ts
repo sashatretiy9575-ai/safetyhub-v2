@@ -40,12 +40,14 @@ export async function GET(_request: Request, context: { params: Promise<{ locale
     categories: ['education', 'business'],
     // Lets a browser tab ask whether this app is already installed on the
     // phone (navigator.getInstalledRelatedApps), so it stops offering it.
-    related_applications: (rolloutFeatureEnabled('localeRoutes') ? APP_LOCALES : [DEFAULT_LOCALE]).map(
-      (locale) => ({
-        platform: 'webapp',
-        url: absoluteUrl(`/manifest/${locale}`),
-      }),
-    ),
+    // Until 1 September 2026 every page linked /manifest.json, so an app
+    // installed before then is known to the phone by that address.
+    related_applications: [
+      ...(rolloutFeatureEnabled('localeRoutes') ? APP_LOCALES : [DEFAULT_LOCALE]).map(
+        (locale) => `/manifest/${locale}`,
+      ),
+      '/manifest.json',
+    ].map((pathname) => ({ platform: 'webapp', url: absoluteUrl(pathname) })),
     icons: [
       {
         src: '/icons/icon-192x192.png',

@@ -66,6 +66,8 @@ test('Android gets the card only while the browser offers installation; only iPh
   assert.match(hook, /android-app:\/\//u);
   assert.match(manifestRoute, /related_applications/u);
   assert.match(manifestRoute, /platform: 'webapp'/u);
+  // An app installed before the locale manifests is known by the old address.
+  assert.ok(manifestRoute.includes("'/manifest.json'"));
 });
 
 test('the copy is readable on a phone', () => {
