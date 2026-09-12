@@ -207,6 +207,9 @@
   --safe-area-left: env(safe-area-inset-left, 0px);
   --mobile-tab-height: 4rem;
   --mobile-fixed-bottom-space: calc(5rem + var(--safe-area-bottom));
+  /* What the install card floats above: the dock while it exists, the bottom
+     edge once the dock is hidden on landscape tablets. */
+  --pwa-dock-offset: var(--mobile-tab-height);
 }
 
 @layer base {
@@ -336,6 +339,7 @@
   @media (min-width: 1024px) {
     :root {
       --mobile-fixed-bottom-space: 0px;
+      --pwa-dock-offset: 0px;
     }
   }
 }

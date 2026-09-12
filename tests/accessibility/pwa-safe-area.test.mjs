@@ -45,7 +45,7 @@ test('deferred install banner stays compact above the mobile bar and reserves te
   // is read against the dock's insets and width.
   assert.match(
     overlay,
-    /bottom-\[calc\(var\(--safe-area-bottom\)\+var\(--mobile-tab-height\)\+5px\)\]/,
+    /bottom-\[calc\(var\(--safe-area-bottom\)\+var\(--pwa-dock-offset\)\+5px\)\]/,
   );
   assert.match(overlay, /rounded-\[var\(--radius-dock\)\] border /);
   assert.match(overlay, /max-w-\[32\.5rem\]/);

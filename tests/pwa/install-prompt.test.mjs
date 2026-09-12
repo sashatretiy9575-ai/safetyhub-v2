@@ -19,13 +19,46 @@ test('the banner shows on every phone visit until the app is installed', () => {
   assert.match(overlay, /routeAllowsAutomaticPrompt\(pathname\)/u);
 });
 
-test('the phone test matches the range where the dock exists', () => {
-  // The query stopped at 899 px and never asked about the pointer, although the
-  // comment beside it claimed both. Between 900 and 1023 px the banner was
-  // absent while the dock it sits on was present, and a narrow desktop window
-  // was offered a phone install prompt.
-  assert.match(overlay, /\(max-width: 1023px\) and \(pointer: coarse\)/u);
-  assert.doesNotMatch(overlay, /max-width: 899px/u);
+test('the card is offered on touch screens up to a landscape tablet, never on a desktop', () => {
+  // The owner's decision (September 2026): phones and tablets in either
+  // orientation, nothing with a mouse. The pointer test keeps a narrow desktop
+  // window out; the width cap ends at the widest tablet in landscape.
+  assert.match(overlay, /\(max-width: 1366px\) and \(pointer: coarse\)/u);
+  assert.doesNotMatch(overlay, /max-width: (?:899|1023)px/u);
+});
+
+test('the card and its reserve follow the dock offset, which is zero once the dock hides', async () => {
+  // Above 1023 px the dock is gone but the card still shows on a landscape
+  // tablet, so its bottom offset and the footer reserve read one variable that
+  // the stylesheet zeroes at the same breakpoint.
+  const css = await read('app/globals.css');
+  assert.match(
+    overlay,
+    /bottom-\[calc\(var\(--safe-area-bottom\)\+var\(--pwa-dock-offset\)\+5px\)\]/u,
+  );
+  assert.match(css, /--pwa-dock-offset: var\(--mobile-tab-height\);/u);
+  assert.match(css, /--pwa-dock-offset: 0px;/u);
+  assert.match(shell, /min-\[1024px\]:pb-\[var\(--pwa-banner-space,0px\)\]/u);
+  assert.doesNotMatch(shell, /min-\[1024px\]:pb-0/u);
+});
+
+test('the button label never depends on whether the browser has fired its install event', () => {
+  // `beforeinstallprompt` arrives seconds after load. A label that read
+  // "How to install" until then and "Install" afterwards changed under the
+  // visitor's thumb on Android; now it reads "Install" until tapped.
+  assert.doesNotMatch(overlay, /isInstallable\s*\?\s*translations\('install'\)/u);
+  assert.match(
+    overlay,
+    /isInstalling \? translations\('installing'\) : translations\('install'\)/u,
+  );
+  assert.match(overlay, /if \(ios \|\| !isInstallable\) \{/u);
+});
+
+test('the copy is readable on a phone', () => {
+  // 12 px body text and a 15 px title were too small to read on a phone.
+  assert.doesNotMatch(overlay, /text-xs leading-relaxed/u);
+  assert.match(overlay, /text-\[17px\] leading-tight font-bold/u);
+  assert.match(overlay, /text-\[15px\] leading-normal/u);
 });
 
 test('visibility has no condition that decides nothing', () => {
@@ -37,9 +70,10 @@ test('visibility has no condition that decides nothing', () => {
 test('the reserved space matches the banner and clears the footer', () => {
   // 160 px was reserved for a banner at least 140 px tall that sits on top of
   // the dock inside the bottom safe area — and it was reserved on <main>, so the
-  // banner covered the footer rather than clearing it.
-  assert.match(overlay, /var\(--mobile-tab-height\) \+ var\(--safe-area-bottom\) \+ 10\.25rem/u);
-  assert.doesNotMatch(shell, /pb-\[var\(--pwa-banner-space,0px\)\]/u);
+  // banner covered the footer rather than clearing it. With the larger type the
+  // card reaches about 180 px on a narrow phone, hence 12 rem.
+  assert.match(overlay, /var\(--pwa-dock-offset\) \+ var\(--safe-area-bottom\) \+ 12rem/u);
+  assert.doesNotMatch(shell, /<main[^>]*--pwa-banner-space/su);
   assert.match(shell, /--pwa-banner-space,0px/u);
 });
 
