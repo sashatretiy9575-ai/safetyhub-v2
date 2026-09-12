@@ -22,10 +22,6 @@ import {
   type CertificateExportMetadata,
 } from '@/lib/pdf/certificate-client-contract';
 import {
-  downloadCertificateExportInBrowser,
-  requestCertificateArchiveFileHandle,
-} from '@/lib/pdf/certificate-client';
-import {
   AttestationsActionDialog,
   type AttestationDialogConfig,
 } from './attestations-action-dialog';
@@ -832,6 +828,10 @@ export function AttestationsManager({
     setExportProgress({ completed: 0, total: selectionSummary.exportable });
     setMessage('Получаем данные сертификатов. PDF и ZIP будут сформированы только в браузере…');
     try {
+      // The renderer bridge and the archive writer load only once an export
+      // starts; no other admin screen needs them in its first paint.
+      const { downloadCertificateExportInBrowser, requestCertificateArchiveFileHandle } =
+        await import('@/lib/pdf/certificate-client');
       // `showSaveFilePicker` creates the .zip on disk before a single
       // certificate is rendered, so any later failure leaves a 0-byte file that
       // Windows reports as a damaged archive. Small exports therefore stay on

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import * as z from 'zod';
+import * as z from 'zod/mini';
 import { Button } from '@/components/ui/button';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 
@@ -10,14 +10,14 @@ type CourseAccessItem = { id: string; title: string; slug: string; granted: bool
 const coursesSchema = z.object({
   courses: z.array(
     z.object({
-      id: z.string().uuid(),
+      id: z.uuid(),
       title: z.string(),
       slug: z.string(),
       granted: z.boolean(),
     }),
   ),
 });
-const savedSchema = z.object({ userId: z.string().uuid(), courseIds: z.array(z.string().uuid()) });
+const savedSchema = z.object({ userId: z.uuid(), courseIds: z.array(z.uuid()) });
 
 const errorMessages: Record<string, string> = {
   COURSE_ACCESS_COURSE_UNKNOWN: 'Один из курсов больше не существует. Обновите страницу.',

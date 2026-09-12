@@ -1,6 +1,10 @@
-import * as z from 'zod';
+import * as z from 'zod/mini';
 import { contentMetadataDraftSchema } from '../content/content-metadata.ts';
 import { isSafeSourceUrl } from './source-url.ts';
+
+// zod/mini on purpose: the article editor, the course editor and the public
+// article renderer all validate blocks in the browser, and the classic API
+// would ship every locale and the JSON-Schema compiler with them.
 
 export const ARTICLE_LIMITS = {
   maxBlocks: 100,
@@ -10,10 +14,7 @@ export const ARTICLE_LIMITS = {
 
 const slugSchema = z
   .string()
-  .trim()
-  .min(1)
-  .max(120)
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+  .check(z.trim(), z.minLength(1), z.maxLength(120), z.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/));
 
 const localImagePath = /^\/images\/[a-zA-Z0-9/_-]+\.(?:avif|gif|jpe?g|png|webp)$/i;
 const managedContentAssetPath =
@@ -91,56 +92,64 @@ export function isSafeArticleSourceUrl(value: string): boolean {
   }
 }
 
+function trimmedText(min: number, max: number) {
+  return z.string().check(z.trim(), z.minLength(min), z.maxLength(max));
+}
+
 const articleImageUrlSchema = z
   .string()
-  .trim()
-  .min(1)
-  .max(2_048)
-  .refine(isSafeArticleImageUrl, 'ARTICLE_IMAGE_URL_INVALID');
+  .check(
+    z.trim(),
+    z.minLength(1),
+    z.maxLength(2_048),
+    z.refine(isSafeArticleImageUrl, 'ARTICLE_IMAGE_URL_INVALID'),
+  );
 
-export const articleCoverImageSchema = z.preprocess(
-  (value) => (value == null || value === '/images/blog/placeholder.jpg' ? '' : value),
+export const articleCoverImageSchema = z.pipe(
+  z.transform((value: unknown) =>
+    value == null || value === '/images/blog/placeholder.jpg' ? '' : value,
+  ),
   z.union([z.literal(''), articleImageUrlSchema]),
 );
 
-const articleSeoSchema = z
-  .object({
-    title: z.string().trim().min(3).max(70),
-    description: z.string().trim().min(40).max(200),
-    ogTitle: z.string().trim().min(3).max(70),
-    ogDescription: z.string().trim().min(40).max(200),
-    ogImage: articleCoverImageSchema,
-    indexable: z.boolean(),
-  })
-  .strict();
+const articleSeoSchema = z.strictObject({
+  title: trimmedText(3, 70),
+  description: trimmedText(40, 200),
+  ogTitle: trimmedText(3, 70),
+  ogDescription: trimmedText(40, 200),
+  ogImage: articleCoverImageSchema,
+  indexable: z.boolean(),
+});
 
 const articleButtonUrlSchema = z
   .string()
-  .trim()
-  .min(1)
-  .max(2_048)
-  .refine(isSafeArticleButtonUrl, 'ARTICLE_BUTTON_URL_INVALID');
+  .check(
+    z.trim(),
+    z.minLength(1),
+    z.maxLength(2_048),
+    z.refine(isSafeArticleButtonUrl, 'ARTICLE_BUTTON_URL_INVALID'),
+  );
 
 const articleSourceUrlSchema = z
   .string()
-  .trim()
-  .min(1)
-  .max(2_048)
-  .refine(isSafeArticleSourceUrl, 'ARTICLE_SOURCE_URL_INVALID');
+  .check(
+    z.trim(),
+    z.minLength(1),
+    z.maxLength(2_048),
+    z.refine(isSafeArticleSourceUrl, 'ARTICLE_SOURCE_URL_INVALID'),
+  );
 
-const optionalShortText = z.string().trim().max(240).optional();
+const optionalShortText = z.optional(z.string().check(z.trim(), z.maxLength(240)));
 
 const accessibleImageFields = {
   src: articleImageUrlSchema,
-  alt: z.string().trim().max(240),
+  alt: z.string().check(z.trim(), z.maxLength(240)),
   decorative: z.boolean(),
   caption: optionalShortText,
 } as const;
 
-const accessibleImageSchema = z
-  .object(accessibleImageFields)
-  .strict()
-  .superRefine((image, context) => {
+const accessibleImageAltMatchesRole = z.superRefine(
+  (image: { alt: string; decorative: boolean }, context) => {
     if (image.decorative && image.alt.length > 0) {
       context.addIssue({
         code: 'custom',
@@ -155,7 +164,12 @@ const accessibleImageSchema = z
         message: 'MEANINGFUL_IMAGE_ALT_REQUIRED',
       });
     }
-  });
+  },
+);
+
+const accessibleImageSchema = z
+  .strictObject(accessibleImageFields)
+  .check(accessibleImageAltMatchesRole);
 
 function normalizeLegacyImage(value: unknown): unknown {
   if (typeof value === 'string') {
@@ -178,118 +192,90 @@ function normalizeLegacyBlock(value: unknown): unknown {
   return value;
 }
 
-const paragraphBlockSchema = z
-  .object({
-    type: z.literal('paragraph'),
-    content: z.string().trim().min(1).max(5_000),
-  })
-  .strict();
+const paragraphBlockSchema = z.strictObject({
+  type: z.literal('paragraph'),
+  content: trimmedText(1, 5_000),
+});
 
-const headingBlockSchema = z
-  .object({
-    type: z.literal('heading'),
-    content: z.string().trim().min(1).max(180),
-    level: z.union([z.literal(2), z.literal(3), z.literal(4)]),
-  })
-  .strict();
+const headingBlockSchema = z.strictObject({
+  type: z.literal('heading'),
+  content: trimmedText(1, 180),
+  level: z.union([z.literal(2), z.literal(3), z.literal(4)]),
+});
 
 const imageBlockSchema = z
-  .object({
+  .strictObject({
     type: z.literal('image'),
     ...accessibleImageFields,
   })
-  .strict()
-  .superRefine((image, context) => {
-    if (image.decorative && image.alt.length > 0) {
-      context.addIssue({
-        code: 'custom',
-        path: ['alt'],
-        message: 'DECORATIVE_IMAGE_ALT_MUST_BE_EMPTY',
-      });
-    }
-    if (!image.decorative && image.alt.length === 0) {
-      context.addIssue({
-        code: 'custom',
-        path: ['alt'],
-        message: 'MEANINGFUL_IMAGE_ALT_REQUIRED',
-      });
-    }
-  });
+  .check(accessibleImageAltMatchesRole);
 
-const buttonBlockSchema = z
-  .object({
-    type: z.literal('button'),
-    text: z.string().trim().min(1).max(80),
-    url: articleButtonUrlSchema,
-    style: z.enum(['primary', 'outline']),
-  })
-  .strict();
+const buttonBlockSchema = z.strictObject({
+  type: z.literal('button'),
+  text: trimmedText(1, 80),
+  url: articleButtonUrlSchema,
+  style: z.enum(['primary', 'outline']),
+});
 
-const sliderBlockSchema = z
-  .object({
-    type: z.literal('slider'),
-    label: z.string().trim().min(1).max(120).optional(),
-    images: z.array(accessibleImageSchema).min(1).max(10),
-  })
-  .strict();
+const sliderBlockSchema = z.strictObject({
+  type: z.literal('slider'),
+  label: z.optional(trimmedText(1, 120)),
+  images: z.array(accessibleImageSchema).check(z.minLength(1), z.maxLength(10)),
+});
 
-const quoteBlockSchema = z
-  .object({
-    type: z.literal('quote'),
-    content: z.string().trim().min(1).max(2_000),
-  })
-  .strict();
+const quoteBlockSchema = z.strictObject({
+  type: z.literal('quote'),
+  content: trimmedText(1, 2_000),
+});
 
-const listBlockSchema = z
-  .object({
-    type: z.literal('list'),
-    style: z.enum(['unordered', 'ordered']),
-    items: z.array(z.string().trim().min(1).max(1_000)).min(1).max(50),
-  })
-  .strict();
+const listBlockSchema = z.strictObject({
+  type: z.literal('list'),
+  style: z.enum(['unordered', 'ordered']),
+  items: z.array(trimmedText(1, 1_000)).check(z.minLength(1), z.maxLength(50)),
+});
 
 const tableBlockSchema = z
-  .object({
+  .strictObject({
     type: z.literal('table'),
-    caption: z.string().trim().min(1).max(240).optional(),
-    headers: z.array(z.string().trim().min(1).max(240)).min(1).max(12),
+    caption: z.optional(trimmedText(1, 240)),
+    headers: z.array(trimmedText(1, 240)).check(z.minLength(1), z.maxLength(12)),
     rows: z
-      .array(z.array(z.string().trim().max(1_000)).min(1).max(12))
-      .min(1)
-      .max(100),
+      .array(
+        z
+          .array(z.string().check(z.trim(), z.maxLength(1_000)))
+          .check(z.minLength(1), z.maxLength(12)),
+      )
+      .check(z.minLength(1), z.maxLength(100)),
   })
-  .strict()
-  .superRefine((table, context) => {
-    table.rows.forEach((row, index) => {
-      if (row.length !== table.headers.length) {
-        context.addIssue({
-          code: 'custom',
-          path: ['rows', index],
-          message: 'ARTICLE_TABLE_COLUMN_COUNT_MISMATCH',
-        });
-      }
-    });
-  });
+  .check(
+    z.superRefine((table, context) => {
+      table.rows.forEach((row, index) => {
+        if (row.length !== table.headers.length) {
+          context.addIssue({
+            code: 'custom',
+            path: ['rows', index],
+            message: 'ARTICLE_TABLE_COLUMN_COUNT_MISMATCH',
+          });
+        }
+      });
+    }),
+  );
 
-const calloutBlockSchema = z
-  .object({
-    type: z.literal('callout'),
-    tone: z.enum(['info', 'warning', 'success']),
-    title: z.string().trim().min(1).max(180).optional(),
-    content: z.string().trim().min(1).max(2_000),
-  })
-  .strict();
+const calloutBlockSchema = z.strictObject({
+  type: z.literal('callout'),
+  tone: z.enum(['info', 'warning', 'success']),
+  title: z.optional(trimmedText(1, 180)),
+  content: trimmedText(1, 2_000),
+});
 
-export const articleSourceSchema = z
-  .object({
-    title: z.string().trim().min(1).max(240),
-    url: articleSourceUrlSchema,
-    note: z.string().trim().min(1).max(500).optional(),
-  })
-  .strict();
+export const articleSourceSchema = z.strictObject({
+  title: trimmedText(1, 240),
+  url: articleSourceUrlSchema,
+  note: z.optional(trimmedText(1, 500)),
+});
 
-const sourceBlockSchema = articleSourceSchema.extend({ type: z.literal('source') }).strict();
-const dividerBlockSchema = z.object({ type: z.literal('divider') }).strict();
+const sourceBlockSchema = z.extend(articleSourceSchema, { type: z.literal('source') });
+const dividerBlockSchema = z.strictObject({ type: z.literal('divider') });
 
 const articleBlockUnionSchema = z.discriminatedUnion('type', [
   paragraphBlockSchema,
@@ -305,16 +291,20 @@ const articleBlockUnionSchema = z.discriminatedUnion('type', [
   dividerBlockSchema,
 ]);
 
-export const articleBlockSchema = z.preprocess(normalizeLegacyBlock, articleBlockUnionSchema);
+// Legacy rows are reshaped before validation; the union still decides what is valid.
+export const articleBlockSchema = z.pipe(
+  z.transform((value: unknown) => normalizeLegacyBlock(value)),
+  articleBlockUnionSchema,
+);
 
-export const articleBlocksSchema = z
-  .array(articleBlockSchema)
-  .max(ARTICLE_LIMITS.maxBlocks)
-  .superRefine((blocks, context) => {
+export const articleBlocksSchema = z.array(articleBlockSchema).check(
+  z.maxLength(ARTICLE_LIMITS.maxBlocks),
+  z.superRefine((blocks, context) => {
     if (blockTextCharacters(blocks) > ARTICLE_LIMITS.maxTextCharacters) {
       context.addIssue({ code: 'custom', message: 'ARTICLE_TEXT_TOO_LARGE' });
     }
-  });
+  }),
+);
 
 /**
  * The same blocks, plus the rule that heading levels may not skip.
@@ -326,20 +316,22 @@ export const articleBlocksSchema = z
  * also parses content already in the database, and tightening it there would
  * make an article that was legal when it was saved unreadable now.
  */
-export const articleBlocksWriteSchema = articleBlocksSchema.superRefine((blocks, context) => {
-  let previous = 1;
-  blocks.forEach((block, index) => {
-    if (!isHeadingBlock(block)) return;
-    if (block.level > previous + 1) {
-      context.addIssue({
-        code: 'custom',
-        path: [index, 'level'],
-        message: 'ARTICLE_HEADING_LEVEL_SKIPPED',
-      });
-    }
-    previous = block.level;
-  });
-});
+export const articleBlocksWriteSchema = articleBlocksSchema.check(
+  z.superRefine((blocks, context) => {
+    let previous = 1;
+    blocks.forEach((block, index) => {
+      if (!isHeadingBlock(block)) return;
+      if (block.level > previous + 1) {
+        context.addIssue({
+          code: 'custom',
+          path: [index, 'level'],
+          message: 'ARTICLE_HEADING_LEVEL_SKIPPED',
+        });
+      }
+      previous = block.level;
+    });
+  }),
+);
 
 function isHeadingBlock(block: unknown): block is { type: 'heading'; level: 2 | 3 | 4 } {
   return (
@@ -352,25 +344,23 @@ function isHeadingBlock(block: unknown): block is { type: 'heading'; level: 2 | 
 
 export const articleStatusSchema = z.enum(['draft', 'published']);
 
-const articleDateSchema = z.string().trim().min(1).max(40);
+const articleDateSchema = trimmedText(1, 40);
 
-export const articleDocumentSchema = z
-  .object({
-    slug: slugSchema,
-    title: z.string().trim().min(2).max(180),
-    description: z.string().trim().max(500).default(''),
-    coverImage: articleCoverImageSchema,
-    createdAt: articleDateSchema.optional(),
-    updatedAt: articleDateSchema.optional(),
-    publishedAt: articleDateSchema.nullable().optional(),
-    author: z.string().trim().min(1).max(180).optional(),
-    seo: articleSeoSchema.optional(),
-    ...contentMetadataDraftSchema.shape,
-    blocks: articleBlocksSchema,
-  })
-  .strict();
+export const articleDocumentSchema = z.strictObject({
+  slug: slugSchema,
+  title: trimmedText(2, 180),
+  description: z._default(z.string().check(z.trim(), z.maxLength(500)), ''),
+  coverImage: articleCoverImageSchema,
+  createdAt: z.optional(articleDateSchema),
+  updatedAt: z.optional(articleDateSchema),
+  publishedAt: z.optional(z.nullable(articleDateSchema)),
+  author: z.optional(trimmedText(1, 180)),
+  seo: z.optional(articleSeoSchema),
+  ...contentMetadataDraftSchema.shape,
+  blocks: articleBlocksSchema,
+});
 
-export const articleDocumentMetadataSchema = articleDocumentSchema.omit({ blocks: true });
+export const articleDocumentMetadataSchema = z.omit(articleDocumentSchema, { blocks: true });
 
 function serializedBytes(value: unknown): number {
   try {
@@ -422,58 +412,55 @@ function blockTextCharacters(blocks: z.infer<typeof articleBlockSchema>[]): numb
 }
 
 export const articleDraftInputSchema = z
-  .object({
-    id: z.uuid().nullable().optional(),
-    originalSlug: slugSchema.nullable().optional(),
-    draftVersion: z.number().int().positive().optional(),
+  .strictObject({
+    id: z.optional(z.nullable(z.uuid())),
+    originalSlug: z.optional(z.nullable(slugSchema)),
+    draftVersion: z.optional(z.int().check(z.positive())),
     slug: slugSchema,
-    title: z.string().trim().min(2).max(180),
-    description: z.string().trim().max(500),
+    title: trimmedText(2, 180),
+    description: z.string().check(z.trim(), z.maxLength(500)),
     coverImage: articleCoverImageSchema,
-    seo: articleSeoSchema.optional(),
+    seo: z.optional(articleSeoSchema),
     ...contentMetadataDraftSchema.shape,
     blocks: articleBlocksWriteSchema,
   })
-  .strict()
-  .superRefine((article, context) => {
-    if (Boolean(article.id) !== Boolean(article.originalSlug)) {
-      context.addIssue({
-        code: 'custom',
-        path: ['originalSlug'],
-        message: 'ARTICLE_IDENTITY_INCOMPLETE',
-      });
-    }
-    if (serializedBytes(article) > ARTICLE_LIMITS.maxPayloadBytes) {
-      context.addIssue({ code: 'custom', path: ['blocks'], message: 'ARTICLE_PAYLOAD_TOO_LARGE' });
-    }
-  });
+  .check(
+    z.superRefine((article, context) => {
+      if (Boolean(article.id) !== Boolean(article.originalSlug)) {
+        context.addIssue({
+          code: 'custom',
+          path: ['originalSlug'],
+          message: 'ARTICLE_IDENTITY_INCOMPLETE',
+        });
+      }
+      if (serializedBytes(article) > ARTICLE_LIMITS.maxPayloadBytes) {
+        context.addIssue({ code: 'custom', path: ['blocks'], message: 'ARTICLE_PAYLOAD_TOO_LARGE' });
+      }
+    }),
+  );
 
 export const articleStatusInputSchema = z
-  .object({
+  .strictObject({
     articleId: z.uuid(),
     status: articleStatusSchema,
-    expectedContentHash: z
-      .string()
-      .regex(/^[0-9a-f]{64}$/)
-      .optional(),
+    expectedContentHash: z.optional(z.string().check(z.regex(/^[0-9a-f]{64}$/))),
   })
-  .strict()
-  .superRefine((input, context) => {
-    if (input.status === 'published' && !input.expectedContentHash) {
-      context.addIssue({
-        code: 'custom',
-        path: ['expectedContentHash'],
-        message: 'ARTICLE_CONTENT_HASH_REQUIRED',
-      });
-    }
-  });
+  .check(
+    z.superRefine((input, context) => {
+      if (input.status === 'published' && !input.expectedContentHash) {
+        context.addIssue({
+          code: 'custom',
+          path: ['expectedContentHash'],
+          message: 'ARTICLE_CONTENT_HASH_REQUIRED',
+        });
+      }
+    }),
+  );
 
-export const articleDeleteInputSchema = z
-  .object({
-    articleId: z.uuid(),
-    expectedVersion: z.number().int().positive(),
-  })
-  .strict();
+export const articleDeleteInputSchema = z.strictObject({
+  articleId: z.uuid(),
+  expectedVersion: z.int().check(z.positive()),
+});
 
 export type ArticleAccessibleImage = z.infer<typeof accessibleImageSchema>;
 export type ArticleBlockInput = z.infer<typeof articleBlockSchema>;

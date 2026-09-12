@@ -1,8 +1,12 @@
-import * as z from 'zod';
+import * as z from 'zod/mini';
 
-const normalizedEmailSchema = z.string().trim().toLowerCase().email().max(254);
-const captchaTokenSchema = z.string().min(1).max(4096).optional();
-const emailOtpLocaleSchema = z.enum(['ru', 'kk', 'en']).optional();
+// zod/mini on purpose: this schema runs in the browser on the login page, and
+// the classic API ships every locale plus the JSON-Schema compiler with it.
+const normalizedEmailSchema = z
+  .string()
+  .check(z.trim(), z.toLowerCase(), z.regex(z.regexes.email), z.maxLength(254));
+const captchaTokenSchema = z.optional(z.string().check(z.minLength(1), z.maxLength(4096)));
+const emailOtpLocaleSchema = z.optional(z.enum(['ru', 'kk', 'en']));
 
 /**
  * Passwordless email entry point. It intentionally accepts both a new and an
@@ -28,7 +32,7 @@ export type EmailOtpStartValues = z.infer<typeof emailOtpStartSchema>;
 // inferred from an old UI mode.
 export const emailOtpVerifySchema = z.object({
   email: normalizedEmailSchema,
-  code: z.string().regex(/^\d{6}$/),
+  code: z.string().check(z.regex(/^\d{6}$/)),
   locale: emailOtpLocaleSchema,
   legalAccepted: z.literal(true),
 });

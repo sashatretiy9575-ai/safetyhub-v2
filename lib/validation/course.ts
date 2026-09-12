@@ -1,33 +1,28 @@
-import * as z from 'zod';
+import * as z from 'zod/mini';
 import { articleBlocksSchema } from './article.ts';
 import { contentSeoSchema } from './content-seo.ts';
 
 const courseEntityIdSchema = z
   .string()
-  .trim()
-  .min(1)
-  .max(80)
-  .regex(/^[a-z0-9-]+$/);
+  .check(z.trim(), z.minLength(1), z.maxLength(80), z.regex(/^[a-z0-9-]+$/));
 
-export const courseLessonSchema = z
-  .object({
-    id: courseEntityIdSchema,
-    title: z.string().trim().min(2).max(180),
-    blocks: articleBlocksSchema.min(1).max(50),
-  })
-  .strict();
+const courseTitleSchema = z.string().check(z.trim(), z.minLength(2), z.maxLength(180));
 
-export const courseModuleSchema = z
-  .object({
-    id: courseEntityIdSchema,
-    title: z.string().trim().min(2).max(180),
-    lessons: z.array(courseLessonSchema).min(1).max(30),
-  })
-  .strict();
+export const courseLessonSchema = z.strictObject({
+  id: courseEntityIdSchema,
+  title: courseTitleSchema,
+  blocks: articleBlocksSchema.check(z.minLength(1), z.maxLength(50)),
+});
 
-export const courseContentSchema = z
-  .object({ modules: z.array(courseModuleSchema).min(1).max(50) })
-  .strict();
+export const courseModuleSchema = z.strictObject({
+  id: courseEntityIdSchema,
+  title: courseTitleSchema,
+  lessons: z.array(courseLessonSchema).check(z.minLength(1), z.maxLength(30)),
+});
+
+export const courseContentSchema = z.strictObject({
+  modules: z.array(courseModuleSchema).check(z.minLength(1), z.maxLength(50)),
+});
 
 export const courseSeoSchema = contentSeoSchema;
 

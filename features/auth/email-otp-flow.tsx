@@ -14,6 +14,7 @@ import {
 import { Turnstile, type TurnstileHandle } from '@/features/auth/turnstile';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { safeReturnPath } from '@/lib/security/redirect';
+import { flattenError } from 'zod/mini';
 import { emailOtpStartSchema, emailOtpVerifySchema } from '@/lib/validation/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -328,7 +329,7 @@ export function EmailOtpFlow() {
     });
     if (!parsed.success) {
       const nextErrors: FieldErrors = {};
-      const flattened = parsed.error.flatten().fieldErrors;
+      const flattened = flattenError(parsed.error).fieldErrors;
       if (flattened.email?.length) nextErrors.email = t('emailInvalid');
       setFieldErrors(nextErrors);
       setError('');
@@ -358,7 +359,7 @@ export function EmailOtpFlow() {
     });
     if (!parsed.success) {
       const nextErrors: FieldErrors = {};
-      const flattened = parsed.error.flatten().fieldErrors;
+      const flattened = flattenError(parsed.error).fieldErrors;
       if (flattened.email?.length) nextErrors.email = t('emailInvalid');
       if (flattened.code?.length) nextErrors.code = t('codeInvalid');
       if (flattened.legalAccepted?.length) nextErrors.legal = t('legalRequired');

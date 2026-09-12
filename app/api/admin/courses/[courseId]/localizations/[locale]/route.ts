@@ -3,7 +3,7 @@ import { apiError } from '@/features/auth/api-error';
 import { invalidOriginResponse } from '@/features/auth/request-origin';
 import { requireCapability } from '@/features/auth/server';
 import {
-  appLocaleSchema,
+  translatedLocaleSchema,
   courseLocalizationDraftSchema,
 } from '@/features/admin/localization-contract';
 import { saveCourseLocalization } from '@/features/admin/localizations-server';
@@ -14,7 +14,7 @@ import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 
 const paramsSchema = z.object({
   courseId: z.string().uuid(),
-  locale: appLocaleSchema.exclude(['ru']),
+  locale: translatedLocaleSchema,
 });
 
 export async function PUT(

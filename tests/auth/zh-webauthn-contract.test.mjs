@@ -129,7 +129,7 @@ test('server-only mapping redacts the synthetic identifier and never persists pa
   assert.match(server, /auth\.admin\.updateUserById/u);
   assert.doesNotMatch(server, /console\.(?:log|error)/u);
   assert.match(validation, /zhPasswordSchema/u);
-  assert.match(validation, /\.min\(12\)/u);
+  assert.match(validation, /z\.minLength\(12\)/u);
   assert.match(validation, /\[a-z\]/u);
   assert.match(validation, /\[A-Z\]/u);
   assert.match(validation, /\[0-9\]/u);

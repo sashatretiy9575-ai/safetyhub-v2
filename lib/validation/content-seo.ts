@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import * as z from 'zod/mini';
 import { articleCoverImageSchema } from './article.ts';
 
 export const CONTENT_SEO_LIMITS = Object.freeze({
@@ -6,16 +6,21 @@ export const CONTENT_SEO_LIMITS = Object.freeze({
   descriptionMax: 200,
 });
 
-export const contentSeoSchema = z
-  .object({
-    title: z.string().trim().min(3).max(CONTENT_SEO_LIMITS.titleMax),
-    description: z.string().trim().min(40).max(CONTENT_SEO_LIMITS.descriptionMax),
-    ogTitle: z.string().trim().min(3).max(CONTENT_SEO_LIMITS.titleMax),
-    ogDescription: z.string().trim().min(40).max(CONTENT_SEO_LIMITS.descriptionMax),
-    ogImage: articleCoverImageSchema,
-    indexable: z.boolean(),
-  })
-  .strict();
+const seoTitleSchema = z
+  .string()
+  .check(z.trim(), z.minLength(3), z.maxLength(CONTENT_SEO_LIMITS.titleMax));
+const seoDescriptionSchema = z
+  .string()
+  .check(z.trim(), z.minLength(40), z.maxLength(CONTENT_SEO_LIMITS.descriptionMax));
+
+export const contentSeoSchema = z.strictObject({
+  title: seoTitleSchema,
+  description: seoDescriptionSchema,
+  ogTitle: seoTitleSchema,
+  ogDescription: seoDescriptionSchema,
+  ogImage: articleCoverImageSchema,
+  indexable: z.boolean(),
+});
 
 export type ContentSeo = z.infer<typeof contentSeoSchema>;
 

@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import { saveArticleLocalization } from '@/features/admin/localizations-server';
 import {
-  appLocaleSchema,
+  translatedLocaleSchema,
   articleLocalizationDraftSchema,
 } from '@/features/admin/localization-contract';
 import { apiError } from '@/features/auth/api-error';
@@ -14,7 +14,7 @@ import { requestSecurityMetadata } from '@/lib/security/request-metadata';
 
 const paramsSchema = z.object({
   articleId: z.string().uuid(),
-  locale: appLocaleSchema.exclude(['ru']),
+  locale: translatedLocaleSchema,
 });
 
 export async function PUT(

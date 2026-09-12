@@ -34,7 +34,7 @@ test('admin inbox stays behind a same-origin capability-gated API', async () => 
   for (const type of ['account.approval_requested', 'course.completed', 'system.alert']) {
     assert.match(contract, new RegExp(`z\\.literal\\('${type.replace('.', '\\.')}\\'\\)`));
   }
-  assert.match(contract, /\.strict\(\)/u);
+  assert.match(contract, /z\.strictObject\(/u);
   assert.match(contract, /phoneCountryIso2/u);
   assert.match(contract, /phoneE164/u);
   assert.match(contract, /schemaVersion: z\.literal\(2\)/u);

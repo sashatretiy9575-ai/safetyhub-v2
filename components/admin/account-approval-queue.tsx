@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import * as z from 'zod';
+import * as z from 'zod/mini';
 import { Check } from '@phosphor-icons/react/dist/ssr/Check';
 import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/ssr/WhatsappLogo';
@@ -28,16 +28,14 @@ const QUICK_REASONS = [
   'Сотрудник отсутствует в списках компании',
 ];
 
-const decisionResponseSchema = z
-  .object({
-    userId: z.string().uuid(),
-    approvalState: z.enum(['approved', 'rejected']),
-    decidedAt: z.string().datetime({ offset: true }),
-    grantedCourseIds: z.array(z.string().uuid()).optional(),
-    replayed: z.boolean(),
-  })
-  .strict();
-const errorResponseSchema = z.object({ error: z.string().min(1).optional() }).strict();
+const decisionResponseSchema = z.strictObject({
+  userId: z.uuid(),
+  approvalState: z.enum(['approved', 'rejected']),
+  decidedAt: z.iso.datetime({ offset: true }),
+  grantedCourseIds: z.optional(z.array(z.uuid())),
+  replayed: z.boolean(),
+});
+const errorResponseSchema = z.strictObject({ error: z.optional(z.string().check(z.minLength(1))) });
 
 const errorMessages: Record<string, string> = {
   ACCOUNT_APPROVAL_NOT_PENDING: 'Заявка уже была рассмотрена. Очередь обновлена.',
