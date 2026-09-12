@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { isSameOriginRequest } from '../../features/auth/request-origin.ts';
+import { isSameOriginRequest } from '../../server/http/request-origin.ts';
 
 function request(url, origin) {
   return new Request(url, { method: 'POST', headers: origin ? { Origin: origin } : {} });

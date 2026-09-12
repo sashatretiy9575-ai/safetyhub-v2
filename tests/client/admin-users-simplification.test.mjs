@@ -12,7 +12,7 @@ test('the product has only participant/admin roles and no browser access editor'
     read('app/(admin)/admin/users/page.tsx'),
     read('app/(admin)/admin/access/page.tsx'),
     read('app/(admin)/admin/layout.tsx'),
-    read('features/auth/server.ts'),
+    read('server/auth/session.ts'),
     read('lib/supabase/types.ts'),
     read('supabase/migrations/20260818000000_two_product_roles.sql'),
   ]);

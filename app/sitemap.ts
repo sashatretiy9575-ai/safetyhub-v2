@@ -1,11 +1,11 @@
 import type { MetadataRoute } from 'next';
 import { absoluteUrl } from '@/lib/utils';
-import { getTopics } from '@/lib/content/topics';
-import { getArticles } from '@/lib/content/articles';
+import { getTopics } from '@/server/content/topics';
+import { getArticles } from '@/server/content/articles';
 import { APP_LOCALES, localeAlternates, localizePathname } from '@/i18n/config';
 import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
 import { PRIVACY_POLICY, TERMS_POLICY } from '@/lib/legal';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 
 const HREFLANG_BY_LOCALE = {
   ru: 'ru-KZ',

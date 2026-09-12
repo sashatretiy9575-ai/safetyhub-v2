@@ -6,10 +6,10 @@ const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8
 
 test('outbox claims stay bounded and historical password invites are terminally retired', async () => {
   const [source, types, data, apiError, retryRoute] = await Promise.all([
-    read('features/admin/server.ts'),
-    read('features/admin/types.ts'),
-    read('features/admin/data.ts'),
-    read('features/auth/api-error.ts'),
+    read('server/admin/management.ts'),
+    read('lib/admin/types.ts'),
+    read('server/admin/data.ts'),
+    read('server/auth/api-error.ts'),
     read('app/api/admin/outbox/[operationId]/retry/route.ts'),
   ]);
 
@@ -44,7 +44,7 @@ test('outbox claims stay bounded and historical password invites are terminally 
 });
 
 test('outbox transitions persist a bounded category instead of an upstream message', async () => {
-  const source = await read('features/admin/server.ts');
+  const source = await read('server/admin/management.ts');
   const advance = source.match(/async function advanceOutbox[\s\S]*?\n\}/u)?.[0] ?? '';
 
   assert.match(source, /type OutboxErrorCategory =/u);
@@ -53,7 +53,7 @@ test('outbox transitions persist a bounded category instead of an upstream messa
 });
 
 test('purge and storage-cleanup state conflicts return a safe 409', async () => {
-  const source = await read('features/auth/api-error.ts');
+  const source = await read('server/auth/api-error.ts');
   for (const token of [
     'ACCOUNT_HAS_PENDING_AUTH_OPERATIONS',
     'ACCOUNT_STORAGE_CLEANUP_PENDING',

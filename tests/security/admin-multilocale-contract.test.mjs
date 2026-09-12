@@ -23,7 +23,7 @@ function sourceBetween(source, start, end) {
 test('Russian admin exposes four locale statuses and localized previews', async () => {
   const [contract, tabs, course, article, legal, adminLayout, rootLayout, proxy] =
     await Promise.all([
-      read('features/admin/localization-contract.ts'),
+      read('lib/admin/localization-contract.ts'),
       read('components/admin/admin-locale-tabs.tsx'),
       read('components/admin/course-localizations-editor.tsx'),
       read('components/admin/article-localizations-editor.tsx'),
@@ -65,8 +65,8 @@ test('Russian admin exposes four locale statuses and localized previews', async 
 test('browser locale editor cannot read or submit persisted assessment identifiers or keys', async () => {
   const [component, contract, server, route, packageJson] = await Promise.all([
     read('components/admin/course-localizations-editor.tsx'),
-    read('features/admin/localization-contract.ts'),
-    read('features/admin/localizations-server.ts'),
+    read('lib/admin/localization-contract.ts'),
+    read('server/admin/localizations.ts'),
     read('app/api/admin/courses/[courseId]/localizations/[locale]/route.ts'),
     read('package.json'),
   ]);
@@ -172,7 +172,7 @@ test('localized presentations bind locale metadata to immutable final object pat
     read('app/api/admin/courses/[courseId]/presentation/upload-token/route.ts'),
     read('app/api/admin/courses/[courseId]/presentation/finalize/route.ts'),
     read('components/admin/course-presentation-input.tsx'),
-    read('features/admin/types.ts'),
+    read('lib/admin/types.ts'),
   ]);
 
   assert.match(upload, /locale: z\.enum\(APP_LOCALES\)/u);
@@ -203,8 +203,8 @@ test('course, article and legal publication use four-locale atomic RPCs', async 
   ] =
     await Promise.all([
       read('components/admin/test-editor.tsx'),
-      read('lib/actions/articles.ts'),
-      read('features/admin/localizations-server.ts'),
+      read('server/actions/articles.ts'),
+      read('server/admin/localizations.ts'),
       read('components/admin/legal-localizations-editor.tsx'),
       read('app/api/admin/legal/localizations/route.ts'),
       read('app/api/admin/legal/bundle/route.ts'),
@@ -251,8 +251,8 @@ test('course, article and legal publication use four-locale atomic RPCs', async 
 
 test('admin user projections render synthetic ZH identities without exposing reserved email', async () => {
   const [data, types, approvals, directory, history] = await Promise.all([
-    read('features/admin/data.ts'),
-    read('features/admin/types.ts'),
+    read('server/admin/data.ts'),
+    read('lib/admin/types.ts'),
     read('components/admin/account-approval-queue.tsx'),
     read('app/(admin)/admin/employees/directory/page.tsx'),
     read('app/(admin)/admin/employees/[userId]/learning-history/page.tsx'),

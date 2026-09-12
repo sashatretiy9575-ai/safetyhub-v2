@@ -1,8 +1,8 @@
 import * as z from 'zod';
-import { apiError } from '@/features/auth/api-error';
-import { listAdminNotificationInbox } from '@/features/admin/notifications';
+import { apiError } from '@/server/auth/api-error';
+import { listAdminNotificationInbox } from '@/server/admin/notifications';
 import { createApiResponse, NextResponse } from '@/lib/security/api-response';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 
 const querySchema = z
   .object({

@@ -4,7 +4,7 @@ import { LegalContacts } from '@/components/legal/legal-contacts';
 import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-document';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
-import { getStaticLegalDocument } from '@/lib/content/legal-documents';
+import { getStaticLegalDocument } from '@/server/content/legal-documents';
 import { DEFAULT_LOCALE } from '@/i18n/config';
 import {
   formatLegalDate,

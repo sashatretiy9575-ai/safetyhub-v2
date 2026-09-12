@@ -16,14 +16,14 @@ import {
   parseAdminOperatorQuery,
   type AdminOperatorQuery,
   type RawAdminSearchParams,
-} from '@/features/admin/data';
+} from '@/server/admin/data';
 import {
   ADMIN_TRAIL_PARAM,
   appendAdminTrail,
   parseAdminTrail,
   serializeAdminTrail,
 } from '@/lib/admin/pagination-trail';
-import { requireCapability } from '@/features/auth/server';
+import { requireCapability } from '@/server/auth/session';
 
 function operatorsHref(
   query: AdminOperatorQuery,

@@ -4,7 +4,7 @@ import {
   deadlineAnchorFromServer,
   formatDeadlineSeconds,
   remainingDeadlineSeconds,
-} from '../../lib/attempt-deadline.ts';
+} from '../../lib/learning/attempt-deadline.ts';
 
 test('the server deadline, not the client wall clock, creates the monotonic anchor', () => {
   const anchor = deadlineAnchorFromServer(

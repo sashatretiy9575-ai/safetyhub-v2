@@ -1,4 +1,4 @@
-import type { AppLocale } from '@/i18n/config';
+import type { AppLocale } from '../../i18n/config.ts';
 import { CONTENT_SEO_LIMITS, type ContentSeo } from './content-seo.ts';
 
 /**

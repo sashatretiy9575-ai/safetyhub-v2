@@ -4,7 +4,7 @@ import type { AbstractIntlMessages } from 'next-intl';
 import { NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { PWARegistration } from '@/components/shared/pwa-registration';
-import { PWA_INSTALL_BOOTSTRAP } from '@/lib/pwa-install-bootstrap';
+import { PWA_INSTALL_BOOTSTRAP } from '@/lib/pwa/install-bootstrap';
 import { BUSINESS_TIME_ZONE, htmlLanguage, type AppLocale } from '@/i18n/config';
 
 /**

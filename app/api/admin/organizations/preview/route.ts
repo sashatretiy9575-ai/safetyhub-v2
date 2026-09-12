@@ -1,11 +1,11 @@
 import * as z from 'zod';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { previewOrganizationMerge } from '@/features/admin/organizations';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { previewOrganizationMerge } from '@/server/admin/organizations';
 import { readJsonBody } from '@/lib/security/request-body';
 import { NextResponse } from '@/lib/security/api-response';
-import { consumeCoarseQuota } from '@/lib/security/rate-limit';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { consumeCoarseQuota } from '@/server/security/rate-limit';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 
 const schema = z
   .object({

@@ -1,14 +1,14 @@
 export const dynamic = 'force-dynamic';
 
-import { AdminAvatarUploader } from '@/features/profile/admin-avatar-uploader';
-import { AccountDeletion } from '@/features/profile/account-deletion';
-import { getProfileAvatarUrl } from '@/features/profile/server';
-import { ProfileForm } from '@/features/auth/profile-form';
-import { requireRole } from '@/features/auth/server';
+import { AdminAvatarUploader } from '@/components/profile/admin-avatar-uploader';
+import { AccountDeletion } from '@/components/profile/account-deletion';
+import { getProfileAvatarUrl } from '@/server/profile/dashboard';
+import { ProfileForm } from '@/components/profile/profile-form';
+import { requireRole } from '@/server/auth/session';
 import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
 import { SignOutAction } from '@/components/shared/sign-out-action';
 import { Card, CardContent } from '@/components/ui/card';
-import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
+import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone/countries';
 
 export default async function AdminAccountPage() {
   const actor = await requireRole(['admin']);

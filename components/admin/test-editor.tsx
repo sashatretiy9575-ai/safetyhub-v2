@@ -8,7 +8,7 @@ import type {
   AdminTestVariant,
   TestEditorSeed,
   TestEditorPayload,
-} from '@/features/admin/types';
+} from '@/lib/admin/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,11 +20,11 @@ import {
   TEST_EDITOR_LIMITS,
   TEST_EDITOR_TOTAL_QUESTIONS,
   validateTestEditor,
-} from '@/lib/admin-test-editor';
+} from '@/lib/admin/course-test-editor';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { defaultContentSeo } from '@/lib/validation/content-seo';
 import { withCourseSeoDefaults } from '@/lib/validation/course-seo-defaults';
-import { resolveCourseIcon } from '@/lib/course-icons';
+import { resolveCourseIcon } from '@/lib/content/course-icons';
 import { IconPicker } from '@/components/admin/icon-picker';
 import { ContentSeoEditor } from '@/components/admin/content-seo-editor';
 import { CoursePresentationInput } from '@/components/admin/course-presentation-input';

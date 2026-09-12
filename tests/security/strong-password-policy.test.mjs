@@ -33,7 +33,7 @@ test('browser-facing entry pages have no password fields and route through the e
   const [login, registration, flow, requestRoute, verifyRoute] = await Promise.all([
     read('app/(account)/auth/login/page.tsx'),
     read('app/(account)/auth/register/page.tsx'),
-    read('features/auth/email-otp-flow.tsx'),
+    read('components/auth/email-otp-flow.tsx'),
     read('app/api/auth/email-otp/request/route.ts'),
     read('app/api/auth/email-otp/verify/route.ts'),
   ]);

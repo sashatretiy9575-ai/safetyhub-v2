@@ -17,7 +17,7 @@ const emailOtpLocaleSchema = z.optional(z.enum(['ru', 'kk', 'en']));
  * sign-in and sign-up bodies, the reset and update-password bodies, the change
  * request union and the invite context — had no reader left once the email
  * realm went code-only. The Chinese realm still uses a password, and it has
- * always validated it in features/auth/zh-username-password-validation.ts.
+ * always validated it in lib/auth/zh-username-password-validation.ts.
  */
 export const emailOtpStartSchema = z.object({
   email: normalizedEmailSchema,

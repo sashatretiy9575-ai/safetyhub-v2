@@ -1,56 +1,78 @@
-import 'server-only';
+export type SiteContactSettings = Readonly<{
+  phoneE164: string;
+  phoneDisplay: string;
+  whatsappE164: string;
+  whatsappSameAsPhone: boolean;
+  version: number;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}>;
 
-import { cache } from 'react';
-import { unstable_cache } from 'next/cache';
-import { createPublicClient } from '@/lib/supabase/public';
-import {
-  coerceSiteContactSettings,
-  type SiteContactSettings,
-} from '@/lib/site-contacts-shared';
+const E164_PATTERN = /^\+[1-9][0-9]{7,14}$/;
 
-export const SITE_CONTACTS_CACHE_TAG = 'site:contacts:v1';
-export const SITE_CONTACTS_REVALIDATE_SECONDS = 60 * 60;
+export function normalizePhoneE164(value: string): string | null {
+  const trimmed = value.trim();
+  const digits = trimmed.replace(/[^0-9]/g, '');
+  let normalizedDigits = digits;
 
-// SAFETYHUB_GLOBAL_CONTACTS: the only hardcoded production-safe contact fallback.
-// Public pages render this value if Supabase is unavailable or the cache is cold.
-export const FALLBACK_SITE_CONTACTS: SiteContactSettings = Object.freeze({
-  phoneE164: '+77017290349',
-  phoneDisplay: '+7 701 729 0349',
-  whatsappE164: '+77017290349',
-  whatsappSameAsPhone: true,
-  version: 0,
-  updatedAt: null,
-  updatedBy: null,
-});
-
-type RpcResult = { data: unknown; error: { message?: string } | null };
-type RpcClient = { rpc(name: string): PromiseLike<RpcResult> };
-
-let lastKnownSiteContacts: SiteContactSettings = FALLBACK_SITE_CONTACTS;
-
-export async function readSiteContactsUncached(): Promise<SiteContactSettings> {
-  const client = createPublicClient();
-  if (!client) return lastKnownSiteContacts;
-
-  try {
-    const { data, error } = await (client as unknown as RpcClient).rpc('get_site_settings');
-    if (error) return lastKnownSiteContacts;
-    const parsed = coerceSiteContactSettings(data);
-    if (!parsed) return lastKnownSiteContacts;
-    lastKnownSiteContacts = parsed;
-    return parsed;
-  } catch {
-    return lastKnownSiteContacts;
+  if (normalizedDigits.length === 11 && normalizedDigits.startsWith('8')) {
+    normalizedDigits = `7${normalizedDigits.slice(1)}`;
+  } else if (normalizedDigits.length === 10) {
+    normalizedDigits = `7${normalizedDigits}`;
   }
+
+  const normalized = `+${normalizedDigits}`;
+  return E164_PATTERN.test(normalized) ? normalized : null;
 }
 
-const getCachedSiteContacts = unstable_cache(
-  readSiteContactsUncached,
-  ['site-contacts-v1'],
-  {
-    revalidate: SITE_CONTACTS_REVALIDATE_SECONDS,
-    tags: [SITE_CONTACTS_CACHE_TAG],
-  },
-);
+export function formatPhoneDisplay(e164: string): string {
+  if (/^\+7[0-9]{10}$/.test(e164)) {
+    return `${e164.slice(0, 2)} ${e164.slice(2, 5)} ${e164.slice(5, 8)} ${e164.slice(8)}`;
+  }
 
-export const getSiteContacts = cache(getCachedSiteContacts);
+  const country = e164.slice(0, Math.min(4, Math.max(2, e164.length - 7)));
+  return `${country} ${e164.slice(country.length).replace(/(.{3})(?=.)/g, '$1 ')}`.trim();
+}
+
+export function coerceSiteContactSettings(value: unknown): SiteContactSettings | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const row = value as Record<string, unknown>;
+  if (
+    typeof row.phoneE164 !== 'string' ||
+    typeof row.phoneDisplay !== 'string' ||
+    typeof row.whatsappE164 !== 'string' ||
+    typeof row.whatsappSameAsPhone !== 'boolean' ||
+    typeof row.version !== 'number'
+  ) {
+    return null;
+  }
+
+  return Object.freeze({
+    phoneE164: row.phoneE164,
+    phoneDisplay: row.phoneDisplay,
+    whatsappE164: row.whatsappE164,
+    whatsappSameAsPhone: row.whatsappSameAsPhone,
+    version: row.version,
+    updatedAt: typeof row.updatedAt === 'string' ? row.updatedAt : null,
+    updatedBy: typeof row.updatedBy === 'string' ? row.updatedBy : null,
+  });
+}
+
+/** A dial link for any E.164 number: the company line or a learner's phone. */
+export function phoneHref(e164: string) {
+  return `tel:${e164}`;
+}
+
+/** A WhatsApp chat link for any E.164 number, with an optional prefilled message. */
+export function whatsappChatHref(e164: string, text?: string) {
+  const base = `https://wa.me/${e164.replace(/\D/g, '')}`;
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base;
+}
+
+export function contactPhoneHref(settings: SiteContactSettings) {
+  return phoneHref(settings.phoneE164);
+}
+
+export function contactWhatsappHref(settings: SiteContactSettings) {
+  return whatsappChatHref(settings.whatsappE164);
+}

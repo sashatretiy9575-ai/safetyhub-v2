@@ -8,7 +8,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { clientRequest } from '@/lib/client-request';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
 import { localizePathname } from '@/i18n/config';
-import { clearSafetyHubDeviceData } from '@/lib/safetyhub-device-data';
+import { clearSafetyHubDeviceData } from '@/lib/pwa/device-data';
 import { cn } from '@/lib/utils';
 
 export function SignOutAction({

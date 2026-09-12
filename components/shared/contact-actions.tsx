@@ -1,6 +1,6 @@
 import { PhoneCall, WhatsappLogo } from '@phosphor-icons/react/dist/ssr';
 import { ContactLink } from '@/components/shared/contact-link';
-import type { SiteContactSettings } from '@/lib/site-contacts-shared';
+import type { SiteContactSettings } from '@/lib/site-contacts';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 

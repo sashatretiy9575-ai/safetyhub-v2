@@ -20,10 +20,10 @@ import {
   getArticles,
   getArticleSlugs,
   type Article,
-} from '@/lib/content/articles';
+} from '@/server/content/articles';
 import { articleJsonLd, breadcrumbsJsonLd, buildMetadata } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
-import { getSiteContacts } from '@/lib/site-contacts';
+import { getSiteContacts } from '@/server/site-contacts';
 import { htmlLanguage, localizePathname, type AppLocale } from '@/i18n/config';
 
 export async function generateStaticParams() {

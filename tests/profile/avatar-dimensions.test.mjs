@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { assertAvatarImageDimensions, parseAvatarImageDimensions } from '../../lib/avatar-image.ts';
+import { assertAvatarImageDimensions, parseAvatarImageDimensions } from '../../lib/profile/avatar-image.ts';
 
 function png(width, height) {
   const bytes = new Uint8Array(24);

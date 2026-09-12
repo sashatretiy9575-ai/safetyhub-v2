@@ -3,10 +3,10 @@ import path from 'node:path';
 import process from 'node:process';
 
 const root = process.cwd();
-const roots = ['app', 'components', 'features', 'lib'];
+const roots = ['app', 'components', 'lib', 'server'];
 const allowed = new Set([
+  path.normalize('server/site-contacts.ts'),
   path.normalize('lib/site-contacts.ts'),
-  path.normalize('lib/site-contacts-shared.ts'),
   path.normalize('components/admin/site-contacts-form.tsx'),
 ]);
 const violations = [];

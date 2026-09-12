@@ -10,8 +10,8 @@ import {
   User,
   UsersThree,
 } from '@phosphor-icons/react/dist/ssr';
-import { requireCapability } from '@/features/auth/server';
-import { readSiteContactsUncached } from '@/lib/site-contacts';
+import { requireCapability } from '@/server/auth/session';
+import { readSiteContactsUncached } from '@/server/site-contacts';
 
 export default async function AdminSettingsPage() {
   await requireCapability('site.settings.manage');

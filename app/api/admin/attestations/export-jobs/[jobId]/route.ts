@@ -1,8 +1,8 @@
 import * as z from 'zod';
-import { apiError } from '@/features/auth/api-error';
-import { requireCapability } from '@/features/auth/server';
-import { createClient } from '@/lib/supabase/server';
-import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
+import { apiError } from '@/server/auth/api-error';
+import { requireCapability } from '@/server/auth/session';
+import { createClient } from '@/server/supabase/server';
+import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 import { NextResponse } from '@/lib/security/api-response';
 
 const jobSchema = z.object({

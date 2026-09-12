@@ -13,7 +13,7 @@ test('production client diagnostics omit exception messages and stacks', async (
 });
 
 test('profile data failures never log a raw upstream error object', async () => {
-  const source = await readFile(new URL('../../features/profile/server.ts', import.meta.url), 'utf8');
+  const source = await readFile(new URL('../../server/profile/dashboard.ts', import.meta.url), 'utf8');
   const functionBody = source.match(/function loadFailure[\s\S]*?\n\}/u)?.[0] ?? '';
   assert.doesNotMatch(functionBody, /cause:\s*error[\s,}]/u);
   assert.match(functionBody, /UNKNOWN_PROFILE_DATA_ERROR/u);
@@ -21,9 +21,9 @@ test('profile data failures never log a raw upstream error object', async () => 
 
 test('admin diagnostics retain only bounded machine codes, never raw database messages', async () => {
   const [attestations, data, organizations, helper] = await Promise.all([
-    read('features/admin/attestations.ts'),
-    read('features/admin/data.ts'),
-    read('features/admin/organizations.ts'),
+    read('server/admin/attestations.ts'),
+    read('server/admin/data.ts'),
+    read('server/admin/organizations.ts'),
     read('lib/security/error-diagnostics.ts'),
   ]);
   for (const source of [attestations, data, organizations]) {

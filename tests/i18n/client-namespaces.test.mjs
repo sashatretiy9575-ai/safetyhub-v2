@@ -5,7 +5,7 @@ import test from 'node:test';
 import { CLIENT_NAMESPACES } from '../../i18n/client-namespaces.ts';
 
 const root = path.resolve(import.meta.dirname, '../..');
-const SCAN_ROOTS = ['app', 'components', 'features'];
+const SCAN_ROOTS = ['app', 'components'];
 
 async function collect(directory, result = []) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {

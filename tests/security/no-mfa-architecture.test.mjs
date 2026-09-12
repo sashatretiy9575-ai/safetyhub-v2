@@ -28,15 +28,15 @@ test('application MFA routes, screens, recovery storage, and capability are abse
     missing('app/api/auth/mfa/recover/route.ts'),
     missing('app/api/auth/mfa/recovery-codes/route.ts'),
     missing('app/api/admin/users/[userId]/mfa-reset/route.ts'),
-    missing('features/auth/mfa-settings.tsx'),
-    missing('features/auth/mfa-challenge.tsx'),
+    missing('components/auth/mfa-settings.tsx'),
+    missing('components/auth/mfa-challenge.tsx'),
     missing('components/admin/mfa-reset-control.tsx'),
     missing('lib/security/mfa-policy.ts'),
   ]);
 
   const [baseline, auth, capabilities, adminLayout] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
-    read('features/auth/server.ts'),
+    read('server/auth/session.ts'),
     read('lib/security/capabilities.ts'),
     read('app/(admin)/admin/layout.tsx'),
   ]);
@@ -48,7 +48,7 @@ test('application MFA routes, screens, recovery storage, and capability are abse
 
 test('application source tree contains no MFA implementation symbols or routes', async () => {
   const files = (
-    await Promise.all(['app', 'components', 'features', 'lib'].map((root) => sourceFiles(root)))
+    await Promise.all(['app', 'components', 'lib', 'server'].map((root) => sourceFiles(root)))
   ).flat();
   const forbiddenSymbol =
     /requiresMfa|mfaAssuranceLevel|requireFresh(?:Capability|Role)|privilegedStepUpMaxAgeSeconds|latestTotpVerification|isMfaVerificationFresh|mfa_reset|mfa_recovery_codes|aal2|totp/i;
@@ -62,8 +62,8 @@ test('application source tree contains no MFA implementation symbols or routes',
 test('password-only auth keeps role, capability, origin, quota, and audit controls', async () => {
   const [baseline, requestOrigin, adminServer] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
-    read('features/auth/request-origin.ts'),
-    read('features/admin/server.ts'),
+    read('server/http/request-origin.ts'),
+    read('server/admin/management.ts'),
   ]);
 
   assert.match(baseline, /private\.require_capability/);

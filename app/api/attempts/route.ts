@@ -1,10 +1,10 @@
 import { NextResponse } from '@/lib/security/api-response';
 import { createAttemptSchema } from '@/lib/validation/attempt';
-import { startAttempt } from '@/features/learning/server';
-import { apiError } from '@/features/auth/api-error';
-import { AttemptPolicyError } from '@/features/learning/policy-error';
-import { requireUser } from '@/features/auth/server';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
+import { startAttempt } from '@/server/learning/attempts';
+import { apiError } from '@/server/auth/api-error';
+import { AttemptPolicyError } from '@/server/learning/policy-error';
+import { requireUser } from '@/server/auth/session';
+import { invalidOriginResponse } from '@/server/http/request-origin';
 import { readJsonBody } from '@/lib/security/request-body';
 
 export async function POST(request: Request) {

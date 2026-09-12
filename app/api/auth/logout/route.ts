@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from '@/lib/security/api-response';
-import { isSameOriginRequest } from '@/features/auth/request-origin';
-import { createClient } from '@/lib/supabase/server';
+import { isSameOriginRequest } from '@/server/http/request-origin';
+import { createClient } from '@/server/supabase/server';
 import { clearSafetyHubLocalSession } from '@/lib/supabase/session-cleanup';
 import { readJsonBody } from '@/lib/security/request-body';
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { encodeAvatarCanvas } from '../../lib/avatar-image.ts';
+import { encodeAvatarCanvas } from '../../lib/profile/avatar-image.ts';
 
 function encoderCanvas(resolveType) {
   const calls = [];

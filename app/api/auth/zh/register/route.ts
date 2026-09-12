@@ -1,12 +1,12 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { isSameOriginRequest } from '@/features/auth/request-origin';
-import { zhUsernamePasswordApiError } from '@/features/auth/zh-username-password-api';
-import { registerZhUsernamePassword } from '@/features/auth/zh-username-password-server';
-import { zhUsernamePasswordRegistrationSchema } from '@/features/auth/zh-username-password-validation';
+import { isSameOriginRequest } from '@/server/http/request-origin';
+import { zhUsernamePasswordApiError } from '@/server/auth/zh-username-password-api';
+import { registerZhUsernamePassword } from '@/server/auth/zh-username-password';
+import { zhUsernamePasswordRegistrationSchema } from '@/lib/auth/zh-username-password-validation';
 import { readJsonBody } from '@/lib/security/request-body';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeCoarseQuota } from '@/lib/security/rate-limit';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeCoarseQuota } from '@/server/security/rate-limit';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 
 export async function POST(request: Request) {
   try {

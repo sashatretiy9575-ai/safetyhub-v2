@@ -6,13 +6,13 @@ import { AppShell } from '@/components/layout/app-shell';
 import { RootDocument } from '@/components/layout/root-document';
 import { PWAProvider } from '@/components/shared/pwa-provider';
 import { UserMenu } from '@/components/shared/user-menu';
-import { CspNonceProvider } from '@/features/auth/csp-nonce';
-import { getAuthContext } from '@/features/auth/server';
+import { CspNonceProvider } from '@/components/auth/csp-nonce';
+import { getAuthContext } from '@/server/auth/session';
 import { pickClientNamespaces } from '@/i18n/client-namespaces';
 import { REQUEST_PATHNAME_HEADER_NAME } from '@/i18n/config';
 import { loadMessages } from '@/i18n/messages';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
-import { APP_VIEWPORT, pwaIdentity } from '@/lib/pwa-identity';
+import { APP_VIEWPORT, pwaIdentity } from '@/lib/pwa/identity';
 import '../globals.css';
 
 // The install block lives on /profile, so this group must carry the full PWA

@@ -2,7 +2,7 @@ import { CaretDown, WhatsappLogo } from '@phosphor-icons/react/dist/ssr';
 import { ContactLink } from '@/components/shared/contact-link';
 import { Container } from '@/components/ui/container';
 import { QUIZ_POLICY } from '@/lib/constants';
-import { getSiteContacts } from '@/lib/site-contacts';
+import { getSiteContacts } from '@/server/site-contacts';
 import { getTranslations } from 'next-intl/server';
 
 export async function getFaqData() {

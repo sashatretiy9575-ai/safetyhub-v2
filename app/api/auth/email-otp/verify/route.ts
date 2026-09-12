@@ -1,26 +1,26 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { isSameOriginRequest } from '@/features/auth/request-origin';
-import { createEphemeralAuthClient } from '@/lib/supabase/ephemeral-auth';
-import { createClient } from '@/lib/supabase/server';
-import { setSafetyHubSessionHint } from '@/lib/supabase/session-hint';
+import { apiError } from '@/server/auth/api-error';
+import { isSameOriginRequest } from '@/server/http/request-origin';
+import { createEphemeralAuthClient } from '@/server/supabase/ephemeral-auth';
+import { createClient } from '@/server/supabase/server';
+import { setSafetyHubSessionHint } from '@/server/supabase/session-hint';
 import { clearSafetyHubLocalSession } from '@/lib/supabase/session-cleanup';
 import { emailOtpVerifySchema } from '@/lib/validation/auth';
 import { readJsonBody } from '@/lib/security/request-body';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeCoarseQuota } from '@/lib/security/rate-limit';
-import { authProviderRetryAfter } from '@/features/auth/otp-rate-limit';
-import { localizedAccountPath } from '@/features/auth/email-otp-locale';
-import type { EmailOtpLocale } from '@/features/auth/email-otp-locale';
-import { getCurrentLegalPolicies, type CurrentLegalPolicies } from '@/lib/legal-current';
-import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeCoarseQuota } from '@/server/security/rate-limit';
+import { authProviderRetryAfter } from '@/lib/auth/otp-rate-limit';
+import { localizedAccountPath } from '@/lib/auth/email-otp-locale';
+import type { EmailOtpLocale } from '@/lib/auth/email-otp-locale';
+import { getCurrentLegalPolicies, type CurrentLegalPolicies } from '@/server/legal';
+import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 import {
   clearEmailOtpChallengeCookie,
   completeEmailOtpChallenge,
   consumeEmailOtpChallengeAttempt,
   readEmailOtpChallengeCookie,
-} from '@/lib/security/email-otp-challenge';
+} from '@/server/security/email-otp-challenge';
 
 type AuthProviderError = { code?: string; status?: number } | null;
 

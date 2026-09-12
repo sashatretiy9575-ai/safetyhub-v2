@@ -28,7 +28,7 @@ test('legacy password APIs fail closed with an explicit no-store 410 response', 
     );
   }
 
-  const helper = await read('features/auth/password-auth-retired.tsx');
+  const helper = await read('server/auth/password-auth-retired.ts');
   assert.match(helper, /PASSWORD_AUTH_RETIRED/u);
   assert.match(helper, /status:\s*410/u);
   assert.match(helper, /'Cache-Control': 'no-store'/u);
@@ -58,7 +58,7 @@ test('legacy callback links discard caller-controlled state without exchanging a
   const [callback, authCallback, helper] = await Promise.all([
     read('app/(account)/callback/route.ts'),
     read('app/(account)/auth/callback/route.ts'),
-    read('features/auth/password-auth-retired.tsx'),
+    read('server/auth/password-auth-retired.ts'),
   ]);
 
   assert.match(callback, /redirectFromRetiredPasswordLink\(\)/u);
@@ -73,6 +73,6 @@ test('legacy callback links discard caller-controlled state without exchanging a
 });
 
 test('obsolete password-entry components are removed from the application bundle', async () => {
-  await assert.rejects(read('features/auth/password-change-form.tsx'), { code: 'ENOENT' });
-  await assert.rejects(read('features/auth/password-recovery-flow.tsx'), { code: 'ENOENT' });
+  await assert.rejects(read('components/auth/password-change-form.tsx'), { code: 'ENOENT' });
+  await assert.rejects(read('components/auth/password-recovery-flow.tsx'), { code: 'ENOENT' });
 });

@@ -1,11 +1,11 @@
 import { NextResponse } from '@/lib/security/api-response';
 import { deleteCourseSchema, entityIdSchema } from '@/lib/validation/admin';
-import { deleteCourse } from '@/features/admin/server';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
-import { requireCapability } from '@/features/auth/server';
+import { deleteCourse } from '@/server/admin/management';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
+import { requireCapability } from '@/server/auth/session';
 import { readJsonBody } from '@/lib/security/request-body';
 
 export async function DELETE(request: Request, context: { params: Promise<{ courseId: string }> }) {

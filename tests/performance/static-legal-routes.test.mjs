@@ -17,7 +17,7 @@ test('public legal documents use immutable local data and static physical routes
     localizedPrivacyVersion,
     localizedTermsVersion,
   ] = await Promise.all([
-    read('lib/content/legal-documents.ts'),
+    read('server/content/legal-documents.ts'),
     read('proxy.ts'),
     read('app/(public)/privacy/page.tsx'),
     read('app/(public)/terms/page.tsx'),
@@ -37,7 +37,7 @@ test('public legal documents use immutable local data and static physical routes
   assert.match(loader, /export function getStaticLegalDocument/);
   assert.match(loader, /export function staticLegalVersions/);
   assert.match(loader, /hasLegacyRussianLegalRenderer/);
-  assert.doesNotMatch(loader, /createClient|createAdminClient|@\/lib\/supabase\/server|cookies\(/u);
+  assert.doesNotMatch(loader, /createClient|createAdminClient|@\/server\/supabase\/server|cookies\(/u);
 
   for (const page of [privacy, terms, localizedPrivacy, localizedTerms]) {
     assert.match(page, /getStaticLegalDocument/);

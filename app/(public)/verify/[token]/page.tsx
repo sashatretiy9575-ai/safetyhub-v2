@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import { CheckCircle, XCircle } from '@phosphor-icons/react/dist/ssr';
-import { getPublicCertificateVerification } from '@/features/certificates/server';
+import { getPublicCertificateVerification } from '@/server/certificates/issuance';
 import { Container } from '@/components/ui/container';
 import { Card, CardContent } from '@/components/ui/card';
 import { getLocale, getTranslations } from 'next-intl/server';

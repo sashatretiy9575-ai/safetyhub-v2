@@ -133,7 +133,7 @@ test('transport failures require degraded mode and backend errors are never mask
 });
 
 test('content readers preserve empty and not-found remote results', async () => {
-  for (const file of ['lib/content/articles.ts', 'lib/content/topics.ts']) {
+  for (const file of ['server/content/articles.ts', 'server/content/topics.ts']) {
     const source = await read(file);
     assert.doesNotMatch(source, /error\s*\|\|\s*!data/);
     assert.doesNotMatch(source, /!data\?\.length/);
@@ -161,8 +161,8 @@ test('an unpublished slug reads as absent content, not as a backend failure', as
   // The guard belongs to the single-item readers only; the list readers return
   // collections and must keep falling back.
   for (const file of [
-    'lib/content/topics.ts',
-    'lib/content/articles.ts',
+    'server/content/topics.ts',
+    'server/content/articles.ts',
   ]) {
     const source = await read(file);
     assert.match(
@@ -202,8 +202,8 @@ test('localized public content never relabels the bundled Russian snapshot', asy
   }
 
   const [articles, topics] = await Promise.all([
-    read('lib/content/articles.ts'),
-    read('lib/content/topics.ts'),
+    read('server/content/articles.ts'),
+    read('server/content/topics.ts'),
   ]);
   for (const source of [articles, topics]) {
     assert.equal(

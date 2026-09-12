@@ -5,7 +5,7 @@ import test from 'node:test';
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
 test('Turnstile remains completely dormant until a protected submit', async () => {
-  const source = await read('features/auth/turnstile.tsx');
+  const source = await read('components/auth/turnstile.tsx');
 
   assert.match(source, /const \[activated, setActivated\] = useState\(false\)/u);
   assert.match(source, /setActivated\(true\)/u);
@@ -16,7 +16,7 @@ test('Turnstile remains completely dormant until a protected submit', async () =
 });
 
 test('Turnstile uses one deferred native Cloudflare widget', async () => {
-  const source = await read('features/auth/turnstile.tsx');
+  const source = await read('components/auth/turnstile.tsx');
 
   assert.match(source, /const TURNSTILE_SCRIPT_ID = 'cloudflare-turnstile-api'/u);
   assert.match(source, /id=\{TURNSTILE_SCRIPT_ID\}/u);
@@ -44,7 +44,7 @@ test('Turnstile uses one deferred native Cloudflare widget', async () => {
 });
 
 test('Turnstile failures invalidate the token and a retry executes the native widget', async () => {
-  const source = await read('features/auth/turnstile.tsx');
+  const source = await read('components/auth/turnstile.tsx');
   const failureHandler = source.slice(
     source.indexOf('const failVerification'),
     source.indexOf('const executeNativeWidget'),
@@ -60,8 +60,8 @@ test('Turnstile failures invalidate the token and a retry executes the native wi
 
 test('auth callers defer one pending submit and continue it once after token delivery', async () => {
   const callers = await Promise.all([
-    read('features/auth/email-otp-flow.tsx'),
-    read('features/auth/zh-username-password-flow.tsx'),
+    read('components/auth/email-otp-flow.tsx'),
+    read('components/auth/zh-username-password-flow.tsx'),
   ]);
 
   for (const source of callers) {
@@ -81,7 +81,7 @@ test('auth callers defer one pending submit and continue it once after token del
 });
 
 test('Chinese username/password retries after a genuine Turnstile failure', async () => {
-  const source = await read('features/auth/zh-username-password-flow.tsx');
+  const source = await read('components/auth/zh-username-password-flow.tsx');
 
   assert.match(
     source,

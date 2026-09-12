@@ -20,8 +20,8 @@ import {
   ADMIN_LOCALE_LABELS,
   ADMIN_LOCALIZATION_STATUS_LABELS,
   type CourseLocalizationEditorItem,
-} from '@/features/admin/localization-contract';
-import type { AdminPresentation } from '@/features/admin/types';
+} from '@/lib/admin/localization-contract';
+import type { AdminPresentation } from '@/lib/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import {
   defaultCourseContent,

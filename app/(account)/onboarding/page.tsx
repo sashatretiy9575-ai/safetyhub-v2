@@ -2,10 +2,10 @@ export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { AuthenticationError, requireUser } from '@/features/auth/server';
-import { OnboardingForm } from '@/features/profile/onboarding-form';
-import { getProfileAvatarUrl } from '@/features/profile/server';
-import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
+import { AuthenticationError, requireUser } from '@/server/auth/session';
+import { OnboardingForm } from '@/components/profile/onboarding-form';
+import { getProfileAvatarUrl } from '@/server/profile/dashboard';
+import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone/countries';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 import { localizePathname, type AppLocale } from '@/i18n/config';

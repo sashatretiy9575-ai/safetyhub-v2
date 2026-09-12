@@ -17,9 +17,9 @@ import {
 } from '@/components/admin/admin-notification-inbox';
 import { UserMenu } from '@/components/shared/user-menu';
 import { Container } from '@/components/ui/container';
-import { AuthenticationError, requireAnyCapability } from '@/features/auth/server';
+import { AuthenticationError, requireAnyCapability } from '@/server/auth/session';
 import { ADMIN_CAPABILITIES } from '@/lib/security/capabilities';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   let actor: Awaited<ReturnType<typeof requireAnyCapability>>;

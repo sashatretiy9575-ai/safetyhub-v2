@@ -4,17 +4,17 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { ArrowRight, Buildings, CaretDown } from '@phosphor-icons/react/dist/ssr';
-import { AuthenticationError, requireUser } from '@/features/auth/server';
-import { ProfileForm } from '@/features/auth/profile-form';
-import { AccountDeletion } from '@/features/profile/account-deletion';
-import { AccountApprovalStatus } from '@/features/profile/account-approval-status';
-import { AvatarUploader } from '@/features/profile/avatar-uploader';
-import { LegalAcceptancePanel } from '@/features/profile/legal-acceptance-panel';
+import { AuthenticationError, requireUser } from '@/server/auth/session';
+import { ProfileForm } from '@/components/profile/profile-form';
+import { AccountDeletion } from '@/components/profile/account-deletion';
+import { AccountApprovalStatus } from '@/components/profile/account-approval-status';
+import { AvatarUploader } from '@/components/profile/avatar-uploader';
+import { LegalAcceptancePanel } from '@/components/profile/legal-acceptance-panel';
 import {
   getProfileAvatarUrl,
   getProfileDashboard,
   type ProfileAttestation,
-} from '@/features/profile/server';
+} from '@/server/profile/dashboard';
 import { Container } from '@/components/ui/container';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
@@ -22,11 +22,11 @@ import { Button } from '@/components/ui/button';
 import { DataLoadFailure } from '@/components/shared/data-load-failure';
 import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
 import { SignOutAction } from '@/components/shared/sign-out-action';
-import { CertificateDownloadButton } from '@/features/certificates/download-button';
-import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone';
-import { getSiteContacts } from '@/lib/site-contacts';
+import { CertificateDownloadButton } from '@/components/certificates/download-button';
+import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone/countries';
+import { getSiteContacts } from '@/server/site-contacts';
 import { localizePathname, type AppLocale } from '@/i18n/config';
-import { getCurrentLegalPolicies } from '@/lib/legal-current';
+import { getCurrentLegalPolicies } from '@/server/legal';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 
 type ProfileTranslator = Awaited<ReturnType<typeof getTranslations>>;

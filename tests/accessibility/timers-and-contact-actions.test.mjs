@@ -6,7 +6,7 @@ const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8
 
 test('approval status uses a calm, minute-resolution status strip instead of nested timer cards', async () => {
   const [status, ruMessages] = await Promise.all([
-    read('features/profile/account-approval-status.tsx'),
+    read('components/profile/account-approval-status.tsx'),
     read('messages/ru.json'),
   ]);
   const ru = JSON.parse(ruMessages);
@@ -50,7 +50,7 @@ test('WhatsApp contact actions use the shared brand-green token and retain expli
   const [contacts, legalContacts, approvalStatus, footer] = await Promise.all([
     read('components/shared/contact-actions.tsx'),
     read('components/legal/legal-contacts.tsx'),
-    read('features/profile/account-approval-status.tsx'),
+    read('components/profile/account-approval-status.tsx'),
     read('components/layout/footer.tsx'),
   ]);
 

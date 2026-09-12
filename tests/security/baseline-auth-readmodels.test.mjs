@@ -7,7 +7,7 @@ const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8
 test('auth context is one actor-bound RPC with no browser SDK or MFA branch', async () => {
   const [baseline, auth] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
-    read('features/auth/server.ts'),
+    read('server/auth/session.ts'),
   ]);
 
   assert.match(baseline, /create function public\.get_auth_context\(\)/);
@@ -33,7 +33,7 @@ test('profile dashboard returns locale-bound draft, approved identity, legal sta
   const [baseline, localeReads, loader, page] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
     read('supabase/migrations/20260901102000_localized_course_publication_reads.sql'),
-    read('features/profile/server.ts'),
+    read('server/profile/dashboard.ts'),
     read('app/(account)/profile/page.tsx'),
   ]);
 

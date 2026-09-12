@@ -21,7 +21,7 @@ test('overlays render outside the query container', async () => {
     'components/admin/attestations-manager.tsx',
     'components/admin/attestations-filter-form.tsx',
     'components/admin/admin-notification-inbox.tsx',
-    'features/profile/avatar-uploader.tsx',
+    'components/profile/avatar-uploader.tsx',
   ]) {
     assert.match(await read(file), /AdminOverlay/u, `${file} must lift its overlay out`);
   }

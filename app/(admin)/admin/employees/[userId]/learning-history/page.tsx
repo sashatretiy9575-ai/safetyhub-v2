@@ -4,7 +4,7 @@ import Link from 'next/link';
 import * as z from 'zod';
 import { LearningHistoryControl } from '@/components/admin/learning-history-control';
 import { Button } from '@/components/ui/button';
-import { getAdminLearningHistory } from '@/features/admin/server';
+import { getAdminLearningHistory } from '@/server/admin/management';
 
 const paramsSchema = z.object({ userId: z.string().uuid() });
 

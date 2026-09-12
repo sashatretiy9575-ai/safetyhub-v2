@@ -23,7 +23,7 @@ test('small export caps at one hundred while background jobs accept five hundred
   const [route, jobs, helper] = await Promise.all([
     read('app/api/admin/attestations/export/route.ts'),
     read('app/api/admin/attestations/export-jobs/route.ts'),
-    read('features/admin/certificate-export-archive.ts'),
+    read('server/admin/certificate-export-archive.ts'),
   ]);
   // The numbers themselves are asserted against `lib/constants.ts`, so a change
   // to either ceiling has to be a deliberate one rather than a stray literal.
@@ -140,7 +140,7 @@ test('server returns export metadata while the browser worker creates reports an
   const [route, exportHelper, report, archive, certificateRoute, worker, client] =
     await Promise.all([
       read('app/api/admin/attestations/export/route.ts'),
-      read('features/admin/certificate-export-archive.ts'),
+      read('server/admin/certificate-export-archive.ts'),
       read('lib/pdf/certificate-report-xlsx.ts'),
       read('lib/pdf/certificate-archive.ts'),
       read('app/api/certificates/[certificateId]/route.ts'),

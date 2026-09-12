@@ -1,11 +1,11 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { zhUsernamePasswordApiError } from '@/features/auth/zh-username-password-api';
-import { provisionZhUsernamePassword } from '@/features/auth/zh-username-password-server';
-import { zhUsernamePasswordProvisionSchema } from '@/features/auth/zh-username-password-validation';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { zhUsernamePasswordApiError } from '@/server/auth/zh-username-password-api';
+import { provisionZhUsernamePassword } from '@/server/auth/zh-username-password';
+import { zhUsernamePasswordProvisionSchema } from '@/lib/auth/zh-username-password-validation';
 import { readJsonBody } from '@/lib/security/request-body';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeCoarseQuota } from '@/lib/security/rate-limit';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeCoarseQuota } from '@/server/security/rate-limit';
 import { entityIdSchema } from '@/lib/validation/admin';
 
 export async function POST(request: Request, context: { params: Promise<{ userId: string }> }) {

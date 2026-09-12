@@ -11,8 +11,8 @@ import {
 import { absoluteUrl } from './utils';
 import { BRAND } from './constants';
 import { isPreviewDeployment } from './site-url';
-import type { SiteContactSettings } from '@/lib/site-contacts-shared';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import type { SiteContactSettings } from '@/lib/site-contacts';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 
 type SeoOptions = {
   title?: string;

@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LocaleFlag } from '@/components/layout/locale-flag';
-import { clearSafetyHubDeviceData } from '@/lib/safetyhub-device-data';
+import { clearSafetyHubDeviceData } from '@/lib/pwa/device-data';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import {
   LOCALE_COOKIE_MAX_AGE,

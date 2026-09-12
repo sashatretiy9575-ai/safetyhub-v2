@@ -4,10 +4,10 @@ import {
   parseSendEmailHookPayload,
   renderAuthEmail,
   verifyStandardWebhook,
-} from '@/features/auth/send-email-hook';
-import { sendSmtpMail } from '@/lib/email/smtp';
+} from '@/server/auth/send-email-hook';
+import { sendSmtpMail } from '@/server/email/smtp';
 import { readBoundedText, RequestBodyError } from '@/lib/security/request-body';
-import { afterResponse } from '@/lib/server/after-response';
+import { afterResponse } from '@/server/http/after-response';
 
 export const runtime = 'nodejs';
 

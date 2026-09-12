@@ -1,16 +1,16 @@
 import * as z from 'zod';
-import { apiError } from '@/features/auth/api-error';
-import { getSiteUrl, requireCapability, requireUser } from '@/features/auth/server';
+import { apiError } from '@/server/auth/api-error';
+import { getSiteUrl, requireCapability, requireUser } from '@/server/auth/session';
 import {
   createCertificateRenderMetadata,
   getCertificateDownloadPayload,
-} from '@/features/certificates/server';
-import { loadCertificateBranding } from '@/features/certificates/settings';
+} from '@/server/certificates/issuance';
+import { loadCertificateBranding } from '@/server/certificates/settings';
 import {
   CERTIFICATE_METADATA_MAX_BYTES,
   createBoundedCertificateMetadataResponse,
-} from '@/features/certificates/metadata-response';
-import { consumeBusinessQuota } from '@/lib/security/rate-limit';
+} from '@/server/certificates/metadata-response';
+import { consumeBusinessQuota } from '@/server/security/rate-limit';
 import { NextResponse } from '@/lib/security/api-response';
 
 export const runtime = 'nodejs';

@@ -1,9 +1,9 @@
-import { requireUser } from '@/features/auth/server';
+import { requireUser } from '@/server/auth/session';
 import {
   decodeCertificateImage,
   readCertificateSettingsWithImages,
   type CertificateImageKind,
-} from '@/features/certificates/settings';
+} from '@/server/certificates/settings';
 import { createApiResponse } from '@/lib/security/api-response';
 
 export const runtime = 'nodejs';

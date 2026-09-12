@@ -1,6 +1,6 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { getAuthContext } from '@/features/auth/server';
-import { hasCourseAccess } from '@/features/learning/course-access';
+import { getAuthContext } from '@/server/auth/session';
+import { hasCourseAccess } from '@/server/learning/course-access';
 
 export const dynamic = 'force-dynamic';
 

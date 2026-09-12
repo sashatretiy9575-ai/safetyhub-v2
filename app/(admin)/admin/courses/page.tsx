@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { PencilSimple, Plus } from '@phosphor-icons/react/dist/ssr';
-import { listTests } from '@/features/admin/server';
+import { listTests } from '@/server/admin/management';
 import { AdminFilterSelect } from '@/components/admin/admin-filter-select';
 import { TestStatusControls } from '@/components/admin/test-status-controls';
 import { Badge } from '@/components/ui/badge';

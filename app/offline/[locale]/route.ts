@@ -6,7 +6,7 @@ import {
   localizePathname,
 } from '@/i18n/config';
 import { loadMessages } from '@/i18n/messages';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 
 export const dynamicParams = false;
 

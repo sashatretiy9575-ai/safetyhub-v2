@@ -10,7 +10,7 @@ import { AdminOverlay } from '@/components/admin/admin-overlay';
 import { Input } from '@/components/ui/input';
 import { useAttestationsModalFocus } from './use-attestations-modal-focus';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
-import type { AdminAttestationFilters } from '@/features/admin/types';
+import type { AdminAttestationFilters } from '@/lib/admin/types';
 
 type FilterValues = {
   query: string;

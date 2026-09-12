@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient } from '@/server/supabase/admin';
 import { entityIdSchema } from '@/lib/validation/admin';
 import { createApiResponse, createImmutableAssetResponse } from '@/lib/security/api-response';
 import {

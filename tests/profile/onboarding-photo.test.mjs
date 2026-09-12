@@ -14,7 +14,7 @@ test('canonical email-OTP access enters required onboarding without a password c
       read('app/(account)/callback/route.ts'),
       read('lib/constants.ts'),
       read('app/(account)/onboarding/page.tsx'),
-      read('features/profile/onboarding-form.tsx'),
+      read('components/profile/onboarding-form.tsx'),
       read('app/api/profile/onboarding/route.ts'),
     ]);
 
@@ -50,8 +50,8 @@ test('canonical email-OTP access enters required onboarding without a password c
 
 test('avatar flow supports camera, system fallback, crop controls, and mandatory cleanup', async () => {
   const [uploader, image, uploadRoute, config] = await Promise.all([
-    read('features/profile/avatar-uploader.tsx'),
-    read('lib/avatar-image.ts'),
+    read('components/profile/avatar-uploader.tsx'),
+    read('lib/profile/avatar-image.ts'),
     read('app/api/profile/avatar/route.ts'),
     read('next.config.ts'),
   ]);
@@ -99,10 +99,10 @@ test('a missing committed avatar sends an already-onboarded learner back to phot
   const [page, profileServer, baselineMigration, approvalMigration, policy, quiz] =
     await Promise.all([
       read('app/(account)/onboarding/page.tsx'),
-      read('features/profile/server.ts'),
+      read('server/profile/dashboard.ts'),
       read('supabase/migrations/20260813070000_persistent_actor_quota.sql'),
       read('supabase/migrations/20260831110000_profile_approval_submission.sql'),
-      read('features/learning/policy-error.ts'),
+      read('server/learning/policy-error.ts'),
       read('components/quiz/quiz-client.tsx'),
     ]);
   assert.match(page, /getProfileAvatarUrl\(context\.user\.id\)/);
@@ -126,8 +126,8 @@ test('public contact surfaces expose phone and WhatsApp without an email address
   const files = await Promise.all(
     [
       'lib/constants.ts',
+      'server/site-contacts.ts',
       'lib/site-contacts.ts',
-      'lib/site-contacts-shared.ts',
       'lib/seo.ts',
       'components/layout/footer.tsx',
       'components/legal/legal-contacts.tsx',

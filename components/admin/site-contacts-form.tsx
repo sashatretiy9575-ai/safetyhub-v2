@@ -9,7 +9,7 @@ import {
   formatPhoneDisplay,
   normalizePhoneE164,
   type SiteContactSettings,
-} from '@/lib/site-contacts-shared';
+} from '@/lib/site-contacts';
 
 const PHONE_ERROR_ID = 'site-contacts-phone-error';
 const WHATSAPP_ERROR_ID = 'site-contacts-whatsapp-error';

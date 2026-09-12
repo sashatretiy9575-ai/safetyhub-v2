@@ -7,7 +7,7 @@ import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-d
 import {
   getStaticLegalDocument,
   hasLegacyRussianLegalRenderer,
-} from '@/lib/content/legal-documents';
+} from '@/server/content/legal-documents';
 import { resolveLegalDocumentVersion, type LegalDocumentType } from '@/lib/legal';
 import type { AppLocale } from '@/i18n/config';
 

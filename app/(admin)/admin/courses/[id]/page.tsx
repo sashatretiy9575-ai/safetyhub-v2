@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getTestEditorSeed } from '@/features/admin/server';
-import { getCourseEditorLocalizations } from '@/features/admin/localizations-server';
+import { getTestEditorSeed } from '@/server/admin/management';
+import { getCourseEditorLocalizations } from '@/server/admin/localizations';
 import { TestEditor } from '@/components/admin/test-editor';
 import { CourseLocalizationsEditor } from '@/components/admin/course-localizations-editor';
 

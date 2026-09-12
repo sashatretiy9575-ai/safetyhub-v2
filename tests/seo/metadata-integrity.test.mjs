@@ -46,9 +46,9 @@ test('JSON-LD describes only visible capabilities and is mounted on matching pag
 test('sitemap uses every published source row and stable content timestamps', async () => {
   const [sitemap, topics, articles, actions, policy] = await Promise.all([
     read('app/sitemap.ts'),
-    read('lib/content/topics.ts'),
-    read('lib/content/articles.ts'),
-    read('lib/actions/articles.ts'),
+    read('server/content/topics.ts'),
+    read('server/content/articles.ts'),
+    read('server/actions/articles.ts'),
     read('lib/content/cache-policy.ts'),
   ]);
 

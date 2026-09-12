@@ -1,10 +1,10 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { isSameOriginRequest } from '@/features/auth/request-origin';
-import { requireUser } from '@/features/auth/server';
-import { getCurrentLegalPolicies } from '@/lib/legal-current';
-import { createClient } from '@/lib/supabase/server';
-import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
+import { apiError } from '@/server/auth/api-error';
+import { isSameOriginRequest } from '@/server/http/request-origin';
+import { requireUser } from '@/server/auth/session';
+import { getCurrentLegalPolicies } from '@/server/legal';
+import { createClient } from '@/server/supabase/server';
+import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 
 type LegalRpcClient = {
   rpc(

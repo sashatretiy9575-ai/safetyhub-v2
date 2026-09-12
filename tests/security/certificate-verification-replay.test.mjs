@@ -5,7 +5,7 @@ import test from 'node:test';
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
 test('valid QR replays share one short-lived database projection', async () => {
-  const source = await read('features/certificates/server.ts');
+  const source = await read('server/certificates/issuance.ts');
 
   assert.match(source, /unstable_cache/u);
   assert.match(source, /public-certificate-verification-v1/u);
@@ -17,10 +17,10 @@ test('valid QR replays share one short-lived database projection', async () => {
 test('certificate-changing application flows invalidate the verification cache', async () => {
   const sources = await Promise.all(
     [
-      'features/admin/attestations.ts',
-      'features/identity/server.ts',
-      'features/learning/server.ts',
-      'features/admin/server.ts',
+      'server/admin/attestations.ts',
+      'server/identity/verification.ts',
+      'server/learning/attempts.ts',
+      'server/admin/management.ts',
       'app/api/profile/account/route.ts',
     ].map(read),
   );

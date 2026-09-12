@@ -76,7 +76,7 @@ test('attempt admission resumes first, then enforces eight starts per Asia/Oral 
 test('completion accepts the full answer set once and atomically maintains the best result', async () => {
   const [baseline, server, client] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
-    read('features/learning/server.ts'),
+    read('server/learning/attempts.ts'),
     read('components/quiz/quiz-client.tsx'),
   ]);
   const complete = sqlFunction(baseline, 'complete_test_attempt');
@@ -106,7 +106,7 @@ test('effective learner payload keeps answer keys private after completion', asy
   const [baseline, payloadMigration, types, client] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
     read('supabase/migrations/20260831113000_no_answer_key_learner_payload.sql'),
-    read('features/learning/types.ts'),
+    read('lib/learning/types.ts'),
     read('components/quiz/quiz-client.tsx'),
   ]);
   const payload = sqlFunction(payloadMigration, 'attempt_payload', 'private');

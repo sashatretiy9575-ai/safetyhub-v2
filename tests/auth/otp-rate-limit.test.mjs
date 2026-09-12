@@ -7,7 +7,7 @@ import {
   normalizeOtpRetryAfter,
   OTP_RETRY_FALLBACK_SECONDS,
   retrySecondsUntil,
-} from '../../features/auth/otp-rate-limit.ts';
+} from '../../lib/auth/otp-rate-limit.ts';
 
 test('provider throttles use a minute when the SDK exposes no reset timestamp', () => {
   assert.equal(

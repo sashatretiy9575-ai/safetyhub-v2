@@ -6,11 +6,11 @@ const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8
 
 test('admin inbox stays behind a same-origin capability-gated API', async () => {
   const [server, listRoute, readRoute, retryRoute, contract] = await Promise.all([
-    read('features/admin/notifications.ts'),
+    read('server/admin/notifications.ts'),
     read('app/api/admin/notifications/route.ts'),
     read('app/api/admin/notifications/read/route.ts'),
     read('app/api/admin/notifications/[eventId]/retry/route.ts'),
-    read('features/admin/notification-contract.ts'),
+    read('lib/admin/notification-contract.ts'),
   ]);
 
   assert.match(server, /requireAnyCapability\(INBOX_CAPABILITIES\)/u);

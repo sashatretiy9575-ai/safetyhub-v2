@@ -2,12 +2,12 @@ import { APP_LOCALES } from '@/i18n/config';
 import * as z from 'zod';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { AuthenticationError, requireUser } from '@/features/auth/server';
-import { isSameOriginRequest } from '@/features/auth/request-origin';
+import { apiError } from '@/server/auth/api-error';
+import { AuthenticationError, requireUser } from '@/server/auth/session';
+import { isSameOriginRequest } from '@/server/http/request-origin';
 import { type AppLocale, localizePathname } from '@/i18n/config';
 import { readJsonBody } from '@/lib/security/request-body';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/server/supabase/server';
 import { clearSafetyHubLocalSession } from '@/lib/supabase/session-cleanup';
 
 const requestSchema = z.object({ locale: z.enum(APP_LOCALES) }).strict();

@@ -17,8 +17,8 @@ import {
   publishArticleAction,
   saveArticleAction,
   setArticleStatusAction,
-} from '@/lib/actions/articles';
-import type { Article, ArticleBlock, ArticlePublicationState } from '@/lib/content/articles';
+} from '@/server/actions/articles';
+import type { Article, ArticleBlock, ArticlePublicationState } from '@/server/content/articles';
 import {
   articleBlockSchema,
   articleBlocksSchema,
@@ -36,9 +36,9 @@ import {
   toContentDateInput,
   type ContentSource,
 } from '@/lib/content/content-metadata';
-import { clearEditorDraft, readEditorDraft, writeEditorDraft } from '@/lib/editor-drafts';
+import { clearEditorDraft, readEditorDraft, writeEditorDraft } from '@/lib/admin/editor-drafts';
 import { ArticleLocalizationsEditor } from '@/components/admin/article-localizations-editor';
-import type { ArticleLocalizationEditorItem } from '@/features/admin/localization-contract';
+import type { ArticleLocalizationEditorItem } from '@/lib/admin/localization-contract';
 
 type ArticleLocalDraft = {
   id: string | null;

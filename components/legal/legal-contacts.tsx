@@ -1,7 +1,7 @@
 import { Phone, WhatsappLogo } from '@phosphor-icons/react/dist/ssr';
 import { getTranslations } from 'next-intl/server';
 import { ContactLink } from '@/components/shared/contact-link';
-import { getSiteContacts } from '@/lib/site-contacts';
+import { getSiteContacts } from '@/server/site-contacts';
 
 const contactClass =
   'flex min-h-14 items-center gap-3 px-1 py-3 transition-colors hover:text-[var(--color-primary)] focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]';

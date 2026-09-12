@@ -7,8 +7,8 @@ const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8
 test('email-code verification uses the server-authorized role landing instead of a hard-coded profile', async () => {
   const [route, flow, auth] = await Promise.all([
     read('app/api/auth/email-otp/verify/route.ts'),
-    read('features/auth/email-otp-flow.tsx'),
-    read('features/auth/server.ts'),
+    read('components/auth/email-otp-flow.tsx'),
+    read('server/auth/session.ts'),
   ]);
 
   assert.match(route, /rpc\('get_auth_context'\)/u);
@@ -40,7 +40,7 @@ test('retired callback discards legacy links and direct participant workspace ro
 
 test('all individual certificate actions use the metadata-and-worker download control', async () => {
   const [download, profile, quiz, admin] = await Promise.all([
-    read('features/certificates/download-button.tsx'),
+    read('components/certificates/download-button.tsx'),
     read('app/(account)/profile/page.tsx'),
     read('components/quiz/quiz-client.tsx'),
     read('components/admin/attestations-manager-panels.tsx'),

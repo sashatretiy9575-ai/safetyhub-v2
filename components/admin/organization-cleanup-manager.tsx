@@ -7,7 +7,7 @@ import type {
   OrganizationCleanupCluster,
   OrganizationMergePreview,
   OrganizationMergeResult,
-} from '@/features/admin/organizations';
+} from '@/server/admin/organizations';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

@@ -1,14 +1,14 @@
-import { apiError } from '@/features/auth/api-error';
-import { getSiteUrl, requireCapability } from '@/features/auth/server';
+import { apiError } from '@/server/auth/api-error';
+import { getSiteUrl, requireCapability } from '@/server/auth/session';
 import {
   CERTIFICATE_METADATA_MAX_BYTES,
   createBoundedCertificateMetadataResponse,
-} from '@/features/certificates/metadata-response';
-import { loadCertificateBranding } from '@/features/certificates/settings';
+} from '@/server/certificates/metadata-response';
+import { loadCertificateBranding } from '@/server/certificates/settings';
 import {
   certificateVerificationUrl,
   createCertificateVerificationToken,
-} from '@/lib/certificates/verification';
+} from '@/server/certificates/verification';
 import { certificateFilename } from '@/lib/pdf/certificate';
 import {
   CERTIFICATE_CLIENT_SCHEMA_VERSION,

@@ -18,12 +18,12 @@ test('canonical access uses neutral email-code while ZH exposes one accessible u
   ] = await Promise.all([
     read('app/(account)/auth/login/page.tsx'),
     read('app/(account)/auth/register/page.tsx'),
-    read('features/auth/email-otp-flow.tsx'),
-    read('features/auth/zh-username-password-flow.tsx'),
+    read('components/auth/email-otp-flow.tsx'),
+    read('components/auth/zh-username-password-flow.tsx'),
     read('app/api/auth/email-otp/request/route.ts'),
     read('app/api/auth/email-otp/verify/route.ts'),
     read('app/(account)/auth/legal/page.tsx'),
-    read('features/auth/legal-acceptance-gate.tsx'),
+    read('components/auth/legal-acceptance-gate.tsx'),
     read('lib/validation/auth.ts'),
   ]);
 
@@ -74,7 +74,7 @@ test('canonical access uses neutral email-code while ZH exposes one accessible u
 
 test('registration start is neutral about whether the email already has an account', async () => {
   const [flow, requestRoute, ruMessages] = await Promise.all([
-    read('features/auth/email-otp-flow.tsx'),
+    read('components/auth/email-otp-flow.tsx'),
     read('app/api/auth/email-otp/request/route.ts'),
     read('messages/ru.json'),
   ]);
@@ -90,8 +90,8 @@ test('registration start is neutral about whether the email already has an accou
 
 test('email-code form exposes inline errors and focuses the first invalid field', async () => {
   const [flow, controls, input] = await Promise.all([
-    read('features/auth/email-otp-flow.tsx'),
-    read('features/auth/form-controls.tsx'),
+    read('components/auth/email-otp-flow.tsx'),
+    read('components/auth/form-controls.tsx'),
     read('components/ui/input.tsx'),
   ]);
 
@@ -110,7 +110,7 @@ test('mobile fields prevent zoom and keep OTP controls accessible', async () => 
   const [input, textarea, flow] = await Promise.all([
     read('components/ui/input.tsx'),
     read('components/ui/textarea.tsx'),
-    read('features/auth/email-otp-flow.tsx'),
+    read('components/auth/email-otp-flow.tsx'),
   ]);
 
   assert.match(input, /text-base[\s\S]*sm:text-sm/u);

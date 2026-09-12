@@ -5,7 +5,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const sourceRoots = ['app', 'components', 'features', 'i18n', 'lib', 'messages'];
+const sourceRoots = ['app', 'components', 'server', 'i18n', 'lib', 'messages'];
 const sourceExtensions = ['.ts', '.tsx', '.js', '.mjs', '.json'];
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
 
@@ -117,10 +117,10 @@ test('client import graph cannot reach reproducible seed or snapshot source file
 
 test('public assets and public course rendering exclude snapshots, answer keys and storage paths', async () => {
   const [topicSource, topicPage, learnerServer, learnerTypes] = await Promise.all([
-    read('lib/content/topics.ts'),
+    read('server/content/topics.ts'),
     read('app/(public)/topics/[slug]/page.tsx'),
-    read('features/learning/server.ts'),
-    read('features/learning/types.ts'),
+    read('server/learning/attempts.ts'),
+    read('lib/learning/types.ts'),
   ]);
   assert.match(topicSource, /^import 'server-only';/u);
   assert.match(topicSource, /function topicFromLocalRecord/u);
@@ -172,7 +172,7 @@ test('the saved question bank is readable only through the audited editor path',
   ] = await Promise.all([
     read('components/admin/test-editor.tsx'),
     read('app/(admin)/admin/courses/[id]/page.tsx'),
-    read('features/admin/server.ts'),
+    read('server/admin/management.ts'),
     read('app/api/admin/courses/route.ts'),
     read('supabase/migrations/20260831116000_retire_browser_editor_key_reads.sql'),
     read('supabase/migrations/20260903090000_course_editor_question_bank_read.sql'),
@@ -279,7 +279,7 @@ test('the saved question bank is readable only through the audited editor path',
 
 test('presentation finalize responses retain no immutable storage path in the browser', async () => {
   const [types, finalizeRoute, presentationInput] = await Promise.all([
-    read('features/admin/types.ts'),
+    read('lib/admin/types.ts'),
     read('app/api/admin/courses/[courseId]/presentation/finalize/route.ts'),
     read('components/admin/course-presentation-input.tsx'),
   ]);

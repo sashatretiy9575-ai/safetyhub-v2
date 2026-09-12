@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation';
-import { requireCapability } from '@/features/auth/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireCapability } from '@/server/auth/session';
+import { createAdminClient } from '@/server/supabase/admin';
 import { AdminEditor } from '@/components/admin/admin-editor';
-import type { Article } from '@/lib/content/articles';
+import type { Article } from '@/server/content/articles';
 import { coerceContentMetadata } from '@/lib/content/content-metadata';
 import { articleBlocksSchema, type ArticleLifecycleStatus } from '@/lib/validation/article';
 import { contentSeoSchema, defaultContentSeo } from '@/lib/validation/content-seo';
-import { getArticleEditorLocalizations } from '@/features/admin/localizations-server';
+import { getArticleEditorLocalizations } from '@/server/admin/localizations';
 
 export default async function EditArticlePage({
   params,

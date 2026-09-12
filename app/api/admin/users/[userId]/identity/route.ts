@@ -1,18 +1,18 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { requireAnyCapability, requireCapability } from '@/features/auth/server';
-import { identityApiError } from '@/features/identity/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
+import { requireAnyCapability, requireCapability } from '@/server/auth/session';
+import { identityApiError } from '@/server/identity/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
 import {
   getUserIdentity,
   revokeUserIdentity,
   verifyUserIdentity,
-} from '@/features/identity/server';
+} from '@/server/identity/verification';
 import {
   identityActionSchema,
   identityUserIdSchema,
 } from '@/lib/validation/identity';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
 
 async function targetId(context: { params: Promise<{ userId: string }> }) {

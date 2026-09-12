@@ -7,7 +7,7 @@ import {
   editorDraftStorageKey,
   readEditorDraft,
   writeEditorDraft,
-} from '../../lib/editor-drafts.ts';
+} from '../../lib/admin/editor-drafts.ts';
 
 class MemoryStorage {
   #values = new Map();

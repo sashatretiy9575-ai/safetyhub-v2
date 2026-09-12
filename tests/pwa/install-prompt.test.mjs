@@ -107,7 +107,7 @@ test('the private roots declare the viewport their layout depends on', async () 
   const [account, admin, identity] = await Promise.all([
     read('app/(account)/layout.tsx'),
     read('app/(admin)/layout.tsx'),
-    read('lib/pwa-identity.ts'),
+    read('lib/pwa/identity.ts'),
   ]);
   // Neither declared one, so `viewportFit: 'cover'` never applied and every
   // safe-area rule on those screens was inert on a phone with a notch.

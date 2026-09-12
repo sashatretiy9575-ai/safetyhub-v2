@@ -145,5 +145,5 @@ export const STATIC_CONTENT_SECURITY_POLICY = buildContentSecurityPolicy({
   development: process.env.NODE_ENV === 'development',
   strict: false,
 });
-import { THEME_BOOTSTRAP_CSP_HASH } from '@/lib/theme';
-import { PWA_INSTALL_BOOTSTRAP_CSP_HASH } from '@/lib/pwa-install-bootstrap';
+import { THEME_BOOTSTRAP_CSP_HASH } from '../theme.ts';
+import { PWA_INSTALL_BOOTSTRAP_CSP_HASH } from '../pwa/install-bootstrap.ts';

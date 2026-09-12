@@ -18,7 +18,7 @@ import {
   ADMIN_LOCALE_LABELS,
   ADMIN_LOCALIZATION_STATUS_LABELS,
   type ArticleLocalizationEditorItem,
-} from '@/features/admin/localization-contract';
+} from '@/lib/admin/localization-contract';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import type { AppLocale } from '@/lib/supabase/types';
 

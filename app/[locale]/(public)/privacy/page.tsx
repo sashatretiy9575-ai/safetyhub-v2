@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-document';
-import { getStaticLegalDocument } from '@/lib/content/legal-documents';
+import { getStaticLegalDocument } from '@/server/content/legal-documents';
 import { PRIVACY_POLICY } from '@/lib/legal';
 import { buildMetadata } from '@/lib/seo';
 import { setPhysicalLocale } from '../../locale-context';

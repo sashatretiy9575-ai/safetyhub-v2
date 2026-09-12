@@ -1,16 +1,16 @@
 import { createHash } from 'node:crypto';
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { isSameOriginRequest } from '@/features/auth/request-origin';
-import { requireUser } from '@/features/auth/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { getProfileAvatarUrl } from '@/features/profile/server';
-import { createClient } from '@/lib/supabase/server';
-import { AVATAR_HEIGHT, AVATAR_MAX_BYTES, AVATAR_WIDTH } from '@/lib/avatar-image';
+import { apiError } from '@/server/auth/api-error';
+import { isSameOriginRequest } from '@/server/http/request-origin';
+import { requireUser } from '@/server/auth/session';
+import { createAdminClient } from '@/server/supabase/admin';
+import { getProfileAvatarUrl } from '@/server/profile/dashboard';
+import { createClient } from '@/server/supabase/server';
+import { AVATAR_HEIGHT, AVATAR_MAX_BYTES, AVATAR_WIDTH } from '@/lib/profile/avatar-image';
 import { validatedStaticWebpDimensions } from '@/lib/security/avatar-webp';
-import { normalizeAvatarImage } from '@/lib/security/avatar-decode';
-import { consumeBusinessQuota } from '@/lib/security/rate-limit';
-import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
+import { normalizeAvatarImage } from '@/server/security/avatar-decode';
+import { consumeBusinessQuota } from '@/server/security/rate-limit';
+import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 
 const AVATAR_BUCKET = 'profile-avatars';
 const MULTIPART_MAX_BYTES = AVATAR_MAX_BYTES + 16 * 1024;

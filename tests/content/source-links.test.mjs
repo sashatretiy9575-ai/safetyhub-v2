@@ -79,7 +79,7 @@ test('publication refuses a reference the reader would never see', () => {
 test('both publication paths run the gate', async () => {
   const [admin, articles] = await Promise.all([
     read('lib/validation/admin.ts'),
-    read('lib/actions/articles.ts'),
+    read('server/actions/articles.ts'),
   ]);
   // `...contentMetadataDraftSchema.shape` copies the fields and drops the
   // object-level refinement, so the gate has to be re-applied explicitly.

@@ -17,7 +17,7 @@ test('locale contract uses the two fixed auth realms', () => {
 });
 
 test('middleware derives only a non-authoritative realm hint from signed user metadata', async () => {
-  const middleware = await read('lib/supabase/middleware.ts');
+  const middleware = await read('server/supabase/middleware.ts');
   assert.match(middleware, /export function authRealmForSessionUser/u);
   assert.match(middleware, /safetyhub_auth_kind[\s\S]*zh_username_password/u);
   assert.match(middleware, /unexpected credential marker/u);

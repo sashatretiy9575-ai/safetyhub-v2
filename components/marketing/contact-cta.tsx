@@ -1,6 +1,6 @@
 import { ContactActions } from '@/components/shared/contact-actions';
 import { Container } from '@/components/ui/container';
-import { getSiteContacts } from '@/lib/site-contacts';
+import { getSiteContacts } from '@/server/site-contacts';
 import { getTranslations } from 'next-intl/server';
 
 /**

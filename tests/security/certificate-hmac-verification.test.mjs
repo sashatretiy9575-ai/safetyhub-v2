@@ -6,7 +6,7 @@ import {
   createCertificateVerificationToken,
   isCertificateVerificationToken,
   verifyCertificateVerificationToken,
-} from '../../lib/certificates/verification.ts';
+} from '../../server/certificates/verification.ts';
 
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 const certificateId = '5f0c6f0e-5f2d-4f69-8a2e-34ac10f4892e';
@@ -86,7 +86,7 @@ test('current and previous verification secrets both require at least 32 charact
 test('certificate verification stores no token or document bytes in Postgres or Storage', async () => {
   const [baseline, server, pdfRoute, metadataRoute, exportRoute] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
-    read('features/certificates/server.ts'),
+    read('server/certificates/issuance.ts'),
     read('app/api/certificates/[certificateId]/route.ts'),
     read('app/api/certificates/[certificateId]/metadata/route.ts'),
     read('app/api/admin/attestations/export/route.ts'),
@@ -111,7 +111,7 @@ test('course deletion metadata never enters certificate download or public verif
   const [baseline, publicOverride, server, pdfRoute] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
     read('supabase/migrations/20260813070000_persistent_actor_quota.sql'),
-    read('features/certificates/server.ts'),
+    read('server/certificates/issuance.ts'),
     read('app/api/certificates/[certificateId]/route.ts'),
   ]);
 

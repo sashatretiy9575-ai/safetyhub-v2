@@ -1,16 +1,16 @@
 import { NextResponse } from '@/lib/security/api-response';
 import * as z from 'zod';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
-import { PROFILE_FIELD_LIMITS } from '@/features/profile/fields';
-import { requireAnyCapability, requireCapability } from '@/features/auth/server';
+import { PROFILE_FIELD_LIMITS } from '@/lib/profile/fields';
+import { requireAnyCapability, requireCapability } from '@/server/auth/session';
 import {
   ADMIN_ATTESTATION_BULK_LIMIT,
   executeAdminAttestationAction,
-} from '@/features/admin/attestations';
+} from '@/server/admin/attestations';
 
 const ids = z
   .array(z.string().uuid())

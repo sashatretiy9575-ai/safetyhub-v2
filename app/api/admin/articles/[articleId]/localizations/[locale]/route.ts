@@ -1,16 +1,16 @@
 import * as z from 'zod';
-import { saveArticleLocalization } from '@/features/admin/localizations-server';
+import { saveArticleLocalization } from '@/server/admin/localizations';
 import {
   translatedLocaleSchema,
   articleLocalizationDraftSchema,
-} from '@/features/admin/localization-contract';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requireCapability } from '@/features/auth/server';
+} from '@/lib/admin/localization-contract';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requireCapability } from '@/server/auth/session';
 import { NextResponse } from '@/lib/security/api-response';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 
 const paramsSchema = z.object({
   articleId: z.string().uuid(),

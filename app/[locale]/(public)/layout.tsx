@@ -5,7 +5,7 @@ import { JsonLd } from '@/components/shared/json-ld';
 import { DeferredPwaInstall } from '@/components/shared/deferred-pwa-install';
 import { PublicAccountControl } from '@/components/shared/public-account-control';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/seo';
-import { getSiteContacts } from '@/lib/site-contacts';
+import { getSiteContacts } from '@/server/site-contacts';
 import { setPhysicalLocale } from '../locale-context';
 
 export const revalidate = 300;

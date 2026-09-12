@@ -28,7 +28,7 @@ test('actor quota is consumed exactly once at the trusted mutation boundary', as
     read('app/api/profile/route.ts'),
     read('app/api/profile/onboarding/route.ts'),
     read('app/api/admin/attestations/export/route.ts'),
-    read('lib/security/rate-limit.ts'),
+    read('server/security/rate-limit.ts'),
   ]);
 
   assert.match(hardening, /private\.enforce_actor_quota\('attempt\.start'\)/);
@@ -76,7 +76,7 @@ test('actor quota is consumed exactly once at the trusted mutation boundary', as
 test('arbitrary actor quota actions are not exposed to browser roles', async () => {
   const [persistent, rateLimit, databaseTypes] = await Promise.all([
     read('supabase/migrations/20260813070000_persistent_actor_quota.sql'),
-    read('lib/security/rate-limit.ts'),
+    read('server/security/rate-limit.ts'),
     read('lib/supabase/types.ts'),
   ]);
 

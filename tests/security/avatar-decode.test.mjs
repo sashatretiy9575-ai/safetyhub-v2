@@ -2,11 +2,11 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import sharp from 'sharp';
-import { isDecodableAvatarWebp } from '../../lib/security/avatar-decode.ts';
+import { isDecodableAvatarWebp } from '../../server/security/avatar-decode.ts';
 import {
   normalizeAvatarImage,
   normalizeAvatarWebp,
-} from '../../lib/security/avatar-decode.ts';
+} from '../../server/security/avatar-decode.ts';
 import { validatedStaticWebpDimensions } from '../../lib/security/avatar-webp.ts';
 
 test('production avatar route traces the Linux sharp runtime into its function', async () => {

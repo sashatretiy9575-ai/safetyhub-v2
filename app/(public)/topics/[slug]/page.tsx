@@ -1,14 +1,14 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { getTopicLocales, getTopicBySlug, getTopicRedirectBySlug, getTopicSlugs } from '@/lib/content/topics';
+import { getTopicLocales, getTopicBySlug, getTopicRedirectBySlug, getTopicSlugs } from '@/server/content/topics';
 import { CourseMaterialActions } from '@/components/topics/course-material-actions';
 import { JsonLd } from '@/components/shared/json-ld';
 import { breadcrumbsJsonLd, buildMetadata, courseJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { TopicSourcesCard } from '@/components/topics/topic-sources-card';
 import { localizePathname } from '@/i18n/config';
-import { getCourseCoverImage } from '@/lib/course-cover-images';
-import { resolveCourseIcon } from '@/lib/course-icons';
+import { getCourseCoverImage } from '@/lib/content/course-cover-images';
+import { resolveCourseIcon } from '@/lib/content/course-icons';
 
 export const revalidate = 300;
 

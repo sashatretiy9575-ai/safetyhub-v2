@@ -94,8 +94,8 @@ test('canonical seed creates drafts and immutable published revisions idempotent
 test('article editor keeps sources optional and publishes directly', async () => {
   const [editor, action, content, page, contract] = await Promise.all([
     read('components/admin/admin-editor.tsx'),
-    read('lib/actions/articles.ts'),
-    read('lib/content/articles.ts'),
+    read('server/actions/articles.ts'),
+    read('server/content/articles.ts'),
     read('app/(public)/blog/[slug]/page.tsx'),
     read('supabase/migrations/20260820010000_content_lifecycle_contract.sql'),
   ]);

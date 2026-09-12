@@ -6,8 +6,8 @@ import {
   phoneCallingCode,
   phoneCountryOptions,
   phoneCountries,
-} from '../../lib/phone.ts';
-import { normalizeUserPhone } from '../../lib/phone-normalization.ts';
+} from '../../lib/phone/countries.ts';
+import { normalizeUserPhone } from '../../lib/phone/normalize.ts';
 
 test('international phone picker keeps Kazakhstan, Russia, and China first', () => {
   assert.deepEqual(phoneCountries().slice(0, 3), ['KZ', 'RU', 'CN']);
@@ -22,12 +22,12 @@ test('international phone picker keeps Kazakhstan, Russia, and China first', () 
 
 test('country labels are serialized by server pages instead of recomputed during hydration', async () => {
   const [phoneInput, onboardingPage, onboardingForm, profilePage, adminAccountPage, profileForm] = await Promise.all([
-    readFile(new URL('../../features/profile/phone-input.tsx', import.meta.url), 'utf8'),
+    readFile(new URL('../../components/profile/phone-input.tsx', import.meta.url), 'utf8'),
     readFile(new URL('../../app/(account)/onboarding/page.tsx', import.meta.url), 'utf8'),
-    readFile(new URL('../../features/profile/onboarding-form.tsx', import.meta.url), 'utf8'),
+    readFile(new URL('../../components/profile/onboarding-form.tsx', import.meta.url), 'utf8'),
     readFile(new URL('../../app/(account)/profile/page.tsx', import.meta.url), 'utf8'),
     readFile(new URL('../../app/(admin)/admin/account/page.tsx', import.meta.url), 'utf8'),
-    readFile(new URL('../../features/auth/profile-form.tsx', import.meta.url), 'utf8'),
+    readFile(new URL('../../components/profile/profile-form.tsx', import.meta.url), 'utf8'),
   ]);
   assert.match(phoneInput, /countryOptions\.map/u);
   assert.doesNotMatch(phoneInput, /countryLabel|phoneCountries|Intl\.DisplayNames/u);

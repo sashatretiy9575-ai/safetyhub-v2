@@ -1,14 +1,14 @@
-import { AuthenticationError, requireUser } from '@/features/auth/server';
+import { AuthenticationError, requireUser } from '@/server/auth/session';
 import { isContentSlug } from '@/lib/content/slug';
 import { createBoundedRelayStream } from '@/lib/security/bounded-relay-stream';
 import {
   consumeBusinessQuota,
   consumeCoarseQuota,
   RateLimitError,
-} from '@/lib/security/rate-limit';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
+} from '@/server/security/rate-limit';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { createAdminClient } from '@/server/supabase/admin';
+import { createClient } from '@/server/supabase/server';
 import { isAppLocale, type AppLocale } from '@/i18n/config';
 import { SENSITIVE_API_CACHE_HEADERS } from '@/lib/security/no-store';
 

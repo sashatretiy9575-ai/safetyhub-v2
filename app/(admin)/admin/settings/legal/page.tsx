@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { LegalLocalizationsEditor } from '@/components/admin/legal-localizations-editor';
-import { listLegalLocalizationVersions } from '@/features/admin/localizations-server';
+import { listLegalLocalizationVersions } from '@/server/admin/localizations';
 
 export default async function AdminLegalLocalizationsPage() {
   const versions = await listLegalLocalizationVersions();

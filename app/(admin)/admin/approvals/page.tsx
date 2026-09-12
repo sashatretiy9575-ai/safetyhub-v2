@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { AccountApprovalQueue } from '@/components/admin/account-approval-queue';
-import { listAdminCourseOptions } from '@/features/admin/course-access';
+import { listAdminCourseOptions } from '@/server/admin/course-access';
 import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data-state';
 import { AdminPagination } from '@/components/admin/admin-pagination';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import {
   getPendingAccountApprovalPage,
   parseAdminAccountApprovalQuery,
   type RawAdminSearchParams,
-} from '@/features/admin/data';
+} from '@/server/admin/data';
 import {
   ADMIN_TRAIL_PARAM,
   appendAdminTrail,

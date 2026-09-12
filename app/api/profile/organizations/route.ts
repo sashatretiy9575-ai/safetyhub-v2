@@ -1,7 +1,7 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { requireUser } from '@/features/auth/server';
-import { createClient } from '@/lib/supabase/server';
+import { apiError } from '@/server/auth/api-error';
+import { requireUser } from '@/server/auth/session';
+import { createClient } from '@/server/supabase/server';
 import { normalizeProfileText } from '@/lib/validation/profile';
 
 type OrganizationSearchRpcClient = {

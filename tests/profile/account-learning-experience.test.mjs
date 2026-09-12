@@ -6,10 +6,10 @@ const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8
 
 test('avatar is square, privately staged, and published only through its manifest', async () => {
   const [compressor, uploader, route, profileServer, layout] = await Promise.all([
-    read('lib/avatar-image.ts'),
-    read('features/profile/avatar-uploader.tsx'),
+    read('lib/profile/avatar-image.ts'),
+    read('components/profile/avatar-uploader.tsx'),
     read('app/api/profile/avatar/route.ts'),
-    read('features/profile/server.ts'),
+    read('server/profile/dashboard.ts'),
     read('app/(account)/layout.tsx'),
   ]);
 
@@ -42,8 +42,8 @@ test('avatar is square, privately staged, and published only through its manifes
 test('profile uses one dashboard contract and keeps attempt analytics hidden', async () => {
   const [profile, server, form] = await Promise.all([
     read('app/(account)/profile/page.tsx'),
-    read('features/profile/server.ts'),
-    read('features/auth/profile-form.tsx'),
+    read('server/profile/dashboard.ts'),
+    read('components/profile/profile-form.tsx'),
   ]);
   assert.match(profile, /getTranslations\(\{ locale, namespace: 'Profile' \}\)/);
   assert.match(profile, /getPrivateRequestLocale\(\)/);
@@ -67,11 +67,11 @@ test('profile uses one dashboard contract and keeps attempt analytics hidden', a
 
 test('account deletion is explicit, irreversible, and completes inside the request', async () => {
   const [control, route, auth, cleanup, sweep, otpRequest, migration] = await Promise.all([
-    read('features/profile/account-deletion.tsx'),
+    read('components/profile/account-deletion.tsx'),
     read('app/api/profile/account/route.ts'),
-    read('features/auth/server.ts'),
+    read('server/auth/session.ts'),
     read('lib/supabase/session-cleanup.ts'),
-    read('features/auth/pending-self-deletion.ts'),
+    read('server/auth/pending-self-deletion.ts'),
     read('app/api/auth/email-otp/request/route.ts'),
     read('supabase/migrations/20260912100000_immediate_self_account_purge.sql'),
   ]);

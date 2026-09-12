@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { serializeTestEditorPayload, validateTestEditor } from '../../lib/admin-test-editor.ts';
+import { serializeTestEditorPayload, validateTestEditor } from '../../lib/admin/course-test-editor.ts';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
@@ -116,7 +116,7 @@ test('course editor exposes presentation, policy, three variants, stable ids and
     read('components/admin/test-editor.tsx'),
     read('components/admin/editor-action-bar.tsx'),
     read('components/admin/course-presentation-input.tsx'),
-    read('features/admin/server.ts'),
+    read('server/admin/management.ts'),
   ]);
   assert.match(component, /<CoursePresentationInput/);
   assert.match(component, /Вариант \{variant\.variantNumber\}/);

@@ -15,7 +15,7 @@ import {
   buildContentSecurityPolicy,
   reportingEndpointsHeader,
 } from './lib/security/content-security-policy';
-import { rolloutFeatureEnabled } from './lib/release/rollout-flags';
+import { rolloutFeatureEnabled } from './lib/rollout-flags';
 import { resolveLegalDocumentVersion, type LegalDocumentType } from './lib/legal';
 import { resolveSiteOrigin } from './lib/site-url';
 import { clearSafetyHubLocalSession } from './lib/supabase/session-cleanup';
@@ -24,7 +24,7 @@ import {
   authRealmForSessionUser,
   isDefinitiveAuthFailure,
   updateSession,
-} from './lib/supabase/middleware';
+} from './server/supabase/middleware';
 
 function hasSupabaseAuthCookie(request: NextRequest): boolean {
   return request.cookies.getAll().some((cookie) => isSupabaseAuthCookieName(cookie.name));

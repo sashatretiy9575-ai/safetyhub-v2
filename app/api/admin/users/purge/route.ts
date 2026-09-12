@@ -1,12 +1,12 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { purgeUserAccounts } from '@/features/admin/server';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requireCapability } from '@/features/auth/server';
+import { purgeUserAccounts } from '@/server/admin/management';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requireCapability } from '@/server/auth/session';
 import { purgeUsersSchema } from '@/lib/validation/admin';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 import { readJsonBody } from '@/lib/security/request-body';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 
 /**
  * Deletes a bounded batch of accounts in one call.

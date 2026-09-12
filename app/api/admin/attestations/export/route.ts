@@ -1,20 +1,20 @@
 import * as z from 'zod';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { getSiteUrl, requireCapability } from '@/features/auth/server';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { getSiteUrl, requireCapability } from '@/server/auth/session';
 import {
   certificateExportResultSchema,
   createCertificateExportMetadata,
-} from '@/features/admin/certificate-export-archive';
+} from '@/server/admin/certificate-export-archive';
 import {
   CERTIFICATE_EXPORT_METADATA_MAX_BYTES,
   createBoundedCertificateMetadataResponse,
-} from '@/features/certificates/metadata-response';
-import { createClient } from '@/lib/supabase/server';
-import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
+} from '@/server/certificates/metadata-response';
+import { createClient } from '@/server/supabase/server';
+import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 import { readJsonBody } from '@/lib/security/request-body';
-import { consumeCoarseQuota } from '@/lib/security/rate-limit';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { consumeCoarseQuota } from '@/server/security/rate-limit';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 import { NextResponse } from '@/lib/security/api-response';
 import { CERTIFICATE_EXPORT_SYNC_LIMIT } from '@/lib/constants';
 

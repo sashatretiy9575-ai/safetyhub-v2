@@ -26,7 +26,7 @@ Run it against the checked-in source. The emitted filename carries the SHA-256
 prefix of its own bytes; the version token in the URL
 (`/certificate-assets/font?locale=zh&v=...`) has to move with it, in
 app/certificate-assets/font/route.ts, lib/pdf/certificate-client-contract.ts,
-features/certificates/server.ts, features/admin/certificate-export-archive.ts
+server/certificates/issuance.ts, server/admin/certificate-export-archive.ts
 and the `outputFileTracingIncludes` entry in next.config.ts.
 """
 

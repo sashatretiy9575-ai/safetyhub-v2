@@ -1,11 +1,11 @@
 import { InitialArticleImportForm } from '@/components/admin/initial-article-import-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { requireCapability } from '@/features/auth/server';
+import { requireCapability } from '@/server/auth/session';
 import {
   INITIAL_ARTICLE_IMPORT_CONFIRMATION,
   INITIAL_ARTICLE_SNAPSHOT_COUNT,
   INITIAL_ARTICLE_SNAPSHOT_HASH,
-} from '@/lib/content/initial-article-import';
+} from '@/server/content/initial-article-import';
 
 export default async function InitialArticleImportPage() {
   await requireCapability('content.manage');

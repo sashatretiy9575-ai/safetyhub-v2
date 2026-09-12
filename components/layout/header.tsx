@@ -12,10 +12,10 @@ import { Logo } from '@/components/shared/logo';
 import { ContactLink } from '@/components/shared/contact-link';
 import { DeferredThemeToggle } from '@/components/layout/deferred-theme-toggle';
 import { ROUTES } from '@/lib/constants';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 import { localesForLanguageSwitcher, localizePathname } from '@/i18n/config';
 import type { AppLocale } from '@/i18n/config';
-import type { SiteContactSettings } from '@/lib/site-contacts-shared';
+import type { SiteContactSettings } from '@/lib/site-contacts';
 
 const contactActionClass =
   'group relative inline-flex size-11 shrink-0 items-center justify-center transition-[color,background-color] duration-150';

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
-import { EmailOtpFlow } from '@/features/auth/email-otp-flow';
-import { ZhUsernamePasswordFlow } from '@/features/auth/zh-username-password-flow';
+import { EmailOtpFlow } from '@/components/auth/email-otp-flow';
+import { ZhUsernamePasswordFlow } from '@/components/auth/zh-username-password-flow';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 import type { AppLocale } from '@/i18n/config';
 

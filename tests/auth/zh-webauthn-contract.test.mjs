@@ -6,7 +6,7 @@ const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8
 
 test('retired Chinese WebAuthn and recovery endpoints are server-side 410 tombstones', async () => {
   const [helper, ...routes] = await Promise.all([
-    read('features/auth/zh-passkey-retired.ts'),
+    read('server/auth/zh-passkey-retired.ts'),
     read('app/api/auth/zh/registration/options/route.ts'),
     read('app/api/auth/zh/registration/verify/route.ts'),
     read('app/api/auth/zh/authentication/options/route.ts'),
@@ -32,7 +32,7 @@ test('Chinese username/password routes are same-origin, bounded, rate-limited, a
     read('app/api/auth/zh/register/route.ts'),
     read('app/api/admin/users/[userId]/zh-password/reset/route.ts'),
     read('app/api/admin/users/[userId]/zh-password/provision/route.ts'),
-    read('features/auth/zh-username-password-server.ts'),
+    read('server/auth/zh-username-password.ts'),
   ]);
 
   for (const route of [login, register]) {
@@ -74,10 +74,10 @@ test('Chinese username/password routes are same-origin, bounded, rate-limited, a
 
 test('Chinese canonical access uses only Latin username and password without client secret persistence', async () => {
   const [flow, loginPage, registerPage, recoveryPage, chinese] = await Promise.all([
-    read('features/auth/zh-username-password-flow.tsx'),
+    read('components/auth/zh-username-password-flow.tsx'),
     read('app/(account)/auth/login/page.tsx'),
     read('app/(account)/auth/register/page.tsx'),
-    read('features/auth/zh-username-password-recovery-notice.tsx'),
+    read('components/auth/zh-username-password-recovery-notice.tsx'),
     read('messages/zh.json').then(JSON.parse),
   ]);
 
@@ -108,8 +108,8 @@ test('Chinese canonical access uses only Latin username and password without cli
 test('server-only mapping redacts the synthetic identifier and never persists passwords', async () => {
   const [migration, server, validation] = await Promise.all([
     read('supabase/migrations/20260902130000_zh_username_password_auth.sql'),
-    read('features/auth/zh-username-password-server.ts'),
-    read('features/auth/zh-username-password-validation.ts'),
+    read('server/auth/zh-username-password.ts'),
+    read('lib/auth/zh-username-password-validation.ts'),
   ]);
 
   assert.match(migration, /create table private\.zh_username_accounts/u);
@@ -139,11 +139,11 @@ test('server-only mapping redacts the synthetic identifier and never persists pa
 test('Chinese registration verifies its separate Turnstile token before allocation and mints a fresh token for auto-login', async () => {
   const [server, verifier, validation, flow, turnstile, loginPage, environment] = await Promise.all(
     [
-      read('features/auth/zh-username-password-server.ts'),
-      read('features/auth/turnstile-server.ts'),
-      read('features/auth/zh-username-password-validation.ts'),
-      read('features/auth/zh-username-password-flow.tsx'),
-      read('features/auth/turnstile.tsx'),
+      read('server/auth/zh-username-password.ts'),
+      read('server/auth/turnstile.ts'),
+      read('lib/auth/zh-username-password-validation.ts'),
+      read('components/auth/zh-username-password-flow.tsx'),
+      read('components/auth/turnstile.tsx'),
       read('app/(account)/auth/login/page.tsx'),
       read('.env.example'),
     ],
@@ -232,12 +232,12 @@ test('Chinese learners follow the same profile, review and photo admission as ev
     read('supabase/migrations/20260903120000_zh_full_profile_admission.sql'),
     read('supabase/tests/zh_minimal_pending_approval.sql'),
     read('supabase/tests/zh_full_profile_admission.sql'),
-    read('features/auth/zh-username-password-server.ts'),
+    read('server/auth/zh-username-password.ts'),
     read('app/(account)/onboarding/page.tsx'),
     read('app/(account)/auth/legal/page.tsx'),
     read('app/(account)/profile/page.tsx'),
     read('components/admin/account-approval-queue.tsx'),
-    read('features/admin/data.ts'),
+    read('server/admin/data.ts'),
     read('lib/supabase/types.ts'),
   ]);
 

@@ -1,12 +1,12 @@
 import { NextResponse } from '@/lib/security/api-response';
 import { saveTestSchema } from '@/lib/validation/admin';
-import { saveTest } from '@/features/admin/server';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
+import { saveTest } from '@/server/admin/management';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
-import { requireCapability } from '@/features/auth/server';
+import { requireCapability } from '@/server/auth/session';
 
 export async function POST(request: Request) {
   try {

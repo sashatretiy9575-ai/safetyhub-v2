@@ -15,7 +15,7 @@ import {
 import type {
   AdminNotificationEvent,
   AdminNotificationPage,
-} from '@/features/admin/notification-contract';
+} from '@/lib/admin/notification-contract';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';

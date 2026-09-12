@@ -8,7 +8,7 @@ test('ZH password sessions are exact, rollout-gated, and never widen email OTP a
   const [migration, sqlContract, server] = await Promise.all([
     read('supabase/migrations/20260902130000_zh_username_password_auth.sql'),
     read('supabase/tests/zh_session_provider_method.sql'),
-    read('features/auth/zh-username-password-server.ts'),
+    read('server/auth/zh-username-password.ts'),
   ]);
 
   assert.match(migration, /private\.runtime_feature_enabled\('zh_username_password'\)/u);

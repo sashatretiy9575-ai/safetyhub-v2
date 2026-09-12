@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { APP_LOCALES, htmlLanguage, isAppLocale, localizePathname } from '@/i18n/config';
 import { loadMessages } from '@/i18n/messages';
 import { DEFAULT_LOCALE } from '@/i18n/config';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 
 export const dynamicParams = false;
 

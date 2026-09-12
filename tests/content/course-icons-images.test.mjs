@@ -7,12 +7,12 @@ import {
   isCourseIconId,
   resolveCourseIcon,
   searchCourseIcons,
-} from '../../lib/course-icons.ts';
+} from '../../lib/content/course-icons.ts';
 import {
   CONTENT_IMAGE_INPUT_TYPES,
   contentImageOutputName,
   scaledImageDimensions,
-} from '../../lib/content-image.ts';
+} from '../../lib/content/image.ts';
 
 test('course icon registry is broad, categorized, searchable and legacy-compatible', () => {
   assert.ok(COURSE_ICONS.length >= 60);

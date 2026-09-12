@@ -1,13 +1,13 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { requireCapability } from '@/features/auth/server';
+import { requireCapability } from '@/server/auth/session';
 import {
   ADMIN_PAGE_SIZE,
   getAdminAuditPage,
   parseAdminAuditQuery,
   type RawAdminSearchParams,
-} from '@/features/admin/data';
+} from '@/server/admin/data';
 import {
   ADMIN_TRAIL_PARAM,
   appendAdminTrail,

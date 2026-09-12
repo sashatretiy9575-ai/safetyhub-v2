@@ -6,7 +6,7 @@ import { ImageSquare, Trash, UploadSimple, X } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
-import { formatContentImagePreparation, prepareContentImage } from '@/lib/content-image';
+import { formatContentImagePreparation, prepareContentImage } from '@/lib/content/image';
 
 type Asset = {
   id: string;

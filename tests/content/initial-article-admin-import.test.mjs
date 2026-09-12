@@ -56,7 +56,7 @@ test('approved initial article snapshot is exact, unique and editor-valid', asyn
 
 test('initial article import is project-bound, confirmation-bound and uses the admin application', async () => {
   const [helper, route, page, form] = await Promise.all([
-    read('lib/content/initial-article-import.ts'),
+    read('server/content/initial-article-import.ts'),
     read('app/api/admin/articles/initial-import/route.ts'),
     read('app/(admin)/admin/articles/initial-import/page.tsx'),
     read('components/admin/initial-article-import-form.tsx'),

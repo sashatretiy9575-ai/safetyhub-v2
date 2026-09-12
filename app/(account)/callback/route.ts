@@ -1,4 +1,4 @@
-import { redirectFromRetiredPasswordLink } from '@/features/auth/password-auth-retired';
+import { redirectFromRetiredPasswordLink } from '@/server/auth/password-auth-retired';
 
 /**
  * Legacy email-confirmation, recovery, and invite links are intentionally

@@ -2,10 +2,10 @@ export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
 import { Container } from '@/components/ui/container';
-import { LegalAcceptanceGate } from '@/features/auth/legal-acceptance-gate';
-import { AuthenticationError, requireUser } from '@/features/auth/server';
+import { LegalAcceptanceGate } from '@/components/auth/legal-acceptance-gate';
+import { AuthenticationError, requireUser } from '@/server/auth/session';
 import { localizePathname, type AppLocale } from '@/i18n/config';
-import { getCurrentLegalPolicies } from '@/lib/legal-current';
+import { getCurrentLegalPolicies } from '@/server/legal';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 
 function authenticatedLanding(context: Awaited<ReturnType<typeof requireUser>>) {

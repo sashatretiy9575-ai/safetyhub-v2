@@ -124,7 +124,7 @@ test('role assignment is one bounded contract and the capability matrix stays ab
   );
   const [roles, auth, operators, roleMigration] = await Promise.all([
     read('supabase/migrations/20260818000000_two_product_roles.sql'),
-    read('features/auth/server.ts'),
+    read('server/auth/session.ts'),
     read('app/api/admin/operators/route.ts'),
     read('supabase/migrations/20260905110000_product_role_assignment_by_email.sql'),
   ]);

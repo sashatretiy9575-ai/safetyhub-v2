@@ -13,7 +13,7 @@ test('manual account approval uses a narrow, idempotent, capability-gated queue'
       read('supabase/tests/account_approval_queue.sql'),
       read('supabase/tests/account_approval_queue_regressions.sql'),
       read('app/api/admin/account-approvals/[userId]/route.ts'),
-      read('features/admin/data.ts'),
+      read('server/admin/data.ts'),
       read('app/(admin)/admin/approvals/page.tsx'),
       read('components/admin/account-approval-queue.tsx'),
     ]);
@@ -91,7 +91,7 @@ test('learner-facing course and profile UI block material until approval', async
   const [topicPage, actions, status] = await Promise.all([
     read('app/(public)/topics/[slug]/page.tsx'),
     read('components/topics/course-material-actions.tsx'),
-    read('features/profile/account-approval-status.tsx'),
+    read('components/profile/account-approval-status.tsx'),
   ]);
 
   // Public course pages deliberately render a generic blocked CTA instead of
@@ -119,7 +119,7 @@ test('minimal ZH applications expose a username only in the existing approval qu
     read('supabase/migrations/20260902150000_zh_minimal_pending_approval.sql'),
     read('supabase/tests/zh_minimal_pending_approval.sql'),
     read('components/admin/account-approval-queue.tsx'),
-    read('features/admin/data.ts'),
+    read('server/admin/data.ts'),
   ]);
 
   assert.match(

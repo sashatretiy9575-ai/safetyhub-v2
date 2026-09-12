@@ -8,7 +8,7 @@ import {
   contactWhatsappHref,
   formatPhoneDisplay,
   normalizePhoneE164,
-} from '../../lib/site-contacts-shared.ts';
+} from '../../lib/site-contacts.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (relativePath) => readFile(path.join(root, relativePath), 'utf8');
@@ -32,7 +32,7 @@ test('contact normalization accepts local formatting and produces canonical link
 
 test('public contacts are server cached and rendered into all locale SEO shells', async () => {
   const [contacts, layout, localizedLayout, seo, shell, adminRoute] = await Promise.all([
-    read('lib/site-contacts.ts'),
+    read('server/site-contacts.ts'),
     read('app/(public)/layout.tsx'),
     read('app/[locale]/(public)/layout.tsx'),
     read('lib/seo.ts'),
@@ -64,7 +64,7 @@ test('application contact surfaces use ContactLink instead of duplicated literal
     'components/shared/contact-actions.tsx',
     'components/legal/legal-contacts.tsx',
     'components/marketing/faq-accordion.tsx',
-    'features/profile/account-approval-status.tsx',
+    'components/profile/account-approval-status.tsx',
   ];
   for (const relative of checked) {
     const source = await read(relative);
@@ -73,7 +73,7 @@ test('application contact surfaces use ContactLink instead of duplicated literal
     assert.doesNotMatch(source, /\+7\s*701\s*729\s*0349/);
   }
 
-  const approvalStatus = await read('features/profile/account-approval-status.tsx');
+  const approvalStatus = await read('components/profile/account-approval-status.tsx');
   assert.match(approvalStatus, /<ContactLink\s+kind="phone"\s+contacts=\{contacts\}/);
   assert.match(approvalStatus, /<ContactLink\s+kind="whatsapp"\s+contacts=\{contacts\}/);
 });

@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
-import type { Course } from '@/lib/content/topics';
+import type { Course } from '@/server/content/topics';
 import { ROUTES } from '@/lib/constants';
 import { useLocale, useTranslations } from 'next-intl';
 import { localizePathname } from '@/i18n/config';

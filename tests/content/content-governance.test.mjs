@@ -83,7 +83,7 @@ test('public course page offers presentation download before the test and preser
   const [topicPage, actions, topicSource, nextConfig] = await Promise.all([
     read('app/(public)/topics/[slug]/page.tsx'),
     read('components/topics/course-material-actions.tsx'),
-    read('lib/content/topics.ts'),
+    read('server/content/topics.ts'),
     read('next.config.ts'),
   ]);
   assert.ok(topicPage.indexOf('<CourseMaterialActions') < topicPage.indexOf('<TopicSourcesCard'));
@@ -125,7 +125,7 @@ test('admin course surface uses v3 publication without loading saved answer keys
   const [adminPage, editor, server, editPage, route] = await Promise.all([
     read('app/(admin)/admin/courses/page.tsx'),
     read('components/admin/test-editor.tsx'),
-    read('features/admin/server.ts'),
+    read('server/admin/management.ts'),
     read('app/(admin)/admin/courses/[id]/page.tsx'),
     read('app/api/admin/courses/route.ts'),
   ]);
@@ -148,8 +148,8 @@ test('admin course surface uses v3 publication without loading saved answer keys
 
 test('learner payload parsing rejects hidden variant identifiers and all answer-key fields', async () => {
   const [learning, types] = await Promise.all([
-    read('features/learning/server.ts'),
-    read('features/learning/types.ts'),
+    read('server/learning/attempts.ts'),
+    read('lib/learning/types.ts'),
   ]);
   assert.match(learning, /\.strict\(\)/);
   assert.doesNotMatch(types, /variantId|variantNumber/);

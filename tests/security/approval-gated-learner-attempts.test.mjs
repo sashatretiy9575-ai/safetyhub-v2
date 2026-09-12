@@ -4,7 +4,7 @@ import test from 'node:test';
 import {
   AttemptPolicyError,
   parseAttemptRpcError,
-} from '../../features/learning/policy-error.ts';
+} from '../../server/learning/policy-error.ts';
 
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 
@@ -48,7 +48,7 @@ test('every learner attempt RPC enforces approval before its domain work', async
 test('the shared learner gate enforces active, approval, then current legal acceptance', async () => {
   const [migration, policyError] = await Promise.all([
     read('supabase/migrations/20260901108000_security_boundary_hardening.sql'),
-    read('features/learning/policy-error.ts'),
+    read('server/learning/policy-error.ts'),
   ]);
   const gate = migration.match(
     /create or replace function private\.require_approved_learner\(\)[\s\S]*?\n\$\$;/u,

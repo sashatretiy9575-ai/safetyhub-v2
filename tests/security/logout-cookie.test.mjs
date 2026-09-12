@@ -20,7 +20,7 @@ test('local logout is idempotent while global revocation reports Auth failure', 
     read('components/shared/sign-out-action.tsx'),
     read('lib/supabase/session-cleanup.ts'),
     read('app/(account)/auth/login/page.tsx'),
-    read('lib/supabase/session-hint.ts'),
+    read('server/supabase/session-hint.ts'),
   ]);
 
   assert.match(route, /try \{[\s\S]*client\.auth\.signOut\(\{ scope \}\)/u);

@@ -9,7 +9,7 @@ const exists = (file) => existsSync(new URL(file, root));
 
 test('learner courses use only canonical presentation-backed content', async () => {
   const [topics, topicPage] = await Promise.all([
-    read('lib/content/topics.ts'),
+    read('server/content/topics.ts'),
     read('app/(public)/topics/[slug]/page.tsx'),
   ]);
 

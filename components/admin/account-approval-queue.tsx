@@ -13,9 +13,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { requestAdminNotificationRefresh } from '@/components/admin/admin-notification-inbox';
-import type { AdminAccountApprovalItem } from '@/features/admin/types';
+import type { AdminAccountApprovalItem } from '@/lib/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
-import { formatPhoneDisplay, phoneHref, whatsappChatHref } from '@/lib/site-contacts-shared';
+import { formatPhoneDisplay, phoneHref, whatsappChatHref } from '@/lib/site-contacts';
 
 type Decision = 'approved' | 'rejected';
 

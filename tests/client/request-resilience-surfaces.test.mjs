@@ -18,7 +18,7 @@ test('client mutations use bounded requests and release every busy scope in fina
       releases: ['setBusy(false)'],
     },
     { file: 'components/admin/test-editor.tsx', releases: ['setBusy(false)'] },
-    { file: 'features/auth/profile-form.tsx', releases: ['setBusy(false)'] },
+    { file: 'components/profile/profile-form.tsx', releases: ['setBusy(false)'] },
     // Both of these used raw `fetch` while this very gate claimed the project
     // had no unbounded client mutations left.
     { file: 'components/admin/site-contacts-form.tsx', releases: [] },
@@ -45,7 +45,7 @@ test('client mutations use bounded requests and release every busy scope in fina
 
 test('application ships no browser Supabase client or direct browser SDK imports', async () => {
   await assert.rejects(access(path.join(repositoryRoot, 'lib/supabase/client.ts')));
-  const roots = ['app', 'components', 'features', 'lib'];
+  const roots = ['app', 'components', 'lib', 'server'];
   const files = [];
   async function walk(directory) {
     for (const entry of await readdir(path.join(repositoryRoot, directory), {

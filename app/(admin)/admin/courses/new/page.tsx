@@ -1,4 +1,4 @@
-import { requireCapability } from '@/features/auth/server';
+import { requireCapability } from '@/server/auth/session';
 import { TestEditor } from '@/components/admin/test-editor';
 
 export default async function NewCoursePage() {

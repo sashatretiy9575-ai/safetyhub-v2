@@ -9,7 +9,7 @@ test('homepage topics and resources use the shared published content APIs', asyn
     read('components/marketing/course-grid.tsx'),
     read('app/(public)/topics/page.tsx'),
     read('components/marketing/resources.tsx'),
-    read('lib/course-cover-images.ts'),
+    read('lib/content/course-cover-images.ts'),
   ]);
 
   assert.match(courses, /await getTopics\(locale\)/);

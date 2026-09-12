@@ -1,14 +1,14 @@
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requireCapability } from '@/features/auth/server';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requireCapability } from '@/server/auth/session';
 import {
   importApprovedInitialArticles,
   InitialArticleImportError,
-} from '@/lib/content/initial-article-import';
+} from '@/server/content/initial-article-import';
 import { NextResponse } from '@/lib/security/api-response';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 import * as z from 'zod';
 
 export const runtime = 'nodejs';

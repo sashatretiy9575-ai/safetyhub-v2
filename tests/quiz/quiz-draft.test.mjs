@@ -5,7 +5,7 @@ import {
   quizDraftStorageKey,
   restoreQuizDraft,
   writeQuizDraft,
-} from '../../lib/quiz-draft.ts';
+} from '../../lib/learning/quiz-draft.ts';
 
 const questions = [
   {

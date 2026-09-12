@@ -1,8 +1,8 @@
 import { NextResponse } from '@/lib/security/api-response';
 import * as z from 'zod';
-import { apiError } from '@/features/auth/api-error';
-import { requireCapability } from '@/features/auth/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { apiError } from '@/server/auth/api-error';
+import { requireCapability } from '@/server/auth/session';
+import { createAdminClient } from '@/server/supabase/admin';
 
 const paramsSchema = z.object({ userId: z.string().uuid() });
 

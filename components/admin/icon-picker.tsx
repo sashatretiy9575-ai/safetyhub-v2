@@ -9,7 +9,7 @@ import {
   searchCourseIcons,
   type CourseIconCategory,
   type IconId,
-} from '@/lib/course-icons';
+} from '@/lib/content/course-icons';
 import { cn } from '@/lib/utils';
 
 export function IconPicker({

@@ -4,8 +4,8 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const route = await readFile('app/api/auth/send-email/route.ts', 'utf8');
-const hook = await readFile('features/auth/send-email-hook.ts', 'utf8');
-const smtp = await readFile('lib/email/smtp.ts', 'utf8');
+const hook = await readFile('server/auth/send-email-hook.ts', 'utf8');
+const smtp = await readFile('server/email/smtp.ts', 'utf8');
 const config = await readFile('supabase/config.toml', 'utf8');
 const exampleEnvironment = await readFile('.env.example', 'utf8');
 

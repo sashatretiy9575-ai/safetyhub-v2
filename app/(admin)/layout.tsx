@@ -5,7 +5,7 @@ import { RootDocument } from '@/components/layout/root-document';
 import { PWAProvider } from '@/components/shared/pwa-provider';
 import { pickClientNamespaces } from '@/i18n/client-namespaces';
 import { DEFAULT_LOCALE } from '@/i18n/config';
-import { APP_VIEWPORT, pwaIdentity } from '@/lib/pwa-identity';
+import { APP_VIEWPORT, pwaIdentity } from '@/lib/pwa/identity';
 import '../globals.css';
 
 // Without this the safe-area insets are zero on these screens, and the

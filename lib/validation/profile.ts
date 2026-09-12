@@ -4,10 +4,10 @@ import {
   normalizeProfileText,
   PROFILE_FIELD_LIMITS,
   type ProfileValues,
-} from '@/features/profile/fields';
+} from '@/lib/profile/fields';
 
-export { normalizeProfileText } from '@/features/profile/fields';
-export type { ProfileValues } from '@/features/profile/fields';
+export { normalizeProfileText } from '@/lib/profile/fields';
+export type { ProfileValues } from '@/lib/profile/fields';
 
 const CONTROL_CHARACTERS = /[\p{Cc}\p{Cf}\p{Cs}]/u;
 

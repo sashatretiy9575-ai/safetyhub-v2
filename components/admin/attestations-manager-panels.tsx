@@ -10,16 +10,16 @@ import { FloppyDisk } from '@phosphor-icons/react/dist/csr/FloppyDisk';
 import { Trash } from '@phosphor-icons/react/dist/csr/Trash';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/csr/WhatsappLogo';
 import { X } from '@phosphor-icons/react/dist/csr/X';
-import type { AdminAttestationRow } from '@/features/admin/types';
+import type { AdminAttestationRow } from '@/lib/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { formatDateTime } from '@/lib/utils';
-import { formatPhoneDisplay, phoneHref, whatsappChatHref } from '@/lib/site-contacts-shared';
+import { formatPhoneDisplay, phoneHref, whatsappChatHref } from '@/lib/site-contacts';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CertificateDownloadButton } from '@/features/certificates/download-button';
+import { CertificateDownloadButton } from '@/components/certificates/download-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -94,7 +94,7 @@ export const attestationFieldLabels = {
 
 /**
  * Mirrors the profile column widths. It is duplicated here rather than imported
- * from `features/profile/fields`, because that module pulls in the phone
+ * from `lib/profile/fields`, because that module pulls in the phone
  * library and this panel is measured against a bundle budget.
  */
 export const attestationFieldMaxLengths = {

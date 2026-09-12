@@ -53,7 +53,7 @@ test('a partial deletion reports what it did', async () => {
   assert.match(manager, /Обработано пачек: \$\{index\} из \$\{chunks\.length\}/u);
   assert.match(manager, /if \(items\.length > 0\) \{/u);
 
-  const apiError = await read('features/auth/api-error.ts');
+  const apiError = await read('server/auth/api-error.ts');
   // These codes are what the panel explains in its own words; the catch-all
   // below used to flatten them into PROTECTED_OPERATION.
   for (const code of ['IDEMPOTENCY_KEY_REUSED', 'LAST_ACTIVE_ADMIN_PROTECTED', 'CANNOT_DELETE_SELF']) {

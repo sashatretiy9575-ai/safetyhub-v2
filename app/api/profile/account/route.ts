@@ -1,11 +1,11 @@
 import { NextResponse } from '@/lib/security/api-response';
 import type { NextRequest } from 'next/server';
-import { apiError } from '@/features/auth/api-error';
-import { isSameOriginRequest } from '@/features/auth/request-origin';
-import { requireAccountDeletionUser } from '@/features/auth/server';
-import { invalidateCertificateVerificationCache } from '@/features/certificates/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { removeAvatarPrefix } from '@/lib/supabase/avatar-prefix-cleanup';
+import { apiError } from '@/server/auth/api-error';
+import { isSameOriginRequest } from '@/server/http/request-origin';
+import { requireAccountDeletionUser } from '@/server/auth/session';
+import { invalidateCertificateVerificationCache } from '@/server/certificates/issuance';
+import { createAdminClient } from '@/server/supabase/admin';
+import { removeAvatarPrefix } from '@/server/supabase/avatar-prefix-cleanup';
 import { clearSafetyHubLocalSession } from '@/lib/supabase/session-cleanup';
 import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
 import { readJsonBody } from '@/lib/security/request-body';

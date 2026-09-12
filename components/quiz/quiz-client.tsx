@@ -15,12 +15,12 @@ import {
 } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { QUIZ_POLICY } from '@/lib/constants';
-import type { AttemptPayload } from '@/features/learning/types';
+import type { AttemptPayload } from '@/lib/learning/types';
 import {
   deadlineAnchorFromServer,
   formatDeadlineSeconds,
   remainingDeadlineSeconds,
-} from '@/lib/attempt-deadline';
+} from '@/lib/learning/attempt-deadline';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import {
   clearQuizDraft,
@@ -28,11 +28,11 @@ import {
   restoreQuizDraft,
   writeQuizDraft,
   type QuizAnswer,
-} from '@/lib/quiz-draft';
+} from '@/lib/learning/quiz-draft';
 import { Container } from '@/components/ui/container';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CertificateDownloadButton } from '@/features/certificates/download-button';
+import { CertificateDownloadButton } from '@/components/certificates/download-button';
 import { Progress } from '@/components/ui/progress';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
 import {

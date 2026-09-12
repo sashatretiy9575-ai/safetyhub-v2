@@ -3,7 +3,7 @@ import {
   contactPhoneHref,
   contactWhatsappHref,
   type SiteContactSettings,
-} from '@/lib/site-contacts-shared';
+} from '@/lib/site-contacts';
 
 type ContactLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
   kind: 'phone' | 'whatsapp';

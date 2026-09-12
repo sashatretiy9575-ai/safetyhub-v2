@@ -8,8 +8,8 @@ import {
   PencilSimple,
   Plus,
 } from '@phosphor-icons/react/dist/ssr';
-import { requireCapability } from '@/features/auth/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireCapability } from '@/server/auth/session';
+import { createAdminClient } from '@/server/supabase/admin';
 import type { ArticleLifecycleStatus } from '@/lib/validation/article';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

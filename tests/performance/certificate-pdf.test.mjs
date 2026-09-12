@@ -56,8 +56,8 @@ const validCertificate = {
 test('authorized certificate metadata is bounded and precedes browser-only rendering', async () => {
   const [route, helper, server] = await Promise.all([
     read('app/api/certificates/[certificateId]/metadata/route.ts'),
-    read('features/certificates/metadata-response.ts'),
-    read('features/certificates/server.ts'),
+    read('server/certificates/metadata-response.ts'),
+    read('server/certificates/issuance.ts'),
   ]);
   const auth = route.indexOf('const auth = await requireUser()');
   const certificate = route.indexOf('getCertificateDownloadPayload(certificateId)');

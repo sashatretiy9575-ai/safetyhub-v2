@@ -1,8 +1,8 @@
 import * as z from 'zod';
-import { apiError } from '@/features/auth/api-error';
-import { requireCapability, requireUser } from '@/features/auth/server';
-import { getCertificateDownloadPayload } from '@/features/certificates/server';
-import { consumeBusinessQuota } from '@/lib/security/rate-limit';
+import { apiError } from '@/server/auth/api-error';
+import { requireCapability, requireUser } from '@/server/auth/session';
+import { getCertificateDownloadPayload } from '@/server/certificates/issuance';
+import { consumeBusinessQuota } from '@/server/security/rate-limit';
 import { NextResponse } from '@/lib/security/api-response';
 
 export const runtime = 'nodejs';

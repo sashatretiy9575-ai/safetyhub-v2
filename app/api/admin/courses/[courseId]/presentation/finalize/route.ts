@@ -4,15 +4,15 @@ import sharp from 'sharp';
 import { PDFDocument } from 'pdf-lib';
 import * as z from 'zod';
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requireCapability } from '@/features/auth/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requireCapability } from '@/server/auth/session';
+import { createAdminClient } from '@/server/supabase/admin';
 import { readJsonBody } from '@/lib/security/request-body';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
-import { renderPdfBoundaryPages } from '@/lib/pdf/server-render-validation';
-import { getRpcMutationError, unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
+import { renderPdfBoundaryPages } from '@/server/pdf/render-validation';
+import { getRpcMutationError, unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 
 const STAGING_BUCKET = 'course-presentations-staging';
 // Kept in step with the ceiling in app/course-presentations/[slug]/[asset].

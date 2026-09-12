@@ -8,7 +8,7 @@ import {
   ADMIN_LOCALE_LABELS,
   ADMIN_LOCALIZATION_STATUS_LABELS,
   type AdminLocalizationStatus,
-} from '@/features/admin/localization-contract';
+} from '@/lib/admin/localization-contract';
 
 export function AdminLocaleTabs({
   activeLocale,

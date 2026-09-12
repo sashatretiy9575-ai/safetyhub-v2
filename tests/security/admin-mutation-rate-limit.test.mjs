@@ -53,7 +53,7 @@ test('every live privileged mutation applies same-origin and shared actor/IP quo
 test('shared admin mutation limiter consumes the app-layer coarse-IP budget', async () => {
   const [rateLimit, baseline, securityHardening, emailOtpLimits, immediatePurge] =
     await Promise.all([
-      read('lib/security/rate-limit.ts'),
+      read('server/security/rate-limit.ts'),
       read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
       read('supabase/migrations/20260813020000_security_hardening.sql'),
       read('supabase/migrations/20260831100000_email_otp_rate_limits.sql'),

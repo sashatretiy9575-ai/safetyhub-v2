@@ -1,13 +1,13 @@
 import * as z from 'zod';
 import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
-import { TEST_EDITOR_LIMITS, TEST_EDITOR_SLUG_PATTERN } from '@/lib/admin-test-editor';
+import { TEST_EDITOR_LIMITS, TEST_EDITOR_SLUG_PATTERN } from '@/lib/admin/course-test-editor';
 import {
   contentMetadataDraftSchema,
   publishableContentMetadataSchema,
 } from '@/lib/content/content-metadata';
 import { courseSeoSchema } from '@/lib/validation/course';
-import { isCourseIconId, type IconId } from '@/lib/course-icons';
-import { normalizePhoneE164 } from '@/lib/site-contacts-shared';
+import { isCourseIconId, type IconId } from '@/lib/content/course-icons';
+import { normalizePhoneE164 } from '@/lib/site-contacts';
 
 export const entityIdSchema = z.string().uuid();
 export const adminActionReasonSchema = z.string().trim().min(10).max(500);

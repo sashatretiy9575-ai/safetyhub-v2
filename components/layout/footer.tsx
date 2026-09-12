@@ -6,7 +6,7 @@ import { ContactLink } from '@/components/shared/contact-link';
 import { Container } from '@/components/ui/container';
 import { ROUTES } from '@/lib/constants';
 import { localizePathname, type AppLocale } from '@/i18n/config';
-import type { SiteContactSettings } from '@/lib/site-contacts-shared';
+import type { SiteContactSettings } from '@/lib/site-contacts';
 
 const NAV_LINKS = [
   { href: ROUTES.topics, messageKey: 'nav.topics' },

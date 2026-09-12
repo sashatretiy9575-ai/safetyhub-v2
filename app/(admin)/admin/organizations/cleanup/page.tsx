@@ -5,7 +5,7 @@ import { ArrowLeft } from '@phosphor-icons/react/dist/ssr';
 import { OrganizationCleanupManager } from '@/components/admin/organization-cleanup-manager';
 import { AdminLoadFailure } from '@/components/admin/admin-data-state';
 import { Button } from '@/components/ui/button';
-import { getOrganizationCleanupClusters } from '@/features/admin/organizations';
+import { getOrganizationCleanupClusters } from '@/server/admin/organizations';
 
 export default async function OrganizationCleanupPage() {
   const result = await getOrganizationCleanupClusters();

@@ -1,19 +1,19 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { isSameOriginRequest } from '@/features/auth/request-origin';
-import { createEphemeralAuthClient } from '@/lib/supabase/ephemeral-auth';
+import { apiError } from '@/server/auth/api-error';
+import { isSameOriginRequest } from '@/server/http/request-origin';
+import { createEphemeralAuthClient } from '@/server/supabase/ephemeral-auth';
 import { emailOtpStartSchema } from '@/lib/validation/auth';
 import { readJsonBody } from '@/lib/security/request-body';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeCoarseQuota } from '@/lib/security/rate-limit';
-import { authProviderRetryAfter } from '@/features/auth/otp-rate-limit';
-import { emailOtpRedirectUrl } from '@/features/auth/email-otp-locale';
-import { finishPendingSelfDeletion } from '@/features/auth/pending-self-deletion';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeCoarseQuota } from '@/server/security/rate-limit';
+import { authProviderRetryAfter } from '@/lib/auth/otp-rate-limit';
+import { emailOtpRedirectUrl } from '@/lib/auth/email-otp-locale';
+import { finishPendingSelfDeletion } from '@/server/auth/pending-self-deletion';
 import { resolveSiteOrigin } from '@/lib/site-url';
 import {
   issueEmailOtpChallenge,
   setEmailOtpChallengeCookie,
-} from '@/lib/security/email-otp-challenge';
+} from '@/server/security/email-otp-challenge';
 
 type AuthProviderError = { code?: string; status?: number } | null;
 

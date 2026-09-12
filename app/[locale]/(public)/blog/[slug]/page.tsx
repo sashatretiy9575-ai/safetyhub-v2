@@ -2,7 +2,7 @@ import BasePage, {
   generateMetadata as baseGenerateMetadata,
 } from '@/app/(public)/blog/[slug]/page';
 import { isAppLocale } from '@/i18n/config';
-import { getArticleSlugs } from '@/lib/content/articles';
+import { getArticleSlugs } from '@/server/content/articles';
 import { setPhysicalLocale } from '../../../locale-context';
 
 type Props = { params: Promise<{ locale: string; slug: string }> };

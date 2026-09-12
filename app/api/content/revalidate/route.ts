@@ -8,7 +8,7 @@ import {
   localizedContentPaths,
 } from '@/lib/content/cache-policy';
 import { readJsonBody } from '@/lib/security/request-body';
-import { matchesBearerSecret } from '@/lib/security/bearer-secret';
+import { matchesBearerSecret } from '@/server/security/bearer-secret';
 
 export const runtime = 'nodejs';
 

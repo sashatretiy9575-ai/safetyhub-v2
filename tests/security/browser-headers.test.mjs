@@ -12,7 +12,7 @@ import { THEME_BOOTSTRAP, THEME_BOOTSTRAP_CSP_HASH } from '../../lib/theme.ts';
 import {
   PWA_INSTALL_BOOTSTRAP,
   PWA_INSTALL_BOOTSTRAP_CSP_HASH,
-} from '../../lib/pwa-install-bootstrap.ts';
+} from '../../lib/pwa/install-bootstrap.ts';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
@@ -160,7 +160,7 @@ test('all responses receive baseline browser hardening headers', async () => {
   assert.match(config, /source: '\/sw\.js'[\s\S]*Service-Worker-Allowed/u);
   assert.doesNotMatch(config, /remotePatterns/u);
 
-  const turnstile = await read('features/auth/turnstile.tsx');
+  const turnstile = await read('components/auth/turnstile.tsx');
   assert.match(turnstile, /nonce=\{nonce\}/u);
   assert.match(turnstile, /useCspNonce\(\)/u);
 });

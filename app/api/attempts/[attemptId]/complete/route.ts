@@ -1,10 +1,10 @@
 import { NextResponse } from '@/lib/security/api-response';
 import { completeAttemptSchema } from '@/lib/validation/attempt';
-import { completeAttempt } from '@/features/learning/server';
-import { apiError } from '@/features/auth/api-error';
-import { requireUser } from '@/features/auth/server';
-import { AttemptExpiredError, AttemptPolicyError } from '@/features/learning/policy-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
+import { completeAttempt } from '@/server/learning/attempts';
+import { apiError } from '@/server/auth/api-error';
+import { requireUser } from '@/server/auth/session';
+import { AttemptExpiredError, AttemptPolicyError } from '@/server/learning/policy-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
 import { readJsonBody } from '@/lib/security/request-body';
 
 export async function POST(request: Request, context: { params: Promise<{ attemptId: string }> }) {

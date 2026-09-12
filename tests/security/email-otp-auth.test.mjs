@@ -80,7 +80,7 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
     confirmationTemplate,
   ] = await Promise.all([
     read('app/api/auth/email-otp/request/route.ts'),
-    read('lib/security/email-otp-challenge.ts'),
+    read('server/security/email-otp-challenge.ts'),
     read('supabase/migrations/20260901108000_security_boundary_hardening.sql'),
     read('lib/supabase/database.generated.ts'),
     read('lib/supabase/types.ts'),
@@ -171,8 +171,8 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
 test('email OTP verification spends only its bound receipt before provider proof', async () => {
   const [route, challenge, ephemeralClient, migration] = await Promise.all([
     read('app/api/auth/email-otp/verify/route.ts'),
-    read('lib/security/email-otp-challenge.ts'),
-    read('lib/supabase/ephemeral-auth.ts'),
+    read('server/security/email-otp-challenge.ts'),
+    read('server/supabase/ephemeral-auth.ts'),
     read('supabase/migrations/20260901108000_security_boundary_hardening.sql'),
   ]);
 
@@ -239,7 +239,7 @@ test('email OTP verification spends only its bound receipt before provider proof
 
 test('passwordless browser form shares a bounded cooldown without storing a code or consent claim', async () => {
   const [flow, login, register] = await Promise.all([
-    read('features/auth/email-otp-flow.tsx'),
+    read('components/auth/email-otp-flow.tsx'),
     read('app/(account)/auth/login/page.tsx'),
     read('app/(account)/auth/register/page.tsx'),
   ]);

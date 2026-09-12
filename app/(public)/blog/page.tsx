@@ -5,7 +5,7 @@ import { Container } from '@/components/ui/container';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/ui/page-header';
 import { JsonLd } from '@/components/shared/json-ld';
-import { getArticles } from '@/lib/content/articles';
+import { getArticles } from '@/server/content/articles';
 import { breadcrumbsJsonLd, buildMetadata } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { localizePathname } from '@/i18n/config';

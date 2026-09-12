@@ -9,7 +9,7 @@ const MIGRATION = 'supabase/migrations/20260912170000_certificate_settings_and_p
 test('the booklet and the protocol are drawn from one settings row that browsers never read directly', async () => {
   const [migration, settings, route, image] = await Promise.all([
     read(MIGRATION),
-    read('features/certificates/settings.ts'),
+    read('server/certificates/settings.ts'),
     read('app/api/admin/settings/certificate/route.ts'),
     read('app/certificate-assets/image/route.ts'),
   ]);
@@ -45,8 +45,8 @@ test('every certificate is a two-sided booklet drawn with the current settings',
   const [contract, renderer, server, exportHelper, metadataRoute, sample] = await Promise.all([
     read('lib/pdf/certificate-client-contract.ts'),
     read('lib/pdf/certificate-renderer.ts'),
-    read('features/certificates/server.ts'),
-    read('features/admin/certificate-export-archive.ts'),
+    read('server/certificates/issuance.ts'),
+    read('server/admin/certificate-export-archive.ts'),
     read('app/api/certificates/[certificateId]/metadata/route.ts'),
     read('app/api/admin/settings/certificate/sample/route.ts'),
   ]);

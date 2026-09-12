@@ -2,7 +2,7 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
 import { LegalContacts } from '@/components/legal/legal-contacts';
-import type { LocalizedLegalDocument } from '@/lib/content/legal-documents';
+import type { LocalizedLegalDocument } from '@/server/content/legal-documents';
 import { LEGAL_EFFECTIVE_TIME_ZONE } from '@/lib/legal';
 
 const externalLinkClass =

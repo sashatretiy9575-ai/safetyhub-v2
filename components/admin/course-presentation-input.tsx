@@ -2,10 +2,10 @@
 
 import { FilePdf, Trash, UploadSimple, X } from '@phosphor-icons/react';
 import { useRef, useState } from 'react';
-import type { AdminPresentation } from '@/features/admin/types';
+import type { AdminPresentation } from '@/lib/admin/types';
 import { Button } from '@/components/ui/button';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
-import { TEST_EDITOR_LIMITS } from '@/lib/admin-test-editor';
+import { TEST_EDITOR_LIMITS } from '@/lib/admin/course-test-editor';
 import type { AppLocale } from '@/lib/supabase/types';
 
 type UploadGrant = {

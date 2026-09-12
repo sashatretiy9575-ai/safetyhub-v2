@@ -1,12 +1,12 @@
 import * as z from 'zod';
 import { createApiResponse, NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requireCapability } from '@/features/auth/server';
-import { retireCoursePresentation } from '@/features/admin/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requireCapability } from '@/server/auth/session';
+import { retireCoursePresentation } from '@/server/admin/management';
+import { createAdminClient } from '@/server/supabase/admin';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 
 const paramsSchema = z.object({
   courseId: z.string().uuid(),

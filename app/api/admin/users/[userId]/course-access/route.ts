@@ -1,13 +1,13 @@
 import * as z from 'zod';
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requireAnyCapability, requireCapability } from '@/features/auth/server';
-import { getUserCourseAccess, parseCourseIdList } from '@/features/admin/course-access';
-import { createClient } from '@/lib/supabase/server';
-import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requireAnyCapability, requireCapability } from '@/server/auth/session';
+import { getUserCourseAccess, parseCourseIdList } from '@/server/admin/course-access';
+import { createClient } from '@/server/supabase/server';
+import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 import { readJsonBody } from '@/lib/security/request-body';
 
 const paramsSchema = z.object({ userId: z.string().uuid() });

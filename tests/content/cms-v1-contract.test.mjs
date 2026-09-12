@@ -8,8 +8,8 @@ test('course publication writes an immutable revision without a review operation
   const [additive, contract, topics, server] = await Promise.all([
     read('supabase/migrations/20260820000000_content_lifecycle_additive.sql'),
     read('supabase/migrations/20260820010000_content_lifecycle_contract.sql'),
-    read('lib/content/topics.ts'),
-    read('features/admin/server.ts'),
+    read('server/content/topics.ts'),
+    read('server/admin/management.ts'),
   ]);
 
   assert.match(additive, /private\.publish_course_revision_v2_unmetered/);
@@ -42,7 +42,7 @@ test('course publication writes an immutable revision without a review operation
 test('articles save the current draft and atomically publish four localized copies', async () => {
   const [additive, action, editor] = await Promise.all([
     read('supabase/migrations/20260820000000_content_lifecycle_additive.sql'),
-    read('lib/actions/articles.ts'),
+    read('server/actions/articles.ts'),
     read('components/admin/admin-editor.tsx'),
   ]);
 
@@ -74,9 +74,9 @@ test('destructive content deletion is transactional and preserves certificate sn
   const [migration, dialog, courseServer, articleActions, attestationTypes] = await Promise.all([
     read('supabase/migrations/20260820000000_content_lifecycle_additive.sql'),
     read('components/admin/destructive-dialog.tsx'),
-    read('features/admin/server.ts'),
-    read('lib/actions/articles.ts'),
-    read('features/admin/types.ts'),
+    read('server/admin/management.ts'),
+    read('server/actions/articles.ts'),
+    read('lib/admin/types.ts'),
   ]);
 
   assert.match(migration, /create or replace function public\.delete_course/);
@@ -137,7 +137,7 @@ test('optional content metadata participates in draft identity', async () => {
 test('deleted-course certificates remain searchable historical ledger rows only', async () => {
   const [historyMigration, mapper, panels] = await Promise.all([
     read('supabase/migrations/20260820001000_deleted_certificate_admin_rows.sql'),
-    read('features/admin/attestations.ts'),
+    read('server/admin/attestations.ts'),
     read('components/admin/attestations-manager-panels.tsx'),
   ]);
 
@@ -165,7 +165,7 @@ test('deleted-course certificates remain searchable historical ledger rows only'
 test('CMS media deletion remains usage-checked and storage-first', async () => {
   const [migration, server, route, picker] = await Promise.all([
     read('supabase/migrations/20260819000000_content_publication_v1.sql'),
-    read('features/admin/server.ts'),
+    read('server/admin/management.ts'),
     read('app/api/admin/content-assets/[assetId]/route.ts'),
     read('components/admin/media-asset-input.tsx'),
   ]);

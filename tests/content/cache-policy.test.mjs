@@ -6,8 +6,8 @@ const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8
 
 test('public Supabase reads have a bounded abortable upstream deadline', async () => {
   const [publicClient, upstream] = await Promise.all([
-    read('lib/supabase/public.ts'),
-    read('lib/content/upstream.ts'),
+    read('server/supabase/public.ts'),
+    read('server/content/upstream.ts'),
   ]);
 
   assert.match(publicClient, /global: \{ fetch: contentUpstreamFetch \}/);
@@ -20,8 +20,8 @@ test('public Supabase reads have a bounded abortable upstream deadline', async (
 
 test('article and topic reads share tagged, time-bounded caches with bounded stale state', async () => {
   const [articles, topics, policy] = await Promise.all([
-    read('lib/content/articles.ts'),
-    read('lib/content/topics.ts'),
+    read('server/content/articles.ts'),
+    read('server/content/topics.ts'),
     read('lib/content/cache-policy.ts'),
   ]);
 
@@ -43,8 +43,8 @@ test('article and topic reads share tagged, time-bounded caches with bounded sta
 
 test('publishing invalidates every content consumer and supports a signed dashboard webhook', async () => {
   const [actions, adminServer, webhook, policy] = await Promise.all([
-    read('lib/actions/articles.ts'),
-    read('features/admin/server.ts'),
+    read('server/actions/articles.ts'),
+    read('server/admin/management.ts'),
     read('app/api/content/revalidate/route.ts'),
     read('lib/content/cache-policy.ts'),
   ]);
@@ -67,8 +67,8 @@ test('publishing invalidates every content consumer and supports a signed dashbo
 
 test('static params and sitemap use the same published content APIs', async () => {
   const [articles, topics, articlePage, topicPage, testPage, sitemap] = await Promise.all([
-    read('lib/content/articles.ts'),
-    read('lib/content/topics.ts'),
+    read('server/content/articles.ts'),
+    read('server/content/topics.ts'),
     read('app/(public)/blog/[slug]/page.tsx'),
     read('app/(public)/topics/[slug]/page.tsx'),
     read('app/(account)/topics/[slug]/test/page.tsx'),

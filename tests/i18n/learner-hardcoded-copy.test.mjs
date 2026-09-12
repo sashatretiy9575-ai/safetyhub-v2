@@ -5,7 +5,7 @@ import test from 'node:test';
 
 const repositoryRoot = path.resolve(import.meta.dirname, '../..');
 
-const SCAN_ROOTS = ['app', 'components', 'features'];
+const SCAN_ROOTS = ['app', 'components'];
 const CANONICAL_RU_CONTENT_SOURCES = new Set([
   // Published Russian legal revisions are immutable content, not UI copy. Other
   // locales are loaded fail-closed from legal_document_localizations.
@@ -20,7 +20,6 @@ function isExcluded(relativePath) {
     relativePath.startsWith('app/(admin)/') ||
     relativePath.startsWith('app/api/') ||
     relativePath.startsWith('components/admin/') ||
-    relativePath.startsWith('features/admin/') ||
     CANONICAL_RU_CONTENT_SOURCES.has(relativePath)
   );
 }

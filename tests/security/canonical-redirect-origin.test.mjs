@@ -35,7 +35,7 @@ test('generated links and retired callback redirects use only a canonical origin
     read('app/api/admin/attestations/export/route.ts'),
     read('app/api/certificates/[certificateId]/route.ts'),
     read('app/(account)/callback/route.ts'),
-    read('features/auth/password-auth-retired.tsx'),
+    read('server/auth/password-auth-retired.ts'),
   ]);
   const proxy = await read('proxy.ts');
 

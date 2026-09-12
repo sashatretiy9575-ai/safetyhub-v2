@@ -108,7 +108,7 @@ test('the employee card edits the open courses through a capability-gated endpoi
     read('components/admin/attestations-manager-panels.tsx'),
     read('components/admin/course-access-control.tsx'),
     read('app/api/admin/users/[userId]/course-access/route.ts'),
-    read('features/admin/course-access.ts'),
+    read('server/admin/course-access.ts'),
   ]);
   assert.match(panels, /<CourseAccessControl/u);
   assert.match(panels, /canManage=\{permissions\.canManageIdentity\}/u);
@@ -125,13 +125,13 @@ test('the employee card edits the open courses through a capability-gated endpoi
 
 test('a locked course is refused by name on every learner surface', async () => {
   const [apiError, policyError, quiz, presentation, access, actions, learning] = await Promise.all([
-    read('features/auth/api-error.ts'),
-    read('features/learning/policy-error.ts'),
+    read('server/auth/api-error.ts'),
+    read('server/learning/policy-error.ts'),
     read('components/quiz/quiz-client.tsx'),
     read('app/course-presentations/[slug]/[asset]/route.ts'),
     read('app/api/auth/access/route.ts'),
     read('components/topics/course-material-actions.tsx'),
-    read('features/learning/course-access.ts'),
+    read('server/learning/course-access.ts'),
   ]);
   assert.match(apiError, /COURSE_ACCESS_REQUIRED.*status: 403/su);
   assert.match(policyError, /\| 'COURSE_ACCESS_REQUIRED'/u);
@@ -156,11 +156,11 @@ test('the phone is optional at registration; name, job and company stay required
     await Promise.all([
       read(MIGRATION),
       read('lib/validation/profile.ts'),
-      read('features/profile/fields.ts'),
+      read('lib/profile/fields.ts'),
       read('app/api/profile/route.ts'),
       read('app/api/profile/onboarding/route.ts'),
-      read('features/auth/profile-form.tsx'),
-      read('features/profile/onboarding-form.tsx'),
+      read('components/profile/profile-form.tsx'),
+      read('components/profile/onboarding-form.tsx'),
     ]);
   assert.match(migration, /\(v_phone_country_iso2 is null\) <> \(v_phone_e164 is null\)/u);
   assert.match(migration, /message = 'PROFILE_FIELDS_REQUIRED'/u);

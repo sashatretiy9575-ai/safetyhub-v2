@@ -5,7 +5,7 @@ import { SectionHeading } from '@/components/marketing/shared/section-heading';
 import { Container } from '@/components/ui/container';
 import { MarketingSlider } from '@/components/ui/marketing-slider';
 import { ROUTES } from '@/lib/constants';
-import { getArticles } from '@/lib/content/articles';
+import { getArticles } from '@/server/content/articles';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { localizePathname } from '@/i18n/config';
 

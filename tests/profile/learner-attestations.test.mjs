@@ -7,7 +7,7 @@ const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8
 test('learner dashboard exposes one best-result model without attempt analytics', async () => {
   const [profile, loader] = await Promise.all([
     read('app/(account)/profile/page.tsx'),
-    read('features/profile/server.ts'),
+    read('server/profile/dashboard.ts'),
   ]);
 
   assert.match(loader, /rpc\('get_profile_dashboard_locale', \{/);
@@ -26,7 +26,7 @@ test('learner dashboard exposes one best-result model without attempt analytics'
 test('quiz reveals a failed score and explains the calendar-day limit without usage analytics', async () => {
   const [client, payload] = await Promise.all([
     read('components/quiz/quiz-client.tsx'),
-    read('features/learning/types.ts'),
+    read('lib/learning/types.ts'),
   ]);
 
   assert.match(client, /ATTEMPT_DAILY_LIMIT/);
@@ -52,11 +52,11 @@ test('quiz reveals a failed score and explains the calendar-day limit without us
 
 test('profile editing includes organization and renders the account-approval status', async () => {
   const [form, profile, approvalStatus, schema, fields, route] = await Promise.all([
-    read('features/auth/profile-form.tsx'),
+    read('components/profile/profile-form.tsx'),
     read('app/(account)/profile/page.tsx'),
-    read('features/profile/account-approval-status.tsx'),
+    read('components/profile/account-approval-status.tsx'),
     read('lib/validation/profile.ts'),
-    read('features/profile/fields.ts'),
+    read('lib/profile/fields.ts'),
     read('app/api/profile/route.ts'),
   ]);
 

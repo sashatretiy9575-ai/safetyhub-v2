@@ -93,7 +93,7 @@ test('bounded presentation relay propagates cancellation and abort cleanup exact
 test('private presentation GET is quota-, lease-, deadline-, and stream-bounded while HEAD is metadata-only', async () => {
   const [route, rateLimit] = await Promise.all([
     read('app/course-presentations/[slug]/[asset]/route.ts'),
-    read('lib/security/rate-limit.ts'),
+    read('server/security/rate-limit.ts'),
   ]);
 
   assert.match(route, /consumeCoarseQuota\('presentation\.download', ipHash\)/);

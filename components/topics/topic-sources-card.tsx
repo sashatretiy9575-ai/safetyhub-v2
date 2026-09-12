@@ -1,5 +1,5 @@
 import { Container } from '@/components/ui/container';
-import type { Topic } from '@/lib/content/topics';
+import type { Topic } from '@/server/content/topics';
 import { useTranslations } from 'next-intl';
 
 export function TopicSourcesCard({ topic }: { topic: Pick<Topic, 'sources'> }) {

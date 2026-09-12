@@ -14,7 +14,7 @@ test('presentation upload uses a signed path-bound TUS grant and immutable priva
     read('components/admin/course-presentation-input.tsx'),
     read('app/api/admin/courses/[courseId]/presentation/finalize/route.ts'),
     read('app/api/admin/courses/[courseId]/presentation/[presentationId]/route.ts'),
-    read('lib/pdf/server-render-validation.ts'),
+    read('server/pdf/render-validation.ts'),
   ]);
 
   assert.match(grant, /courseId: z\.string\(\)\.uuid\(\)/);
@@ -102,7 +102,7 @@ test('catalog cutover API is same-origin, capability-gated, bounded and RPC-enve
     read('app/api/admin/course-catalog/activate/route.ts'),
     read('app/api/admin/course-catalog/maintenance/route.ts'),
     read('lib/validation/admin.ts'),
-    read('features/admin/server.ts'),
+    read('server/admin/management.ts'),
   ]);
   for (const route of [prepareRoute, activateRoute, maintenanceRoute]) {
     assert.match(route, /invalidOriginResponse\(request\)/);
@@ -130,7 +130,7 @@ test('catalog cutover API is same-origin, capability-gated, bounded and RPC-enve
   assert.match(server, /catalogChecksum/);
   assert.match(server, /value\.maintenanceEnabled !== true/);
   assert.match(server, /invalidateTestContent\(\)/);
-  const apiErrors = await read('features/auth/api-error.ts');
+  const apiErrors = await read('server/auth/api-error.ts');
   assert.match(apiErrors, /COURSE_CATALOG_MAINTENANCE'[\s\S]*status: 503/);
   assert.match(apiErrors, /CATALOG_MAINTENANCE_REQUIRED'[\s\S]*status: 409/);
 });
@@ -181,7 +181,7 @@ test('course material is approval-gated, private, and stays out of precache', as
     read('components/topics/course-material-actions.tsx'),
     read('app/(public)/topics/[slug]/page.tsx'),
     read('app/course-presentations/[slug]/[asset]/route.ts'),
-    read('lib/content/topics.ts'),
+    read('server/content/topics.ts'),
     read('scripts/ensure-course-presentation-buckets.mjs'),
     read('supabase/migrations/20260831104000_approved_course_presentation_access.sql'),
     read('components/admin/course-presentation-input.tsx'),
@@ -267,7 +267,7 @@ test('course material is approval-gated, private, and stays out of precache', as
 
 test('rolling Stage-A learner parsing accepts only legacy five or canonical ten questions', async () => {
   const [server, validation, attemptRoute] = await Promise.all([
-    read('features/learning/server.ts'),
+    read('server/learning/attempts.ts'),
     read('lib/validation/attempt.ts'),
     read('app/api/attempts/[attemptId]/route.ts'),
   ]);
@@ -313,14 +313,14 @@ test('learning-history deletion is separately authorized, reasoned, idempotent a
     read('lib/security/capabilities.ts'),
     read('lib/validation/admin.ts'),
     read('app/api/admin/users/[userId]/learning-history/route.ts'),
-    read('features/admin/server.ts'),
-    read('features/admin/data.ts'),
+    read('server/admin/management.ts'),
+    read('server/admin/data.ts'),
     read('components/admin/learning-history-control.tsx'),
     read('app/(admin)/admin/employees/directory/page.tsx'),
     read('app/(admin)/admin/employees/[userId]/learning-history/page.tsx'),
     read('app/(admin)/admin/employees/page.tsx'),
     read('app/(admin)/admin/layout.tsx'),
-    read('features/auth/api-error.ts'),
+    read('server/auth/api-error.ts'),
   ]);
 
   assert.match(capabilities, /'results\.delete'/);

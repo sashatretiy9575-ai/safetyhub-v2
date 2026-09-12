@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { AdminAttestationRow } from '@/features/admin/types';
+import type { AdminAttestationRow } from '@/lib/admin/types';
 import { formatDateTime } from '@/lib/utils';
 import {
   AttestationRowActions,

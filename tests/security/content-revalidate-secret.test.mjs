@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { matchesBearerSecret } from '../../lib/security/bearer-secret.ts';
+import { matchesBearerSecret } from '../../server/security/bearer-secret.ts';
 
 test('content revalidation fails closed for missing and short secrets', () => {
   assert.equal(matchesBearerSecret('Bearer short', undefined), false);

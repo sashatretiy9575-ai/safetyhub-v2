@@ -5,8 +5,8 @@ import {
   TEST_EDITOR_LIMITS,
   TEST_EDITOR_TOTAL_QUESTIONS,
   validateTestEditor,
-} from '../../lib/admin-test-editor.ts';
-import { exclusiveRangeEnd, inclusiveRangeStart } from '../../features/admin/date-range.ts';
+} from '../../lib/admin/course-test-editor.ts';
+import { exclusiveRangeEnd, inclusiveRangeStart } from '../../server/admin/date-range.ts';
 
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 
@@ -96,8 +96,8 @@ test('saving a legal translation keeps the tab and the text', () => {
 });
 
 test('both administrative date filters compute the same boundary', () => {
-  const attestations = 'features/admin/attestations.ts';
-  const history = 'features/admin/data.ts';
+  const attestations = 'server/admin/attestations.ts';
+  const history = 'server/admin/data.ts';
   assert.equal(inclusiveRangeStart('2026-01-01'), '2026-01-01T00:00:00.000Z');
   assert.equal(exclusiveRangeEnd('2026-01-01'), '2026-01-02T00:00:00.000Z');
   assert.equal(exclusiveRangeEnd('2026-12-31'), '2027-01-01T00:00:00.000Z');
@@ -114,7 +114,7 @@ test('both administrative date filters compute the same boundary', () => {
 });
 
 test('the certificate download stops when its button leaves the page', async () => {
-  const button = await read('features/certificates/download-button.tsx');
+  const button = await read('components/certificates/download-button.tsx');
   assert.match(button, /const resetTimerRef = useRef<number \| null>\(null\);/u);
   assert.match(button, /window\.clearTimeout\(resetTimerRef\.current\)/u);
   assert.match(button, /CERTIFICATE_METADATA_TIMEOUT_MS = 30_000/u);

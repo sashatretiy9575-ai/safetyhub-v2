@@ -2,12 +2,12 @@ import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 import { NextResponse } from '@/lib/security/api-response';
 import { readBoundedBytes } from '@/lib/security/request-body';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { apiError } from '@/features/auth/api-error';
-import { requireCapability } from '@/features/auth/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { apiError } from '@/server/auth/api-error';
+import { requireCapability } from '@/server/auth/session';
+import { createAdminClient } from '@/server/supabase/admin';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 
 export const runtime = 'nodejs';
 

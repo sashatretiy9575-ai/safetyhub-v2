@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { CertificateSettingsForm } from '@/components/admin/certificate-settings-form';
 import { Button } from '@/components/ui/button';
-import { readCertificateSettings } from '@/features/certificates/settings';
+import { readCertificateSettings } from '@/server/certificates/settings';
 
 export default async function AdminCertificateSettingsPage() {
   const settings = await readCertificateSettings();

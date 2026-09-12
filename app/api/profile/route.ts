@@ -1,14 +1,14 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { isSameOriginRequest } from '@/features/auth/request-origin';
-import { requireUser } from '@/features/auth/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
+import { apiError } from '@/server/auth/api-error';
+import { isSameOriginRequest } from '@/server/http/request-origin';
+import { requireUser } from '@/server/auth/session';
+import { createAdminClient } from '@/server/supabase/admin';
+import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 import { profileSubmissionSchema } from '@/lib/validation/profile';
 import { readJsonBody } from '@/lib/security/request-body';
-import { normalizeUserPhone } from '@/lib/phone-server';
-import { consumeBusinessQuota, consumeCoarseQuota } from '@/lib/security/rate-limit';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { normalizeUserPhone } from '@/server/phone';
+import { consumeBusinessQuota, consumeCoarseQuota } from '@/server/security/rate-limit';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 
 type TrustedProfileSubmissionRpcClient = {
   rpc(

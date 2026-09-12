@@ -5,7 +5,7 @@ import {
   getStaticLegalDocument,
   hasLegacyRussianLegalRenderer,
   staticLegalVersions,
-} from '@/lib/content/legal-documents';
+} from '@/server/content/legal-documents';
 import { APP_LOCALES, DEFAULT_LOCALE } from '@/i18n/config';
 import { TERMS_POLICY, resolveLegalDocumentVersion } from '@/lib/legal';
 import { buildMetadata } from '@/lib/seo';

@@ -6,7 +6,7 @@ const root = new URL('../../', import.meta.url);
 const read = (path) => readFile(new URL(path, root), 'utf8');
 
 test('reserved mutation envelopes are validated and converted into server errors', async () => {
-  const source = await read('lib/supabase/rpc-mutation-result.ts');
+  const source = await read('server/supabase/rpc-mutation-result.ts');
   assert.match(source, /__safetyhubRpcError/);
   assert.match(source, /payload\?\.version !== 1/);
   assert.match(source, /SQLSTATE_PATTERN\.test\(code\)/);
@@ -23,12 +23,12 @@ test('reserved mutation envelopes are validated and converted into server errors
 
 test('every metered application RPC unwraps the reserved error envelope before success', async () => {
   const files = [
-    'features/site-settings/server.ts',
-    'lib/actions/articles.ts',
-    'features/identity/server.ts',
-    'features/learning/server.ts',
-    'features/admin/attestations.ts',
-    'features/admin/server.ts',
+    'server/site-settings.ts',
+    'server/actions/articles.ts',
+    'server/identity/verification.ts',
+    'server/learning/attempts.ts',
+    'server/admin/attestations.ts',
+    'server/admin/management.ts',
     'app/api/profile/route.ts',
     'app/api/profile/onboarding/route.ts',
     'app/api/profile/legal-acceptances/route.ts',
@@ -45,7 +45,7 @@ test('every metered application RPC unwraps the reserved error envelope before s
 });
 
 test('API error mapping preserves safe SQLSTATE classes without leaking database detail', async () => {
-  const source = await read('features/auth/api-error.ts');
+  const source = await read('server/auth/api-error.ts');
   assert.match(source, /error instanceof RpcMutationError/);
   assert.match(source, /error\.code === '42501'/);
   assert.match(source, /'23505', '55000', '40001', '40P01'/);

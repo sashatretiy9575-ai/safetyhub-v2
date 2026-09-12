@@ -19,7 +19,7 @@ function sqlFunction(source, name) {
 }
 
 test('capability checks read the database answer instead of a hard-coded preset', async () => {
-  const server = await read('features/auth/server.ts');
+  const server = await read('server/auth/session.ts');
 
   // The previous version of this test compared two constants and could not fail
   // while `requireCapability` ignored its argument. These assertions describe
@@ -124,7 +124,7 @@ test('admin read models are bounded and keyset-paginated without offset scans', 
 test('reasoned administrative writes are audited per target with batch and correlation metadata', async () => {
   const [baseline, requestMetadata] = await Promise.all([
     read('supabase/migrations/20260813000000_safetyhub_baseline.sql'),
-    read('lib/security/request-metadata.ts'),
+    read('server/security/request-metadata.ts'),
   ]);
 
   assert.match(
@@ -149,7 +149,7 @@ test('reasoned administrative writes are audited per target with batch and corre
 
 test('same-origin route boundary is shared by privileged mutations', async () => {
   const [origin, attestationRoute, contactsRoute] = await Promise.all([
-    read('features/auth/request-origin.ts'),
+    read('server/http/request-origin.ts'),
     read('app/api/admin/attestations/actions/route.ts'),
     read('app/api/admin/settings/contacts/route.ts'),
   ]);

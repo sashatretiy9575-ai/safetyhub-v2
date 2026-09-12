@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { PWA_INSTALL_EVENT_KEY, PWA_INSTALL_READY_EVENT } from '@/lib/pwa-install-bootstrap';
+import { PWA_INSTALL_EVENT_KEY, PWA_INSTALL_READY_EVENT } from '@/lib/pwa/install-bootstrap';
 
 export type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;

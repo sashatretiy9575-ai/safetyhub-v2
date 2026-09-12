@@ -4,8 +4,8 @@ import { ArrowRight, CheckCircle, Info, Quotes, Warning } from '@phosphor-icons/
 import { Button } from '@/components/ui/button';
 import { Carousel } from '@/components/ui/carousel';
 import { ContactLink } from '@/components/shared/contact-link';
-import type { ArticleBlock } from '@/lib/content/articles';
-import type { SiteContactSettings } from '@/lib/site-contacts-shared';
+import type { ArticleBlock } from '@/server/content/articles';
+import type { SiteContactSettings } from '@/lib/site-contacts';
 import { ARTICLE_WHATSAPP_ACTION_URL, articleBlocksSchema } from '@/lib/validation/article';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';

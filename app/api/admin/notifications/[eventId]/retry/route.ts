@@ -1,11 +1,11 @@
 import * as z from 'zod';
-import { retryAdminNotificationDelivery } from '@/features/admin/notifications';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
+import { retryAdminNotificationDelivery } from '@/server/admin/notifications';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
 import { NextResponse } from '@/lib/security/api-response';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
-import { rolloutFeatureEnabled } from '@/lib/release/rollout-flags';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
+import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
 
 const paramsSchema = z.object({ eventId: z.string().uuid() }).strict();
 

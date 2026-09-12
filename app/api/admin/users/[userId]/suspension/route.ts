@@ -1,9 +1,9 @@
 import { NextResponse } from '@/lib/security/api-response';
 import { entityIdSchema, suspendUserSchema } from '@/lib/validation/admin';
-import { setUserSuspended } from '@/features/admin/server';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { setUserSuspended } from '@/server/admin/management';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 import { readJsonBody } from '@/lib/security/request-body';
 
 export async function PATCH(request: Request, context: { params: Promise<{ userId: string }> }) {

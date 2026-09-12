@@ -1,14 +1,14 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
 import {
   ADMIN_ATTESTATION_BULK_LIMIT,
   adminAttestationFilterInputSchema,
   resolveAdminAttestationSelection,
-} from '@/features/admin/attestations';
+} from '@/server/admin/attestations';
 import { readJsonBody } from '@/lib/security/request-body';
-import { consumeCoarseQuota } from '@/lib/security/rate-limit';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { consumeCoarseQuota } from '@/server/security/rate-limit';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 
 export async function POST(request: Request) {
   try {

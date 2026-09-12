@@ -8,8 +8,8 @@ const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8
 
 test('server and middleware share one HttpOnly Supabase cookie policy', async () => {
   const [server, middleware, policy] = await Promise.all([
-    read('lib/supabase/server.ts'),
-    read('lib/supabase/middleware.ts'),
+    read('server/supabase/server.ts'),
+    read('server/supabase/middleware.ts'),
     read('lib/supabase/auth-cookie-options.ts'),
   ]);
   for (const source of [server, middleware]) {

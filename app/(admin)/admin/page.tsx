@@ -11,9 +11,9 @@ import {
 } from '@phosphor-icons/react/dist/ssr';
 import { AdminLoadFailure } from '@/components/admin/admin-data-state';
 import { Button } from '@/components/ui/button';
-import { getAdminWorkQueue } from '@/features/admin/attestations';
-import { getPendingAccountApprovalPage } from '@/features/admin/data';
-import { requireCapability } from '@/features/auth/server';
+import { getAdminWorkQueue } from '@/server/admin/attestations';
+import { getPendingAccountApprovalPage } from '@/server/admin/data';
+import { requireCapability } from '@/server/auth/session';
 
 export default async function AdminWorkPage() {
   const actor = await requireCapability('results.read');

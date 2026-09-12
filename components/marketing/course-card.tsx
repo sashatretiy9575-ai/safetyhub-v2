@@ -1,7 +1,7 @@
 import { ArrowUpRight, Clock, ListChecks } from '@phosphor-icons/react/dist/ssr';
 import Image from 'next/image';
 import Link from 'next/link';
-import { resolveCourseIcon } from '@/lib/course-icons';
+import { resolveCourseIcon } from '@/lib/content/course-icons';
 import { useLocale, useTranslations } from 'next-intl';
 import { localizePathname } from '@/i18n/config';
 import { CARD_BLUR_PLACEHOLDER } from '@/components/marketing/shared/card-blur-placeholder';

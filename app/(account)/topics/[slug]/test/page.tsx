@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { getTopicBySlug, getTopicSlugs } from '@/lib/content/topics';
+import { getTopicBySlug, getTopicSlugs } from '@/server/content/topics';
 import { QuizClient } from '@/components/quiz/quiz-client';
 import { buildMetadata } from '@/lib/seo';
 import type { AppLocale } from '@/i18n/config';

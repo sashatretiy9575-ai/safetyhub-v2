@@ -8,7 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const read = (file) => readFile(path.join(root, file), 'utf8');
 
 test('unified attestation read model is bounded, filterable, sorted, and cursor paginated', async () => {
-  const server = await read('features/admin/attestations.ts');
+  const server = await read('server/admin/attestations.ts');
   assert.match(server, /ADMIN_ATTESTATION_DEFAULT_PAGE_SIZE = 50/);
   assert.match(server, /ADMIN_ATTESTATION_PAGE_SIZES = \[25, 50, 100\]/);
   for (const filter of [
@@ -55,7 +55,7 @@ test('filter dictionaries use their own authenticated no-store endpoint', async 
 
 test('attestation mutations have narrow capability checks and bounded targets', async () => {
   const [server, route, migration] = await Promise.all([
-    read('features/admin/attestations.ts'),
+    read('server/admin/attestations.ts'),
     read('app/api/admin/attestations/actions/route.ts'),
     read('supabase/migrations/20260818030000_idempotent_attestation_actions.sql'),
   ]);
@@ -73,7 +73,7 @@ test('attestation mutations have narrow capability checks and bounded targets', 
 });
 
 test('bulk mutation reasons accept only bounded machine tokens', async () => {
-  const source = await read('features/admin/attestations.ts');
+  const source = await read('server/admin/attestations.ts');
   assert.match(source, /const mutationReasonSchema/);
   assert.match(source, /\.max\(96\)/);
   assert.match(source, /\^\[A-Z\]\[A-Z0-9_\]/);

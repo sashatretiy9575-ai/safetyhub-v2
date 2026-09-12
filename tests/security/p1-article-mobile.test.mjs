@@ -83,7 +83,7 @@ test('article count and serialized size limits fail before persistence', () => {
 });
 
 test('server actions validate before authentication or database access', async () => {
-  const source = await read('lib/actions/articles.ts');
+  const source = await read('server/actions/articles.ts');
   const saveStart = source.indexOf('export async function saveArticleAction');
   const statusStart = source.indexOf('export async function setArticleStatusAction');
   const saveBody = source.slice(saveStart, statusStart);
@@ -127,7 +127,7 @@ test('narrow layouts and course actions avoid clipping and scroll jumps', async 
       read('components/admin/editor-shell.tsx'),
       read('components/admin/editor-action-bar.tsx'),
       read('components/admin/content-block-editor.tsx'),
-      read('features/auth/turnstile.tsx'),
+      read('components/auth/turnstile.tsx'),
       read('components/topics/course-material-actions.tsx'),
     ],
   );

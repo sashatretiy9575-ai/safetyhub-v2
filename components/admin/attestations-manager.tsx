@@ -11,7 +11,7 @@ import type {
   AdminAttestationRow,
   AdminAttestationSelection,
   AdminAttestationMutationItem,
-} from '@/features/admin/types';
+} from '@/lib/admin/types';
 import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
 import { ADMIN_ATTESTATION_BULK_LIMIT } from '@/lib/constants';
 import { AdminOverlay } from '@/components/admin/admin-overlay';

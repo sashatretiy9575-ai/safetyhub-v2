@@ -14,14 +14,14 @@ import {
   parseAdminAttestationQuery,
   type AdminAttestationQuery,
   type RawAdminAttestationSearchParams,
-} from '@/features/admin/attestations';
+} from '@/server/admin/attestations';
 import {
   ADMIN_TRAIL_PARAM,
   appendAdminTrail,
   parseAdminTrail,
   serializeAdminTrail,
 } from '@/lib/admin/pagination-trail';
-import { requireCapability } from '@/features/auth/server';
+import { requireCapability } from '@/server/auth/session';
 
 function inputDate(value: string | null, exclusiveEnd = false) {
   if (!value) return '';

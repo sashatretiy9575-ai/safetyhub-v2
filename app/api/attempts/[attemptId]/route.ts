@@ -1,9 +1,9 @@
 import { NextResponse } from '@/lib/security/api-response';
 import * as z from 'zod';
-import { getAttempt } from '@/features/learning/server';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { AttemptPolicyError } from '@/features/learning/policy-error';
+import { getAttempt } from '@/server/learning/attempts';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { AttemptPolicyError } from '@/server/learning/policy-error';
 
 const paramsSchema = z.object({ attemptId: z.string().uuid() });
 

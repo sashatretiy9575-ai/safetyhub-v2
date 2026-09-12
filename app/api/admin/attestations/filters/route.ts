@@ -1,6 +1,6 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { getAdminAttestationFilters } from '@/features/admin/attestations';
-import { apiError } from '@/features/auth/api-error';
+import { getAdminAttestationFilters } from '@/server/admin/attestations';
+import { apiError } from '@/server/auth/api-error';
 
 export async function GET() {
   try {

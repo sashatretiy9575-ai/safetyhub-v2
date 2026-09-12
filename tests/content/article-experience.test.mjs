@@ -179,10 +179,10 @@ test('article cards keep copy visible and expose a clear reading action', async 
 test('stored content and admin editing use the same runtime block contract', async () => {
   const [content, editPage, editor, actions, blockEditor, renderer, carousel, migration] =
     await Promise.all([
-      read('lib/content/articles.ts'),
+      read('server/content/articles.ts'),
       read('app/(admin)/admin/articles/[slug]/edit/page.tsx'),
       read('components/admin/admin-editor.tsx'),
-      read('lib/actions/articles.ts'),
+      read('server/actions/articles.ts'),
       read('components/admin/content-block-editor.tsx'),
       read('components/article-renderer/index.tsx'),
       read('components/ui/carousel.tsx'),

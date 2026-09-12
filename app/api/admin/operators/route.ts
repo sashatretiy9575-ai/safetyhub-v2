@@ -1,12 +1,12 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { setProductRoleByEmail, setProductRoleByUserId } from '@/features/admin/server';
-import { apiError } from '@/features/auth/api-error';
-import { invalidOriginResponse } from '@/features/auth/request-origin';
-import { requireCapability } from '@/features/auth/server';
+import { setProductRoleByEmail, setProductRoleByUserId } from '@/server/admin/management';
+import { apiError } from '@/server/auth/api-error';
+import { invalidOriginResponse } from '@/server/http/request-origin';
+import { requireCapability } from '@/server/auth/session';
 import { operatorRoleByEmailSchema, operatorRoleByIdSchema } from '@/lib/validation/admin';
-import { requestSecurityMetadata } from '@/lib/security/request-metadata';
+import { requestSecurityMetadata } from '@/server/security/request-metadata';
 import { readJsonBody } from '@/lib/security/request-body';
-import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
+import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 
 /** Appoints an administrator by the email address they sign in with. */
 export async function POST(request: Request) {

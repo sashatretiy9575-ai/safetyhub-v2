@@ -1,5 +1,5 @@
 import AuditPage from '../../audit/page';
-import type { RawAdminSearchParams } from '@/features/admin/data';
+import type { RawAdminSearchParams } from '@/server/admin/data';
 
 export const dynamic = 'force-dynamic';
 

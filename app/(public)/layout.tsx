@@ -9,7 +9,7 @@ import { PublicAccountControl } from '@/components/shared/public-account-control
 import { pickClientNamespaces } from '@/i18n/client-namespaces';
 import { DEFAULT_LOCALE } from '@/i18n/config';
 import { buildMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
-import { getSiteContacts } from '@/lib/site-contacts';
+import { getSiteContacts } from '@/server/site-contacts';
 import '../globals.css';
 
 export const revalidate = 300;

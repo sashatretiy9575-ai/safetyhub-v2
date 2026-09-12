@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { DeferredBottomTabBar } from '@/components/layout/deferred-bottom-tab-bar';
-import { getSiteContacts } from '@/lib/site-contacts';
+import { getSiteContacts } from '@/server/site-contacts';
 import type { AppLocale } from '@/i18n/config';
 
 export async function AppShell({
