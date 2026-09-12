@@ -117,19 +117,18 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const localMigrations = inventory;
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
-  // 12 September 2026 (night): production carries everything up to the
-  // manual course access grants; the certificate settings and purge receipt
-  // migration, the admin reads and schedules migration and the sign-in email
-  // outbox migration are pending.
+  // 13 September 2026: production carries every migration, the certificate
+  // settings and purge receipt, the admin reads and schedules and the sign-in
+  // email outbox included; nothing is pending.
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 3);
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
   assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 84);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 81);
-  assert.equal(receipt.pendingCount, 3);
-  assert.equal(receipt.expectedBaseCount, 81);
-  assert.equal(receipt.expectedPendingCount, 3);
+  assert.equal(receipt.matchedCount, 84);
+  assert.equal(receipt.pendingCount, 0);
+  assert.equal(receipt.expectedBaseCount, 84);
+  assert.equal(receipt.expectedPendingCount, 0);
   assert.equal(receipt.expectedTotalCount, 84);
   assert.deepEqual(
     receipt.pendingMigrations,

@@ -143,10 +143,15 @@ begin
   if not (v_result ?& array['queued', 'sending', 'failedLastDay', 'sentLastHour']) then
     raise exception 'summary keys are wrong: %', v_result;
   end if;
+  -- Retention is measured on this test's two rows only: a stand that has sent
+  -- real sign-in codes keeps its own rows, and aging every row made the count
+  -- depend on what the stand had done before (the transaction rolls back).
+  delete from private.auth_email_outbox where webhook_id not in ('wh_test_1', 'wh_test_2');
   if public.prune_auth_email_outbox(500) <> 0 then
     raise exception 'fresh rows must survive pruning';
   end if;
-  update private.auth_email_outbox set created_at = statement_timestamp() - interval '8 days';
+  update private.auth_email_outbox set created_at = statement_timestamp() - interval '8 days'
+  where webhook_id in ('wh_test_1', 'wh_test_2');
   if public.prune_auth_email_outbox(500) <> 2 then
     raise exception 'sent and failed rows older than a week must be pruned';
   end if;
