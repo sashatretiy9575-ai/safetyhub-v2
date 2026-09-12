@@ -9,7 +9,7 @@ export default function AdminLoading() {
   return (
     <div className="space-y-4" role="status" aria-live="polite" aria-label="Загружаем раздел">
       <div className="h-9 w-64 animate-pulse rounded-xl bg-[var(--color-surface-muted)]" />
-      <div className="h-14 animate-pulse rounded-2xl bg-[var(--color-surface-muted)]" />
+      <div className="h-14 animate-pulse rounded-[var(--radius-group)] bg-[var(--color-surface-muted)]" />
       <div className="h-12 animate-pulse rounded-xl bg-[var(--color-surface-muted)]" />
       <div className="space-y-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
         {[0, 1, 2, 3, 4, 5].map((row) => (

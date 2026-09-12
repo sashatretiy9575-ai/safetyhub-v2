@@ -74,8 +74,9 @@ export default async function EmployeeDirectoryPage({
 
       <form className="grid gap-3 rounded-xl border bg-[var(--color-surface)] p-4 sm:grid-cols-[1fr_auto_auto] sm:items-end">
         <div className="space-y-1">
-          <Label htmlFor="employee-directory-query">Имя или email</Label>
+          <Label className="sr-only" htmlFor="employee-directory-query">Имя или email</Label>
           <Input
+          placeholder="Имя или email"
             id="employee-directory-query"
             name="q"
             type="search"

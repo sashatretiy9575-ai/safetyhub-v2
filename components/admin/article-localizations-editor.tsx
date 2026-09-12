@@ -213,8 +213,9 @@ export function ArticleLocalizationsEditor({
             <div className="space-y-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-1.5 md:col-span-2">
-                  <Label htmlFor={`article-localization-title-${activeLocale}`}>Заголовок</Label>
+                  <Label className="sr-only" htmlFor={`article-localization-title-${activeLocale}`}>Заголовок</Label>
                   <Input
+          placeholder="Заголовок"
                     id={`article-localization-title-${activeLocale}`}
                     maxLength={200}
                     value={active.title}
@@ -222,10 +223,11 @@ export function ArticleLocalizationsEditor({
                   />
                 </div>
                 <div className="space-y-1.5 md:col-span-2">
-                  <Label htmlFor={`article-localization-description-${activeLocale}`}>
+                  <Label className="sr-only" htmlFor={`article-localization-description-${activeLocale}`}>
                     Описание
                   </Label>
                   <Textarea
+          placeholder="Описание"
                     id={`article-localization-description-${activeLocale}`}
                     maxLength={2_000}
                     value={active.description}

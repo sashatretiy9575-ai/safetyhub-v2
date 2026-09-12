@@ -133,7 +133,7 @@ export function OrganizationCleanupManager({
 
   if (clusters.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed p-8 text-center">
+      <div className="rounded-[var(--radius-group)] border border-dashed p-8 text-center">
         <p className="font-semibold">Похожие названия не найдены</p>
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
           Каталог компаний не требует ручной очистки.
@@ -191,7 +191,7 @@ export function OrganizationCleanupManager({
         onClose={() => {
           if (cluster && !busy) setCluster(null);
         }}
-        className="m-auto max-h-[92dvh] w-[min(44rem,calc(100vw-1rem))] overflow-y-auto rounded-2xl border bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55"
+        className="m-auto max-h-[92dvh] w-[min(44rem,calc(100vw-1rem))] overflow-y-auto rounded-[var(--radius-group)] border bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55"
       >
         {cluster ? (
           <form

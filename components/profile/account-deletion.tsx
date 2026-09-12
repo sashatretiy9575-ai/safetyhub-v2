@@ -85,10 +85,11 @@ export function AccountDeletion() {
         <p className="mt-2 text-sm text-[var(--color-text-muted)]">{t('description')}</p>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="account-deletion-confirmation">
+        <Label className="sr-only" htmlFor="account-deletion-confirmation">
           {t('prompt', { confirmation: confirmationPhrase })}
         </Label>
         <Input
+          placeholder={t('prompt', { confirmation: confirmationPhrase })}
           id="account-deletion-confirmation"
           value={confirmation}
           onChange={(event) => {

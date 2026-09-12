@@ -76,7 +76,7 @@ export function AttestationsActionDialog({
       onClose={() => {
         if (config && !busy) onCancel();
       }}
-      className="m-auto w-[min(34rem,calc(100vw-1.5rem))] rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55"
+      className="m-auto w-[min(34rem,calc(100vw-1.5rem))] rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55"
     >
       {config ? (
         <form
@@ -97,7 +97,7 @@ export function AttestationsActionDialog({
           <div className="space-y-4 p-5">
             {config.input ? (
               <div className="space-y-2">
-                <Label htmlFor={`${titleId}-value`}>{config.input.label}</Label>
+                <Label className="sr-only" htmlFor={`${titleId}-value`}>{config.input.label}</Label>
                 <Input
                   id={`${titleId}-value`}
                   value={value}
@@ -112,7 +112,7 @@ export function AttestationsActionDialog({
             ) : null}
             {config.reason ? (
               <div className="space-y-2">
-                <Label htmlFor={`${titleId}-reason`}>{config.reason.label}</Label>
+                <Label className="sr-only" htmlFor={`${titleId}-reason`}>{config.reason.label}</Label>
                 <Textarea
                   id={`${titleId}-reason`}
                   value={reason}

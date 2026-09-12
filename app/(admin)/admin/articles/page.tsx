@@ -126,7 +126,7 @@ export default async function AdminArticlesPage({
       </form>
 
       {articles.length ? (
-        <div className="overflow-hidden rounded-2xl border bg-[var(--color-surface)]">
+        <div className="overflow-hidden rounded-[var(--radius-group)] border bg-[var(--color-surface)]">
           <div className="hidden min-h-11 grid-cols-[minmax(0,2fr)_11rem_8rem_auto] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] md:grid">
             <span>Название</span>
             <span>Статус</span>

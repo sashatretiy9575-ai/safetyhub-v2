@@ -100,7 +100,7 @@ export default async function AdminEmployeesPage({
       {queueResult.state === 'ready' ? (
         <nav
           aria-label="Рабочие очереди"
-          className="grid overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm sm:grid-cols-2"
+          className="grid overflow-hidden rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm sm:grid-cols-2"
         >
           {[
             {

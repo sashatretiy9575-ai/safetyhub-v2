@@ -708,7 +708,7 @@ export function AdminNotificationInboxButton({
             role="dialog"
             aria-label="Уведомления администратора"
             className={cn(
-              'z-[var(--z-popover)] w-[min(24rem,calc(100vw-1rem))] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-pop)]',
+              'z-[var(--z-popover)] w-[min(24rem,calc(100vw-1rem))] overflow-hidden rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-pop)]',
               placement === 'desktop'
                 ? 'absolute bottom-0 left-[calc(100%+0.75rem)]'
                 : 'fixed top-[calc(var(--safe-area-top)+3.5rem)] right-2',

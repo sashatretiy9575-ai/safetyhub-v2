@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import type { AdminAttestationRow } from '@/lib/admin/types';
-import { formatDateTime } from '@/lib/utils';
 import {
   AttestationRowActions,
   AttestationWorkflowBadge,
@@ -64,24 +63,27 @@ export function AttestationTableRow({
   organizationHref,
   grouped,
 }: AttestationTableRowProps) {
-  const completed = formatDateTime(row.completedAt);
-
   return (
     <article
       role="row"
-      // Phone: two lines per person instead of four — name/score/actions, then
-      // course · date · status. The company is deliberately absent, the band
-      // above already names it, and a four-line card made fifty rows a marathon.
-      className="@min-[760px]:text-caption grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] gap-x-2 gap-y-0.5 rounded-xl border bg-[var(--color-surface)] px-2 py-1.5 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:min-h-9 @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px] @min-[760px]:items-center @min-[760px]:gap-x-2 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:shadow-none"
+      // Three layouts, one markup:
+      //   under 30rem — name, then course and date, then the status on a line
+      //     of its own, so a 320 px phone still shows the whole name instead of
+      //     surrendering half the width to a 110 px pill;
+      //   30rem and up — the status moves up beside the course;
+      //   47.5rem and up — the spreadsheet, one line per person.
+      // The checkbox and the actions button stand centred against the whole
+      // card at every size rather than clinging to its first line.
+      className="@min-[760px]:text-caption grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-1.5 rounded-xl border border-[var(--color-border)]/55 bg-[var(--color-surface)] px-3 py-2.5 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:min-h-11 @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px] @min-[760px]:gap-x-2 @min-[760px]:gap-y-0 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:border-[var(--color-border)]/55 @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:shadow-none"
       onClick={(event) => {
         const target = event.target as HTMLElement;
         if (!target.closest('button, input, a, [role="menuitem"]')) onOpenDetails();
       }}
     >
-      {/* 1. Selection */}
+      {/* 1. Selection — one band down the left of both lines */}
       <div
         role="cell"
-        className="col-start-1 row-start-1 @min-[760px]:col-start-1 @min-[760px]:row-start-1 @min-[760px]:grid @min-[760px]:place-items-center"
+        className="col-start-1 row-span-3 row-start-1 @min-[480px]:row-span-2 @min-[760px]:col-start-1 @min-[760px]:row-span-1 @min-[760px]:row-start-1 @min-[760px]:grid @min-[760px]:place-items-center"
       >
         <label className="grid size-11 cursor-pointer place-items-center @min-[760px]:size-8">
           <input
@@ -138,10 +140,12 @@ export function AttestationTableRow({
 
       {/* 4. Course — `col-end` must be reset, otherwise the desktop start column
           is greater than the mobile end column and the browser swaps them, so
-          the course lands back on top of the previous cell. */}
+          the course lands back on top of the previous cell. On a phone the
+          course and the date share one line, so the card is exactly two rows
+          and the status badge to the right lines up with them. */}
       <div
         role="cell"
-        className={`col-start-2 col-end-4 row-start-2 min-w-0 @min-[760px]:col-start-4 @min-[760px]:col-end-auto @min-[760px]:row-start-1 ${CELL}`}
+        className={`col-start-2 col-end-3 row-start-2 flex min-w-0 items-baseline gap-1.5 @min-[760px]:col-start-4 @min-[760px]:col-end-auto @min-[760px]:row-start-1 @min-[760px]:block ${CELL}`}
       >
         <p
           className="@min-[760px]:text-caption truncate text-xs @min-[760px]:font-normal"
@@ -149,10 +153,13 @@ export function AttestationTableRow({
         >
           {row.courseTitle}
         </p>
-        <p className="text-micro truncate text-[var(--color-text-subtle)] @min-[760px]:hidden">
-          {completed}
+        <time
+          dateTime={row.completedAt}
+          className="text-micro shrink-0 text-[var(--color-text-subtle)] tabular-nums @min-[760px]:hidden"
+        >
+          {compactDateTime(row.completedAt)}
           {!grouped && row.organization ? ` · ${row.organization}` : ''}
-        </p>
+        </time>
       </div>
 
       {/* 5. Completion date — its own column on the desktop sheet */}
@@ -173,23 +180,23 @@ export function AttestationTableRow({
         </span>
       </div>
 
-      {/* 7. Status */}
+      {/* 7. Status — its own line on a narrow phone, beside the course as soon
+          as there is room, its own column on the sheet */}
       <div
         role="cell"
-        className={`col-start-4 row-start-2 flex min-w-0 items-center justify-end @min-[760px]:col-start-7 @min-[760px]:row-start-1 @min-[760px]:justify-start ${CELL}`}
+        className={`col-start-2 col-end-5 row-start-3 flex min-w-0 items-center justify-start @min-[480px]:col-start-3 @min-[480px]:col-end-auto @min-[480px]:row-start-2 @min-[480px]:justify-end @min-[760px]:col-start-7 @min-[760px]:row-start-1 @min-[760px]:justify-start ${CELL}`}
       >
         <AttestationWorkflowBadge row={row} />
       </div>
 
-      {/* 8. Actions */}
+      {/* 8. Actions — one band down the right of the whole card */}
       <div
         role="cell"
-        className="col-start-4 row-start-1 flex justify-end @min-[760px]:col-start-8 @min-[760px]:row-start-1 @min-[760px]:justify-center"
+        className="col-start-4 row-span-3 row-start-1 flex items-center justify-end @min-[480px]:row-span-2 @min-[760px]:col-start-8 @min-[760px]:row-span-1 @min-[760px]:row-start-1 @min-[760px]:justify-center"
       >
         <AttestationRowActions
           row={row}
           permissions={permissions}
-          openDetails={onOpenDetails}
           openAction={onSingleAction}
         />
       </div>

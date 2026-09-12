@@ -278,8 +278,9 @@ function LegalVersionEditor({
           ) : (
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor={`${idPrefix}-title-${activeLocale}`}>Название документа</Label>
+                <Label className="sr-only" htmlFor={`${idPrefix}-title-${activeLocale}`}>Название документа</Label>
                 <Input
+          placeholder="Название документа"
                   id={`${idPrefix}-title-${activeLocale}`}
                   value={active.title}
                   maxLength={200}
@@ -288,10 +289,11 @@ function LegalVersionEditor({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor={`${idPrefix}-body-${activeLocale}`}>
+                <Label className="sr-only" htmlFor={`${idPrefix}-body-${activeLocale}`}>
                   Структурированное тело документа (JSON)
                 </Label>
                 <Textarea
+          placeholder="Структурированное тело документа (JSON)"
                   id={`${idPrefix}-body-${activeLocale}`}
                   value={bodyText}
                   rows={16}
@@ -566,7 +568,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="legal-bundle-privacy">Privacy</Label>
+              <Label className="sr-only" htmlFor="legal-bundle-privacy">Privacy</Label>
               <select
                 id="legal-bundle-privacy"
                 className="min-h-11 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3"
@@ -587,7 +589,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
               </select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="legal-bundle-terms">Terms</Label>
+              <Label className="sr-only" htmlFor="legal-bundle-terms">Terms</Label>
               <select
                 id="legal-bundle-terms"
                 className="min-h-11 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3"
@@ -639,7 +641,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="legal-stage-document-type">Документ</Label>
+              <Label className="sr-only" htmlFor="legal-stage-document-type">Документ</Label>
               <select
                 id="legal-stage-document-type"
                 className="min-h-11 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3"
@@ -653,7 +655,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
               </select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="legal-stage-version">Номер версии</Label>
+              <Label className="sr-only" htmlFor="legal-stage-version">Номер версии</Label>
               <Input
                 id="legal-stage-version"
                 value={version}
@@ -663,7 +665,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="legal-stage-revision">Описание редакции</Label>
+              <Label className="sr-only" htmlFor="legal-stage-revision">Описание редакции</Label>
               <Input
                 id="legal-stage-revision"
                 value={bodyRevision}

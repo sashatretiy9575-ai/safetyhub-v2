@@ -61,8 +61,9 @@ export function InitialArticleImportForm({ confirmation }: { confirmation: strin
   return (
     <form onSubmit={submit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="initial-article-import-confirmation">Строка подтверждения</Label>
+        <Label className="sr-only" htmlFor="initial-article-import-confirmation">Строка подтверждения</Label>
         <Input
+          placeholder="Строка подтверждения"
           id="initial-article-import-confirmation"
           value={value}
           onChange={(event) => setValue(event.target.value)}

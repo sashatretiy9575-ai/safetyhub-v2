@@ -99,7 +99,7 @@ const QUEUE_REFRESH_DEBOUNCE_MS = 1_500;
 
 function Avatar({ item, size }: { item: AdminAccountApprovalItem; size: 48 | 96 }) {
   const label = fullName(item);
-  const box = size === 48 ? 'size-12 rounded-xl text-lg' : 'size-24 rounded-2xl text-3xl';
+  const box = size === 48 ? 'size-12 rounded-xl text-lg' : 'size-24 rounded-[var(--radius-group)] text-3xl';
   return item.avatarUrl ? (
     // The signed URL arrives with the page, so the list makes no extra requests
     // — and with fixed dimensions it no longer reflows as photos land.
@@ -447,7 +447,7 @@ export function AccountApprovalQueue({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-col gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1">
           <MagnifyingGlass
             className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[var(--color-text-subtle)]"
@@ -492,7 +492,7 @@ export function AccountApprovalQueue({
         // One place to tick courses for several applications at once.
         <section
           aria-label="Курсы для выбранных заявок"
-          className="space-y-3 rounded-2xl border border-[var(--color-primary)]/40 bg-[var(--color-primary-soft)]/40 p-3 sm:p-4"
+          className="space-y-3 rounded-[var(--radius-group)] border border-[var(--color-primary)]/40 bg-[var(--color-primary-soft)]/40 p-3 sm:p-4"
         >
           <p className="text-sm font-bold">
             Выбрано заявок: {selectedItems.length}. Какие курсы открыть всем?
@@ -534,7 +534,7 @@ export function AccountApprovalQueue({
       {courses.length === 0 ? (
         <p
           role="alert"
-          className="rounded-2xl border border-[var(--color-warning)]/50 bg-[var(--color-surface)] p-3 text-sm text-[var(--color-text-muted)]"
+          className="rounded-[var(--radius-group)] border border-[var(--color-warning)]/50 bg-[var(--color-surface)] p-3 text-sm text-[var(--color-text-muted)]"
         >
           Опубликованных курсов нет, поэтому подтвердить заявку пока нельзя: подтверждение открывает
           конкретные курсы.
@@ -552,7 +552,7 @@ export function AccountApprovalQueue({
           return (
             <li
               key={item.id}
-              className={`flex items-center gap-3 rounded-2xl border bg-[var(--color-surface)] p-3 shadow-sm transition-colors sm:px-4 ${
+              className={`flex items-center gap-3 rounded-[var(--radius-group)] border bg-[var(--color-surface)] p-3 shadow-sm transition-colors sm:px-4 ${
                 isSelected ? 'border-[var(--color-primary)]/60' : 'border-[var(--color-border)]'
               } ${resolved ? 'opacity-60' : ''}`}
             >
@@ -646,7 +646,7 @@ export function AccountApprovalQueue({
         onClick={(event) => {
           if (event.target === dialogRef.current) closeDialog();
         }}
-        className="m-auto max-h-[calc(100dvh-1rem)] w-[min(32rem,calc(100vw-1rem))] overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55"
+        className="m-auto max-h-[calc(100dvh-1rem)] w-[min(32rem,calc(100vw-1rem))] overflow-y-auto rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55"
       >
         {openItem
           ? (() => {

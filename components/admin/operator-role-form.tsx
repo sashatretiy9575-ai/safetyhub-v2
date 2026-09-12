@@ -85,7 +85,7 @@ export function OperatorRoleForm() {
   return (
     <form onSubmit={submit} className="space-y-3">
       <div className="space-y-1.5">
-        <Label htmlFor="operator-email">Почта нового администратора</Label>
+        <Label className="sr-only" htmlFor="operator-email">Почта нового администратора</Label>
         <Input
           id="operator-email"
           type="email"
@@ -98,7 +98,7 @@ export function OperatorRoleForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="operator-reason">Причина (в журнал действий)</Label>
+        <Label className="sr-only" htmlFor="operator-reason">Причина (в журнал действий)</Label>
         <Textarea
           id="operator-reason"
           required

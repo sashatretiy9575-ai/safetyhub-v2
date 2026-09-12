@@ -31,8 +31,9 @@ export function ContentSeoEditor({
   return (
     <div className={cn('grid gap-4 md:grid-cols-2', className)}>
       <div className="space-y-1.5">
-        <Label htmlFor={`${idPrefix}-seo-title`}>SEO-заголовок</Label>
+        <Label className="sr-only" htmlFor={`${idPrefix}-seo-title`}>SEO-заголовок</Label>
         <Input
+          placeholder="SEO-заголовок"
           id={`${idPrefix}-seo-title`}
           maxLength={70}
           value={value.title}
@@ -40,8 +41,9 @@ export function ContentSeoEditor({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor={`${idPrefix}-og-title`}>Open Graph заголовок</Label>
+        <Label className="sr-only" htmlFor={`${idPrefix}-og-title`}>Open Graph заголовок</Label>
         <Input
+          placeholder="Open Graph заголовок"
           id={`${idPrefix}-og-title`}
           maxLength={70}
           value={value.ogTitle}
@@ -49,8 +51,9 @@ export function ContentSeoEditor({
         />
       </div>
       <div className="space-y-1.5 md:col-span-2">
-        <Label htmlFor={`${idPrefix}-seo-description`}>SEO-описание</Label>
+        <Label className="sr-only" htmlFor={`${idPrefix}-seo-description`}>SEO-описание</Label>
         <Textarea
+          placeholder="SEO-описание"
           id={`${idPrefix}-seo-description`}
           maxLength={200}
           value={value.description}
@@ -58,8 +61,9 @@ export function ContentSeoEditor({
         />
       </div>
       <div className="space-y-1.5 md:col-span-2">
-        <Label htmlFor={`${idPrefix}-og-description`}>Open Graph описание</Label>
+        <Label className="sr-only" htmlFor={`${idPrefix}-og-description`}>Open Graph описание</Label>
         <Textarea
+          placeholder="Open Graph описание"
           id={`${idPrefix}-og-description`}
           maxLength={200}
           value={value.ogDescription}

@@ -240,16 +240,18 @@ export default async function AuditPage({
       <form className="grid gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 sm:grid-cols-2 sm:items-end lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_9.5rem_9.5rem_auto_auto]">
         {query.action ? <input type="hidden" name="action" value={query.action} /> : null}
         <div className="space-y-1">
-          <Label htmlFor="audit-actor" className="text-xs">
+          <Label className="sr-only" htmlFor="audit-actor">
             Кто (инициатор)
           </Label>
-          <Input id="audit-actor" name="actor" defaultValue={query.actor} maxLength={100} />
+          <Input
+          placeholder="Кто (инициатор)" id="audit-actor" name="actor" defaultValue={query.actor} maxLength={100} />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="audit-target" className="text-xs">
+          <Label className="sr-only" htmlFor="audit-target">
             Над кем / над чем
           </Label>
-          <Input id="audit-target" name="target" defaultValue={query.target} maxLength={100} />
+          <Input
+          placeholder="Над кем / над чем" id="audit-target" name="target" defaultValue={query.target} maxLength={100} />
         </div>
         <div className="space-y-1">
           <Label htmlFor="audit-from" className="text-xs">

@@ -95,8 +95,9 @@ export default async function AdminOperatorsPage({
 
       <form className="grid gap-3 rounded-xl border bg-[var(--color-surface)] p-4 sm:grid-cols-[1fr_auto_auto] sm:items-end">
         <div className="space-y-1">
-          <Label htmlFor="operators-query">Имя или почта</Label>
+          <Label className="sr-only" htmlFor="operators-query">Имя или почта</Label>
           <Input
+          placeholder="Имя или почта"
             id="operators-query"
             name="q"
             type="search"

@@ -140,8 +140,9 @@ export function ProfileForm({
       ) : (
         <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2" noValidate>
           <div className="space-y-1">
-            <Label htmlFor="profile-name">{t('name')}</Label>
+            <Label className="sr-only" htmlFor="profile-name">{t('name')}</Label>
             <Input
+          placeholder={t('name')}
               id="profile-name"
               autoComplete="given-name"
               maxLength={PROFILE_FIELD_LIMITS.name}
@@ -155,8 +156,9 @@ export function ProfileForm({
             ) : null}
           </div>
           <div className="space-y-1">
-            <Label htmlFor="profile-surname">{t('surname')}</Label>
+            <Label className="sr-only" htmlFor="profile-surname">{t('surname')}</Label>
             <Input
+          placeholder={t('surname')}
               id="profile-surname"
               autoComplete="family-name"
               maxLength={PROFILE_FIELD_LIMITS.surname}
@@ -172,8 +174,9 @@ export function ProfileForm({
             ) : null}
           </div>
           <div className="space-y-1 sm:col-span-2">
-            <Label htmlFor="profile-job">{t('job')}</Label>
+            <Label className="sr-only" htmlFor="profile-job">{t('job')}</Label>
             <Input
+          placeholder={t('job')}
               id="profile-job"
               autoComplete="organization-title"
               maxLength={PROFILE_FIELD_LIMITS.job}
@@ -187,8 +190,9 @@ export function ProfileForm({
             ) : null}
           </div>
           <div className="space-y-1 sm:col-span-2">
-            <Label htmlFor="profile-organization">{t('organizationShort')}</Label>
+            <Label className="sr-only" htmlFor="profile-organization">{t('organizationShort')}</Label>
             <Input
+          placeholder={t('organizationShort')}
               id="profile-organization"
               list="profile-organizations"
               autoComplete="organization"

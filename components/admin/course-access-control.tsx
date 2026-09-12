@@ -132,7 +132,7 @@ export function CourseAccessControl({ userId, canManage }: { userId: string; can
 
   return (
     <section
-      className="space-y-3 rounded-2xl border p-4"
+      className="space-y-3 rounded-[var(--radius-group)] border p-4"
       aria-labelledby={`course-access-${userId}`}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">

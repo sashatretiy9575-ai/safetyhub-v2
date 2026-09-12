@@ -21,7 +21,7 @@ export function AdminListSkeleton({
         <div className="h-9 w-40 animate-pulse rounded-xl bg-[var(--color-surface-muted)]" />
       </div>
       {summary ? (
-        <div className="grid gap-px overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-border)] sm:grid-cols-2">
+        <div className="grid gap-px overflow-hidden rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-border)] sm:grid-cols-2">
           <div className="h-20 animate-pulse bg-[var(--color-surface)]" />
           <div className="h-20 animate-pulse bg-[var(--color-surface)]" />
         </div>

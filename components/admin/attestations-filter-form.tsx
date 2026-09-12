@@ -60,7 +60,7 @@ function FilterChip({ label, value, href }: { label: string; value: string; href
   return (
     <Link
       href={href}
-      className="inline-flex min-h-11 max-w-full items-center gap-1 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 text-xs font-semibold hover:bg-[var(--color-surface-muted)]"
+      className="text-caption inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-full border border-[var(--color-accent-amber)]/45 bg-[var(--color-accent-amber-soft)] px-3 font-semibold text-[var(--color-warning)] transition-colors hover:border-[var(--color-accent-amber)] hover:brightness-105"
       title={`Убрать фильтр: ${label}`}
     >
       <span className="truncate">
@@ -153,24 +153,29 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
             className="pl-10"
           />
         </div>
-        <Button type="submit" size="sm" className="min-h-11 shrink-0" aria-label="Найти">
-          <MagnifyingGlass aria-hidden size={18} className="xs:hidden" />
-          <span className="xs:inline hidden">Найти</span>
+        <Button type="submit" size="icon" className="shrink-0" aria-label="Найти">
+          <MagnifyingGlass aria-hidden />
         </Button>
         <Button
           ref={filterButtonRef}
           type="button"
-          size="sm"
-          className="min-h-11 shrink-0"
+          size="icon"
+          className="relative shrink-0"
           variant="outline"
           aria-expanded={filtersOpen}
           aria-label={`Фильтры${activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}`}
           aria-controls="attestation-filters-panel"
           onClick={() => setFiltersOpen(true)}
         >
-          <FunnelSimple />
-          <span className="xs:inline hidden">Фильтры</span>
-          {activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+          <FunnelSimple aria-hidden />
+          {activeFilterCount > 0 ? (
+            <span
+              aria-hidden
+              className="text-micro absolute -top-1 -right-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--color-accent-amber)] px-1 font-black text-[#1b1205] tabular-nums"
+            >
+              {activeFilterCount}
+            </span>
+          ) : null}
         </Button>
       </div>
 
@@ -247,7 +252,7 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
           aria-labelledby={filtersOpen ? 'attestation-filters-title' : undefined}
           className={`${
             filtersOpen
-              ? 'fixed inset-x-3 bottom-3 z-[var(--z-overlay)] block max-h-[88dvh] overflow-y-auto rounded-3xl border bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)] lg:max-h-[min(42rem,calc(100dvh-8rem))] @min-[760px]:top-[4.5rem] @min-[760px]:right-3 @min-[760px]:bottom-auto @min-[760px]:left-auto @min-[760px]:max-h-[min(42rem,calc(100dvh-8rem-var(--mobile-tab-height)))] @min-[760px]:w-[min(52rem,calc(100%-1.5rem))] @min-[760px]:rounded-2xl @min-[760px]:pb-4'
+              ? 'fixed inset-x-3 bottom-3 z-[var(--z-overlay)] block max-h-[88dvh] overflow-y-auto rounded-3xl border bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)] lg:max-h-[min(42rem,calc(100dvh-8rem))] @min-[760px]:top-[4.5rem] @min-[760px]:right-3 @min-[760px]:bottom-auto @min-[760px]:left-auto @min-[760px]:max-h-[min(42rem,calc(100dvh-8rem-var(--mobile-tab-height)))] @min-[760px]:w-[min(52rem,calc(100%-1.5rem))] @min-[760px]:rounded-[var(--radius-group)] @min-[760px]:pb-4'
               : 'hidden'
           }`}
         >
@@ -268,8 +273,8 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
           </div>
 
           <div className="grid gap-3 md:grid-cols-2 @min-[760px]:grid-cols-4">
-            <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
-              Компания
+            <label className="block">
+              <span className="sr-only">Компания</span>
               <Input
                 form={FILTER_FORM_ID}
                 name="organization"
@@ -277,7 +282,6 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
                 placeholder="Точная компания"
                 aria-label="Фильтр по компании"
                 list="attestation-organizations"
-                className="mt-1"
               />
               <datalist id="attestation-organizations">
                 {dictionaries.organizations.map((organization) => (
@@ -285,13 +289,13 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
                 ))}
               </datalist>
             </label>
-            <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
-              Курс
+            <label className="block">
+              <span className="sr-only">Курс</span>
               <select
                 form={FILTER_FORM_ID}
                 name="course"
                 defaultValue={values.testId ?? ''}
-                className={`${selectClass} mt-1`}
+                className={selectClass}
                 aria-label="Курс"
               >
                 <option value="">Все курсы</option>
@@ -302,13 +306,13 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
                 ))}
               </select>
             </label>
-            <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
-              Результат
+            <label className="block">
+              <span className="sr-only">Результат</span>
               <select
                 form={FILTER_FORM_ID}
                 name="result"
                 defaultValue={values.resultState ?? ''}
-                className={`${selectClass} mt-1`}
+                className={selectClass}
                 aria-label="Результат"
               >
                 <option value="">Все результаты</option>
@@ -316,13 +320,13 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
                 <option value="failed">Не сдан</option>
               </select>
             </label>
-            <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
-              Состояние сертификата
+            <label className="block">
+              <span className="sr-only">Состояние сертификата</span>
               <select
                 form={FILTER_FORM_ID}
                 name="certificate"
                 defaultValue={values.certificateState ?? ''}
-                className={`${selectClass} mt-1`}
+                className={selectClass}
                 aria-label="Состояние сертификата"
               >
                 <option value="">Все состояния сертификата</option>
@@ -332,35 +336,40 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
                 <option value="revoked">Нужно выдать заново</option>
               </select>
             </label>
-            <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
-              С даты
-              <Input
+            {/* A date input draws its own dd.mm.yyyy, so a placeholder cannot
+                name it. The two fields share one frame that reads "с … по …"
+                instead of carrying a caption each. */}
+            <div className="flex min-h-11 items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)] md:col-span-2">
+              <span aria-hidden className="text-caption text-[var(--color-text-subtle)]">
+                с
+              </span>
+              <input
                 form={FILTER_FORM_ID}
                 type="date"
                 name="from"
                 defaultValue={values.from}
                 aria-label="Дата результата с"
-                className="mt-1"
+                className="min-w-0 flex-1 bg-transparent text-sm text-[var(--color-text)] outline-none"
               />
-            </label>
-            <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
-              По дату
-              <Input
+              <span aria-hidden className="text-caption text-[var(--color-text-subtle)]">
+                по
+              </span>
+              <input
                 form={FILTER_FORM_ID}
                 type="date"
                 name="to"
                 defaultValue={values.to}
                 aria-label="Дата результата по"
-                className="mt-1"
+                className="min-w-0 flex-1 bg-transparent text-sm text-[var(--color-text)] outline-none"
               />
-            </label>
-            <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
-              Сортировка
+            </div>
+            <label className="block">
+              <span className="sr-only">Сортировка</span>
               <select
                 form={FILTER_FORM_ID}
                 name="sort"
                 defaultValue={values.sort}
-                className={`${selectClass} mt-1`}
+                className={selectClass}
                 aria-label="Сортировка"
               >
                 <option value="completed_desc">Сначала новые</option>
@@ -371,13 +380,13 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
                 <option value="score_asc">Сначала низкий балл</option>
               </select>
             </label>
-            <label className="block text-xs font-semibold text-[var(--color-text-muted)]">
-              Строк на странице
+            <label className="block">
+              <span className="sr-only">Строк на странице</span>
               <select
                 form={FILTER_FORM_ID}
                 name="pageSize"
                 defaultValue={values.pageSize}
-                className={`${selectClass} mt-1`}
+                className={selectClass}
                 aria-label="Строк на странице"
               >
                 <option value="25">25 строк</option>

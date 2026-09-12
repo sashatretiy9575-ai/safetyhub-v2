@@ -92,8 +92,11 @@ export function TestStatusControls({
       <DestructiveDialog
         open={unpublishOpen}
         title="Снять курс с публикации?"
-        description="Курс перейдёт в статус черновика и временно перестанет быть доступен учащимся на портале."
+        description="Курс перейдёт в статус черновика и временно перестанет быть доступен учащимся на портале. Опубликовать его снова можно из редактора."
         busy={busy}
+        confirmLabel="Снять с публикации"
+        busyLabel="Снимаем…"
+        acknowledgement={null}
         error={error}
         onOpenChange={(open) => {
           setUnpublishOpen(open);

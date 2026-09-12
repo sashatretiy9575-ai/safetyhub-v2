@@ -282,8 +282,9 @@ export function ZhUsernamePasswordFlow() {
 
       <form className="space-y-4" noValidate onSubmit={submit}>
         <div className="space-y-2">
-          <Label htmlFor={`zh-${mode}-username`}>{t('usernameLabel')}</Label>
+          <Label className="sr-only" htmlFor={`zh-${mode}-username`}>{t('usernameLabel')}</Label>
           <Input
+          placeholder={t('usernameLabel')}
             id={`zh-${mode}-username`}
             autoComplete="username"
             autoCapitalize="none"
@@ -304,8 +305,9 @@ export function ZhUsernamePasswordFlow() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor={`zh-${mode}-password`}>{t('passwordLabel')}</Label>
+          <Label className="sr-only" htmlFor={`zh-${mode}-password`}>{t('passwordLabel')}</Label>
           <Input
+          placeholder={t('passwordLabel')}
             id={`zh-${mode}-password`}
             type="password"
             autoComplete={isRegistration ? 'new-password' : 'current-password'}
@@ -328,10 +330,11 @@ export function ZhUsernamePasswordFlow() {
         {isRegistration ? (
           <>
             <div className="space-y-2">
-              <Label htmlFor="zh-register-password-confirmation">
+              <Label className="sr-only" htmlFor="zh-register-password-confirmation">
                 {t('passwordConfirmationLabel')}
               </Label>
               <Input
+          placeholder={t('passwordConfirmationLabel')}
                 id="zh-register-password-confirmation"
                 type="password"
                 autoComplete="new-password"

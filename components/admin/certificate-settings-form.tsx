@@ -233,7 +233,7 @@ export function CertificateSettingsForm({
     options: { placeholder?: string; hint?: string; maxLength?: number } = {},
   ) => (
     <div className="space-y-1.5">
-      <Label htmlFor={`certificate-${key}`}>{label}</Label>
+      <Label className="sr-only" htmlFor={`certificate-${key}`}>{label}</Label>
       <Input
         id={`certificate-${key}`}
         value={fields[key]}
@@ -249,8 +249,9 @@ export function CertificateSettingsForm({
 
   const textArea = (key: keyof Fields, label: string, hint: string) => (
     <div className="space-y-1.5">
-      <Label htmlFor={`certificate-${key}`}>{label}</Label>
+      <Label className="sr-only" htmlFor={`certificate-${key}`}>{label}</Label>
       <Textarea
+          placeholder={label}
         id={`certificate-${key}`}
         value={fields[key]}
         rows={3}
@@ -300,8 +301,9 @@ export function CertificateSettingsForm({
             hint: 'Подставляется вместо {protocol} в текстах ниже. Пусто — прочерк.',
           })}
           <div className="space-y-1.5">
-            <Label htmlFor="certificate-validityMonths">Срок действия, месяцев</Label>
+            <Label className="sr-only" htmlFor="certificate-validityMonths">Срок действия, месяцев</Label>
             <Input
+          placeholder="Срок действия, месяцев"
               id="certificate-validityMonths"
               type="number"
               inputMode="numeric"

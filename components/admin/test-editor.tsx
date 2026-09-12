@@ -558,8 +558,9 @@ export function TestEditor({
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5 md:col-span-2">
-                <Label htmlFor="test-title">Название</Label>
+                <Label className="sr-only" htmlFor="test-title">Название</Label>
                 <Input
+          placeholder="Название"
                   id="test-title"
                   value={course.title}
                   invalid={validationAttempted && Boolean(validation.fieldErrors['test-title'])}
@@ -573,8 +574,9 @@ export function TestEditor({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="test-slug">Slug</Label>
+                <Label className="sr-only" htmlFor="test-slug">Slug</Label>
                 <Input
+          placeholder="Slug"
                   id="test-slug"
                   value={course.slug}
                   invalid={validationAttempted && Boolean(validation.fieldErrors['test-slug'])}
@@ -588,8 +590,9 @@ export function TestEditor({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="test-display-order">Порядок в каталоге</Label>
+                <Label className="sr-only" htmlFor="test-display-order">Порядок в каталоге</Label>
                 <Input
+          placeholder="Порядок в каталоге"
                   id="test-display-order"
                   type="number"
                   min={1}
@@ -609,8 +612,9 @@ export function TestEditor({
                 />
               </div>
               <div className="space-y-1.5 md:col-span-2">
-                <Label htmlFor="test-description">Описание</Label>
+                <Label className="sr-only" htmlFor="test-description">Описание</Label>
                 <Textarea
+          placeholder="Описание"
                   id="test-description"
                   value={course.description}
                   onChange={(event) =>
@@ -658,8 +662,9 @@ export function TestEditor({
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-1.5">
-                <Label htmlFor="test-duration">Минуты</Label>
+                <Label className="sr-only" htmlFor="test-duration">Минуты</Label>
                 <Input
+          placeholder="Минуты"
                   id="test-duration"
                   type="number"
                   min={1}
@@ -680,8 +685,9 @@ export function TestEditor({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="test-pass-score">Проходной балл</Label>
+                <Label className="sr-only" htmlFor="test-pass-score">Проходной балл</Label>
                 <Input
+          placeholder="Проходной балл"
                   id="test-pass-score"
                   type="number"
                   min={1}
@@ -699,8 +705,9 @@ export function TestEditor({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="test-attempt-limit">Попыток в день</Label>
+                <Label className="sr-only" htmlFor="test-attempt-limit">Попыток в день</Label>
                 <Input
+          placeholder="Попыток в день"
                   id="test-attempt-limit"
                   type="number"
                   min={1}
@@ -721,8 +728,9 @@ export function TestEditor({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="test-timezone">Часовой пояс</Label>
-                <Input id="test-timezone" value={course.attemptResetTimezone} readOnly />
+                <Label className="sr-only" htmlFor="test-timezone">Часовой пояс</Label>
+                <Input
+          placeholder="Часовой пояс" id="test-timezone" value={course.attemptResetTimezone} readOnly />
               </div>
             </CardContent>
           </Card>
@@ -837,10 +845,11 @@ export function TestEditor({
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor={`variant-${activeVariant}-question-${activeQuestion}`}>
+                    <Label className="sr-only" htmlFor={`variant-${activeVariant}-question-${activeQuestion}`}>
                       Текст вопроса
                     </Label>
                     <Textarea
+          placeholder="Текст вопроса"
                       id={`variant-${activeVariant}-question-${activeQuestion}`}
                       value={currentQuestion.text}
                       onChange={(event) => updateQuestion({ text: event.target.value })}
@@ -903,12 +912,11 @@ export function TestEditor({
                     })}
                   </fieldset>
                   <div className="space-y-1.5">
-                    <Label
-                      htmlFor={`variant-${activeVariant}-question-${activeQuestion}-explanation`}
-                    >
+                    <Label className="sr-only" htmlFor={`variant-${activeVariant}-question-${activeQuestion}-explanation`}>
                       Пояснение (необязательно)
                     </Label>
                     <Textarea
+          placeholder="Пояснение (необязательно)"
                       id={`variant-${activeVariant}-question-${activeQuestion}-explanation`}
                       value={currentQuestion.explanation}
                       onChange={(event) => updateQuestion({ explanation: event.target.value })}

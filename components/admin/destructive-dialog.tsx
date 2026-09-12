@@ -104,7 +104,7 @@ export function DestructiveDialog({
           aria-modal="true"
           aria-labelledby={titleId}
           aria-describedby={descriptionId}
-          className="w-full max-w-md rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 shadow-2xl"
+          className="w-full max-w-md rounded-[var(--radius-group)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 shadow-2xl"
         >
           <h2 id={titleId} className="text-xl font-bold">
             {title}

@@ -529,8 +529,9 @@ export function EmailOtpFlow() {
       {stage === 'email' && (
         <form onSubmit={requestCode} className="space-y-4" noValidate>
           <div className="space-y-2">
-            <Label htmlFor="email-otp-email">{t('emailLabel')}</Label>
+            <Label className="sr-only" htmlFor="email-otp-email">{t('emailLabel')}</Label>
             <Input
+          placeholder={t('emailLabel')}
               id="email-otp-email"
               ref={emailRef}
               type="email"
@@ -579,8 +580,9 @@ export function EmailOtpFlow() {
       {stage === 'code' && (
         <form onSubmit={verifyCode} className="space-y-4" noValidate>
           <div className="space-y-2">
-            <Label htmlFor="email-otp-code-email">{t('emailLabel')}</Label>
+            <Label className="sr-only" htmlFor="email-otp-code-email">{t('emailLabel')}</Label>
             <Input
+          placeholder={t('emailLabel')}
               id="email-otp-code-email"
               ref={emailRef}
               type="email"
@@ -600,8 +602,9 @@ export function EmailOtpFlow() {
             <FieldError id="email-otp-code-email-error" message={fieldErrors.email} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email-otp-code">{t('codeLabel')}</Label>
+            <Label className="sr-only" htmlFor="email-otp-code">{t('codeLabel')}</Label>
             <Input
+          placeholder={t('codeLabel')}
               id="email-otp-code"
               ref={codeRef}
               type="text"

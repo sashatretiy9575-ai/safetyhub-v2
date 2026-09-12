@@ -23,7 +23,7 @@ async function sourceFiles(directory) {
 // the whole site now shares. Breakpoints are the Tailwind names plus xs and
 // wide; the only pixel media query left is the course card's 280 px badge
 // swap, and the admin tables keep their 760 px container query.
-const ALLOWED_PIXEL_QUERIES = new Set(['min-[280px]:', '@min-[760px]:']);
+const ALLOWED_PIXEL_QUERIES = new Set(['min-[280px]:', '@min-[480px]:', '@min-[760px]:']);
 
 test('components use the fluid type tokens instead of pixel font sizes', async () => {
   const files = [

@@ -961,45 +961,6 @@ export function AttestationsManager({
       // selected made the whole page jump on the first tick of a checkbox.
       className="space-y-3 pb-28 @min-[760px]:pb-36"
     >
-      <AttestationSelectionBanner
-        selectedCount={selectedCount}
-        totalFiltered={page.total}
-        pageSize={page.items.length}
-        isAllFilteredSelected={allFilteredSelected}
-        selectingAll={selectingAll}
-        onSelectAllFiltered={selectAllFiltered}
-        onClearSelection={clearSelection}
-      />
-
-      {message ? (
-        <div role="status" className="rounded-xl bg-[var(--color-primary-soft)] px-4 py-3 text-sm">
-          <p>{message}</p>
-          {messageReasons.length > 0 ? (
-            <>
-              <p className="mt-2 font-bold">Почему пропущено:</p>
-              <ul className="mt-1 list-disc space-y-0.5 pl-5">
-                {messageReasons.map(([label, count]) => (
-                  <li key={label}>
-                    {count} — {label}
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
-        </div>
-      ) : null}
-
-      {exportProgress ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--color-primary)] bg-[var(--color-primary-soft)] px-4 py-3 text-sm">
-          <p>
-            Формирование в браузере: {exportProgress.completed} из {exportProgress.total} PDF.
-          </p>
-          <Button size="sm" variant="outline" onClick={() => exportAbortRef.current?.abort()}>
-            <X /> Отменить
-          </Button>
-        </div>
-      ) : null}
-
       <div
         role="table"
         aria-label="Аттестации сотрудников"
@@ -1183,88 +1144,140 @@ export function AttestationsManager({
         </div>
       </div>
 
-      {selectedCount > 0 ? (
-        <>
-          <aside
-            aria-label="Выбранные аттестации"
-            className="glass-strong sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+.5rem)] z-30 flex items-center gap-3 rounded-2xl border p-3 shadow-[var(--shadow-pop)] @min-[760px]:hidden"
+      {/* Everything that comes and goes lives in this strip: a banner above the
+          list pushed every company down the screen on the first tick of a
+          checkbox. The list reserves the strip's height at all times, so
+          selecting, exporting or finishing an action never moves a row. */}
+      <div className="sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+1rem)] z-[var(--z-sticky)] space-y-2 lg:bottom-4">
+        <AttestationSelectionBanner
+          selectedCount={selectedCount}
+          totalFiltered={page.total}
+          pageSize={page.items.length}
+          isAllFilteredSelected={allFilteredSelected}
+          selectingAll={selectingAll}
+          onSelectAllFiltered={selectAllFiltered}
+          onClearSelection={clearSelection}
+        />
+
+        {message ? (
+          <div
+            role="status"
+            className="glass-strong rounded-[var(--radius-group)] border border-[var(--color-primary)]/40 px-4 py-3 text-sm shadow-[var(--shadow-pop)]"
           >
-            <p className="min-w-0 flex-1 font-bold tabular-nums">Выбрано: {selectedCount}</p>
-            <Button ref={bulkActionsTriggerRef} size="sm" onClick={() => setBulkActionsOpen(true)}>
-              Действия
+            <p>{message}</p>
+            {messageReasons.length > 0 ? (
+              <>
+                <p className="mt-2 font-bold">Почему пропущено:</p>
+                <ul className="mt-1 list-disc space-y-0.5 pl-5">
+                  {messageReasons.map(([label, count]) => (
+                    <li key={label}>
+                      {count} — {label}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+          </div>
+        ) : null}
+
+        {exportProgress ? (
+          <div className="glass-strong flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-group)] border border-[var(--color-primary)] px-4 py-3 text-sm shadow-[var(--shadow-pop)]">
+            <p>
+              Формирование в браузере: {exportProgress.completed} из {exportProgress.total} PDF.
+            </p>
+            <Button size="sm" variant="outline" onClick={() => exportAbortRef.current?.abort()}>
+              <X /> Отменить
             </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={clearSelection}
-              aria-label="Снять выделение"
+          </div>
+        ) : null}
+
+        {selectedCount > 0 ? (
+          <>
+            <aside
+              aria-label="Выбранные аттестации"
+              className="glass-strong flex items-center gap-3 rounded-[var(--radius-group)] border p-3 shadow-[var(--shadow-pop)] @min-[760px]:hidden"
             >
-              <X />
-            </Button>
-          </aside>
-
-          <aside
-            aria-label="Массовые действия"
-            className="glass-strong sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+1rem)] z-[var(--z-sticky)] hidden rounded-2xl border p-4 shadow-[var(--shadow-pop)] lg:bottom-4 @min-[760px]:block"
-          >
-            <div className="flex flex-wrap items-center gap-3">
-              <strong className="text-sm tabular-nums">Выбрано: {selectionSummary.total}</strong>
-              <AttestationBulkActionButtons
-                summary={selectionSummary}
-                permissions={permissions}
-                busy={busy}
-                onAction={setPending}
-              />
-            </div>
-          </aside>
-
-          {bulkActionsOpen ? (
-            <AdminOverlay>
-              <div
-                className="fixed inset-0 z-[var(--z-overlay)] grid items-end bg-black/45 @min-[760px]:hidden"
-                role="presentation"
-                onMouseDown={(event) => {
-                  if (event.target === event.currentTarget) closeBulkActions();
-                }}
+              <p className="min-w-0 flex-1 font-bold tabular-nums">Выбрано: {selectedCount}</p>
+              <Button
+                ref={bulkActionsTriggerRef}
+                size="sm"
+                onClick={() => setBulkActionsOpen(true)}
               >
-                <section
-                  ref={bulkActionsPanelRef}
-                  tabIndex={-1}
-                  role="dialog"
-                  aria-modal="true"
-                  aria-labelledby="bulk-actions-title"
-                  className="max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)]"
-                >
-                  <header className="mb-4 flex items-start justify-between gap-3">
-                    <h2 id="bulk-actions-title" className="text-lg font-bold">
-                      Действия · {selectionSummary.total}
-                    </h2>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={closeBulkActions}
-                      aria-label="Закрыть действия"
-                      data-modal-initial-focus
-                    >
-                      <X />
-                    </Button>
-                  </header>
-                  <AttestationBulkActionButtons
-                    summary={selectionSummary}
-                    permissions={permissions}
-                    busy={busy}
-                    onAction={(action) => {
-                      setBulkActionsOpen(false);
-                      setPending(action);
-                    }}
-                    compact
-                  />
-                </section>
+                Действия
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={clearSelection}
+                aria-label="Снять выделение"
+              >
+                <X />
+              </Button>
+            </aside>
+
+            <aside
+              aria-label="Массовые действия"
+              className="glass-strong hidden rounded-[var(--radius-group)] border p-4 shadow-[var(--shadow-pop)] @min-[760px]:block"
+            >
+              <div className="flex flex-wrap items-center gap-3">
+                <strong className="text-sm tabular-nums">Выбрано: {selectionSummary.total}</strong>
+                <AttestationBulkActionButtons
+                  summary={selectionSummary}
+                  permissions={permissions}
+                  busy={busy}
+                  onAction={setPending}
+                />
               </div>
-            </AdminOverlay>
-          ) : null}
-        </>
-      ) : null}
+            </aside>
+
+            {bulkActionsOpen ? (
+              <AdminOverlay>
+                <div
+                  className="fixed inset-0 z-[var(--z-overlay)] grid items-end bg-black/45 @min-[760px]:hidden"
+                  role="presentation"
+                  onMouseDown={(event) => {
+                    if (event.target === event.currentTarget) closeBulkActions();
+                  }}
+                >
+                  <section
+                    ref={bulkActionsPanelRef}
+                    tabIndex={-1}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="bulk-actions-title"
+                    className="max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)]"
+                  >
+                    <header className="mb-4 flex items-start justify-between gap-3">
+                      <h2 id="bulk-actions-title" className="text-lg font-bold">
+                        Действия · {selectionSummary.total}
+                      </h2>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={closeBulkActions}
+                        aria-label="Закрыть действия"
+                        data-modal-initial-focus
+                      >
+                        <X />
+                      </Button>
+                    </header>
+                    <AttestationBulkActionButtons
+                      summary={selectionSummary}
+                      permissions={permissions}
+                      busy={busy}
+                      onAction={(action) => {
+                        setBulkActionsOpen(false);
+                        setPending(action);
+                      }}
+                      compact
+                    />
+                  </section>
+                </div>
+              </AdminOverlay>
+            ) : null}
+          </>
+        ) : null}
+      </div>
 
       <AttestationDetailDrawer
         row={detail}

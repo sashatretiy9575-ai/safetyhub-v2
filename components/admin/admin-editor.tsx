@@ -589,7 +589,7 @@ export function AdminEditor({
               <CardContent className="xs:p-5 min-w-0 space-y-4 p-4 md:p-6">
                 <h2 className="font-semibold">Метаданные</h2>
                 <div className="min-w-0 space-y-2">
-                  <Label htmlFor="article-slug">Slug (URL)</Label>
+                  <Label className="sr-only" htmlFor="article-slug">Slug (URL)</Label>
                   <Input
                     id="article-slug"
                     value={slug}
@@ -639,8 +639,9 @@ export function AdminEditor({
                   </summary>
                   <div className="mt-4 space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="article-jurisdiction">Юрисдикция</Label>
+                      <Label className="sr-only" htmlFor="article-jurisdiction">Юрисдикция</Label>
                       <Input
+          placeholder="Юрисдикция"
                         id="article-jurisdiction"
                         value={jurisdiction}
                         maxLength={CONTENT_METADATA_LIMITS.jurisdictionMax}
@@ -738,7 +739,7 @@ export function AdminEditor({
             <Card>
               <CardContent className="space-y-4 p-4 md:p-5">
                 <div className="space-y-2">
-                  <Label htmlFor="article-title">Название статьи</Label>
+                  <Label className="sr-only" htmlFor="article-title">Название статьи</Label>
                   <Input
                     id="article-title"
                     value={title}
@@ -748,7 +749,7 @@ export function AdminEditor({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="article-description">Краткое описание</Label>
+                  <Label className="sr-only" htmlFor="article-description">Краткое описание</Label>
                   <Textarea
                     id="article-description"
                     value={description}

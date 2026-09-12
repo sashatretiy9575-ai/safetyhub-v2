@@ -35,8 +35,9 @@ export function CourseContentEditor({
         >
           <div className="flex flex-wrap items-end gap-2">
             <div className="min-w-0 flex-1 space-y-1">
-              <Label htmlFor={`module-${module.id}`}>Название модуля</Label>
+              <Label className="sr-only" htmlFor={`module-${module.id}`}>Название модуля</Label>
               <Input
+          placeholder="Название модуля"
                 id={`module-${module.id}`}
                 value={module.title}
                 onChange={(event) => updateModule(moduleIndex, { title: event.target.value })}
@@ -108,8 +109,9 @@ export function CourseContentEditor({
               <legend className="px-1 text-sm font-bold">Урок {lessonIndex + 1}</legend>
               <div className="flex flex-wrap items-end gap-2">
                 <div className="min-w-0 flex-1 space-y-1">
-                  <Label htmlFor={`lesson-${lesson.id}`}>Название урока</Label>
+                  <Label className="sr-only" htmlFor={`lesson-${lesson.id}`}>Название урока</Label>
                   <Input
+          placeholder="Название урока"
                     id={`lesson-${lesson.id}`}
                     value={lesson.title}
                     onChange={(event) =>

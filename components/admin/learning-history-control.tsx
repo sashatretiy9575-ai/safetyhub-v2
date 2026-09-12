@@ -221,8 +221,9 @@ export function LearningHistoryControl({
             {history?.counts.revokedCertificates ?? 0}.
           </p>
           <div className="space-y-1">
-            <Label htmlFor={`history-reason-${userId}`}>Причина, минимум 10 символов</Label>
+            <Label className="sr-only" htmlFor={`history-reason-${userId}`}>Причина, минимум 10 символов</Label>
             <Textarea
+          placeholder="Причина, минимум 10 символов"
               id={`history-reason-${userId}`}
               minLength={10}
               maxLength={500}
@@ -231,8 +232,9 @@ export function LearningHistoryControl({
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor={`history-confirm-${userId}`}>Введите УДАЛИТЬ</Label>
+            <Label className="sr-only" htmlFor={`history-confirm-${userId}`}>Введите УДАЛИТЬ</Label>
             <Input
+          placeholder="Введите УДАЛИТЬ"
               id={`history-confirm-${userId}`}
               autoComplete="off"
               value={confirmation}

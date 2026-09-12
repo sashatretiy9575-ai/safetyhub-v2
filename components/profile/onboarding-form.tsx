@@ -201,8 +201,9 @@ export function OnboardingForm({
     <form onSubmit={submit} className="space-y-6" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="onboarding-name">{t('name')}</Label>
+          <Label className="sr-only" htmlFor="onboarding-name">{t('name')}</Label>
           <Input
+          placeholder={t('name')}
             ref={nameRef}
             id="onboarding-name"
             autoComplete="given-name"
@@ -224,8 +225,9 @@ export function OnboardingForm({
           ) : null}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="onboarding-surname">{t('surname')}</Label>
+          <Label className="sr-only" htmlFor="onboarding-surname">{t('surname')}</Label>
           <Input
+          placeholder={t('surname')}
             ref={surnameRef}
             id="onboarding-surname"
             autoComplete="family-name"
@@ -247,8 +249,9 @@ export function OnboardingForm({
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="onboarding-job">{t('job')}</Label>
+          <Label className="sr-only" htmlFor="onboarding-job">{t('job')}</Label>
           <Input
+          placeholder={t('job')}
             ref={jobRef}
             id="onboarding-job"
             autoComplete="organization-title"
@@ -270,8 +273,9 @@ export function OnboardingForm({
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="onboarding-organization">{t('organization')}</Label>
+          <Label className="sr-only" htmlFor="onboarding-organization">{t('organization')}</Label>
           <Input
+          placeholder={t('organization')}
             ref={organizationRef}
             id="onboarding-organization"
             list="onboarding-organization-options"
