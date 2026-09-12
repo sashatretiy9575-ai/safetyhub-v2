@@ -598,14 +598,14 @@ export function AdminEditor({
                   />
                 </div>
                 <div className="min-w-0 space-y-2">
-                  <Label htmlFor="article-cover">Обложка</Label>
+                  <Label className="sr-only" htmlFor="article-cover">Обложка</Label>
                   <MediaAssetInput
                     id="article-cover"
                     value={coverImage}
                     maxWidth={1600}
                     maxHeight={900}
                     onChange={setCoverImage}
-                    placeholder="/images/generated/cover.webp"
+                    placeholder="Обложка"
                   />
                 </div>
               </CardContent>
@@ -648,13 +648,19 @@ export function AdminEditor({
                         onChange={(event) => setJurisdiction(event.target.value)}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="article-effective-date">Дата актуальности</Label>
-                      <Input
+                    <div className="flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)]">
+                      <Label className="sr-only" htmlFor="article-effective-date">
+                        Дата актуальности
+                      </Label>
+                      <span aria-hidden className="text-caption shrink-0 text-[var(--color-text-subtle)]">
+                        актуально на
+                      </span>
+                      <input
                         id="article-effective-date"
                         type="date"
                         value={effectiveDate}
                         onChange={(event) => setEffectiveDate(event.target.value)}
+                        className="min-w-0 flex-1 bg-transparent text-sm text-[var(--color-text)] outline-none"
                       />
                     </div>
 

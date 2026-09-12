@@ -300,10 +300,11 @@ export function ContentBlockEditor({
 
           {block.type === 'image' ? (
             <div className="grid gap-2">
-              <Label htmlFor={`course-image-${index}`}>Изображение</Label>
+              <Label className="sr-only" htmlFor={`course-image-${index}`}>Изображение</Label>
               <MediaAssetInput
                 id={`course-image-${index}`}
                 value={block.src}
+                placeholder="Изображение"
                 maxWidth={1600}
                 maxHeight={1200}
                 onChange={(src) => update(index, { ...block, src })}

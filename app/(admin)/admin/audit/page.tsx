@@ -197,9 +197,6 @@ export default async function AuditPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-h3 font-bold">История действий</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Кто и что изменил. Только чтение; записи старше 30 дней удаляются.
-          </p>
         </div>
         {auditResult.state === 'ready' ? (
           <ResultsExport
@@ -253,17 +250,31 @@ export default async function AuditPage({
           <Input
           placeholder="Над кем / над чем" id="audit-target" name="target" defaultValue={query.target} maxLength={100} />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="audit-from" className="text-xs">
-            С даты
-          </Label>
-          <Input id="audit-from" name="from" type="date" defaultValue={fromValue} />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="audit-to" className="text-xs">
-            По дату
-          </Label>
-          <Input id="audit-to" name="to" type="date" defaultValue={toValue} />
+        {/* A date input draws its own dd.mm.yyyy, so the pair shares one frame
+            that reads "с … по …" instead of a caption over each field. */}
+        <div className="flex min-h-11 items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)]">
+          <span aria-hidden className="text-caption text-[var(--color-text-subtle)]">
+            с
+          </span>
+          <input
+            id="audit-from"
+            name="from"
+            type="date"
+            defaultValue={fromValue}
+            aria-label="С даты"
+            className="min-w-0 flex-1 bg-transparent text-sm text-[var(--color-text)] outline-none"
+          />
+          <span aria-hidden className="text-caption text-[var(--color-text-subtle)]">
+            по
+          </span>
+          <input
+            id="audit-to"
+            name="to"
+            type="date"
+            defaultValue={toValue}
+            aria-label="По дату"
+            className="min-w-0 flex-1 bg-transparent text-sm text-[var(--color-text)] outline-none"
+          />
         </div>
         <Button type="submit" size="sm" className="h-11">
           Показать

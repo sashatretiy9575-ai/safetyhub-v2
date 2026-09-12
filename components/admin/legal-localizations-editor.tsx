@@ -349,12 +349,6 @@ function LegalVersionEditor({
           )}
         </section>
 
-        <div className="border-t border-[var(--color-border)] pt-4">
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Сохраните и отметьте готовыми четыре языка. Публикация выполняется только общим пакетом
-            Privacy + Terms выше на странице.
-          </p>
-        </div>
         {message ? (
           <p role="status" className="text-sm text-[var(--color-text-muted)]">
             {message}
@@ -559,11 +553,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
     <div className="space-y-6" data-admin-legal-localizations>
       <Card data-admin-legal-bundle-publisher>
         <CardHeader>
-          <CardTitle as="h2">Атомарная публикация Privacy + Terms</CardTitle>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Выберите две готовые версии с одной датой вступления в силу. Все восемь локализаций
-            публикуются в одной транзакции; одиночная публикация отключена.
-          </p>
+          <CardTitle as="h2">Публикация Privacy + Terms</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -633,10 +623,6 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
       <Card>
         <CardHeader>
           <CardTitle as="h2">Новая версия документа</CardTitle>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Создайте каноническую версию, затем заполните RU, KK, EN и ZH. Дата фиксируется на
-            начало дня по времени Asia/Oral.
-          </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -674,13 +660,19 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
                 onChange={(event) => setBodyRevision(event.target.value)}
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="legal-stage-effective-date">Дата вступления в силу</Label>
-              <Input
+            <div className="flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)]">
+              <Label className="sr-only" htmlFor="legal-stage-effective-date">
+                Дата вступления в силу
+              </Label>
+              <span aria-hidden className="text-caption shrink-0 text-[var(--color-text-subtle)]">
+                действует с
+              </span>
+              <input
                 id="legal-stage-effective-date"
                 type="date"
                 value={effectiveDate}
                 onChange={(event) => setEffectiveDate(event.target.value)}
+                className="min-w-0 flex-1 bg-transparent text-sm text-[var(--color-text)] outline-none"
               />
             </div>
           </div>

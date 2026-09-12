@@ -34,9 +34,7 @@ export default async function AdminCoursesPage({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-h3 font-bold">Курсы</h1>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Презентации, варианты вопросов и публикация. Найдено: {courses.length}.
-          </p>
+          <p className="text-sm text-[var(--color-text-muted)]">Найдено: {courses.length}</p>
         </div>
         <Button asChild>
           <Link href="/admin/courses/new">

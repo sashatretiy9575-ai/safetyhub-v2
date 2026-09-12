@@ -202,12 +202,7 @@ export function OrganizationCleanupManager({
             }}
           >
             <header className="flex items-start justify-between gap-3">
-              <div>
-                <h2 className="font-display text-xl font-bold">Объединить компании</h2>
-                <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                  Автоматического объединения не будет: выберите итог и политику документов.
-                </p>
-              </div>
+              <h2 className="font-display text-xl font-bold">Объединить компании</h2>
               <Button
                 type="button"
                 size="icon"

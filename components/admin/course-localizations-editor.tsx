@@ -234,10 +234,6 @@ export function CourseLocalizationsEditor({
     <Card data-admin-course-localizations>
       <CardHeader>
         <CardTitle as="h2">Локализации курса</CardTitle>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          Русские подписи админки не меняются. Публикация создаёт одну редакцию только после
-          готовности RU, KK, EN и ZH.
-        </p>
       </CardHeader>
       <CardContent className="space-y-5">
         <AdminLocaleTabs
@@ -311,12 +307,7 @@ export function CourseLocalizationsEditor({
               </div>
 
               <div className="space-y-3 rounded-xl border border-[var(--color-border)] p-4">
-                <div>
-                  <h3 className="font-bold">Учебный материал</h3>
-                  <p className="text-sm text-[var(--color-text-muted)]">
-                    Идентификаторы модулей и уроков сохраняются вместе с локализованным текстом.
-                  </p>
-                </div>
+                <h3 className="font-bold">Учебный материал</h3>
                 {parsedContent.success ? (
                   <CourseContentEditor
                     value={parsedContent.data}
@@ -348,12 +339,7 @@ export function CourseLocalizationsEditor({
 
               <div className="space-y-3 rounded-xl border border-[var(--color-border)] p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <h3 className="font-bold">Источники</h3>
-                    <p className="text-sm text-[var(--color-text-muted)]">
-                      Названия источников локализуются, HTTPS-ссылки остаются точными.
-                    </p>
-                  </div>
+                  <h3 className="font-bold">Источники</h3>
                   <Button
                     type="button"
                     size="sm"

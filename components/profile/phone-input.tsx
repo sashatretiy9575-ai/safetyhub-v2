@@ -19,6 +19,7 @@ export function PhoneInput({
   invalid,
   describedBy,
   disabled = false,
+  optional = false,
   countryOptions,
 }: {
   id: string;
@@ -27,6 +28,8 @@ export function PhoneInput({
   invalid?: boolean;
   describedBy?: string;
   disabled?: boolean;
+  /** A Chinese account may leave the number out; the placeholder says so. */
+  optional?: boolean;
   countryOptions: readonly PhoneCountryOption[];
 }) {
   const t = useTranslations('Profile');
@@ -92,8 +95,12 @@ export function PhoneInput({
         invalid={invalid}
         aria-describedby={describedBy}
         disabled={disabled}
-        placeholder={t('phonePlaceholder', { code: phoneCallingCode(value.countryIso2) })}
-        required
+        placeholder={
+          optional
+            ? `${t('phonePlaceholder', { code: phoneCallingCode(value.countryIso2) })} ${t('optional')}`
+            : t('phonePlaceholder', { code: phoneCallingCode(value.countryIso2) })
+        }
+        required={!optional}
       />
     </div>
   );

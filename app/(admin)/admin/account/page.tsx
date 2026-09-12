@@ -27,9 +27,6 @@ export default async function AdminAccountPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
         <h1 className="text-h3 font-black">Мой аккаунт</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Данные и фотография администратора без перехода в кабинет ученика.
-        </p>
       </div>
 
       <Card>

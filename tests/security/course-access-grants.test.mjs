@@ -179,9 +179,13 @@ test('the phone is required at registration from everyone but a Chinese account'
   }
   for (const form of [profileForm, onboardingForm]) {
     assert.match(form, /validateProfileSubmissionValues\(form, \{ phoneRequired \}\)/u);
-    assert.match(form, /\{phoneRequired \? null : \(/u);
-    assert.match(form, /t\('optional'\)/u);
+    // No caption above the field: the optional mark rides in the placeholder.
+    assert.match(form, /optional=\{!phoneRequired\}/u);
+    assert.doesNotMatch(form, /t\('optional'\)/u);
   }
+  const phoneInput = await read('components/profile/phone-input.tsx');
+  assert.match(phoneInput, /t\('optional'\)/u);
+  assert.match(phoneInput, /required=\{!optional\}/u);
   for (const locale of ['ru', 'kk', 'en']) {
     const messages = JSON.parse(await read(`messages/${locale}.json`));
     assert.doesNotMatch(

@@ -22,9 +22,11 @@ test('the three provider refusals become three different answers', () => {
     { code: 'ADDRESS_COOLDOWN', retryAfter: 47 },
   );
   // Project-wide hourly bucket: one slot frees up every 3600 / email_sent seconds.
+  // At the default 100 an hour that is 36 seconds, held to the minute the form
+  // already enforces.
   assert.deepEqual(
     classifyAuthProviderError({ code: 'over_email_send_rate_limit', message: 'Email rate limit exceeded' }),
-    { code: 'PROVIDER_BUSY', retryAfter: 90 },
+    { code: 'PROVIDER_BUSY', retryAfter: 60 },
   );
   assert.deepEqual(
     classifyAuthProviderError({ code: 'over_email_send_rate_limit', message: 'Email rate limit exceeded' }, 30),
@@ -43,7 +45,7 @@ test('the three provider refusals become three different answers', () => {
     code: 'RATE_LIMITED',
     retryAfter: OTP_RETRY_FALLBACK_SECONDS,
   });
-  assert.equal(DEFAULT_PROVIDER_EMAILS_PER_HOUR, 40);
+  assert.equal(DEFAULT_PROVIDER_EMAILS_PER_HOUR, 100);
 });
 
 test('the hourly budget comes from the environment and falls back to the config value', () => {

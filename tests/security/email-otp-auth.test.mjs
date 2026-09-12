@@ -153,7 +153,7 @@ test('email OTP request is origin-bound, provider-proven, and issues an opaque r
   }
   assert.match(generatedTypes, /email_otp_challenges: \{[\s\S]*challenge_hash: string/u);
   assert.match(config, /\[auth\][\s\S]*?enable_signup = true/u);
-  assert.match(config, /\[auth\.rate_limit\][\s\S]*?email_sent = 40/u);
+  assert.match(config, /\[auth\.rate_limit\][\s\S]*?email_sent = 100/u);
   assert.match(config, /\[auth\.captcha\][\s\S]*?enabled = true/u);
   assert.match(config, /\[auth\.captcha\][\s\S]*?provider = "turnstile"/u);
   assert.match(config, /secret = "env\(SUPABASE_AUTH_CAPTCHA_SECRET\)"/u);

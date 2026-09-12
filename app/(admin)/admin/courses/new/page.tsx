@@ -7,9 +7,6 @@ export default async function NewCoursePage() {
     <section className="space-y-6">
       <div>
         <h1 className="font-display text-h3 font-bold">Новый курс</h1>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          Черновик, PDF и три варианта по десять вопросов.
-        </p>
       </div>
       <TestEditor />
     </section>

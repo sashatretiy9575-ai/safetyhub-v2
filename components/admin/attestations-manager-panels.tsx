@@ -537,36 +537,6 @@ function AttestationIdentityForm({
   );
 }
 
-/**
- * The score against the pass mark without a caption: the bar fills to the
- * score, the thin mark stands at the pass score, and the colour says which side
- * of it the person landed.
- */
-function ScoreBar({ score, total, passScore }: { score: number; total: number; passScore: number }) {
-  const safeTotal = Math.max(total, 1);
-  const percent = (value: number) =>
-    `${Math.min(100, Math.max(0, (value / safeTotal) * 100))}%`;
-  const passed = score >= passScore;
-  return (
-    <div
-      role="img"
-      aria-label={`${score} из ${total}, проходной балл ${passScore}`}
-      title={`Проходной балл: ${passScore}`}
-      className="relative h-2 min-w-0 flex-1 rounded-full bg-[var(--color-border)]"
-    >
-      <div
-        className={`h-full rounded-full ${passed ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-danger)]'}`}
-        style={{ width: percent(score) }}
-      />
-      <span
-        aria-hidden="true"
-        className="absolute -top-1 -bottom-1 w-0.5 -translate-x-1/2 rounded-full bg-[var(--color-text)]"
-        style={{ left: percent(passScore) }}
-      />
-    </div>
-  );
-}
-
 type DetailProps = {
   permissions: AttestationPermissions;
   onClose: () => void;
@@ -819,12 +789,9 @@ function AttestationDetailContent({
                 </h3>
                 <AttestationWorkflowBadge row={row} />
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-2xl leading-none font-black tabular-nums">
-                  {row.score}/{row.total}
-                </span>
-                <ScoreBar score={row.score} total={row.total} passScore={row.passScore} />
-              </div>
+              <p className="text-2xl leading-none font-black tabular-nums">
+                {row.score}/{row.total}
+              </p>
               <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-[var(--color-text-muted)]">
                 <time dateTime={row.completedAt} className="tabular-nums">
                   {formatDateTime(row.completedAt)}

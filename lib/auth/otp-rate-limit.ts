@@ -1,7 +1,7 @@
 export const OTP_RETRY_FALLBACK_SECONDS = 60;
 export const OTP_MAX_RETRY_SECONDS = 60 * 60;
 /** Mirrors `[auth.rate_limit] email_sent` in supabase/config.toml. */
-export const DEFAULT_PROVIDER_EMAILS_PER_HOUR = 40;
+export const DEFAULT_PROVIDER_EMAILS_PER_HOUR = 100;
 
 export type AuthProviderThrottleCode = 'ADDRESS_COOLDOWN' | 'PROVIDER_BUSY' | 'RATE_LIMITED';
 

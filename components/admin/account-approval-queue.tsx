@@ -721,11 +721,7 @@ export function AccountApprovalQueue({
                         Написать в WhatsApp
                       </a>
                     </Button>
-                  ) : (
-                    <p className="text-sm text-[var(--color-text-muted)]">
-                      Телефон не указан — свяжитесь по почте.
-                    </p>
-                  )}
+                  ) : null}
 
                   <CoursePicker
                     courses={courses}

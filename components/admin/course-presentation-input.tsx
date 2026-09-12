@@ -435,11 +435,7 @@ export function CoursePresentationInput({
             <Trash aria-hidden="true" />
           </Button>
         </div>
-      ) : (
-        <p className="text-sm text-[var(--color-text-muted)]">
-          Загрузите PDF. Исходный PPTX пользователям не выдаётся.
-        </p>
-      )}
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"

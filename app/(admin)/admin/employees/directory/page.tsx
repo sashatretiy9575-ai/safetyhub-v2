@@ -59,12 +59,7 @@ export default async function EmployeeDirectoryPage({
   return (
     <section className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-display text-h3 font-bold">Все аккаунты сотрудников</h1>
-          <p className="mt-1 max-w-3xl text-sm text-[var(--color-text-muted)]">
-            Все аккаунты, включая сотрудников без аттестаций.
-          </p>
-        </div>
+        <h1 className="font-display text-h3 font-bold">Все аккаунты сотрудников</h1>
         <Button asChild variant="outline">
           <Link href={backHref}>
             {backHref === '/admin/employees' ? 'К рабочему списку' : 'К админ-панели'}

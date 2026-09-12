@@ -70,7 +70,7 @@ test('production Auth config preparation is isolated, exact, and does not push',
     assert.equal(preparedConfig, createProductionConfiguration(sourceBefore));
     assert.equal(preparedConfig.includes('http://localhost:3000'), false);
     assert.equal(preparedConfig.includes(productionSiteUrl), true);
-    assert.match(preparedConfig, /\[auth\.rate_limit\][\s\S]*?email_sent = 40/u);
+    assert.match(preparedConfig, /\[auth\.rate_limit\][\s\S]*?email_sent = 100/u);
     assert.match(
       preparedConfig,
       /\[auth\.captcha\][\s\S]*?enabled = true[\s\S]*?provider = "turnstile"[\s\S]*?secret = "env\(SUPABASE_AUTH_CAPTCHA_SECRET\)"/u,
@@ -107,7 +107,7 @@ test('production config hashes, email quota, and the two-line allowlist stay sou
   assert.equal(configurationSha256(sourceConfiguration), expectedSourceConfigurationSha256);
   assert.equal(configurationSha256(productionConfiguration), expectedProductionConfigurationSha256);
   for (const configuration of [sourceConfiguration, productionConfiguration]) {
-    assert.match(configuration, /\[auth\.rate_limit\][\s\S]*?email_sent = 40/u);
+    assert.match(configuration, /\[auth\.rate_limit\][\s\S]*?email_sent = 100/u);
     assert.match(configuration, /\[auth\.captcha\][\s\S]*?provider = "turnstile"/u);
     assert.match(configuration, /secret = "env\(SUPABASE_AUTH_CAPTCHA_SECRET\)"/u);
   }

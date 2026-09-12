@@ -187,11 +187,7 @@ export function MediaAssetInput({
               <p role="alert" className="text-xs text-[var(--color-danger)]">
                 По этому пути изображение не загружается. Выберите файл из медиатеки.
               </p>
-            ) : (
-              <p className="text-xs text-[var(--color-text-muted)]">
-                Так изображение выглядит на сайте.
-              </p>
-            )}
+            ) : null}
             <div className="flex flex-wrap gap-2 pt-1">
               <Button type="button" size="sm" variant="outline" onClick={() => setOpen(true)}>
                 Заменить

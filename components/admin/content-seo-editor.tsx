@@ -70,15 +70,14 @@ export function ContentSeoEditor({
           onChange={(event) => update('ogDescription', event.target.value)}
         />
       </div>
-      <div className="space-y-1.5 md:col-span-2">
-        <Label htmlFor={`${idPrefix}-og-image`}>{imageLabel}</Label>
-        {imageHint ? (
-          <p className="text-xs text-[var(--color-text-muted)]">{imageHint}</p>
-        ) : null}
+      <div className="space-y-1.5 md:col-span-2" title={imageHint}>
+        <Label className="sr-only" htmlFor={`${idPrefix}-og-image`}>
+          {imageLabel}
+        </Label>
         <MediaAssetInput
           id={`${idPrefix}-og-image`}
           value={value.ogImage}
-          placeholder="/images/generated/cover.webp"
+          placeholder={imageLabel}
           maxWidth={1200}
           maxHeight={630}
           onChange={(ogImage) => update('ogImage', ogImage)}

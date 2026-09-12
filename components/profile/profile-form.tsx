@@ -216,14 +216,12 @@ export function ProfileForm({
             ) : null}
           </div>
           <div className="space-y-1 sm:col-span-2">
-            <Label htmlFor="profile-phone">
+            <Label className="sr-only" htmlFor="profile-phone">
               {t('phone')}
-              {phoneRequired ? null : (
-                <span className="ml-1 font-normal text-[var(--color-text-muted)]">{t('optional')}</span>
-              )}
             </Label>
             <PhoneInput
               id="profile-phone"
+              optional={!phoneRequired}
               countryOptions={countryOptions}
               value={form.phone}
               onChange={(phone) => {

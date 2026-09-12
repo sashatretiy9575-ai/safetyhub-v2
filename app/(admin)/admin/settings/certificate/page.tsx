@@ -13,10 +13,6 @@ export default async function AdminCertificateSettingsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Удостоверение</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Настраивается один раз. Каждое удостоверение (корочка из двух сторон) и каждый протокол
-            комиссии собираются с этими реквизитами, печатью и подписями.
-          </p>
         </div>
         <Button asChild size="sm" variant="outline">
           <Link href="/admin/settings">К настройкам</Link>

@@ -70,11 +70,12 @@ export function OperatorRevokeButton({ userId, label }: { userId: string; label:
 
   return (
     <form onSubmit={submit} className="w-full space-y-2 rounded-xl border p-3 sm:max-w-md">
-      <Label htmlFor={`operator-revoke-${userId}`}>
+      <Label className="sr-only" htmlFor={`operator-revoke-${userId}`}>
         Причина: почему {label} больше не администратор
       </Label>
       <Textarea
         id={`operator-revoke-${userId}`}
+        placeholder={`Почему ${label} больше не администратор`}
         required
         minLength={10}
         maxLength={500}

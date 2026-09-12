@@ -286,11 +286,7 @@ export function OnboardingForm({
             value={form.organization}
             onChange={update('organization')}
             invalid={Boolean(fieldErrors.organization)}
-            aria-describedby={
-              fieldErrors.organization
-                ? 'onboarding-organization-help onboarding-organization-error'
-                : 'onboarding-organization-help'
-            }
+            aria-describedby={fieldErrors.organization ? 'onboarding-organization-error' : undefined}
             required
           />
           <datalist id="onboarding-organization-options">
@@ -298,9 +294,6 @@ export function OnboardingForm({
               <option key={organization} value={organization} />
             ))}
           </datalist>
-          <p id="onboarding-organization-help" className="text-xs text-[var(--color-text-muted)]">
-            {t('organizationHint')}
-          </p>
           {fieldErrors.organization ? (
             <p
               id="onboarding-organization-error"
@@ -312,14 +305,12 @@ export function OnboardingForm({
           ) : null}
         </div>
         <div ref={phoneContainerRef} className="space-y-2 sm:col-span-2">
-          <Label htmlFor="onboarding-phone">
+          <Label className="sr-only" htmlFor="onboarding-phone">
             {t('phone')}
-            {phoneRequired ? null : (
-              <span className="ml-1 font-normal text-[var(--color-text-muted)]">{t('optional')}</span>
-            )}
           </Label>
           <PhoneInput
             id="onboarding-phone"
+            optional={!phoneRequired}
             countryOptions={countryOptions}
             value={form.phone}
             onChange={(phone) => {

@@ -11,12 +11,7 @@ export default async function InitialArticleImportPage() {
   await requireCapability('content.manage');
   return (
     <section className="space-y-5">
-      <div>
-        <h1 className="font-display text-h3 font-bold">Первичная публикация материалов</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Публикация утверждённого снимка статей.
-        </p>
-      </div>
+      <h1 className="font-display text-h3 font-bold">Первичная публикация материалов</h1>
       <Card>
         <CardHeader>
           <CardTitle as="p">{INITIAL_ARTICLE_SNAPSHOT_COUNT} статей</CardTitle>

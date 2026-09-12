@@ -238,12 +238,10 @@ export function CertificateSettingsForm({
         id={`certificate-${key}`}
         value={fields[key]}
         maxLength={options.maxLength ?? 200}
-        placeholder={options.placeholder}
+        placeholder={label}
+        title={options.hint}
         onChange={(event) => setField(key, event.target.value)}
       />
-      {options.hint ? (
-        <p className="text-xs text-[var(--color-text-muted)]">{options.hint}</p>
-      ) : null}
     </div>
   );
 
@@ -255,10 +253,10 @@ export function CertificateSettingsForm({
         id={`certificate-${key}`}
         value={fields[key]}
         rows={3}
+        title={hint}
         maxLength={1000}
         onChange={(event) => setField(key, event.target.value)}
       />
-      <p className="text-xs text-[var(--color-text-muted)]">{hint}</p>
     </div>
   );
 
@@ -267,10 +265,6 @@ export function CertificateSettingsForm({
       <section className="space-y-4">
         <div>
           <h2 className="text-lg font-bold">Организация и комиссия</h2>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Печатается на каждом удостоверении и в каждом протоколе. Пустое поле оставляет на бланке
-            пустую линию.
-          </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           {textField('organizationName', 'Учебная организация', {
@@ -303,7 +297,7 @@ export function CertificateSettingsForm({
           <div className="space-y-1.5">
             <Label className="sr-only" htmlFor="certificate-validityMonths">Срок действия, месяцев</Label>
             <Input
-          placeholder="Срок действия, месяцев"
+          placeholder="Срок действия, месяцев (0 — без срока)"
               id="certificate-validityMonths"
               type="number"
               inputMode="numeric"
@@ -313,9 +307,6 @@ export function CertificateSettingsForm({
               invalid={!validityValid}
               onChange={(event) => setField('validityMonths', event.target.value)}
             />
-            <p className="text-xs text-[var(--color-text-muted)]">
-              Считается от даты выдачи. 0 — строка «Действителен до» остаётся пустой.
-            </p>
           </div>
         </div>
       </section>
@@ -323,9 +314,6 @@ export function CertificateSettingsForm({
       <section className="space-y-4">
         <div>
           <h2 className="text-lg font-bold">Печать и подписи</h2>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            PNG до 400 КБ, лучше с прозрачным фоном. Без файла место остаётся пустым.
-          </p>
         </div>
         <div className="divide-y divide-[var(--color-border)]">
           {IMAGES.map(({ key, flag, kind, title, hint }) => {
@@ -339,7 +327,7 @@ export function CertificateSettingsForm({
                     : null
                   : image.dataUrl;
             return (
-              <div key={key} className="flex flex-wrap items-center gap-4 py-4">
+              <div key={key} title={hint} className="flex flex-wrap items-center gap-4 py-4">
                 <div className="grid size-24 shrink-0 place-items-center rounded-xl bg-[var(--color-surface-muted)] p-2">
                   {preview ? (
                     <img
@@ -353,7 +341,6 @@ export function CertificateSettingsForm({
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">{title}</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">{hint}</p>
                 </div>
                 <input
                   ref={(element) => {
@@ -404,8 +391,7 @@ export function CertificateSettingsForm({
         <div>
           <h2 className="text-lg font-bold">Тексты бланка</h2>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Как на бумажной корочке: две фразы на первой стороне и две на второй. Место для номера
-            протокола обозначается как {'{protocol}'}.
+            {'{protocol}'} — номер протокола
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
