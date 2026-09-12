@@ -30,7 +30,9 @@ export const BUNDLE_BUDGETS = [
     manifest: 'server/app/(admin)/admin/employees/page_client-reference-manifest.js',
     buildManifest: 'server/app/(admin)/admin/employees/page/build-manifest.json',
     pageEntry: '[project]/app/(admin)/admin/employees/page',
-    initial: 280 * KIB,
+    // 280.2 KiB measured after the confirmation dialog replaced window.confirm
+    // across the panel; 285 leaves the same headroom the entry had before.
+    initial: 285 * KIB,
     route: 110 * KIB,
   },
   {

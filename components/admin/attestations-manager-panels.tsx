@@ -6,9 +6,7 @@ import { Certificate } from '@phosphor-icons/react/dist/csr/Certificate';
 import { CheckCircle } from '@phosphor-icons/react/dist/csr/CheckCircle';
 import { DotsThree } from '@phosphor-icons/react/dist/csr/DotsThree';
 import { DownloadSimple } from '@phosphor-icons/react/dist/csr/DownloadSimple';
-import { EnvelopeSimple } from '@phosphor-icons/react/dist/csr/EnvelopeSimple';
 import { FloppyDisk } from '@phosphor-icons/react/dist/csr/FloppyDisk';
-import { Phone } from '@phosphor-icons/react/dist/csr/Phone';
 import { Trash } from '@phosphor-icons/react/dist/csr/Trash';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/csr/WhatsappLogo';
 import { X } from '@phosphor-icons/react/dist/csr/X';
@@ -710,10 +708,7 @@ export function AttestationDetailDrawer({
                 {contact.phoneE164 ? (
                   <>
                     <Button asChild size="sm" variant="outline">
-                      <a href={phoneHref(contact.phoneE164)}>
-                        <Phone size={18} aria-hidden="true" />
-                        Позвонить
-                      </a>
+                      <a href={phoneHref(contact.phoneE164)}>Позвонить</a>
                     </Button>
                     {/* A new tab, so the card stays open behind the chat.
                         `noopener` keeps that tab from reaching back here. */}
@@ -731,10 +726,7 @@ export function AttestationDetailDrawer({
                 ) : null}
                 {contact.email ? (
                   <Button asChild size="sm" variant="outline">
-                    <a href={`mailto:${contact.email}`}>
-                      <EnvelopeSimple size={18} aria-hidden="true" />
-                      Письмо
-                    </a>
+                    <a href={`mailto:${contact.email}`}>Письмо</a>
                   </Button>
                 ) : null}
               </div>
