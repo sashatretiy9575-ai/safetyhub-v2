@@ -9,6 +9,26 @@ import {
 import { assertCertificateExportMetadata } from '../../lib/pdf/certificate-client-contract.ts';
 
 // The same shape tests/performance/certificate-pdf.test.mjs accepts as valid.
+const branding = {
+  organizationName: 'ТОО «Пример»',
+  bin: '123456789012',
+  chairmanName: 'Иванов И. И.',
+  chairmanPosition: 'Директор SafetyHub',
+  memberName: 'Петров П. П.',
+  memberPosition: 'Преподаватель SafetyHub',
+  secondMemberName: 'Сидоров С. С.',
+  secondMemberPosition: 'Преподаватель SafetyHub',
+  protocolNumber: '7',
+  validityMonths: 12,
+  examTextKk: '№{protocol} хаттама негіздемесі бойынша емтихан тапсырды',
+  examTextRu: 'сдал экзамен на основании протокола №{protocol}',
+  knowledgeTextKk: 'өрт қауіпсіздігі бойынша емтихан тапсырды',
+  knowledgeTextRu: 'сдал экзамен по пожарной безопасности',
+  stampUrl: null,
+  chairmanSignatureUrl: null,
+  memberSignatureUrl: null,
+};
+
 const certificate = (index, organization) => ({
   schemaVersion: 1,
   certificateId: `5f0c6f0e-5f2d-4f69-8a2e-${String(index).padStart(12, '0')}`,
@@ -29,6 +49,7 @@ const certificate = (index, organization) => ({
   issuedAt: '2026-08-31T10:01:00.000Z',
   verificationUrl:
     'https://safetyhub.kz/verify/v1.5f0c6f0e-5f2d-4f69-8a2e-34ac10f4892e.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  branding,
 });
 
 function exportOf(items, skipped = []) {

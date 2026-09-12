@@ -521,7 +521,7 @@ export type Database = {
           catalog_hash: string
           completed_at: string | null
           created_at: string
-          created_by: string
+          created_by: string | null
           id: string
           payload_hash: string | null
           post_receipt: Json | null
@@ -535,7 +535,7 @@ export type Database = {
           catalog_hash: string
           completed_at?: string | null
           created_at?: string
-          created_by: string
+          created_by?: string | null
           id?: string
           payload_hash?: string | null
           post_receipt?: Json | null
@@ -549,7 +549,7 @@ export type Database = {
           catalog_hash?: string
           completed_at?: string | null
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           id?: string
           payload_hash?: string | null
           post_receipt?: Json | null
@@ -1437,6 +1437,10 @@ export type Database = {
       capabilities_for_user: { Args: { p_user_id: string }; Returns: string[] }
       certificate_download_payload: {
         Args: { p_certificate_id: string }
+        Returns: Json
+      }
+      certificate_settings_payload: {
+        Args: { p_include_images: boolean }
         Returns: Json
       }
       certificate_state: { Args: { p_attestation_id: string }; Returns: string }
@@ -2546,6 +2550,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      certificate_settings: {
+        Row: {
+          bin: string
+          chairman_name: string
+          chairman_position: string
+          chairman_signature_png: string | null
+          exam_text_kk: string
+          exam_text_ru: string
+          knowledge_text_kk: string
+          knowledge_text_ru: string
+          member_name: string
+          member_position: string
+          member_signature_png: string | null
+          organization_name: string
+          protocol_number: string
+          second_member_name: string
+          second_member_position: string
+          singleton: boolean
+          stamp_png: string | null
+          updated_at: string
+          updated_by: string | null
+          validity_months: number
+          version: number
+        }
+        Insert: {
+          bin?: string
+          chairman_name?: string
+          chairman_position?: string
+          chairman_signature_png?: string | null
+          exam_text_kk?: string
+          exam_text_ru?: string
+          knowledge_text_kk?: string
+          knowledge_text_ru?: string
+          member_name?: string
+          member_position?: string
+          member_signature_png?: string | null
+          organization_name?: string
+          protocol_number?: string
+          second_member_name?: string
+          second_member_position?: string
+          singleton?: boolean
+          stamp_png?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          validity_months?: number
+          version?: number
+        }
+        Update: {
+          bin?: string
+          chairman_name?: string
+          chairman_position?: string
+          chairman_signature_png?: string | null
+          exam_text_kk?: string
+          exam_text_ru?: string
+          knowledge_text_kk?: string
+          knowledge_text_ru?: string
+          member_name?: string
+          member_position?: string
+          member_signature_png?: string | null
+          organization_name?: string
+          protocol_number?: string
+          second_member_name?: string
+          second_member_position?: string
+          singleton?: boolean
+          stamp_png?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          validity_months?: number
+          version?: number
+        }
+        Relationships: []
       }
       certificates: {
         Row: {
@@ -4388,6 +4464,10 @@ export type Database = {
         Returns: Json
       }
       get_certificate_export_job: { Args: { p_job_id: string }; Returns: Json }
+      get_certificate_settings: {
+        Args: { p_include_images?: boolean }
+        Returns: Json
+      }
       get_course_catalog_maintenance: {
         Args: { p_actor_id: string }
         Returns: Json
@@ -5237,6 +5317,10 @@ export type Database = {
           p_surname: string
           p_user_id: string
         }
+        Returns: Json
+      }
+      update_certificate_settings: {
+        Args: { p_expected_version: number; p_patch: Json }
         Returns: Json
       }
       update_profile: {

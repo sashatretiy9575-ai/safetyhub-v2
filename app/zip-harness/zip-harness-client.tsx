@@ -15,7 +15,13 @@ import {
 
 declare global {
   interface Window {
-    __zipResult?: { mode: string; base64: string; bytes: number; entries?: string[]; error?: string };
+    __zipResult?: {
+      mode: string;
+      base64: string;
+      bytes: number;
+      entries?: string[];
+      error?: string;
+    };
   }
 }
 
@@ -49,6 +55,25 @@ function buildMetadata(count: number): CertificateExportMetadata {
     completedAt: now,
     issuedAt: now,
     verificationUrl: `${origin}/verify/v1.test${index + 1}`,
+    branding: {
+      organizationName: 'ТОО «Тест»',
+      bin: '000000000000',
+      chairmanName: 'Председатель',
+      chairmanPosition: 'Директор',
+      memberName: 'Член комиссии',
+      memberPosition: 'Преподаватель',
+      secondMemberName: '',
+      secondMemberPosition: '',
+      protocolNumber: '1',
+      validityMonths: 12,
+      examTextKk: 'емтихан тапсырды №{protocol}',
+      examTextRu: 'сдал экзамен по протоколу №{protocol}',
+      knowledgeTextKk: 'емтихан тапсырды',
+      knowledgeTextRu: 'сдал экзамен',
+      stampUrl: null,
+      chairmanSignatureUrl: null,
+      memberSignatureUrl: null,
+    },
   }));
   return {
     schemaVersion: CERTIFICATE_CLIENT_SCHEMA_VERSION,
@@ -99,7 +124,8 @@ export function ZipHarnessClient() {
       createWritable: async () => ({
         write: async (data: BufferSource | Blob | string) => {
           if (data instanceof ArrayBuffer) chunks.push(new Uint8Array(data));
-          else if (ArrayBuffer.isView(data)) chunks.push(new Uint8Array(data.buffer, data.byteOffset, data.byteLength));
+          else if (ArrayBuffer.isView(data))
+            chunks.push(new Uint8Array(data.buffer, data.byteOffset, data.byteLength));
           else if (data instanceof Blob) chunks.push(new Uint8Array(await data.arrayBuffer()));
           else chunks.push(new TextEncoder().encode(String(data)));
         },
@@ -114,7 +140,12 @@ export function ZipHarnessClient() {
       });
       const bytes = concat(chunks);
       const entries = await verify(bytes);
-      window.__zipResult = { mode: 'stream', base64: toBase64(bytes), bytes: bytes.byteLength, entries };
+      window.__zipResult = {
+        mode: 'stream',
+        base64: toBase64(bytes),
+        bytes: bytes.byteLength,
+        entries,
+      };
       setLog(`stream ok: ${bytes.byteLength} bytes, ${entries.length} entries`);
     } catch (error) {
       window.__zipResult = { mode: 'stream', base64: '', bytes: 0, error: String(error) };
@@ -137,7 +168,12 @@ export function ZipHarnessClient() {
       if (!captured) throw new Error('no blob captured');
       const bytes = new Uint8Array(await (captured as Blob).arrayBuffer());
       const entries = await verify(bytes);
-      window.__zipResult = { mode: 'buffered', base64: toBase64(bytes), bytes: bytes.byteLength, entries };
+      window.__zipResult = {
+        mode: 'buffered',
+        base64: toBase64(bytes),
+        bytes: bytes.byteLength,
+        entries,
+      };
       setLog(`buffered ok: ${bytes.byteLength} bytes, ${entries.length} entries`);
     } catch (error) {
       window.__zipResult = { mode: 'buffered', base64: '', bytes: 0, error: String(error) };
@@ -148,12 +184,21 @@ export function ZipHarnessClient() {
   };
 
   return (
-    <main data-ready={mounted ? 'true' : undefined} style={{ padding: 24, fontFamily: 'sans-serif' }}>
+    <main
+      data-ready={mounted ? 'true' : undefined}
+      style={{ padding: 24, fontFamily: 'sans-serif' }}
+    >
       <h1>ZIP harness</h1>
       <p id="log">{log}</p>
-      <button id="run-stream" onClick={() => runStreaming(3)}>stream 3</button>{' '}
-      <button id="run-buffered" onClick={() => runBuffered(3)}>buffered 3</button>{' '}
-      <button id="run-stream-0" onClick={() => runStreaming(0)}>stream 0</button>
+      <button id="run-stream" onClick={() => runStreaming(3)}>
+        stream 3
+      </button>{' '}
+      <button id="run-buffered" onClick={() => runBuffered(3)}>
+        buffered 3
+      </button>{' '}
+      <button id="run-stream-0" onClick={() => runStreaming(0)}>
+        stream 0
+      </button>
     </main>
   );
 }

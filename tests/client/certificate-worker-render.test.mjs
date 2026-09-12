@@ -4,6 +4,26 @@ import test from 'node:test';
 import { PDFDocument } from 'pdf-lib';
 import { generateCertificateInBrowser } from '../../lib/pdf/certificate-renderer.ts';
 
+const branding = {
+  organizationName: 'ТОО «Пример»',
+  bin: '123456789012',
+  chairmanName: 'Иванов И. И.',
+  chairmanPosition: 'Директор SafetyHub',
+  memberName: 'Петров П. П.',
+  memberPosition: 'Преподаватель SafetyHub',
+  secondMemberName: 'Сидоров С. С.',
+  secondMemberPosition: 'Преподаватель SafetyHub',
+  protocolNumber: '7',
+  validityMonths: 12,
+  examTextKk: '№{protocol} хаттама негіздемесі бойынша емтихан тапсырды',
+  examTextRu: 'сдал экзамен на основании протокола №{protocol}',
+  knowledgeTextKk: 'өрт қауіпсіздігі бойынша емтихан тапсырды',
+  knowledgeTextRu: 'сдал экзамен по пожарной безопасности',
+  stampUrl: null,
+  chairmanSignatureUrl: null,
+  memberSignatureUrl: null,
+};
+
 const validCertificate = {
   schemaVersion: 1,
   certificateId: '5f0c6f0e-5f2d-4f69-8a2e-34ac10f4892e',
@@ -24,6 +44,7 @@ const validCertificate = {
   issuedAt: '2026-08-31T10:01:00.000Z',
   verificationUrl:
     'https://safetyhub.kz/verify/v1.5f0c6f0e-5f2d-4f69-8a2e-34ac10f4892e.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  branding,
 };
 
 test('certificate renderer operates without window/document canvas in Web Worker environment', async () => {
@@ -58,7 +79,7 @@ test('certificate renderer operates without window/document canvas in Web Worker
     const bytes = await generateCertificateInBrowser(validCertificate);
     assert.equal(new TextDecoder().decode(bytes.slice(0, 5)), '%PDF-');
     const pdf = await PDFDocument.load(bytes);
-    assert.equal(pdf.getPageCount(), 1);
+    assert.equal(pdf.getPageCount(), 2);
     assert.match(pdf.getTitle() ?? '', /SH-2026-ABC/);
   } finally {
     globalThis.fetch = originalFetch;

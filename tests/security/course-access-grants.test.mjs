@@ -81,16 +81,24 @@ test('the queue ticks courses per application and reaches the applicant on Whats
   assert.match(queue, /useState<Record<string, ReadonlySet<string>>>\(\s*\{\},?\s*\)/u);
   assert.match(queue, /decision === 'approved' && courseIds\.length === 0/u);
   assert.match(queue, /\.\.\.\(decision === 'rejected' \? \{ reason \} : \{ courseIds \}\)/u);
-  assert.match(queue, /disabled=\{actionDisabled \|\| selection\.size === 0\}/u);
+  assert.match(queue, /disabled=\{busy \|\| selection\.size === 0\}/u);
   // Several applications at once share one course picker.
   assert.match(queue, /aria-label="Курсы для выбранных заявок"/u);
   assert.match(queue, /selectedWithoutCourses\.length > 0/u);
   // The idempotency key covers the course list, so a changed list is a new operation.
   assert.match(queue, /\$\{decision\}:\$\{reason\}:\$\{courseIds\.join\(','\)\}/u);
   // WhatsApp and the profile dialog.
-  assert.match(queue, /https:\/\/wa\.me\/\$\{phoneE164\.replace\(\/\\D\/g, ''\)\}/u);
+  // The card is brief; the application opens in a dialog with the person,
+  // the ways to reach them, the course picker and the decision.
+  assert.match(queue, /aria-label=\{`Открыть заявку: \$\{label\}`\}/u);
+  assert.match(queue, /<CoursePicker/u);
+  // WhatsApp opens with the greeting already typed.
+  assert.match(
+    queue,
+    /wa\.me\/\$\{digits\}\?text=\$\{encodeURIComponent\(whatsappGreeting\(item\)\)\}/u,
+  );
+  assert.match(queue, /Вы оставляли заявку на обучение на сайте safetyhub\.kz/u);
   assert.match(queue, /target="_blank"\s+rel="noopener noreferrer"/u);
-  assert.match(queue, /function ApplicantProfileDialog/u);
   assert.match(queue, /formatPhoneDisplay\(item\.phoneE164\)/u);
   assert.match(queue, /href=\{`tel:\$\{item\.phoneE164\}`\}/u);
 });

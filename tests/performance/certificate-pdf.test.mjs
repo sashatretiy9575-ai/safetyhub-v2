@@ -10,6 +10,26 @@ import { generateCertificateInBrowser } from '../../lib/pdf/certificate-renderer
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
+const branding = {
+  organizationName: 'ТОО «Пример»',
+  bin: '123456789012',
+  chairmanName: 'Иванов И. И.',
+  chairmanPosition: 'Директор SafetyHub',
+  memberName: 'Петров П. П.',
+  memberPosition: 'Преподаватель SafetyHub',
+  secondMemberName: 'Сидоров С. С.',
+  secondMemberPosition: 'Преподаватель SafetyHub',
+  protocolNumber: '7',
+  validityMonths: 12,
+  examTextKk: '№{protocol} хаттама негіздемесі бойынша емтихан тапсырды',
+  examTextRu: 'сдал экзамен на основании протокола №{protocol}',
+  knowledgeTextKk: 'өрт қауіпсіздігі бойынша емтихан тапсырды',
+  knowledgeTextRu: 'сдал экзамен по пожарной безопасности',
+  stampUrl: null,
+  chairmanSignatureUrl: null,
+  memberSignatureUrl: null,
+};
+
 const validCertificate = {
   schemaVersion: 1,
   certificateId: '5f0c6f0e-5f2d-4f69-8a2e-34ac10f4892e',
@@ -30,6 +50,7 @@ const validCertificate = {
   issuedAt: '2026-08-31T10:01:00.000Z',
   verificationUrl:
     'https://safetyhub.kz/verify/v1.5f0c6f0e-5f2d-4f69-8a2e-34ac10f4892e.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  branding,
 };
 
 test('authorized certificate metadata is bounded and precedes browser-only rendering', async () => {
@@ -40,7 +61,7 @@ test('authorized certificate metadata is bounded and precedes browser-only rende
   ]);
   const auth = route.indexOf('const auth = await requireUser()');
   const certificate = route.indexOf('getCertificateDownloadPayload(certificateId)');
-  const metadata = route.indexOf('createCertificateRenderMetadata(data, getSiteUrl())');
+  const metadata = route.indexOf('createCertificateRenderMetadata(');
 
   assert.ok(auth >= 0 && auth < certificate && certificate < metadata);
   assert.match(route, /requireCapability\('certificate\.read'/);
@@ -72,7 +93,7 @@ test('worker graph dynamically loads heavy libraries and contains no Node runtim
     read('lib/pdf/certificate-client.ts'),
     read('lib/pdf/certificate.worker.ts'),
     read('lib/pdf/certificate-renderer.ts'),
-    read('lib/pdf/certificate-report.ts'),
+    read('lib/pdf/certificate-report-xlsx.ts'),
     read('lib/pdf/certificate-archive.ts'),
   ]);
   assert.match(client, /new Worker\(new URL\('\.\/certificate\.worker\.ts', import\.meta\.url\)/);
@@ -141,7 +162,7 @@ test('client metadata rejects oversized or unsafe render/export payloads', () =>
   );
 });
 
-test('browser renderer produces a valid one-page PDF from fetched immutable assets', async () => {
+test('browser renderer produces the two-sided booklet from fetched immutable assets', async () => {
   const [template, font] = await Promise.all([
     readFile(new URL('../../public/certificates/template-v1.pdf', import.meta.url)),
     readFile(new URL('../../lib/pdf/assets/noto-sans-latin-cyrillic.ttf', import.meta.url)),
@@ -165,7 +186,7 @@ test('browser renderer produces a valid one-page PDF from fetched immutable asse
     const bytes = await generateCertificateInBrowser(validCertificate);
     assert.equal(new TextDecoder().decode(bytes.slice(0, 5)), '%PDF-');
     const pdf = await PDFDocument.load(bytes);
-    assert.equal(pdf.getPageCount(), 1);
+    assert.equal(pdf.getPageCount(), 2);
     assert.match(pdf.getTitle() ?? '', /SH-2026-ABC/);
   } finally {
     globalThis.fetch = originalFetch;
@@ -207,7 +228,7 @@ test('browser renderer embeds the full pinned CJK font for a Chinese identity an
     const bytes = await generateCertificateInBrowser(zhCertificate);
     assert.equal(new TextDecoder().decode(bytes.slice(0, 5)), '%PDF-');
     const pdf = await PDFDocument.load(bytes);
-    assert.equal(pdf.getPageCount(), 1);
+    assert.equal(pdf.getPageCount(), 2);
     assert.match(pdf.getTitle() ?? '', /SH-2026-ZH-001/);
     assert.ok(bytes.byteLength < 2 * 1024 * 1024, `subset PDF is ${bytes.byteLength} bytes`);
   } finally {

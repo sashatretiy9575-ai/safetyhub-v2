@@ -12,6 +12,7 @@ import {
 import {
   CERTIFICATE_CLIENT_SCHEMA_VERSION,
   CERTIFICATE_LOCALES,
+  type CertificateBranding,
   type CertificateLocale,
   type CertificateRenderMetadata,
 } from '@/lib/pdf/certificate-client-contract';
@@ -30,7 +31,10 @@ const publicCertificateSchema = z.object({
 
 const boundedText = (maximum: number) => z.string().trim().min(1).max(maximum);
 const nullableBoundedText = (maximum: number) =>
-  z.preprocess((value) => (value === '' ? null : value), z.string().trim().min(1).max(maximum).nullable());
+  z.preprocess(
+    (value) => (value === '' ? null : value),
+    z.string().trim().min(1).max(maximum).nullable(),
+  );
 const localeSchema = z.preprocess(
   (value) => (value === null || value === undefined ? 'ru' : value),
   z.enum(CERTIFICATE_LOCALES),
@@ -42,23 +46,23 @@ const templateVersionSchema = z.preprocess(
 
 export const certificateDownloadPayloadSchema = z
   .object({
-  id: z.string().uuid(),
-  certificateNumber: boundedText(96),
-  userId: z.string().uuid(),
-  revisionId: z.string().uuid().nullable(),
-  fullName: boundedText(200),
-  job: nullableBoundedText(160),
-  organization: nullableBoundedText(200),
-  testSlug: boundedText(160),
-  testTitle: boundedText(240),
-  titleSnapshot: boundedText(240).nullable().optional(),
-  locale: localeSchema,
-  score: z.coerce.number().int().min(0).max(10_000),
-  total: z.coerce.number().int().min(1).max(10_000),
-  passScore: z.coerce.number().int().min(0).max(10_000),
-  bestCompletedAt: z.string().datetime({ offset: true }),
-  issuedAt: z.string().datetime({ offset: true }),
-  templateVersion: templateVersionSchema,
+    id: z.string().uuid(),
+    certificateNumber: boundedText(96),
+    userId: z.string().uuid(),
+    revisionId: z.string().uuid().nullable(),
+    fullName: boundedText(200),
+    job: nullableBoundedText(160),
+    organization: nullableBoundedText(200),
+    testSlug: boundedText(160),
+    testTitle: boundedText(240),
+    titleSnapshot: boundedText(240).nullable().optional(),
+    locale: localeSchema,
+    score: z.coerce.number().int().min(0).max(10_000),
+    total: z.coerce.number().int().min(1).max(10_000),
+    passScore: z.coerce.number().int().min(0).max(10_000),
+    bestCompletedAt: z.string().datetime({ offset: true }),
+    issuedAt: z.string().datetime({ offset: true }),
+    templateVersion: templateVersionSchema,
   })
   .superRefine((value, context) => {
     if (value.score > value.total || value.passScore > value.total) {
@@ -132,6 +136,7 @@ function certificateFontUrl(locale: CertificateLocale) {
 export async function createCertificateRenderMetadata(
   data: CertificateDownloadPayload,
   siteUrl: string,
+  branding: CertificateBranding,
 ): Promise<CertificateRenderMetadata> {
   const verificationToken = await getCertificateVerificationToken(data.id);
   return {
@@ -153,6 +158,7 @@ export async function createCertificateRenderMetadata(
     completedAt: data.bestCompletedAt,
     issuedAt: data.issuedAt,
     verificationUrl: certificateVerificationUrl(siteUrl, verificationToken),
+    branding,
   };
 }
 

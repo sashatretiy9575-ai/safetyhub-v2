@@ -131,7 +131,10 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
   }),
 ]);
 export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
-
+  Object.freeze({
+    filename: '20260912170000_certificate_settings_and_purge_receipts.sql',
+    sha256: '0b1a82c895b62ac06372aa416ad70e71089958e9fce65537f0d6f4b5733d8811',
+  }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;

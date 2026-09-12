@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { Check } from '@phosphor-icons/react/dist/ssr/Check';
 import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
-import { UserCircle } from '@phosphor-icons/react/dist/ssr/UserCircle';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/ssr/WhatsappLogo';
 import { X } from '@phosphor-icons/react/dist/ssr/X';
 import { Button } from '@/components/ui/button';
@@ -70,8 +69,24 @@ function accountIdentifier(item: AdminAccountApprovalItem) {
   return item.username ? `Логин: ${item.username}` : (item.email ?? 'Вход по логину и паролю');
 }
 
-function whatsappHref(phoneE164: string) {
-  return `https://wa.me/${phoneE164.replace(/\D/g, '')}`;
+/**
+ * The first message to an applicant, ready to send: who is writing, where
+ * the application came from, what happens next. The administrator only has
+ * to press "send" — or edit it first.
+ */
+export function whatsappGreeting(item: AdminAccountApprovalItem) {
+  const name = item.name.trim();
+  return [
+    `Здравствуйте${name ? `, ${name}` : ''}!`,
+    'Это администратор SafetyHub. Вы оставляли заявку на обучение на сайте safetyhub.kz.',
+    'Подскажите, пожалуйста, какие курсы вам нужны — после этого мы откроем к ним доступ.',
+  ].join(' ');
+}
+
+export function whatsappHref(item: AdminAccountApprovalItem) {
+  if (!item.phoneE164) return null;
+  const digits = item.phoneE164.replace(/\D/g, '');
+  return `https://wa.me/${digits}?text=${encodeURIComponent(whatsappGreeting(item))}`;
 }
 
 function courseWord(count: number) {
@@ -85,17 +100,9 @@ function courseWord(count: number) {
 /** Long enough to coalesce a burst of decisions into one server round trip. */
 const QUEUE_REFRESH_DEBOUNCE_MS = 1_500;
 
-function Avatar({
-  item,
-  size,
-  className = '',
-}: {
-  item: AdminAccountApprovalItem;
-  size: 48 | 112;
-  className?: string;
-}) {
+function Avatar({ item, size }: { item: AdminAccountApprovalItem; size: 48 | 96 }) {
   const label = fullName(item);
-  const box = size === 48 ? 'size-12 rounded-xl text-lg' : 'size-28 rounded-2xl text-4xl';
+  const box = size === 48 ? 'size-12 rounded-xl text-lg' : 'size-24 rounded-2xl text-3xl';
   return item.avatarAvailable ? (
     // One request per row, all at once, against an admin-only endpoint — and
     // with no dimensions the list reflowed as each one landed.
@@ -106,12 +113,12 @@ function Avatar({
       height={size}
       loading="lazy"
       decoding="async"
-      className={`${box} shrink-0 border border-[var(--color-border)] object-cover ${className}`}
+      className={`${box} shrink-0 border border-[var(--color-border)] object-cover`}
     />
   ) : (
     <div
       aria-hidden="true"
-      className={`${box} grid shrink-0 place-items-center border border-[var(--color-border)] bg-[var(--color-surface-muted)] font-black text-[var(--color-primary)] ${className}`}
+      className={`${box} grid shrink-0 place-items-center border border-[var(--color-border)] bg-[var(--color-surface-muted)] font-black text-[var(--color-primary)]`}
     >
       {label.charAt(0).toUpperCase()}
     </div>
@@ -136,7 +143,7 @@ function CourseChip({
       aria-pressed={pressed}
       disabled={disabled}
       onClick={() => onToggle(!pressed)}
-      className={`inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-lg border px-2.5 py-1 text-left text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`inline-flex min-h-11 max-w-full items-center gap-2 rounded-xl border px-3 py-1.5 text-left text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
         pressed
           ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-on-primary-soft)]'
           : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
@@ -144,127 +151,64 @@ function CourseChip({
     >
       <span
         aria-hidden="true"
-        className={`grid size-4 shrink-0 place-items-center rounded border ${
+        className={`grid size-5 shrink-0 place-items-center rounded-md border ${
           pressed
             ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white'
             : 'border-[var(--color-border-strong)]'
         }`}
       >
-        {pressed ? <Check size={11} weight="bold" /> : null}
+        {pressed ? <Check size={12} weight="bold" /> : null}
       </span>
       <span className="min-w-0 break-words">{course.title}</span>
     </button>
   );
 }
 
-/**
- * The full application, opened by clicking the person: photo, every field
- * they submitted, and the two ways to reach them.
- */
-function ApplicantProfileDialog({
-  item,
-  onClose,
+function CoursePicker({
+  courses,
+  selection,
+  disabled,
+  onToggle,
+  onAll,
 }: {
-  item: AdminAccountApprovalItem | null;
-  onClose: () => void;
+  courses: ApprovalCourseOption[];
+  selection: ReadonlySet<string>;
+  disabled: boolean;
+  onToggle: (courseId: string, next: boolean) => void;
+  onAll: (checked: boolean) => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (item && dialog && !dialog.open) dialog.showModal();
-    if (!item && dialog?.open) dialog.close();
-  }, [item]);
-
   return (
-    <dialog
-      ref={dialogRef}
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClose={() => {
-        if (item) onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === dialogRef.current) onClose();
-      }}
-      className="m-auto max-h-[calc(100dvh-1.5rem)] w-[min(28rem,calc(100vw-1.5rem))] overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55"
-    >
-      {item ? (
-        <div className="p-5">
-          <div className="flex items-start justify-between gap-3">
-            <Avatar item={item} size={112} />
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              aria-label="Закрыть"
-              onClick={onClose}
-            >
-              <X aria-hidden="true" />
-            </Button>
-          </div>
-          <h2 className="mt-4 text-xl font-bold break-words">{fullName(item)}</h2>
-          <p className="mt-0.5 text-sm break-all text-[var(--color-text-muted)]">
-            {accountIdentifier(item)}
-          </p>
-
-          <dl className="mt-5 grid gap-3 text-sm">
-            <div>
-              <dt className="text-xs text-[var(--color-text-subtle)]">Должность</dt>
-              <dd className="mt-0.5 break-words">{item.job || 'Не указана'}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-text-subtle)]">Компания</dt>
-              <dd className="mt-0.5 break-words">{item.organization || 'Не указана'}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-text-subtle)]">Телефон</dt>
-              <dd className="mt-0.5">
-                {item.phoneE164 ? (
-                  <a
-                    className="font-semibold tabular-nums underline underline-offset-4"
-                    href={`tel:${item.phoneE164}`}
-                  >
-                    {formatPhoneDisplay(item.phoneE164)}
-                  </a>
-                ) : (
-                  'Не указан'
-                )}
-              </dd>
-            </div>
-            {item.email ? (
-              <div>
-                <dt className="text-xs text-[var(--color-text-subtle)]">Почта</dt>
-                <dd className="mt-0.5 break-all">
-                  <a className="underline underline-offset-4" href={`mailto:${item.email}`}>
-                    {item.email}
-                  </a>
-                </dd>
-              </div>
-            ) : null}
-            <div>
-              <dt className="text-xs text-[var(--color-text-subtle)]">Заявка</dt>
-              <dd className="mt-0.5 text-[var(--color-text-muted)]">
-                Отправлена <time dateTime={item.requestedAt}>{dateTime(item.requestedAt)}</time>
-                <br />
-                Ответить до <time dateTime={item.dueAt}>{dateTime(item.dueAt)}</time>
-              </dd>
-            </div>
-          </dl>
-
-          {item.phoneE164 ? (
-            <Button asChild className="mt-5 w-full">
-              <a href={whatsappHref(item.phoneE164)} target="_blank" rel="noopener noreferrer">
-                <WhatsappLogo size={18} aria-hidden="true" />
-                Написать в WhatsApp
-              </a>
-            </Button>
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-sm font-bold">
+          Открыть курсы
+          {selection.size > 0 ? (
+            <span className="ml-1.5 text-[var(--color-primary)]">· {selection.size}</span>
           ) : null}
-        </div>
-      ) : null}
-    </dialog>
+        </p>
+        {courses.length > 1 ? (
+          <button
+            type="button"
+            className="text-xs font-semibold text-[var(--color-primary)] hover:underline"
+            disabled={disabled}
+            onClick={() => onAll(selection.size < courses.length)}
+          >
+            {selection.size < courses.length ? 'Все курсы' : 'Снять все'}
+          </button>
+        ) : null}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {courses.map((course) => (
+          <CourseChip
+            key={course.id}
+            course={course}
+            pressed={selection.has(course.id)}
+            disabled={disabled}
+            onToggle={(next) => onToggle(course.id, next)}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -288,12 +232,13 @@ export function AccountApprovalQueue({
   // Which courses each application opens. Nothing is pre-ticked: the owner's
   // rule is that access is granted by hand, course by course.
   const [courseSelections, setCourseSelections] = useState<Record<string, ReadonlySet<string>>>({});
-  const [profileId, setProfileId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
   const operationKeys = useRef(new Map<string, string>());
   const busyIdsRef = useRef(new Set<string>());
   const resolvedIdsRef = useRef(new Set<string>());
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   // B4-14: the pending refresh survived unmount and called `router.refresh()`
   // on a page the operator had already left.
@@ -304,6 +249,13 @@ export function AccountApprovalQueue({
     },
     [],
   );
+
+  const openItem = openId ? (items.find((item) => item.id === openId) ?? null) : null;
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (openItem && dialog && !dialog.open) dialog.showModal();
+    if (!openItem && dialog?.open) dialog.close();
+  }, [openItem]);
 
   const refreshQueueNow = () => {
     requestAdminNotificationRefresh();
@@ -421,10 +373,11 @@ export function AccountApprovalQueue({
       setResolvedIds(new Set(resolvedIdsRef.current));
       setReasons((current) => ({ ...current, [item.id]: '' }));
       setRejectionId((current) => (current === item.id ? null : current));
+      setOpenId((current) => (current === item.id ? null : current));
       setMessage(
         decision === 'approved'
           ? `Доступ подтверждён: ${fullName(item)}, ${courseIds.length} ${courseWord(courseIds.length)}.`
-          : 'Заявка возвращена на уточнение.',
+          : `Заявка возвращена на уточнение: ${fullName(item)}.`,
       );
       refreshQueueSoon();
       return true;
@@ -490,7 +443,10 @@ export function AccountApprovalQueue({
     }
   };
 
-  const profileItem = profileId ? (items.find((item) => item.id === profileId) ?? null) : null;
+  const closeDialog = () => {
+    setOpenId(null);
+    setRejectionId(null);
+  };
 
   return (
     <div className="space-y-3">
@@ -536,49 +492,29 @@ export function AccountApprovalQueue({
       </div>
 
       {selectedItems.length > 0 ? (
-        // One place to tick courses for several applications at once; the
-        // per-card chips below reflect the same selection.
+        // One place to tick courses for several applications at once.
         <section
           aria-label="Курсы для выбранных заявок"
           className="space-y-3 rounded-2xl border border-[var(--color-primary)]/40 bg-[var(--color-primary-soft)]/40 p-3 sm:p-4"
         >
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="text-sm font-bold">
-              Выбрано заявок: {selectedItems.length}. Какие курсы открыть?
-            </p>
-            <div className="flex gap-3 text-xs font-semibold">
-              <button
-                type="button"
-                className="text-[var(--color-primary)] hover:underline"
-                onClick={() => setAllCourses(selectedItemIds, true)}
-              >
-                Все курсы
-              </button>
-              <button
-                type="button"
-                className="text-[var(--color-text-muted)] hover:underline"
-                onClick={() => setAllCourses(selectedItemIds, false)}
-              >
-                Снять
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {courses.map((course) => {
-              const pressedCount = selectedItems.filter((item) =>
-                coursesFor(item.id).has(course.id),
-              ).length;
-              return (
-                <CourseChip
-                  key={course.id}
-                  course={course}
-                  pressed={pressedCount === selectedItems.length}
-                  disabled={bulkBusy}
-                  onToggle={(next) => setCourse(selectedItemIds, course.id, next)}
-                />
-              );
-            })}
-          </div>
+          <p className="text-sm font-bold">
+            Выбрано заявок: {selectedItems.length}. Какие курсы открыть всем?
+          </p>
+          <CoursePicker
+            courses={courses}
+            selection={
+              new Set(
+                courses
+                  .filter((course) =>
+                    selectedItems.every((item) => coursesFor(item.id).has(course.id)),
+                  )
+                  .map((course) => course.id),
+              )
+            }
+            disabled={bulkBusy}
+            onToggle={(courseId, next) => setCourse(selectedItemIds, courseId, next)}
+            onAll={(checked) => setAllCourses(selectedItemIds, checked)}
+          />
           <div className="flex flex-wrap items-center gap-3">
             <Button
               type="button"
@@ -608,30 +544,27 @@ export function AccountApprovalQueue({
         </p>
       ) : null}
 
-      {visibleItems.map((item) => {
-        const busy = busyIds.has(item.id);
-        const resolved = resolvedIds.has(item.id);
-        const actionDisabled = busy || resolved;
-        const label = fullName(item);
-        const requestingRejection = rejectionId === item.id;
-        const isSelected = selectedIds.has(item.id);
-        const selection = coursesFor(item.id);
-        const subtitle = [item.job, item.organization].filter(Boolean).join(' · ');
-        return (
-          <article
-            key={item.id}
-            className={`rounded-2xl border bg-[var(--color-surface)] p-4 shadow-sm transition-colors sm:p-5 ${
-              isSelected ? 'border-[var(--color-primary)]/60' : 'border-[var(--color-border)]'
-            }`}
-          >
-            <div className="flex items-start gap-3">
+      <ul className="space-y-2">
+        {visibleItems.map((item) => {
+          const resolved = resolvedIds.has(item.id);
+          const label = fullName(item);
+          const isSelected = selectedIds.has(item.id);
+          const selection = coursesFor(item.id);
+          const subtitle = [item.job, item.organization].filter(Boolean).join(' · ');
+          const whatsapp = whatsappHref(item);
+          return (
+            <li
+              key={item.id}
+              className={`flex items-center gap-3 rounded-2xl border bg-[var(--color-surface)] p-3 shadow-sm transition-colors sm:px-4 ${
+                isSelected ? 'border-[var(--color-primary)]/60' : 'border-[var(--color-border)]'
+              } ${resolved ? 'opacity-60' : ''}`}
+            >
               {!resolved ? (
-                <label className="grid size-11 shrink-0 -translate-x-2 cursor-pointer place-items-center">
+                <label className="grid size-11 shrink-0 -translate-x-1 cursor-pointer place-items-center">
                   <input
                     type="checkbox"
                     className="size-4.5 accent-[var(--color-primary)]"
                     checked={isSelected}
-                    disabled={actionDisabled}
                     onChange={(event) => {
                       setSelectedIds((current) => {
                         const next = new Set(current);
@@ -645,199 +578,48 @@ export function AccountApprovalQueue({
                 </label>
               ) : null}
 
+              {/* The whole card opens the application: the person, the ways
+                  to reach them and the courses to open live in one place. */}
               <button
                 type="button"
-                onClick={() => setProfileId(item.id)}
-                className="shrink-0 rounded-xl transition hover:opacity-85 focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:outline-none"
-                aria-label={`Открыть профиль: ${label}`}
+                disabled={resolved}
+                onClick={() => setOpenId(item.id)}
+                className="flex min-w-0 flex-1 items-center gap-3 rounded-xl text-left focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:outline-none"
+                aria-label={`Открыть заявку: ${label}`}
               >
                 <Avatar item={item} size={48} />
+                <span className="min-w-0 flex-1">
+                  <span className="font-display block truncate text-base font-bold">{label}</span>
+                  <span className="block truncate text-sm text-[var(--color-text-muted)]">
+                    {subtitle || 'Должность и компания не указаны'}
+                  </span>
+                  <span className="block truncate text-xs text-[var(--color-text-subtle)]">
+                    {resolved
+                      ? 'Решение сохранено. Обновляем очередь…'
+                      : selection.size > 0
+                        ? `Отмечено: ${selection.size} ${courseWord(selection.size)} · до ${dateTime(item.dueAt)}`
+                        : `до ${dateTime(item.dueAt)}`}
+                  </span>
+                </span>
               </button>
 
-              <div className="min-w-0 flex-1">
-                <button
-                  type="button"
-                  onClick={() => setProfileId(item.id)}
-                  className="font-display block max-w-full text-left text-base font-bold break-words hover:underline"
-                >
-                  {label}
-                </button>
-                <p className="mt-0.5 text-sm break-words text-[var(--color-text-muted)]">
-                  {subtitle || 'Должность и компания не указаны'}
-                </p>
-                <p className="mt-0.5 text-xs break-all text-[var(--color-text-subtle)]">
-                  {item.phoneE164 ? `${formatPhoneDisplay(item.phoneE164)} · ` : ''}
-                  {accountIdentifier(item)} · до {dateTime(item.dueAt)}
-                </p>
-              </div>
-
-              <div className="flex shrink-0 gap-1">
-                {item.phoneE164 ? (
-                  <Button asChild size="icon" variant="outline" className="size-11">
-                    <a
-                      href={whatsappHref(item.phoneE164)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Написать в WhatsApp: ${label}`}
-                      title="Написать в WhatsApp"
-                    >
-                      <WhatsappLogo size={20} aria-hidden="true" />
-                    </a>
-                  </Button>
-                ) : null}
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  className="size-11"
-                  aria-label={`Открыть профиль: ${label}`}
-                  title="Профиль"
-                  onClick={() => setProfileId(item.id)}
-                >
-                  <UserCircle size={22} aria-hidden="true" />
-                </Button>
-              </div>
-            </div>
-
-            {!resolved ? (
-              <div className="mt-4 space-y-2">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="text-xs font-semibold text-[var(--color-text-muted)]">
-                    Открыть курсы
-                    {selection.size > 0 ? (
-                      <span className="ml-1 text-[var(--color-primary)]">· {selection.size}</span>
-                    ) : null}
-                  </p>
-                  {courses.length > 1 ? (
-                    <button
-                      type="button"
-                      className="text-xs font-semibold text-[var(--color-primary)] hover:underline"
-                      disabled={actionDisabled}
-                      onClick={() => setAllCourses([item.id], selection.size < courses.length)}
-                    >
-                      {selection.size < courses.length ? 'Все курсы' : 'Снять все'}
-                    </button>
-                  ) : null}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {courses.map((course) => (
-                    <CourseChip
-                      key={course.id}
-                      course={course}
-                      pressed={selection.has(course.id)}
-                      disabled={actionDisabled}
-                      onToggle={(next) => setCourse([item.id], course.id, next)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            {requestingRejection ? (
-              <div className="mt-4 space-y-2 border-t border-[var(--color-border)] pt-3">
-                {/* The label used to wrap the whole block, so the quick-reason
-                    buttons were inside it: their text joined the field's
-                    accessible name, and clicking one also focused the
-                    textarea. */}
-                <div className="block space-y-1">
-                  <label
-                    htmlFor={`approval-reason-${item.id}`}
-                    className="block text-xs font-semibold text-[var(--color-text-muted)]"
+              {whatsapp && !resolved ? (
+                <Button asChild size="icon" variant="outline" className="size-11 shrink-0">
+                  <a
+                    href={whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Написать в WhatsApp: ${label}`}
+                    title="Написать в WhatsApp"
                   >
-                    Что нужно уточнить
-                  </label>
-                  <div className="flex flex-wrap gap-1.5 pb-1">
-                    {QUICK_REASONS.map((preset) => (
-                      <button
-                        key={preset}
-                        type="button"
-                        onClick={() => setReasons((current) => ({ ...current, [item.id]: preset }))}
-                        className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs text-[var(--color-text-muted)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
-                      >
-                        {preset}
-                      </button>
-                    ))}
-                  </div>
-                  <Textarea
-                    id={`approval-reason-${item.id}`}
-                    value={reasons[item.id] ?? ''}
-                    onChange={(event) =>
-                      setReasons((current) => ({ ...current, [item.id]: event.target.value }))
-                    }
-                    maxLength={500}
-                    rows={2}
-                    placeholder="Например: уточните название компании."
-                    disabled={actionDisabled}
-                  />
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="min-h-11"
-                    disabled={actionDisabled}
-                    onClick={() => {
-                      setRejectionId(null);
-                      setMessage('');
-                      setOperationDiagnostic('');
-                    }}
-                  >
-                    Отмена
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="min-h-11"
-                    disabled={actionDisabled || (reasons[item.id] ?? '').trim().length < 3}
-                    onClick={() => void decide(item, 'rejected')}
-                  >
-                    Вернуть на уточнение
-                  </Button>
-                </div>
-              </div>
-            ) : resolved ? (
-              <p
-                role="status"
-                className="mt-4 border-t border-[var(--color-border)] pt-3 text-sm text-[var(--color-text-muted)]"
-              >
-                Решение сохранено. Обновляем очередь…
-              </p>
-            ) : (
-              <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--color-border)] pt-3">
-                <Button
-                  type="button"
-                  size="sm"
-                  className="min-h-11"
-                  disabled={actionDisabled || selection.size === 0}
-                  onClick={() => void decide(item, 'approved')}
-                >
-                  {busy
-                    ? 'Подтверждаем…'
-                    : selection.size === 0
-                      ? 'Подтвердить доступ'
-                      : `Подтвердить: ${selection.size} ${courseWord(selection.size)}`}
+                    <WhatsappLogo size={20} aria-hidden="true" />
+                  </a>
                 </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className="min-h-11"
-                  disabled={actionDisabled}
-                  onClick={() => {
-                    setRejectionId(item.id);
-                    setMessage('');
-                    setOperationDiagnostic('');
-                  }}
-                >
-                  Вернуть на уточнение
-                </Button>
-              </div>
-            )}
-          </article>
-        );
-      })}
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
 
       {message ? (
         <div
@@ -855,7 +637,197 @@ export function AccountApprovalQueue({
         </div>
       ) : null}
 
-      <ApplicantProfileDialog item={profileItem} onClose={() => setProfileId(null)} />
+      <dialog
+        ref={dialogRef}
+        onCancel={(event) => {
+          event.preventDefault();
+          closeDialog();
+        }}
+        onClose={() => {
+          if (openItem) closeDialog();
+        }}
+        onClick={(event) => {
+          if (event.target === dialogRef.current) closeDialog();
+        }}
+        className="m-auto max-h-[calc(100dvh-1rem)] w-[min(32rem,calc(100vw-1rem))] overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55"
+      >
+        {openItem
+          ? (() => {
+              const item = openItem;
+              const label = fullName(item);
+              const busy = busyIds.has(item.id);
+              const selection = coursesFor(item.id);
+              const whatsapp = whatsappHref(item);
+              const requestingRejection = rejectionId === item.id;
+              return (
+                <div className="space-y-5 p-4 sm:p-5">
+                  <div className="flex items-start gap-4">
+                    <Avatar item={item} size={96} />
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-lg font-bold break-words">{label}</h2>
+                      <p className="mt-0.5 text-sm break-words text-[var(--color-text-muted)]">
+                        {[item.job, item.organization].filter(Boolean).join(' · ') ||
+                          'Должность и компания не указаны'}
+                      </p>
+                      <p className="mt-0.5 text-xs break-all text-[var(--color-text-subtle)]">
+                        {accountIdentifier(item)}
+                      </p>
+                      <p className="mt-0.5 text-xs text-[var(--color-text-subtle)]">
+                        Заявка от {dateTime(item.requestedAt)} · ответить до {dateTime(item.dueAt)}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      aria-label="Закрыть"
+                      onClick={closeDialog}
+                    >
+                      <X aria-hidden="true" />
+                    </Button>
+                  </div>
+
+                  <dl className="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
+                    <div>
+                      <dt className="text-xs text-[var(--color-text-subtle)]">Телефон</dt>
+                      <dd className="mt-0.5">
+                        {item.phoneE164 ? (
+                          <a
+                            className="font-semibold tabular-nums underline underline-offset-4"
+                            href={`tel:${item.phoneE164}`}
+                          >
+                            {formatPhoneDisplay(item.phoneE164)}
+                          </a>
+                        ) : (
+                          'Не указан'
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-[var(--color-text-subtle)]">Почта</dt>
+                      <dd className="mt-0.5 break-all">
+                        {item.email ? (
+                          <a className="underline underline-offset-4" href={`mailto:${item.email}`}>
+                            {item.email}
+                          </a>
+                        ) : (
+                          'Не указана'
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  {whatsapp ? (
+                    <Button asChild variant="outline" className="min-h-11 w-full">
+                      <a href={whatsapp} target="_blank" rel="noopener noreferrer">
+                        <WhatsappLogo size={18} aria-hidden="true" />
+                        Написать в WhatsApp
+                      </a>
+                    </Button>
+                  ) : (
+                    <p className="text-sm text-[var(--color-text-muted)]">
+                      Телефон не указан — свяжитесь по почте.
+                    </p>
+                  )}
+
+                  <CoursePicker
+                    courses={courses}
+                    selection={selection}
+                    disabled={busy}
+                    onToggle={(courseId, next) => setCourse([item.id], courseId, next)}
+                    onAll={(checked) => setAllCourses([item.id], checked)}
+                  />
+
+                  {requestingRejection ? (
+                    <div className="space-y-2 border-t border-[var(--color-border)] pt-4">
+                      {/* The label used to wrap the whole block, so the quick-reason
+                          buttons were inside it: their text joined the field's
+                          accessible name, and clicking one also focused the
+                          textarea. */}
+                      <label
+                        htmlFor={`approval-reason-${item.id}`}
+                        className="block text-xs font-semibold text-[var(--color-text-muted)]"
+                      >
+                        Что нужно уточнить
+                      </label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {QUICK_REASONS.map((preset) => (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() =>
+                              setReasons((current) => ({ ...current, [item.id]: preset }))
+                            }
+                            className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs text-[var(--color-text-muted)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                          >
+                            {preset}
+                          </button>
+                        ))}
+                      </div>
+                      <Textarea
+                        id={`approval-reason-${item.id}`}
+                        value={reasons[item.id] ?? ''}
+                        onChange={(event) =>
+                          setReasons((current) => ({ ...current, [item.id]: event.target.value }))
+                        }
+                        maxLength={500}
+                        rows={2}
+                        placeholder="Например: уточните название компании."
+                        disabled={busy}
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="min-h-11"
+                          disabled={busy}
+                          onClick={() => setRejectionId(null)}
+                        >
+                          Отмена
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="min-h-11"
+                          disabled={busy || (reasons[item.id] ?? '').trim().length < 3}
+                          onClick={() => void decide(item, 'rejected')}
+                        >
+                          {busy ? 'Сохраняем…' : 'Вернуть на уточнение'}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2 border-t border-[var(--color-border)] pt-4">
+                      <Button
+                        type="button"
+                        className="min-h-11 flex-1"
+                        disabled={busy || selection.size === 0}
+                        onClick={() => void decide(item, 'approved')}
+                      >
+                        {busy
+                          ? 'Подтверждаем…'
+                          : selection.size === 0
+                            ? 'Подтвердить доступ'
+                            : `Подтвердить: ${selection.size} ${courseWord(selection.size)}`}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="min-h-11"
+                        disabled={busy}
+                        onClick={() => setRejectionId(item.id)}
+                      >
+                        Вернуть на уточнение
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              );
+            })()
+          : null}
+      </dialog>
     </div>
   );
 }

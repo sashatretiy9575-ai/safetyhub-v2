@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
+import { AccountPurgeButton } from '@/components/admin/account-purge-button';
 import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data-state';
 import { AdminPagination } from '@/components/admin/admin-pagination';
 import { Button } from '@/components/ui/button';
@@ -49,9 +50,11 @@ export default async function EmployeeDirectoryPage({
   const query = parseLearningHistoryTargetQuery(params);
   const result = await getLearningHistoryTargetsPage(query);
   const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
-  const currentToken = query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
+  const currentToken =
+    query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
   const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
   const backHref = actor.capabilities.includes('results.read') ? '/admin/employees' : '/admin';
+  const canDeleteUser = actor.capabilities.includes('user.delete');
 
   return (
     <section className="space-y-5">
@@ -110,11 +113,16 @@ export default async function EmployeeDirectoryPage({
                     Участник · {user.status === 'active' ? 'активен' : 'приостановлен'}
                   </p>
                 </div>
-                <Button asChild variant="outline">
-                  <Link href={`/admin/employees/${user.id}/learning-history`}>
-                    Учебная история
-                  </Link>
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button asChild variant="outline" className="min-h-11">
+                    <Link href={`/admin/employees/${user.id}/learning-history`}>
+                      Учебная история
+                    </Link>
+                  </Button>
+                  {canDeleteUser ? (
+                    <AccountPurgeButton userId={user.id} label={user.label} />
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>

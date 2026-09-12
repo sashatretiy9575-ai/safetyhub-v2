@@ -7,8 +7,17 @@ import {
 } from './certificate-client-contract.ts';
 import { certificateFilename } from './certificate.ts';
 import { createStreamingZipArchive, type ArchiveEntry } from './certificate-archive.ts';
-import { generateCertificateInBrowser, loadCertificateFontBytes, resolveAssetUrl } from './certificate-renderer.ts';
-import { certificateReportRows, generateCertificateReportInBrowser } from './certificate-report.ts';
+import { generateCertificateInBrowser } from './certificate-renderer.ts';
+import {
+  CERTIFICATE_REPORT_FILENAME,
+  certificateReportRows,
+  generateCertificateReportWorkbook,
+} from './certificate-report-xlsx.ts';
+import {
+  generateProtocolInBrowser,
+  groupItemsForProtocols,
+  protocolFilename,
+} from './protocol-renderer.ts';
 import type {
   CertificateWorkerRequest,
   CertificateWorkerResponse,
@@ -67,18 +76,21 @@ async function* certificateArchiveEntries(
   taskId: string,
   signal: AbortSignal,
 ): AsyncGenerator<ArchiveEntry> {
-  const sampleVerification = metadata.items[0]?.verificationUrl;
-  const reportFont = await loadCertificateFontBytes(
-    resolveAssetUrl(metadata.reportFontUrl, sampleVerification),
-    signal,
-  );
-  const report = await generateCertificateReportInBrowser(
+  const report = await generateCertificateReportWorkbook(
     certificateReportRows(metadata.items),
     new Date(metadata.generatedAt),
-    reportFont,
-    metadata.reportFontUrl.includes('locale=zh'),
   );
-  yield { name: 'report.pdf', bytes: report };
+  yield { name: CERTIFICATE_REPORT_FILENAME, bytes: report };
+
+  // One protocol per company and course, before the certificates it lists.
+  for (const group of groupItemsForProtocols(metadata.items)) {
+    if (signal.aborted) throw new DOMException('Cancelled', 'AbortError');
+    const branding = group.items[0]!.branding;
+    yield {
+      name: protocolFilename(group, branding.protocolNumber),
+      bytes: await generateProtocolInBrowser(group, branding, metadata.reportFontUrl, signal),
+    };
+  }
 
   let completed = 0;
   for (let offset = 0; offset < metadata.items.length; offset += CERTIFICATE_RENDER_CONCURRENCY) {

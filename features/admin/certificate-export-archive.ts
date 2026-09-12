@@ -5,6 +5,7 @@ import {
   certificateDownloadPayloadSchema,
   createCertificateRenderMetadata,
 } from '@/features/certificates/server';
+import { loadCertificateBranding } from '@/features/certificates/settings';
 import {
   CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS,
   CERTIFICATE_CLIENT_SCHEMA_VERSION,
@@ -52,13 +53,16 @@ export async function createCertificateExportMetadata(
   now: Date,
   siteUrl: string,
 ): Promise<CertificateExportMetadata> {
+  // One read of the booklet settings for the whole export; every certificate
+  // in it is drawn with the same stamp, signatures and texts.
+  const branding = await loadCertificateBranding();
   const items = [];
   for (let offset = 0; offset < result.items.length; offset += 25) {
     items.push(
       ...(await Promise.all(
         result.items
           .slice(offset, offset + 25)
-          .map((item) => createCertificateRenderMetadata(item, siteUrl)),
+          .map((item) => createCertificateRenderMetadata(item, siteUrl, branding)),
       )),
     );
   }

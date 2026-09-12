@@ -6,6 +6,32 @@ export const CERTIFICATE_RENDER_CONCURRENCY = 2;
 export const CERTIFICATE_LOCALES = ['ru', 'kk', 'en', 'zh'] as const;
 export type CertificateLocale = (typeof CERTIFICATE_LOCALES)[number];
 
+/**
+ * The booklet's fixed part, set once by the administrator: organization,
+ * commission, statements, validity and the stamp/signature images. Copied
+ * into every certificate's metadata so a download always uses the current
+ * settings.
+ */
+export type CertificateBranding = Readonly<{
+  organizationName: string;
+  bin: string;
+  chairmanName: string;
+  chairmanPosition: string;
+  memberName: string;
+  memberPosition: string;
+  secondMemberName: string;
+  secondMemberPosition: string;
+  protocolNumber: string;
+  validityMonths: number;
+  examTextKk: string;
+  examTextRu: string;
+  knowledgeTextKk: string;
+  knowledgeTextRu: string;
+  stampUrl: string | null;
+  chairmanSignatureUrl: string | null;
+  memberSignatureUrl: string | null;
+}>;
+
 export type CertificateRenderMetadata = Readonly<{
   schemaVersion: typeof CERTIFICATE_CLIENT_SCHEMA_VERSION;
   certificateId: string;
@@ -25,6 +51,7 @@ export type CertificateRenderMetadata = Readonly<{
   completedAt: string;
   issuedAt: string;
   verificationUrl: string;
+  branding: CertificateBranding;
 }>;
 
 export type CertificateExportSkip = Readonly<{
@@ -54,10 +81,12 @@ export type CertificateWorkerProgress = Readonly<{
   total: number;
 }>;
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const CERTIFICATE_NUMBER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,95}$/u;
-const SAFE_ASSET_PATH_PATTERN = /^\/certificate-assets\/font\?locale=(?:ru|zh)&v=(?:1|Sans2\.005)$/u;
+const SAFE_ASSET_PATH_PATTERN =
+  /^\/certificate-assets\/font\?locale=(?:ru|zh)&v=(?:1|Sans2\.005)$/u;
+const SAFE_IMAGE_PATH_PATTERN =
+  /^\/certificate-assets\/image\?kind=(?:stamp|chairman|member)&v=[0-9]{1,12}$/u;
 
 function assertString(value: unknown, code: string, maxLength: number): asserts value is string {
   if (typeof value !== 'string' || value.length < 1 || value.length > maxLength) {
@@ -70,7 +99,10 @@ function assertOptionalString(
   code: string,
   maxLength: number,
 ): asserts value is string | null {
-  if (value !== null && (typeof value !== 'string' || value.length < 1 || value.length > maxLength)) {
+  if (
+    value !== null &&
+    (typeof value !== 'string' || value.length < 1 || value.length > maxLength)
+  ) {
     throw new Error(code);
   }
 }
@@ -79,6 +111,41 @@ function assertInteger(value: unknown, code: string, minimum: number, maximum: n
   if (!Number.isInteger(value) || Number(value) < minimum || Number(value) > maximum) {
     throw new Error(code);
   }
+}
+
+function assertBoundedText(
+  value: unknown,
+  code: string,
+  maxLength: number,
+): asserts value is string {
+  if (typeof value !== 'string' || value.length > maxLength) throw new Error(code);
+}
+
+function assertImageUrl(value: unknown, code: string): asserts value is string | null {
+  if (value === null) return;
+  if (typeof value !== 'string' || !SAFE_IMAGE_PATH_PATTERN.test(value)) throw new Error(code);
+}
+
+export function assertCertificateBranding(value: unknown): asserts value is CertificateBranding {
+  if (!value || typeof value !== 'object') throw new Error('CERTIFICATE_BRANDING_INVALID');
+  const branding = value as Record<string, unknown>;
+  assertBoundedText(branding.organizationName, 'CERTIFICATE_BRANDING_INVALID', 200);
+  assertBoundedText(branding.bin, 'CERTIFICATE_BRANDING_INVALID', 32);
+  assertBoundedText(branding.chairmanName, 'CERTIFICATE_BRANDING_INVALID', 200);
+  assertBoundedText(branding.chairmanPosition, 'CERTIFICATE_BRANDING_INVALID', 200);
+  assertBoundedText(branding.memberName, 'CERTIFICATE_BRANDING_INVALID', 200);
+  assertBoundedText(branding.memberPosition, 'CERTIFICATE_BRANDING_INVALID', 200);
+  assertBoundedText(branding.secondMemberName, 'CERTIFICATE_BRANDING_INVALID', 200);
+  assertBoundedText(branding.secondMemberPosition, 'CERTIFICATE_BRANDING_INVALID', 200);
+  assertBoundedText(branding.protocolNumber, 'CERTIFICATE_BRANDING_INVALID', 64);
+  assertInteger(branding.validityMonths, 'CERTIFICATE_BRANDING_INVALID', 0, 120);
+  assertBoundedText(branding.examTextKk, 'CERTIFICATE_BRANDING_INVALID', 1000);
+  assertBoundedText(branding.examTextRu, 'CERTIFICATE_BRANDING_INVALID', 1000);
+  assertBoundedText(branding.knowledgeTextKk, 'CERTIFICATE_BRANDING_INVALID', 1000);
+  assertBoundedText(branding.knowledgeTextRu, 'CERTIFICATE_BRANDING_INVALID', 1000);
+  assertImageUrl(branding.stampUrl, 'CERTIFICATE_ASSET_URL_INVALID');
+  assertImageUrl(branding.chairmanSignatureUrl, 'CERTIFICATE_ASSET_URL_INVALID');
+  assertImageUrl(branding.memberSignatureUrl, 'CERTIFICATE_ASSET_URL_INVALID');
 }
 
 export function assertCertificateRenderMetadata(
@@ -141,7 +208,8 @@ export function assertCertificateRenderMetadata(
   }
   const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(verificationUrl.hostname);
   if (
-    (verificationUrl.protocol !== 'https:' && !(verificationUrl.protocol === 'http:' && loopback)) ||
+    (verificationUrl.protocol !== 'https:' &&
+      !(verificationUrl.protocol === 'http:' && loopback)) ||
     verificationUrl.username ||
     verificationUrl.password ||
     verificationUrl.search ||
@@ -150,6 +218,7 @@ export function assertCertificateRenderMetadata(
   ) {
     throw new Error('CERTIFICATE_VERIFICATION_URL_INVALID');
   }
+  assertCertificateBranding(item.branding);
 }
 
 export function assertCertificateExportMetadata(

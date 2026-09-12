@@ -10,7 +10,10 @@ import {
   normalizePdfText,
 } from '../../lib/pdf/certificate.ts';
 import { createStreamingZipArchive, createZipArchive } from '../../lib/pdf/certificate-archive.ts';
-import { generateCertificateReportInBrowser } from '../../lib/pdf/certificate-report.ts';
+import {
+  CERTIFICATE_REPORT_FILENAME,
+  generateCertificateReportWorkbook,
+} from '../../lib/pdf/certificate-report-xlsx.ts';
 import {
   CERTIFICATE_EXPORT_JOB_LIMIT,
   CERTIFICATE_EXPORT_SYNC_LIMIT,
@@ -61,26 +64,28 @@ test('export revalidates the full selection in one actor-bound RPC', async () =>
   assert.match(route, /createBoundedCertificateMetadataResponse/);
 });
 
-test('report-only ZIP input creates one informative PDF page', async () => {
-  const report = await read('lib/pdf/certificate-report.ts');
-  assert.match(report, /sourceRows\.length > 500/);
-  assert.match(report, /Math\.max\(1, Math\.ceil\(rows\.length \/ rowsPerPage\)\)/);
-  assert.match(report, /Действующих сертификатов в выбранных строках нет/);
+test('the list that travels with the certificates is a workbook, not a PDF table', async () => {
+  const report = await read('lib/pdf/certificate-report-xlsx.ts');
+  assert.match(report, /sourceRows\.length > MAX_ROWS/);
+  assert.match(report, /Действующих удостоверений в выбранных строках нет/);
+  assert.match(report, /CERTIFICATE_REPORT_FILENAME = 'report\.xlsx'/);
+  assert.doesNotMatch(report, /pdf-lib|node:(?:fs|path|crypto)/);
+  const columns = report.match(/const COLUMNS: readonly Column\[\] = \[([\s\S]*?)\n\];/)?.[1];
+  assert.ok(columns, 'expected the workbook column definition');
+  assert.equal((columns.match(/label: '/g) ?? []).length, 10);
+  assert.match(columns, /label: '№ удостоверения'/);
+  assert.match(columns, /label: 'Действителен до'/);
 
   const archive = await createZipArchive([
-    { name: 'report.pdf', bytes: new TextEncoder().encode('%PDF-empty-report') },
+    { name: CERTIFICATE_REPORT_FILENAME, bytes: new TextEncoder().encode('PK-empty-report') },
   ]);
   const unpacked = unzipSync(archive);
-  assert.deepEqual(Object.keys(unpacked), ['report.pdf']);
-  assert.equal(new TextDecoder().decode(unpacked['report.pdf']), '%PDF-empty-report');
+  assert.deepEqual(Object.keys(unpacked), ['report.xlsx']);
 });
 
-test('browser report renderer creates a valid PDF without server filesystem access', async () => {
-  const fontBytes = await readFile(
-    new URL('../../lib/pdf/assets/noto-sans-latin-cyrillic.ttf', import.meta.url),
-  );
+test('browser workbook writer creates a valid .xlsx without server filesystem access', async () => {
   const createdAt = new Date('2026-09-01T10:00:00.000Z');
-  const bytes = await generateCertificateReportInBrowser(
+  const bytes = await generateCertificateReportWorkbook(
     [
       {
         fullName: 'Әділ Құсайынұлы',
@@ -91,49 +96,46 @@ test('browser report renderer creates a valid PDF without server filesystem acce
         total: 10,
         completedAt: createdAt,
         issuedAt: createdAt,
+        validUntil: new Date('2027-09-01T10:00:00.000Z'),
         certificateNumber: 'SH-2026-ABCDEF123456',
+      },
+      {
+        fullName: '=HYPERLINK("x")',
+        position: null,
+        organization: null,
+        courseTitle: 'Курс',
+        score: 7,
+        total: 10,
+        completedAt: createdAt,
+        issuedAt: createdAt,
+        validUntil: null,
+        certificateNumber: 'SH-2026-000000000001',
       },
     ],
     createdAt,
-    fontBytes,
   );
-  assert.equal(new TextDecoder().decode(bytes.slice(0, 5)), '%PDF-');
-  const pdf = await PDFDocument.load(bytes);
-  assert.equal(pdf.getPageCount(), 1);
-  assert.match(pdf.getTitle() ?? '', /SafetyHub\.kz/);
-});
-
-test('report geometry preserves every canonical certificate number without ellipsis', async () => {
-  const report = await read('lib/pdf/certificate-report.ts');
-  const columns = report.match(/const COLUMNS: readonly Column\[\] = \[([\s\S]*?)\n\];/)?.[1];
-  assert.ok(columns, 'expected the report column definition');
-  const widths = [...columns.matchAll(/\bwidth: (\d+)/g)].map((match) => Number(match[1]));
-  assert.equal(widths.length, 8);
-  assert.ok(widths.reduce((total, width) => total + width, 0) <= 841.89 - 32 * 2);
-
-  const certificateWidth = Number(
-    columns.match(
-      /label: '№ сертификата', width: (\d+), value: \(row\) => row\.certificateNumber/,
-    )?.[1],
+  assert.equal(new TextDecoder().decode(bytes.slice(0, 2)), 'PK');
+  const parts = unzipSync(bytes);
+  assert.deepEqual(
+    Object.keys(parts).sort(),
+    [
+      '[Content_Types].xml',
+      '_rels/.rels',
+      'docProps/app.xml',
+      'docProps/core.xml',
+      'xl/_rels/workbook.xml.rels',
+      'xl/styles.xml',
+      'xl/workbook.xml',
+      'xl/worksheets/sheet1.xml',
+    ].sort(),
   );
-  assert.ok(Number.isFinite(certificateWidth));
-
-  const pdf = await PDFDocument.create();
-  pdf.registerFontkit(fontkit);
-  const fontBytes = await readFile(
-    new URL('../../lib/pdf/assets/noto-sans-latin-cyrillic.ttf', import.meta.url),
-  );
-  const font = await pdf.embedFont(fontBytes, { subset: false });
-  const widestHex = Array.from('0123456789ABCDEF').reduce((widest, candidate) =>
-    font.widthOfTextAtSize(candidate, 8) > font.widthOfTextAtSize(widest, 8) ? candidate : widest,
-  );
-  const values = ['SH-2026-0376EB71EF71', `SH-2026-${widestHex.repeat(12)}`];
-  for (const value of values) {
-    assert.ok(
-      font.widthOfTextAtSize(value, 8) <= certificateWidth - 12,
-      `${value} must fit the report cell at 8pt`,
-    );
-  }
+  const sheet = new TextDecoder().decode(parts['xl/worksheets/sheet1.xml']);
+  assert.match(sheet, /Әділ Құсайынұлы/);
+  assert.match(sheet, /SH-2026-ABCDEF123456/);
+  assert.match(sheet, /01\.09\.2027/);
+  // A formula-looking name is stored as text, never evaluated.
+  assert.match(sheet, /'=HYPERLINK\(&quot;x&quot;\)/);
+  assert.doesNotMatch(sheet, /<f>/);
 });
 
 test('server returns export metadata while the browser worker creates reports and archives', async () => {
@@ -141,7 +143,7 @@ test('server returns export metadata while the browser worker creates reports an
     await Promise.all([
       read('app/api/admin/attestations/export/route.ts'),
       read('features/admin/certificate-export-archive.ts'),
-      read('lib/pdf/certificate-report.ts'),
+      read('lib/pdf/certificate-report-xlsx.ts'),
       read('lib/pdf/certificate-archive.ts'),
       read('app/api/certificates/[certificateId]/route.ts'),
       read('lib/pdf/certificate.worker.ts'),
@@ -153,7 +155,7 @@ test('server returns export metadata while the browser worker creates reports an
   assert.doesNotMatch(route, /application\/zip|createStreamingZipArchive|generateCertificate/);
   assert.match(exportHelper, /createCertificateRenderMetadata/);
   assert.match(exportHelper, /archivePolicy/);
-  assert.match(worker, /name: 'report\.pdf'/);
+  assert.match(worker, /name: CERTIFICATE_REPORT_FILENAME/);
   assert.match(worker, /name: `certificates\//);
   assert.match(worker, /createStreamingZipArchive/);
   assert.match(client, /CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS/);
@@ -163,11 +165,11 @@ test('server returns export metadata while the browser worker creates reports an
   assert.match(client, /type: 'chunk-ack'/);
   assert.match(worker, /waitForChunkAcknowledgement/);
   assert.match(worker, /await acknowledged/);
-  assert.match(report, /Отчёт по выданным сертификатам/);
-  assert.match(report, /rowsPerPage/);
-  assert.match(report, /Страница \$\{pageIndex \+ 1\} из \$\{pageCount\}/);
-  assert.match(report, /label: '№ сертификата', width: 117/);
-  assert.match(report, /fixed `SH-YYYY-XXXXXXXXXXXX` shape/);
+  // The list is a workbook: one sheet, frozen header, every certificate number in full.
+  assert.match(report, /Выданные удостоверения · SafetyHub ·/);
+  assert.match(report, /state="frozen"/);
+  assert.match(report, /label: '№ удостоверения', width: 24/);
+  assert.match(report, /zipSync\(/);
   assert.match(archive, /ZipPassThrough/);
   assert.match(archive, /controller\.desiredSize/);
   assert.match(archive, /highWaterMark: 1024 \* 1024/);
@@ -189,9 +191,11 @@ test('certificate payload and filenames preserve multilingual participant data s
   assert.match(assets, /b2e9d66e497b1e69e5066b8bec9433d5026aa593918d4625a03555817047f993/);
   assert.match(assets, /fs\.readFile\(descriptor\.path\)/);
   assert.doesNotMatch(assets, /fetch\(|raw\.githubusercontent|upstream/);
-  assert.match(renderer, /organization: 'Компания'/);
-  assert.match(renderer, /passScore: \(score, total\) => `Проходной балл:/);
-  assert.match(renderer, /heading: '证书'/);
+  // The booklet's labels are the fixed bilingual form; the locale only picks
+  // the font, so a Chinese name still renders with the CJK face.
+  assert.match(renderer, /КУӘЛІК \/ УДОСТОВЕРЕНИЕ №/);
+  assert.match(renderer, /Сведения о проверке знаний/);
+  assert.match(renderer, /subset: metadata\.locale === 'zh'/);
   assert.match(certificate, /filename\*=UTF-8''/);
   assert.match(certificate, /certificateFilename/);
 });

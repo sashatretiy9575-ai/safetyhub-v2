@@ -5,6 +5,7 @@ import {
   createCertificateRenderMetadata,
   getCertificateDownloadPayload,
 } from '@/features/certificates/server';
+import { loadCertificateBranding } from '@/features/certificates/settings';
 import {
   CERTIFICATE_METADATA_MAX_BYTES,
   createBoundedCertificateMetadataResponse,
@@ -32,7 +33,11 @@ export async function GET(
     if (!data) {
       return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 });
     }
-    const metadata = await createCertificateRenderMetadata(data, getSiteUrl());
+    const metadata = await createCertificateRenderMetadata(
+      data,
+      getSiteUrl(),
+      await loadCertificateBranding(),
+    );
     return createBoundedCertificateMetadataResponse(metadata, CERTIFICATE_METADATA_MAX_BYTES);
   } catch (error) {
     return apiError(error);

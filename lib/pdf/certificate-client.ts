@@ -243,25 +243,32 @@ async function renderArchiveInMainThread(
   options: WorkerOptions & { destination?: WritableDestination },
 ): Promise<Uint8Array | null> {
   const { createStreamingZipArchive } = await import('./certificate-archive.ts');
-  const { generateCertificateInBrowser, loadCertificateFontBytes, resolveAssetUrl } =
-    await import('./certificate-renderer.ts');
-  const { certificateReportRows, generateCertificateReportInBrowser } =
-    await import('./certificate-report.ts');
+  const { generateCertificateInBrowser } = await import('./certificate-renderer.ts');
+  const { CERTIFICATE_REPORT_FILENAME, certificateReportRows, generateCertificateReportWorkbook } =
+    await import('./certificate-report-xlsx.ts');
+  const { generateProtocolInBrowser, groupItemsForProtocols, protocolFilename } =
+    await import('./protocol-renderer.ts');
   const { certificateFilename } = await import('./certificate.ts');
 
   async function* entriesGenerator(): AsyncGenerator<{ name: string; bytes: Uint8Array }> {
-    const sampleVerification = metadata.items[0]?.verificationUrl;
-    const reportFont = await loadCertificateFontBytes(
-      resolveAssetUrl(metadata.reportFontUrl, sampleVerification),
-      options.signal,
-    );
-    const report = await generateCertificateReportInBrowser(
+    const report = await generateCertificateReportWorkbook(
       certificateReportRows(metadata.items),
       new Date(metadata.generatedAt),
-      reportFont,
-      metadata.reportFontUrl.includes('locale=zh'),
     );
-    yield { name: 'report.pdf', bytes: report };
+    yield { name: CERTIFICATE_REPORT_FILENAME, bytes: report };
+    for (const group of groupItemsForProtocols(metadata.items)) {
+      if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
+      const branding = group.items[0]!.branding;
+      yield {
+        name: protocolFilename(group, branding.protocolNumber),
+        bytes: await generateProtocolInBrowser(
+          group,
+          branding,
+          metadata.reportFontUrl,
+          options.signal,
+        ),
+      };
+    }
 
     let completed = 0;
     for (let offset = 0; offset < metadata.items.length; offset += CERTIFICATE_RENDER_CONCURRENCY) {
