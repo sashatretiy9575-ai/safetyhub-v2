@@ -121,7 +121,10 @@ test('attestation screen is responsive and exposes selection, filters, and confi
   assert.match(manager, /aria-pressed=\{groupFullySelected\}/);
   assert.match(manager, /setOrganizationGroupSelected\(row\.organization, !groupFullySelected\)/);
   assert.match(fullManager, /Выбрать все \$\{totalFiltered\} по фильтру/);
-  assert.match(manager, /organizationHref\(filters, row\.organization\)/);
+  assert.match(manager, /organizationHref\(filters, org\)/);
+  // The company band has no menu: its checkbox selects the company, and the
+  // filters narrow the list to it.
+  assert.doesNotMatch(manager, /Выбрать всю компанию|Показать только компанию/u);
   assert.match(manager, /resolvedSelection\.uniquePeople/);
   assert.match(manager, /resolvedSelection\.pendingIdentity/);
   assert.match(manager, /resolvedSelection\.ready/);
@@ -167,10 +170,7 @@ test('attestation list keeps personal details compact and loads the avatar only 
   assert.doesNotMatch(page, /\{result\.data\.total\} записей/u);
   assert.equal((managerSurface.match(/<ProfileAvatar/g) ?? []).length, 1);
   assert.match(managerSurface, /\/api\/admin\/attestations\/avatar\/\$\{row\.userId\}/);
-  assert.equal(
-    (managerSurface.match(/<AttestationWorkflowBadge row=\{row\} \/>/g) ?? []).length,
-    2,
-  );
+  assert.equal((managerSurface.match(/<AttestationWorkflowBadge row=\{row\}/g) ?? []).length, 2);
   assert.doesNotMatch(managerSurface, /Нажмите, чтобы оставить только эту компанию/);
   assert.match(panels, /Сохранить данные/);
   assert.match(panels, /\/api\/admin\/users\/\$\{row\.userId\}\/identity/);
@@ -180,14 +180,16 @@ test('attestation list keeps personal details compact and loads the avatar only 
   assert.match(panels, /Должность/);
   assert.match(panels, /Компания/);
   assert.doesNotMatch(panels, /onEdit\('(?:name|surname|job|organization)'\)/);
-  assert.match(managerSurface, />Контакт</);
   assert.match(managerSurface, /mailto:\$\{contact\.email\}/);
   // The card shows the phone and a WhatsApp button as soon as it opens, for
   // every row, so the number and the address come from their own endpoint
   // rather than riding on the certificate history that a deleted course lacks.
   const contactRoute = await read('app/api/admin/attestations/contact/[userId]/route.ts');
   assert.match(managerSurface, /\/api\/admin\/attestations\/contact\/\$\{row\.userId\}/);
-  assert.match(managerSurface, />Телефон</);
+  // The owner's rules: no captions over the contact details, no mail button,
+  // and never a sentence claiming the phone is optional.
+  assert.doesNotMatch(managerSurface, />(?:Контакт|Телефон)</u);
+  assert.doesNotMatch(managerSurface, />Письмо<|необязателен при регистрации/u);
   assert.match(managerSurface, /phoneHref\(contact\.phoneE164\)/);
   assert.match(managerSurface, /formatPhoneDisplay\(contact\.phoneE164\)/);
   assert.match(

@@ -7,9 +7,13 @@ type AttestationSelectionBannerProps = {
   isAllFilteredSelected: boolean;
   selectingAll: boolean;
   onSelectAllFiltered: () => void;
-  onClearSelection: () => void;
 };
 
+/**
+ * Offers to extend a selection past the current page. The count and the
+ * clear button belong to the selection panel right under it, so repeating
+ * them here only said the same thing twice.
+ */
 export function AttestationSelectionBanner({
   selectedCount,
   totalFiltered,
@@ -17,34 +21,18 @@ export function AttestationSelectionBanner({
   isAllFilteredSelected,
   selectingAll,
   onSelectAllFiltered,
-  onClearSelection,
 }: AttestationSelectionBannerProps) {
-  if (selectedCount === 0) return null;
+  if (selectedCount === 0 || isAllFilteredSelected || totalFiltered <= pageSize) return null;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--color-primary)] bg-[var(--color-primary-soft)] px-4 py-2 text-sm">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold tabular-nums">Выделено: {selectedCount}</span>
-        {totalFiltered > pageSize && !isAllFilteredSelected ? (
-          <>
-            <span className="text-[var(--color-text-subtle)]">·</span>
-            <button
-              type="button"
-              disabled={selectingAll}
-              onClick={onSelectAllFiltered}
-              className="font-medium text-[var(--color-primary)] underline hover:no-underline disabled:opacity-50"
-            >
-              {selectingAll ? 'Выбираем…' : `Выбрать все ${totalFiltered} по фильтру`}
-            </button>
-          </>
-        ) : null}
-      </div>
+    <div className="rounded-xl border border-[var(--color-primary)] bg-[var(--color-primary-soft)] px-4 py-2 text-sm">
       <button
         type="button"
-        onClick={onClearSelection}
-        className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] underline"
+        disabled={selectingAll}
+        onClick={onSelectAllFiltered}
+        className="min-h-9 font-medium text-[var(--color-primary)] underline hover:no-underline disabled:opacity-50"
       >
-        Снять
+        {selectingAll ? 'Выбираем…' : `Выбрать все ${totalFiltered} по фильтру`}
       </button>
     </div>
   );

@@ -26,7 +26,7 @@ test('only the newest selection may decide what gets deleted', () => {
 
 test('a second click cannot start while a selection is resolving', () => {
   const disabled = manager.match(/disabled=\{selectingAll \|\| busy\}/gu) ?? [];
-  assert.ok(disabled.length >= 3, 'the band button and both menu entries are guarded');
+  assert.ok(disabled.length >= 2, 'the band checkbox and the rename button are guarded');
 });
 
 test('the rename dialog waits for the selection it will act on', () => {

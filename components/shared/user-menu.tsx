@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { DownloadSimple, Gauge, User } from '@phosphor-icons/react';
+import { DownloadSimple, Gauge, User, UserGear } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -72,7 +72,13 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
               <AvatarImage src={avatarUrl} alt="" className="size-full rounded-full object-cover" />
             ) : null}
             <AvatarFallback className="rounded-full bg-[var(--color-surface-muted)] text-xs font-semibold text-[var(--color-text)]">
-              {initials || <User size={18} weight="regular" />}
+              {/* An administrator without a photo gets the administrator icon
+                  rather than two letters of their name. */}
+              {isAdmin ? (
+                <UserGear size={20} weight="regular" aria-hidden="true" />
+              ) : (
+                initials || <User size={18} weight="regular" />
+              )}
             </AvatarFallback>
           </Avatar>
         </Button>

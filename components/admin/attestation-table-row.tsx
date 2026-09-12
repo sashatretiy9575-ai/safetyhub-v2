@@ -53,6 +53,10 @@ function compactDateTime(value: string) {
   return COMPACT_DATE_TIME.format(date);
 }
 
+/** One step smaller on a phone, so the course beside it keeps its words. */
+const STATUS_BADGE =
+  'text-micro min-h-6 px-2 py-0.5 @min-[760px]:text-caption @min-[760px]:min-h-7 @min-[760px]:px-3 @min-[760px]:py-1';
+
 export function AttestationTableRow({
   row,
   selected,
@@ -66,26 +70,30 @@ export function AttestationTableRow({
   return (
     <article
       role="row"
-      // Three layouts, one markup:
-      //   under 30rem — name, then course and date, then the status on a line
-      //     of its own, so a 320 px phone still shows the whole name instead of
-      //     surrendering half the width to a 110 px pill;
-      //   30rem and up — the status moves up beside the course;
-      //   47.5rem and up — the spreadsheet, one line per person.
-      // The checkbox and the actions button stand centred against the whole
-      // card at every size rather than clinging to its first line.
-      className="@min-[760px]:text-caption grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-1.5 rounded-xl border border-[var(--color-border)]/55 bg-[var(--color-surface)] px-3 py-2.5 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:min-h-11 @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px] @min-[760px]:gap-x-2 @min-[760px]:gap-y-0 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:border-[var(--color-border)]/55 @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:shadow-none"
+      // Two layouts, one markup.
+      //   A phone gets two lines between the checkbox and the actions button,
+      //   which stand at the card's edges at its full height: the name and the
+      //   score, then the course and the status. The lines are one wrapping
+      //   flex row, so a long status takes room from the course beside it and
+      //   never from the name above it; when the course would lose its words
+      //   altogether, the status moves under it.
+      //   From 47.5rem it is the spreadsheet, one line per person. Below
+      //   57.5rem (a 1024 px laptop with the sidebar) the sheet leaves out the
+      //   position column and the time, so names and course titles stay whole.
+      className="@min-[760px]:text-caption relative flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-0.5 rounded-xl border border-[var(--color-border)]/55 bg-[var(--color-surface)] py-2.5 pr-10 pl-10 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:grid @min-[760px]:min-h-11 @min-[760px]:grid-cols-[32px_minmax(0,1.2fr)_minmax(0,1.2fr)_4.75rem_44px_minmax(10.75rem,1fr)_44px] @min-[920px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(10.75rem,1fr)_44px] @min-[760px]:gap-x-2 @min-[760px]:gap-y-0 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:border-[var(--color-border)]/55 @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:shadow-none"
       onClick={(event) => {
         const target = event.target as HTMLElement;
-        if (!target.closest('button, input, a, [role="menuitem"]')) onOpenDetails();
+        // `label` too: a tap on the checkbox's padding used to tick the box and
+        // open the card at the same time.
+        if (!target.closest('button, input, a, label, [role="menuitem"]')) onOpenDetails();
       }}
     >
-      {/* 1. Selection — one band down the left of both lines */}
+      {/* 1. Selection — the card's left edge, centred on its full height */}
       <div
         role="cell"
-        className="col-start-1 row-span-3 row-start-1 @min-[480px]:row-span-2 @min-[760px]:col-start-1 @min-[760px]:row-span-1 @min-[760px]:row-start-1 @min-[760px]:grid @min-[760px]:place-items-center"
+        className="absolute inset-y-0 left-0 grid w-10 place-items-center @min-[760px]:static @min-[760px]:col-start-1 @min-[760px]:row-start-1 @min-[760px]:w-auto"
       >
-        <label className="grid size-11 cursor-pointer place-items-center @min-[760px]:size-8">
+        <label className="grid h-11 w-10 cursor-pointer place-items-center @min-[760px]:size-8">
           <input
             type="checkbox"
             checked={selected}
@@ -101,7 +109,7 @@ export function AttestationTableRow({
       {/* 2. Employee */}
       <div
         role="cell"
-        className="col-start-2 row-start-1 min-w-0 @min-[760px]:col-start-2 @min-[760px]:row-start-1"
+        className="order-1 min-w-0 grow basis-24 @min-[760px]:col-start-2 @min-[760px]:row-start-1"
       >
         <button
           type="button"
@@ -114,12 +122,13 @@ export function AttestationTableRow({
         </button>
       </div>
 
-      {/* 3. Desktop only. While the sheet is banded by company this column shows
-             the position; otherwise it shows the company, matching its header.
-             On a phone the company rides along on the second line instead. */}
+      {/* 3. The full sheet only. While the sheet is banded by company this column
+             shows the position; otherwise it shows the company, matching its
+             header. On a phone and on the narrow sheet the company rides along
+             after the course instead. */}
       <div
         role="cell"
-        className={`@min-[760px]:text-caption hidden min-w-0 text-xs @min-[760px]:col-start-3 @min-[760px]:row-start-1 @min-[760px]:block ${CELL}`}
+        className={`@min-[760px]:text-caption hidden min-w-0 text-xs @min-[760px]:row-start-1 @min-[920px]:col-start-3 @min-[920px]:block ${CELL}`}
       >
         {grouped ? (
           <span className="block truncate text-[var(--color-text-muted)]" title={row.job}>
@@ -138,61 +147,68 @@ export function AttestationTableRow({
         )}
       </div>
 
-      {/* 4. Course — `col-end` must be reset, otherwise the desktop start column
-          is greater than the mobile end column and the browser swaps them, so
-          the course lands back on top of the previous cell. On a phone the
-          course and the date share one line, so the card is exactly two rows
-          and the status badge to the right lines up with them. */}
+      {/* 4. Course, with the date beside it once a phone has the room */}
       <div
         role="cell"
-        className={`col-start-2 col-end-3 row-start-2 flex min-w-0 items-baseline gap-1.5 @min-[760px]:col-start-4 @min-[760px]:col-end-auto @min-[760px]:row-start-1 @min-[760px]:block ${CELL}`}
+        className={`order-4 flex min-w-0 grow basis-16 items-baseline gap-1.5 @min-[760px]:col-start-3 @min-[760px]:row-start-1 @min-[760px]:block @min-[920px]:col-start-4 ${CELL}`}
       >
         <p
-          className="@min-[760px]:text-caption truncate text-xs @min-[760px]:font-normal"
+          className="@min-[760px]:text-caption truncate text-xs text-[var(--color-text-muted)] @min-[760px]:text-[var(--color-text)]"
           title={row.courseTitle}
         >
           {row.courseTitle}
+          {!grouped && row.organization ? (
+            <span className="@min-[920px]:hidden"> · {row.organization}</span>
+          ) : null}
         </p>
         <time
           dateTime={row.completedAt}
-          className="text-micro shrink-0 text-[var(--color-text-subtle)] tabular-nums @min-[760px]:hidden"
+          className="text-micro hidden shrink-0 text-[var(--color-text-subtle)] tabular-nums @min-[480px]:inline @min-[760px]:hidden"
         >
           {compactDateTime(row.completedAt)}
-          {!grouped && row.organization ? ` · ${row.organization}` : ''}
         </time>
       </div>
 
       {/* 5. Completion date — its own column on the desktop sheet */}
       <div
         role="cell"
-        className={`hidden whitespace-nowrap text-[var(--color-text-muted)] tabular-nums @min-[760px]:col-start-5 @min-[760px]:row-start-1 @min-[760px]:block ${CELL}`}
+        className={`hidden whitespace-nowrap text-[var(--color-text-muted)] tabular-nums @min-[760px]:col-start-4 @min-[760px]:row-start-1 @min-[760px]:block @min-[920px]:col-start-5 ${CELL}`}
       >
-        <time dateTime={row.completedAt}>{compactDateTime(row.completedAt)}</time>
+        {/* The narrow sheet keeps the day and drops the time; the card and a
+            wider sheet show both. */}
+        <time dateTime={row.completedAt}>
+          {compactDateTime(row.completedAt).split(', ')[0]}
+          <span className="hidden @min-[920px]:inline">
+            , {compactDateTime(row.completedAt).split(', ')[1] ?? ''}
+          </span>
+        </time>
       </div>
 
       {/* 6. Score */}
       <div
         role="cell"
-        className={`col-start-3 row-start-1 flex items-center justify-end @min-[760px]:col-start-6 @min-[760px]:row-start-1 @min-[760px]:justify-start ${CELL}`}
+        className={`order-2 flex shrink-0 items-center justify-end @min-[760px]:col-start-5 @min-[760px]:row-start-1 @min-[760px]:justify-start @min-[920px]:col-start-6 ${CELL}`}
       >
         <span className="font-bold tabular-nums @min-[760px]:font-semibold">
           {row.score}/{row.total}
         </span>
       </div>
 
-      {/* 7. Status — its own line on a narrow phone, beside the course as soon
-          as there is room, its own column on the sheet */}
+      {/* Phone only: closes the first line, so the course opens the second. */}
+      <div aria-hidden="true" className="order-3 basis-full @min-[760px]:hidden" />
+
+      {/* 7. Status */}
       <div
         role="cell"
-        className={`col-start-2 col-end-5 row-start-3 flex min-w-0 items-center justify-start @min-[480px]:col-start-3 @min-[480px]:col-end-auto @min-[480px]:row-start-2 @min-[480px]:justify-end @min-[760px]:col-start-7 @min-[760px]:row-start-1 @min-[760px]:justify-start ${CELL}`}
+        className={`order-5 flex shrink-0 items-center justify-end @min-[760px]:col-start-6 @min-[760px]:row-start-1 @min-[760px]:justify-start @min-[920px]:col-start-7 ${CELL}`}
       >
-        <AttestationWorkflowBadge row={row} />
+        <AttestationWorkflowBadge row={row} className={STATUS_BADGE} />
       </div>
 
-      {/* 8. Actions — one band down the right of the whole card */}
+      {/* 8. Actions — the card's right edge, centred on its full height */}
       <div
         role="cell"
-        className="col-start-4 row-span-3 row-start-1 flex items-center justify-end @min-[480px]:row-span-2 @min-[760px]:col-start-8 @min-[760px]:row-span-1 @min-[760px]:row-start-1 @min-[760px]:justify-center"
+        className="absolute inset-y-0 right-0 grid w-10 place-items-center @min-[760px]:static @min-[760px]:col-start-7 @min-[760px]:row-start-1 @min-[760px]:w-auto @min-[920px]:col-start-8"
       >
         <AttestationRowActions
           row={row}

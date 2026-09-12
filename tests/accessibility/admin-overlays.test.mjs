@@ -64,6 +64,10 @@ test('desktop sticky rails clear the mobile chrome that is still on screen', asy
     /sticky bottom-\[calc\(var\(--mobile-tab-height\)\+var\(--safe-area-bottom\)\+1rem\)\][\s\S]*lg:bottom-4/u,
   );
   assert.match(manager, /sticky top-\[calc\(3\.5rem\+var\(--safe-area-top\)\)\][\s\S]*lg:top-0/u);
+  // A hidden overflow on the sheet made it the header's scroll container, so
+  // the 3.5rem offset pushed the header down over the first company band.
+  assert.match(manager, /role="table"[\s\S]{0,600}@min-\[760px\]:overflow-clip/u);
+  assert.doesNotMatch(manager, /role="table"[\s\S]{0,600}@min-\[760px\]:overflow-hidden/u);
   assert.match(actionBar, /lg:top-4/u);
 });
 

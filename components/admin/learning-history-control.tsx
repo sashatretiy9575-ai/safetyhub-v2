@@ -9,22 +9,40 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 
+const EMPTY_COUNTS: AdminLearningHistory['counts'] = {
+  attempts: 0,
+  startedAttempts: 0,
+  attestations: 0,
+  activeCertificates: 0,
+  revokedCertificates: 0,
+};
+
+/**
+ * Deletes a learner's attempts, attestations and certificates and keeps the
+ * account. On its own page it shows the counts and a delete button. Inside the
+ * employee card (`variant="confirm"`) it is only the confirmation, opened from
+ * the card's delete link, and cancelling returns to the card.
+ */
 export function LearningHistoryControl({
   userId,
   userLabel,
   initialHistory = null,
   onDeleted,
+  onCancel,
+  variant = 'page',
 }: {
   userId: string;
   userLabel: string;
   initialHistory?: AdminLearningHistory | null;
   onDeleted?: () => void;
+  onCancel?: () => void;
+  variant?: 'page' | 'confirm';
 }) {
   const idempotencyKey = useRef(crypto.randomUUID());
   const [history, setHistory] = useState<AdminLearningHistory | null>(initialHistory);
   const [loading, setLoading] = useState(!initialHistory);
   const [busy, setBusy] = useState(false);
-  const [confirming, setConfirming] = useState(false);
+  const [confirming, setConfirming] = useState(variant === 'confirm');
   const [reason, setReason] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [message, setMessage] = useState('');
@@ -61,6 +79,18 @@ export function LearningHistoryControl({
     return () => controller.abort();
   }, [initialHistory, userId]);
 
+  const markEmpty = () =>
+    setHistory((current) =>
+      current ? { ...current, counts: EMPTY_COUNTS, lastActivityAt: null, deletable: false } : null,
+    );
+
+  const cancel = () => {
+    setReason('');
+    setConfirmation('');
+    if (variant === 'confirm') onCancel?.();
+    else setConfirming(false);
+  };
+
   const remove = async () => {
     if (reason.trim().length < 10 || confirmation !== 'УДАЛИТЬ') return;
     setBusy(true);
@@ -81,22 +111,7 @@ export function LearningHistoryControl({
       >(result.response);
       if (!result.ok || !payload?.counts)
         throw new Error(payload?.error ?? 'LEARNING_HISTORY_DELETE_FAILED');
-      setHistory((current) =>
-        current
-          ? {
-              ...current,
-              counts: {
-                attempts: 0,
-                startedAttempts: 0,
-                attestations: 0,
-                activeCertificates: 0,
-                revokedCertificates: 0,
-              },
-              lastActivityAt: null,
-              deletable: false,
-            }
-          : null,
-      );
+      markEmpty();
       setConfirming(false);
       setMessage(
         payload.deleted
@@ -108,22 +123,7 @@ export function LearningHistoryControl({
     } catch (error) {
       const code = error instanceof Error ? error.message : '';
       if (code === 'LEARNING_HISTORY_ALREADY_DELETED') {
-        setHistory((current) =>
-          current
-            ? {
-                ...current,
-                counts: {
-                  attempts: 0,
-                  startedAttempts: 0,
-                  attestations: 0,
-                  activeCertificates: 0,
-                  revokedCertificates: 0,
-                },
-                lastActivityAt: null,
-                deletable: false,
-              }
-            : null,
-        );
+        markEmpty();
         setConfirming(false);
         setMessage('Учебная история уже была удалена другим запросом. Аккаунт сохранён.');
       } else {
@@ -150,15 +150,105 @@ export function LearningHistoryControl({
       history.counts.activeCertificates +
       history.counts.revokedCertificates
     : 0;
+  const canDelete = Boolean(history?.deletable) && total > 0;
+
+  const messageNode = message ? (
+    <p
+      role={failed ? 'alert' : 'status'}
+      className={
+        failed ? 'text-sm text-[var(--color-danger)]' : 'text-sm text-[var(--color-text-muted)]'
+      }
+    >
+      {message}
+    </p>
+  ) : null;
+
+  const confirmationForm = (
+    <div className="space-y-3">
+      <p className="text-sm font-bold text-[var(--color-danger)]">
+        Будут удалены все попытки, аттестации и сертификаты пользователя {userLabel}. Старые
+        QR-коды перестанут работать.
+      </p>
+      <p className="text-sm text-[var(--color-text-muted)]">
+        Попытки: {history?.counts.attempts ?? 0} (незавершённые:{' '}
+        {history?.counts.startedAttempts ?? 0}); аттестации: {history?.counts.attestations ?? 0};
+        сертификаты: {history?.counts.activeCertificates ?? 0}; заменённые:{' '}
+        {history?.counts.revokedCertificates ?? 0}.
+      </p>
+      <div>
+        <Label className="sr-only" htmlFor={`history-reason-${userId}`}>
+          Причина, минимум 10 символов
+        </Label>
+        <Textarea
+          id={`history-reason-${userId}`}
+          placeholder="Причина, минимум 10 символов"
+          autoFocus={variant === 'confirm'}
+          minLength={10}
+          maxLength={500}
+          value={reason}
+          disabled={busy}
+          onChange={(event) => setReason(event.target.value)}
+        />
+      </div>
+      <div>
+        <Label className="sr-only" htmlFor={`history-confirm-${userId}`}>
+          Введите УДАЛИТЬ
+        </Label>
+        <Input
+          id={`history-confirm-${userId}`}
+          placeholder="Введите УДАЛИТЬ"
+          autoComplete="off"
+          value={confirmation}
+          disabled={busy}
+          onChange={(event) => setConfirmation(event.target.value)}
+        />
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="danger"
+          disabled={busy || reason.trim().length < 10 || confirmation !== 'УДАЛИТЬ'}
+          aria-busy={busy || undefined}
+          onClick={() => void remove()}
+        >
+          {busy ? 'Удаляем…' : 'Удалить без восстановления'}
+        </Button>
+        <Button type="button" variant="outline" disabled={busy} onClick={cancel}>
+          Отмена
+        </Button>
+      </div>
+    </div>
+  );
+
+  if (variant === 'confirm') {
+    return (
+      <section
+        aria-label="Удаление учебной истории"
+        className="space-y-3 rounded-[var(--radius-group)] border border-[var(--color-danger)]/45 p-4"
+      >
+        {loading ? (
+          <p role="status" className="text-sm text-[var(--color-text-muted)]">
+            Загружаем историю…
+          </p>
+        ) : canDelete ? (
+          confirmationForm
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-[var(--color-text-muted)]">
+              {history ? (total === 0 ? 'Учебная история пуста.' : 'Эту историю удалить нельзя.') : ''}
+            </p>
+            <Button type="button" size="sm" variant="outline" onClick={cancel}>
+              Закрыть
+            </Button>
+          </div>
+        )}
+        {messageNode}
+      </section>
+    );
+  }
 
   return (
-    <section className="space-y-3 border-t border-[var(--color-border)] pt-4">
-      <div>
-        <h3 className="text-base font-bold">Учебная история</h3>
-        <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-          Удаление не затрагивает аккаунт, профиль, роль или аудит.
-        </p>
-      </div>
+    <section className="space-y-3">
       {loading ? (
         <p role="status" className="text-sm text-[var(--color-text-muted)]">
           Загружаем историю…
@@ -202,79 +292,21 @@ export function LearningHistoryControl({
         </dl>
       ) : null}
 
-      {history?.deletable && total > 0 && !confirming ? (
-        <Button type="button" variant="danger" onClick={() => setConfirming(true)}>
+      {canDelete && !confirming ? (
+        <Button
+          type="button"
+          variant="outline"
+          className="text-[var(--color-danger)]"
+          onClick={() => setConfirming(true)}
+        >
           <Trash aria-hidden="true" />
           Удалить всю учебную историю
         </Button>
       ) : null}
       {confirming ? (
-        <div className="space-y-3 rounded-xl border border-[var(--color-danger)] p-4">
-          <p className="text-sm font-bold text-[var(--color-danger)]">
-            Будут удалены все попытки, аттестации и сертификаты пользователя {userLabel}. Старые
-            QR-коды перестанут работать.
-          </p>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Попытки: {history?.counts.attempts ?? 0} (незавершённые:{' '}
-            {history?.counts.startedAttempts ?? 0}); аттестации: {history?.counts.attestations ?? 0}
-            ; сертификаты: {history?.counts.activeCertificates ?? 0}; заменённые:{' '}
-            {history?.counts.revokedCertificates ?? 0}.
-          </p>
-          <div className="space-y-1">
-            <Label className="sr-only" htmlFor={`history-reason-${userId}`}>Причина, минимум 10 символов</Label>
-            <Textarea
-          placeholder="Причина, минимум 10 символов"
-              id={`history-reason-${userId}`}
-              minLength={10}
-              maxLength={500}
-              value={reason}
-              onChange={(event) => setReason(event.target.value)}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label className="sr-only" htmlFor={`history-confirm-${userId}`}>Введите УДАЛИТЬ</Label>
-            <Input
-          placeholder="Введите УДАЛИТЬ"
-              id={`history-confirm-${userId}`}
-              autoComplete="off"
-              value={confirmation}
-              onChange={(event) => setConfirmation(event.target.value)}
-            />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="danger"
-              disabled={busy || reason.trim().length < 10 || confirmation !== 'УДАЛИТЬ'}
-              onClick={() => void remove()}
-            >
-              {busy ? 'Удаляем…' : 'Удалить без восстановления'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={busy}
-              onClick={() => {
-                setConfirming(false);
-                setReason('');
-                setConfirmation('');
-              }}
-            >
-              Отмена
-            </Button>
-          </div>
-        </div>
+        <div className="rounded-xl border border-[var(--color-danger)] p-4">{confirmationForm}</div>
       ) : null}
-      {message ? (
-        <p
-          role={failed ? 'alert' : 'status'}
-          className={
-            failed ? 'text-sm text-[var(--color-danger)]' : 'text-sm text-[var(--color-text-muted)]'
-          }
-        >
-          {message}
-        </p>
-      ) : null}
+      {messageNode}
     </section>
   );
 }

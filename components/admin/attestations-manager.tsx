@@ -1,10 +1,9 @@
 'use client';
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CaretDown } from '@phosphor-icons/react/dist/csr/CaretDown';
-import { DotsThree } from '@phosphor-icons/react/dist/csr/DotsThree';
+import { PencilSimple } from '@phosphor-icons/react/dist/csr/PencilSimple';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import type {
   AdminAttestationPage,
@@ -26,12 +25,6 @@ import {
   type AttestationDialogConfig,
 } from './attestations-action-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { AttestationSelectionBanner } from './attestation-selection-banner';
 import { AttestationTableRow } from './attestation-table-row';
 import { useAttestationsModalFocus } from './use-attestations-modal-focus';
@@ -964,18 +957,24 @@ export function AttestationsManager({
       <div
         role="table"
         aria-label="Аттестации сотрудников"
-        className="space-y-2 @min-[760px]:space-y-0 @min-[760px]:overflow-hidden @min-[760px]:rounded-xl @min-[760px]:border @min-[760px]:bg-[var(--color-surface)]"
+        // `clip`, not `hidden`: a hidden overflow made this box the scroll
+        // container of the sticky column header, whose 3.5rem offset then
+        // pushed it down over the first company band and the rows under it.
+        className="space-y-2 @min-[760px]:space-y-0 @min-[760px]:overflow-clip @min-[760px]:rounded-xl @min-[760px]:border @min-[760px]:bg-[var(--color-surface)]"
       >
         <div
           role="row"
-          className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-20 hidden min-h-9 items-center gap-x-2 bg-[var(--color-surface-muted)] px-1.5 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] lg:top-0 @min-[760px]:grid @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px]"
+          className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-20 hidden min-h-9 items-center gap-x-2 bg-[var(--color-surface-muted)] px-1.5 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] lg:top-0 @min-[760px]:grid @min-[760px]:grid-cols-[32px_minmax(0,1.2fr)_minmax(0,1.2fr)_4.75rem_44px_minmax(10.75rem,1fr)_44px] @min-[920px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(10.75rem,1fr)_44px]"
         >
           {/* An `sr-only` cell is absolutely positioned and therefore leaves the
               grid flow, which shifted every visible heading one column to the
               left. Keep the cell in flow and hide only its text. */}
           <span role="columnheader" aria-label="Выбор" />
           <span role="columnheader">Сотрудник</span>
-          <span role="columnheader" className="border-l border-[var(--color-border)] pl-2">
+          <span
+            role="columnheader"
+            className="hidden border-l border-[var(--color-border)] pl-2 @min-[920px]:block"
+          >
             {grouped ? 'Должность' : 'Компания'}
           </span>
           <span role="columnheader" className="border-l border-[var(--color-border)] pl-2">
@@ -1010,13 +1009,17 @@ export function AttestationsManager({
             return (
               <Fragment key={row.recordId}>
                 {showGroup ? (
+                  // The company band is drawn in the page's inverted colours, a
+                  // dark strip on the light theme and a light one on the dark
+                  // theme like the install card, so it is never taken for one
+                  // more person in the list.
                   <div
                     role="row"
-                    className="rounded-lg bg-[var(--color-surface-muted)] @min-[760px]:rounded-none @min-[760px]:border-t-2 @min-[760px]:border-[var(--color-border-strong)]"
+                    className="mt-2 rounded-xl bg-[var(--color-text)] text-[var(--color-bg)] first:mt-0 @min-[760px]:mt-0 @min-[760px]:rounded-none"
                   >
                     <div
                       role="cell"
-                      className="flex min-h-10 items-center gap-1 px-1.5 text-xs font-bold"
+                      className="flex min-h-12 items-center gap-1 px-1.5 @min-[760px]:min-h-10"
                     >
                       <button
                         type="button"
@@ -1030,10 +1033,11 @@ export function AttestationsManager({
                             return next;
                           })
                         }
-                        className="grid size-11 shrink-0 place-items-center rounded-lg hover:bg-[var(--color-surface)] @min-[760px]:size-9"
+                        className="grid size-11 shrink-0 place-items-center rounded-lg text-[var(--color-bg)]/70 transition-colors hover:bg-[var(--color-bg)]/10 hover:text-[var(--color-bg)] @min-[760px]:size-9"
                       >
                         <CaretDown
                           size={16}
+                          weight="bold"
                           className={
                             groupCollapsed
                               ? '-rotate-90 transition-transform'
@@ -1041,10 +1045,8 @@ export function AttestationsManager({
                           }
                         />
                       </button>
-                      {/* Clicking the company name selects everyone in it. That is
-                          the operation an administrator actually performs on a
-                          company; jumping to a filtered URL stayed available in
-                          the menu next to it. */}
+                      {/* A tap on the company selects everyone in it; narrowing
+                          the list to one company is what the filters do. */}
                       <button
                         type="button"
                         aria-pressed={groupFullySelected}
@@ -1057,71 +1059,52 @@ export function AttestationsManager({
                         onClick={() =>
                           void setOrganizationGroupSelected(row.organization, !groupFullySelected)
                         }
-                        className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-lg px-1.5 text-left hover:bg-[var(--color-surface)] @min-[760px]:min-h-9"
+                        className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg px-1.5 text-left transition-colors hover:bg-[var(--color-bg)]/10 @min-[760px]:min-h-9"
                       >
                         <span
                           aria-hidden
-                          className={`text-micro grid size-4 shrink-0 place-items-center rounded-[4px] border leading-none ${
+                          className={`text-micro grid size-[1.125rem] shrink-0 place-items-center rounded-[5px] border-2 leading-none ${
                             groupFullySelected
                               ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
-                              : 'border-[var(--color-border-strong)]'
+                              : 'border-[var(--color-bg)]/60'
                           }`}
                         >
                           {groupFullySelected ? '✓' : ''}
                         </span>
-                        <span className="min-w-0 text-base font-bold break-words @min-[760px]:text-sm @min-[760px]:font-semibold">
+                        <span className="min-w-0 text-base font-bold break-words @min-[760px]:text-sm">
                           {row.organization || 'Компания не указана'}
                         </span>
-                        <span className="shrink-0 text-sm font-medium text-[var(--color-text-muted)] tabular-nums">
+                        <span className="shrink-0 rounded-full bg-[var(--color-bg)]/15 px-2 py-0.5 text-xs font-semibold tabular-nums">
                           {row.organizationGroupCount}
                         </span>
                       </button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="size-11 @min-[760px]:size-9"
-                            aria-label={`Действия с компанией: ${row.organization || 'не указана'}`}
-                          >
-                            <DotsThree size={18} weight="bold" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            disabled={selectingAll || busy}
-                            onSelect={() =>
-                              void setOrganizationGroupSelected(row.organization, true)
-                            }
-                          >
-                            Выбрать всю компанию
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={selectingAll || busy}
-                            onSelect={() => {
-                              // The dialog used to open before the selection had
-                              // resolved: it reported "0 чел." and the request
-                              // behind it was refused as INVALID_REQUEST.
-                              void (async () => {
-                                const selection = await setOrganizationGroupSelected(
-                                  row.organization,
-                                  true,
-                                  'replace',
-                                );
-                                if (!selection) return;
-                                setPending({ kind: 'bulk-update', field: 'organization' });
-                              })();
-                            }}
-                          >
-                            Изменить название компании
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link href={organizationHref(filters, row.organization)}>
-                              Показать только компанию
-                            </Link>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {permissions.canManageIdentity ? (
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          disabled={selectingAll || busy}
+                          className="size-11 text-[var(--color-bg)]/70 hover:bg-[var(--color-bg)]/10 hover:text-[var(--color-bg)] @min-[760px]:size-9"
+                          aria-label={`Изменить название компании: ${row.organization || 'не указана'}`}
+                          title="Изменить название компании"
+                          onClick={() => {
+                            // The dialog used to open before the selection had
+                            // resolved: it reported "0 чел." and the request
+                            // behind it was refused as INVALID_REQUEST.
+                            void (async () => {
+                              const selection = await setOrganizationGroupSelected(
+                                row.organization,
+                                true,
+                                'replace',
+                              );
+                              if (!selection) return;
+                              setPending({ kind: 'bulk-update', field: 'organization' });
+                            })();
+                          }}
+                        >
+                          <PencilSimple />
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 ) : null}
@@ -1156,7 +1139,6 @@ export function AttestationsManager({
           isAllFilteredSelected={allFilteredSelected}
           selectingAll={selectingAll}
           onSelectAllFiltered={selectAllFiltered}
-          onClearSelection={clearSelection}
         />
 
         {message ? (
@@ -1227,6 +1209,16 @@ export function AttestationsManager({
                   busy={busy}
                   onAction={setPending}
                 />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="ml-auto"
+                  onClick={clearSelection}
+                  aria-label="Снять выделение"
+                  title="Снять выделение"
+                >
+                  <X />
+                </Button>
               </div>
             </aside>
 
