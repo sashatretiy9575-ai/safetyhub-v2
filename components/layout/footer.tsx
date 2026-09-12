@@ -48,7 +48,7 @@ export async function Footer({
             <ContactLink
               kind="whatsapp"
               contacts={contacts}
-              className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-[var(--color-primary)]/60 bg-[var(--color-primary)]/15 px-4 text-[15px] font-semibold text-white transition-[color,background-color,border-color] duration-150 hover:bg-[var(--color-primary)]/25 focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
+              className="text-body-sm inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border border-[var(--color-primary)]/60 bg-[var(--color-primary)]/15 px-4 font-semibold text-white transition-[color,background-color,border-color] duration-150 hover:bg-[var(--color-primary)]/25 focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)]"
             >
               <WhatsappLogo
                 size={20}
@@ -83,7 +83,7 @@ export async function Footer({
             <h2 className="text-xs font-semibold tracking-[0.16em] text-white/45 uppercase">
               {translations('footer.contact')}
             </h2>
-            <div className="mt-3 grid gap-1 text-[15px]">
+            <div className="text-body-sm mt-3 grid gap-1">
               <ContactLink
                 kind="phone"
                 contacts={contacts}
@@ -147,7 +147,7 @@ export async function Footer({
               href="https://rc-web.kz/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center text-[18px] font-extrabold text-[#ff8a24] transition-colors duration-150 hover:text-[#ffad66] sm:text-[20px]"
+              className="text-title inline-flex min-h-11 items-center font-extrabold text-[#ff8a24] transition-colors duration-150 hover:text-[#ffad66]"
             >
               rc-web.kz
             </a>

@@ -30,17 +30,17 @@ export function PageHeader({
     >
       <Container size="wide" className="space-y-4">
         {eyebrow && (
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">
+          <p className="text-xs font-bold tracking-widest text-[var(--color-text-subtle)] uppercase">
             {eyebrow}
           </p>
         )}
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-3xl space-y-3">
-            <h1 className="text-balance text-[28px] font-bold leading-[1.18] tracking-[-0.03em] sm:text-[36px] md:text-[44px] lg:text-[52px]">
-              {title}
-            </h1>
+            <h1 className="text-display font-bold text-balance">{title}</h1>
             {description && (
-              <p className="max-w-2xl text-pretty text-[15px] leading-[1.55] text-[var(--color-text-muted)] sm:text-base md:text-lg">{description}</p>
+              <p className="text-lead max-w-2xl text-pretty text-[var(--color-text-muted)]">
+                {description}
+              </p>
             )}
           </div>
         </div>

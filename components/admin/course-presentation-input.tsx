@@ -379,7 +379,7 @@ export function CoursePresentationInput({
           ) : courseId ? (
             <div className="grid aspect-video w-full place-items-center gap-1 rounded-lg bg-[var(--color-surface-muted)] p-3 text-center sm:w-48">
               <FilePdf size={32} aria-hidden="true" />
-              <span className="text-[11px] leading-tight text-[var(--color-text-muted)]">
+              <span className="text-micro leading-tight text-[var(--color-text-muted)]">
                 Файл загружен, но превью первой страницы пока недоступно
               </span>
             </div>

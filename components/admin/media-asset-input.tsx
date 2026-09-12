@@ -153,7 +153,7 @@ export function MediaAssetInput({
         <div className="flex items-start gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-2">
           <span className="relative block aspect-video w-32 shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface)]">
             {previewFailed ? (
-              <span className="grid size-full place-items-center px-1 text-center text-[10px] leading-tight text-[var(--color-text-muted)]">
+              <span className="text-micro grid size-full place-items-center px-1 text-center leading-tight text-[var(--color-text-muted)]">
                 Файл не открылся
               </span>
             ) : (
@@ -262,7 +262,7 @@ export function MediaAssetInput({
                     <span className="mt-1 block truncate text-xs" title={asset.filename}>
                       {asset.filename}
                     </span>
-                    <span className="block text-[10px] text-[var(--color-text-muted)]">
+                    <span className="text-micro block text-[var(--color-text-muted)]">
                       {asset.width}×{asset.height} · {Math.ceil(asset.bytes / 1024)} КБ · ссылок{' '}
                       {asset.usageCount}
                     </span>

@@ -61,10 +61,10 @@ test('desktop sticky rails clear the mobile chrome that is still on screen', asy
   // between, both were on screen and the desktop rails sat underneath them.
   assert.match(
     manager,
-    /sticky bottom-\[calc\(var\(--mobile-tab-height\)\+var\(--safe-area-bottom\)\+1rem\)\][\s\S]*min-\[1024px\]:bottom-4/u,
+    /sticky bottom-\[calc\(var\(--mobile-tab-height\)\+var\(--safe-area-bottom\)\+1rem\)\][\s\S]*lg:bottom-4/u,
   );
-  assert.match(manager, /sticky top-\[calc\(3\.5rem\+var\(--safe-area-top\)\)\][\s\S]*min-\[1024px\]:top-0/u);
-  assert.match(actionBar, /min-\[1024px\]:top-4/u);
+  assert.match(manager, /sticky top-\[calc\(3\.5rem\+var\(--safe-area-top\)\)\][\s\S]*lg:top-0/u);
+  assert.match(actionBar, /lg:top-4/u);
 });
 
 test('the dock reserve is released exactly when the dock disappears', () => {

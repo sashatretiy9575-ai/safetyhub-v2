@@ -159,7 +159,7 @@ export function OrganizationCleanupManager({
                   Действующих сертификатов: {item.activeCertificates}
                 </span>
               </div>
-              <div className="grid gap-2 min-[480px]:grid-cols-[1fr_auto_1fr] min-[480px]:items-center">
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
                 <div className="rounded-xl border p-3">
                   <p className="font-semibold break-words">{item.left.canonicalName}</p>
                   <p className="text-xs text-[var(--color-text-muted)]">
@@ -208,7 +208,13 @@ export function OrganizationCleanupManager({
                   Автоматического объединения не будет: выберите итог и политику документов.
                 </p>
               </div>
-              <Button type="button" size="icon" variant="ghost" onClick={close} aria-label="Закрыть">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={close}
+                aria-label="Закрыть"
+              >
                 <X />
               </Button>
             </header>
@@ -216,7 +222,10 @@ export function OrganizationCleanupManager({
             <fieldset className="space-y-2">
               <legend className="font-semibold">Каноническое название</legend>
               {[cluster.left, cluster.right].map((organization) => (
-                <label key={organization.id} className="flex min-h-12 items-center gap-3 rounded-xl border p-3">
+                <label
+                  key={organization.id}
+                  className="flex min-h-12 items-center gap-3 rounded-xl border p-3"
+                >
                   <input
                     type="radio"
                     name="canonical-organization"
@@ -231,10 +240,22 @@ export function OrganizationCleanupManager({
             </fieldset>
 
             {preview ? (
-              <div className="grid gap-2 rounded-xl bg-[var(--color-surface-muted)] p-4 text-sm min-[480px]:grid-cols-3">
-                <p><strong>{preview.profiles}</strong><br />профилей изменится</p>
-                <p><strong>{preview.verifiedIdentities}</strong><br />проверенных данных</p>
-                <p><strong>{preview.activeCertificates}</strong><br />действующих сертификатов</p>
+              <div className="grid gap-2 rounded-xl bg-[var(--color-surface-muted)] p-4 text-sm sm:grid-cols-3">
+                <p>
+                  <strong>{preview.profiles}</strong>
+                  <br />
+                  профилей изменится
+                </p>
+                <p>
+                  <strong>{preview.verifiedIdentities}</strong>
+                  <br />
+                  проверенных данных
+                </p>
+                <p>
+                  <strong>{preview.activeCertificates}</strong>
+                  <br />
+                  действующих сертификатов
+                </p>
               </div>
             ) : (
               <p className="text-sm text-[var(--color-text-muted)]">Строим предпросмотр…</p>
@@ -278,7 +299,6 @@ export function OrganizationCleanupManager({
               </label>
             </fieldset>
 
-
             {requiredPhrase ? (
               <div className="space-y-2 rounded-xl bg-[var(--color-danger-soft)] p-3">
                 <Label htmlFor="organization-merge-confirmation">
@@ -294,12 +314,20 @@ export function OrganizationCleanupManager({
               </div>
             ) : null}
 
-            {error ? <p role="alert" className="text-sm text-[var(--color-danger)]">{error}</p> : null}
+            {error ? (
+              <p role="alert" className="text-sm text-[var(--color-danger)]">
+                {error}
+              </p>
+            ) : null}
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button type="button" variant="outline" onClick={close} disabled={busy}>Отмена</Button>
+              <Button type="button" variant="outline" onClick={close} disabled={busy}>
+                Отмена
+              </Button>
               <Button
                 type="submit"
-                disabled={busy || !preview || Boolean(requiredPhrase && confirmation !== requiredPhrase)}
+                disabled={
+                  busy || !preview || Boolean(requiredPhrase && confirmation !== requiredPhrase)
+                }
               >
                 {busy ? 'Объединяем…' : 'Объединить'}
               </Button>

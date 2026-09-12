@@ -10,10 +10,7 @@ const ThemeToggle = dynamic(
     // icon button; above it, a labelled control of a fixed width. A placeholder
     // that only matched the square made the header jump once the chunk landed.
     loading: () => (
-      <span
-        aria-hidden="true"
-        className="block size-11 shrink-0 min-[1024px]:h-11 min-[1024px]:w-[7.25rem]"
-      />
+      <span aria-hidden="true" className="block size-11 shrink-0 lg:h-11 lg:w-[7.25rem]" />
     ),
   },
 );

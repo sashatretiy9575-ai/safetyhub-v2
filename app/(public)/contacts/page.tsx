@@ -70,7 +70,7 @@ export default async function ContactsPage() {
                     </span>
                     {label}
                   </dt>
-                  <dd className="mt-1 min-w-0 text-[15px] leading-6 font-semibold break-words">
+                  <dd className="text-body-sm mt-1 min-w-0 leading-6 font-semibold break-words">
                     {'href' in item ? (
                       <a
                         href={item.href}

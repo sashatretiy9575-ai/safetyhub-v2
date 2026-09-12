@@ -23,7 +23,7 @@ export async function generateMetadata() {
 
 function ArticleGridSkeleton({ label }: { label: string }) {
   return (
-    <div className="grid gap-5 min-[1100px]:grid-cols-3 sm:grid-cols-2 lg:gap-6" aria-label={label}>
+    <div className="wide:grid-cols-3 grid gap-5 sm:grid-cols-2 lg:gap-6" aria-label={label}>
       {Array.from({ length: 3 }, (_, index) => (
         <div
           key={index}
@@ -52,7 +52,7 @@ async function ArticlesGrid() {
 
   return (
     <div
-      className="grid items-stretch gap-5 min-[1100px]:grid-cols-3 sm:grid-cols-2 lg:gap-6"
+      className="wide:grid-cols-3 grid items-stretch gap-5 sm:grid-cols-2 lg:gap-6"
       aria-label={t('listAria')}
     >
       {articles.map((article, index) => (

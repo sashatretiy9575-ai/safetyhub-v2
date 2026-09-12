@@ -42,7 +42,7 @@ export function PublicAccountControl() {
       <AccountIconLink href={localizePathname(ROUTES.profile, locale)} label={t('authenticated')} />
       {/* The header is 52 px tall and shared with the language switcher below
           1024 px; sign-out lives on the profile page and in the dock there. */}
-      <div className="hidden min-[1024px]:block">
+      <div className="hidden lg:block">
         <DeferredSignOutAction compact />
       </div>
     </div>

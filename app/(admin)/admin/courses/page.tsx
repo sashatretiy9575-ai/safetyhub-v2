@@ -33,7 +33,7 @@ export default async function AdminCoursesPage({
     <section className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-bold">Курсы</h1>
+          <h1 className="font-display text-h3 font-bold">Курсы</h1>
           <p className="text-sm text-[var(--color-text-muted)]">
             Презентации, варианты вопросов и публикация. Найдено: {courses.length}.
           </p>
@@ -64,7 +64,7 @@ export default async function AdminCoursesPage({
       </form>
 
       <div className="overflow-hidden rounded-xl border bg-[var(--color-surface)]">
-        <div className="hidden min-h-10 grid-cols-[minmax(0,1.5fr)_11rem_8rem_auto] items-center gap-3 bg-[var(--color-surface-muted)] px-3 text-xs font-bold text-[var(--color-text-muted)] min-[760px]:grid">
+        <div className="hidden min-h-10 grid-cols-[minmax(0,1.5fr)_11rem_8rem_auto] items-center gap-3 bg-[var(--color-surface-muted)] px-3 text-xs font-bold text-[var(--color-text-muted)] md:grid">
           <span>Курс</span>
           <span>Статус</span>
           <span>Изменён</span>
@@ -77,23 +77,26 @@ export default async function AdminCoursesPage({
           return (
             <article
               key={course.id}
-              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 border-t px-3 py-2.5 first:border-t-0 min-[760px]:min-h-16 min-[760px]:grid-cols-[minmax(0,1.5fr)_11rem_8rem_auto] min-[760px]:gap-3"
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 border-t px-3 py-2.5 first:border-t-0 md:min-h-16 md:grid-cols-[minmax(0,1.5fr)_11rem_8rem_auto] md:gap-3"
             >
               <div className="min-w-0">
                 <h2 className="truncate font-semibold" title={course.title}>
-                  <Link href={editHref} className="hover:text-[var(--color-primary)] hover:underline">
+                  <Link
+                    href={editHref}
+                    className="hover:text-[var(--color-primary)] hover:underline"
+                  >
                     {course.title}
                   </Link>
                 </h2>
                 <p className="truncate text-xs text-[var(--color-text-muted)]">/{course.slug}</p>
               </div>
-              <div className="col-span-2 flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)] min-[760px]:col-span-1">
+              <div className="col-span-2 flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)] md:col-span-1">
                 <Badge variant={currentStatus === 'published' ? 'success' : 'warning'}>
                   {STATUS_LABELS[currentStatus]}
                 </Badge>
                 {course.has_draft_changes ? <Badge variant="default">Есть черновик</Badge> : null}
               </div>
-              <div className="col-span-2 text-xs text-[var(--color-text-muted)] tabular-nums min-[760px]:col-span-1">
+              <div className="col-span-2 text-xs text-[var(--color-text-muted)] tabular-nums md:col-span-1">
                 <time dateTime={course.updated_at}>
                   {updated.toLocaleDateString('ru-RU')}
                   <span className="ml-1.5 text-[var(--color-text-subtle)]">
@@ -101,7 +104,7 @@ export default async function AdminCoursesPage({
                   </span>
                 </time>
               </div>
-              <div className="col-start-2 row-start-1 flex items-center justify-end gap-1.5 min-[760px]:col-start-4">
+              <div className="col-start-2 row-start-1 flex items-center justify-end gap-1.5 md:col-start-4">
                 <Button asChild size="sm" variant="outline" className="h-9 px-2.5 text-xs">
                   <Link href={editHref} aria-label={`Редактировать: ${course.title}`}>
                     <PencilSimple aria-hidden />

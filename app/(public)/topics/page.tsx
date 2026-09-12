@@ -46,7 +46,7 @@ export default async function TopicsPage() {
             </div>
           ) : (
             <div
-              className="grid items-stretch gap-4 min-[1200px]:grid-cols-3 sm:grid-cols-2 lg:gap-5"
+              className="wide:grid-cols-3 grid items-stretch gap-4 sm:grid-cols-2 lg:gap-5"
               aria-label={t('catalogAria')}
             >
               {topics.map((topic, index) => (

@@ -22,7 +22,7 @@ export default async function LocalizedPublicNotFound() {
         <p className="font-mono text-sm tracking-widest text-[var(--color-text-muted)] uppercase">
           404
         </p>
-        <h1 className="font-display text-3xl font-semibold">{state('notFoundTitle')}</h1>
+        <h1 className="font-display text-h2 font-semibold">{state('notFoundTitle')}</h1>
         <p className="text-[var(--color-text-muted)]">{state('notFoundDescription')}</p>
         <Button asChild>
           <Link href={localizePathname('/', locale as AppLocale)}>{common('home')}</Link>

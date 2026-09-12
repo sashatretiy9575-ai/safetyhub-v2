@@ -18,11 +18,11 @@ test('public shell uses neutral glass chrome and the 1024px navigation breakpoin
   assert.match(css, /@supports \(\(-webkit-backdrop-filter:/);
   assert.match(css, /@media \(forced-colors: active\)/);
   assert.match(header, /glass-strong/);
-  assert.match(header, /min-\[1024px\]:flex/);
+  assert.match(header, /lg:flex/);
   // The account slot renders once, at every width, so the header carries no
   // mobile-only block any more: the quick-contact group is the only part of
   // the right cluster gated to 1024 px and up.
-  assert.doesNotMatch(header, /min-\[1024px\]:hidden/);
+  assert.doesNotMatch(header, /lg:hidden/);
   assert.match(header, /<AccountIconLink/);
   assert.match(tabs, /rounded-\[var\(--radius-dock\)\]/);
   // The owner asked for the quiet dock back: one weight for every icon, the
@@ -30,10 +30,10 @@ test('public shell uses neutral glass chrome and the 1024px navigation breakpoin
   assert.match(tabs, /weight="regular"/);
   assert.match(tabs, /size-1 rounded-full bg-\[var\(--color-primary\)\]/);
   assert.match(tabs, /bg-\[var\(--color-surface-muted\)\] text-\[var\(--color-text\)\]/);
-  assert.match(tabs, /min-\[1024px\]:hidden/);
+  assert.match(tabs, /lg:hidden/);
   // Above the dock breakpoint the footer reserves only the install card's
   // space, which is zero unless the card is showing on a landscape tablet.
-  assert.match(shell, /min-\[1024px\]:pb-\[var\(--pwa-banner-space,0px\)\]/);
+  assert.match(shell, /lg:pb-\[var\(--pwa-banner-space,0px\)\]/);
 });
 
 test('theme, contact actions, and footer keep explicit accessible labels', async () => {
@@ -63,7 +63,7 @@ test('theme, contact actions, and footer keep explicit accessible labels', async
   assert.match(footer, /text-white\/45/);
   assert.match(footer, /min-h-11/);
   assert.match(footer, /text-\[#ff8a24\]/);
-  assert.match(footer, /sm:text-\[20px\]/);
+  assert.match(footer, /text-title/);
 });
 
 test('marketing descriptions and card labels preserve native accessible semantics', async () => {

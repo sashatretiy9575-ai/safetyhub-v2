@@ -32,7 +32,7 @@ export async function LegalContacts() {
             <span className="block text-xs font-bold text-[var(--color-text-subtle)]">
               {t('phone')}
             </span>
-            <span className="mt-1 block text-[15px] font-semibold text-[var(--color-text)]">
+            <span className="text-body-sm mt-1 block font-semibold text-[var(--color-text)]">
               {contacts.phoneDisplay}
             </span>
           </span>
@@ -48,7 +48,7 @@ export async function LegalContacts() {
             <span className="block text-xs font-bold text-[var(--color-text-subtle)]">
               WhatsApp
             </span>
-            <span className="mt-1 block text-[15px] font-semibold text-[var(--color-text)]">
+            <span className="text-body-sm mt-1 block font-semibold text-[var(--color-text)]">
               {t('write')}
             </span>
           </span>

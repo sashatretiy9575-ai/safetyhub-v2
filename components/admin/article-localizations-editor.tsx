@@ -197,7 +197,7 @@ export function ArticleLocalizationsEditor({
               className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 md:p-7"
             >
               <Badge variant="sapphire">Предпросмотр · {ADMIN_LOCALE_LABELS[activeLocale]}</Badge>
-              <h3 className="mt-3 text-3xl font-black break-words">
+              <h3 className="text-h3 mt-3 font-black break-words">
                 {active.title || 'Без заголовка'}
               </h3>
               <p className="mt-2 mb-6 break-words text-[var(--color-text-muted)]">

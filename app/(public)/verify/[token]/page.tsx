@@ -60,7 +60,7 @@ export default async function VerifyCertificatePage({
           <Card>
             <CardContent className="space-y-3 p-5 text-center md:p-8">
               <XCircle className="mx-auto text-[var(--color-text-muted)]" size={48} />
-              <h1 className="font-display text-2xl font-bold">{t('notFoundTitle')}</h1>
+              <h1 className="font-display text-h2 font-bold">{t('notFoundTitle')}</h1>
               <p className="text-sm text-[var(--color-text-muted)]">{t('notFoundDescription')}</p>
             </CardContent>
           </Card>
@@ -82,7 +82,7 @@ export default async function VerifyCertificatePage({
                 <p className="text-xs font-bold tracking-wider text-[var(--color-text-muted)] uppercase">
                   {t('verification')}
                 </p>
-                <h1 className="font-display text-2xl font-bold md:text-3xl">{t('valid')}</h1>
+                <h1 className="font-display text-h2 font-bold">{t('valid')}</h1>
                 <p className="mt-1 text-sm text-[var(--color-text-muted)]">
                   {t('validDescription')}
                 </p>
@@ -118,9 +118,7 @@ export default async function VerifyCertificatePage({
               </div>
             </dl>
 
-            <p className="text-sm text-[var(--color-text-muted)]">
-              {t('compareHint')}
-            </p>
+            <p className="text-sm text-[var(--color-text-muted)]">{t('compareHint')}</p>
           </CardContent>
         </Card>
       </Container>

@@ -196,7 +196,7 @@ export default async function AuditPage({
     <section className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-bold">История действий</h1>
+          <h1 className="font-display text-h3 font-bold">История действий</h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
             Кто и что изменил. Только чтение; записи старше 30 дней удаляются.
           </p>
@@ -305,7 +305,7 @@ export default async function AuditPage({
                 >
                   <time
                     dateTime={event.createdAt}
-                    className="order-2 font-mono text-[11px] whitespace-nowrap text-[var(--color-text-subtle)] lg:order-none"
+                    className="text-micro order-2 font-mono whitespace-nowrap text-[var(--color-text-subtle)] lg:order-none"
                   >
                     {created.toLocaleDateString('ru-RU', {
                       day: '2-digit',
@@ -323,7 +323,7 @@ export default async function AuditPage({
                   <div className="order-1 col-span-2 min-w-0 lg:order-none lg:col-span-1">
                     <div className="flex min-w-0 flex-wrap items-center gap-1.5">
                       <span
-                        className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-bold ${style.className}`}
+                        className={`text-micro inline-flex shrink-0 items-center rounded-full px-2 py-0.5 font-bold ${style.className}`}
                       >
                         {style.label}
                       </span>
@@ -331,13 +331,13 @@ export default async function AuditPage({
                         {readableAction(event.action)}
                       </span>
                       {status ? (
-                        <span className="shrink-0 text-[11px] text-[var(--color-text-muted)]">
+                        <span className="text-micro shrink-0 text-[var(--color-text-muted)]">
                           · {status}
                         </span>
                       ) : null}
                     </div>
                     {reason ? (
-                      <p className="mt-0.5 truncate text-[11px] text-[var(--color-text-subtle)]">
+                      <p className="text-micro mt-0.5 truncate text-[var(--color-text-subtle)]">
                         {reason}
                       </p>
                     ) : null}

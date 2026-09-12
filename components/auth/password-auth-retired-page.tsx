@@ -18,12 +18,10 @@ export async function PasswordAuthRetiredPage() {
     <section className="py-10 md:py-20">
       <Container size="narrow">
         <Card className="mx-auto max-w-md">
-          <CardContent className="space-y-5 p-4 min-[320px]:p-6 md:p-8">
+          <CardContent className="space-y-5 p-6 md:p-8">
             <div className="space-y-2">
               <h1 className="font-display text-2xl font-bold">{t('retiredTitle')}</h1>
-              <p className="text-sm text-[var(--color-text-muted)]">
-                {t('retiredDescription')}
-              </p>
+              <p className="text-sm text-[var(--color-text-muted)]">{t('retiredDescription')}</p>
             </div>
             <Button asChild className="w-full">
               <Link href={localizePathname('/auth/login', locale)}>{t('retiredAction')}</Link>

@@ -24,7 +24,8 @@ type AttestationTableRowProps = {
 };
 
 /** Vertical rule between desktop cells; a spreadsheet reads by columns. */
-const CELL = '@min-[760px]:border-l @min-[760px]:border-[var(--color-border)] @min-[760px]:pl-2';
+const CELL =
+  'min-w-0 @min-[760px]:border-l @min-[760px]:border-[var(--color-border)] @min-[760px]:pl-2';
 
 /**
  * A spreadsheet column needs one short line, not "8 авг. 2026 г., 14:51".
@@ -71,7 +72,7 @@ export function AttestationTableRow({
       // Phone: two lines per person instead of four — name/score/actions, then
       // course · date · status. The company is deliberately absent, the band
       // above already names it, and a four-line card made fifty rows a marathon.
-      className="grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] gap-x-2 gap-y-0.5 rounded-xl border bg-[var(--color-surface)] px-2 py-1.5 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:min-h-9 @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px] @min-[760px]:items-center @min-[760px]:gap-x-2 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:text-[13px] @min-[760px]:shadow-none"
+      className="@min-[760px]:text-caption grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] gap-x-2 gap-y-0.5 rounded-xl border bg-[var(--color-surface)] px-2 py-1.5 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:min-h-9 @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px] @min-[760px]:items-center @min-[760px]:gap-x-2 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:shadow-none"
       onClick={(event) => {
         const target = event.target as HTMLElement;
         if (!target.closest('button, input, a, [role="menuitem"]')) onOpenDetails();
@@ -104,7 +105,7 @@ export function AttestationTableRow({
           type="button"
           onClick={onOpenDetails}
           aria-label={`Открыть сведения: ${row.fullName}`}
-          className="block min-w-0 max-w-full truncate text-left font-semibold hover:underline"
+          className="block max-w-full min-w-0 truncate text-left font-semibold hover:underline"
           title={row.fullName}
         >
           {row.fullName}
@@ -116,7 +117,7 @@ export function AttestationTableRow({
              On a phone the company rides along on the second line instead. */}
       <div
         role="cell"
-        className={`hidden min-w-0 text-xs @min-[760px]:col-start-3 @min-[760px]:row-start-1 @min-[760px]:block @min-[760px]:text-[13px] ${CELL}`}
+        className={`@min-[760px]:text-caption hidden min-w-0 text-xs @min-[760px]:col-start-3 @min-[760px]:row-start-1 @min-[760px]:block ${CELL}`}
       >
         {grouped ? (
           <span className="block truncate text-[var(--color-text-muted)]" title={row.job}>
@@ -143,12 +144,12 @@ export function AttestationTableRow({
         className={`col-start-2 col-end-4 row-start-2 min-w-0 @min-[760px]:col-start-4 @min-[760px]:col-end-auto @min-[760px]:row-start-1 ${CELL}`}
       >
         <p
-          className="truncate text-xs @min-[760px]:text-[13px] @min-[760px]:font-normal"
+          className="@min-[760px]:text-caption truncate text-xs @min-[760px]:font-normal"
           title={row.courseTitle}
         >
           {row.courseTitle}
         </p>
-        <p className="truncate text-[11px] text-[var(--color-text-subtle)] @min-[760px]:hidden">
+        <p className="text-micro truncate text-[var(--color-text-subtle)] @min-[760px]:hidden">
           {completed}
           {!grouped && row.organization ? ` · ${row.organization}` : ''}
         </p>

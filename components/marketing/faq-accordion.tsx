@@ -48,13 +48,10 @@ export async function FaqAccordion({
         >
           {withHeader ? (
             <div className="max-w-xl lg:pt-2">
-              <Heading
-                id="faq-heading"
-                className="text-[22px] leading-[1.22] font-bold tracking-[-0.025em] text-balance sm:text-[28px] lg:text-[36px]"
-              >
+              <Heading id="faq-heading" className="text-h2 font-bold text-balance">
                 {t('title')}
               </Heading>
-              <p className="mt-2.5 text-[14px] leading-[1.5] text-[var(--color-text-muted)] sm:text-[15px] sm:leading-6 lg:text-base">
+              <p className="text-body-sm mt-2.5 text-[var(--color-text-muted)] lg:text-base">
                 {t('description')}
               </p>
             </div>

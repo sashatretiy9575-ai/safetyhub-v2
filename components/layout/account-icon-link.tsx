@@ -24,7 +24,7 @@ export function AccountIconLink({ href, label }: { href: string; label: string }
       >
         <User size={18} weight="regular" />
       </span>
-      <span aria-hidden="true" className={`${headerTooltipClass} hidden min-[1024px]:block`}>
+      <span aria-hidden="true" className={`${headerTooltipClass} hidden lg:block`}>
         {label}
       </span>
     </Link>

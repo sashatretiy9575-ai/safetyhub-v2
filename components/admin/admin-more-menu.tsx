@@ -19,7 +19,9 @@ type MoreItem = { href: string; label: string };
  */
 export function AdminMoreMenu({ items }: { items: readonly MoreItem[] }) {
   const pathname = usePathname();
-  const active = items.some((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+  const active = items.some(
+    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
+  );
 
   return (
     <DropdownMenu>
@@ -29,7 +31,7 @@ export function AdminMoreMenu({ items }: { items: readonly MoreItem[] }) {
           aria-label="Ещё разделы"
           aria-current={active ? 'page' : undefined}
           className={cn(
-            'group flex min-h-11 w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[11px] leading-none font-bold transition-colors',
+            'group text-micro flex min-h-11 w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 leading-none font-bold transition-colors',
             active
               ? 'bg-[var(--color-primary-soft)] text-[var(--color-on-primary-soft)]'
               : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',

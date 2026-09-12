@@ -49,7 +49,7 @@ export function PrivacyPolicyV11({ policy }: { policy: LegalDocumentVersion }) {
       >
         <Container
           size="content"
-          className="max-w-[52rem] space-y-8 text-[15px] leading-7 text-[var(--color-text-muted)] md:text-base"
+          className="text-body-sm max-w-[52rem] space-y-8 leading-7 text-[var(--color-text-muted)] md:text-base"
         >
           <header
             id="document-version"

@@ -30,11 +30,7 @@ function inputDate(value: string | null, exclusiveEnd = false) {
   return date.toISOString().slice(0, 10);
 }
 
-function employeeHref(
-  query: AdminAttestationQuery,
-  cursorToken: string,
-  trail: readonly string[],
-) {
+function employeeHref(query: AdminAttestationQuery, cursorToken: string, trail: readonly string[]) {
   const params = new URLSearchParams();
   if (query.query) params.set('q', query.query);
   if (query.organization) params.set('organization', query.organization);
@@ -86,7 +82,7 @@ export default async function AdminEmployeesPage({
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-3xl font-bold">Сотрудники</h1>
+        <h1 className="font-display text-h3 font-bold">Сотрудники</h1>
         <div className="flex flex-wrap items-center gap-3">
           {result.state === 'ready' ? (
             <p className="text-sm font-bold text-[var(--color-text-muted)] tabular-nums">

@@ -159,10 +159,7 @@ function RelatedArticles({
         <p className="text-xs font-bold tracking-[0.18em] text-[var(--color-primary)] uppercase">
           {eyebrow}
         </p>
-        <h2
-          id="related-articles-title"
-          className="font-display mt-1 text-2xl font-bold md:text-3xl"
-        >
+        <h2 id="related-articles-title" className="font-display text-h3 mt-1 font-bold">
           {title}
         </h2>
       </div>
@@ -247,9 +244,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
             className="mx-auto mt-4 grid max-w-[70rem] items-stretch gap-6 overflow-hidden rounded-[30px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-card)] sm:p-7 md:mt-7 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)] lg:gap-10 lg:p-9"
           >
             <header className="flex min-w-0 flex-col justify-center text-left">
-              <h1 className="font-display text-[30px] leading-[1.16] font-black tracking-[-0.035em] text-balance sm:text-[38px] lg:text-[48px]">
-                {article.title}
-              </h1>
+              <h1 className="font-display text-h1 font-black text-balance">{article.title}</h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-pretty text-[var(--color-text-muted)] sm:text-lg">
                 {article.description}
               </p>

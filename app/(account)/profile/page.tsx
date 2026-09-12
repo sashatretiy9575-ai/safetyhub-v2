@@ -202,7 +202,7 @@ function CourseRow({
         {isSpecialCertState ? certificateLabel(item.certificateState, t) : resultLabel(item, t)}
       </Badge>
       {isSpecialCertState && item.resultState === 'passed' ? (
-        <Badge variant="outline" className="text-[11px] text-[var(--color-text-muted)]">
+        <Badge variant="outline" className="text-micro text-[var(--color-text-muted)]">
           {resultLabel(item, t)}
         </Badge>
       ) : null}
@@ -384,7 +384,7 @@ export default async function ProfilePage() {
     <section className="py-7 md:py-12">
       <Container size="content" className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-display text-3xl font-black md:text-4xl">{t('dashboardTitle')}</h1>
+          <h1 className="font-display text-h2 font-black">{t('dashboardTitle')}</h1>
           {/* An approved learner already has the next-step card and the course
               table below: a third link to the catalogue up here was clutter.
               Before approval the only useful action is the data section. */}
@@ -454,12 +454,12 @@ export default async function ProfilePage() {
                       {fullName} · {profile.organization || t('companyMissing')}
                     </span>
                   </h2>
-                  <Badge variant={approval.variant} className="mt-1.5 min-[420px]:hidden">
+                  <Badge variant={approval.variant} className="xs:hidden mt-1.5">
                     {approval.label}
                   </Badge>
                 </div>
                 <span className="flex shrink-0 items-center gap-2">
-                  <Badge variant={approval.variant} className="hidden min-[420px]:inline-flex">
+                  <Badge variant={approval.variant} className="xs:inline-flex hidden">
                     {approval.label}
                   </Badge>
                   <CaretDown className="transition-transform group-open:rotate-180" />

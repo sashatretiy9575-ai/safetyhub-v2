@@ -90,7 +90,7 @@ export default async function AdminArticlesPage({
     <section className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2.5">
-          <h1 className="font-display text-2xl font-bold sm:text-3xl">Материалы</h1>
+          <h1 className="font-display text-h3 font-bold">Материалы</h1>
           <span className="rounded-full bg-[var(--color-surface-muted)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-text-muted)] tabular-nums">
             {articles.length}
           </span>
@@ -120,14 +120,14 @@ export default async function AdminArticlesPage({
           <option value="published">Опубликованные</option>
         </AdminFilterSelect>
         <Button type="submit" size="sm" className="min-h-11 shrink-0" aria-label="Найти">
-          <MagnifyingGlass aria-hidden size={18} className="min-[400px]:hidden" />
-          <span className="hidden min-[400px]:inline">Найти</span>
+          <MagnifyingGlass aria-hidden size={18} className="xs:hidden" />
+          <span className="xs:inline hidden">Найти</span>
         </Button>
       </form>
 
       {articles.length ? (
         <div className="overflow-hidden rounded-2xl border bg-[var(--color-surface)]">
-          <div className="hidden min-h-11 grid-cols-[minmax(0,2fr)_11rem_8rem_auto] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] min-[760px]:grid">
+          <div className="hidden min-h-11 grid-cols-[minmax(0,2fr)_11rem_8rem_auto] items-center gap-3 bg-[var(--color-surface-muted)] px-4 text-xs font-bold text-[var(--color-text-muted)] md:grid">
             <span>Название</span>
             <span>Статус</span>
             <span>Изменено</span>
@@ -141,7 +141,7 @@ export default async function AdminArticlesPage({
                 key={item.id}
                 // Phone: title and actions on one line, status and date on the
                 // next; the desktop sheet keeps its columns.
-                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 border-t px-3 py-2.5 first:border-t-0 min-[760px]:min-h-16 min-[760px]:grid-cols-[minmax(0,2fr)_11rem_8rem_auto] min-[760px]:gap-3 min-[760px]:px-4"
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 border-t px-3 py-2.5 first:border-t-0 md:min-h-16 md:grid-cols-[minmax(0,2fr)_11rem_8rem_auto] md:gap-3 md:px-4"
               >
                 <div className="min-w-0">
                   {/* The title is the primary way into the editor: an icon-only
@@ -157,16 +157,16 @@ export default async function AdminArticlesPage({
                   </h2>
                   <p className="truncate text-xs text-[var(--color-text-muted)]">/{item.slug}</p>
                 </div>
-                <div className="col-span-2 flex flex-wrap items-center gap-1.5 min-[760px]:col-span-1">
+                <div className="col-span-2 flex flex-wrap items-center gap-1.5 md:col-span-1">
                   <Badge variant={item.status === 'published' ? 'success' : 'warning'}>
                     {statusLabel[item.status]}
                   </Badge>
                   {item.hasDraftChanges ? <Badge variant="default">Есть черновик</Badge> : null}
-                  <span className="text-xs text-[var(--color-text-muted)] tabular-nums min-[760px]:hidden">
+                  <span className="text-xs text-[var(--color-text-muted)] tabular-nums md:hidden">
                     <time dateTime={item.updated_at}>{updated.toLocaleDateString('ru-RU')}</time>
                   </span>
                 </div>
-                <div className="hidden text-xs text-[var(--color-text-muted)] tabular-nums min-[760px]:block">
+                <div className="hidden text-xs text-[var(--color-text-muted)] tabular-nums md:block">
                   <time dateTime={item.updated_at}>
                     {updated.toLocaleDateString('ru-RU')}
                     <span className="ml-1.5 text-[var(--color-text-subtle)]">
@@ -174,7 +174,7 @@ export default async function AdminArticlesPage({
                     </span>
                   </time>
                 </div>
-                <div className="col-start-2 row-start-1 flex items-center justify-end gap-1.5 min-[760px]:col-start-4">
+                <div className="col-start-2 row-start-1 flex items-center justify-end gap-1.5 md:col-start-4">
                   {item.status === 'published' ? (
                     <Button
                       asChild
@@ -196,7 +196,7 @@ export default async function AdminArticlesPage({
                   <Button asChild size="sm" variant="outline" className="h-9 px-2.5 text-xs">
                     <Link href={editHref} aria-label={`Редактировать: ${item.title}`}>
                       <PencilSimple aria-hidden />
-                      <span className="hidden min-[400px]:inline">Изменить</span>
+                      <span className="xs:inline hidden">Изменить</span>
                     </Link>
                   </Button>
                 </div>

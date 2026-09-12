@@ -7,6 +7,8 @@ type MarketingSliderProps = {
   className?: string;
   itemClassName?: string;
   itemLabel?: string;
+  /** `stack`: a plain grid on phones instead of a slider; three cards fit under each other. */
+  mobile?: 'slider' | 'stack';
 };
 
 export function MarketingSlider({
@@ -15,6 +17,7 @@ export function MarketingSlider({
   className,
   itemClassName,
   itemLabel,
+  mobile = 'slider',
 }: MarketingSliderProps) {
   return (
     <Carousel
@@ -23,6 +26,7 @@ export function MarketingSlider({
       itemClassName={itemClassName}
       className={className}
       variant="marketing"
+      mobile={mobile}
     >
       {children}
     </Carousel>

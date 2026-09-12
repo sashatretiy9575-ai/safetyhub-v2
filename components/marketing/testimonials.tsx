@@ -31,13 +31,10 @@ export function Testimonials() {
     >
       <div className="mx-auto w-full max-w-[1280px] px-4 md:px-6 xl:px-8">
         <div>
-          <p className="text-[11px] font-bold tracking-[0.14em] text-[var(--color-text-subtle)] uppercase sm:text-xs">
+          <p className="text-micro font-bold tracking-widest text-[var(--color-text-subtle)] uppercase sm:text-xs">
             {t('eyebrow')}
           </p>
-          <h2
-            id="cases-heading"
-            className="mt-2.5 text-[24px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[30px] lg:text-[38px]"
-          >
+          <h2 id="cases-heading" className="text-h2 mt-2.5 font-bold text-balance">
             {t('title')}
           </h2>
         </div>

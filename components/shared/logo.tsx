@@ -12,18 +12,18 @@ export function Logo({ className, inverse = false }: LogoProps) {
       <div
         data-logo-mark
         className={cn(
-          'grid size-7 shrink-0 place-items-center rounded-[10px] border shadow-[var(--shadow-soft)] min-[1024px]:size-8 min-[1024px]:rounded-[var(--radius-control)]',
+          'grid size-7 shrink-0 place-items-center rounded-[10px] border shadow-[var(--shadow-soft)] lg:size-8 lg:rounded-[var(--radius-control)]',
           inverse
             ? 'border-white/15 bg-white/[0.06] text-[#70c990] shadow-none'
             : 'border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-primary)]',
         )}
       >
-        <ShieldCheck size={19} weight="regular" className="min-[1024px]:size-5" />
+        <ShieldCheck size={19} weight="regular" className="lg:size-5" />
       </div>
       <span
         data-logo-wordmark
         className={cn(
-          'text-[15px] font-extrabold tracking-[-0.035em] min-[400px]:text-[17px] min-[1024px]:text-lg',
+          'text-body-sm xs:text-lg font-extrabold tracking-tight',
           inverse ? 'text-white' : 'text-[var(--color-text)]',
         )}
       >

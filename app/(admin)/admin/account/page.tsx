@@ -25,7 +25,7 @@ export default async function AdminAccountPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="text-3xl font-black tracking-tight">Мой аккаунт</h1>
+        <h1 className="text-h3 font-black">Мой аккаунт</h1>
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
           Данные и фотография администратора без перехода в кабинет ученика.
         </p>
@@ -33,10 +33,7 @@ export default async function AdminAccountPage() {
 
       <Card>
         <CardContent className="grid gap-6 p-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:p-6">
-          <AdminAvatarUploader
-            initialUrl={avatarUrl}
-            initials={initials || 'SH'}
-          />
+          <AdminAvatarUploader initialUrl={avatarUrl} initials={initials || 'SH'} />
           <div className="min-w-0 space-y-4">
             <div>
               <h2 className="text-xl font-bold break-words">{fullName}</h2>

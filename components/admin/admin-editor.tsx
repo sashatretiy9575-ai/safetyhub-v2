@@ -561,10 +561,8 @@ export function AdminEditor({
 
       {preview ? (
         <Card className="min-w-0 overflow-hidden">
-          <CardContent className="min-w-0 p-4 min-[360px]:p-5 md:p-8">
-            <h2 className="mb-3 text-2xl font-bold break-words md:text-4xl">
-              {title || 'Без заголовка'}
-            </h2>
+          <CardContent className="xs:p-5 min-w-0 p-4 md:p-8">
+            <h2 className="text-h2 mb-3 font-bold break-words">{title || 'Без заголовка'}</h2>
             <p className="mb-6 text-base break-words text-[var(--color-text-muted)] md:mb-8 md:text-xl">
               {description}
             </p>
@@ -581,7 +579,7 @@ export function AdminEditor({
           {/* On the phone the text comes first; the metadata cards follow. */}
           <div className="order-2 min-w-0 space-y-6 lg:col-span-1">
             <Card className="min-w-0">
-              <CardContent className="min-w-0 space-y-4 p-4 min-[360px]:p-5 md:p-6">
+              <CardContent className="xs:p-5 min-w-0 space-y-4 p-4 md:p-6">
                 <h2 className="font-semibold">Метаданные</h2>
                 <div className="min-w-0 space-y-2">
                   <Label htmlFor="article-slug">Slug (URL)</Label>
@@ -609,7 +607,7 @@ export function AdminEditor({
             {/* Optional sections start folded: they never block publication and
                 used to push the actual text editor off the first screen. */}
             <Card className="min-w-0">
-              <CardContent className="min-w-0 p-4 min-[360px]:p-5 md:p-6">
+              <CardContent className="xs:p-5 min-w-0 p-4 md:p-6">
                 <details className="group">
                   <summary className="flex min-h-11 cursor-pointer items-center font-semibold">
                     SEO и соцсети
@@ -622,7 +620,7 @@ export function AdminEditor({
             </Card>
 
             <Card className="min-w-0">
-              <CardContent className="min-w-0 p-4 min-[360px]:p-5 md:p-6">
+              <CardContent className="xs:p-5 min-w-0 p-4 md:p-6">
                 <details className="group">
                   <summary className="flex min-h-11 cursor-pointer items-center font-semibold">
                     Источники и юрисдикция
@@ -633,85 +631,96 @@ export function AdminEditor({
                     ) : null}
                   </summary>
                   <div className="mt-4 space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="article-jurisdiction">Юрисдикция</Label>
-                  <Input
-                    id="article-jurisdiction"
-                    value={jurisdiction}
-                    maxLength={CONTENT_METADATA_LIMITS.jurisdictionMax}
-                    onChange={(event) => setJurisdiction(event.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="article-effective-date">Дата актуальности</Label>
-                  <Input
-                    id="article-effective-date"
-                    type="date"
-                    value={effectiveDate}
-                    onChange={(event) => setEffectiveDate(event.target.value)}
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="article-jurisdiction">Юрисдикция</Label>
+                      <Input
+                        id="article-jurisdiction"
+                        value={jurisdiction}
+                        maxLength={CONTENT_METADATA_LIMITS.jurisdictionMax}
+                        onChange={(event) => setJurisdiction(event.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="article-effective-date">Дата актуальности</Label>
+                      <Input
+                        id="article-effective-date"
+                        type="date"
+                        value={effectiveDate}
+                        onChange={(event) => setEffectiveDate(event.target.value)}
+                      />
+                    </div>
 
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="text-sm font-semibold">Нормативные источники</h3>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      disabled={sources.length >= CONTENT_METADATA_LIMITS.sourceCountMax}
-                      onClick={() => setSources((current) => [...current, { title: '', url: '' }])}
-                    >
-                      <Plus aria-hidden="true" /> Добавить
-                    </Button>
-                  </div>
-                  {sources.map((source, sourceIndex) => (
-                    <fieldset
-                      key={sourceIndex}
-                      className="min-w-0 space-y-2 rounded-[var(--radius-md)] border border-[var(--color-border)] p-3"
-                    >
-                      <legend className="px-1 text-xs font-bold">Источник {sourceIndex + 1}</legend>
-                      <Label className="sr-only" htmlFor={`article-source-${sourceIndex}-title`}>
-                        Название источника {sourceIndex + 1}
-                      </Label>
-                      <Input
-                        id={`article-source-${sourceIndex}-title`}
-                        value={source.title}
-                        maxLength={CONTENT_METADATA_LIMITS.sourceTitleMax}
-                        placeholder="Название документа"
-                        onChange={(event) =>
-                          updateSource(sourceIndex, { title: event.target.value })
-                        }
-                      />
-                      <Label className="sr-only" htmlFor={`article-source-${sourceIndex}-url`}>
-                        HTTPS-ссылка источника {sourceIndex + 1}
-                      </Label>
-                      <Input
-                        id={`article-source-${sourceIndex}-url`}
-                        type="url"
-                        value={source.url}
-                        maxLength={CONTENT_METADATA_LIMITS.sourceUrlMax}
-                        placeholder="https://adilet.zan.kz/..."
-                        onChange={(event) => updateSource(sourceIndex, { url: event.target.value })}
-                      />
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        onClick={() =>
-                          setSources((current) =>
-                            current.filter((_, currentIndex) => currentIndex !== sourceIndex),
-                          )
-                        }
-                      >
-                        <Trash aria-hidden="true" /> Удалить источник
-                      </Button>
-                    </fieldset>
-                  ))}
-                  {sources.length === 0 ? (
-                    <p className="text-xs text-[var(--color-text-muted)]">Источники не указаны.</p>
-                  ) : null}
-                </div>
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h3 className="text-sm font-semibold">Нормативные источники</h3>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled={sources.length >= CONTENT_METADATA_LIMITS.sourceCountMax}
+                          onClick={() =>
+                            setSources((current) => [...current, { title: '', url: '' }])
+                          }
+                        >
+                          <Plus aria-hidden="true" /> Добавить
+                        </Button>
+                      </div>
+                      {sources.map((source, sourceIndex) => (
+                        <fieldset
+                          key={sourceIndex}
+                          className="min-w-0 space-y-2 rounded-[var(--radius-md)] border border-[var(--color-border)] p-3"
+                        >
+                          <legend className="px-1 text-xs font-bold">
+                            Источник {sourceIndex + 1}
+                          </legend>
+                          <Label
+                            className="sr-only"
+                            htmlFor={`article-source-${sourceIndex}-title`}
+                          >
+                            Название источника {sourceIndex + 1}
+                          </Label>
+                          <Input
+                            id={`article-source-${sourceIndex}-title`}
+                            value={source.title}
+                            maxLength={CONTENT_METADATA_LIMITS.sourceTitleMax}
+                            placeholder="Название документа"
+                            onChange={(event) =>
+                              updateSource(sourceIndex, { title: event.target.value })
+                            }
+                          />
+                          <Label className="sr-only" htmlFor={`article-source-${sourceIndex}-url`}>
+                            HTTPS-ссылка источника {sourceIndex + 1}
+                          </Label>
+                          <Input
+                            id={`article-source-${sourceIndex}-url`}
+                            type="url"
+                            value={source.url}
+                            maxLength={CONTENT_METADATA_LIMITS.sourceUrlMax}
+                            placeholder="https://adilet.zan.kz/..."
+                            onChange={(event) =>
+                              updateSource(sourceIndex, { url: event.target.value })
+                            }
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() =>
+                              setSources((current) =>
+                                current.filter((_, currentIndex) => currentIndex !== sourceIndex),
+                              )
+                            }
+                          >
+                            <Trash aria-hidden="true" /> Удалить источник
+                          </Button>
+                        </fieldset>
+                      ))}
+                      {sources.length === 0 ? (
+                        <p className="text-xs text-[var(--color-text-muted)]">
+                          Источники не указаны.
+                        </p>
+                      ) : null}
+                    </div>
                   </div>
                 </details>
               </CardContent>

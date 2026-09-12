@@ -12,7 +12,7 @@ export default async function InitialArticleImportPage() {
   return (
     <section className="space-y-5">
       <div>
-        <h1 className="font-display text-3xl font-bold">Первичная публикация материалов</h1>
+        <h1 className="font-display text-h3 font-bold">Первичная публикация материалов</h1>
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
           Публикация утверждённого снимка статей.
         </p>

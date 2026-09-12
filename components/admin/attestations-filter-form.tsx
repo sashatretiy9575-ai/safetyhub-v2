@@ -154,8 +154,8 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
           />
         </div>
         <Button type="submit" size="sm" className="min-h-11 shrink-0" aria-label="Найти">
-          <MagnifyingGlass aria-hidden size={18} className="min-[400px]:hidden" />
-          <span className="hidden min-[400px]:inline">Найти</span>
+          <MagnifyingGlass aria-hidden size={18} className="xs:hidden" />
+          <span className="xs:inline hidden">Найти</span>
         </Button>
         <Button
           ref={filterButtonRef}
@@ -169,7 +169,7 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
           onClick={() => setFiltersOpen(true)}
         >
           <FunnelSimple />
-          <span className="hidden min-[400px]:inline">Фильтры</span>
+          <span className="xs:inline hidden">Фильтры</span>
           {activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
         </Button>
       </div>
@@ -247,7 +247,7 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
           aria-labelledby={filtersOpen ? 'attestation-filters-title' : undefined}
           className={`${
             filtersOpen
-              ? 'fixed inset-x-3 bottom-3 z-[var(--z-overlay)] block max-h-[88dvh] overflow-y-auto rounded-3xl border bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)] min-[1024px]:max-h-[min(42rem,calc(100dvh-8rem))] @min-[760px]:top-[4.5rem] @min-[760px]:right-3 @min-[760px]:bottom-auto @min-[760px]:left-auto @min-[760px]:max-h-[min(42rem,calc(100dvh-8rem-var(--mobile-tab-height)))] @min-[760px]:w-[min(52rem,calc(100%-1.5rem))] @min-[760px]:rounded-2xl @min-[760px]:pb-4'
+              ? 'fixed inset-x-3 bottom-3 z-[var(--z-overlay)] block max-h-[88dvh] overflow-y-auto rounded-3xl border bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)] lg:max-h-[min(42rem,calc(100dvh-8rem))] @min-[760px]:top-[4.5rem] @min-[760px]:right-3 @min-[760px]:bottom-auto @min-[760px]:left-auto @min-[760px]:max-h-[min(42rem,calc(100dvh-8rem-var(--mobile-tab-height)))] @min-[760px]:w-[min(52rem,calc(100%-1.5rem))] @min-[760px]:rounded-2xl @min-[760px]:pb-4'
               : 'hidden'
           }`}
         >

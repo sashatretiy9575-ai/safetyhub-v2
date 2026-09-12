@@ -36,7 +36,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <section className="py-10 md:py-20">
       <Container size="narrow">
         <Card className="mx-auto max-w-md">
-          <CardContent className="space-y-6 p-4 min-[320px]:p-6 md:p-8">
+          <CardContent className="space-y-6 p-6 md:p-8">
             {query.accountDeleted === '1' ? (
               <p
                 role="status"

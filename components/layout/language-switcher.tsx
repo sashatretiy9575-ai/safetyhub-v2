@@ -164,7 +164,7 @@ export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] })
             <CaretDown
               size={15}
               weight="bold"
-              className="hidden shrink-0 text-[var(--color-text-subtle)] min-[340px]:block"
+              className="xs:block hidden shrink-0 text-[var(--color-text-subtle)]"
               aria-hidden="true"
             />
           </button>

@@ -148,10 +148,10 @@ export function PWAInstallOverlay() {
           className="size-12 shrink-0 rounded-[14px] shadow-[var(--shadow-soft)]"
         />
         <div className="min-w-0 flex-1 pt-0.5">
-          <p id="pwa-install-title" className="font-display text-[17px] leading-tight font-bold">
+          <p id="pwa-install-title" className="font-display text-title leading-tight font-bold">
             {translations('title')}
           </p>
-          <p className="mt-1 text-[15px] leading-normal text-[var(--color-bg)]/80">
+          <p className="text-body-sm mt-1 leading-normal text-[var(--color-bg)]/80">
             {ios
               ? translations.rich('iosHint', {
                   share: hintChip(Export),
@@ -173,7 +173,7 @@ export function PWAInstallOverlay() {
       {showInstructions ? (
         <ol
           id="pwa-install-steps"
-          className="mt-3 space-y-2 border-t border-[var(--color-bg)]/12 pt-3 text-[15px] leading-normal text-[var(--color-bg)]/80"
+          className="text-body-sm mt-3 space-y-2 border-t border-[var(--color-bg)]/12 pt-3 leading-normal text-[var(--color-bg)]/80"
         >
           {steps.map((step, index) => (
             <li key={step} className="flex gap-2.5">
@@ -191,7 +191,12 @@ export function PWAInstallOverlay() {
 
       <div className="mt-3 flex gap-2">
         {showInstructions ? (
-          <Button type="button" size="sm" onClick={dismiss} className="min-h-11 flex-1 text-[15px]">
+          <Button
+            type="button"
+            size="sm"
+            onClick={dismiss}
+            className="text-body-sm min-h-11 flex-1"
+          >
             {translations('gotIt')}
           </Button>
         ) : (
@@ -202,7 +207,7 @@ export function PWAInstallOverlay() {
               onClick={() => void handleInstall()}
               disabled={isInstalling}
               aria-controls="pwa-install-steps"
-              className="min-h-11 flex-1 text-[15px]"
+              className="text-body-sm min-h-11 flex-1"
             >
               {isInstalling ? translations('installing') : translations('install')}
             </Button>
@@ -211,7 +216,7 @@ export function PWAInstallOverlay() {
               size="sm"
               variant="ghost"
               onClick={dismiss}
-              className="min-h-11 shrink-0 text-[15px] text-[var(--color-bg)]/85 hover:bg-[var(--color-bg)]/10"
+              className="text-body-sm min-h-11 shrink-0 text-[var(--color-bg)]/85 hover:bg-[var(--color-bg)]/10"
             >
               {translations('later')}
             </Button>

@@ -73,7 +73,7 @@ test('marketing collections use the native scroll-snap slider below 1200px', asy
   assert.match(carousel, /event\.key === 'ArrowLeft'/);
   assert.match(carousel, /prefers-reduced-motion: reduce/);
   assert.match(carousel, /snap-x snap-mandatory/);
-  assert.match(carousel, /min-\[1200px\]:grid-cols-3/);
+  assert.match(carousel, /wide:grid-cols-3/);
   assert.match(carousel, /pr-\[14%\]/);
   assert.match(carousel, /data-marketing-carousel-controls/);
   assert.doesNotMatch(carousel, /absolute top-1\/2 (?:left|right)-1/);
@@ -89,7 +89,7 @@ test('complete catalogs expose every item in an ordinary responsive grid', async
 
   for (const source of catalogs) {
     assert.match(source, /grid items-stretch gap-[45][^"\n]*sm:grid-cols-2/);
-    assert.match(source, /min-\[(?:1100|1200)px\]:grid-cols-3/);
+    assert.match(source, /wide:grid-cols-3/);
     assert.doesNotMatch(source, /<MarketingSlider/);
   }
 });

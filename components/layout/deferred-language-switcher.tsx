@@ -28,7 +28,7 @@ function LanguageSwitcherFallback({
         <span>{LOCALE_SHORT_LABEL_BY_LOCALE[locale]}</span>
         {/* Holds the 15 px the hydrated trigger's caret occupies, without
             pulling the icon set into the public LCP bundle. */}
-        <span aria-hidden="true" className="hidden size-[15px] shrink-0 min-[340px]:block" />
+        <span aria-hidden="true" className="xs:block hidden size-[15px] shrink-0" />
       </button>
     </div>
   );

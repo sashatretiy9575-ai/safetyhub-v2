@@ -83,7 +83,7 @@ export async function Hero() {
           </div>
 
           <div className="relative z-10 flex flex-col justify-center p-5 sm:p-8 lg:order-1 lg:p-11 xl:p-14">
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/70 px-3 py-1.5 text-[11px] font-semibold tracking-[0.1em] text-[var(--color-text-muted)] uppercase backdrop-blur-xl sm:text-xs">
+            <span className="text-micro inline-flex w-fit items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/70 px-3 py-1.5 font-semibold tracking-widest text-[var(--color-text-muted)] uppercase backdrop-blur-xl sm:text-xs">
               <MapPin
                 size={15}
                 weight="duotone"
@@ -96,27 +96,24 @@ export async function Hero() {
               aria-hidden="true"
               className="mt-5 h-1 w-10 rounded-full bg-[var(--color-primary)]/80"
             />
-            <h1
-              id="hero-heading"
-              className="mt-3.5 max-w-xl text-[28px] leading-[1.14] font-bold tracking-[-0.04em] text-balance sm:text-[40px] sm:leading-[1.1] lg:text-[46px] lg:leading-[1.07] xl:text-[50px]"
-            >
+            <h1 id="hero-heading" className="text-display mt-3.5 max-w-xl font-bold text-balance">
               {t('title')}
             </h1>
-            <p className="mt-4 max-w-xl text-[14px] leading-[1.6] text-[var(--color-text-muted)] sm:text-base sm:leading-7">
+            <p className="text-lead mt-4 max-w-xl text-[var(--color-text-muted)]">
               {t('description', { count: QUIZ_POLICY.questionCount, pass: QUIZ_POLICY.passScore })}
             </p>
 
-            <div className="mt-6 grid grid-cols-1 gap-2.5 min-[340px]:grid-cols-2 sm:mt-7 sm:flex sm:flex-wrap sm:gap-3">
+            <div className="xs:grid-cols-2 mt-6 grid grid-cols-1 gap-2.5 sm:mt-7 sm:flex sm:flex-wrap sm:gap-3">
               <Link
                 href={localizePathname(ROUTES.topics, locale)}
-                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-2.5 text-[13px] font-semibold text-[var(--color-primary-foreground)] transition hover:bg-[var(--color-primary-hover)] sm:min-h-[52px] sm:gap-2 sm:px-6 sm:text-sm"
+                className="text-caption inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-2.5 font-semibold text-[var(--color-primary-foreground)] transition hover:bg-[var(--color-primary-hover)] sm:min-h-[52px] sm:gap-2 sm:px-6 sm:text-sm"
               >
                 {t('courses')}
                 <ArrowRight size={17} weight="regular" aria-hidden="true" />
               </Link>
               <Link
                 href={localizePathname(ROUTES.contacts, locale)}
-                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 px-2.5 text-[13px] font-semibold text-[var(--color-text)] backdrop-blur-xl transition hover:bg-[var(--color-surface)] sm:min-h-[52px] sm:gap-2 sm:px-6 sm:text-sm"
+                className="text-caption inline-flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 px-2.5 font-semibold text-[var(--color-text)] backdrop-blur-xl transition hover:bg-[var(--color-surface)] sm:min-h-[52px] sm:gap-2 sm:px-6 sm:text-sm"
               >
                 <ChatCircleDots
                   size={18}

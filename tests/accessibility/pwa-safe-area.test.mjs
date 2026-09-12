@@ -24,7 +24,7 @@ test('shared safe-area tokens drive the header and mobile tab reserve', async ()
   assert.match(header, /pt-\[var\(--safe-area-top\)\]/);
   assert.match(header, /var\(--safe-area-left\)/);
   assert.match(tabs, /bottom-\[var\(--safe-area-bottom\)\]/);
-  assert.match(tabs, /min-\[1024px\]:hidden/);
+  assert.match(tabs, /lg:hidden/);
 });
 
 test('deferred install banner stays compact above the mobile bar and reserves temporary space', async () => {

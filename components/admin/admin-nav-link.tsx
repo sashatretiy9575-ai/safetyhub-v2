@@ -8,11 +8,14 @@ import { cn } from '@/lib/utils';
 export function AdminNavLink({
   href,
   label,
+  shortLabel,
   children,
   mobile = false,
 }: {
   href: string;
   label: string;
+  /** Shown instead of the label on the phone dock; the label stays the accessible name. */
+  shortLabel?: string;
   children: ReactNode;
   mobile?: boolean;
 }) {
@@ -30,14 +33,23 @@ export function AdminNavLink({
           ? 'bg-[var(--color-surface-muted)] text-[var(--color-text)]'
           : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
         mobile
-          ? 'min-w-0 w-full flex-col justify-center gap-0.5 px-0.5 py-1 text-[11px] leading-none'
+          ? 'text-micro w-full min-w-0 flex-col justify-center gap-0.5 px-0.5 py-1 leading-none'
           : 'px-3 py-2 text-sm',
       )}
     >
       <span aria-hidden="true" className={cn('grid shrink-0 place-items-center', mobile && 'h-6')}>
         {children}
       </span>
-      <span className={cn(mobile && 'max-w-20 truncate')}>{label}</span>
+      {mobile && shortLabel ? (
+        <>
+          <span aria-hidden="true" className="max-w-20 truncate">
+            {shortLabel}
+          </span>
+          <span className="sr-only">{label}</span>
+        </>
+      ) : (
+        <span className={cn(mobile && 'max-w-20 truncate')}>{label}</span>
+      )}
     </Link>
   );
 }

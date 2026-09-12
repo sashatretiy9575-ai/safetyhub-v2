@@ -31,13 +31,13 @@ export function ArticleCard({
       className={cn(
         'group flex h-full min-w-0 flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_16px_40px_-30px_rgba(15,23,18,0.34)] transition duration-300 hover:border-[var(--color-primary)]/45 hover:shadow-[var(--shadow-card)] focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)] motion-safe:hover:-translate-y-1',
         featured &&
-          'min-[1100px]:col-span-2 min-[1100px]:grid min-[1100px]:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)]',
+          'wide:col-span-2 wide:grid wide:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)]',
       )}
     >
       <div
         className={cn(
           'relative aspect-[16/8] shrink-0 overflow-hidden bg-[var(--color-surface-muted)]',
-          featured && 'min-[1100px]:aspect-auto',
+          featured && 'wide:aspect-auto',
         )}
       >
         {coverImage ? (
@@ -68,13 +68,11 @@ export function ArticleCard({
         />
       </div>
 
-      <div
-        className={cn('flex min-w-0 flex-1 flex-col p-5 sm:p-6', featured && 'min-[1100px]:p-8')}
-      >
+      <div className={cn('flex min-w-0 flex-1 flex-col p-5 sm:p-6', featured && 'wide:p-8')}>
         <h3
           className={cn(
-            'text-[18px] leading-[1.28] font-bold tracking-[-0.02em] text-balance transition-colors group-hover:text-[var(--color-primary-hover)] sm:text-xl',
-            featured && 'min-[1100px]:text-[28px] min-[1100px]:leading-[1.22]',
+            'text-title font-bold text-balance transition-colors group-hover:text-[var(--color-primary-hover)] sm:text-xl',
+            featured && 'wide:text-h3',
           )}
         >
           {title}
@@ -82,7 +80,7 @@ export function ArticleCard({
         <p
           className={cn(
             'mt-3 text-sm leading-6 text-[var(--color-text-muted)]',
-            featured && 'min-[1100px]:text-base min-[1100px]:leading-7',
+            featured && 'wide:text-base wide:leading-7',
           )}
         >
           {description}

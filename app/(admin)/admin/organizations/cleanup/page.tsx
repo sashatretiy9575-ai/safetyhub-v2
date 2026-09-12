@@ -13,9 +13,11 @@ export default async function OrganizationCleanupPage() {
     <section className="space-y-6">
       <div>
         <Button asChild size="sm" variant="ghost" className="mb-2">
-          <Link href="/admin/employees"><ArrowLeft /> Сотрудники</Link>
+          <Link href="/admin/employees">
+            <ArrowLeft /> Сотрудники
+          </Link>
         </Button>
-        <h1 className="font-display text-3xl font-bold">Очистка компаний</h1>
+        <h1 className="font-display text-h3 font-bold">Очистка компаний</h1>
         <p className="mt-1 max-w-3xl text-sm text-[var(--color-text-muted)]">
           Объединение похожих названий подтверждает администратор.
         </p>

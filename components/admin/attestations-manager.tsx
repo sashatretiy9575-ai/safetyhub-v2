@@ -1007,7 +1007,7 @@ export function AttestationsManager({
       >
         <div
           role="row"
-          className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-20 hidden min-h-9 items-center gap-x-2 bg-[var(--color-surface-muted)] px-1.5 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] min-[1024px]:top-0 @min-[760px]:grid @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px]"
+          className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-20 hidden min-h-9 items-center gap-x-2 bg-[var(--color-surface-muted)] px-1.5 text-left text-xs font-bold text-[var(--color-text-muted)] shadow-[0_1px_var(--color-border)] lg:top-0 @min-[760px]:grid @min-[760px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(0,0.9fr)_44px]"
         >
           {/* An `sr-only` cell is absolutely positioned and therefore leaves the
               grid flow, which shifted every visible heading one column to the
@@ -1100,7 +1100,7 @@ export function AttestationsManager({
                       >
                         <span
                           aria-hidden
-                          className={`grid size-4 shrink-0 place-items-center rounded-[4px] border text-[10px] leading-none ${
+                          className={`text-micro grid size-4 shrink-0 place-items-center rounded-[4px] border leading-none ${
                             groupFullySelected
                               ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
                               : 'border-[var(--color-border-strong)]'
@@ -1205,7 +1205,7 @@ export function AttestationsManager({
 
           <aside
             aria-label="Массовые действия"
-            className="glass-strong sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+1rem)] z-[var(--z-sticky)] hidden rounded-2xl border p-4 shadow-[var(--shadow-pop)] min-[1024px]:bottom-4 @min-[760px]:block"
+            className="glass-strong sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+1rem)] z-[var(--z-sticky)] hidden rounded-2xl border p-4 shadow-[var(--shadow-pop)] lg:bottom-4 @min-[760px]:block"
           >
             <div className="flex flex-wrap items-center gap-3">
               <strong className="text-sm tabular-nums">Выбрано: {selectionSummary.total}</strong>

@@ -585,7 +585,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
               {passed ? (
                 <>
                   <div className="py-2">
-                    <strong className="text-5xl font-black tracking-tight tabular-nums">
+                    <strong className="text-h1 font-black tabular-nums">
                       {attempt.score ?? 0} / {attempt.total}
                     </strong>
                     <p className="mt-1.5 text-sm font-medium text-[var(--color-text-muted)]">
@@ -609,7 +609,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                 </div>
               ) : (
                 <div className="space-y-2 py-2">
-                  <strong className="text-5xl font-black tracking-tight tabular-nums">
+                  <strong className="text-h1 font-black tabular-nums">
                     {attempt.score ?? 0}/{attempt.total}
                   </strong>
                   <p className="mt-1 text-sm font-medium text-[var(--color-text-muted)]">
@@ -703,7 +703,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
       <section className="py-8 md:py-16">
         <Container size="narrow">
           <Card className="border-2">
-            <CardContent className="space-y-6 p-4 min-[320px]:p-5 md:p-8">
+            <CardContent className="space-y-6 p-5 md:p-8">
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-bold text-[var(--color-primary)]">
@@ -716,7 +716,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     ariaLabel={timerAriaLabel}
                   />
                 </div>
-                <h2 className="font-display mt-1 text-2xl font-black">{t('review.title')}</h2>
+                <h2 className="font-display text-h3 mt-1 font-black">{t('review.title')}</h2>
                 <p className="mt-2 text-sm text-[var(--color-text-muted)]">
                   {t('review.description')}
                 </p>
@@ -791,7 +791,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                   {error}
                 </p>
               )}
-              <div className="flex flex-col-reverse justify-between gap-3 min-[420px]:flex-row">
+              <div className="xs:flex-row flex flex-col-reverse justify-between gap-3">
                 <Button
                   variant="outline"
                   onClick={() => navigateToQuestion(currentIndexRef.current)}
@@ -914,7 +914,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           })}
         </nav>
         <Card className="border-2">
-          <CardContent className="space-y-6 p-4 min-[320px]:p-5 md:p-8">
+          <CardContent className="space-y-6 p-5 md:p-8">
             <h2 className="font-display text-xl leading-tight font-bold">{currentQuestion.text}</h2>
             <fieldset className="space-y-3">
               <legend className="sr-only">{t('chooseAnswer')}</legend>

@@ -48,9 +48,7 @@ export default async function OnboardingPage() {
             <p className="text-sm font-semibold text-[var(--color-primary)]">
               {t('onboardingEyebrow')}
             </p>
-            <h1 className="font-display mt-1 text-3xl font-black md:text-4xl">
-              {t('onboardingTitle')}
-            </h1>
+            <h1 className="font-display text-h2 mt-1 font-black">{t('onboardingTitle')}</h1>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[var(--color-text-muted)]">
               {t('onboardingDescription')}
             </p>

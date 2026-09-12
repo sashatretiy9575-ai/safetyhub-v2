@@ -24,6 +24,8 @@ type CarouselProps = {
   previousLabel?: string;
   nextLabel?: string;
   variant?: 'standard' | 'marketing';
+  /** Marketing only. `stack` renders the items as a static grid at every width. */
+  mobile?: 'slider' | 'stack';
 };
 
 export function Carousel({
@@ -36,6 +38,7 @@ export function Carousel({
   previousLabel,
   nextLabel,
   variant = 'standard',
+  mobile = 'slider',
 }: CarouselProps) {
   const t = useTranslations('Common.carousel');
   const resolvedItemLabel = itemLabel ?? t('item');
@@ -101,6 +104,21 @@ export function Carousel({
 
   if (items.length === 0) return null;
 
+  const stacked = variant === 'marketing' && mobile === 'stack';
+  if (stacked) {
+    return (
+      <section role="region" aria-label={label} className={cn('min-w-0', className)}>
+        <div role="list" className="wide:gap-5 grid gap-3 sm:grid-cols-3 sm:gap-4">
+          {items.map((item, index) => (
+            <div key={index} role="listitem" className={cn('h-auto min-w-0', itemClassName)}>
+              {item}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       role="region"
@@ -158,7 +176,7 @@ export function Carousel({
         onScroll={updateActive}
         className={cn(
           variant === 'marketing'
-            ? 'flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 pr-[14%] [scrollbar-width:none] focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)] [&::-webkit-scrollbar]:hidden sm:gap-4 sm:pr-[12%] min-[1200px]:grid min-[1200px]:grid-cols-3 min-[1200px]:gap-5 min-[1200px]:overflow-visible min-[1200px]:pr-0'
+            ? 'wide:grid wide:grid-cols-3 wide:gap-5 wide:overflow-visible wide:pr-0 flex snap-x snap-mandatory [scrollbar-width:none] gap-3 overflow-x-auto pr-[14%] pb-2 focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)] sm:gap-4 sm:pr-[12%] [&::-webkit-scrollbar]:hidden'
             : 'flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)] md:grid md:gap-5 md:overflow-visible md:pb-0',
           variant === 'standard' ? gridClassName : undefined,
         )}
@@ -175,8 +193,8 @@ export function Carousel({
             })}
             className={cn(
               variant === 'marketing'
-                ? 'h-auto min-w-[min(82vw,19.5rem)] snap-start sm:min-w-[calc((100%_-_1rem)/2.15)] min-[1200px]:min-w-0'
-                : 'min-w-[92%] snap-start min-[420px]:min-w-[76%] md:min-w-0',
+                ? 'wide:min-w-0 h-auto min-w-[min(82vw,19.5rem)] snap-start sm:min-w-[calc((100%_-_1rem)/2.15)]'
+                : 'xs:min-w-[76%] min-w-[92%] snap-start md:min-w-0',
               itemClassName,
             )}
           >
@@ -187,9 +205,9 @@ export function Carousel({
       {variant === 'marketing' && items.length > 1 ? (
         <div
           data-marketing-carousel-controls
-          className="mt-3 flex items-center justify-between gap-3 min-[1200px]:hidden"
+          className="wide:hidden mt-3 flex items-center justify-between gap-3"
         >
-          <div aria-hidden="true" className="flex min-w-0 max-w-36 flex-1 gap-1.5">
+          <div aria-hidden="true" className="flex max-w-36 min-w-0 flex-1 gap-1.5">
             {items.map((_, index) => (
               <span
                 key={index}

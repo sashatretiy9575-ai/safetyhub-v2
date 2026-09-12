@@ -55,14 +55,14 @@ export async function AppShell({
       <main
         id="main-content"
         tabIndex={-1}
-        className="flex-1 scroll-mt-[calc(3.75rem+var(--safe-area-top))] outline-none min-[1024px]:scroll-mt-[calc(4.5rem+var(--safe-area-top))]"
+        className="flex-1 scroll-mt-[calc(3.75rem+var(--safe-area-top))] outline-none lg:scroll-mt-[calc(4.5rem+var(--safe-area-top))]"
       >
         {children}
       </main>
       {/* The install banner overlays the bottom of the page, so the reserve has
           to sit below the footer rather than inside <main>, where the banner
           simply covered the footer instead of clearing it. */}
-      <div className="bg-[var(--color-footer)] pb-[calc(var(--mobile-fixed-bottom-space)+var(--pwa-banner-space,0px))] min-[1024px]:pb-[var(--pwa-banner-space,0px)]">
+      <div className="bg-[var(--color-footer)] pb-[calc(var(--mobile-fixed-bottom-space)+var(--pwa-banner-space,0px))] lg:pb-[var(--pwa-banner-space,0px)]">
         <Footer contacts={contacts} locale={locale} />
       </div>
       <DeferredBottomTabBar accountMode={accountMode} />

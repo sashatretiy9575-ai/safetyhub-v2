@@ -129,7 +129,7 @@ export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: Article
   const headingIds = new Map(getArticleToc(validBlocks).map((item) => [item.blockIndex, item.id]));
 
   return (
-    <div className="prose-blog min-w-0 text-[15.5px] leading-[1.78] text-[var(--color-text-muted)] sm:text-[17px] lg:text-[18px]">
+    <div className="prose-blog text-prose min-w-0 text-[var(--color-text-muted)]">
       {validBlocks.map((block, index) => {
         switch (block.type) {
           case 'paragraph':
@@ -150,9 +150,8 @@ export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: Article
                 id={headingIds.get(index)}
                 className={cn(
                   'scroll-mt-24 text-balance text-[var(--color-text)]',
-                  block.level === 2 &&
-                    'mt-12 mb-4 text-[24px] leading-[1.24] font-extrabold sm:text-[30px]',
-                  block.level === 3 && 'mt-9 mb-3 text-xl leading-[1.3] font-bold sm:text-[24px]',
+                  block.level === 2 && 'text-h3 mt-12 mb-4 font-extrabold',
+                  block.level === 3 && 'text-h4 mt-9 mb-3 font-bold',
                   block.level === 4 && 'mt-7 mb-3 text-lg leading-[1.35] font-bold',
                 )}
               >
@@ -219,7 +218,7 @@ export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: Article
                 label={block.label ?? t('gallery', { count: index + 1 })}
                 className="my-7"
                 gridClassName="md:grid-cols-2"
-                itemClassName="min-w-[92%] min-[420px]:min-w-[82%]"
+                itemClassName="min-w-[92%] xs:min-w-[82%]"
                 itemLabel={t('image')}
                 previousLabel={t('previousImage')}
                 nextLabel={t('nextImage')}
@@ -270,7 +269,7 @@ export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: Article
               <List
                 key={index}
                 className={cn(
-                  'my-6 space-y-2 leading-7 pl-6',
+                  'my-6 space-y-2 pl-6 leading-7',
                   isOrdered ? 'list-decimal' : 'list-disc',
                 )}
               >
@@ -292,7 +291,7 @@ export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: Article
                 tabIndex={0}
                 className="my-7 w-full overflow-x-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
-                <table className="w-full text-left text-sm sm:text-[15px]">
+                <table className="sm:text-body-sm w-full text-left text-sm">
                   {block.caption ? (
                     <caption className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]/50 px-4 py-2 text-left text-xs font-bold text-[var(--color-text-muted)]">
                       {block.caption}
@@ -304,7 +303,7 @@ export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: Article
                         <th
                           key={headerIndex}
                           scope="col"
-                          className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-[var(--color-text-muted)]"
+                          className="px-4 py-3 text-xs font-bold tracking-wide text-[var(--color-text-muted)] uppercase"
                         >
                           {header}
                         </th>

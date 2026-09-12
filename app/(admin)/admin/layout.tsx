@@ -39,7 +39,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const items = [
     { href: '/admin', icon: CheckSquareOffset, label: 'В работе' },
     { href: '/admin/approvals', icon: UserCircleCheck, label: 'Заявки' },
-    { href: employeeHref, icon: Users, label: 'Сотрудники' },
+    { href: employeeHref, icon: Users, label: 'Сотрудники', shortLabel: 'Люди' },
     { href: '/admin/courses', icon: ClipboardText, label: 'Курсы' },
     { href: '/admin/articles', icon: Article, label: 'Материалы' },
     { href: '/admin/settings', icon: Gear, label: 'Настройки' },
@@ -59,7 +59,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <AdminNotificationInboxProvider enabled={notificationsEnabled}>
       <div
         data-admin-shell
-        className="min-h-dvh bg-[var(--color-bg)] min-[1024px]:grid min-[1024px]:grid-cols-[13.5rem_minmax(0,1fr)]"
+        className="min-h-dvh bg-[var(--color-bg)] lg:grid lg:grid-cols-[13.5rem_minmax(0,1fr)]"
       >
         <a
           href="#admin-main"
@@ -68,11 +68,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           К содержанию
         </a>
 
-        <aside className="sticky top-0 hidden h-dvh min-h-0 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)] p-3 min-[1024px]:flex">
-          <Link
-            href="/admin"
-            className="flex min-h-12 items-center gap-3 rounded-xl px-2"
-          >
+        <aside className="sticky top-0 hidden h-dvh min-h-0 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)] p-3 lg:flex">
+          <Link href="/admin" className="flex min-h-12 items-center gap-3 rounded-xl px-2">
             <span className="grid size-10 place-items-center rounded-xl bg-[var(--color-primary)] font-black text-[var(--color-primary-foreground)]">
               S
             </span>
@@ -116,7 +113,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </aside>
 
         <div className="min-w-0">
-          <header className="sticky top-0 z-40 flex min-h-14 items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 pt-[var(--safe-area-top)] pr-[max(1rem,var(--safe-area-right))] pl-[max(1rem,var(--safe-area-left))] backdrop-blur-xl min-[1024px]:hidden">
+          <header className="sticky top-0 z-40 flex min-h-14 items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 pt-[var(--safe-area-top)] pr-[max(1rem,var(--safe-area-right))] pl-[max(1rem,var(--safe-area-left))] backdrop-blur-xl lg:hidden">
             <Link href="/admin" className="min-w-0 py-2">
               <span className="block truncate text-sm font-black">SafetyHub Admin</span>
             </Link>
@@ -144,7 +141,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             // focus on <body>, and without the scroll margin the heading it
             // jumps to sits under the sticky header.
             tabIndex={-1}
-            className="min-w-0 scroll-mt-[calc(3.5rem+var(--safe-area-top))] pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)] outline-none min-[1024px]:scroll-mt-0 min-[1024px]:pb-0"
+            className="min-w-0 scroll-mt-[calc(3.5rem+var(--safe-area-top))] pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)] outline-none lg:scroll-mt-0 lg:pb-0"
           >
             <Container
               size="admin"
@@ -157,11 +154,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
           <nav
             aria-label="Мобильная навигация админ-панели"
-            className="fixed inset-x-0 bottom-0 z-50 overflow-x-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)]/95 pb-[var(--safe-area-bottom)] backdrop-blur-xl min-[1024px]:hidden"
+            className="fixed inset-x-0 bottom-0 z-50 overflow-x-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)]/95 pb-[var(--safe-area-bottom)] backdrop-blur-xl lg:hidden"
           >
             <div className="grid min-h-[var(--mobile-tab-height)] grid-cols-5 px-[max(.25rem,var(--safe-area-left))] py-1 pr-[max(.25rem,var(--safe-area-right))]">
-              {items.slice(0, 4).map(({ href, icon: Icon, label }) => (
-                <AdminNavLink key={href} href={href} label={label} mobile>
+              {items.slice(0, 4).map(({ href, icon: Icon, label, shortLabel }) => (
+                <AdminNavLink key={href} href={href} label={label} shortLabel={shortLabel} mobile>
                   <Icon size={20} />
                 </AdminNavLink>
               ))}

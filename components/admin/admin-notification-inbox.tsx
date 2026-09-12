@@ -694,7 +694,7 @@ export function AdminNotificationInboxButton({
       >
         <Bell size={20} />
         {page?.unread ? (
-          <span className="absolute -top-0.5 -right-0.5 grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--color-danger)] px-1 text-[10px] font-black text-[var(--color-danger-foreground)]">
+          <span className="text-micro absolute -top-0.5 -right-0.5 grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--color-danger)] px-1 font-black text-[var(--color-danger-foreground)]">
             {page.unread > 99 ? '99+' : page.unread}
           </span>
         ) : null}
@@ -779,7 +779,7 @@ export function AdminNotificationInboxButton({
                                 {presentation.description}
                               </span>
                             </Link>
-                            <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--color-text-subtle)]">
+                            <div className="text-micro mt-1 flex flex-wrap items-center justify-between gap-2 text-[var(--color-text-subtle)]">
                               <time dateTime={event.occurredAt}>{dateTime(event.occurredAt)}</time>
                               <span>{deliveryLabels[event.delivery.status]}</span>
                             </div>

@@ -18,11 +18,11 @@ function HomeSectionFallback({ label }: { label: string }) {
       className="mx-auto w-full max-w-[1280px] px-4 py-10 sm:py-14 md:px-6 lg:py-16 xl:px-8"
     >
       <div className="h-6 w-56 animate-pulse rounded bg-[var(--color-surface-muted)] sm:h-8" />
-      <div className="mt-7 flex gap-3 overflow-hidden pr-[14%] min-[1200px]:grid min-[1200px]:grid-cols-3 min-[1200px]:gap-5 min-[1200px]:pr-0 sm:mt-10 sm:gap-4 sm:pr-[12%]">
+      <div className="wide:grid wide:grid-cols-3 wide:gap-5 wide:pr-0 mt-7 flex gap-3 overflow-hidden pr-[14%] sm:mt-10 sm:gap-4 sm:pr-[12%]">
         {Array.from({ length: 3 }, (_, index) => (
           <div
             key={index}
-            className="h-[25rem] min-w-[min(82vw,19.5rem)] animate-pulse rounded-[24px] bg-[var(--color-surface-soft)] min-[1200px]:min-w-0 sm:min-w-[calc((100%_-_1rem)/2.15)]"
+            className="wide:min-w-0 h-[25rem] min-w-[min(82vw,19.5rem)] animate-pulse rounded-[24px] bg-[var(--color-surface-soft)] sm:min-w-[calc((100%_-_1rem)/2.15)]"
             aria-hidden="true"
           />
         ))}

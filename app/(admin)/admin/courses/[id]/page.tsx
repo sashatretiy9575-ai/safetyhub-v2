@@ -25,7 +25,7 @@ export default async function EditCoursePage({
   const localizations = localizationsResult.value;
   return (
     <section className="space-y-6">
-      <h1 className="font-display text-3xl font-bold">Новая редакция курса</h1>
+      <h1 className="font-display text-h3 font-bold">Новая редакция курса</h1>
       <TestEditor
         initial={seed}
         initialPublicationNotice={

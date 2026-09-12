@@ -25,7 +25,7 @@ export default async function EmployeeLearningHistoryPage({
     <section className="mx-auto max-w-3xl space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-bold">Учебная история</h1>
+          <h1 className="font-display text-h3 font-bold">Учебная история</h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
             {userLabel}
             {history.user.email ? ` · ${history.user.email}` : ' · Вход по логину и паролю'}

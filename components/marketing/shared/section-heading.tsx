@@ -21,13 +21,13 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        'flex flex-col items-start justify-between gap-5 min-[900px]:flex-row min-[900px]:items-end min-[900px]:gap-8',
+        'flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-end lg:gap-8',
         className,
       )}
     >
       <div className="max-w-3xl">
         {eyebrow ? (
-          <p className="mb-2.5 inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] text-[var(--color-text-subtle)] uppercase sm:text-xs">
+          <p className="text-micro mb-2.5 inline-flex items-center gap-2 font-bold tracking-widest text-[var(--color-text-subtle)] uppercase sm:text-xs">
             <span
               aria-hidden="true"
               className="h-px w-5 rounded-full bg-[var(--color-primary)] sm:w-6"
@@ -35,14 +35,11 @@ export function SectionHeading({
             {eyebrow}
           </p>
         ) : null}
-        <h2
-          id={id}
-          className="max-w-2xl text-[24px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[30px] sm:leading-[1.18] lg:text-[38px]"
-        >
+        <h2 id={id} className="text-h2 max-w-2xl font-bold text-balance">
           {title}
         </h2>
         {description ? (
-          <p className="mt-3 max-w-2xl text-[14px] leading-[1.6] text-[var(--color-text-muted)] sm:text-[15px] sm:leading-6 lg:text-base">
+          <p className="text-body-sm mt-3 max-w-2xl text-[var(--color-text-muted)] lg:text-base">
             {description}
           </p>
         ) : null}

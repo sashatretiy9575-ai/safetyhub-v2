@@ -18,10 +18,7 @@ export async function ContactCta() {
     >
       <Container size="wide">
         <div className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)]/76 p-5 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl sm:p-7 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.7fr)] lg:items-center lg:gap-x-12 lg:p-9">
-          <h2
-            id="contacts-heading"
-            className="max-w-xl text-[24px] leading-[1.2] font-bold tracking-[-0.03em] text-balance sm:text-[30px] lg:text-[36px]"
-          >
+          <h2 id="contacts-heading" className="text-h2 max-w-xl font-bold text-balance">
             {t('title')}
           </h2>
 

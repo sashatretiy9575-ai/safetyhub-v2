@@ -39,7 +39,12 @@ export function PartnersStrip() {
     >
       <SectionHeading id="benefits-heading" eyebrow={t('eyebrow')} title={t('title')} />
 
-      <MarketingSlider label={t('slider')} itemLabel={t('item')} className="mt-7 sm:mt-10">
+      <MarketingSlider
+        label={t('slider')}
+        itemLabel={t('item')}
+        className="mt-7 sm:mt-10"
+        mobile="stack"
+      >
         {benefits.map(({ icon: Icon, image, title, text }, index) => (
           <article
             key={title}
@@ -58,16 +63,14 @@ export function PartnersStrip() {
               <span className="absolute top-3 left-3 grid size-10 place-items-center rounded-[14px] border border-white/55 bg-white/82 text-[#176b43] shadow-sm backdrop-blur-xl">
                 <Icon size={21} weight="duotone" aria-hidden="true" />
               </span>
-              <span className="absolute top-3 right-3 rounded-full border border-white/45 bg-white/68 px-2.5 py-1 text-xs font-black tracking-[0.1em] text-slate-700 tabular-nums backdrop-blur-xl">
+              <span className="absolute top-3 right-3 rounded-full border border-white/45 bg-white/68 px-2.5 py-1 text-xs font-black tracking-widest text-slate-700 tabular-nums backdrop-blur-xl">
                 {String(index + 1).padStart(2, '0')}
               </span>
             </div>
 
             <div className="flex min-h-0 flex-1 flex-col p-5">
-              <h3 className="line-clamp-2 text-[16px] leading-[1.3] font-bold sm:text-[17px]">
-                {title}
-              </h3>
-              <p className="mt-2.5 line-clamp-2 text-[13.5px] leading-5 text-[var(--color-text-muted)] sm:text-sm">
+              <h3 className="text-title line-clamp-2 font-bold">{title}</h3>
+              <p className="text-caption mt-2.5 line-clamp-2 text-[var(--color-text-muted)] sm:text-sm">
                 {text}
               </p>
             </div>

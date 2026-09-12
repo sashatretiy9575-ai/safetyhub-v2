@@ -133,10 +133,10 @@ export function CourseMaterialActions({
                 <div className="mb-5 grid size-14 place-items-center rounded-2xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                   {iconSlot ?? <FilePdf size={30} weight="duotone" aria-hidden="true" />}
                 </div>
-                <p className="text-xs font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">
+                <p className="text-xs font-bold tracking-widest text-[var(--color-primary)] uppercase">
                   {t('online')}
                 </p>
-                <h1 className="mt-2 text-3xl leading-tight font-black tracking-[-0.035em] sm:text-4xl">
+                <h1 className="mt-2 text-h2 font-black">
                   {t('pageHeading', { course: course.title })}
                 </h1>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--color-text-muted)] sm:text-base">

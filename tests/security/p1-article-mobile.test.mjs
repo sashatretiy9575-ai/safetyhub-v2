@@ -135,7 +135,7 @@ test('narrow layouts and course actions avoid clipping and scroll jumps', async 
   assert.match(actionBar, /top-\[calc\(3\.5rem\+var\(--safe-area-top\)\)\]/);
   // The bar has to keep the header offset until the admin header actually
   // disappears, which happens at 1024 px and not at the `md` breakpoint.
-  assert.match(actionBar, /min-\[1024px\]:top-4/);
+  assert.match(actionBar, /lg:top-4/);
   assert.doesNotMatch(actionBar, /md:top-4/);
   assert.match(actionBar, /max-h-16/);
   assert.match(blockEditor, /grid gap-2 sm:grid-cols-2/);

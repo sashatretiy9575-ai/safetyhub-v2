@@ -6,7 +6,7 @@ export default async function NewCoursePage() {
   return (
     <section className="space-y-6">
       <div>
-        <h1 className="font-display text-3xl font-bold">Новый курс</h1>
+        <h1 className="font-display text-h3 font-bold">Новый курс</h1>
         <p className="text-sm text-[var(--color-text-muted)]">
           Черновик, PDF и три варианта по десять вопросов.
         </p>

@@ -83,9 +83,7 @@ export function CourseCard({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
-        <h3 className="line-clamp-2 text-[17px] leading-[1.3] font-bold tracking-[-0.02em] sm:text-lg">
-          {title}
-        </h3>
+        <h3 className="text-title line-clamp-2 font-bold">{title}</h3>
         {description ? (
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[var(--color-text-muted)]">
             {description}

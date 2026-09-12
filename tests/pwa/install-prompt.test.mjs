@@ -38,8 +38,8 @@ test('the card and its reserve follow the dock offset, which is zero once the do
   );
   assert.match(css, /--pwa-dock-offset: var\(--mobile-tab-height\);/u);
   assert.match(css, /--pwa-dock-offset: 0px;/u);
-  assert.match(shell, /min-\[1024px\]:pb-\[var\(--pwa-banner-space,0px\)\]/u);
-  assert.doesNotMatch(shell, /min-\[1024px\]:pb-0/u);
+  assert.match(shell, /lg:pb-\[var\(--pwa-banner-space,0px\)\]/u);
+  assert.doesNotMatch(shell, /lg:pb-0/u);
 });
 
 test('the button label never depends on whether the browser has fired its install event', () => {
@@ -57,8 +57,8 @@ test('the button label never depends on whether the browser has fired its instal
 test('the copy is readable on a phone', () => {
   // 12 px body text and a 15 px title were too small to read on a phone.
   assert.doesNotMatch(overlay, /text-xs leading-relaxed/u);
-  assert.match(overlay, /text-\[17px\] leading-tight font-bold/u);
-  assert.match(overlay, /text-\[15px\] leading-normal/u);
+  assert.match(overlay, /text-title leading-tight font-bold/u);
+  assert.match(overlay, /text-body-sm[^"]*leading-normal/u);
 });
 
 test('visibility has no condition that decides nothing', () => {
