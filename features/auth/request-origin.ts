@@ -1,5 +1,5 @@
-import { resolveSiteOrigin } from '../../lib/site-url.ts';
-import { enforceNoStore } from '../../lib/security/no-store.ts';
+import { resolveSiteOrigin } from '@/lib/site-url';
+import { enforceNoStore } from '@/lib/security/no-store';
 
 export function isSameOriginRequest(request: Request) {
   const origin = request.headers.get('origin');

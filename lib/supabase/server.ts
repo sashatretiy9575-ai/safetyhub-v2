@@ -1,8 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
-import type { Database } from './types';
-import { supabaseAuthCookieOptions } from './auth-cookie-options';
+import type { Database } from '@/lib/supabase/types';
+import { supabaseAuthCookieOptions } from '@/lib/supabase/auth-cookie-options';
 
 function createFallbackClient() {
   return {

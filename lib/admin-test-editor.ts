@@ -1,9 +1,9 @@
 /** Shared browser/server contract for the administrative course editor. */
-import { contentMetadataSchema } from './content/content-metadata.ts';
-import { courseSeoSchema } from './validation/course.ts';
-import { defaultContentSeo, type ContentSeo } from './validation/content-seo.ts';
-import { isCourseIconId } from './course-icons.ts';
-import type { AppLocale } from './supabase/types.ts';
+import { contentMetadataSchema } from '@/lib/content/content-metadata';
+import { courseSeoSchema } from '@/lib/validation/course';
+import { defaultContentSeo, type ContentSeo } from '@/lib/validation/content-seo';
+import { isCourseIconId } from '@/lib/course-icons';
+import type { AppLocale } from '@/lib/supabase/types';
 
 export const TEST_EDITOR_LIMITS = Object.freeze({
   variantCount: 3,

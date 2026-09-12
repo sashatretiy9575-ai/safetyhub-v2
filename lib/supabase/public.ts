@@ -2,7 +2,7 @@ import 'server-only';
 
 import { createClient } from '@supabase/supabase-js';
 import { contentUpstreamFetch } from '@/lib/content/upstream';
-import type { Database } from './types';
+import type { Database } from '@/lib/supabase/types';
 
 export function createPublicClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

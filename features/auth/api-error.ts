@@ -1,5 +1,5 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { AuthenticationError } from './server';
+import { AuthenticationError } from '@/features/auth/server';
 import { RateLimitError } from '@/lib/security/rate-limit';
 import { RequestBodyError } from '@/lib/security/request-body';
 import { RpcMutationError } from '@/lib/supabase/rpc-mutation-result';

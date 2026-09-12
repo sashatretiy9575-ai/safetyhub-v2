@@ -2,8 +2,8 @@ import { createServerClient } from '@supabase/ssr';
 import { isAuthApiError, isAuthSessionMissingError } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { AuthRealm } from '@/i18n/config';
-import type { Database } from './types';
-import { supabaseAuthCookieOptions } from './auth-cookie-options';
+import type { Database } from '@/lib/supabase/types';
+import { supabaseAuthCookieOptions } from '@/lib/supabase/auth-cookie-options';
 
 type AuthenticatedUserMetadata = Readonly<{
   app_metadata?: unknown;

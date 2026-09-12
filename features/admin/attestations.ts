@@ -15,7 +15,7 @@ import type {
   AdminAttestationSelection,
   AdminDataResult,
   AdminWorkQueue,
-} from './types';
+} from '@/features/admin/types';
 
 export const ADMIN_ATTESTATION_DEFAULT_PAGE_SIZE = 50;
 export const ADMIN_ATTESTATION_PAGE_SIZES = [25, 50, 100] as const;

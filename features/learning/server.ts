@@ -8,8 +8,8 @@ import { normalizeRateLimitError } from '@/lib/security/rate-limit';
 import { requireUser } from '@/features/auth/server';
 import { invalidateCertificateVerificationCache } from '@/features/certificates/server';
 import type { Json } from '@/lib/supabase/types';
-import type { AttemptPayload } from './types';
-import { AttemptExpiredError, parseAttemptRpcError } from './policy-error';
+import type { AttemptPayload } from '@/features/learning/types';
+import { AttemptExpiredError, parseAttemptRpcError } from '@/features/learning/policy-error';
 import { QUIZ_POLICY } from '@/lib/constants';
 import type { AppLocale } from '@/i18n/config';
 

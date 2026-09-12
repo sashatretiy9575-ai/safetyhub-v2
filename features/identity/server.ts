@@ -4,7 +4,7 @@ import * as z from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { invalidateCertificateVerificationCache } from '@/features/certificates/server';
-import type { VerifiedIdentity } from './types';
+import type { VerifiedIdentity } from '@/features/identity/types';
 
 type RpcError = {
   message: string;

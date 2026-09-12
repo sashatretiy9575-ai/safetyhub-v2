@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types';
+import type { Database } from '@/lib/supabase/types';
 
 export function createAdminClient() {
   const secret = process.env.SUPABASE_SECRET_KEY;

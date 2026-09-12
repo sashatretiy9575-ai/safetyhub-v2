@@ -1,5 +1,5 @@
 import { parsePhoneNumberFromString, type CountryCode } from 'libphonenumber-js/max';
-import { isPhoneCountryCode } from './phone.ts';
+import { isPhoneCountryCode } from '@/lib/phone';
 
 export type UserPhoneInput = Readonly<{
   countryIso2: string;

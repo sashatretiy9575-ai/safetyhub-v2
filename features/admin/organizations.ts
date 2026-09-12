@@ -6,7 +6,7 @@ import { requireCapability } from '@/features/auth/server';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
-import type { AdminDataResult } from './types';
+import type { AdminDataResult } from '@/features/admin/types';
 
 const organizationSchema = z.object({
   id: z.string().uuid(),

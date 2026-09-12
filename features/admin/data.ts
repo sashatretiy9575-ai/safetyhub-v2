@@ -12,7 +12,7 @@ import type {
   AdminDataResult,
   AdminPage,
   LearningHistoryTarget,
-} from './types';
+} from '@/features/admin/types';
 
 export const ADMIN_PAGE_SIZE = 25;
 

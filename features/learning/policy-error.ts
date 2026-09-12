@@ -1,4 +1,4 @@
-import type { AttemptPayload } from './types';
+import type { AttemptPayload } from '@/features/learning/types';
 
 export type AttemptPolicyCode =
   | 'ACCOUNT_APPROVAL_REQUIRED'
