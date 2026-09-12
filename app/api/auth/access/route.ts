@@ -34,7 +34,11 @@ export async function GET(request: Request) {
     }
     const slug = new URL(request.url).searchParams.get('course') ?? '';
     if (slug && slug.length <= 120 && COURSE_SLUG.test(slug)) {
-      if (!(await hasCourseAccess(context.user.id, slug))) {
+      // A failed grant lookup must never demote a signed-in learner to
+      // "anonymous": before the grants migration is applied the table does
+      // not exist, and the page then asked people to sign in again.
+      const opened = await hasCourseAccess(context.user.id, slug).catch(() => true);
+      if (!opened) {
         return NextResponse.json({ access: 'course_locked', role: context.role });
       }
     }
