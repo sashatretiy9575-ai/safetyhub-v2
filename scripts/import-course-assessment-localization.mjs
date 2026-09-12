@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { createClient } from '@supabase/supabase-js';
-import { z } from 'zod';
+import * as z from 'zod';
 
 const uuid = z.string().uuid();
 const option = z.object({ id: uuid, text: z.string().trim().min(1).max(2_000) }).strict();

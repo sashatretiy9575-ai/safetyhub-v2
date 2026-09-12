@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { retryAdminNotificationDelivery } from '@/features/admin/notifications';
 import { apiError } from '@/features/auth/api-error';
 import { invalidOriginResponse } from '@/features/auth/request-origin';

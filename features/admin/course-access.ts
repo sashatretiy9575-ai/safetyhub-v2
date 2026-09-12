@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { z } from 'zod';
+import * as z from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /** One course an administrator can open to a learner. */

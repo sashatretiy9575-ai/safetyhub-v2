@@ -1,9 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import fontkit from '@pdf-lib/fontkit';
 import { unzipSync } from 'fflate';
-import { PDFDocument } from 'pdf-lib';
 import {
   attachmentContentDisposition,
   certificateFilename,

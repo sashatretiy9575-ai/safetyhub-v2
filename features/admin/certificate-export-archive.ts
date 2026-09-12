@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { z } from 'zod';
+import * as z from 'zod';
 import {
   certificateDownloadPayloadSchema,
   createCertificateRenderMetadata,

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 const CONTROL_CHARACTERS = /[\p{Cc}\p{Cf}\p{Cs}]/u;
 const CAPTCHA_TOKEN_MAX_BYTES = 2_048;

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { articleBlocksSchema } from './article.ts';
 import { contentSeoSchema } from './content-seo.ts';
 

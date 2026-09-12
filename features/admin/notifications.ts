@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { createHash } from 'node:crypto';
-import { z } from 'zod';
+import * as z from 'zod';
 import { requireAnyCapability } from '@/features/auth/server';
 import {
   adminNotificationEventSchema,

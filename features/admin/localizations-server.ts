@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { revalidatePath, revalidateTag } from 'next/cache';
-import { z } from 'zod';
+import * as z from 'zod';
 import { requireCapability } from '@/features/auth/server';
 import {
   ADMIN_CONTENT_LOCALES,

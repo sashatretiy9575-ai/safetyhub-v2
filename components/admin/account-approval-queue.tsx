@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { z } from 'zod';
+import * as z from 'zod';
 import { Check } from '@phosphor-icons/react/dist/ssr/Check';
 import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/ssr/WhatsappLogo';

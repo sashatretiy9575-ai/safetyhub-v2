@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { publishCourseLocalizations } from '@/features/admin/localizations-server';
 import { localizedPublicationSchema } from '@/features/admin/localization-contract';
 import { apiError } from '@/features/auth/api-error';

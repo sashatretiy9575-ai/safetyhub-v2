@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { z } from 'zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 

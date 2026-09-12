@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { APP_LOCALES, type AppLocale } from '@/i18n/config';
 import type { ArticleBlock } from '@/lib/content/articles';
 import type { ContentSource } from '@/lib/content/content-metadata';

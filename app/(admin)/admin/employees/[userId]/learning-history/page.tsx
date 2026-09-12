@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { z } from 'zod';
+import * as z from 'zod';
 import { LearningHistoryControl } from '@/components/admin/learning-history-control';
 import { Button } from '@/components/ui/button';
 import { getAdminLearningHistory } from '@/features/admin/server';

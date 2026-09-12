@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { apiError } from '@/features/auth/api-error';
 import { getSiteUrl, requireCapability } from '@/features/auth/server';
 import {

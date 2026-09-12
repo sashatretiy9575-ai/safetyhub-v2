@@ -2,7 +2,7 @@ import 'server-only';
 
 import { randomUUID } from 'node:crypto';
 import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
-import { z } from 'zod';
+import * as z from 'zod';
 import { requireCapability } from '@/features/auth/server';
 import { invalidateCertificateVerificationCache } from '@/features/certificates/server';
 import { createClient } from '@/lib/supabase/server';

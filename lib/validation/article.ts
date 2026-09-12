@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { contentMetadataDraftSchema } from '../content/content-metadata.ts';
 import { isSafeSourceUrl } from './source-url.ts';
 

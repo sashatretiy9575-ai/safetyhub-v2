@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 const normalizedEmailSchema = z.string().trim().toLowerCase().email().max(254);
 const captchaTokenSchema = z.string().min(1).max(4096).optional();

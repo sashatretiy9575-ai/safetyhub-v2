@@ -1,5 +1,5 @@
 import { APP_LOCALES } from '@/i18n/config';
-import { z } from 'zod';
+import * as z from 'zod';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from '@/lib/security/api-response';
 import { apiError } from '@/features/auth/api-error';

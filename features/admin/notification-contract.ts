@@ -1,5 +1,5 @@
 import { APP_LOCALES } from '@/i18n/config';
-import { z } from 'zod';
+import * as z from 'zod';
 
 export const ADMIN_NOTIFICATION_EVENT_TYPES = [
   'account.approval_requested',

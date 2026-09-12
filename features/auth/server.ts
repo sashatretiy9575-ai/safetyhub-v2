@@ -2,7 +2,7 @@ import { APP_LOCALES } from '@/i18n/config';
 import 'server-only';
 
 import { cache } from 'react';
-import { z } from 'zod';
+import * as z from 'zod';
 import {
   createClient,
   hasSupabaseSessionCookie,

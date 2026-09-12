@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { isSafeSourceUrl } from '../validation/source-url.ts';
 
 export const CONTENT_METADATA_LIMITS = Object.freeze({

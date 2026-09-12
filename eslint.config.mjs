@@ -1,10 +1,14 @@
+import { fixupConfigRules } from '@eslint/compat';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTypescript from 'eslint-config-next/typescript';
 
+// eslint-plugin-react and eslint-plugin-jsx-a11y (pulled in by eslint-config-next)
+// still call the context methods ESLint 10 removed; the compat wrapper restores
+// them so the shared config runs unchanged on the current ESLint.
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTypescript,
+  ...fixupConfigRules(nextVitals),
+  ...fixupConfigRules(nextTypescript),
   globalIgnores(['тест safetyhub/**', '.next/**', 'node_modules/**', 'supabase/**']),
   {
     rules: {

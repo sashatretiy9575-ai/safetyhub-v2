@@ -9,7 +9,7 @@ import { NextResponse } from '@/lib/security/api-response';
 import { consumeAdminMutationQuota } from '@/lib/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
-import { z } from 'zod';
+import * as z from 'zod';
 
 export const runtime = 'nodejs';
 

@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { z } from 'zod';
+import * as z from 'zod';
 import { requireCapability } from '@/features/auth/server';
 import type { CertificateBranding } from '@/lib/pdf/certificate-client-contract';
 import { createAdminClient } from '@/lib/supabase/admin';

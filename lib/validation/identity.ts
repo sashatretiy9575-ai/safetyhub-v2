@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { PROFILE_FIELD_LIMITS } from '@/features/profile/fields';
 import { profileField } from '@/lib/validation/profile';
 

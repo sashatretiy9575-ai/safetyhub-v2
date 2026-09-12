@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { articleCoverImageSchema } from './article.ts';
 
 export const CONTENT_SEO_LIMITS = Object.freeze({

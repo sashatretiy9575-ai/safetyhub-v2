@@ -1,5 +1,5 @@
 import { APP_LOCALES } from '@/i18n/config';
-import { z } from 'zod';
+import * as z from 'zod';
 import { QUIZ_POLICY } from '@/lib/constants';
 
 const LEGACY_QUESTION_COUNT = 5;

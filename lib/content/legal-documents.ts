@@ -3,7 +3,7 @@ import 'server-only';
 
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { z } from 'zod';
+import * as z from 'zod';
 import { isAppLocale, type AppLocale } from '@/i18n/config';
 import {
   LEGAL_DOCUMENT_VERSIONS,

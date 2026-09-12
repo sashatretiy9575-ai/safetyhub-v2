@@ -1,7 +1,7 @@
 import { APP_LOCALES } from '@/i18n/config';
 import 'server-only';
 
-import { z } from 'zod';
+import * as z from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { getRpcMutationError } from '@/lib/supabase/rpc-mutation-result';
 import { normalizeRateLimitError } from '@/lib/security/rate-limit';

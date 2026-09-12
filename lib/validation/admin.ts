@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
 import { TEST_EDITOR_LIMITS, TEST_EDITOR_SLUG_PATTERN } from '@/lib/admin-test-editor';
 import {

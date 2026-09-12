@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { revalidateTag, unstable_cache } from 'next/cache';
-import { z } from 'zod';
+import * as z from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import {

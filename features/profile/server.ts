@@ -2,7 +2,7 @@ import 'server-only';
 
 import { randomUUID } from 'node:crypto';
 import { cache } from 'react';
-import { z } from 'zod';
+import * as z from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json, LegalAcceptanceRow } from '@/lib/supabase/types';

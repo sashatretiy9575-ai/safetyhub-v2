@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { apiError } from '@/features/auth/api-error';
 import { requireCapability, requireUser } from '@/features/auth/server';
 import { getCertificateDownloadPayload } from '@/features/certificates/server';

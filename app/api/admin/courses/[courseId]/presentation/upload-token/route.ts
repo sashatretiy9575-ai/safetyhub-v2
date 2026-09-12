@@ -1,6 +1,6 @@
 import { APP_LOCALES } from '@/i18n/config';
 import { randomUUID } from 'node:crypto';
-import { z } from 'zod';
+import * as z from 'zod';
 import { NextResponse } from '@/lib/security/api-response';
 import { apiError } from '@/features/auth/api-error';
 import { invalidOriginResponse } from '@/features/auth/request-origin';

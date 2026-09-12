@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { z } from 'zod';
+import * as z from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { unwrapRpcMutationResponse } from '@/lib/supabase/rpc-mutation-result';
 import { invalidateCertificateVerificationCache } from '@/features/certificates/server';

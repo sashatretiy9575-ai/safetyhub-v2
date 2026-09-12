@@ -9,6 +9,14 @@ updates:
       timezone: Asia/Almaty
     open-pull-requests-limit: 5
     versioning-strategy: increase-if-necessary
+    ignore:
+      # TypeScript 7 ships without the JavaScript compiler API that
+      # typescript-eslint and eslint-config-next require; @types/node must
+      # track the Node 24 runtime declared in engines and used by Vercel/CI.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     groups:
       production-updates:
         dependency-type: production

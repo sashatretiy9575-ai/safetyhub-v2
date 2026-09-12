@@ -56,7 +56,12 @@ export function AccountDeletion() {
         return;
       }
       await clearSafetyHubDeviceData();
-      window.location.assign(`${localizePathname('/auth/login', locale)}?accountDeleted=1`);
+      // A full document load, not a router push: the deleted account must not
+      // keep any cached segment or client state alive. The absolute URL keeps the
+      // navigation on this origin.
+      window.location.assign(
+        new URL(`${localizePathname('/auth/login', locale)}?accountDeleted=1`, window.location.origin).href,
+      );
     } catch (error) {
       setMessage(localizedClientRequestMessage(error, t('failed'), tErrors));
     } finally {

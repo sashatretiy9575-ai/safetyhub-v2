@@ -1,5 +1,5 @@
 import { NextResponse } from '@/lib/security/api-response';
-import { z } from 'zod';
+import * as z from 'zod';
 import { apiError } from '@/features/auth/api-error';
 import { invalidOriginResponse } from '@/features/auth/request-origin';
 import { requestSecurityMetadata } from '@/lib/security/request-metadata';
