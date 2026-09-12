@@ -37,10 +37,16 @@ type SchemaProfileValues = z.infer<typeof profileSchema>;
 const _profileTypeCheck: ProfileValues = {} as SchemaProfileValues;
 void _profileTypeCheck;
 
+// The phone is optional since September 2026: an empty national number is a
+// submission without a phone, a filled one still has to be a real number.
 export const profileSubmissionSchema = profileSchema.extend({
   phone: z.object({
-    countryIso2: z.string().trim().toUpperCase().regex(/^[A-Z]{2}$/),
-    nationalNumber: z.string().trim().min(1).max(64),
+    countryIso2: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .regex(/^[A-Z]{2}$/),
+    nationalNumber: z.string().trim().max(64),
   }),
 });
 

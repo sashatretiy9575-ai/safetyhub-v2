@@ -31,7 +31,9 @@ test('public shell uses neutral glass chrome and the 1024px navigation breakpoin
   assert.match(tabs, /size-1 rounded-full bg-\[var\(--color-primary\)\]/);
   assert.match(tabs, /bg-\[var\(--color-surface-muted\)\] text-\[var\(--color-text\)\]/);
   assert.match(tabs, /min-\[1024px\]:hidden/);
-  assert.match(shell, /min-\[1024px\]:pb-0/);
+  // Above the dock breakpoint the footer reserves only the install card's
+  // space, which is zero unless the card is showing on a landscape tablet.
+  assert.match(shell, /min-\[1024px\]:pb-\[var\(--pwa-banner-space,0px\)\]/);
 });
 
 test('theme, contact actions, and footer keep explicit accessible labels', async () => {

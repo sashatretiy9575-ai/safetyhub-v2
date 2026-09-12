@@ -99,11 +99,7 @@ export function ProfileForm({
       setForm(normalized);
       setSavedProfile(normalized);
       setEditing(false);
-      setMessage(
-        payload?.approvalState === 'pending'
-          ? t('savedForReview')
-          : t('saved'),
-      );
+      setMessage(payload?.approvalState === 'pending' ? t('savedForReview') : t('saved'));
       router.refresh();
     } catch (requestError) {
       setMessage(localizedClientRequestMessage(requestError, t('saveFailed'), tErrors));
@@ -155,9 +151,7 @@ export function ProfileForm({
               required
             />
             {errors.name ? (
-              <p className="text-xs text-[var(--color-danger)]">
-                {validationMessage(errors.name)}
-              </p>
+              <p className="text-xs text-[var(--color-danger)]">{validationMessage(errors.name)}</p>
             ) : null}
           </div>
           <div className="space-y-1">
@@ -216,7 +210,10 @@ export function ProfileForm({
             ) : null}
           </div>
           <div className="space-y-1 sm:col-span-2">
-            <Label htmlFor="profile-phone">{t('phone')}</Label>
+            <Label htmlFor="profile-phone">
+              {t('phone')}{' '}
+              <span className="font-normal text-[var(--color-text-muted)]">{t('optional')}</span>
+            </Label>
             <PhoneInput
               id="profile-phone"
               countryOptions={countryOptions}

@@ -1,9 +1,17 @@
 import { NextResponse } from '@/lib/security/api-response';
 import { getAuthContext } from '@/features/auth/server';
+import { hasCourseAccess } from '@/features/learning/course-access';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+const COURSE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+
+/**
+ * The learner's standing, optionally for one course (`?course=<slug>`): an
+ * approved account still sees `course_locked` for a course the administrator
+ * has not opened to it.
+ */
+export async function GET(request: Request) {
   try {
     const context = await getAuthContext();
     if (!context) {
@@ -23,6 +31,12 @@ export async function GET() {
     }
     if (context.approval.state === 'rejected') {
       return NextResponse.json({ access: 'rejected' });
+    }
+    const slug = new URL(request.url).searchParams.get('course') ?? '';
+    if (slug && slug.length <= 120 && COURSE_SLUG.test(slug)) {
+      if (!(await hasCourseAccess(context.user.id, slug))) {
+        return NextResponse.json({ access: 'course_locked', role: context.role });
+      }
     }
     return NextResponse.json({ access: 'approved', role: context.role });
   } catch {

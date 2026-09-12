@@ -112,6 +112,8 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
       switch (payload.error) {
         case 'ACCOUNT_APPROVAL_REQUIRED':
           return t('errors.approvalRequired');
+        case 'COURSE_ACCESS_REQUIRED':
+          return t('errors.courseAccessRequired');
         case 'PROFILE_ONBOARDING_REQUIRED':
           return t('errors.onboardingRequired');
         case 'AVATAR_REQUIRED':
@@ -505,6 +507,9 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
   if (!attempt) {
     const onboardingAction = errorCode === 'PROFILE_ONBOARDING_REQUIRED';
     const approvalAction = errorCode === 'ACCOUNT_APPROVAL_REQUIRED';
+    // The account is approved but this course was not opened to it: the
+    // account page lists what is open and how to reach the administrator.
+    const courseLockedAction = errorCode === 'COURSE_ACCESS_REQUIRED';
     return (
       <section className="py-16">
         <Container size="narrow">
@@ -526,6 +531,10 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                 ) : approvalAction ? (
                   <Button asChild>
                     <Link href={localizePathname('/profile', locale)}>{t('openApproval')}</Link>
+                  </Button>
+                ) : courseLockedAction ? (
+                  <Button asChild>
+                    <Link href={localizePathname('/profile', locale)}>{t('openAccount')}</Link>
                   </Button>
                 ) : errorCode === 'ATTEMPT_NOT_FOUND' ? (
                   <Button onClick={() => void loadAttempt()}>{t('newAttempt')}</Button>

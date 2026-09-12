@@ -19,8 +19,8 @@ type TrustedProfileSubmissionRpcClient = {
       p_surname: string;
       p_job: string;
       p_organization: string;
-      p_phone_country_iso2: string;
-      p_phone_e164: string;
+      p_phone_country_iso2: string | null;
+      p_phone_e164: string | null;
     },
   ) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
 };
@@ -35,8 +35,9 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_PROFILE' }, { status: 400 });
     }
-    const phone = normalizeUserPhone(parsed.data.phone);
-    if (!phone) {
+    // No number is fine; a number that does not parse is not.
+    const phone = parsed.data.phone.nationalNumber ? normalizeUserPhone(parsed.data.phone) : null;
+    if (parsed.data.phone.nationalNumber && !phone) {
       return NextResponse.json({ error: 'INVALID_PHONE' }, { status: 400 });
     }
 
@@ -48,18 +49,17 @@ export async function POST(request: Request) {
       consumeBusinessQuota('profile.update', context.user.id),
       consumeCoarseQuota('profile.update', requestSecurityMetadata(request).ipHash),
     ]);
-    const response = await (createAdminClient() as unknown as TrustedProfileSubmissionRpcClient).rpc(
-      'submit_profile_for_approval_from_trusted_server',
-      {
-        p_user_id: context.user.id,
-        p_name: parsed.data.name,
-        p_surname: parsed.data.surname,
-        p_job: parsed.data.job,
-        p_organization: parsed.data.organization,
-        p_phone_country_iso2: phone.countryIso2,
-        p_phone_e164: phone.phoneE164,
-      },
-    );
+    const response = await (
+      createAdminClient() as unknown as TrustedProfileSubmissionRpcClient
+    ).rpc('submit_profile_for_approval_from_trusted_server', {
+      p_user_id: context.user.id,
+      p_name: parsed.data.name,
+      p_surname: parsed.data.surname,
+      p_job: parsed.data.job,
+      p_organization: parsed.data.organization,
+      p_phone_country_iso2: phone?.countryIso2 ?? null,
+      p_phone_e164: phone?.phoneE164 ?? null,
+    });
     return NextResponse.json(unwrapRpcMutationResponse(response));
   } catch (error) {
     return apiError(error);

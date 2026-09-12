@@ -159,9 +159,11 @@ async function authorizeAsset(
       p_locale: locale,
     });
     if (error) {
-      return ['ACCOUNT_APPROVAL_REQUIRED', 'LEGAL_ACCEPTANCE_REQUIRED'].includes(
-        error.message ?? '',
-      )
+      return [
+        'ACCOUNT_APPROVAL_REQUIRED',
+        'COURSE_ACCESS_REQUIRED',
+        'LEGAL_ACCEPTANCE_REQUIRED',
+      ].includes(error.message ?? '')
         ? blockedResponse(403)
         : blockedResponse(404);
     }

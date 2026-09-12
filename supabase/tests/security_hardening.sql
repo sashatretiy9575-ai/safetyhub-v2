@@ -804,7 +804,9 @@ begin
   on conflict do nothing;
 
   -- This scenario validates the downstream calendar-limit envelope. Satisfy
-  -- the learner-approval prerequisite so it cannot mask that assertion.
+  -- the learner-approval prerequisite so it cannot mask that assertion, and
+  -- open the course itself: since course access became manual an approved
+  -- account without a grant is refused before the calendar limit is reached.
   update public.account_controls
   set approval_state = 'approved',
       approval_requested_at = null,
@@ -832,6 +834,10 @@ begin
   set current_revision_id = v_revision_id, content_version = 1,
       status = 'published'
   where id = v_test_id;
+  -- Course access is manual: approval alone opens nothing.
+  insert into public.course_access_grants (user_id, test_id)
+  values (v_user_id, v_test_id)
+  on conflict do nothing;
 
   insert into public.test_revision_variants(
     id, stable_id, revision_id, variant_number, questions, question_count

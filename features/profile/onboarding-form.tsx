@@ -111,11 +111,10 @@ export function OnboardingForm({
     };
   }, [form.organization]);
 
-  const update =
-    (field: ProfileField) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setForm((current) => ({ ...current, [field]: event.target.value }));
-      setFieldErrors((current) => ({ ...current, [field]: undefined }));
-    };
+  const update = (field: ProfileField) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((current) => ({ ...current, [field]: event.target.value }));
+    setFieldErrors((current) => ({ ...current, [field]: undefined }));
+  };
 
   const focusFirstInvalid = (errors: FieldErrors) => {
     const target = errors.name
@@ -307,7 +306,10 @@ export function OnboardingForm({
           ) : null}
         </div>
         <div ref={phoneContainerRef} className="space-y-2 sm:col-span-2">
-          <Label htmlFor="onboarding-phone">{t('phone')}</Label>
+          <Label htmlFor="onboarding-phone">
+            {t('phone')}{' '}
+            <span className="font-normal text-[var(--color-text-muted)]">{t('optional')}</span>
+          </Label>
           <PhoneInput
             id="onboarding-phone"
             countryOptions={countryOptions}
@@ -324,7 +326,11 @@ export function OnboardingForm({
             {t('phoneHint')}
           </p>
           {fieldErrors.phone ? (
-            <p id="onboarding-phone-error" role="alert" className="text-xs text-[var(--color-danger)]">
+            <p
+              id="onboarding-phone-error"
+              role="alert"
+              className="text-xs text-[var(--color-danger)]"
+            >
               {validationMessage(fieldErrors.phone)}
             </p>
           ) : null}
@@ -335,15 +341,13 @@ export function OnboardingForm({
         ref={avatarSectionRef}
         tabIndex={-1}
         aria-labelledby="onboarding-photo-title"
-        className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-muted)]/45 p-4 sm:p-6 outline-none"
+        className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-muted)]/45 p-4 outline-none sm:p-6"
       >
         <div className="text-center">
           <h2 id="onboarding-photo-title" className="font-display text-lg font-bold">
             {t('avatar')}
           </h2>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {t('avatarHint')}
-          </p>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">{t('avatarHint')}</p>
         </div>
         <AvatarUploader
           initialUrl={initialAvatarUrl}

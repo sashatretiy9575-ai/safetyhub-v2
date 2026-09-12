@@ -15,6 +15,9 @@ const bodySchema = z.discriminatedUnion('decision', [
     .object({
       idempotencyKey: z.string().uuid(),
       decision: z.literal('approved'),
+      // Course access is manual: an approval names the courses it opens, and
+      // it opens at least one, otherwise the learner is approved into nothing.
+      courseIds: z.array(z.string().uuid()).min(1).max(200),
     })
     .strict(),
   z
@@ -34,14 +37,12 @@ type ApprovalDecisionRpcClient = {
       p_target_user_id: string;
       p_decision: 'approved' | 'rejected';
       p_reason: string | null;
+      p_course_ids: string[] | null;
     },
   ): PromiseLike<{ data: unknown; error: { message: string; code?: string } | null }>;
 };
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ userId: string }> },
-) {
+export async function POST(request: Request, context: { params: Promise<{ userId: string }> }) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;
@@ -59,13 +60,16 @@ export async function POST(
       requestSecurityMetadata(request).ipHash,
     );
     const data = parsedBody.data;
-    const response = await (await createClient() as unknown as ApprovalDecisionRpcClient).rpc(
+    // All five arguments are always sent so PostgREST resolves the
+    // course-aware overload rather than the legacy four-argument wrapper.
+    const response = await ((await createClient()) as unknown as ApprovalDecisionRpcClient).rpc(
       'decide_account_approval',
       {
         p_idempotency_key: data.idempotencyKey,
         p_target_user_id: parsedId.data.userId,
         p_decision: data.decision,
         p_reason: data.decision === 'rejected' ? data.reason : null,
+        p_course_ids: data.decision === 'approved' ? data.courseIds : null,
       },
     );
     void actor;

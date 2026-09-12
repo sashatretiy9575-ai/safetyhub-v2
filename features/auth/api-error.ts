@@ -83,6 +83,9 @@ export function apiError(error: unknown) {
   if (message.includes('ACCOUNT_APPROVAL_REQUIRED')) {
     return NextResponse.json({ error: 'ACCOUNT_APPROVAL_REQUIRED' }, { status: 403 });
   }
+  if (message.includes('COURSE_ACCESS_REQUIRED')) {
+    return NextResponse.json({ error: 'COURSE_ACCESS_REQUIRED' }, { status: 403 });
+  }
   if (message.includes('LEGAL_ACCEPTANCE_REQUIRED')) {
     return NextResponse.json({ error: 'LEGAL_ACCEPTANCE_REQUIRED' }, { status: 403 });
   }

@@ -1588,6 +1588,10 @@ export type Database = {
         Args: { p_actor_id: string; p_target_user_id: string }
         Returns: Json
       }
+      has_course_access: {
+        Args: { p_test_id: string; p_user_id: string }
+        Returns: boolean
+      }
       has_current_legal_acceptance: {
         Args: { p_user_id: string }
         Returns: boolean
@@ -1839,6 +1843,10 @@ export type Database = {
       }
       require_approved_learner: { Args: never; Returns: string }
       require_capability: { Args: { p_capability: string }; Returns: string }
+      require_course_access_by_slug: {
+        Args: { p_test_slug: string; p_user_id: string }
+        Returns: undefined
+      }
       resolve_certificate_export_unmetered: {
         Args: { p_attestation_ids: string[] }
         Returns: Json
@@ -2730,6 +2738,35 @@ export type Database = {
           width?: number
         }
         Relationships: []
+      }
+      course_access_grants: {
+        Row: {
+          granted_at: string
+          granted_by: string | null
+          test_id: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          granted_by?: string | null
+          test_id: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          granted_by?: string | null
+          test_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_access_grants_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       course_catalog_batch_items: {
         Row: {
@@ -4139,15 +4176,26 @@ export type Database = {
         Args: { p_attestation_ids: string[] }
         Returns: Json
       }
-      decide_account_approval: {
-        Args: {
-          p_decision: string
-          p_idempotency_key: string
-          p_reason?: string
-          p_target_user_id: string
-        }
-        Returns: Json
-      }
+      decide_account_approval:
+        | {
+            Args: {
+              p_decision: string
+              p_idempotency_key: string
+              p_reason?: string
+              p_target_user_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_course_ids: string[]
+              p_decision: string
+              p_idempotency_key: string
+              p_reason: string
+              p_target_user_id: string
+            }
+            Returns: Json
+          }
       delete_admin_learning_history: {
         Args: {
           p_actor_id: string
@@ -5093,6 +5141,10 @@ export type Database = {
           p_monthly_active_learner_limit: number
           p_reason: string
         }
+        Returns: Json
+      }
+      set_course_access: {
+        Args: { p_course_ids: string[]; p_target_user_id: string }
         Returns: Json
       }
       set_course_catalog_maintenance: {

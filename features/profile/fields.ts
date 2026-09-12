@@ -89,13 +89,13 @@ export function normalizeProfileSubmissionValues(
 export function validateProfileSubmissionValues(values: ProfileSubmissionValues) {
   const errors: Partial<Record<ProfileSubmissionField, ProfileValidationError>> =
     validateProfileValues(values);
+  const nationalNumber = values.phone.nationalNumber.trim();
+  // The phone is optional: a blank number is simply absent, a typed one has
+  // to look like a number and name its country.
+  if (!nationalNumber) return errors;
   if (!isPhoneCountryCode(values.phone.countryIso2)) {
     errors.phone = { code: 'PHONE_COUNTRY_REQUIRED' };
-  } else if (
-    !values.phone.nationalNumber.trim() ||
-    values.phone.nationalNumber.trim().length > 64 ||
-    !/[0-9]/u.test(values.phone.nationalNumber)
-  ) {
+  } else if (nationalNumber.length > 64 || !/[0-9]/u.test(nationalNumber)) {
     errors.phone = { code: 'PHONE_INVALID' };
   }
   return errors;

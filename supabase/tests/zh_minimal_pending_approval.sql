@@ -380,6 +380,13 @@ begin
   ) then
     raise exception 'ordinary profile fixture unexpectedly owns a ZH username mapping';
   end if;
+  -- Course access is manual: open the course so the loop below reaches the
+  -- profile/avatar gate rather than stopping at COURSE_ACCESS_REQUIRED.
+  insert into public.course_access_grants (user_id, test_id)
+  select v_ordinary_user_id, test.id
+  from public.tests test
+  where test.slug = v_test_slug
+  on conflict do nothing;
   perform set_config('request.jwt.claim.sub', v_ordinary_user_id::text, true);
   perform set_config(
     'request.jwt.claims',
@@ -485,11 +492,13 @@ begin
     raise exception 'ZH queue projection is invalid: %', v_queue_item;
   end if;
 
+  -- The administrator opens the course together with the approval.
   v_result := public.decide_account_approval(
     '7b000000-0000-4000-8000-000000000003',
     v_user_id,
     'approved',
-    null
+    null,
+    (select array_agg(test.id) from public.tests test where test.slug = v_test_slug)
   );
   if v_result ->> 'approvalState' <> 'approved' then
     raise exception 'administrator could not approve the minimal ZH application: %', v_result;

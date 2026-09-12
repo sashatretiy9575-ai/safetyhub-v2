@@ -130,7 +130,12 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
     sha256: 'c591faa13edc838492c12605781c4daa07a82b888c77891c94fa90ba50f0d91b',
   }),
 ]);
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+  Object.freeze({
+    filename: '20260912130000_course_access_grants.sql',
+    sha256: 'ff2f5a3ae020414be1d2b4e0df4a334772785e6710e788361aeabc14a32bf71a',
+  }),
+]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;
 const REVIEWED_APPLIED_RELEASE_START_INDEX =

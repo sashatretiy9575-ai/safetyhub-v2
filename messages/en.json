@@ -215,14 +215,17 @@
       "legalDescription": "Once you accept the current documents, you can complete your training application.",
       "legalLabel": "Open documents",
       "profileTitle": "Complete your profile first",
-      "profileDescription": "Add a contact phone number and photo, then submit your application to the administrator.",
+      "profileDescription": "Add your details and a photo, then submit your application to the administrator.",
       "profileLabel": "Complete profile",
       "pendingTitle": "Your application is under review",
       "pendingDescription": "The presentation, questions and test remain unavailable until approval. Your account shows the status and countdown.",
       "pendingLabel": "View application status",
       "rejectedTitle": "Your application needs clarification",
       "rejectedDescription": "Review the administrator’s comment and submit your details again.",
-      "rejectedLabel": "Update details"
+      "rejectedLabel": "Update details",
+      "lockedTitle": "Course not opened yet",
+      "lockedDescription": "Your account is approved, but the administrator has not opened this course to you yet. Contact us if you need it.",
+      "lockedLabel": "Open account"
     }
   },
   "Topics": {
@@ -403,7 +406,7 @@
     "phone": "Phone number",
     "phoneCountry": "Phone country",
     "phonePlaceholder": "Number after {code}",
-    "phoneHint": "This number is only used to contact you about the application. We do not send SMS codes.",
+    "phoneHint": "You can leave this empty. The number is only used to contact you about the application; no SMS codes are sent.",
     "avatar": "Profile photo",
     "avatarHint": "Take a photo with your camera or choose an existing one.",
     "submit": "Submit for review",
@@ -468,7 +471,8 @@
     "continueCourse": "Continue “{title}”",
     "startCourse": "Start “{title}”",
     "chooseCourse": "Choose a course",
-    "dashboardFailure": "Training results could not be loaded. Account settings still work."
+    "dashboardFailure": "Training results could not be loaded. Account settings still work.",
+    "optional": "(optional)"
   },
   "Avatar": {
     "profilePhoto": "Profile photo",
@@ -547,7 +551,7 @@
   "Approval": {
     "accessEyebrow": "Training access",
     "profileTitle": "Complete your profile first",
-    "profileDescription": "Add your details, phone number and photo. An administrator will review your application after you submit it.",
+    "profileDescription": "Add your details and a photo. An administrator will review your application after you submit it.",
     "profileAction": "Complete profile",
     "rejectedEyebrow": "Clarification needed",
     "rejectedTitle": "Your application is not approved yet",
@@ -642,7 +646,8 @@
       "loadFailed": "The test could not be loaded. Try again.",
       "invalidDeadline": "The server returned an invalid test deadline. Refresh the page.",
       "localSaveFailed": "The browser did not allow local saving. Do not close this page before submitting the test.",
-      "submitFailed": "The test could not be submitted. Your answers are saved; it is safe to submit again."
+      "submitFailed": "The test could not be submitted. Your answers are saved; it is safe to submit again.",
+      "courseAccessRequired": "This course is not open to you yet. An administrator grants course access — contact them if you need this course."
     }
   },
   "Certificate": {

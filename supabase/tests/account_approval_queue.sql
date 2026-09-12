@@ -55,8 +55,19 @@ begin
     raise exception 'approval queue PII/authorization boundary invalid';
   end if;
 
+  -- The four-argument form is a thin wrapper since course access became
+  -- manual; the contract lives in the five-argument function it delegates to.
+  if to_regprocedure('public.decide_account_approval(uuid,uuid,text,text,uuid[])') is null
+    or has_function_privilege(
+      'anon', 'public.decide_account_approval(uuid,uuid,text,text,uuid[])', 'EXECUTE'
+    )
+    or not has_function_privilege(
+      'authenticated', 'public.decide_account_approval(uuid,uuid,text,text,uuid[])', 'EXECUTE'
+    ) then
+    raise exception 'course-aware approval decision grant boundary invalid';
+  end if;
   v_decision_definition := lower(pg_get_functiondef(
-    'public.decide_account_approval(uuid,uuid,text,text)'::regprocedure
+    'public.decide_account_approval(uuid,uuid,text,text,uuid[])'::regprocedure
   ));
   if position('private.require_capability(''identity.manage'')' in v_decision_definition) = 0
     or position('private.enforce_actor_quota(''admin.identity.mutate'')' in v_decision_definition) = 0

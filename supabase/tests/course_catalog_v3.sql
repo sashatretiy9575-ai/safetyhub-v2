@@ -1113,6 +1113,12 @@ begin
       approval_decided_by = null,
       approval_rejection_reason = null
   where user_id = v_participant_b;
+  -- Course access is manual: approval alone opens nothing.
+  insert into public.course_access_grants (user_id, test_id)
+  select v_participant_b, test.id
+  from public.tests test
+  where test.slug = 'db-v3-behavior-fixture'
+  on conflict do nothing;
 
   perform set_config('request.jwt.claim.sub', v_participant_b::text, true);
   for v_index in 1..8 loop

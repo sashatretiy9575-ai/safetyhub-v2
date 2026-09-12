@@ -372,6 +372,12 @@ export type Database = {
         suspension_reason: string | null;
         updated_at: string;
       }>;
+      course_access_grants: Table<{
+        user_id: string;
+        test_id: string;
+        granted_by: string | null;
+        granted_at: string;
+      }>;
       admin_capability_catalog: Table<{
         capability: string;
         category: string;

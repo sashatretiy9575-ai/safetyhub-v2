@@ -24,6 +24,7 @@ import { Label } from '@/components/ui/label';
 
 const actionLabels: Record<string, string> = {
   'account.approval.approved': 'Регистрация подтверждена',
+  'course.access.changed': 'Изменён доступ к курсам',
   'test.passed': 'Тест пройден',
   'certificate.issued': 'Сертификат выдан',
   'user.self_delete_requested': 'Пользователь удалил учётную запись',
@@ -180,7 +181,8 @@ export default async function AuditPage({
   const auditResult = await getAdminAuditPage(query);
 
   const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
-  const currentToken = query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
+  const currentToken =
+    query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
   const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
   const fromValue = query.from ? query.from.slice(0, 10) : '';
   const toValue = query.to

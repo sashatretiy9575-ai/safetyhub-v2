@@ -215,14 +215,17 @@
       "legalDescription": "接受当前版本文件后，您可以完成培训申请。",
       "legalLabel": "打开文件",
       "profileTitle": "请先完善个人资料",
-      "profileDescription": "添加联系电话和照片，然后向管理员提交申请。",
+      "profileDescription": "添加个人信息和照片，然后向管理员提交申请。",
       "profileLabel": "完善个人资料",
       "pendingTitle": "管理员正在审核申请",
       "pendingDescription": "获批前无法查看演示资料、题目或参加测试。账户中可查看状态和倒计时。",
       "pendingLabel": "查看申请状态",
       "rejectedTitle": "申请资料需要补充",
       "rejectedDescription": "请查看管理员备注，修改后重新提交。",
-      "rejectedLabel": "修改资料"
+      "rejectedLabel": "修改资料",
+      "lockedTitle": "课程尚未开放",
+      "lockedDescription": "您的账户已获批准，但管理员尚未向您开放此课程。如需此课程，请联系我们。",
+      "lockedLabel": "打开个人中心"
     }
   },
   "Topics": {
@@ -403,7 +406,7 @@
     "phone": "联系电话",
     "phoneCountry": "号码所属国家/地区",
     "phonePlaceholder": "请输入 {code} 后的号码",
-    "phoneHint": "该号码仅用于申请联系，不会接收短信验证码。",
+    "phoneHint": "可不填写。该号码仅用于申请联系，不会接收短信验证码。",
     "avatar": "个人照片",
     "avatarHint": "可使用摄像头拍照或选择已有照片。",
     "submit": "提交审核",
@@ -468,7 +471,8 @@
     "continueCourse": "继续学习《{title}》",
     "startCourse": "开始学习《{title}》",
     "chooseCourse": "选择课程",
-    "dashboardFailure": "暂时无法加载培训结果，账户设置仍可使用。"
+    "dashboardFailure": "暂时无法加载培训结果，账户设置仍可使用。",
+    "optional": "（选填）"
   },
   "Avatar": {
     "profilePhoto": "个人照片",
@@ -547,7 +551,7 @@
   "Approval": {
     "accessEyebrow": "培训访问权限",
     "profileTitle": "请先完善个人资料",
-    "profileDescription": "请添加个人信息、联系电话和照片。提交后由管理员审核。",
+    "profileDescription": "请添加个人信息和照片。提交后由管理员审核。",
     "profileAction": "完善个人资料",
     "rejectedEyebrow": "需要补充",
     "rejectedTitle": "申请尚未获批",
@@ -642,7 +646,8 @@
       "loadFailed": "无法加载测试。请重试。",
       "invalidDeadline": "服务器返回了无效的测试截止时间。请刷新页面。",
       "localSaveFailed": "浏览器不允许本地保存。提交测试前请勿关闭此页面。",
-      "submitFailed": "无法提交测试。答案已保存，可以安全地再次提交。"
+      "submitFailed": "无法提交测试。答案已保存，可以安全地再次提交。",
+      "courseAccessRequired": "该课程尚未向您开放。课程权限由管理员分配，如需此课程请联系管理员。"
     }
   },
   "Certificate": {

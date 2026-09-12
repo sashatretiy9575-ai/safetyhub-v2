@@ -21,6 +21,7 @@ export type CourseMaterialAccess =
   | 'profile_incomplete'
   | 'pending'
   | 'rejected'
+  | 'course_locked'
   | 'approved';
 
 function presentationDownloadUrl(url: string, slug: string) {
@@ -54,7 +55,9 @@ function accessCta(access: CourseMaterialAccess, slug: string, locale: ReturnTyp
   };
 }
 
-let cachedClientAccess: CourseMaterialAccess | null = null;
+// Keyed by course: since access is granted per course, one course's answer
+// says nothing about the next one the visitor opens.
+const cachedClientAccess = new Map<string, CourseMaterialAccess>();
 
 export function CourseMaterialActions({
   course,
@@ -68,20 +71,20 @@ export function CourseMaterialActions({
   const locale = useLocale();
   const t = useTranslations('Course');
   const [currentAccess, setCurrentAccess] = useState<CourseMaterialAccess>(
-    () => cachedClientAccess ?? access,
+    () => cachedClientAccess.get(course.slug) ?? access,
   );
   const [isResolving, setIsResolving] = useState(
-    () => cachedClientAccess === null && access === 'anonymous',
+    () => !cachedClientAccess.has(course.slug) && access === 'anonymous',
   );
 
   useEffect(() => {
     let active = true;
     if (access === 'anonymous') {
-      fetch('/api/auth/access')
+      fetch(`/api/auth/access?course=${encodeURIComponent(course.slug)}`)
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
           if (active && data?.access) {
-            cachedClientAccess = data.access;
+            cachedClientAccess.set(course.slug, data.access);
             setCurrentAccess(data.access);
           }
         })
@@ -92,14 +95,14 @@ export function CourseMaterialActions({
           }
         });
     } else {
-      cachedClientAccess = access;
+      cachedClientAccess.set(course.slug, access);
       setCurrentAccess(access);
       setIsResolving(false);
     }
     return () => {
       active = false;
     };
-  }, [access]);
+  }, [access, course.slug]);
 
   const filename = `${course.slug}.pdf`;
   const cta = accessCta(currentAccess, course.slug, locale, {
@@ -108,6 +111,7 @@ export function CourseMaterialActions({
     profile_incomplete: { title: t('access.profileTitle'), description: t('access.profileDescription'), label: t('access.profileLabel') },
     pending: { title: t('access.pendingTitle'), description: t('access.pendingDescription'), label: t('access.pendingLabel') },
     rejected: { title: t('access.rejectedTitle'), description: t('access.rejectedDescription'), label: t('access.rejectedLabel') },
+    course_locked: { title: t('access.lockedTitle'), description: t('access.lockedDescription'), label: t('access.lockedLabel') },
   });
 
   return (

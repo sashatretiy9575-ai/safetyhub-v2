@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { AccountApprovalQueue } from '@/components/admin/account-approval-queue';
+import { listAdminCourseOptions } from '@/features/admin/course-access';
 import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data-state';
 import { AdminPagination } from '@/components/admin/admin-pagination';
 import { Button } from '@/components/ui/button';
@@ -39,8 +40,13 @@ export default async function AdminApprovalsPage({
   const params = await searchParams;
   const query = parseAdminAccountApprovalQuery(params);
   const result = await getPendingAccountApprovalPage(query);
+  // Approval opens the ticked courses only, so the queue needs the catalogue.
+  // A failed catalogue read leaves the queue readable but not approvable,
+  // which the queue explains itself.
+  const courses = await listAdminCourseOptions().catch(() => []);
   const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
-  const currentToken = query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
+  const currentToken =
+    query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
   const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
 
   return (
@@ -70,7 +76,7 @@ export default async function AdminApprovalsPage({
         <AdminEmptyState>Новых заявок на проверку нет.</AdminEmptyState>
       ) : (
         <>
-          <AccountApprovalQueue items={result.data.items} />
+          <AccountApprovalQueue items={result.data.items} courses={courses} />
           <AdminPagination
             total={result.data.total}
             visible={result.data.items.length}

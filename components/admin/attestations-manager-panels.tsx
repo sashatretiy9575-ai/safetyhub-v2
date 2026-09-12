@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LearningHistoryControl } from '@/components/admin/learning-history-control';
+import { CourseAccessControl } from '@/components/admin/course-access-control';
 
 export type AttestationPermissions = {
   canReadUser: boolean;
@@ -706,6 +707,14 @@ export function AttestationDetailDrawer({
                   Написать в WhatsApp
                 </a>
               </Button>
+            ) : null}
+
+            {permissions.canReadIdentity || permissions.canManageIdentity ? (
+              <CourseAccessControl
+                key={`course-access:${row.userId}`}
+                userId={row.userId}
+                canManage={permissions.canManageIdentity}
+              />
             ) : null}
 
             <dl className="grid gap-3 rounded-2xl border p-4 text-sm sm:grid-cols-2">
