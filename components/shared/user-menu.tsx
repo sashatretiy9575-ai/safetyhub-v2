@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { DownloadSimple, Gauge, User, UserGear } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants';
 import { usePWA } from '@/components/shared/pwa-provider';
+import { detectInstallPlatform } from '@/components/shared/install-platform';
 import { SignOutAction } from '@/components/shared/sign-out-action';
 import { localizePathname } from '@/i18n/config';
 
@@ -33,7 +35,10 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
   // listeners answered one browser event and could disagree about whether the
   // app was installable. The menu renders inside PWAProvider in both private
   // roots, so it reads the shared answer.
-  const { install, isInstallable, isStandalone } = usePWA();
+  const { install, isInstallable, isInstalled } = usePWA();
+  // iPhone always has the steps to offer; any other browser only its own sheet.
+  const [ios, setIos] = useState(false);
+  useEffect(() => setIos(detectInstallPlatform() === 'ios'), []);
   const initials = (fullName ?? email)
     .split(/[\s@]+/)
     .filter(Boolean)
@@ -119,7 +124,7 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
           </DropdownMenuItem>
         ) : null}
 
-        {!isStandalone ? (
+        {!isInstalled && (ios || isInstallable) ? (
           <DropdownMenuItem
             className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
             onSelect={() => void handleInstall()}

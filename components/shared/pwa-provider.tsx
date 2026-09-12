@@ -7,6 +7,8 @@ interface PWAContextType {
   isInstallable: boolean;
   install: () => Promise<'accepted' | 'dismissed' | 'unavailable'>;
   isStandalone: boolean;
+  /** The app window itself, or a browser tab on a phone where the app is installed. */
+  isInstalled: boolean;
 }
 
 const PWAContext = createContext<PWAContextType | undefined>(undefined);

@@ -15,7 +15,7 @@ test('the banner shows on every phone visit until the app is installed', () => {
   // free of it.
   assert.doesNotMatch(overlay, /PROMPT_DELAY_MS|localStorage|sessionStorage/u);
   assert.match(overlay, /const \[isDismissed, setIsDismissed\] = React\.useState\(false\)/u);
-  assert.match(overlay, /!isStandalone/u);
+  assert.match(overlay, /!isInstalled/u);
   assert.match(overlay, /routeAllowsAutomaticPrompt\(pathname\)/u);
 });
 
@@ -42,16 +42,30 @@ test('the card and its reserve follow the dock offset, which is zero once the do
   assert.doesNotMatch(shell, /lg:pb-0/u);
 });
 
-test('the button label never depends on whether the browser has fired its install event', () => {
-  // `beforeinstallprompt` arrives seconds after load. A label that read
-  // "How to install" until then and "Install" afterwards changed under the
-  // visitor's thumb on Android; now it reads "Install" until tapped.
-  assert.doesNotMatch(overlay, /isInstallable\s*\?\s*translations\('install'\)/u);
+test('Android gets the card only while the browser offers installation; only iPhone gets steps', async () => {
+  // The owner (September 2026): Android installs from the browser's own sheet
+  // with one tap and never needs the menu steps, and a phone that already has
+  // the app never receives the browser's offer, so the card stays away there.
+  assert.match(overlay, /\(ios \|\| isInstallable\)/u);
+  assert.match(overlay, /if \(ios\) \{/u);
+  assert.doesNotMatch(overlay, /instructions\.\$\{platform\}/u);
   assert.match(
     overlay,
     /isInstalling \? translations\('installing'\) : translations\('install'\)/u,
   );
-  assert.match(overlay, /if \(ios \|\| !isInstallable\) \{/u);
+
+  const [hook, manifestRoute] = await Promise.all([
+    read('components/shared/use-pwa-install.ts'),
+    read('app/manifest/[locale]/route.ts'),
+  ]);
+  // The app is recognised in its own window, from a browser tab on the same
+  // phone, and after the browser reports the installation.
+  assert.match(hook, /getInstalledRelatedApps/u);
+  assert.match(hook, /'appinstalled'/u);
+  assert.match(hook, /'minimal-ui'/u);
+  assert.match(hook, /android-app:\/\//u);
+  assert.match(manifestRoute, /related_applications/u);
+  assert.match(manifestRoute, /platform: 'webapp'/u);
 });
 
 test('the copy is readable on a phone', () => {
@@ -83,7 +97,7 @@ test('the install button never points at a route that does not exist', async () 
   // instructions — to a 404.
   assert.doesNotMatch(overlay, /window\.location\.href = '\/install'/u);
   assert.match(overlay, /setShowInstructions\(true\)/u);
-  assert.match(overlay, /instructions\.\$\{platform\}\.\$\{step\}/u);
+  assert.match(overlay, /instructions\.ios\.\$\{step\}/u);
 
   // And the menu entry for administrators now has a target to land on.
   const adminAccount = await read('app/(admin)/admin/account/page.tsx');

@@ -3,6 +3,7 @@ import { APP_LOCALES, htmlLanguage, isAppLocale, localizePathname } from '@/i18n
 import { loadMessages } from '@/i18n/messages';
 import { DEFAULT_LOCALE } from '@/i18n/config';
 import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
+import { absoluteUrl } from '@/lib/utils';
 
 export const dynamicParams = false;
 
@@ -37,6 +38,14 @@ export async function GET(_request: Request, context: { params: Promise<{ locale
     background_color: '#f7f8fa',
     theme_color: '#f7f8fa',
     categories: ['education', 'business'],
+    // Lets a browser tab ask whether this app is already installed on the
+    // phone (navigator.getInstalledRelatedApps), so it stops offering it.
+    related_applications: (rolloutFeatureEnabled('localeRoutes') ? APP_LOCALES : [DEFAULT_LOCALE]).map(
+      (locale) => ({
+        platform: 'webapp',
+        url: absoluteUrl(`/manifest/${locale}`),
+      }),
+    ),
     icons: [
       {
         src: '/icons/icon-192x192.png',

@@ -533,21 +533,6 @@
         "1": "Open SafetyHub in Safari.",
         "2": "Tap Share in the browser toolbar.",
         "3": "Choose Add to Home Screen, then tap Add."
-      },
-      "android": {
-        "1": "Open the browser menu ⋮.",
-        "2": "Choose Install app or Add to Home screen.",
-        "3": "Confirm the installation."
-      },
-      "desktop": {
-        "1": "Find the install icon in the browser address bar.",
-        "2": "If it is not shown, open the browser menu and choose Install SafetyHub.",
-        "3": "Confirm the installation."
-      },
-      "other": {
-        "1": "Open the browser menu.",
-        "2": "Find Install app or Add to Home screen.",
-        "3": "If the option is unavailable, open the page in Safari, Chrome or Edge."
       }
     }
   },

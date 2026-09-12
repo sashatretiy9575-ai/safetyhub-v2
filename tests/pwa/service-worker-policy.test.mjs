@@ -119,11 +119,12 @@ test('manual installation remains available without beforeinstallprompt and expl
   ]);
   const ru = JSON.parse(ruMessages);
 
-  assert.match(manual, /if \(!isInstallable\)/);
-  assert.match(manual, /t\(`instructions\.\$\{platform\}\.\$\{step\}`\)/);
+  assert.match(manual, /if \(ios\) \{/);
+  assert.match(manual, /t\(`instructions\.ios\.\$\{step\}`\)/);
   assert.match(ru.PwaManual.instructions.ios['1'], /Safari/u);
   assert.match(ru.PwaManual.instructions.ios['3'], /На экран Домой/u);
-  assert.match(ru.PwaManual.instructions.android['2'], /Установить приложение/u);
+  // Android installs from the browser's own sheet; only iPhone has steps.
+  assert.equal(ru.PwaManual.instructions.android, undefined);
   assert.match(menu, /translations\('install'\)/);
   assert.equal(ru.Shell.userMenu.install, 'Установить приложение');
   assert.match(menu, /#install-app/);

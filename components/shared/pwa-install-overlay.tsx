@@ -43,17 +43,17 @@ function hintChip(Icon: HintIcon) {
  * on. Standalone (installed) launches never see it, and neither do the admin
  * screens or a running test, where it would cover the controls.
  *
- * The button reads "Install" everywhere. On Android it opens the browser's
- * own install sheet; on iPhone, where no such sheet exists, it opens the
- * manual steps in place. The label depends only on what the visitor has done,
- * never on whether the browser has fired its install event yet — that event
- * arrives seconds after load, and a label tied to it changed under the thumb.
+ * On iPhone, where no install sheet exists, the button opens the steps in
+ * place. Everywhere else the card appears only once the browser offers
+ * installation and the button opens the browser's own sheet: Android needs no
+ * steps, and a phone that already has the app never receives that offer, so
+ * the card no longer nags inside the installed app or in a browser tab.
  */
 export function PWAInstallOverlay() {
   const translations = useTranslations('Pwa');
   const manualTranslations = useTranslations('PwaManual');
   const pathname = usePathname();
-  const { isInstallable, install, isStandalone } = usePWA();
+  const { isInstallable, install, isInstalled } = usePWA();
   const [isTouchScreen, setIsTouchScreen] = React.useState(false);
   const [isDismissed, setIsDismissed] = React.useState(false);
   const [isInstalling, setIsInstalling] = React.useState(false);
@@ -74,8 +74,13 @@ export function PWAInstallOverlay() {
     return () => query.removeEventListener('change', sync);
   }, []);
 
+  const ios = platform === 'ios';
   const visible =
-    isTouchScreen && !isStandalone && !isDismissed && routeAllowsAutomaticPrompt(pathname);
+    isTouchScreen &&
+    !isInstalled &&
+    !isDismissed &&
+    (ios || isInstallable) &&
+    routeAllowsAutomaticPrompt(pathname);
 
   React.useEffect(() => {
     // The card floats 5 px above the dock (or above the bottom edge where the
@@ -95,37 +100,28 @@ export function PWAInstallOverlay() {
 
   const dismiss = React.useCallback(() => setIsDismissed(true), []);
 
-  const ios = platform === 'ios';
-
   const handleInstall = React.useCallback(async () => {
-    if (ios || !isInstallable) {
-      // There is no /install route, and there never was: this sent iOS and
-      // desktop Safari — the browsers with no install prompt, i.e. exactly the
-      // ones that need instructions — to a 404. The steps open in place.
+    if (ios) {
+      // No install sheet on iPhone: the steps open in place, never at a route.
       setShowInstructions(true);
       return;
     }
     setIsInstalling(true);
     try {
-      const outcome = await install();
-      if (outcome === 'unavailable') {
-        setShowInstructions(true);
-      } else {
-        dismiss();
-      }
+      // One tap opens the browser's own install sheet.
+      await install();
     } catch {
-      // Chrome refuses a second `prompt()` on a used event and any call it
-      // does not consider a user gesture. The manual steps still apply.
-      setShowInstructions(true);
+      // A used or refused prompt leaves nothing more to offer on this page.
     } finally {
       setIsInstalling(false);
+      dismiss();
     }
-  }, [dismiss, install, ios, isInstallable]);
+  }, [dismiss, install, ios]);
 
   if (!visible) return null;
 
   const steps = (['1', '2', '3'] as const).map((step) =>
-    manualTranslations(`instructions.${platform}.${step}`),
+    manualTranslations(`instructions.ios.${step}`),
   );
 
   return (
