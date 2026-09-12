@@ -111,19 +111,85 @@ function createCertificateWorker() {
   });
 }
 
+/**
+ * The workers of one export: a coordinator that assembles the archive and
+ * renders, plus helpers that render certificates in parallel on the other
+ * cores. Created once per export and reused for every archive part and every
+ * company, so the fonts are fetched and parsed once instead of once per part.
+ */
+type RenderPool = {
+  readonly coordinator: Worker;
+  readonly helpers: readonly Worker[];
+  /** Transferred to the coordinator with its first archive request. */
+  pendingPorts: MessagePort[];
+  /** A crashed or cancelled worker is never reused; the rest of the export renders on the main thread. */
+  broken: boolean;
+  terminate(): void;
+};
+
+// Three helpers plus the coordinator keep a four-core laptop busy without
+// starving the tab; more cores render no faster on a two-page booklet.
+const MAX_RENDER_HELPERS = 3;
+
+function createRenderPool(): RenderPool {
+  const coordinator = createCertificateWorker();
+  const spareCores = Math.max(0, (navigator.hardwareConcurrency ?? 2) - 1);
+  const helpers: Worker[] = [];
+  const pendingPorts: MessagePort[] = [];
+  for (let index = 0; index < Math.min(MAX_RENDER_HELPERS, spareCores); index += 1) {
+    const helper = createCertificateWorker();
+    const channel = new MessageChannel();
+    helper.postMessage(
+      { type: 'serve', taskId: '', port: channel.port2 } satisfies CertificateWorkerRequest,
+      [channel.port2],
+    );
+    helpers.push(helper);
+    pendingPorts.push(channel.port1);
+  }
+  const pool: RenderPool = {
+    coordinator,
+    helpers,
+    pendingPorts,
+    broken: false,
+    terminate() {
+      coordinator.terminate();
+      for (const helper of helpers) helper.terminate();
+    },
+  };
+  for (const helper of helpers) {
+    helper.addEventListener('error', () => {
+      pool.broken = true;
+    });
+  }
+  return pool;
+}
+
 async function runWorker(
-  request: Exclude<CertificateWorkerRequest, { type: 'cancel' }>,
+  request: Exclude<
+    CertificateWorkerRequest,
+    { type: 'cancel' } | { type: 'chunk-ack' } | { type: 'serve' }
+  >,
   options: WorkerOptions = {},
+  pool?: RenderPool,
 ) {
   if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
-  const worker = createCertificateWorker();
+  const worker = pool ? pool.coordinator : createCertificateWorker();
+  const transfer: Transferable[] = [];
+  if (request.type === 'render-archive' && pool && pool.pendingPorts.length > 0) {
+    request = { ...request, renderPorts: pool.pendingPorts };
+    transfer.push(...pool.pendingPorts);
+    pool.pendingPorts = [];
+  }
   return new Promise<Readonly<{ bytes?: Uint8Array; filename: string }>>((resolve, reject) => {
     let settled = false;
     const finish = (callback: () => void) => {
       if (settled) return;
       settled = true;
       options.signal?.removeEventListener('abort', abort);
-      worker.terminate();
+      worker.removeEventListener('error', onError);
+      worker.removeEventListener('message', onMessage);
+      // A pooled coordinator lives on for the next part; a one-off worker does not.
+      if (!pool) worker.terminate();
       callback();
     };
     const abort = () => {
@@ -131,15 +197,16 @@ async function runWorker(
         type: 'cancel',
         taskId: request.taskId,
       } satisfies CertificateWorkerRequest);
+      if (pool) pool.broken = true;
       void options.destination?.abort(new DOMException('Cancelled', 'AbortError'));
       finish(() => reject(new DOMException('Cancelled', 'AbortError')));
     };
-    options.signal?.addEventListener('abort', abort, { once: true });
-    worker.addEventListener('error', () => {
+    const onError = () => {
+      if (pool) pool.broken = true;
       void options.destination?.abort('CERTIFICATE_WORKER_FAILED');
       finish(() => reject(workerError('CERTIFICATE_WORKER_FAILED')));
-    });
-    worker.addEventListener('message', (event: MessageEvent<CertificateWorkerResponse>) => {
+    };
+    const onMessage = (event: MessageEvent<CertificateWorkerResponse>) => {
       const message = event.data;
       if (!message || message.taskId !== request.taskId) return;
       if (message.type === 'progress') {
@@ -168,6 +235,7 @@ async function runWorker(
         return;
       }
       if (message.type === 'error') {
+        if (pool) pool.broken = true;
         void options.destination?.abort(message.code);
         finish(() => reject(workerError(message.code)));
         return;
@@ -179,8 +247,11 @@ async function runWorker(
         return;
       }
       finish(() => resolve({ bytes: new Uint8Array(message.bytes), filename: message.filename }));
-    });
-    worker.postMessage(request);
+    };
+    options.signal?.addEventListener('abort', abort, { once: true });
+    worker.addEventListener('error', onError);
+    worker.addEventListener('message', onMessage);
+    worker.postMessage(request, transfer);
   });
 }
 
@@ -351,6 +422,7 @@ async function pauseBetweenDownloads(signal: AbortSignal | undefined) {
 async function renderBufferedArchiveParts(
   metadata: CertificateExportMetadata,
   options: WorkerOptions,
+  pool: RenderPool,
 ): Promise<number> {
   const partCount = Math.max(
     1,
@@ -373,29 +445,29 @@ async function renderBufferedArchiveParts(
       items,
     };
     const taskId = crypto.randomUUID();
+    const onProgress = (progress: CertificateWorkerProgress) =>
+      options.onProgress?.({
+        completed: partIndex * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS + progress.completed,
+        total: metadata.items.length,
+      });
     let archiveBytes: Uint8Array | null = null;
-    try {
-      const result = await runWorker(
-        { type: 'render-archive', taskId, metadata: partMetadata, stream: false },
-        {
-          signal: options.signal,
-          onProgress: (progress) =>
-            options.onProgress?.({
-              completed: partIndex * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS + progress.completed,
-              total: metadata.items.length,
-            }),
-        },
-      );
-      archiveBytes = result.bytes ? new Uint8Array(result.bytes) : null;
-    } catch (workerError) {
-      if (options.signal?.aborted) throw workerError;
+    if (!pool.broken) {
+      try {
+        const result = await runWorker(
+          { type: 'render-archive', taskId, metadata: partMetadata, stream: false },
+          { signal: options.signal, onProgress },
+          pool,
+        );
+        archiveBytes = result.bytes ? new Uint8Array(result.bytes) : null;
+      } catch (workerFailure) {
+        if (options.signal?.aborted) throw workerFailure;
+        archiveBytes = null;
+      }
+    }
+    if (!archiveBytes) {
       archiveBytes = await renderArchiveInMainThread(partMetadata, {
         signal: options.signal,
-        onProgress: (progress) =>
-          options.onProgress?.({
-            completed: partIndex * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS + progress.completed,
-            total: metadata.items.length,
-          }),
+        onProgress,
       });
     }
     if (!archiveBytes) throw workerError('CERTIFICATE_ARCHIVE_EMPTY');
@@ -416,61 +488,71 @@ export async function downloadCertificateExportInBrowser(
   } = {},
 ) {
   assertCertificateExportMetadata(metadata);
-  if (options.fileHandle) {
-    if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
-    const destination = await options.fileHandle.createWritable();
-    const rewindable = createRewindableDestination(destination);
-    const taskId = crypto.randomUUID();
-    try {
-      await runWorker(
-        { type: 'render-archive', taskId, metadata, stream: true },
-        { ...options, destination: rewindable.proxy },
-      );
-    } catch (workerError) {
-      if (options.signal?.aborted) {
-        await destination.abort(workerError).catch(() => undefined);
-        throw workerError;
-      }
-      // Retrying on top of a partially written file would produce a broken
-      // archive, so a file that cannot be rewound is abandoned instead.
-      if (!(await rewindable.rewind())) {
-        await destination.abort(workerError).catch(() => undefined);
-        throw workerError;
-      }
+  const pool = createRenderPool();
+  try {
+    if (options.fileHandle) {
+      if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
+      const destination = await options.fileHandle.createWritable();
+      const rewindable = createRewindableDestination(destination);
+      const taskId = crypto.randomUUID();
       try {
-        await renderArchiveInMainThread(metadata, {
-          ...options,
-          destination: rewindable.proxy,
-        });
-      } catch (fallbackError) {
-        await destination.abort(fallbackError).catch(() => undefined);
-        throw fallbackError;
+        await runWorker(
+          { type: 'render-archive', taskId, metadata, stream: true },
+          { ...options, destination: rewindable.proxy },
+          pool,
+        );
+      } catch (workerFailure) {
+        if (options.signal?.aborted) {
+          await destination.abort(workerFailure).catch(() => undefined);
+          throw workerFailure;
+        }
+        // Retrying on top of a partially written file would produce a broken
+        // archive, so a file that cannot be rewound is abandoned instead.
+        if (!(await rewindable.rewind())) {
+          await destination.abort(workerFailure).catch(() => undefined);
+          throw workerFailure;
+        }
+        try {
+          await renderArchiveInMainThread(metadata, {
+            ...options,
+            destination: rewindable.proxy,
+          });
+        } catch (fallbackError) {
+          await destination.abort(fallbackError).catch(() => undefined);
+          throw fallbackError;
+        }
       }
+      return { archives: 1, streamed: true, companies: 1 } as const;
     }
-    return { archives: 1, streamed: true, companies: 1 } as const;
-  }
 
-  // Operators file certificates by company, so a mixed selection leaves the
-  // browser as one archive per company. The metadata was fetched once for the
-  // whole selection; only the rendering is split.
-  const groups =
-    options.groupBy === 'organization'
-      ? groupCertificateExportByOrganization(metadata)
-      : [{ key: '', organization: null, metadata }];
-  let archives = 0;
-  let completedBefore = 0;
-  for (const [index, group] of groups.entries()) {
-    if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
-    if (index > 0) await pauseBetweenDownloads(options.signal);
-    archives += await renderBufferedArchiveParts(group.metadata, {
-      signal: options.signal,
-      onProgress: (progress) =>
-        options.onProgress?.({
-          completed: completedBefore + progress.completed,
-          total: metadata.items.length,
-        }),
-    });
-    completedBefore += group.metadata.items.length;
+    // Operators file certificates by company, so a mixed selection leaves the
+    // browser as one archive per company. The metadata was fetched once for the
+    // whole selection; only the rendering is split.
+    const groups =
+      options.groupBy === 'organization'
+        ? groupCertificateExportByOrganization(metadata)
+        : [{ key: '', organization: null, metadata }];
+    let archives = 0;
+    let completedBefore = 0;
+    for (const [index, group] of groups.entries()) {
+      if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
+      if (index > 0) await pauseBetweenDownloads(options.signal);
+      archives += await renderBufferedArchiveParts(
+        group.metadata,
+        {
+          signal: options.signal,
+          onProgress: (progress) =>
+            options.onProgress?.({
+              completed: completedBefore + progress.completed,
+              total: metadata.items.length,
+            }),
+        },
+        pool,
+      );
+      completedBefore += group.metadata.items.length;
+    }
+    return { archives, streamed: false, companies: groups.length } as const;
+  } finally {
+    pool.terminate();
   }
-  return { archives, streamed: false, companies: groups.length } as const;
 }

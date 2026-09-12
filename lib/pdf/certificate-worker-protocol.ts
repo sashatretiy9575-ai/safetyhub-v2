@@ -14,6 +14,18 @@ export type CertificateWorkerRequest =
       taskId: string;
       metadata: CertificateExportMetadata;
       stream: boolean;
+      /**
+       * Ports to helper workers that render certificates in parallel with
+       * this one; transferred with the first archive request of a session
+       * and kept for the following parts.
+       */
+      renderPorts?: readonly MessagePort[];
+    }>
+  | Readonly<{
+      /** Turns this worker into a helper that answers `render-certificate` on the port. */
+      type: 'serve';
+      taskId: string;
+      port: MessagePort;
     }>
   | Readonly<{
       type: 'cancel';

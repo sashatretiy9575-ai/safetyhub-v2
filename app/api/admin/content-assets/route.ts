@@ -10,6 +10,8 @@ import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { requestSecurityMetadata } from '@/server/security/request-metadata';
 
 export const runtime = 'nodejs';
+// Heavier than an ordinary API call: the default function budget cuts it off.
+export const maxDuration = 60;
 
 const SOURCE_MAX_BYTES = 8 * 1024 * 1024;
 const OUTPUT_MAX_BYTES = 2 * 1024 * 1024;

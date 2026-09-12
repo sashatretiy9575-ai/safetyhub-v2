@@ -3,6 +3,13 @@ import 'server-only';
 const MAX_RENDER_EDGE = 640;
 const MAX_RENDER_IMAGE_PIXELS = 8_000_000;
 const MAX_RENDER_CANVAS_BYTES = MAX_RENDER_EDGE * MAX_RENDER_EDGE * 4;
+// The byte-level scan in the finalize route already refuses any PDF that
+// mentions JavaScript, launch actions or embedded files, so the parsed check
+// here is a second opinion, not the only one. Reading every page of a
+// 200-page deck through pdf.js cost most of the request; a bounded sample
+// keeps the second opinion and returns in a few seconds.
+const PAGE_SAMPLE_LIMIT = 32;
+const PAGE_BATCH_SIZE = 8;
 
 function installCanvasGlobals(canvasModule: typeof import('@napi-rs/canvas')) {
   for (const [name, value] of [
@@ -43,6 +50,17 @@ function hasEntries(value: unknown) {
 function mapValue(value: unknown, key: string) {
   if (value instanceof Map) return value.get(key);
   return value && typeof value === 'object' ? (value as Record<string, unknown>)[key] : undefined;
+}
+
+/** The first and last page always, the rest spread evenly across the deck. */
+export function sampledPageNumbers(pageCount: number, limit = PAGE_SAMPLE_LIMIT) {
+  if (pageCount <= limit) return Array.from({ length: pageCount }, (_, index) => index + 1);
+  const pages = new Set<number>([1, pageCount]);
+  const step = (pageCount - 1) / (limit - 1);
+  for (let index = 1; index < limit - 1; index += 1) {
+    pages.add(Math.round(1 + index * step));
+  }
+  return [...pages].sort((left, right) => left - right);
 }
 
 /**
@@ -86,7 +104,7 @@ export async function renderPdfBoundaryPages(pdfBytes: Uint8Array, expectedPageC
     ) {
       throw new Error('PRESENTATION_UNSAFE_ACTION');
     }
-    for (let pageNumber = 1; pageNumber <= expectedPageCount; pageNumber += 1) {
+    const inspectPage = async (pageNumber: number) => {
       const page = await document.getPage(pageNumber);
       const [pageJavaScript, annotations] = await Promise.all([
         page.getJSActions(),
@@ -101,9 +119,14 @@ export async function renderPdfBoundaryPages(pdfBytes: Uint8Array, expectedPageC
           String(annotation.action ?? '').toLowerCase() === 'launch',
       );
       page.cleanup();
-      if (hasEntries(pageJavaScript) || unsafeAnnotation) {
-        throw new Error('PRESENTATION_UNSAFE_ACTION');
-      }
+      return hasEntries(pageJavaScript) || unsafeAnnotation;
+    };
+    const sampled = sampledPageNumbers(expectedPageCount);
+    for (let offset = 0; offset < sampled.length; offset += PAGE_BATCH_SIZE) {
+      const verdicts = await Promise.all(
+        sampled.slice(offset, offset + PAGE_BATCH_SIZE).map(inspectPage),
+      );
+      if (verdicts.some(Boolean)) throw new Error('PRESENTATION_UNSAFE_ACTION');
     }
     for (const pageNumber of new Set([1, expectedPageCount])) {
       const page = await document.getPage(pageNumber);

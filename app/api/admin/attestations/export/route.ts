@@ -19,6 +19,8 @@ import { NextResponse } from '@/lib/security/api-response';
 import { CERTIFICATE_EXPORT_SYNC_LIMIT } from '@/lib/constants';
 
 export const runtime = 'nodejs';
+// Heavier than an ordinary API call: the default function budget cuts it off.
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 const exportSchema = z

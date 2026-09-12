@@ -12,6 +12,10 @@ import { normalizeAvatarImage } from '@/server/security/avatar-decode';
 import { consumeBusinessQuota } from '@/server/security/rate-limit';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 
+export const runtime = 'nodejs';
+// Heavier than an ordinary API call: the default function budget cuts it off.
+export const maxDuration = 60;
+
 const AVATAR_BUCKET = 'profile-avatars';
 const MULTIPART_MAX_BYTES = AVATAR_MAX_BYTES + 16 * 1024;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;

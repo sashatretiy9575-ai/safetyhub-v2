@@ -14,6 +14,10 @@ import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { renderPdfBoundaryPages } from '@/server/pdf/render-validation';
 import { getRpcMutationError, unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 
+export const runtime = 'nodejs';
+// Heavier than an ordinary API call: the default function budget cuts it off.
+export const maxDuration = 60;
+
 const STAGING_BUCKET = 'course-presentations-staging';
 // Kept in step with the ceiling in app/course-presentations/[slug]/[asset].
 const THUMBNAIL_MAX_BYTES = 5 * 1024 * 1024;

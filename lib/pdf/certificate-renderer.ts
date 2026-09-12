@@ -635,22 +635,17 @@ export async function generateCertificateInBrowser(
   pdf.setCreationDate(issuedAt);
   pdf.setModificationDate(issuedAt);
   pdf.registerFontkit(fontkit);
-  const font = await pdf.embedFont(fontBytes, { subset: metadata.locale === 'zh' });
-  const assets: Assets = {
-    stamp: await embedOptionalPng(pdf, branding.stampUrl, metadata.verificationUrl, signal),
-    chairmanSignature: await embedOptionalPng(
-      pdf,
-      branding.chairmanSignatureUrl,
-      metadata.verificationUrl,
-      signal,
-    ),
-    memberSignature: await embedOptionalPng(
-      pdf,
-      branding.memberSignatureUrl,
-      metadata.verificationUrl,
-      signal,
-    ),
-  };
+  // Every face is subset: the booklet uses a few dozen glyphs, and the full
+  // Latin/Cyrillic file used to add 100 KB to each of the hundred certificates
+  // in an export. Subsetting costs no measurable time (the Chinese face was
+  // always subset) and keeps the text selectable through the ToUnicode map.
+  const [font, stamp, chairmanSignature, memberSignature] = await Promise.all([
+    pdf.embedFont(fontBytes, { subset: true }),
+    embedOptionalPng(pdf, branding.stampUrl, metadata.verificationUrl, signal),
+    embedOptionalPng(pdf, branding.chairmanSignatureUrl, metadata.verificationUrl, signal),
+    embedOptionalPng(pdf, branding.memberSignatureUrl, metadata.verificationUrl, signal),
+  ]);
+  const assets: Assets = { stamp, chairmanSignature, memberSignature };
   if (signal?.aborted) throw abortError();
 
   const ink = rgb(0.08, 0.09, 0.11);

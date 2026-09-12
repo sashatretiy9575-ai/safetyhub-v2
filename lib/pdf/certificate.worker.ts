@@ -31,6 +31,14 @@ type WorkerPort = Readonly<{
   ): void;
 }>;
 
+type Respond = (message: CertificateWorkerResponse, transfer?: Transferable[]) => void;
+type RenderSlot = (metadata: CertificateRenderMetadata, signal: AbortSignal) => Promise<Uint8Array>;
+
+// A helper that stops answering (crashed, killed by the browser) must not
+// hang the whole export; the coordinator gives up on it and the client falls
+// back to rendering on the main thread.
+const REMOTE_RENDER_TIMEOUT_MS = 60_000;
+
 const workerPort = self as unknown as WorkerPort;
 const tasks = new Map<string, AbortController>();
 const chunkAcknowledgements = new Map<
@@ -47,6 +55,88 @@ function errorCode(error: unknown) {
 
 function transferableBytes(bytes: Uint8Array) {
   return bytes.slice().buffer;
+}
+
+/**
+ * A helper worker reached through a MessagePort. It renders one certificate
+ * per request; the coordinator keeps as many of these busy as the machine has
+ * spare cores while it assembles the archive.
+ */
+class RemoteRenderer {
+  private readonly pending = new Map<
+    string,
+    { resolve: (bytes: Uint8Array) => void; reject: (reason: unknown) => void }
+  >();
+
+  constructor(private readonly port: MessagePort) {
+    port.addEventListener('message', (event: MessageEvent<CertificateWorkerResponse>) => {
+      const message = event.data;
+      if (!message || typeof message !== 'object') return;
+      const waiter = this.pending.get(message.taskId);
+      if (!waiter) return;
+      if (message.type === 'result') {
+        this.pending.delete(message.taskId);
+        waiter.resolve(new Uint8Array(message.bytes));
+      } else if (message.type === 'error') {
+        this.pending.delete(message.taskId);
+        waiter.reject(new Error(message.code));
+      }
+    });
+    port.start();
+  }
+
+  render(metadata: CertificateRenderMetadata, signal: AbortSignal): Promise<Uint8Array> {
+    if (signal.aborted) return Promise.reject(new DOMException('Cancelled', 'AbortError'));
+    const taskId = crypto.randomUUID();
+    return new Promise<Uint8Array>((resolve, reject) => {
+      const settle = () => {
+        signal.removeEventListener('abort', abort);
+        clearTimeout(timer);
+        this.pending.delete(taskId);
+      };
+      const abort = () => {
+        settle();
+        this.port.postMessage({ type: 'cancel', taskId } satisfies CertificateWorkerRequest);
+        reject(new DOMException('Cancelled', 'AbortError'));
+      };
+      const timer = setTimeout(() => {
+        settle();
+        reject(new Error('CERTIFICATE_RENDER_HELPER_TIMEOUT'));
+      }, REMOTE_RENDER_TIMEOUT_MS);
+      this.pending.set(taskId, {
+        resolve: (bytes) => {
+          settle();
+          resolve(bytes);
+        },
+        reject: (reason) => {
+          settle();
+          reject(reason);
+        },
+      });
+      signal.addEventListener('abort', abort, { once: true });
+      this.port.postMessage({
+        type: 'render-certificate',
+        taskId,
+        metadata,
+      } satisfies CertificateWorkerRequest);
+    });
+  }
+}
+
+// Helpers attached by the first archive request of a session and reused by
+// every following part; the client terminates all of them together.
+let remoteRenderers: RemoteRenderer[] = [];
+
+function renderSlots(): RenderSlot[] {
+  const local: RenderSlot = (metadata, signal) => generateCertificateInBrowser(metadata, signal);
+  const remote: RenderSlot[] = remoteRenderers.map(
+    (renderer) => (metadata, signal) => renderer.render(metadata, signal),
+  );
+  // This worker renders too, so a machine without spare cores behaves as
+  // before: CERTIFICATE_RENDER_CONCURRENCY documents in flight, all local.
+  const slots = [...remote, local];
+  while (slots.length < CERTIFICATE_RENDER_CONCURRENCY) slots.push(local);
+  return slots;
 }
 
 function waitForChunkAcknowledgement(taskId: string, sequence: number, signal: AbortSignal) {
@@ -75,6 +165,7 @@ async function* certificateArchiveEntries(
   metadata: CertificateExportMetadata,
   taskId: string,
   signal: AbortSignal,
+  respond: Respond,
 ): AsyncGenerator<ArchiveEntry> {
   const report = await generateCertificateReportWorkbook(
     certificateReportRows(metadata.items),
@@ -92,19 +183,20 @@ async function* certificateArchiveEntries(
     };
   }
 
+  const slots = renderSlots();
   let completed = 0;
-  for (let offset = 0; offset < metadata.items.length; offset += CERTIFICATE_RENDER_CONCURRENCY) {
+  for (let offset = 0; offset < metadata.items.length; offset += slots.length) {
     if (signal.aborted) throw new DOMException('Cancelled', 'AbortError');
-    const batch = metadata.items.slice(offset, offset + CERTIFICATE_RENDER_CONCURRENCY);
+    const batch = metadata.items.slice(offset, offset + slots.length);
     const generated = await Promise.all(
-      batch.map(async (item: CertificateRenderMetadata) => ({
+      batch.map(async (item: CertificateRenderMetadata, index) => ({
         item,
-        bytes: await generateCertificateInBrowser(item, signal),
+        bytes: await slots[index]!(item, signal),
       })),
     );
     for (const { item, bytes } of generated) {
       completed += 1;
-      workerPort.postMessage({
+      respond({
         type: 'progress',
         taskId,
         completed,
@@ -123,13 +215,14 @@ async function renderArchive(
   metadata: CertificateExportMetadata,
   streamOutput: boolean,
   signal: AbortSignal,
+  respond: Respond,
 ) {
   assertCertificateExportMetadata(metadata);
   if (!streamOutput && metadata.items.length > CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS) {
     throw new Error('CERTIFICATE_BUFFERED_ARCHIVE_LIMIT_EXCEEDED');
   }
   const archive = await createStreamingZipArchive(
-    certificateArchiveEntries(metadata, taskId, signal),
+    certificateArchiveEntries(metadata, taskId, signal, respond),
   );
   const reader = archive.getReader();
   const chunks: Uint8Array[] = [];
@@ -146,7 +239,7 @@ async function renderArchive(
       sequence += 1;
       const buffer = transferableBytes(value);
       const acknowledged = waitForChunkAcknowledgement(taskId, sequence, signal);
-      workerPort.postMessage({ type: 'chunk', taskId, sequence, bytes: buffer }, [buffer]);
+      respond({ type: 'chunk', taskId, sequence, bytes: buffer }, [buffer]);
       await acknowledged;
     } else {
       chunks.push(value);
@@ -154,7 +247,7 @@ async function renderArchive(
     }
   }
   if (streamOutput) {
-    workerPort.postMessage({ type: 'complete', taskId, filename: metadata.filename });
+    respond({ type: 'complete', taskId, filename: metadata.filename });
     return;
   }
   const archiveBytes = new Uint8Array(totalBytes);
@@ -164,13 +257,15 @@ async function renderArchive(
     offset += chunk.byteLength;
   }
   const buffer = archiveBytes.buffer;
-  workerPort.postMessage({ type: 'result', taskId, bytes: buffer, filename: metadata.filename }, [
-    buffer,
-  ]);
+  respond({ type: 'result', taskId, bytes: buffer, filename: metadata.filename }, [buffer]);
 }
 
 async function run(
-  request: Exclude<CertificateWorkerRequest, { type: 'cancel' } | { type: 'chunk-ack' }>,
+  request: Exclude<
+    CertificateWorkerRequest,
+    { type: 'cancel' } | { type: 'chunk-ack' } | { type: 'serve' }
+  >,
+  respond: Respond,
 ) {
   const controller = new AbortController();
   tasks.set(request.taskId, controller);
@@ -178,7 +273,7 @@ async function run(
     if (request.type === 'render-certificate') {
       const bytes = await generateCertificateInBrowser(request.metadata, controller.signal);
       const buffer = transferableBytes(bytes);
-      workerPort.postMessage(
+      respond(
         {
           type: 'result',
           taskId: request.taskId,
@@ -189,9 +284,18 @@ async function run(
       );
       return;
     }
-    await renderArchive(request.taskId, request.metadata, request.stream, controller.signal);
+    if (request.renderPorts && request.renderPorts.length > 0) {
+      remoteRenderers = request.renderPorts.map((port) => new RemoteRenderer(port));
+    }
+    await renderArchive(
+      request.taskId,
+      request.metadata,
+      request.stream,
+      controller.signal,
+      respond,
+    );
   } catch (error) {
-    workerPort.postMessage({
+    respond({
       type: 'error',
       taskId: request.taskId,
       code: errorCode(error),
@@ -202,8 +306,7 @@ async function run(
   }
 }
 
-workerPort.addEventListener('message', (event) => {
-  const request = event.data;
+function handleRequest(request: CertificateWorkerRequest | null | undefined, respond: Respond) {
   if (!request || typeof request !== 'object' || typeof request.taskId !== 'string') return;
   if (request.type === 'cancel') {
     tasks.get(request.taskId)?.abort();
@@ -222,5 +325,17 @@ workerPort.addEventListener('message', (event) => {
     }
     return;
   }
-  void run(request);
+  if (request.type === 'serve') {
+    const port = request.port;
+    port.addEventListener('message', (event: MessageEvent<CertificateWorkerRequest>) => {
+      handleRequest(event.data, (message, transfer) => port.postMessage(message, transfer ?? []));
+    });
+    port.start();
+    return;
+  }
+  void run(request, respond);
+}
+
+workerPort.addEventListener('message', (event) => {
+  handleRequest(event.data, (message, transfer) => workerPort.postMessage(message, transfer));
 });

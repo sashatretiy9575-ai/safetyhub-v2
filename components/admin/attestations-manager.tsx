@@ -301,6 +301,16 @@ export function AttestationsManager({
     () => page.items.filter((row) => selected.has(row.recordId)),
     [page.items, selected],
   );
+  const rowIdsByGroup = useMemo(() => {
+    const groups = new Map<string, string[]>();
+    for (const item of page.items) {
+      const key = organizationGroupKey(item.organization);
+      const ids = groups.get(key);
+      if (ids) ids.push(item.recordId);
+      else groups.set(key, [item.recordId]);
+    }
+    return groups;
+  }, [page.items]);
   const selectedCount = resolvedSelection?.total ?? selected.size;
   // A row whose course was deleted still belongs to a real person, and deleting
   // that person is exactly what an operator expects the checkbox to cover.
@@ -1030,11 +1040,7 @@ export function AttestationsManager({
               (index === 0 ||
                 groupKey !== organizationGroupKey(page.items[index - 1]?.organization ?? ''));
             const groupCollapsed = collapsedGroups.has(groupKey);
-            const groupRowIds = showGroup
-              ? page.items
-                  .filter((item) => organizationGroupKey(item.organization) === groupKey)
-                  .map((item) => item.recordId)
-              : [];
+            const groupRowIds = showGroup ? (rowIdsByGroup.get(groupKey) ?? []) : [];
             const groupFullySelected =
               showGroup &&
               groupRowIds.length > 0 &&

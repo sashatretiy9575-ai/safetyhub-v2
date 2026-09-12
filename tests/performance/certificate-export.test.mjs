@@ -193,7 +193,8 @@ test('certificate payload and filenames preserve multilingual participant data s
   // the font, so a Chinese name still renders with the CJK face.
   assert.match(renderer, /КУӘЛІК \/ УДОСТОВЕРЕНИЕ №/);
   assert.match(renderer, /Сведения о проверке знаний/);
-  assert.match(renderer, /subset: metadata\.locale === 'zh'/);
+  // Every face is subset now: a Cyrillic booklet no longer carries the whole font.
+  assert.match(renderer, /embedFont\(fontBytes, \{ subset: true \}\)/);
   assert.match(certificate, /filename\*=UTF-8''/);
   assert.match(certificate, /certificateFilename/);
 });
