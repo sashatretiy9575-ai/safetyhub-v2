@@ -151,7 +151,7 @@ test('a locked course is refused by name on every learner surface', async () => 
   assert.ok(messages.Course.access.lockedTitle);
 });
 
-test('the phone is optional at registration; name, job and company stay required', async () => {
+test('the phone is required at registration from everyone but a Chinese account', async () => {
   const [migration, schema, fields, profileRoute, onboardingRoute, profileForm, onboardingForm] =
     await Promise.all([
       read(MIGRATION),
@@ -162,17 +162,33 @@ test('the phone is optional at registration; name, job and company stay required
       read('components/profile/profile-form.tsx'),
       read('components/profile/onboarding-form.tsx'),
     ]);
+  // The database still stores a missing phone as a null pair, because a
+  // Chinese account may register without one.
   assert.match(migration, /\(v_phone_country_iso2 is null\) <> \(v_phone_e164 is null\)/u);
   assert.match(migration, /message = 'PROFILE_FIELDS_REQUIRED'/u);
   assert.match(schema, /nationalNumber: z\.string\(\)\.trim\(\)\.max\(64\)/u);
-  assert.doesNotMatch(schema, /nationalNumber: z\.string\(\)\.trim\(\)\.min\(1\)/u);
-  assert.match(fields, /if \(!nationalNumber\) return errors;/u);
+  assert.match(
+    fields,
+    /export function phoneRequiredForLocale\(locale: string\) \{\s*return locale !== 'zh';/u,
+  );
+  assert.match(fields, /if \(phoneRequired\) errors\.phone = \{ code: 'PHONE_INVALID' \};/u);
   for (const route of [profileRoute, onboardingRoute]) {
+    assert.match(route, /!phone && phoneRequiredForLocale\(context\.profile\.preferred_locale\)/u);
     assert.match(route, /parsed\.data\.phone\.nationalNumber && !phone/u);
     assert.match(route, /p_phone_e164: phone\?\.phoneE164 \?\? null/u);
   }
   for (const form of [profileForm, onboardingForm]) {
+    assert.match(form, /validateProfileSubmissionValues\(form, \{ phoneRequired \}\)/u);
+    assert.match(form, /\{phoneRequired \? null : \(/u);
     assert.match(form, /t\('optional'\)/u);
+  }
+  for (const locale of ['ru', 'kk', 'en']) {
+    const messages = JSON.parse(await read(`messages/${locale}.json`));
+    assert.doesNotMatch(
+      messages.Profile.phoneHint,
+      /Можно не указывать|Толтырмауға болады|leave this empty/u,
+      locale,
+    );
   }
   for (const locale of ['ru', 'kk', 'en', 'zh']) {
     const messages = JSON.parse(await read(`messages/${locale}.json`));

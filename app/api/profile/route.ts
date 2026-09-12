@@ -7,6 +7,7 @@ import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result
 import { profileSubmissionSchema } from '@/lib/validation/profile';
 import { readJsonBody } from '@/lib/security/request-body';
 import { normalizeUserPhone } from '@/server/phone';
+import { phoneRequiredForLocale } from '@/lib/profile/fields';
 import { consumeBusinessQuota, consumeCoarseQuota } from '@/server/security/rate-limit';
 import { requestSecurityMetadata } from '@/server/security/request-metadata';
 
@@ -35,9 +36,13 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_PROFILE' }, { status: 400 });
     }
-    // No number is fine; a number that does not parse is not.
+    // Everyone but a Chinese account has to leave a number, and a number that
+    // does not parse is refused from anyone.
     const phone = parsed.data.phone.nationalNumber ? normalizeUserPhone(parsed.data.phone) : null;
-    if (parsed.data.phone.nationalNumber && !phone) {
+    if (
+      (parsed.data.phone.nationalNumber && !phone) ||
+      (!phone && phoneRequiredForLocale(context.profile.preferred_locale))
+    ) {
       return NextResponse.json({ error: 'INVALID_PHONE' }, { status: 400 });
     }
 

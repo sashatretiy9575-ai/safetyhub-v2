@@ -409,7 +409,7 @@
     "phone": "Phone number",
     "phoneCountry": "Phone country",
     "phonePlaceholder": "Number after {code}",
-    "phoneHint": "You can leave this empty. The number is only used to contact you about the application; no SMS codes are sent.",
+    "phoneHint": "The number is only used to contact you about the application; no SMS codes are sent.",
     "avatar": "Profile photo",
     "avatarHint": "Take a photo with your camera or choose an existing one.",
     "submit": "Submit for review",

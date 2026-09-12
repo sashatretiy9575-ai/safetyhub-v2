@@ -38,10 +38,12 @@ export function OnboardingForm({
   initial,
   initialAvatarUrl,
   countryOptions,
+  phoneRequired,
 }: {
   initial: OnboardingProfileValues;
   initialAvatarUrl: string | null;
   countryOptions: readonly PhoneCountryOption[];
+  phoneRequired: boolean;
 }) {
   const router = useRouter();
   const locale = useLocale() as AppLocale;
@@ -140,7 +142,7 @@ export function OnboardingForm({
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const errors: FieldErrors = validateProfileSubmissionValues(form);
+    const errors: FieldErrors = validateProfileSubmissionValues(form, { phoneRequired });
     if (!avatarReady) errors.avatar = { code: 'AVATAR_REQUIRED' };
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -311,8 +313,10 @@ export function OnboardingForm({
         </div>
         <div ref={phoneContainerRef} className="space-y-2 sm:col-span-2">
           <Label htmlFor="onboarding-phone">
-            {t('phone')}{' '}
-            <span className="font-normal text-[var(--color-text-muted)]">{t('optional')}</span>
+            {t('phone')}
+            {phoneRequired ? null : (
+              <span className="ml-1 font-normal text-[var(--color-text-muted)]">{t('optional')}</span>
+            )}
           </Label>
           <PhoneInput
             id="onboarding-phone"

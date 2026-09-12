@@ -29,9 +29,11 @@ type UpdateResponse = {
 export function ProfileForm({
   initial,
   countryOptions,
+  phoneRequired,
 }: {
   initial: ProfileSubmissionValues;
   countryOptions: readonly PhoneCountryOption[];
+  phoneRequired: boolean;
 }) {
   const router = useRouter();
   const t = useTranslations('Profile');
@@ -75,7 +77,7 @@ export function ProfileForm({
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const validation = validateProfileSubmissionValues(form);
+    const validation = validateProfileSubmissionValues(form, { phoneRequired });
     if (Object.keys(validation).length > 0) {
       setErrors(validation);
       setMessage(t('required'));
@@ -215,8 +217,10 @@ export function ProfileForm({
           </div>
           <div className="space-y-1 sm:col-span-2">
             <Label htmlFor="profile-phone">
-              {t('phone')}{' '}
-              <span className="font-normal text-[var(--color-text-muted)]">{t('optional')}</span>
+              {t('phone')}
+              {phoneRequired ? null : (
+                <span className="ml-1 font-normal text-[var(--color-text-muted)]">{t('optional')}</span>
+              )}
             </Label>
             <PhoneInput
               id="profile-phone"

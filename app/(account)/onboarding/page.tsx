@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { AuthenticationError, requireUser } from '@/server/auth/session';
 import { OnboardingForm } from '@/components/profile/onboarding-form';
+import { phoneRequiredForLocale } from '@/lib/profile/fields';
 import { getProfileAvatarUrl } from '@/server/profile/dashboard';
 import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone/countries';
 import { Card, CardContent } from '@/components/ui/card';
@@ -57,6 +58,7 @@ export default async function OnboardingPage() {
             <CardContent className="p-4 sm:p-6 md:p-8">
               <OnboardingForm
                 countryOptions={phoneCountryOptions(locale)}
+                phoneRequired={phoneRequiredForLocale(context.profile.preferred_locale)}
                 initial={{
                   name: profile.name,
                   surname: profile.surname,

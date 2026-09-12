@@ -37,8 +37,9 @@ type SchemaProfileValues = z.infer<typeof profileSchema>;
 const _profileTypeCheck: ProfileValues = {} as SchemaProfileValues;
 void _profileTypeCheck;
 
-// The phone is optional since September 2026: an empty national number is a
-// submission without a phone, a filled one still has to be a real number.
+// An empty national number passes the schema because a Chinese account may
+// register without a phone. The routes require one from everyone else
+// (phoneRequiredForLocale), and a filled number still has to be a real one.
 export const profileSubmissionSchema = profileSchema.extend({
   phone: z.object({
     countryIso2: z

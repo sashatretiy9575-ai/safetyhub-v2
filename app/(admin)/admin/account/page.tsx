@@ -4,6 +4,7 @@ import { AdminAvatarUploader } from '@/components/profile/admin-avatar-uploader'
 import { AccountDeletion } from '@/components/profile/account-deletion';
 import { getProfileAvatarUrl } from '@/server/profile/dashboard';
 import { ProfileForm } from '@/components/profile/profile-form';
+import { phoneRequiredForLocale } from '@/lib/profile/fields';
 import { requireRole } from '@/server/auth/session';
 import { PwaManualInstall } from '@/components/shared/pwa-manual-install';
 import { SignOutAction } from '@/components/shared/sign-out-action';
@@ -43,6 +44,7 @@ export default async function AdminAccountPage() {
             </div>
             <ProfileForm
               countryOptions={phoneCountryOptions()}
+              phoneRequired={phoneRequiredForLocale(actor.profile.preferred_locale)}
               initial={{
                 name: actor.profile.name,
                 surname: actor.profile.surname,

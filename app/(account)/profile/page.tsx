@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { ArrowRight, Buildings, CaretDown } from '@phosphor-icons/react/dist/ssr';
 import { AuthenticationError, requireUser } from '@/server/auth/session';
+import { phoneRequiredForLocale } from '@/lib/profile/fields';
 import { ProfileForm } from '@/components/profile/profile-form';
 import { AccountDeletion } from '@/components/profile/account-deletion';
 import { AccountApprovalStatus } from '@/components/profile/account-approval-status';
@@ -487,6 +488,7 @@ export default async function ProfilePage() {
                   </div>
                   <ProfileForm
                     countryOptions={phoneCountryOptions(locale)}
+                    phoneRequired={phoneRequiredForLocale(context.profile.preferred_locale)}
                     initial={{
                       name: profile.name,
                       surname: profile.surname,
