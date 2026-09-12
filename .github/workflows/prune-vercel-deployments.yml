@@ -4,9 +4,12 @@ name: Prune Vercel deployments
 # keeps the three newest successful production deployments, plus whatever the
 # production domains serve, and deletes the rest. A build still running, or a
 # failed deployment newer than the last successful one, waits for the next run.
+# The hourly run starts the cleanup on its own once the token is in place.
 on:
   deployment_status:
   workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
 
 permissions:
   contents: read
@@ -18,7 +21,7 @@ concurrency:
 jobs:
   prune:
     name: prune-vercel-deployments
-    if: github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success'
+    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
