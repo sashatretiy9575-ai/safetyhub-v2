@@ -32,6 +32,7 @@ type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
 };
 export type ProfileRow = {
   id: string;
+  education?: string;
   name: string;
   surname: string;
   job: string;

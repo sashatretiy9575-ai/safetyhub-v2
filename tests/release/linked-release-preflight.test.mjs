@@ -121,14 +121,14 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   // its database transaction and history entry were verified after application.
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
   assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 85);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 87);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 85);
+  assert.equal(receipt.matchedCount, 87);
   assert.equal(receipt.pendingCount, 0);
-  assert.equal(receipt.expectedBaseCount, 85);
+  assert.equal(receipt.expectedBaseCount, 87);
   assert.equal(receipt.expectedPendingCount, 0);
-  assert.equal(receipt.expectedTotalCount, 85);
+  assert.equal(receipt.expectedTotalCount, 87);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

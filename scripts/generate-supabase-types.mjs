@@ -11,7 +11,13 @@ const GET_AUTH_CONTEXT_RETURN =
 
 export function normalizeGeneratedTypes(source) {
   const normalizedLineEndings = source.replaceAll('\r\n', '\n');
-  const withoutEnvironmentMetadata = normalizedLineEndings.replace(INTERNAL_SUPABASE_METADATA, '');
+  // A preserved, hosted-only operator backup from the earlier document release
+  // is not an application table. Ignore only this exact backup, not schema drift.
+  const withoutOperatorBackup = normalizedLineEndings.replace(
+    /^      document_editor_release_backup_20260915: \{\n[\s\S]*?^      \}\n/mu,
+    '',
+  );
+  const withoutEnvironmentMetadata = withoutOperatorBackup.replace(INTERNAL_SUPABASE_METADATA, '');
   const withCanonicalTableReturn = withoutEnvironmentMetadata.replace(
     GET_AUTH_CONTEXT_RETURN,
     '$1[]$2',

@@ -25,20 +25,21 @@ test('protocol date follows Oral midnight and manual numbers survive date change
   assert.equal(changeDocumentDate({ ...batch, number: 'CUSTOM/1', automatic: false }, '2026-09-08').number, 'CUSTOM/1');
 });
 
-test('PDFs contain actual results, all company participants, no signing blocks or image requests', async () => {
+test('PDFs contain actual results, all company participants, signature placeholders but no signature image requests', async () => {
   const font = await readFile(new URL('../../lib/pdf/assets/noto-sans-latin-cyrillic.ttf', import.meta.url));
   const original = globalThis.fetch;
   const requests = [];
   globalThis.fetch = async input => {
     requests.push(String(input));
     assert.match(String(input), /font/);
-    return new Response(font);
+    return new Response(String(input).includes('face=serif') ? await readFile(new URL('../../lib/pdf/assets/NotoSerif-' + (String(input).includes('weight=bold') ? 'Bold' : 'Regular') + '.ttf', import.meta.url)) : String(input).includes('face=sans') ? await readFile(new URL('../../lib/pdf/assets/NotoSans-Bold.ttf', import.meta.url)) : font);
   };
   const branding = {
     organizationName: 'ТОО «Work Safety (Уорк Сэйфти)»', bin: '171140039242', chairmanName: 'Битемиров А.У.', chairmanPosition: 'Директор',
     memberName: '', memberPosition: '', secondMemberName: '', secondMemberPosition: '', protocolNumber: '08.09', protocolDate: '2026-09-08', validityMonths: 12,
-    examTextKk: '', examTextRu: 'Программа «{program}». Протокол №{protocol}', knowledgeTextKk: '', knowledgeTextRu: 'Протокол №{protocol}',
-    documentDefaults: DOCUMENT_DEFAULTS,
+    examTextKk: '«{program}» бағдарламасы бойынша емтихан тапсырды. №{protocol} хаттама.', examTextRu: 'сдал (а) экзамен по программе «{program}» на основании протокола №{protocol}',
+    knowledgeTextKk: '«{program}» бағдарламасы бойынша білімін тексеру. №{protocol} хаттама.', knowledgeTextRu: 'Проверка знаний по программе «{program}». Протокол №{protocol}.',
+    documentDefaults: { ...DOCUMENT_DEFAULTS, insertWidthCm: 32, insertHeightCm: 10 },
     stampUrl: '/certificate-assets/image?kind=stamp&v=1', chairmanSignatureUrl: '/certificate-assets/image?kind=chairman&v=1', memberSignatureUrl: null,
   };
   try {
@@ -68,7 +69,7 @@ test('PDFs contain actual results, all company participants, no signing blocks o
     assert.match(text, /Участник 130/);
     assert.match(text, /Не сдал/);
     assert.match(text, /Проверка не пройдена/);
-    assert.doesNotMatch(text, /Подпись|подпись|М\.П\.|М\.О\.|____|Куратор Заказчика/);
+    assert.match(text, /Образование/);
     await task.destroy();
     const certificate = await generateCertificateInBrowser({
       schemaVersion: 1, certificateId: '00000000-0000-4000-8000-000000000001', filename: 'SH-TEST.pdf', locale: 'ru',
@@ -78,7 +79,7 @@ test('PDFs contain actual results, all company participants, no signing blocks o
       issuedAt: '2026-09-08T12:00:00Z', completedAt: '2026-09-08T12:00:00Z',
       verificationUrl: 'https://safetyhub.kz/verify/v1.test', branding,
     });
-    assert.equal((await PDFDocument.load(certificate)).getPageCount(), 2);
+    assert.equal((await PDFDocument.load(certificate)).getPageCount(), 1);
     const certTask = pdfjs.getDocument({ data: certificate.slice(), useSystemFonts: true });
     const certPdf = await certTask.promise;
     let certText = '';
@@ -89,7 +90,7 @@ test('PDFs contain actual results, all company participants, no signing blocks o
     }
     assert.match(certText, /08\.09/);
     assert.match(certText, /Работа на высоте/);
-    assert.doesNotMatch(certText, /Подпись|подпись|М\.П\.|М\.О\.|____/);
+    assert.match(certText, /М\.П\./);
     await certTask.destroy();
     assert.ok(requests.every(url => !url.includes('image')));
   } finally { globalThis.fetch = original; }

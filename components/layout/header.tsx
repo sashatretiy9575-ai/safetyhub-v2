@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { PhoneCall } from '@phosphor-icons/react/dist/ssr/PhoneCall';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/ssr/WhatsappLogo';
-import Link from 'next/link';
+import Link from '@/components/shared/navigation-link';
 import { AccountIconLink } from '@/components/layout/account-icon-link';
 import { ACCOUNT_NAV_ITEMS, type AccountMode } from '@/components/layout/navigation-items';
 import { HeaderNav } from '@/components/layout/header-nav';

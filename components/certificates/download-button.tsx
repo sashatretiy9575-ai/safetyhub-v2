@@ -80,6 +80,9 @@ export function CertificateDownloadButton({
       }
       const metadata = await readClientResponseJson<CertificateRenderMetadata>(result.response);
       assertCertificateRenderMetadata(metadata);
+      if (!metadata.branding.documentDefaults?.insertWidthCm || !metadata.branding.documentDefaults?.insertHeightCm) {
+        setMessage(t('sizeRequired')); setStatus('idle'); return;
+      }
       const { downloadCertificateInBrowser } = await import('@/lib/pdf/certificate-client');
       await downloadCertificateInBrowser(metadata, { signal: controller.signal });
       setStatus('downloaded');

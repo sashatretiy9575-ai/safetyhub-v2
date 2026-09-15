@@ -12,7 +12,6 @@ import { AccountApprovalStatus } from '@/components/profile/account-approval-sta
 import { AvatarUploader } from '@/components/profile/avatar-uploader';
 import { LegalAcceptancePanel } from '@/components/profile/legal-acceptance-panel';
 import {
-  getProfileAvatarUrl,
   getProfileDashboard,
   type ProfileAttestation,
 } from '@/server/profile/dashboard';
@@ -352,7 +351,7 @@ export default async function ProfilePage() {
   const [dashboardResult, avatarUrl, contacts, currentPolicies] = await Promise.all([
     getProfileDashboard(locale),
     context.profile.avatar_updated_at
-      ? getProfileAvatarUrl(context.user.id)
+      ? Promise.resolve('/api/profile/avatar')
       : Promise.resolve(null),
     getSiteContacts(),
     context.hasCurrentLegalAcceptance ? Promise.resolve(null) : getCurrentLegalPolicies(),

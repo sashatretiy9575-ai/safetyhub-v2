@@ -6,7 +6,7 @@ import { House } from '@phosphor-icons/react/dist/ssr/House';
 import { Phone } from '@phosphor-icons/react/dist/ssr/Phone';
 import { SignIn } from '@phosphor-icons/react/dist/ssr/SignIn';
 import { User } from '@phosphor-icons/react/dist/ssr/User';
-import Link from 'next/link';
+import Link from '@/components/shared/navigation-link';
 import { useLocale, useTranslations } from 'next-intl';
 import { ACCOUNT_NAV_ITEMS, type AccountMode } from '@/components/layout/navigation-items';
 import { useHydratedPathname } from '@/components/layout/use-hydrated-pathname';

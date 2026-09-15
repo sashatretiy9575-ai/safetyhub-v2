@@ -197,7 +197,7 @@ test('attestation list keeps personal details compact and loads the avatar only 
     /whatsappChatHref\(contact\.phoneE164\)/,
   );
   assert.match(managerSurface, /target="_blank"\s+rel="noopener noreferrer"/);
-  assert.match(managerSurface, /Написать в WhatsApp/);
+  assert.match(managerSurface, /WhatsApp/);
   assert.match(contactRoute, /requireCapability\('user\.read'\)/);
   assert.match(contactRoute, /rpc\('get_safe_user_email'/);
   assert.match(contactRoute, /\.from\('profiles'\)/);

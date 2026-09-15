@@ -2079,6 +2079,7 @@ export type Database = {
         Returns: Json
       }
       valid_document_defaults: { Args: { v: Json }; Returns: boolean }
+      valid_document_defaults_v1: { Args: { v: Json }; Returns: boolean }
       verify_user_identity_unmetered: {
         Args: {
           p_job: string
@@ -3485,6 +3486,7 @@ export type Database = {
         Row: {
           avatar_updated_at: string | null
           created_at: string
+          education: string
           id: string
           job: string
           name: string
@@ -3500,6 +3502,7 @@ export type Database = {
         Insert: {
           avatar_updated_at?: string | null
           created_at?: string
+          education?: string
           id: string
           job?: string
           name?: string
@@ -3515,6 +3518,7 @@ export type Database = {
         Update: {
           avatar_updated_at?: string | null
           created_at?: string
+          education?: string
           id?: string
           job?: string
           name?: string
@@ -5541,6 +5545,17 @@ export type Database = {
       }
       verify_user_identity: {
         Args: {
+          p_job: string
+          p_name: string
+          p_organization: string
+          p_surname: string
+          p_target_id: string
+        }
+        Returns: Json
+      }
+      verify_user_identity_with_education: {
+        Args: {
+          p_education: string
           p_job: string
           p_name: string
           p_organization: string

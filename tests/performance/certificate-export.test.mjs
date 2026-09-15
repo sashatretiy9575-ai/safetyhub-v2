@@ -194,7 +194,7 @@ test('certificate payload and filenames preserve multilingual participant data s
   assert.match(renderer, /КУӘЛІК \/ УДОСТОВЕРЕНИЕ №/);
   assert.match(renderer, /Сведения о проверке знаний/);
   // Every face is subset now: a Cyrillic booklet no longer carries the whole font.
-  assert.match(renderer, /embedFont\(fontBytes, \{ subset: true \}\)/);
+  assert.match(await read('lib/pdf/document-layout.ts'), /subset: true/);
   assert.match(certificate, /filename\*=UTF-8''/);
   assert.match(certificate, /certificateFilename/);
 });

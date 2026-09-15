@@ -1,6 +1,6 @@
 import type { PDFFont } from 'pdf-lib';
 import type { CertificateBranding, CertificateRenderMetadata } from './certificate-client-contract.ts';
-import { formatIssueDate, loadCertificateFontBytes, resolveAssetUrl } from './certificate-renderer.ts';
+import { formatIssueDate } from './certificate-renderer.ts';
 import { normalizePdfText, safeFilenameSegment } from './certificate.ts';
 import { documentCommission, documentStatement, participantResult, type DocumentParticipant } from './document-editor.ts';
 
@@ -46,69 +46,88 @@ export function wrapDocumentText(font: PDFFont, text: string, size: number, widt
   return lines.length ? lines : [''];
 }
 
-export async function generateProtocolInBrowser(
-  group: ProtocolGroup, branding: CertificateBranding, fontUrl: string, signal?: AbortSignal,
-): Promise<Uint8Array> {
-  const [{ PDFDocument, rgb }, fontkitModule, fontBytes] = await Promise.all([
-    import('pdf-lib'), import('@pdf-lib/fontkit'),
-    loadCertificateFontBytes(resolveAssetUrl(fontUrl, group.items[0]?.verificationUrl), signal),
-  ]);
+
+export async function generateProtocolInBrowser(group: ProtocolGroup, branding: CertificateBranding, fontUrl: string, signal?: AbortSignal): Promise<Uint8Array> {
+  const [{ PDFDocument }, fontkitModule, { loadDocumentFonts, block, rule, ink }] = await Promise.all([import('pdf-lib'), import('@pdf-lib/fontkit'), import('./document-layout.ts')]);
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkitModule.default);
-  const font = await pdf.embedFont(fontBytes, { subset: true });
-  const ink = rgb(0.08, 0.09, 0.11);
-  const rule = rgb(0.65, 0.65, 0.65);
-  let page = pdf.addPage([595.28, 841.89]);
-  let y = 792;
-  const nextPage = () => { page = pdf.addPage([595.28, 841.89]); y = 792; };
-  const paragraph = (text: string, size = 10.5, center = false) => {
-    for (const line of wrapDocumentText(font, text, size, 499)) {
-      if (y < 52) nextPage();
-      page.drawText(line, { x: center ? (595.28 - font.widthOfTextAtSize(line, size)) / 2 : 48, y, size, font, color: ink });
-      y -= size * 1.4;
+  const fonts = await loadDocumentFonts(pdf, fontUrl, group.items[0]?.verificationUrl, signal);
+  let page = pdf.addPage([595.28, 841.89]), y = 22;
+  const nextPage = () => { page = pdf.addPage([595.28, 841.89]); y = 34; };
+  const paragraph = (text: string, size = 11, align: 'left' | 'center' | 'right' = 'left', bold = false, underline = false, caption?: string) => {
+    const font = fonts.pick(text, bold);
+    const lines = wrapDocumentText(font, text, size, 499);
+    const height = lines.length * size * 1.2;
+    if (y + height + 28 > 790) nextPage();
+    block(page, text, font, 48, y, 499, height + 1, size, align, size);
+    if (underline) {
+      const lineWidth = lines.length > 1 ? 499 : font.widthOfTextAtSize(text, size);
+      rule(page, align === 'center' ? (595.28 - lineWidth) / 2 : 48, y + height, lineWidth);
     }
-    y -= 6;
+    y += height + 5;
+    if (caption) { block(page, caption, fonts.regular, 48, y, 499, 16, 7.5, align, 7.5); y += 17; }
   };
   const date = new Date((group.date ?? branding.protocolDate ?? group.items[0]?.issuedAt?.slice(0, 10) ?? new Date().toISOString().slice(0, 10)) + 'T12:00:00+05:00');
-  pdf.setTitle(`Протокол № ${branding.protocolNumber} — ${group.courseTitle}`);
+  pdf.setTitle('Протокол № ' + branding.protocolNumber + ' — ' + group.courseTitle);
   pdf.setAuthor(branding.organizationName);
-  paragraph(branding.organizationName, 12, true);
-  if (branding.bin) paragraph('БИН ' + branding.bin, 10, true);
-  paragraph('Протокол № ' + branding.protocolNumber, 14, true);
-  paragraph('заседания комиссии по проверке знаний', 11, true);
-  paragraph(group.organization ?? '', 11, true);
-  paragraph(formatIssueDate(date), 11, true);
-  paragraph(`Председатель: ${branding.chairmanName}. ${branding.chairmanPosition}`);
-  for (const member of documentCommission(branding)) paragraph(`Член комиссии: ${member.name}. ${member.position}`);
-  if (branding.documentDefaults?.reviewerName) paragraph('Проверяющий: ' + branding.documentDefaults.reviewerName);
-  paragraph(documentStatement(branding.documentDefaults?.protocolText ?? 'Проверка знаний по программе «{program}»', branding, group.courseTitle));
-  const columns = [28, 172, 160, 139];
-  const header = ['№', 'Ф.И.О.', 'Должность', 'Результат проверки'];
+  paragraph(branding.organizationName, 12, 'center', true, true, '(Наименование учебной организации)');
+  paragraph('Протокол № ' + branding.protocolNumber, 12, 'center', true);
+  paragraph('заседания комиссии по проверке знаний', 12, 'center', true);
+  y += 14;
+  const companyName = group.organization ?? '';
+  const companySize = Math.max(9, Math.min(12, 499 * 12 / Math.max(1, fonts.pick(companyName, true).widthOfTextAtSize(companyName, 12))));
+  paragraph(companyName, companySize, 'center', true, true, '(наименование компании)');
+  paragraph(formatIssueDate(date), 12, 'right', true);
+  y += 10;
+  paragraph('Председатель: ' + branding.chairmanName + ' — ' + branding.chairmanPosition, 11, 'left', false, true, '(Ф.И.О., должность)');
+  paragraph('Члены комиссии:', 11);
+  for (const m of documentCommission(branding)) paragraph(m.name + ' — ' + m.position, 11, 'left', false, true, '(Ф.И.О., должность)');
+  paragraph('Проверка знаний проведена', 11);
+  paragraph(documentStatement(branding.documentDefaults?.protocolText ?? 'В соответствии с утвержденной программой на тему: «{program}»', branding, group.courseTitle).replace(/^Проверка знаний проведена\s*/u, ''), 11, 'center', false, true, '(Наименование программы)');
+  paragraph('РЕЗУЛЬТАТЫ ПРОВЕРКИ', 12, 'center', true);
+  y += 12;
+  const columns = [30, 133, 150, 98, 90], left = (595.28 - 501) / 2;
+  const header = ['№', 'Ф.И.О.', 'Занимаемая должность', 'Образование', 'Результат сдачи экзаменов'];
   const row = (cells: string[], isHeader = false) => {
-    const wrapped = cells.map((cell, i) => wrapDocumentText(font, cell, 9, columns[i]! - 12));
-    const height = Math.max(...wrapped.map((lines) => lines.length)) * 12 + 12;
-    if (y - height < 48) { nextPage(); if (!isHeader) row(header, true); }
-    let x = 48;
-    for (let i = 0; i < columns.length; i++) {
-      page.drawRectangle({ x, y: y - height, width: columns[i]!, height, borderColor: rule, borderWidth: 0.5,
-        ...(isHeader ? { color: rgb(0.94, 0.94, 0.94) } : {}) });
-      wrapped[i]!.forEach((line, n) => page.drawText(line, { x: x + 6, y: y - 15 - n * 12, size: 9, font, color: ink }));
+    const size = 10;
+    const wrapped = cells.map((text, i) => wrapDocumentText(fonts.pick(text), text, size, columns[i]! - 10));
+    const height = Math.max(...wrapped.map(lines => lines.length)) * 12 + 10;
+    if (height > 720) throw new Error('DOCUMENT_TEXT_OVERFLOW');
+    if (y + height > 785) { nextPage(); if (!isHeader) row(header, true); }
+    let x = left;
+    cells.forEach((text, i) => {
+      page.drawRectangle({ x, y: page.getHeight() - y - height, width: columns[i]!, height, borderColor: ink, borderWidth: .5 });
+      block(page, text, fonts.pick(text), x + 5, y + 4, columns[i]! - 10, height - 8, size, i === 1 && !isHeader ? 'left' : 'center', size);
       x += columns[i]!;
-    }
-    y -= height;
+    });
+    y += height;
   };
   row(header, true);
   const people = group.participants ?? group.items.map((item): DocumentParticipant => ({
-    userId: item.certificateId, fullName: item.fullName, position: item.position ?? '',
+    userId: item.certificateId, fullName: item.fullName, position: item.position ?? '', education: item.education ?? '',
     status: item.score >= item.passScore ? 'passed' : 'failed', score: item.score, total: item.total, certificateId: item.certificateId,
   }));
   for (const [i, person] of people.entries()) {
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
-    row([String(i + 1), person.fullName || 'ФИО не указано', person.position, participantResult(person)]);
+    row([String(i + 1) + '.', person.fullName || 'ФИО не указано', person.position, person.education ?? '', participantResult(person)]);
   }
-  if (!people.length) { y -= 18; paragraph('В компании нет участников.'); }
+  if (!people.length) { y += 12; paragraph('В компании нет участников.'); }
+  y += 20;
+  paragraph('Лица, получившие положительные оценки, допускаются к самостоятельной работе, к выполнению соответствующих работ.');
+  y += 20;
+  paragraph('Қолы / Подпись:', 9, 'left', true);
+  for (const m of [{ name: branding.chairmanName, position: 'Төраға / Председатель' }, ...documentCommission(branding).map(m => ({ name: m.name, position: 'Мүшесі / Член комиссии' }))]) {
+    if (y + 28 > 790) nextPage();
+    paragraph(m.position + ': ' + m.name, 9);
+    rule(page, 400, y - 6, 135); y += 9;
+  }
+  if (branding.documentDefaults?.reviewerName) paragraph('Проверяющий: ' + branding.documentDefaults.reviewerName, 9);
+  y += 14;
+  paragraph('Проведение обучения в установленном порядке подтверждаю, замечаний нет', 8);
+  paragraph('Куратор Заказчика (подпись, ФИО)', 8);
+  rule(page, 260, y - 6, 180);
   for (const [i, sheet] of pdf.getPages().entries()) {
-    sheet.drawText(`${i + 1} / ${pdf.getPageCount()}`, { x: 510, y: 24, size: 8, font, color: ink });
+    if (pdf.getPageCount() > 1) block(sheet, String(i + 1) + ' / ' + pdf.getPageCount(), fonts.regular, 500, 813, 48, 12, 8, 'right');
   }
   return pdf.save({ useObjectStreams: true });
 }

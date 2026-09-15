@@ -1,5 +1,2 @@
-import { AdminListSkeleton } from '@/components/admin/admin-skeletons';
-
-export default function EmployeesLoading() {
-  return <AdminListSkeleton label="Загружаем сотрудников" rows={8} summary />;
-}
+import { RouteLoading } from '@/components/shared/route-loading';
+export default function Loading() { return <RouteLoading />; }

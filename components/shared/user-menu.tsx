@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
+import Link from '@/components/shared/navigation-link';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/lib/constants';
 import { usePWA } from '@/components/shared/pwa-provider';

@@ -26,6 +26,7 @@ const editorSchema = z.object({
   batch: batchRowSchema.nullable(),
   participants: z.array(z.object({
     userId: z.string().uuid(), fullName: z.string(), position: z.string(),
+    education: z.string().default(''), photoUrl: z.string().nullable().default(null),
     status: z.enum(['passed','failed','started','expired','none']), score: z.number().nullable(), total: z.number().nullable(), certificateId: z.string().uuid().nullable(),
   })),
 });
@@ -33,6 +34,11 @@ export async function readDocumentEditor(organization?: string, courseSlug?: str
   await requireCapability('site.settings.manage');
   await requireCapability('results.read');
   await requireCapability('certificate.read');
+  if (courseSlug && /^[0-9a-f-]{36}$/iu.test(courseSlug)) {
+    const course = await createAdminClient().from('tests').select('slug').eq('id', courseSlug).maybeSingle();
+    if (course.error) throw course.error;
+    courseSlug = course.data?.slug ?? courseSlug;
+  }
   const client = await createClient() as unknown as RpcClient;
   const result = unwrapRpcMutationResponse(await client.rpc('get_document_editor_data', { p_organization: organization || null, p_course_slug: courseSlug || null }));
   const parsed = editorSchema.parse(result);

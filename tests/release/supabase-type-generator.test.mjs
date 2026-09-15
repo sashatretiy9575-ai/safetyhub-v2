@@ -3,6 +3,14 @@ import test from 'node:test';
 
 import { normalizeGeneratedTypes } from '../../scripts/generate-supabase-types.mjs';
 
+test('only the preserved operator backup is excluded from application type comparison', () => {
+  const backup = '      document_editor_release_backup_20260915: {\n        Row: { saved_at: string }\n      }\n';
+  const application = '      real_application_table: {\n        Row: { id: string }\n      }\n';
+  assert.equal(normalizeGeneratedTypes(backup + application), normalizeGeneratedTypes(application));
+  assert.match(normalizeGeneratedTypes(application), /real_application_table/);
+  assert.match(normalizeGeneratedTypes(backup.replace('20260915', '20260916')), /20260916/);
+});
+
 const authContext = `      get_auth_context: {
         Args: never
         Returns: {

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/shared/navigation-link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { PRIMARY_NAV_ITEMS } from '@/components/layout/navigation-items';
 import { localizePathname, type AppLocale } from '@/i18n/config';

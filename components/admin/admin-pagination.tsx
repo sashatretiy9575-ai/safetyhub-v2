@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/shared/navigation-link';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
 

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/shared/navigation-link';
 import { User } from '@phosphor-icons/react/dist/ssr/User';
 import { headerTooltipClass } from '@/components/layout/header-tooltip';
 

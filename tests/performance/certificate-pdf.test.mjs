@@ -11,6 +11,7 @@ import { generateCertificateInBrowser } from '../../lib/pdf/certificate-renderer
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
 const branding = {
+  documentDefaults: { reviewerName: 'Иванов', commission: [], companyName: '', programName: '', protocolText: '', insertWidthCm: 32, insertHeightCm: 10 },
   organizationName: 'ТОО «Пример»',
   bin: '123456789012',
   chairmanName: 'Иванов И. И.',
@@ -175,7 +176,7 @@ test('browser renderer produces the two-sided booklet from fetched immutable ass
         headers: { 'Content-Type': 'application/pdf', 'Content-Length': String(template.length) },
       });
     }
-    if (url === validCertificate.fontUrl) {
+    if (url.includes('/certificate-assets/font')) {
       return new Response(font, {
         headers: { 'Content-Type': 'font/ttf', 'Content-Length': String(font.length) },
       });
@@ -186,7 +187,7 @@ test('browser renderer produces the two-sided booklet from fetched immutable ass
     const bytes = await generateCertificateInBrowser(validCertificate);
     assert.equal(new TextDecoder().decode(bytes.slice(0, 5)), '%PDF-');
     const pdf = await PDFDocument.load(bytes);
-    assert.equal(pdf.getPageCount(), 2);
+    assert.equal(pdf.getPageCount(), 1);
     assert.match(pdf.getTitle() ?? '', /SH-2026-ABC/);
   } finally {
     globalThis.fetch = originalFetch;
@@ -217,7 +218,7 @@ test('browser renderer embeds the full pinned CJK font for a Chinese identity an
         headers: { 'Content-Type': 'application/pdf', 'Content-Length': String(template.length) },
       });
     }
-    if (url === zhCertificate.fontUrl) {
+    if (url.includes('/certificate-assets/font')) {
       return new Response(font, {
         headers: { 'Content-Type': 'font/otf', 'Content-Length': String(font.length) },
       });
@@ -228,7 +229,7 @@ test('browser renderer embeds the full pinned CJK font for a Chinese identity an
     const bytes = await generateCertificateInBrowser(zhCertificate);
     assert.equal(new TextDecoder().decode(bytes.slice(0, 5)), '%PDF-');
     const pdf = await PDFDocument.load(bytes);
-    assert.equal(pdf.getPageCount(), 2);
+    assert.equal(pdf.getPageCount(), 1);
     assert.match(pdf.getTitle() ?? '', /SH-2026-ZH-001/);
     assert.ok(bytes.byteLength < 2 * 1024 * 1024, `subset PDF is ${bytes.byteLength} bytes`);
   } finally {

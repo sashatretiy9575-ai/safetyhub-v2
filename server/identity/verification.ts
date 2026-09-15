@@ -2,6 +2,8 @@ import 'server-only';
 
 import * as z from 'zod';
 import { createClient } from '@/server/supabase/server';
+import { createAdminClient } from '@/server/supabase/admin';
+import { requireAnyCapability } from '@/server/auth/session';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 import { invalidateCertificateVerificationCache } from '@/server/certificates/issuance';
 import type { VerifiedIdentity } from '@/server/identity/types';
@@ -27,6 +29,7 @@ const identitySchema = z.object({
   surname: z.string(),
   job: z.string(),
   organization: z.string(),
+  education: z.string().optional(),
   verifiedAt: z.string().nullable(),
   revokedAt: z.string().nullable(),
   revokeReason: z.string().nullable(),
@@ -40,20 +43,26 @@ async function callIdentityRpc(name: string, args: Record<string, unknown>) {
   return parsed.data satisfies VerifiedIdentity;
 }
 
-export function getUserIdentity(targetId: string | null = null) {
-  return callIdentityRpc('get_user_identity', { p_target_id: targetId });
+export async function getUserIdentity(targetId: string | null = null) {
+  const identity = await callIdentityRpc('get_user_identity', { p_target_id: targetId });
+  if (!targetId) return identity;
+  await requireAnyCapability(['identity.read', 'identity.manage']);
+  const { data, error } = await createAdminClient().from('profiles').select('education').eq('id', identity.userId).single();
+  if (error) throw error;
+  return { ...identity, education: data.education };
 }
 
 export async function verifyUserIdentity(
   targetId: string,
-  values: { name: string; surname: string; job: string; organization: string },
+  values: { name: string; surname: string; job: string; organization: string; education?: string },
 ) {
-  const result = await callIdentityRpc('verify_user_identity', {
+  const result = await callIdentityRpc(values.education === undefined ? 'verify_user_identity' : 'verify_user_identity_with_education', {
     p_target_id: targetId,
     p_name: values.name,
     p_surname: values.surname,
     p_job: values.job,
     p_organization: values.organization,
+    ...(values.education === undefined ? {} : { p_education: values.education }),
   });
   invalidateCertificateVerificationCache();
   return result;

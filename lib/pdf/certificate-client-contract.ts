@@ -45,6 +45,8 @@ export type CertificateRenderMetadata = Readonly<{
   templateUrl: string;
   fontUrl: string;
   fullName: string;
+  photoUrl?: string | null;
+  education?: string;
   position: string | null;
   organization: string | null;
   score: number;
@@ -140,6 +142,10 @@ export function assertCertificateBranding(value: unknown): asserts value is Cert
     assertBoundedText(defaults.companyName, 'DOCUMENT_DEFAULTS_INVALID', 200);
     assertBoundedText(defaults.programName, 'DOCUMENT_DEFAULTS_INVALID', 240);
     assertBoundedText(defaults.protocolText, 'DOCUMENT_DEFAULTS_INVALID', 1000);
+    for (const [key, min, max] of [['insertWidthCm', 8, 60], ['insertHeightCm', 4, 30]] as const) {
+      const size = defaults[key];
+      if (size != null && (typeof size !== 'number' || !Number.isFinite(size) || size < min || size > max)) throw new Error('INSERT_SIZE_INVALID');
+    }
     for (const member of defaults.commission) {
       if (!member || typeof member !== 'object') throw new Error('COMMISSION_INVALID');
       assertBoundedText(member.name, 'COMMISSION_INVALID', 200);
@@ -198,6 +204,8 @@ export function assertCertificateRenderMetadata(
     throw new Error('CERTIFICATE_ASSET_URL_INVALID');
   }
   assertString(item.fullName, 'CERTIFICATE_NAME_INVALID', 200);
+  if (item.photoUrl != null && (typeof item.photoUrl !== 'string' || !/^\/api\/(?:certificates\/[0-9a-f-]{36}\/photo|admin\/documents\/photo\/[0-9a-f-]{36})$/u.test(item.photoUrl))) throw new Error('CERTIFICATE_PHOTO_URL_INVALID');
+  if (item.education !== undefined) assertBoundedText(item.education, 'CERTIFICATE_EDUCATION_INVALID', 200);
   assertOptionalString(item.position, 'CERTIFICATE_POSITION_INVALID', 160);
   assertOptionalString(item.organization, 'CERTIFICATE_ORGANIZATION_INVALID', 200);
   assertInteger(item.score, 'CERTIFICATE_SCORE_INVALID', 0, 10_000);

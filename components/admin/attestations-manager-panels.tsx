@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Buildings } from '@phosphor-icons/react/dist/csr/Buildings';
 import { CaretDown } from '@phosphor-icons/react/dist/csr/CaretDown';
 import { Certificate } from '@phosphor-icons/react/dist/csr/Certificate';
@@ -11,6 +12,7 @@ import { FloppyDisk } from '@phosphor-icons/react/dist/csr/FloppyDisk';
 import { PencilSimple } from '@phosphor-icons/react/dist/csr/PencilSimple';
 import { Trash } from '@phosphor-icons/react/dist/csr/Trash';
 import { WhatsappLogo } from '@phosphor-icons/react/dist/csr/WhatsappLogo';
+import { Phone } from '@phosphor-icons/react/dist/csr/Phone';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import type { AdminAttestationRow } from '@/lib/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
@@ -29,8 +31,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LearningHistoryControl } from '@/components/admin/learning-history-control';
-import { CourseAccessControl } from '@/components/admin/course-access-control';
+const LearningHistoryControl = dynamic(() => import('@/components/admin/learning-history-control').then(module => module.LearningHistoryControl), { loading: () => <p role="status">Загружаем действия…</p> });
+const CourseAccessControl = dynamic(() => import('@/components/admin/course-access-control').then(module => module.CourseAccessControl), { loading: () => <p role="status">Загружаем допуски…</p> });
 
 export type AttestationPermissions = {
   canManageDocuments?: boolean;
@@ -436,6 +438,17 @@ function AttestationIdentityForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
+  const [education, setEducation] = useState<string | null>(null);
+  const [savedEducation, setSavedEducation] = useState('');
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch(`/api/admin/users/${row.userId}/identity`, { signal: controller.signal, cache: 'no-store' })
+      .then(async r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(value => { if (!controller.signal.aborted) { setEducation(value.education ?? ''); setSavedEducation(value.education ?? ''); } })
+      .catch(() => { if (!controller.signal.aborted) setError('Не удалось загрузить образование. Закройте и повторите редактирование.'); });
+    return () => controller.abort();
+  }, [row.userId]);
+
   const update =
     (field: keyof AttestationIdentityFields) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setError('');
@@ -447,7 +460,7 @@ function AttestationIdentityForm({
   );
 
   const save = async () => {
-    if (busy) return;
+    if (busy || education === null) return;
     const normalized = {
       name: fields.name.trim(),
       surname: fields.surname.trim(),
@@ -465,7 +478,7 @@ function AttestationIdentityForm({
       const result = await clientRequest(`/api/admin/users/${row.userId}/identity`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'verify', ...normalized }),
+        body: JSON.stringify({ action: 'verify', ...normalized, education }),
       });
       const payload = await readClientResponseJson<{ status?: string; error?: string }>(
         result.response,
@@ -515,6 +528,7 @@ function AttestationIdentityForm({
           ),
         )}
       </div>
+      <Input aria-label="Образование" placeholder="Образование (необязательно)" value={education ?? ''} disabled={busy || education === null} maxLength={200} onChange={e => setEducation(e.target.value)} />
       {error ? (
         <p role="alert" className="text-sm text-[var(--color-danger)]">
           {error}
@@ -525,7 +539,7 @@ function AttestationIdentityForm({
           type="submit"
           size="sm"
           className="min-w-0 flex-1 sm:flex-none"
-          disabled={busy || !dirty}
+          disabled={busy || education === null || (!dirty && education === savedEducation)}
           aria-busy={busy || undefined}
         >
           <FloppyDisk /> {busy ? 'Сохраняем…' : 'Сохранить данные'}
@@ -746,20 +760,18 @@ function AttestationDetailContent({
 
             {contact.phoneE164 ? (
               <div className="flex gap-2">
-                <Button asChild variant="outline" className="min-w-0 flex-1 tabular-nums">
-                  <a href={phoneHref(contact.phoneE164)}>{formatPhoneDisplay(contact.phoneE164)}</a>
+                <Button asChild className="min-w-0 flex-1 px-3">
+                  <a href={whatsappChatHref(contact.phoneE164)} target="_blank" rel="noopener noreferrer"><WhatsappLogo aria-hidden="true" /> WhatsApp</a>
                 </Button>
                 {/* A new tab, so the card stays open behind the chat.
                     `noopener` keeps that tab from reaching back here. */}
                 <Button asChild variant="outline" size="icon">
                   <a
-                    href={whatsappChatHref(contact.phoneE164)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Написать в WhatsApp"
-                    title="Написать в WhatsApp"
+                    href={phoneHref(contact.phoneE164)}
+                    aria-label={'Позвонить: ' + formatPhoneDisplay(contact.phoneE164)}
+                    title={formatPhoneDisplay(contact.phoneE164)}
                   >
-                    <WhatsappLogo aria-hidden="true" />
+                    <Phone aria-hidden="true" />
                   </a>
                 </Button>
               </div>
@@ -826,7 +838,7 @@ function AttestationDetailContent({
               ) : null}
             </section>
 
-            {permissions.canManageDocuments && row.organization && !courseDeleted ? <a className="inline-block min-h-11 text-sm underline" href={'/admin/settings/certificate?' + new URLSearchParams({ organization: row.organization, course: row.testId ?? '', user: row.userId, tab: 'certificate' })}>Открыть корочку в редакторе</a> : null}
+            {permissions.canManageDocuments && row.organization && !courseDeleted ? <div className="grid gap-2 sm:grid-cols-2">{(['certificate', 'protocol'] as const).map(tab => <Button key={tab} asChild variant="outline" className="h-auto min-h-11 whitespace-normal text-center"><a href={'/admin/settings/certificate?' + new URLSearchParams({ organization: row.organization!, course: row.testId ?? '', user: row.userId, tab })}>{tab === 'certificate' ? 'Редактировать корочку' : 'Протокол компании'}</a></Button>)}</div> : null}
             {canReadCertificate && !courseDeleted ? (
               <details className="group rounded-[var(--radius-group)] border border-[var(--color-border)]">
                 <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-semibold [&::-webkit-details-marker]:hidden">

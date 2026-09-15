@@ -57,13 +57,13 @@ test('every certificate is a two-sided booklet drawn with the current settings',
     /SAFE_IMAGE_PATH_PATTERN =\s*\/\^\\\/certificate-assets\\\/image\\\?kind=\(\?:stamp\|chairman\|member\)&v=\[0-9\]\{1,12\}\$\/u/u,
   );
   // Two A5 landscape sides, the paper form's bilingual labels, no template PDF.
-  assert.match(renderer, /const PAGE: \[number, number\] = \[595\.28, 419\.53\]/u);
+  assert.match(renderer, /insertWidthCm \* 72 \/ 2\.54/u);
   // Actual two-page output is exercised by document-editor.test.mjs.
-  assert.match(renderer, /pageText\(sheet\(\)/u);
-  assert.match(renderer, /const right = sheet\(\)/u);
+  assert.match(renderer, /pdf\.addPage\(\[half \* 2, 375\]\)/u);
+  assert.match(renderer, /const right = half \+ margin/u);
   assert.match(renderer, /КУӘЛІК \/ УДОСТОВЕРЕНИЕ №/u);
   assert.match(renderer, /Білімін тексеру туралы мәліметтер/u);
-  assert.match(renderer, /Председатель:/u);
+  assert.match(renderer, /Председатель/u);
   assert.doesNotMatch(renderer, /templateBytes|PDFDocument\.load\(/u);
   assert.match(renderer, /documentStatement\(text, branding, metadata.titleSnapshot\)/u);
   // The server copies the branding into each certificate's metadata.
@@ -86,9 +86,9 @@ test('an export carries the workbook, one protocol per company and course, then 
   assert.match(protocol, /export function groupItemsForProtocols/u);
   assert.match(protocol, /return `protocols\/Протокол-/u);
   assert.match(protocol, /заседания комиссии по проверке знаний/u);
-  assert.match(protocol, /Результат проверки/u);
+  assert.match(protocol, /Результат сдачи экзаменов/u);
   assert.match(protocol, /participantResult\(person\)/u);
-  assert.doesNotMatch(protocol, /Куратор Заказчика|drawSignature|drawImage/u);
+  assert.doesNotMatch(protocol, /drawSignature|drawImage/u);
   assert.doesNotMatch(protocol, /node:(?:fs|path|crypto)|SafetyHub\.kz/u);
   for (const source of [worker, client]) {
     const report = source.indexOf('CERTIFICATE_REPORT_FILENAME');

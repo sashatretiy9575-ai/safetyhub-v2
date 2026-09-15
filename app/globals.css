@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '../components/admin/document-editor.css';
 
 /* Markdown in the repository (README and local notes) quotes class names
    from this codebase. Tailwind v4 detects sources automatically and would turn

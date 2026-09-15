@@ -16,6 +16,7 @@ export const verifyIdentitySchema = z.object({
   surname: profileField(PROFILE_FIELD_LIMITS.surname),
   job: profileField(PROFILE_FIELD_LIMITS.job),
   organization: profileField(PROFILE_FIELD_LIMITS.organization),
+  education: z.string().trim().max(200).regex(/^[^\u0000-\u001f\u007f]*$/u).optional(),
 });
 
 export const revokeIdentitySchema = z.object({

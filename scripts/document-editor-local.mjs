@@ -2,6 +2,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
 import { prepareReleaseE2eAuth } from './e2e-passwordless-session.mjs';
 
 if (Number(process.versions.node.split('.')[0]) !== 24) throw new Error('Node 24 required');
@@ -31,6 +32,12 @@ const mode = process.argv[2] ?? 'dev';
 let auth;
 let args;
 if (mode === 'test') {
+  // Repeated local UI runs share one synthetic account. Reset only its test
+  // settings quota, never production limits or other users' state.
+  const localRef = readFileSync('supabase/.temp/project-ref', 'utf8').trim();
+  if (!/^[a-z0-9]+$/.test(localRef)) throw new Error('INVALID_LOCAL_CONTAINER');
+  const reset = spawnSync('docker', ['exec', 'supabase_db_' + localRef, 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-c', "update private.business_rate_limits set consumed=0 where action='site.settings.update' and actor_id in (select id from auth.users where email='admin@safetyhub.local')"], { encoding: 'utf8', windowsHide: true });
+  if (reset.status !== 0) throw new Error('LOCAL_TEST_QUOTA_RESET_FAILED');
   auth = await prepareReleaseE2eAuth({ environment: env });
   env.E2E_ADMIN_STORAGE_STATE = auth.adminStatePath;
   env.E2E_PARTICIPANT_STORAGE_STATE = auth.participantStatePath;

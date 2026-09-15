@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/shared/navigation-link';
 import { usePathname } from 'next/navigation';
 import { DotsThreeOutline } from '@phosphor-icons/react/dist/csr/DotsThreeOutline';
 import {

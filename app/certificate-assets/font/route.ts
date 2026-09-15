@@ -37,6 +37,9 @@ type FontDescriptor = {
 };
 
 const FONT_REQUESTS = new Map<string, FontDescriptor>([
+  ['?face=sans&weight=bold&v=1', { locale: 'ru', path: path.join(process.cwd(), 'lib/pdf/assets/NotoSans-Bold.ttf'), contentType: 'font/ttf', etag: '"noto-sans-bold-v1"' }],
+  ['?face=serif&weight=regular&v=1', { locale: 'ru', path: path.join(process.cwd(), 'lib/pdf/assets/NotoSerif-Regular.ttf'), contentType: 'font/ttf', etag: '"noto-serif-regular-v1"' }],
+  ['?face=serif&weight=bold&v=1', { locale: 'ru', path: path.join(process.cwd(), 'lib/pdf/assets/NotoSerif-Bold.ttf'), contentType: 'font/ttf', etag: '"noto-serif-bold-v1"' }],
   [
     '?locale=ru&v=1',
     {

@@ -19,6 +19,8 @@ export const documentDefaultsSchema = z.object({
   reviewerName: text(200),
   commission: z.array(z.object({ name: text(200), position: text(200) }).strict()).max(20),
   companyName: text(200), programName: text(240), protocolText: text(1000),
+  insertWidthCm: z.number().min(8).max(60).nullable().optional(),
+  insertHeightCm: z.number().min(4).max(30).nullable().optional(),
 }).strict();
 
 /** The row as the admin page and the renderer see it; images are flags here. */

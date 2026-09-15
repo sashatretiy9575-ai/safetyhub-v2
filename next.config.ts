@@ -113,7 +113,9 @@ const nextConfig: NextConfig = {
   // Sharp discovers its platform binding and libvips payload dynamically.
   // Next's file tracer can otherwise keep the binding while dropping the
   // shared library from this route's Vercel function.
-  outputFileTracingIncludes: {
+    outputFileTracingIncludes: {
+      '/api/certificates/*/photo': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
+      '/api/admin/documents/photo/*': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
     '/api/profile/avatar': [
       './node_modules/@img/sharp-linux-x64/**/*',
       './node_modules/@img/sharp-libvips-linux-x64/**/*',
@@ -128,7 +130,10 @@ const nextConfig: NextConfig = {
       './node_modules/@img/sharp-linux-x64/**/*',
       './node_modules/@img/sharp-libvips-linux-x64/**/*',
     ],
-    '/certificate-assets/font': [
+      '/certificate-assets/font': [
+        './lib/pdf/assets/NotoSerif-Regular.ttf',
+        './lib/pdf/assets/NotoSerif-Bold.ttf',
+        './lib/pdf/assets/NotoSans-Bold.ttf',
       './lib/pdf/assets/noto-sans-latin-cyrillic.ttf',
       './lib/pdf/assets/NotoSansCJKsc-Regular-b2e9d66e.otf',
     ],

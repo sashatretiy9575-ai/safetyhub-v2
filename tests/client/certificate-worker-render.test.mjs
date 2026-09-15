@@ -5,6 +5,7 @@ import { PDFDocument } from 'pdf-lib';
 import { generateCertificateInBrowser } from '../../lib/pdf/certificate-renderer.ts';
 
 const branding = {
+  documentDefaults: { reviewerName: 'Иванов', commission: [], companyName: '', programName: '', protocolText: '', insertWidthCm: 32, insertHeightCm: 10 },
   organizationName: 'ТОО «Пример»',
   bin: '123456789012',
   chairmanName: 'Иванов И. И.',
@@ -67,7 +68,7 @@ test('certificate renderer operates without window/document canvas in Web Worker
         headers: { 'Content-Type': 'application/pdf', 'Content-Length': String(template.length) },
       });
     }
-    if (url === validCertificate.fontUrl) {
+    if (url.includes('/certificate-assets/font')) {
       return new Response(font, {
         headers: { 'Content-Type': 'font/ttf', 'Content-Length': String(font.length) },
       });
@@ -79,11 +80,42 @@ test('certificate renderer operates without window/document canvas in Web Worker
     const bytes = await generateCertificateInBrowser(validCertificate);
     assert.equal(new TextDecoder().decode(bytes.slice(0, 5)), '%PDF-');
     const pdf = await PDFDocument.load(bytes);
-    assert.equal(pdf.getPageCount(), 2);
+    assert.equal(pdf.getPageCount(), 1);
     assert.match(pdf.getTitle() ?? '', /SH-2026-ABC/);
   } finally {
     globalThis.fetch = originalFetch;
     if (previousDocument !== undefined) globalThis.document = previousDocument;
     if (previousWindow !== undefined) globalThis.window = previousWindow;
   }
+});
+
+test('photo is embedded in the same single sheet and transport errors never produce an incomplete download', async () => {
+  const sharp = (await import('sharp')).default;
+  const photo = await sharp({ create: { width: 30, height: 40, channels: 3, background: '#456789' } }).jpeg().toBuffer();
+  const font = await readFile(new URL('../../lib/pdf/assets/noto-sans-latin-cyrillic.ttf', import.meta.url));
+  const previous = globalThis.fetch;
+  const photoUrl = `/api/certificates/${validCertificate.certificateId}/photo`;
+  let fail = false, requested = 0;
+  globalThis.fetch = async (input, init) => {
+    if (String(input) === photoUrl) {
+      requested++;
+      assert.equal(init.credentials, 'same-origin');
+      assert.equal(init.cache, 'no-store');
+      return fail ? new Response(null, { status: 503 }) : new Response(photo);
+    }
+    return new Response(font);
+  };
+  try {
+    const bytes = await generateCertificateInBrowser({ ...validCertificate, photoUrl });
+    const pdf = await PDFDocument.load(bytes);
+    assert.equal(pdf.getPageCount(), 1);
+    assert.ok(Math.abs(pdf.getPage(0).getWidth() - 32 * 72 / 2.54) < .01);
+    assert.ok(Math.abs(pdf.getPage(0).getHeight() - 10 * 72 / 2.54) < .01);
+    const { PDFName } = await import('pdf-lib');
+    assert.ok(pdf.getPage(0).node.Resources().lookup(PDFName.of('XObject')).keys().length > 0);
+    fail = true;
+    await assert.rejects(generateCertificateInBrowser({ ...validCertificate, photoUrl }), /CERTIFICATE_PHOTO_UNAVAILABLE/);
+    assert.equal(requested, 2, 'a profile photo must not be reused from the font cache');
+    await assert.rejects(generateCertificateInBrowser({ ...validCertificate, branding: { ...branding, documentDefaults: undefined } }), /INSERT_SIZE_REQUIRED/);
+  } finally { globalThis.fetch = previous; }
 });

@@ -4,7 +4,7 @@ import { apiError } from '@/server/auth/api-error';
 import { isSameOriginRequest } from '@/server/http/request-origin';
 import { requireUser } from '@/server/auth/session';
 import { createAdminClient } from '@/server/supabase/admin';
-import { getProfileAvatarUrl } from '@/server/profile/dashboard';
+import { certificatePhotoResponse } from '@/server/certificates/photo';
 import { createClient } from '@/server/supabase/server';
 import { AVATAR_HEIGHT, AVATAR_MAX_BYTES, AVATAR_WIDTH } from '@/lib/profile/avatar-image';
 import { validatedStaticWebpDimensions } from '@/lib/security/avatar-webp';
@@ -519,13 +519,7 @@ export async function GET() {
     if (!auth.profile.avatar_updated_at) {
       return NextResponse.json({ error: 'AVATAR_NOT_FOUND' }, { status: 404 });
     }
-    const signedUrl = await getProfileAvatarUrl(auth.user.id);
-    if (!signedUrl) {
-      return NextResponse.json({ error: 'AVATAR_NOT_FOUND' }, { status: 404 });
-    }
-    const response = NextResponse.redirect(signedUrl, 307);
-    response.headers.set('Cache-Control', 'private, no-store');
-    return response;
+    return await certificatePhotoResponse(auth.user.id, true);
   } catch (error) {
     return apiError(error);
   }

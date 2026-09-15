@@ -141,6 +141,8 @@ export async function createCertificateRenderMetadata(
   branding: CertificateBranding,
 ): Promise<CertificateRenderMetadata> {
   const verificationToken = await getCertificateVerificationToken(data.id);
+  const profile = await createAdminClient().from('profiles').select('avatar_updated_at,education').eq('id', data.userId).single();
+  if (profile.error) throw profile.error;
   const batch = data.organization ? await findCertificateDocumentBatch(data.organization, data.testSlug) : null;
   const protocolDate = batch?.date ?? documentDate(new Date(data.issuedAt));
   return {
@@ -153,6 +155,8 @@ export async function createCertificateRenderMetadata(
     templateUrl: `/certificates/template-v${data.templateVersion}.pdf`,
     fontUrl: certificateFontUrl(data.locale),
     fullName: data.fullName,
+    photoUrl: profile.data.avatar_updated_at ? `/api/certificates/${data.id}/photo` : null,
+    education: profile.data.education,
     position: data.job,
     organization: data.organization,
     score: data.score,

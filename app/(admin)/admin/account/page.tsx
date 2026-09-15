@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic';
 
 import { AdminAvatarUploader } from '@/components/profile/admin-avatar-uploader';
 import { AccountDeletion } from '@/components/profile/account-deletion';
-import { getProfileAvatarUrl } from '@/server/profile/dashboard';
 import { ProfileForm } from '@/components/profile/profile-form';
 import { phoneRequiredForLocale } from '@/lib/profile/fields';
 import { requireRole } from '@/server/auth/session';
@@ -14,7 +13,7 @@ import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone/countr
 export default async function AdminAccountPage() {
   const actor = await requireRole(['admin']);
   const avatarUrl = actor.profile.avatar_updated_at
-    ? await getProfileAvatarUrl(actor.user.id)
+    ? '/api/profile/avatar'
     : null;
   const fullName = `${actor.profile.name} ${actor.profile.surname}`.trim() || 'Администратор';
   const initials = fullName

@@ -2,11 +2,31 @@ import { expect, test } from '@playwright/test';
 
 test.use({ storageState: process.env.E2E_ADMIN_STORAGE_STATE, channel: 'chrome' });
 
+test('protected photo route returns JPEG from a real private storage manifest', async ({ page }, testInfo) => {
+  const base = String(testInfo.project.use.baseURL);
+  if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('LOCAL_ONLY');
+  const identity = await (await page.request.get('/api/identity')).json();
+  expect(identity.userId).toBeTruthy();
+  let photo = await page.request.get('/api/admin/documents/photo/' + identity.userId);
+  if (photo.status() === 404) {
+    const sharp = (await import('sharp')).default;
+    const fixture = await sharp({ create: { width: 360, height: 360, channels: 3, background: '#738491' } }).jpeg().toBuffer();
+    const upload = await page.request.post('/api/profile/avatar', { headers: { origin: base }, multipart: { avatar: { name: 'local-fixture.jpg', mimeType: 'image/jpeg', buffer: fixture } } });
+    expect(upload.ok(), await upload.text()).toBeTruthy();
+    photo = await page.request.get('/api/admin/documents/photo/' + identity.userId);
+  }
+  expect(photo.status()).toBe(200);
+  expect(photo.headers()['content-type']).toContain('image/jpeg');
+  expect(photo.headers()['cache-control']).toContain('no-store');
+  expect((await photo.body()).subarray(0, 2).toString('hex')).toBe('ffd8');
+});
+
 test('company protocol, individual booklet, persistence and mobile preview', async ({ page }, testInfo) => {
   test.setTimeout(180_000);
   const base = testInfo.project.use.baseURL;
   if (!base || !['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('LOCAL_ONLY');
   const errors: string[] = [];
+  page.on('console', message => { if (message.type() === 'error' && /Content Security Policy|Refused to apply inline style/.test(message.text())) errors.push(message.text()); });
   page.on('response', async response => {
     if (response.request().method() === 'PATCH' && response.status() >= 400 && response.status() !== 409) {
       console.error('Document mutation failed', response.status(), (await response.json()).error);
@@ -31,7 +51,9 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   }
   expect(chosen, 'seeded company must include an issued certificate').not.toBeNull();
   await page.goto('/admin/settings/certificate?' + new URLSearchParams({ organization: chosen!.organization, course: chosen!.course, user: chosen!.user }));
-  await expect(page.getByLabel('Клиент', { exact: true })).toHaveValue(chosen!.user);
+  await expect(page.getByRole('button', { name: 'Изменить', exact: true })).toBeVisible();
+  await page.getByLabel('Общая ширина, см', { exact: true }).fill('32');
+  await page.getByLabel('Высота, см', { exact: true }).fill('10');
   await expect(page.locator('canvas').first()).toBeVisible({ timeout: 30_000 });
   await page.getByLabel('Дата', { exact: true }).fill('2026-09-08');
   await page.getByRole('button', { name: 'Номер по дате', exact: true }).click();
@@ -71,28 +93,78 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   await page.getByLabel('Проверяющий', { exact: true }).fill(originalReviewer);
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
   await expect(page.getByText('Настройки и реквизиты протокола сохранены.')).toBeVisible();
-  await page.getByRole('button', { name: 'Корочка клиента', exact: true }).click();
-  await expect(page.locator('canvas')).toHaveCount(2, { timeout: 30_000 });
+  await page.getByRole('button', { name: 'Корочка', exact: true }).click();
+  await expect(page.locator('canvas')).toHaveCount(1, { timeout: 30_000 });
   await expect(page.getByRole('button', { name: 'Скачать PDF', exact: true })).toBeEnabled();
+  await page.setViewportSize({ width: 240, height: 812 });
+  await page.getByRole('button', { name: 'Предпросмотр', exact: true }).click();
+  await page.getByRole('button', { name: 'Правая', exact: true }).click();
+  expect(await page.locator('.document-insert').evaluate(el => getComputedStyle(el).transform)).not.toBe('none');
+  await page.getByRole('button', { name: 'Левая', exact: true }).click();
+  expect(await page.locator('.document-insert').evaluate(el => getComputedStyle(el).transform)).toBe('none');
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.screenshot({ path: testInfo.outputPath('booklet-desktop.png'), fullPage: true });
-  for (let i = 0; i < 2; i++) await page.locator('canvas').nth(i).screenshot({ path: testInfo.outputPath(`booklet-side-${i + 1}.png`) });
+  for (let i = 0; i < 1; i++) await page.locator('canvas').nth(i).screenshot({ path: testInfo.outputPath(`booklet-side-${i + 1}.png`) });
   const downloadEvent = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Скачать PDF', exact: true }).click();
-  expect((await downloadEvent).suggestedFilename()).toMatch(/\.pdf$/);
-  await page.getByRole('button', { name: 'Протокол компании', exact: true }).click();
+  const bookletDownload = await downloadEvent;
+  expect(bookletDownload.suggestedFilename()).toMatch(/\.pdf$/);
+  await bookletDownload.saveAs(testInfo.outputPath('booklet.pdf'));
+  await page.getByRole('button', { name: 'Протокол', exact: true }).click();
   await expect(page.locator('canvas').first()).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('protocol-desktop.png'), fullPage: true });
   const zipEvent = page.waitForEvent('download', { timeout: 90_000 });
   await page.getByRole('button', { name: 'Скачать комплект компании', exact: true }).click();
   expect((await zipEvent).suggestedFilename()).toMatch(/\.zip$/);
-  await page.setViewportSize({ width: 375, height: 812 });
+  const draftPerson = company.participants.find((p: { certificateId: string | null }) => !p.certificateId);
+  if (draftPerson) {
+    await page.getByRole('button', { name: 'Корочка', exact: true }).click();
+    await page.getByLabel('Сотрудник', { exact: true }).click();
+    await page.getByRole('button', { name: draftPerson.fullName, exact: true }).click();
+    await expect(page.getByText(/Предварительный просмотр\. Удостоверение ещё не выдано/)).toBeVisible();
+    await expect(page.locator('canvas')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Скачать PDF', exact: true })).toBeDisabled();
+    await page.getByRole('button', { name: 'Протокол', exact: true }).click();
+  }
+  await page.setViewportSize({ width: 240, height: 740 });
   await page.getByRole('button', { name: 'Предпросмотр', exact: true }).click();
   await expect(page.locator('canvas').first()).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   await page.screenshot({ path: testInfo.outputPath('editor-mobile.png'), fullPage: true });
-  await page.getByRole('button', { name: 'Увеличить документ', exact: true }).click();
+  for (const width of [240, 320, 375, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 812 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow at ${width}`).toBeTruthy();
+    await page.screenshot({ path: testInfo.outputPath(`editor-${width}.png`), fullPage: true });
+    if (width < 1024) {
+      await page.getByRole('button', { name: 'Поля', exact: true }).click();
+      await page.evaluate(() => window.scrollTo(0, 0));
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+      expect(await page.locator('.document-editor button').evaluateAll(buttons => buttons.filter(b => b.getBoundingClientRect().height > 0).every(b => b.scrollHeight <= b.clientHeight + 1))).toBeTruthy();
+      await page.screenshot({ path: testInfo.outputPath(`fields-${width}.png`), fullPage: true });
+      if (width === 240) {
+        await page.setViewportSize({ width, height: 390 });
+        await page.getByLabel('Номер', { exact: true }).focus();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+        await page.setViewportSize({ width, height: 812 });
+      }
+      await page.getByRole('button', { name: 'Предпросмотр', exact: true }).click();
+    }
+  }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   expect(errors).toEqual([]);
+});
+
+test('a slow navigation shows a non-blocking circle and clears it on completion', async ({ page }) => {
+  await page.route(/\/admin\/employees(?:\?|$)/, async route => {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    await route.continue();
+  });
+  await page.goto('/admin/account');
+  await page.getByRole('link', { name: 'Сотрудники', exact: true }).filter({ visible: true }).click();
+  await expect(page.getByRole('status', { name: 'Loading', exact: true }).first()).toBeVisible({ timeout: 1000 });
+  await expect(page.getByRole('heading', { name: 'Сотрудники', exact: true })).toBeVisible();
+  await expect(page.getByRole('status', { name: 'Loading', exact: true })).toHaveCount(0);
 });
 
 test('anonymous and participant cannot read company documents', async ({ browser }) => {
@@ -101,6 +173,8 @@ test('anonymous and participant cannot read company documents', async ({ browser
   expect([401, 403]).toContain(result.status());
   const foreignCertificate = await context.request.get('http://localhost:3100/api/certificates/20000000-0000-4000-8000-000000000062/metadata');
   expect([403, 404]).toContain(foreignCertificate.status());
+  const foreignPhoto = await context.request.get('http://localhost:3100/api/certificates/20000000-0000-4000-8000-000000000062/photo');
+  expect([403, 404]).toContain(foreignPhoto.status());
   await context.close();
   const anonymous = await browser.newContext({ storageState: { cookies: [], origins: [] } });
   const denied = await anonymous.request.get('http://localhost:3100/api/admin/documents', { maxRedirects: 0 });

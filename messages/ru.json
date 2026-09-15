@@ -641,6 +641,7 @@
     }
   },
   "Certificate": {
+    "sizeRequired": "Администратору нужно указать размер вкладыша в настройках документов.",
     "downloadPdf": "Скачать PDF",
     "generating": "Готовим PDF…",
     "downloaded": "Скачано",

@@ -7,6 +7,8 @@ export type DocumentDefaults = {
   companyName: string;
   programName: string;
   protocolText: string;
+  insertWidthCm?: number | null;
+  insertHeightCm?: number | null;
 };
 export type DocumentBatch = {
   id?: string;
@@ -21,6 +23,8 @@ export type DocumentParticipant = {
   userId: string;
   fullName: string;
   position: string;
+  education?: string;
+  photoUrl?: string | null;
   status: 'passed' | 'failed' | 'started' | 'expired' | 'none';
   score: number | null;
   total: number | null;
@@ -63,6 +67,11 @@ export function documentCommission(branding: CertificateBranding): CommissionMem
 export function documentStatement(text: string, branding: CertificateBranding, program: string) {
   return text.replaceAll('{protocol}', branding.protocolNumber)
     .replaceAll('{program}', program);
+}
+
+export function hasInsertSize(branding: CertificateBranding) {
+  const d = branding.documentDefaults;
+  return Boolean(d?.insertWidthCm && d?.insertHeightCm);
 }
 export function participantResult(person: DocumentParticipant) {
   const result = { passed: 'Сдал', failed: 'Не сдал', started: 'Не завершил', expired: 'Время истекло', none: 'Проверка не пройдена' }[person.status];

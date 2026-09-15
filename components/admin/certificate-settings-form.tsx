@@ -1,6 +1,8 @@
 'use client';
 
+
 import { useEffect, useRef, useState } from 'react';
+import { Plus, Trash, CaretDown } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -42,8 +44,7 @@ function PdfPreview({ bytes }: { bytes: Uint8Array | null }) {
   useEffect(() => {
     const container = host.current;
     if (!container) return;
-    container.replaceChildren();
-    if (!bytes) return;
+    if (!bytes) { container.replaceChildren(); return; }
     let cancelled = false;
     let dispose: (() => void) | undefined;
     void (async () => {
@@ -53,6 +54,7 @@ function PdfPreview({ bytes }: { bytes: Uint8Array | null }) {
       const task = pdfjs.getDocument({ data: bytes.slice(), enableXfa: false });
       dispose = () => { void task.destroy(); };
       const pdf = await task.promise;
+      const fragment = document.createDocumentFragment();
       for (let pageNumber = 1; pageNumber <= pdf.numPages && !cancelled; pageNumber++) {
         const page = await pdf.getPage(pageNumber);
         if (cancelled) break;
@@ -61,12 +63,12 @@ function PdfPreview({ bytes }: { bytes: Uint8Array | null }) {
         canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
         canvas.style.width = '100%'; canvas.style.height = 'auto';
         canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', 'Страница ' + pageNumber);
-        container.appendChild(canvas);
+        fragment.appendChild(canvas);
         await page.render({ canvas, viewport }).promise;
       }
-      if (!cancelled) setError('');
+      if (!cancelled) { container.replaceChildren(fragment); setError(''); }
     })().catch(() => { if (!cancelled) setError('Предпросмотр не загрузился. Повторите изменение поля.'); });
-    return () => { cancelled = true; dispose?.(); container.replaceChildren(); };
+    return () => { cancelled = true; dispose?.(); };
   }, [bytes]);
   return <><div ref={host} className="space-y-4" />{error && <p role="alert">{error}</p>}</>;
 }
@@ -80,12 +82,13 @@ export function CertificateSettingsForm({ initialSettings, initialData, initialS
   const [data, setData] = useState(initialData);
   const [organization, setOrganization] = useState(initialSelection.organization ?? '');
   const [course, setCourse] = useState(() => initialData.courses.find(c => c.slug === initialSelection.course || c.id === initialSelection.course)?.slug ?? '');
-  const [user, setUser] = useState(initialSelection.user ?? '');
+  const [user, setUser] = useState(initialSelection.user ?? initialData.participants[0]?.userId ?? '');
   const [tab, setTab] = useState<'protocol' | 'certificate'>(initialSelection.tab === 'certificate' ? 'certificate' : 'protocol');
   const [mobile, setMobile] = useState<'fields' | 'preview'>('fields');
-  const [zoomed, setZoomed] = useState(false);
-  const [batch, setBatch] = useState(() => newDocumentBatch('', ''));
-  const [savedBatch, setSavedBatch] = useState<DocumentBatch | null>(null);
+  const [half, setHalf] = useState<'left' | 'right'>('left');
+  const [changeContext, setChangeContext] = useState(!initialSelection.organization || !initialSelection.course);
+  const [batch, setBatch] = useState(() => initialData.batch ?? newDocumentBatch(initialSelection.organization ?? '', initialData.courses.find(c => c.slug === initialSelection.course || c.id === initialSelection.course)?.slug ?? ''));
+  const [savedBatch, setSavedBatch] = useState<DocumentBatch | null>(initialData.batch);
   const [metadata, setMetadata] = useState<CertificateRenderMetadata | null>(null);
   const [bytes, setBytes] = useState<Uint8Array | null>(null);
   const [message, setMessage] = useState('');
@@ -94,6 +97,8 @@ export function CertificateSettingsForm({ initialSettings, initialData, initialS
   const [exporting, setExporting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rendering, setRendering] = useState(false);
+  const [metadataLoading, setMetadataLoading] = useState(false);
+  const [previewRetry, setPreviewRetry] = useState(0);
   const exportAbort = useRef<AbortController | null>(null);
   useEffect(() => () => exportAbort.current?.abort(), []);
   const selectedPerson = data.participants.find(p => p.userId === user);
@@ -107,7 +112,10 @@ export function CertificateSettingsForm({ initialSettings, initialData, initialS
     stampUrl: null, chairmanSignatureUrl: null, memberSignatureUrl: null,
   };
 
+  const loadedSelection = useRef(JSON.stringify([organization, course]));
   useEffect(() => {
+    const selection = JSON.stringify([organization, course]);
+    if (loadedSelection.current === selection) return;
     const controller = new AbortController();
     setLoading(true); setBytes(null); setMetadata(null); setMessage('');
     const params = new URLSearchParams({ organization, course });
@@ -115,6 +123,7 @@ export function CertificateSettingsForm({ initialSettings, initialData, initialS
       .then(async response => { if (!response.ok) throw new Error(); return await response.json() as EditorData; })
       .then(next => {
         if (controller.signal.aborted) return;
+        loadedSelection.current = selection;
         setData(next);
         const nextBatch = next.batch ?? newDocumentBatch(organization, course);
         setBatch(nextBatch); setSavedBatch(next.batch);
@@ -127,32 +136,41 @@ export function CertificateSettingsForm({ initialSettings, initialData, initialS
   useEffect(() => {
     const controller = new AbortController();
     setMetadata(null);
+    setMetadataLoading(Boolean(selectedCertificate));
     if (selectedCertificate) void metadataFor(selectedCertificate, controller.signal)
       .then(value => { if (!controller.signal.aborted) setMetadata(value); })
-      .catch(() => { if (!controller.signal.aborted) setPreviewMessage('Удостоверение недоступно. Проверьте выдачу и данные участника.'); });
+      .catch(() => { if (!controller.signal.aborted) setPreviewMessage('Удостоверение недоступно. Проверьте выдачу и данные участника.'); })
+      .finally(() => { if (!controller.signal.aborted) setMetadataLoading(false); });
     return () => controller.abort();
-  }, [selectedCertificate]);
+  }, [selectedCertificate, previewRetry]);
 
-  const renderKey = JSON.stringify({ branding, people: data.participants, metadata, program, organization, tab, loading });
+  const renderKey = JSON.stringify({ branding, people: data.participants, metadata, program, organization, tab, loading, user, batch, previewRetry });
   useEffect(() => {
     const controller = new AbortController();
-    setBytes(null); setRendering(true); setPreviewMessage('');
+    setRendering(true); setPreviewMessage('');
     const timer = setTimeout(() => {
       void (async () => {
         if (loading) return null;
         if (tab === 'certificate') {
           if (!selectedPerson) { setPreviewMessage('Выберите компанию, программу и участника.'); return null; }
-          if (!selectedCertificate) { setPreviewMessage('Участнику ещё не выдано удостоверение. Откройте его карточку для проверки и выдачи.'); return null; }
-          if (!metadata) return null;
-          const { generateCertificateInBrowser } = await import('@/lib/pdf/certificate-renderer');
-          return generateCertificateInBrowser({ ...metadata, branding }, controller.signal);
+          if (selectedCertificate && (!metadata || metadata.certificateId !== selectedCertificate)) return null;
+          const { generateCertificatePreview } = await import('@/lib/pdf/certificate-renderer');
+          const draft = {
+            schemaVersion: 1 as const, filename: 'Предпросмотр.pdf', locale: 'ru' as const, templateVersion: 1,
+            templateUrl: '/certificate-assets/template', fontUrl: '/certificate-assets/font?locale=ru&v=1',
+            fullName: selectedPerson.fullName, position: selectedPerson.position, organization,
+            titleSnapshot: program, photoUrl: selectedPerson.photoUrl, score: selectedPerson.score ?? 0,
+            total: selectedPerson.total ?? 0, passScore: 0, certificateNumber: 'ПРЕДПРОСМОТР',
+            completedAt: batch.date, issuedAt: batch.date + 'T12:00:00+05:00', branding,
+          };
+          return generateCertificatePreview({ ...(metadata ?? draft), branding }, controller.signal);
         }
         const { generateProtocolInBrowser } = await import('@/lib/pdf/protocol-renderer');
         return generateProtocolInBrowser({
           organization: organization || fields.documentDefaults.companyName, courseTitle: program, date: batch.date,
           items: [], participants: data.participants,
         }, branding, '/certificate-assets/font?locale=' + (data.participants.some(p => /[\u3400-\u9fff]/u.test(p.fullName)) ? 'zh&v=Sans2.005' : 'ru&v=1'), controller.signal);
-      })().then(result => { if (!controller.signal.aborted) setBytes(result); })
+      })().then(result => { if (!controller.signal.aborted && result) setBytes(result); })
         .catch(error => { if (!controller.signal.aborted) setPreviewMessage(error instanceof Error && error.message === 'DOCUMENT_TEXT_OVERFLOW' ? 'Текст не помещается на двух сторонах корочки. Сократите тексты бланка или состав комиссии.' : 'Не удалось сформировать PDF. Проверьте поля и повторите.'); })
         .finally(() => { if (!controller.signal.aborted) setRendering(false); });
     }, 300);
@@ -222,6 +240,9 @@ export function CertificateSettingsForm({ initialSettings, initialData, initialS
       const { zipSync } = await import('fflate');
       const { safeFilenameSegment } = await import('@/lib/pdf/certificate');
       const archive: Record<string, Uint8Array> = {};
+      if ((single && tab === 'certificate' || !single && current.participants.some(p => p.certificateId)) && (!fields.documentDefaults.insertWidthCm || !fields.documentDefaults.insertHeightCm)) {
+        setMessage('Укажите и сохраните ширину и высоту раскрытого вкладыша в сантиметрах.'); setMobile('fields'); return;
+      }
       if (single && tab === 'certificate') {
         if (!selectedCertificate) throw new Error();
         const item = await metadataFor(selectedCertificate, controller.signal);
@@ -252,30 +273,31 @@ export function CertificateSettingsForm({ initialSettings, initialData, initialS
   function field(key: keyof Omit<SettingsFields, 'documentDefaults' | 'validityMonths'>, label: string, multiline = false) {
     const props = { id: 'doc-' + key, value: fields[key], maxLength: multiline ? 1000 : key === 'bin' ? 32 : 200,
       onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setFields(current => ({ ...current, [key]: event.target.value })) };
-    return <div className="space-y-1"><Label htmlFor={props.id}>{label}</Label>{multiline ? <Textarea {...props} rows={3} /> : <Input {...props} />}</div>;
+    return <label className="relative block"><span className="absolute left-3 top-1.5 z-10 text-xs text-[var(--color-text-muted)]">{label}</span>{multiline ? <Textarea {...props} aria-label={label} placeholder={label} className="pt-6" rows={3} /> : <Input {...props} aria-label={label} placeholder={label} className="h-auto min-h-14 pt-6" />}</label>;
   }
-  function defaultsField(key: Exclude<keyof DocumentDefaults, 'commission'>, label: string) {
-    return <div className="space-y-1"><Label htmlFor={'default-' + key}>{label}</Label>
-      <Textarea id={'default-' + key} value={fields.documentDefaults[key]} rows={2} maxLength={key === 'protocolText' ? 1000 : key === 'programName' ? 240 : 200}
+  function defaultsField(key: Exclude<keyof DocumentDefaults, 'commission' | 'insertWidthCm' | 'insertHeightCm'>, label: string) {
+    return <div className="relative"><Label className="absolute left-3 top-1.5 text-xs" htmlFor={'default-' + key}>{label}</Label>
+      <Textarea className="pt-6" placeholder={label} id={'default-' + key} value={fields.documentDefaults[key]} rows={2} maxLength={key === 'protocolText' ? 1000 : key === 'programName' ? 240 : 200}
         onChange={e => setFields(current => ({ ...current, documentDefaults: { ...current.documentDefaults, [key]: e.target.value } }))} /></div>;
   }
-  const selectClass = 'min-h-11 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm';
-  const canDownload = bytes && !busy && !loading && !rendering && !dirty && !batchDirty && organization && course;
-  return <div className="space-y-5">
-    <div className="flex flex-wrap gap-2" aria-label="Вид документа">
-      <Button variant={tab === 'protocol' ? 'primary' : 'outline'} onClick={() => setTab('protocol')}>Протокол компании</Button>
-      <Button variant={tab === 'certificate' ? 'primary' : 'outline'} onClick={() => setTab('certificate')}>Корочка клиента</Button>
+  const canDownload = bytes && !previewMessage && !busy && !loading && !rendering && !dirty && !batchDirty && organization && course;
+  return <div className="document-editor min-w-0 space-y-4">
+    <div className="sticky top-14 z-20 space-y-2 bg-[var(--color-surface)] py-2">
+      <div className="grid grid-cols-2 gap-2" aria-label="Вид документа">
+        <Button variant={tab === 'certificate' ? 'primary' : 'outline'} onClick={() => { setBytes(null); setTab('certificate'); }}>Корочка</Button>
+        <Button variant={tab === 'protocol' ? 'primary' : 'outline'} onClick={() => { setBytes(null); setTab('protocol'); }}>Протокол</Button>
+      </div>
+      <div className="document-mode-switch grid grid-cols-2 gap-2 lg:hidden [&_button]:text-xs"><Button variant={mobile === 'fields' ? 'primary' : 'outline'} onClick={() => setMobile('fields')}>Поля</Button><Button variant={mobile === 'preview' ? 'primary' : 'outline'} onClick={() => setMobile('preview')}>Предпросмотр</Button></div>
     </div>
-    <div className="grid gap-3 md:grid-cols-3">
-      <div><Label htmlFor="doc-company">Компания</Label><select id="doc-company" className={selectClass} value={organization} disabled={busy || batchDirty && Boolean(savedBatch)} onChange={e => setOrganization(e.target.value)}>
-        <option value="">Выберите компанию</option>{data.organizations.map(org => <option key={org}>{org}</option>)}</select></div>
-      <div><Label htmlFor="doc-course">Программа</Label><select id="doc-course" className={selectClass} value={course} disabled={busy || batchDirty && Boolean(savedBatch)} onChange={e => setCourse(e.target.value)}>
-        <option value="">Выберите программу</option>{data.courses.map(c => <option key={c.slug} value={c.slug}>{c.title}</option>)}</select></div>
-      <div><Label htmlFor="doc-person">Клиент</Label><select id="doc-person" className={selectClass} value={user} disabled={loading || busy} onChange={e => setUser(e.target.value)}>
-        <option value="">Выберите клиента</option>{data.participants.map(p => <option key={p.userId} value={p.userId}>{p.fullName || 'ФИО не указано'}</option>)}</select></div>
+    <div className="min-w-0 space-y-2">
+      {!changeContext && <div className="flex min-w-0 items-start gap-2"><div className="min-w-0 flex-1 text-sm"><p className="break-words font-semibold">{organization}</p><p className="break-words text-[var(--color-text-muted)]">{program}</p></div><Button size="sm" variant="ghost" onClick={() => setChangeContext(true)}>Изменить</Button></div>}
+      {changeContext && <div className="grid min-w-0 gap-3 md:grid-cols-2">
+        <DocumentSelect label="Компания" value={organization} options={data.organizations.map(value => ({value, label: value}))} disabled={busy || batchDirty && Boolean(savedBatch)} onChange={setOrganization} />
+        <DocumentSelect label="Программа" value={course} options={data.courses.map(c => ({value: c.slug, label: c.title}))} disabled={busy || batchDirty && Boolean(savedBatch)} onChange={setCourse} />
+        {organization && course && <Button size="sm" variant="ghost" onClick={() => setChangeContext(false)}>Готово</Button>}
+      </div>}
+      {tab === 'certificate' && <DocumentSelect label="Сотрудник" value={user} options={data.participants.map(p => ({value: p.userId, label: p.fullName || 'ФИО не указано'}))} disabled={busy || loading} onChange={value => { setBytes(null); setMetadata(null); setUser(value); }} />}
     </div>
-    {organization && course && <p className="text-sm">Участников компании: {data.participants.length}. Корочек выдано: {data.participants.filter(p => p.certificateId).length}.</p>}
-    <div className="flex gap-2 lg:hidden"><Button variant={mobile === 'fields' ? 'primary' : 'outline'} onClick={() => setMobile('fields')}>Поля</Button><Button variant={mobile === 'preview' ? 'primary' : 'outline'} onClick={() => setMobile('preview')}>Предпросмотр</Button></div>
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,0.8fr)_minmax(0,1.2fr)]">
       <fieldset disabled={busy} className={`min-w-0 space-y-5 ${mobile === 'preview' ? 'hidden lg:block' : ''}`}>
         <section className="space-y-3"><h2 className="font-bold">Дата и номер протокола</h2>
@@ -288,13 +310,17 @@ export function CertificateSettingsForm({ initialSettings, initialData, initialS
           {field('organizationName', 'Учебная организация')}{field('bin', 'БИН')}
           {field('chairmanName', 'Председатель')}{field('chairmanPosition', 'Должность председателя')}
           {defaultsField('reviewerName', 'Проверяющий')}
-          {fields.documentDefaults.commission.map((member, i) => <div key={i} className="space-y-2 rounded-lg border p-3">
-            <Label htmlFor={'member-name-' + i}>Член комиссии {i + 1}</Label>
-            <Input id={'member-name-' + i} value={member.name} maxLength={200} onChange={e => setFields(current => ({ ...current, documentDefaults: { ...current.documentDefaults, commission: current.documentDefaults.commission.map((m, n) => n === i ? { ...m, name: e.target.value } : m) } }))} />
-            <Label htmlFor={'member-position-' + i}>Должность</Label><Input id={'member-position-' + i} value={member.position} maxLength={200} onChange={e => setFields(current => ({ ...current, documentDefaults: { ...current.documentDefaults, commission: current.documentDefaults.commission.map((m, n) => n === i ? { ...m, position: e.target.value } : m) } }))} />
-            <Button variant="ghost" onClick={() => setFields(current => ({ ...current, documentDefaults: { ...current.documentDefaults, commission: current.documentDefaults.commission.filter((_, n) => n !== i) } }))}>Убрать члена комиссии</Button>
+          {fields.documentDefaults.commission.map((member, i) => <div key={i} className="space-y-2 py-3">
+            <Label className="sr-only" htmlFor={'member-name-' + i}>Член комиссии {i + 1}</Label>
+            <label className="relative block"><span className="absolute left-3 top-1.5 z-10 text-xs">Член комиссии {i + 1}</span><Input className="h-auto min-h-14 pt-6" placeholder="ФИО участника комиссии" id={'member-name-' + i} value={member.name} maxLength={200} onChange={e => setFields(current => ({ ...current, documentDefaults: { ...current.documentDefaults, commission: current.documentDefaults.commission.map((m, n) => n === i ? { ...m, name: e.target.value } : m) } }))} /></label>
+            <Label className="sr-only" htmlFor={'member-position-' + i}>Должность</Label><label className="relative block"><span className="absolute left-3 top-1.5 z-10 text-xs">Должность в комиссии</span><Input className="h-auto min-h-14 pt-6" placeholder="Должность в комиссии" id={'member-position-' + i} value={member.position} maxLength={200} onChange={e => setFields(current => ({ ...current, documentDefaults: { ...current.documentDefaults, commission: current.documentDefaults.commission.map((m, n) => n === i ? { ...m, position: e.target.value } : m) } }))} /></label>
+            <Button variant="outline" onClick={() => setFields(current => ({ ...current, documentDefaults: { ...current.documentDefaults, commission: current.documentDefaults.commission.filter((_, n) => n !== i) } }))}><Trash aria-hidden="true" />Удалить участника</Button>
           </div>)}
-          <Button variant="outline" disabled={fields.documentDefaults.commission.length >= 20} onClick={() => setFields(current => ({ ...current, documentDefaults: { ...current.documentDefaults, commission: [...current.documentDefaults.commission, { name: '', position: '' }] } }))}>Добавить члена комиссии</Button>
+          <Button variant="outline" disabled={fields.documentDefaults.commission.length >= 20} onClick={() => setFields(current => ({ ...current, documentDefaults: { ...current.documentDefaults, commission: [...current.documentDefaults.commission, { name: '', position: '' }] } }))}><Plus aria-hidden="true" />Добавить участника комиссии</Button>
+        </section>
+        <section className="space-y-3"><h2 className="font-bold">Размер раскрытого вкладыша</h2>
+          <p className="text-sm text-[var(--color-text-muted)]">Обе половины вместе, в сантиметрах. Для печати укажите фактический размер; масштаб принтера — 100%.</p>
+          {(['insertWidthCm', 'insertHeightCm'] as const).map(key => <label key={key} className="relative block"><span className="absolute left-3 top-1.5 z-10 text-xs">{key === 'insertWidthCm' ? 'Общая ширина, см' : 'Высота, см'}</span><Input className="h-auto min-h-14 pt-6" type="number" step="0.1" min={key === 'insertWidthCm' ? 8 : 4} max={key === 'insertWidthCm' ? 60 : 30} aria-label={key === 'insertWidthCm' ? 'Общая ширина, см' : 'Высота, см'} placeholder="Не задана" value={fields.documentDefaults[key] ?? ''} onChange={e => setFields(current => ({...current, documentDefaults: {...current.documentDefaults, [key]: e.target.value === '' ? null : Number(e.target.value)}}))} /></label>)}
         </section>
         <details className="space-y-3"><summary className="min-h-11 cursor-pointer font-bold">Тексты и значения образца</summary>
           {defaultsField('companyName', 'Компания образца')}{defaultsField('programName', 'Программа образца')}
@@ -310,19 +336,34 @@ export function CertificateSettingsForm({ initialSettings, initialData, initialS
         <h2 className="font-bold">{tab === 'protocol' ? 'Протокол компании' : 'Индивидуальная корочка'}</h2>
         {(dirty || batchDirty) && <p className="text-sm">Предпросмотр изменений. Сохраните перед скачиванием.</p>}
         {!organization || !course ? <p className="text-sm">Образец: выберите компанию и программу для рабочего документа.</p> : null}
-        {loading || rendering ? <p role="status">Подготавливаем документ…</p> : null}
-        {previewMessage && <p role="status">{previewMessage}</p>}
-        <Button variant="outline" aria-pressed={zoomed} onClick={() => setZoomed(value => !value)}>{zoomed ? 'Уместить по ширине' : 'Увеличить документ'}</Button>
-        <div className="max-h-[80dvh] overflow-auto rounded-xl bg-neutral-200 p-2 sm:p-4"><div style={zoomed ? { width: 850 } : undefined}><PdfPreview bytes={bytes} /></div></div>
+        {loading || rendering || metadataLoading ? <p role="status" className="flex items-center gap-2 text-sm"><span className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-current border-r-transparent motion-reduce:animate-none" />Обновляем документ…</p> : null}
+        {tab === 'certificate' && selectedPerson && !selectedCertificate && <p className="text-sm">Предварительный просмотр. Удостоверение ещё не выдано; официальное скачивание недоступно.</p>}
+        {tab === 'certificate' && selectedPerson && !selectedPerson.photoUrl && <p role="status" className="text-sm">В профиле нет фотографии. Добавьте её перед печатью корочки.</p>}
+        {previewMessage && <div className="space-y-2"><p role="status">{previewMessage}</p><Button variant="outline" onClick={() => setPreviewRetry(value => value + 1)}>Повторить предпросмотр</Button></div>}
+        {tab === 'certificate' && <div className="grid grid-cols-2 gap-2 lg:hidden"><Button size="sm" variant={half === 'left' ? 'primary' : 'outline'} onClick={() => setHalf('left')}>Левая</Button><Button size="sm" variant={half === 'right' ? 'primary' : 'outline'} onClick={() => setHalf('right')}>Правая</Button></div>}
+        <div className="overflow-hidden bg-neutral-200 p-1"><div className={tab === 'certificate' ? 'document-insert ' + (half === 'right' ? 'document-insert-right' : '') : ''}><PdfPreview bytes={bytes} /></div></div>
         {selectedPerson && <a className="inline-block min-h-11 text-sm underline" href={'/admin/employees?q=' + encodeURIComponent(selectedPerson.fullName)}>Данные и выдача участника</a>}
       </section>
     </div>
     {message && <p role="status" className="text-sm">{message}</p>}
-    <div className="flex flex-wrap gap-2 border-t bg-[var(--color-surface)] py-3 lg:sticky lg:bottom-0">
+    <div className="grid gap-2 bg-[var(--color-surface)] py-3 sm:flex sm:flex-wrap">
       <Button disabled={busy || loading || !valid || !(dirty || batchDirty) || !batch.number.trim()} onClick={() => void save()}>Сохранить настройки</Button>
-      <Button variant="outline" disabled={!canDownload} onClick={() => void exportCompany(true)}>Скачать PDF</Button>
+      <Button variant="outline" disabled={!canDownload || tab === 'certificate' && !selectedCertificate} onClick={() => void exportCompany(true)}>Скачать PDF</Button>
       <Button variant="outline" disabled={busy || loading || dirty || batchDirty || !organization || !course} onClick={() => void exportCompany()}>Скачать комплект компании</Button>
       {exporting && <Button variant="ghost" onClick={() => exportAbort.current?.abort()}>Отменить</Button>}
     </div>
   </div>;
+}
+
+function DocumentSelect({ label, value, options, disabled, onChange }: { label: string; value: string; options: {value: string; label: string}[]; disabled?: boolean; onChange(value: string): void }) {
+  const ref = useRef<HTMLDetailsElement>(null);
+  return <details ref={ref} className="relative min-w-0">
+    <summary aria-label={label} aria-disabled={disabled} onClick={e => { if (disabled) e.preventDefault(); }} className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-lg bg-[var(--color-bg)] px-3 py-2 ring-1 ring-[var(--color-border)]">
+      <span className="min-w-0 flex-1 break-words text-sm"><span className="block text-xs text-[var(--color-text-muted)]">{label}</span>{options.find(o => o.value === value)?.label || 'Выберите'}</span><CaretDown aria-hidden="true" className="shrink-0" size={18} />
+    </summary>
+    <div className="absolute inset-x-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-lg bg-[var(--color-surface)] p-1 shadow-lg">
+      {options.map(option => <button type="button" key={option.value} disabled={disabled} aria-pressed={option.value === value} className="block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-[var(--color-bg)]" onClick={() => { onChange(option.value); if (ref.current) ref.current.open = false; }}>{option.label}</button>)}
+      {!options.length && <p className="p-3 text-sm">Нет доступных вариантов</p>}
+    </div>
+  </details>;
 }
