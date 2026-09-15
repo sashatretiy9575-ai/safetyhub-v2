@@ -7,6 +7,7 @@ import type { CertificateBranding } from '@/lib/pdf/certificate-client-contract'
 import { createAdminClient } from '@/server/supabase/admin';
 import { createClient } from '@/server/supabase/server';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
+import { DOCUMENT_DEFAULTS, documentDate, numberFromDate } from '@/lib/pdf/document-editor';
 
 /** One PNG, at most this many bytes once decoded. */
 export const CERTIFICATE_IMAGE_MAX_BYTES = 400 * 1024;
@@ -14,9 +15,15 @@ const PNG_DATA_URL = /^data:image\/png;base64,([A-Za-z0-9+/]+=*)$/u;
 const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
 const text = (maximum: number) => z.string().max(maximum);
+export const documentDefaultsSchema = z.object({
+  reviewerName: text(200),
+  commission: z.array(z.object({ name: text(200), position: text(200) }).strict()).max(20),
+  companyName: text(200), programName: text(240), protocolText: text(1000),
+}).strict();
 
 /** The row as the admin page and the renderer see it; images are flags here. */
 export const certificateSettingsSchema = z.object({
+  documentDefaults: documentDefaultsSchema.default(DOCUMENT_DEFAULTS),
   organizationName: text(200),
   bin: text(32),
   chairmanName: text(200),
@@ -62,6 +69,7 @@ export function decodeCertificateImage(value: unknown): Uint8Array | null {
 /** The patch the admin page sends: only the keys being changed. */
 export const certificateSettingsPatchSchema = z
   .object({
+    documentDefaults: documentDefaultsSchema.optional(),
     organizationName: text(200).optional(),
     bin: text(32).optional(),
     chairmanName: text(200).optional(),
@@ -77,9 +85,9 @@ export const certificateSettingsPatchSchema = z
     knowledgeTextKk: text(1000).optional(),
     knowledgeTextRu: text(1000).optional(),
     // null clears the image; a data URL replaces it; absent leaves it.
-    stampPng: z.string().nullable().optional(),
-    chairmanSignaturePng: z.string().nullable().optional(),
-    memberSignaturePng: z.string().nullable().optional(),
+    stampPng: z.never().optional(),
+    chairmanSignaturePng: z.never().optional(),
+    memberSignaturePng: z.never().optional(),
     expectedVersion: z.number().int().min(1),
   })
   .strict()
@@ -169,8 +177,8 @@ export function certificateImageUrl(kind: CertificateImageKind, version: number)
 export function certificateBranding(
   settings: CertificateSettingsWithImages | CertificateSettings,
 ): CertificateBranding {
-  const version = settings.version;
   return {
+    documentDefaults: settings.documentDefaults,
     organizationName: settings.organizationName,
     bin: settings.bin,
     chairmanName: settings.chairmanName,
@@ -179,17 +187,15 @@ export function certificateBranding(
     memberPosition: settings.memberPosition,
     secondMemberName: settings.secondMemberName,
     secondMemberPosition: settings.secondMemberPosition,
-    protocolNumber: settings.protocolNumber,
+    protocolNumber: numberFromDate(documentDate()),
     validityMonths: settings.validityMonths,
     examTextKk: settings.examTextKk,
     examTextRu: settings.examTextRu,
     knowledgeTextKk: settings.knowledgeTextKk,
     knowledgeTextRu: settings.knowledgeTextRu,
-    stampUrl: settings.hasStamp ? certificateImageUrl('stamp', version) : null,
-    chairmanSignatureUrl: settings.hasChairmanSignature
-      ? certificateImageUrl('chairman', version)
-      : null,
-    memberSignatureUrl: settings.hasMemberSignature ? certificateImageUrl('member', version) : null,
+    stampUrl: null,
+    chairmanSignatureUrl: null,
+    memberSignatureUrl: null,
   };
 }
 

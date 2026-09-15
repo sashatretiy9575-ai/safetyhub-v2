@@ -17,6 +17,8 @@ import {
   type CertificateRenderMetadata,
 } from '@/lib/pdf/certificate-client-contract';
 import { certificateFilename } from '@/lib/pdf/certificate';
+import { findCertificateDocumentBatch } from '@/server/certificates/document-editor';
+import { numberFromDate, documentDate } from '@/lib/pdf/document-editor';
 
 const publicCertificateSchema = z.object({
   id: z.string().uuid(),
@@ -139,6 +141,8 @@ export async function createCertificateRenderMetadata(
   branding: CertificateBranding,
 ): Promise<CertificateRenderMetadata> {
   const verificationToken = await getCertificateVerificationToken(data.id);
+  const batch = data.organization ? await findCertificateDocumentBatch(data.organization, data.testSlug) : null;
+  const protocolDate = batch?.date ?? documentDate(new Date(data.issuedAt));
   return {
     schemaVersion: CERTIFICATE_CLIENT_SCHEMA_VERSION,
     certificateId: data.id,
@@ -158,7 +162,7 @@ export async function createCertificateRenderMetadata(
     completedAt: data.bestCompletedAt,
     issuedAt: data.issuedAt,
     verificationUrl: certificateVerificationUrl(siteUrl, verificationToken),
-    branding,
+    branding: { ...branding, protocolNumber: batch?.number ?? numberFromDate(protocolDate), protocolDate },
   };
 }
 

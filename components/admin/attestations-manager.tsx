@@ -1077,6 +1077,7 @@ export function AttestationsManager({
                           {row.organizationGroupCount}
                         </span>
                       </button>
+                      {permissions.canManageDocuments && row.organization ? <a className="px-2 text-sm underline" href={'/admin/settings/certificate?' + new URLSearchParams({ organization: row.organization, course: row.testId ?? '', tab: 'protocol' })}>Протокол</a> : null}
                       {permissions.canManageIdentity ? (
                         <Button
                           type="button"

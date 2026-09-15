@@ -33,6 +33,7 @@ import { LearningHistoryControl } from '@/components/admin/learning-history-cont
 import { CourseAccessControl } from '@/components/admin/course-access-control';
 
 export type AttestationPermissions = {
+  canManageDocuments?: boolean;
   canReadUser: boolean;
   canReadIdentity: boolean;
   canReadCertificate: boolean;
@@ -825,6 +826,7 @@ function AttestationDetailContent({
               ) : null}
             </section>
 
+            {permissions.canManageDocuments && row.organization && !courseDeleted ? <a className="inline-block min-h-11 text-sm underline" href={'/admin/settings/certificate?' + new URLSearchParams({ organization: row.organization, course: row.testId ?? '', user: row.userId, tab: 'certificate' })}>Открыть корочку в редакторе</a> : null}
             {canReadCertificate && !courseDeleted ? (
               <details className="group rounded-[var(--radius-group)] border border-[var(--color-border)]">
                 <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-semibold [&::-webkit-details-marker]:hidden">

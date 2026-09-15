@@ -170,8 +170,8 @@ begin
   if v_settings ->> 'stampPng' is not null and jsonb_typeof(v_settings -> 'stampPng') <> 'null' then
     raise exception 'an administrator session received image bytes: %', v_settings -> 'hasStamp';
   end if;
-  if (v_settings ->> 'organizationName') is distinct from 'SafetyHub' then
-    raise exception 'default organization must be plain SafetyHub: %', v_settings ->> 'organizationName';
+  if (v_settings ->> 'organizationName') is distinct from 'ТОО «Work Safety (Уорк Сэйфти)»' then
+    raise exception 'default organization must match supplied protocol: %', v_settings ->> 'organizationName';
   end if;
   if position('{protocol}' in (v_settings ->> 'examTextRu')) = 0 then
     raise exception 'default exam text must carry the protocol placeholder';
@@ -182,8 +182,7 @@ begin
       'chairmanName', '  Иванов И. И.  ',
       'chairmanPosition', 'Директор',
       'protocolNumber', '09/04',
-      'validityMonths', 24,
-      'stampPng', 'data:image/png;base64,iVBORw0KGgo='
+      'validityMonths', 24
     ),
     (v_settings ->> 'version')::bigint
   );
@@ -191,13 +190,13 @@ begin
     or (v_updated ->> 'chairmanPosition') is distinct from 'Директор'
     or (v_updated ->> 'protocolNumber') is distinct from '09/04'
     or (v_updated ->> 'validityMonths')::integer <> 24
-    or (v_updated ->> 'hasStamp')::boolean is not true
+    or (v_updated ->> 'hasStamp')::boolean is not false
     or (v_updated ->> 'version')::bigint <> (v_settings ->> 'version')::bigint + 1 then
     raise exception 'certificate settings update did not apply: %', v_updated;
   end if;
 
   -- A stale version is refused, an absent key leaves the value alone, and
-  -- a null image key clears the image.
+  -- images are rejected by the editor.
   v_updated := public.update_certificate_settings(
     jsonb_build_object('bin', '123'),
     (v_settings ->> 'version')::bigint
@@ -210,9 +209,8 @@ begin
     jsonb_build_object('stampPng', null),
     (v_settings ->> 'version')::bigint + 1
   );
-  if (v_updated ->> 'hasStamp')::boolean is not false
-    or (v_updated ->> 'chairmanName') is distinct from 'Иванов И. И.' then
-    raise exception 'clearing the stamp changed more than the stamp: %', v_updated;
+  if (v_updated #>> '{__safetyhubRpcError,message}') is distinct from 'DOCUMENT_IMAGES_DISABLED' then
+    raise exception 'image update must be disabled: %', v_updated;
   end if;
 
   -- The server role receives the bytes it needs for the image route.

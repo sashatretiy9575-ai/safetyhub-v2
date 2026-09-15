@@ -1494,6 +1494,10 @@ export type Database = {
         Args: { p_include_images: boolean }
         Returns: Json
       }
+      certificate_settings_payload_v1: {
+        Args: { p_include_images: boolean }
+        Returns: Json
+      }
       certificate_state: { Args: { p_attestation_id: string }; Returns: string }
       claim_auth_admin_operation_confirmed_unmetered: {
         Args: {
@@ -2051,6 +2055,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_certificate_settings_v1: {
+        Args: { p_expected_version: number; p_patch: Json }
+        Returns: Json
+      }
       update_profile_unmetered: {
         Args: {
           p_job: string
@@ -2070,6 +2078,7 @@ export type Database = {
         }
         Returns: Json
       }
+      valid_document_defaults: { Args: { v: Json }; Returns: boolean }
       verify_user_identity_unmetered: {
         Args: {
           p_job: string
@@ -2610,6 +2619,7 @@ export type Database = {
           chairman_name: string
           chairman_position: string
           chairman_signature_png: string | null
+          document_defaults: Json
           exam_text_kk: string
           exam_text_ru: string
           knowledge_text_kk: string
@@ -2633,6 +2643,7 @@ export type Database = {
           chairman_name?: string
           chairman_position?: string
           chairman_signature_png?: string | null
+          document_defaults?: Json
           exam_text_kk?: string
           exam_text_ru?: string
           knowledge_text_kk?: string
@@ -2656,6 +2667,7 @@ export type Database = {
           chairman_name?: string
           chairman_position?: string
           chairman_signature_png?: string | null
+          document_defaults?: Json
           exam_text_kk?: string
           exam_text_ru?: string
           knowledge_text_kk?: string
@@ -3251,6 +3263,53 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tests"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_batches: {
+        Row: {
+          automatic: boolean
+          course_slug: string
+          document_date: string
+          id: string
+          organization: string
+          organization_key: string | null
+          protocol_number: string
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          automatic?: boolean
+          course_slug: string
+          document_date: string
+          id?: string
+          organization: string
+          organization_key?: string | null
+          protocol_number: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          automatic?: boolean
+          course_slug?: string
+          document_date?: string
+          id?: string
+          organization?: string
+          organization_key?: string | null
+          protocol_number?: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_batches_course_slug_fkey"
+            columns: ["course_slug"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["slug"]
           },
         ]
       }
@@ -4594,6 +4653,10 @@ export type Database = {
         Args: { p_actor_id: string; p_test_id: string }
         Returns: Json
       }
+      get_document_editor_data: {
+        Args: { p_course_slug?: string; p_organization?: string }
+        Returns: Json
+      }
       get_legal_document_localization: {
         Args: {
           p_document_type: Database["public"]["Enums"]["legal_document_type"]
@@ -5302,6 +5365,17 @@ export type Database = {
           p_test_id: string
           p_title: string
           p_translation_qa: Json
+        }
+        Returns: Json
+      }
+      save_document_batch: {
+        Args: {
+          p_automatic: boolean
+          p_course_slug: string
+          p_date: string
+          p_number: string
+          p_organization: string
+          p_version: number
         }
         Returns: Json
       }

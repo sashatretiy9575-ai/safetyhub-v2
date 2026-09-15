@@ -58,12 +58,14 @@ test('every certificate is a two-sided booklet drawn with the current settings',
   );
   // Two A5 landscape sides, the paper form's bilingual labels, no template PDF.
   assert.match(renderer, /const PAGE: \[number, number\] = \[595\.28, 419\.53\]/u);
-  assert.match(renderer, /pdf\.addPage\(PAGE\);[\s\S]*pdf\.addPage\(PAGE\)/u);
+  // Actual two-page output is exercised by document-editor.test.mjs.
+  assert.match(renderer, /pageText\(sheet\(\)/u);
+  assert.match(renderer, /const right = sheet\(\)/u);
   assert.match(renderer, /КУӘЛІК \/ УДОСТОВЕРЕНИЕ №/u);
   assert.match(renderer, /Білімін тексеру туралы мәліметтер/u);
-  assert.match(renderer, /Емтихан комиссиясының төрағасы/u);
+  assert.match(renderer, /Председатель:/u);
   assert.doesNotMatch(renderer, /templateBytes|PDFDocument\.load\(/u);
-  assert.match(renderer, /replaceAll\('\{protocol\}', protocol\)/u);
+  assert.match(renderer, /documentStatement\(text, branding, metadata.titleSnapshot\)/u);
   // The server copies the branding into each certificate's metadata.
   assert.match(server, /branding: CertificateBranding,/u);
   assert.match(exportHelper, /const branding = await loadCertificateBranding\(\);/u);
@@ -82,14 +84,11 @@ test('an export carries the workbook, one protocol per company and course, then 
     read('lib/pdf/certificate-client.ts'),
   ]);
   assert.match(protocol, /export function groupItemsForProtocols/u);
-  assert.match(
-    protocol,
-    /return `protocols\/Протокол-\$\{number\}-\$\{company\}-\$\{course\}\.pdf`/u,
-  );
+  assert.match(protocol, /return `protocols\/Протокол-/u);
   assert.match(protocol, /заседания комиссии по проверке знаний/u);
-  assert.match(protocol, /РЕЗУЛЬТАТЫ ПРОВЕРКИ/u);
-  assert.match(protocol, /Лица, получившие положительные оценки/u);
-  assert.match(protocol, /Куратор Заказчика/u);
+  assert.match(protocol, /Результат проверки/u);
+  assert.match(protocol, /participantResult\(person\)/u);
+  assert.doesNotMatch(protocol, /Куратор Заказчика|drawSignature|drawImage/u);
   assert.doesNotMatch(protocol, /node:(?:fs|path|crypto)|SafetyHub\.kz/u);
   for (const source of [worker, client]) {
     const report = source.indexOf('CERTIFICATE_REPORT_FILENAME');

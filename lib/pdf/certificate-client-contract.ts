@@ -1,3 +1,4 @@
+import type { DocumentDefaults } from './document-editor.ts';
 export const CERTIFICATE_CLIENT_SCHEMA_VERSION = 1 as const;
 export const CERTIFICATE_EXPORT_MAX_ITEMS = 500;
 export const CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS = 100;
@@ -13,6 +14,8 @@ export type CertificateLocale = (typeof CERTIFICATE_LOCALES)[number];
  * settings.
  */
 export type CertificateBranding = Readonly<{
+  documentDefaults?: DocumentDefaults;
+  protocolDate?: string;
   organizationName: string;
   bin: string;
   chairmanName: string;
@@ -129,6 +132,20 @@ function assertImageUrl(value: unknown, code: string): asserts value is string |
 export function assertCertificateBranding(value: unknown): asserts value is CertificateBranding {
   if (!value || typeof value !== 'object') throw new Error('CERTIFICATE_BRANDING_INVALID');
   const branding = value as Record<string, unknown>;
+  if (branding.protocolDate !== undefined && (typeof branding.protocolDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/u.test(branding.protocolDate))) throw new Error('PROTOCOL_DATE_INVALID');
+  if (branding.documentDefaults !== undefined) {
+    const defaults = branding.documentDefaults as DocumentDefaults;
+    if (!defaults || !Array.isArray(defaults.commission) || defaults.commission.length > 20) throw new Error('COMMISSION_INVALID');
+    assertBoundedText(defaults.reviewerName, 'COMMISSION_INVALID', 200);
+    assertBoundedText(defaults.companyName, 'DOCUMENT_DEFAULTS_INVALID', 200);
+    assertBoundedText(defaults.programName, 'DOCUMENT_DEFAULTS_INVALID', 240);
+    assertBoundedText(defaults.protocolText, 'DOCUMENT_DEFAULTS_INVALID', 1000);
+    for (const member of defaults.commission) {
+      if (!member || typeof member !== 'object') throw new Error('COMMISSION_INVALID');
+      assertBoundedText(member.name, 'COMMISSION_INVALID', 200);
+      assertBoundedText(member.position, 'COMMISSION_INVALID', 200);
+    }
+  }
   assertBoundedText(branding.organizationName, 'CERTIFICATE_BRANDING_INVALID', 200);
   assertBoundedText(branding.bin, 'CERTIFICATE_BRANDING_INVALID', 32);
   assertBoundedText(branding.chairmanName, 'CERTIFICATE_BRANDING_INVALID', 200);

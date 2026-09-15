@@ -12,13 +12,12 @@ import { requestSecurityMetadata } from '@/server/security/request-metadata';
 import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
 
-// Three PNGs of up to 400 KB each travel as base64 in one request.
-const PATCH_BODY_LIMIT = 2 * 1024 * 1024;
+const PATCH_BODY_LIMIT = 64 * 1024;
 
 export async function GET() {
   try {
     await requireCapability('site.settings.manage');
-    return NextResponse.json({ settings: await readCertificateSettings() });
+    return NextResponse.json({ settings: await readCertificateSettings() }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     return apiError(error);
   }

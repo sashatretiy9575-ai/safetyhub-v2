@@ -333,6 +333,11 @@ type JsonRpc = { Args: Record<string, unknown>; Returns: Json };
 export type Database = {
   public: {
     Tables: {
+      document_batches: Table<{
+        id: string; organization: string; organization_key: string; course_slug: string;
+        document_date: string; protocol_number: string; automatic: boolean; version: number;
+        updated_at: string; updated_by: string | null;
+      }>;
       profiles: Table<ProfileRow>;
       organizations: Table<{
         id: string;

@@ -66,9 +66,9 @@ export default async function AdminSettingsPage() {
               <Certificate size={18} />
             </span>
             <span className="min-w-0">
-              <span className="block text-sm font-semibold">Удостоверение</span>
+              <span className="block text-sm font-semibold">Документы</span>
               <span className="block truncate text-xs text-[var(--color-text-muted)]">
-                Реквизиты, печать, подписи и тексты корочки
+                Корочки клиентов и общие протоколы компаний
               </span>
             </span>
           </div>

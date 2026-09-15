@@ -67,6 +67,7 @@ export default async function AdminEmployeesPage({
   const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
 
   const permissions = {
+    canManageDocuments: actor.capabilities.includes('site.settings.manage') && actor.capabilities.includes('certificate.read') && actor.capabilities.includes('results.export'),
     canReadUser: actor.capabilities.includes('user.read'),
     canReadIdentity: actor.capabilities.includes('identity.read'),
     canReadCertificate: actor.capabilities.includes('certificate.read'),
