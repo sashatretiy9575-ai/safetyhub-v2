@@ -1,4 +1,4 @@
-import type { DocumentDefaults } from './document-editor.ts';
+import { insertSizeProblem, type DocumentDefaults } from './document-editor.ts';
 export const CERTIFICATE_CLIENT_SCHEMA_VERSION = 1 as const;
 export const CERTIFICATE_EXPORT_MAX_ITEMS = 500;
 export const CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS = 100;
@@ -150,10 +150,7 @@ export function assertCertificateBranding(value: unknown): asserts value is Cert
     assertBoundedText(defaults.companyName, 'DOCUMENT_DEFAULTS_INVALID', 200);
     assertBoundedText(defaults.programName, 'DOCUMENT_DEFAULTS_INVALID', 240);
     assertBoundedText(defaults.protocolText, 'DOCUMENT_DEFAULTS_INVALID', 1000);
-    for (const [key, min, max] of [['insertWidthCm', 8, 60], ['insertHeightCm', 4, 30]] as const) {
-      const size = defaults[key];
-      if (size != null && (typeof size !== 'number' || !Number.isFinite(size) || size < min || size > max)) throw new Error('INSERT_SIZE_INVALID');
-    }
+    if (insertSizeProblem(defaults)) throw new Error('INSERT_SIZE_INVALID');
     for (const member of defaults.commission) {
       if (!member || typeof member !== 'object') throw new Error('COMMISSION_INVALID');
       assertBoundedText(member.name, 'COMMISSION_INVALID', 200);

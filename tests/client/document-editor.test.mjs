@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import test from 'node:test';
 import { PDFDict, PDFDocument, PDFName } from 'pdf-lib';
-import { documentDate, numberFromDate, newDocumentBatch, changeDocumentDate, DOCUMENT_DEFAULTS } from '../../lib/pdf/document-editor.ts';
+import { documentDate, numberFromDate, newDocumentBatch, changeDocumentDate, insertSizeProblem, DOCUMENT_DEFAULTS } from '../../lib/pdf/document-editor.ts';
 import { generateProtocolInBrowser } from '../../lib/pdf/protocol-renderer.ts';
 import { generateCertificateInBrowser } from '../../lib/pdf/certificate-renderer.ts';
 
@@ -23,6 +23,19 @@ test('protocol date follows Oral midnight and manual numbers survive date change
   const batch = newDocumentBatch('Компания', 'biot');
   assert.equal(changeDocumentDate(batch, '2026-09-08').number, '08.09');
   assert.equal(changeDocumentDate({ ...batch, number: 'CUSTOM/1', automatic: false }, '2026-09-08').number, 'CUSTOM/1');
+});
+
+test('an insert size that cannot be printed is named by its side before it is sent', () => {
+  assert.equal(insertSizeProblem({ insertWidthCm: 32, insertHeightCm: 10 }), null);
+  assert.equal(insertSizeProblem({ insertWidthCm: 8, insertHeightCm: 30 }), null);
+  // Not filled in yet is not a mistake: the editor says «Не задан» instead.
+  assert.equal(insertSizeProblem({ insertWidthCm: null }), null);
+  assert.equal(insertSizeProblem(undefined), null);
+  // Millimetres, one half instead of the spread, a slip of the keyboard.
+  assert.equal(insertSizeProblem({ insertWidthCm: 320, insertHeightCm: 10 }), 'insertWidthCm');
+  assert.equal(insertSizeProblem({ insertWidthCm: 7.9, insertHeightCm: 10 }), 'insertWidthCm');
+  assert.equal(insertSizeProblem({ insertWidthCm: 32, insertHeightCm: 100 }), 'insertHeightCm');
+  assert.equal(insertSizeProblem({ insertWidthCm: 32, insertHeightCm: Number.NaN }), 'insertHeightCm');
 });
 
 // The smallest PNG there is; DOCUMENT_EDITOR_STAMP_PNG / DOCUMENT_EDITOR_SIGNATURE_PNG

@@ -37,8 +37,17 @@ test('the booklet and the protocol are drawn from one settings row that browsers
   // the settings version so a replaced image is never reused from cache.
   assert.match(image, /requireUser\(\{ enforceLegal: false \}\)/u);
   assert.match(image, /status: 401/u);
-  assert.match(image, /String\(settings\.version\) !== version/u);
-  assert.match(image, /'Cache-Control': 'private, max-age=31536000, immutable'/u);
+  // Kept for good only under the current version: a page opened before the last
+  // save gets today's picture uncached instead of a preview that cannot be drawn.
+  assert.match(image, /const current = String\(settings\.version\) === version;/u);
+  assert.match(
+    image,
+    /current \? 'private, max-age=31536000, immutable' : 'private, no-store'/u,
+  );
+  // A refused save names its field, and the editor names the insert's limits
+  // before anything is sent: «повторите» never helped with a size in millimetres.
+  assert.match(route, /const field = parsed\.error\.issues\[0\]\?\.path\.map\(String\)\.join\('\.'\)/u);
+  assert.match(settings, /INSERT_SIZE_LIMITS\[key\]\[0\]\)\.max\(INSERT_SIZE_LIMITS\[key\]\[1\]\)/u);
 });
 
 test('the stamp and the signatures are pictures the administrator uploads, one save each', async () => {

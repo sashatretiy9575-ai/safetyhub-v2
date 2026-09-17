@@ -37,18 +37,22 @@ export async function GET(request: Request) {
   }
   const settings = await readCertificateImagesCached();
   const bytes = decodeCertificateImage(certificateImageDataUrl(settings, kind));
-  if (!bytes || String(settings.version) !== version) {
+  if (!bytes) {
     return createApiResponse(null, {
       status: 404,
       headers: { 'Cache-Control': 'private, no-store' },
     });
   }
+  // A page opened before the last save still asks for its own version. It gets
+  // the picture that is on the documents now, and no browser keeps it under that
+  // address: an editor left open in a second tab must not lose its preview.
+  const current = String(settings.version) === version;
   return createApiResponse(Buffer.from(bytes), {
     headers: {
       'Content-Type': 'image/png',
       'Content-Length': String(bytes.byteLength),
-      // The URL carries the settings version, so the bytes never change under it.
-      'Cache-Control': 'private, max-age=31536000, immutable',
+      // Under its own version the bytes never change.
+      'Cache-Control': current ? 'private, max-age=31536000, immutable' : 'private, no-store',
       'X-Content-Type-Options': 'nosniff',
     },
   });

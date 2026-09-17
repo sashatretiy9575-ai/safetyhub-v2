@@ -73,6 +73,20 @@ export function hasInsertSize(branding: CertificateBranding) {
   const d = branding.documentDefaults;
   return Boolean(d?.insertWidthCm && d?.insertHeightCm);
 }
+/** The open spread in centimetres: the smallest and the largest the layout is drawn for. */
+export const INSERT_SIZE_LIMITS = { insertWidthCm: [8, 60], insertHeightCm: [4, 30] } as const;
+export type InsertSizeKey = keyof typeof INSERT_SIZE_LIMITS;
+/** The side of the insert that is filled in but cannot be printed, if there is one. */
+export function insertSizeProblem(
+  defaults: Pick<DocumentDefaults, InsertSizeKey> | null | undefined,
+): InsertSizeKey | null {
+  for (const key of ['insertWidthCm', 'insertHeightCm'] as const) {
+    const size = defaults?.[key];
+    const [min, max] = INSERT_SIZE_LIMITS[key];
+    if (size != null && (typeof size !== 'number' || !Number.isFinite(size) || size < min || size > max)) return key;
+  }
+  return null;
+}
 export function participantResult(person: DocumentParticipant) {
   const result = { passed: 'Сдал', failed: 'Не сдал', started: 'Не завершил', expired: 'Время истекло', none: 'Проверка не пройдена' }[person.status];
   return person.score !== null && person.total !== null ? `${result} (${person.score}/${person.total})` : result;

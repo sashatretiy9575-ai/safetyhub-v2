@@ -64,6 +64,16 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   // Rare settings are one line each until opened; what was open survives a reload.
   await page.getByRole('radio', { name: 'Корочка', exact: true }).click();
   await page.getByRole('button', { name: /^Размер вкладыша/ }).click();
+  // A size typed in millimetres is named at its field and is never sent to be refused.
+  let refusedSaves = 0;
+  page.on('request', request => { if (request.method() === 'PATCH' && request.url().endsWith('/api/admin/settings/certificate')) refusedSaves++; });
+  await page.getByLabel('Общая ширина, см', { exact: true }).fill('320');
+  await expect(page.getByRole('button', { name: /^Размер вкладыша/ })).toContainText('Общая ширина вкладыша: от 8 до 60 см');
+  await expect(page.getByLabel('Общая ширина, см', { exact: true })).toHaveAttribute('aria-invalid', 'true');
+  await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Общая ширина вкладыша: от 8 до 60 см', visible: true }).first()).toBeVisible();
+  await expect(page.getByLabel('Общая ширина, см', { exact: true })).toBeFocused();
+  expect(refusedSaves).toBe(0);
   await page.getByLabel('Общая ширина, см', { exact: true }).fill('32');
   await page.getByLabel('Высота, см', { exact: true }).fill('10');
   await expect(page.locator('canvas').first()).toBeVisible({ timeout: 30_000 });
@@ -201,8 +211,12 @@ test('a photographed stamp becomes a transparent picture, stays until replaced a
     const alpha = (x: number, y: number) => data[(y * info.width + x) * 4 + 3] ?? 0;
     expect(alpha(Math.floor(info.width / 2), Math.floor(info.height / 2))).toBe(0);
     expect(Math.max(...Array.from({ length: info.width }, (_, x) => alpha(x, Math.floor(info.height / 2))))).toBeGreaterThan(200);
-    // A replaced image is never served under the address of the previous one.
-    expect((await stored(before.version)).status()).toBe(404);
+    // A page opened before the change still draws its preview: it gets today's picture,
+    // and no browser keeps it under the address of the previous one.
+    const outdated = await stored(before.version);
+    expect(outdated.status()).toBe(200);
+    expect(outdated.headers()['cache-control']).toContain('no-store');
+    expect(Buffer.compare(await outdated.body(), await image.body())).toBe(0);
     await openEditor(page);
     await expect(page.getByRole('button', { name: 'Печать: заменить', exact: true })).toBeVisible();
     const removal = page.waitForResponse(response => response.url().includes('/api/admin/settings/certificate/image') && response.request().method() === 'DELETE');

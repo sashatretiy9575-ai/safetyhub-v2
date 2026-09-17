@@ -11,7 +11,13 @@ import {
 import { createAdminClient } from '@/server/supabase/admin';
 import { createClient } from '@/server/supabase/server';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
-import { DOCUMENT_DEFAULTS, documentDate, numberFromDate } from '@/lib/pdf/document-editor';
+import {
+  DOCUMENT_DEFAULTS,
+  INSERT_SIZE_LIMITS,
+  documentDate,
+  numberFromDate,
+  type InsertSizeKey,
+} from '@/lib/pdf/document-editor';
 
 /** One PNG, at most this many bytes once decoded. */
 export const CERTIFICATE_IMAGE_MAX_BYTES = 400 * 1024;
@@ -19,12 +25,14 @@ const PNG_DATA_URL = /^data:image\/png;base64,([A-Za-z0-9+/]+=*)$/u;
 const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
 const text = (maximum: number) => z.string().max(maximum);
+const insertSide = (key: InsertSizeKey) =>
+  z.number().min(INSERT_SIZE_LIMITS[key][0]).max(INSERT_SIZE_LIMITS[key][1]).nullable().optional();
 export const documentDefaultsSchema = z.object({
   reviewerName: text(200),
   commission: z.array(z.object({ name: text(200), position: text(200) }).strict()).max(20),
   companyName: text(200), programName: text(240), protocolText: text(1000),
-  insertWidthCm: z.number().min(8).max(60).nullable().optional(),
-  insertHeightCm: z.number().min(4).max(30).nullable().optional(),
+  insertWidthCm: insertSide('insertWidthCm'),
+  insertHeightCm: insertSide('insertHeightCm'),
 }).strict();
 
 /** The row as the admin page and the renderer see it; images are flags here. */

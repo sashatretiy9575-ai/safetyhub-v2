@@ -40,11 +40,14 @@ import {
   type CertificateRenderMetadata,
 } from '@/lib/pdf/certificate-client-contract';
 import {
+  INSERT_SIZE_LIMITS,
   changeDocumentDate,
+  insertSizeProblem,
   newDocumentBatch,
   numberFromDate,
   type DocumentBatch,
   type DocumentDefaults,
+  type InsertSizeKey,
 } from '@/lib/pdf/document-editor';
 import { cn } from '@/lib/utils';
 import type { readDocumentEditor } from '@/server/certificates/document-editor';
@@ -162,6 +165,10 @@ async function metadataFor(id: string, signal?: AbortSignal): Promise<Certificat
   assertCertificateRenderMetadata(data);
   return data;
 }
+
+/** Why a filled-in side of the insert is refused, with the limits the administrator can act on. */
+const insertSizeMessage = (key: InsertSizeKey) =>
+  `${key === 'insertWidthCm' ? 'Общая ширина' : 'Высота'} вкладыша: от ${INSERT_SIZE_LIMITS[key][0]} до ${INSERT_SIZE_LIMITS[key][1]} см`;
 
 const protocolFontUrl = (people: EditorData['participants']) =>
   '/certificate-assets/font?locale=' +
@@ -294,6 +301,8 @@ export function CertificateSettingsForm({
   const [previewRetry, setPreviewRetry] = useState(0);
   const exportAbort = useRef<AbortController | null>(null);
   const swipeStart = useRef<number | null>(null);
+  const sizeInputs = useRef<Partial<Record<InsertSizeKey, HTMLInputElement | null>>>({});
+  const refusedSize = useRef<InsertSizeKey | null>(null);
   useEffect(() => () => exportAbort.current?.abort(), []);
   // Whatever was open stays open across a reload: the administrator is in the middle of it.
   // The marker tells a test that clicks are heard: one made before hydration is lost.
@@ -323,6 +332,8 @@ export function CertificateSettingsForm({
     fields.validityMonths <= 120;
   const sizeMissing =
     !fields.documentDefaults.insertWidthCm || !fields.documentDefaults.insertHeightCm;
+  // A size typed in millimetres or for one half only: named here, never sent to be refused.
+  const sizeProblem = insertSizeProblem(fields.documentDefaults);
   const canRevertBatch = batchDirty && Boolean(savedBatch);
   const branding = brandingOf(saved, fields, batch);
   const openSections = (change: (open: Set<SectionId>) => void) =>
@@ -441,6 +452,10 @@ export function CertificateSettingsForm({
             setPreviewMessage('Выберите компанию, программу и сотрудника');
             return null;
           }
+          if (sizeProblem) {
+            setPreviewMessage(insertSizeMessage(sizeProblem));
+            return null;
+          }
           if (
             selectedCertificate &&
             (!metadata || metadata.certificateId !== selectedCertificate)
@@ -510,6 +525,26 @@ export function CertificateSettingsForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [renderKey]);
 
+  /** Says which side of the insert is wrong and opens its field, wherever the administrator is. */
+  function refuseSize(key: InsertSizeKey) {
+    setMessage(insertSizeMessage(key));
+    switchTab('certificate');
+    setMobile('fields');
+    openSections((open) => {
+      open.add('size');
+    });
+    refusedSize.current = key;
+  }
+  // Once its section is on the screen and the fields are enabled again, the
+  // refused side is brought under the hand. It waits out as many renders as that takes.
+  useEffect(() => {
+    const input = !busy && refusedSize.current && sizeInputs.current[refusedSize.current];
+    if (!input) return;
+    refusedSize.current = null;
+    input.scrollIntoView({ block: 'center' });
+    input.focus({ preventScroll: true });
+  });
+
   /** Saves whatever is unsaved and returns what the server now holds, or null on failure. */
   async function persist(): Promise<{
     settings: CertificateSettingsView;
@@ -517,6 +552,10 @@ export function CertificateSettingsForm({
   } | null> {
     let settings = saved;
     let nextBatch = savedBatch;
+    if (sizeProblem) {
+      refuseSize(sizeProblem);
+      return null;
+    }
     try {
       if (dirty) {
         const response = await clientFetch('/api/admin/settings/certificate', {
@@ -528,6 +567,12 @@ export function CertificateSettingsForm({
         if (response.status === 409 && result.settings) {
           setSaved(result.settings);
           setMessage('Настройки изменил другой администратор. Сохраните ещё раз');
+          return null;
+        }
+        // The server names the field it refused; the insert size is the one a form can get wrong.
+        const refused = String(result.field ?? '').replace('documentDefaults.', '');
+        if (response.status === 400 && Object.hasOwn(INSERT_SIZE_LIMITS, refused)) {
+          refuseSize(refused as InsertSizeKey);
           return null;
         }
         if (!response.ok) throw new Error(response.status === 429 ? 'RATE_LIMITED' : 'SETTINGS');
@@ -1119,9 +1164,13 @@ export function CertificateSettingsForm({
                 icon={<Ruler aria-hidden="true" />}
                 title="Размер вкладыша"
                 hint={
-                  sizeMissing ? 'Не задан' : `${size.insertWidthCm} × ${size.insertHeightCm} см`
+                  sizeProblem
+                    ? insertSizeMessage(sizeProblem)
+                    : sizeMissing
+                      ? 'Не задан'
+                      : `${size.insertWidthCm} × ${size.insertHeightCm} см`
                 }
-                alert={sizeMissing}
+                alert={sizeMissing || Boolean(sizeProblem)}
                 open={sections.has('size')}
                 onToggle={() => toggle('size')}
               >
@@ -1131,12 +1180,16 @@ export function CertificateSettingsForm({
                     return (
                       <Field key={key} label={label}>
                         <Input
+                          ref={(element) => {
+                            sizeInputs.current[key] = element;
+                          }}
                           type="number"
                           inputMode="decimal"
                           step="0.1"
-                          min={key === 'insertWidthCm' ? 8 : 4}
-                          max={key === 'insertWidthCm' ? 60 : 30}
+                          min={INSERT_SIZE_LIMITS[key][0]}
+                          max={INSERT_SIZE_LIMITS[key][1]}
                           aria-label={label}
+                          invalid={sizeProblem === key}
                           className={FIELD_INPUT}
                           value={size[key] ?? ''}
                           onChange={(e) =>
@@ -1149,6 +1202,9 @@ export function CertificateSettingsForm({
                     );
                   })}
                 </div>
+                <p className="text-xs text-[var(--color-text-muted)]">
+                  Вкладыш в развёрнутом виде, обе половины вместе
+                </p>
               </Section>
             ) : null}
           </div>

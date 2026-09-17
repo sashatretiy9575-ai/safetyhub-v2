@@ -42,8 +42,10 @@ export async function PATCH(request: Request) {
       const imageIssue = parsed.error.issues.find(
         (issue) => issue.message === 'CERTIFICATE_IMAGE_INVALID',
       );
+      // The editor names the refused field to the administrator instead of «повторите».
+      const field = parsed.error.issues[0]?.path.map(String).join('.') ?? '';
       return NextResponse.json(
-        { error: imageIssue ? 'CERTIFICATE_IMAGE_INVALID' : 'INVALID_REQUEST' },
+        { error: imageIssue ? 'CERTIFICATE_IMAGE_INVALID' : 'INVALID_REQUEST', field },
         { status: 400 },
       );
     }
