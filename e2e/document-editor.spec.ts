@@ -1,6 +1,13 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 test.use({ storageState: process.env.E2E_ADMIN_STORAGE_STATE, channel: 'chrome' });
+
+// A click that lands before React hydrates is lost, and on a CI runner that window is seconds wide.
+async function openEditor(page: Page, url?: string) {
+  if (url) await page.goto(url);
+  else await page.reload();
+  await expect(page.locator('.document-editor[data-hydrated]')).toBeVisible();
+}
 
 test('protected photo route returns JPEG from a real private storage manifest', async ({ page }, testInfo) => {
   const base = String(testInfo.project.use.baseURL);
@@ -36,7 +43,7 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   // The actions are laid out twice, in the top row of a desktop and under the thumb on a phone; one is shown.
   const saved = page.getByText('Сохранено', { exact: true }).filter({ visible: true });
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/admin/settings/certificate');
+  await openEditor(page, '/admin/settings/certificate');
   await expect(page.getByRole('heading', { name: 'Документы', exact: true })).toBeVisible();
   const response = await page.request.get('/api/admin/documents');
   expect(response.ok()).toBeTruthy();
@@ -52,7 +59,7 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
     if (chosen) break;
   }
   expect(chosen, 'seeded company must include an issued certificate').not.toBeNull();
-  await page.goto('/admin/settings/certificate?' + new URLSearchParams({ organization: chosen!.organization, course: chosen!.course, user: chosen!.user }));
+  await openEditor(page, '/admin/settings/certificate?' + new URLSearchParams({ organization: chosen!.organization, course: chosen!.course, user: chosen!.user }));
   await expect(page.getByRole('button', { name: 'Изменить', exact: true })).toBeVisible();
   // Rare settings are one line each until opened; what was open survives a reload.
   await page.getByRole('radio', { name: 'Корочка', exact: true }).click();
@@ -70,14 +77,14 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   await expect(page.getByLabel('Номер', { exact: true })).toHaveValue(manualNumber);
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
   await expect(saved).toBeVisible();
-  await page.reload();
+  await openEditor(page);
   await expect(page.getByLabel('Номер', { exact: true })).toHaveValue(manualNumber);
   await expect(page.getByLabel('Дата', { exact: true })).toHaveValue('2026-09-09');
   const originalReviewer = await page.getByLabel('Проверяющий', { exact: true }).inputValue();
   await page.getByLabel('Проверяющий', { exact: true }).fill('Проверяющий локального теста');
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
   await expect(saved).toBeVisible();
-  await page.reload();
+  await openEditor(page);
   await expect(page.getByLabel('Проверяющий', { exact: true })).toHaveValue('Проверяющий локального теста');
   const company = await (await page.request.get('/api/admin/documents', { params: chosen! })).json();
   const certificateId = company.participants.find((p: { userId: string }) => p.userId === chosen!.user).certificateId;
@@ -175,7 +182,7 @@ test('a photographed stamp becomes a transparent picture, stays until replaced a
   // A sheet photographed under a lamp: a blue ring on unevenly lit paper, no transparency at all.
   const sheet = await sharp(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="420" height="320"><defs><linearGradient id="l"><stop offset="0" stop-color="#f4f1ea"/><stop offset="1" stop-color="#c9c6c0"/></linearGradient></defs><rect width="420" height="320" fill="url(#l)"/><circle cx="210" cy="160" r="96" fill="none" stroke="#2f4fb4" stroke-width="9"/></svg>')).jpeg({ quality: 90 }).toBuffer();
   try {
-    await page.goto('/admin/settings/certificate?tab=certificate');
+    await openEditor(page, '/admin/settings/certificate?tab=certificate');
     await page.getByRole('button', { name: /^Печать и подпись/ }).click();
     const chooser = page.waitForEvent('filechooser');
     await page.getByRole('button', { name: /^Печать: (?:загрузить|заменить)$/ }).click();
@@ -196,7 +203,7 @@ test('a photographed stamp becomes a transparent picture, stays until replaced a
     expect(Math.max(...Array.from({ length: info.width }, (_, x) => alpha(x, Math.floor(info.height / 2))))).toBeGreaterThan(200);
     // A replaced image is never served under the address of the previous one.
     expect((await stored(before.version)).status()).toBe(404);
-    await page.reload();
+    await openEditor(page);
     await expect(page.getByRole('button', { name: 'Печать: заменить', exact: true })).toBeVisible();
     const removal = page.waitForResponse(response => response.url().includes('/api/admin/settings/certificate/image') && response.request().method() === 'DELETE');
     await page.getByRole('button', { name: 'Печать: убрать', exact: true }).click();

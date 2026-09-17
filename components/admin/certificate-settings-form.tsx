@@ -296,7 +296,10 @@ export function CertificateSettingsForm({
   const swipeStart = useRef<number | null>(null);
   useEffect(() => () => exportAbort.current?.abort(), []);
   // Whatever was open stays open across a reload: the administrator is in the middle of it.
+  // The marker tells a test that clicks are heard: one made before hydration is lost.
+  const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
+    setHydrated(true);
     try {
       const stored: unknown = JSON.parse(sessionStorage.getItem(SECTIONS_KEY) ?? '[]');
       if (Array.isArray(stored)) {
@@ -801,7 +804,7 @@ export function CertificateSettingsForm({
   );
 
   return (
-    <div className="document-editor min-w-0 space-y-4">
+    <div className="document-editor min-w-0 space-y-4" data-hydrated={hydrated ? '' : undefined}>
       <div className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-[var(--z-sticky)] -mx-1 flex min-w-0 flex-col gap-2 bg-[var(--color-bg)]/92 px-1 py-2 backdrop-blur-xl min-[280px]:flex-row min-[280px]:items-center lg:top-0">
         <SegmentedControl
           label="Вид документа"
