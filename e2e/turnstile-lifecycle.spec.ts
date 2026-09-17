@@ -53,10 +53,15 @@ for (const width of [240, 320, 390, 768]) {
     await mockTurnstile(page);
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/auth/login');
-    const geometry = await page.evaluate(() => ({ clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth }));
-    expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth);
+    // The old check asked for the idle label after the click, which is only there when the click is
+    // lost before hydration: a fast runner heard the click, the form said «Отправляем…», the test failed.
+    await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+    const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(await overflow()).toBeLessThanOrEqual(0);
     await page.getByLabel('Email').fill('user@example.com');
     await page.getByRole('button', { name: 'Получить код' }).click();
-    await expect(page.getByRole('button', { name: 'Получить код' })).toBeVisible();
+    // The form waits for Turnstile and says so, still inside the viewport.
+    await expect(page.getByRole('button', { name: 'Отправляем…' })).toBeVisible();
+    expect(await overflow()).toBeLessThanOrEqual(0);
   });
 }
