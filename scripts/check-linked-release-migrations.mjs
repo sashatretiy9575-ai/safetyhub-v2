@@ -19,12 +19,8 @@ const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 // so the pending tail is empty and the whole history is a pinned receipt. Adding
 // a migration means adding it here too, with its hash; an open-ended local tail
 // would defeat this preflight.
-export const REVIEWED_BASE_MIGRATION_COUNT = 87;
+export const REVIEWED_BASE_MIGRATION_COUNT = 88;
 export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
-  Object.freeze({
-    filename: '20260903090000_course_editor_question_bank_read.sql',
-    sha256: '424d69c17873a72b1a37c578b8f87176270a635ea20a18dad3a3902867d9c233',
-  }),
   Object.freeze({
     filename: '20260903120000_zh_full_profile_admission.sql',
     sha256: '3395026046b965d87f711e195fb6b02dc854f4cf69ea022e5578024512a078a5',
@@ -129,12 +125,13 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
     filename: '20260915190000_education_durable_quota.sql',
     sha256: 'e883aea122538333e90eceac6548d853a339c7da40086ebecc8f147983f9a29b',
   }),
-]);
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260917120000_document_facsimiles.sql',
     sha256: '9f4b898891325a0f42684a27941a8ac6b2dfb6168756fbd468dd299327d6e679',
   }),
+]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;
