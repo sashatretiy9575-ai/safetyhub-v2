@@ -2630,6 +2630,7 @@ export type Database = {
           member_signature_png: string | null
           organization_name: string
           protocol_number: string
+          protocol_signature_png: string | null
           second_member_name: string
           second_member_position: string
           singleton: boolean
@@ -2654,6 +2655,7 @@ export type Database = {
           member_signature_png?: string | null
           organization_name?: string
           protocol_number?: string
+          protocol_signature_png?: string | null
           second_member_name?: string
           second_member_position?: string
           singleton?: boolean
@@ -2678,6 +2680,7 @@ export type Database = {
           member_signature_png?: string | null
           organization_name?: string
           protocol_number?: string
+          protocol_signature_png?: string | null
           second_member_name?: string
           second_member_position?: string
           singleton?: boolean

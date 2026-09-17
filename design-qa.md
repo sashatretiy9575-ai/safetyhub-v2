@@ -32,3 +32,29 @@ Intentional differences from blank reference forms: filled participant data and 
 Local implementation final result: passed.
 
 Production deployment and the real Nursultan Zhussipov case are verified separately after publication; this local QA record does not assert production rollout completion.
+
+---
+
+# Stamp, signatures and the editor's controls
+
+Date: 2026-09-17
+
+## Scope and evidence
+
+Local development build, Docker/Supabase, Chromium. Editor checked at 240, 320, 390, 768, 1024 and 1440 px in the light and the dark theme, fields and preview, both halves of the booklet. The owner's stamp and signature were cut out of his scan with `scripts/build-facsimile-png.mjs` and uploaded through the editor itself; they are stored in the database only, because this repository is public.
+
+## Changes
+
+- The stamp and the signatures are drawn again: the stamp over «М.П.» and the chairman's signature across his line in the booklet, the stamp at its real 38 mm beside the protocol's own signature in the protocol. A picture is its own save and stays until it is replaced; removing one is confirmed first.
+- An uploaded scan or phone photograph loses its paper in the browser (`lib/pdf/facsimile-image.ts`): uneven light is measured around every pixel, the ink keeps its hue, a small scan is enlarged with smooth edges. A PNG that already has a cut-out background is left as drawn. The server decodes and re-encodes whatever arrives before it is stored.
+- Three rows of buttons became switches (`components/ui/segmented-control.tsx`): document, fields or preview, left or right half. The half also follows a swipe.
+- What is set once is one line until opened — pictures, organization and commission, texts, insert size — and each document shows only its own settings. Open sections survive a reload.
+- Actions are icons with a word where there is room: in the top row on a desktop, in a floating bar under the thumb on a phone. A download saves unsaved edits first instead of refusing.
+- The preview is drawn as sharp as the screen shows it, keeps the previous pages while the next ones are prepared, and is not drawn at all while hidden behind the fields.
+- No border sits inside another border: sections are divided by lines, fields carry the only outlines, the preview frame is a tinted surface. Paper and ink tiles stay white in the dark theme on purpose.
+
+## Results
+
+- No horizontal overflow and no clipped button label at any tested width; the five Chrome integration tests of `e2e/document-editor.spec.ts` pass, including the upload, replacement and removal of a photographed stamp.
+- A booklet with both pictures renders in about 230 ms (170 ms without) and weighs about 200 KB (26 KB without a photograph or pictures).
+

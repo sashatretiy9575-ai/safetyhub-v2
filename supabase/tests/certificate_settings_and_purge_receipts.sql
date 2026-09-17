@@ -140,6 +140,13 @@ begin
     );
   update public.user_roles set role = 'admin' where user_id = v_admin_id;
 
+  -- A developer's database may already carry uploaded pictures; the checks
+  -- below start from none, and the transaction is rolled back at the end.
+  update public.certificate_settings
+  set stamp_png = null, chairman_signature_png = null,
+      member_signature_png = null, protocol_signature_png = null
+  where singleton;
+
   -- A learner reads nothing.
   perform set_config('request.jwt.claim.role', 'authenticated', true);
   perform set_config('request.jwt.claim.sub', v_learner_id::text, true);
@@ -195,8 +202,7 @@ begin
     raise exception 'certificate settings update did not apply: %', v_updated;
   end if;
 
-  -- A stale version is refused, an absent key leaves the value alone, and
-  -- images are rejected by the editor.
+  -- A stale version is refused and an absent key leaves the value alone.
   v_updated := public.update_certificate_settings(
     jsonb_build_object('bin', '123'),
     (v_settings ->> 'version')::bigint
@@ -205,12 +211,36 @@ begin
     and (v_updated #>> '{__safetyhubRpcError,message}') is distinct from 'CERTIFICATE_SETTINGS_VERSION_CONFLICT' then
     raise exception 'stale version was accepted: %', v_updated;
   end if;
+  -- A stamp and the protocol's own signature are saved as PNG data URLs, the
+  -- administrator gets flags back rather than bytes and anything else is refused.
   v_updated := public.update_certificate_settings(
-    jsonb_build_object('stampPng', null),
+    jsonb_build_object('stampPng', 'data:text/html;base64,PHNjcmlwdD4='),
     (v_settings ->> 'version')::bigint + 1
   );
-  if (v_updated #>> '{__safetyhubRpcError,message}') is distinct from 'DOCUMENT_IMAGES_DISABLED' then
-    raise exception 'image update must be disabled: %', v_updated;
+  if (v_updated #>> '{__safetyhubRpcError,message}') is distinct from 'CERTIFICATE_IMAGE_INVALID' then
+    raise exception 'a non-PNG image was accepted: %', v_updated;
+  end if;
+  v_updated := public.update_certificate_settings(
+    jsonb_build_object(
+      'stampPng', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+      'protocolSignaturePng', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+    ),
+    (v_settings ->> 'version')::bigint + 1
+  );
+  if (v_updated ->> 'hasStamp')::boolean is not true
+    or (v_updated ->> 'hasProtocolSignature')::boolean is not true
+    or (v_updated ->> 'hasChairmanSignature')::boolean is not false
+    or v_updated ->> 'stampPng' is not null
+    or (v_updated ->> 'version')::bigint <> (v_settings ->> 'version')::bigint + 2 then
+    raise exception 'image update did not apply: %', v_updated - 'documentDefaults';
+  end if;
+  v_updated := public.update_certificate_settings(
+    jsonb_build_object('stampPng', null),
+    (v_settings ->> 'version')::bigint + 2
+  );
+  if (v_updated ->> 'hasStamp')::boolean is not false
+    or (v_updated ->> 'hasProtocolSignature')::boolean is not true then
+    raise exception 'removing one image must leave the other: %', v_updated - 'documentDefaults';
   end if;
 
   -- The server role receives the bytes it needs for the image route.
@@ -218,7 +248,9 @@ begin
   perform set_config('request.jwt.claim.sub', '', true);
   perform set_config('request.jwt.claims', jsonb_build_object('role', 'service_role')::text, true);
   v_settings := public.get_certificate_settings(true);
-  if (v_settings ->> 'protocolNumber') is distinct from '09/04' then
+  if (v_settings ->> 'protocolNumber') is distinct from '09/04'
+    or (v_settings ->> 'protocolSignaturePng') not like 'data:image/png;base64,%'
+    or v_settings ->> 'stampPng' is not null then
     raise exception 'service role did not read the saved settings: %', v_settings;
   end if;
 end;

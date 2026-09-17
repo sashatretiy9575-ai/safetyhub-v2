@@ -41,6 +41,36 @@ test('the booklet and the protocol are drawn from one settings row that browsers
   assert.match(image, /'Cache-Control': 'private, max-age=31536000, immutable'/u);
 });
 
+test('the stamp and the signatures are pictures the administrator uploads, one save each', async () => {
+  const [migration, settings, route, normalizer, renderer] = await Promise.all([
+    read('supabase/migrations/20260917120000_document_facsimiles.sql'),
+    read('server/certificates/settings.ts'),
+    read('app/api/admin/settings/certificate/image/route.ts'),
+    read('server/certificates/facsimile-image.ts'),
+    read('lib/pdf/certificate-renderer.ts'),
+  ]);
+  // The editor migration switched images off; this one switches them back on
+  // and gives the protocol a signature of its own.
+  assert.match(migration, /add column protocol_signature_png text/u);
+  assert.doesNotMatch(migration, /DOCUMENT_IMAGES_DISABLED/u);
+  assert.match(migration, /message='CERTIFICATE_IMAGE_INVALID'/u);
+  // This repository is public: a signature lives in the database, never in a migration.
+  assert.doesNotMatch(migration, /base64,[A-Za-z0-9+/]{32}/u);
+  // An image has its own route; the text save still cannot carry one.
+  assert.match(settings, /stampPng: z\.never\(\)\.optional\(\)/u);
+  assert.match(
+    route,
+    /await authorize\(request\);[\s\S]*?readBoundedBytes\(request, FACSIMILE_UPLOAD_MAX_BYTES\)/u,
+  );
+  assert.match(route, /invalidOriginResponse\(request\)/u);
+  assert.match(route, /consumeAdminMutationQuota\('site\.settings\.update'/u);
+  // The whole PNG is decoded and re-encoded: pdf-lib parses it for every certificate.
+  assert.match(normalizer, /failOn: 'warning'/u);
+  assert.match(normalizer, /metadata\.format !== 'png'/u);
+  assert.match(renderer, /embedFacsimile\(pdf, branding\.stampUrl,/u);
+  assert.match(renderer, /embedFacsimile\(pdf, branding\.chairmanSignatureUrl,/u);
+});
+
 test('every certificate is a two-sided booklet drawn with the current settings', async () => {
   const [contract, renderer, server, exportHelper, metadataRoute, sample] = await Promise.all([
     read('lib/pdf/certificate-client-contract.ts'),
@@ -54,7 +84,7 @@ test('every certificate is a two-sided booklet drawn with the current settings',
   assert.match(contract, /assertCertificateBranding\(item\.branding\)/u);
   assert.match(
     contract,
-    /SAFE_IMAGE_PATH_PATTERN =\s*\/\^\\\/certificate-assets\\\/image\\\?kind=\(\?:stamp\|chairman\|member\)&v=\[0-9\]\{1,12\}\$\/u/u,
+    /SAFE_IMAGE_PATH_PATTERN =\s*\/\^\\\/certificate-assets\\\/image\\\?kind=\(\?:stamp\|chairman\|member\|protocol\)&v=\[0-9\]\{1,12\}\$\/u/u,
   );
   // Two A5 landscape sides, the paper form's bilingual labels, no template PDF.
   assert.match(renderer, /insertWidthCm \* 72 \/ 2\.54/u);
@@ -88,7 +118,10 @@ test('an export carries the workbook, one protocol per company and course, then 
   assert.match(protocol, /заседания комиссии по проверке знаний/u);
   assert.match(protocol, /Результат сдачи экзаменов/u);
   assert.match(protocol, /participantResult\(person\)/u);
-  assert.doesNotMatch(protocol, /drawSignature|drawImage/u);
+  // The stamp and the protocol's own signature, never the booklet's.
+  assert.match(protocol, /embedFacsimile\(pdf, branding\.stampUrl,/u);
+  assert.match(protocol, /embedFacsimile\(pdf, branding\.protocolSignatureUrl,/u);
+  assert.doesNotMatch(protocol, /chairmanSignatureUrl/u);
   assert.doesNotMatch(protocol, /node:(?:fs|path|crypto)|SafetyHub\.kz/u);
   for (const source of [worker, client]) {
     const report = source.indexOf('CERTIFICATE_REPORT_FILENAME');

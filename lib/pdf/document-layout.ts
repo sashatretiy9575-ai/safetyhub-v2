@@ -1,6 +1,6 @@
-import type { PDFDocument, PDFFont, PDFPage } from 'pdf-lib';
+import type { PDFDocument, PDFFont, PDFImage, PDFPage } from 'pdf-lib';
 import { rgb } from 'pdf-lib';
-import { loadCertificateFontBytes, resolveAssetUrl } from './certificate-renderer.ts';
+import { loadCertificateFontBytes, loadCertificateImageBytes, resolveAssetUrl } from './certificate-renderer.ts';
 import { wrapDocumentText } from './protocol-renderer.ts';
 
 export const ink = rgb(0, 0, 0);
@@ -19,6 +19,17 @@ export function block(page: PDFPage, text: string, font: PDFFont, x: number, top
     return lines.length * s * 1.2;
   }
   throw new Error('DOCUMENT_TEXT_OVERFLOW');
+}
+/** The stamp or a signature the administrator uploaded; transparency survives as a soft mask. */
+export async function embedFacsimile(pdf: PDFDocument, url: string | null | undefined, origin?: string, signal?: AbortSignal): Promise<PDFImage | null> {
+  if (!url) return null;
+  return pdf.embedPng(await loadCertificateImageBytes(resolveAssetUrl(url, origin), signal));
+}
+/** Fits the image inside the box and centres it; drawn last, so the ink lies over the text like on paper. */
+export function drawFacsimile(page: PDFPage, image: PDFImage | null, x: number, top: number, width: number, height: number) {
+  if (!image) return;
+  const fit = Math.min(width / image.width, height / image.height);
+  page.drawImage(image, { x: x + (width - image.width * fit) / 2, y: page.getHeight() - top - height + (height - image.height * fit) / 2, width: image.width * fit, height: image.height * fit });
 }
 export function rule(page: PDFPage, x: number, top: number, width: number, thickness = .5) {
   page.drawLine({ start: { x, y: page.getHeight() - top }, end: { x: x + width, y: page.getHeight() - top }, thickness, color: ink });

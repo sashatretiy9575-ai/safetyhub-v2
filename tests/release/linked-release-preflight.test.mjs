@@ -117,18 +117,18 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const localMigrations = inventory;
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
-  // 15 September 2026: production carries the document editor migration too;
-  // its database transaction and history entry were verified after application.
+  // 17 September 2026: production carries everything up to the document editor;
+  // the stamp and signature migration is reviewed and waits for the release.
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 87);
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 88);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(receipt.matchedCount, 87);
-  assert.equal(receipt.pendingCount, 0);
+  assert.equal(receipt.pendingCount, 1);
   assert.equal(receipt.expectedBaseCount, 87);
-  assert.equal(receipt.expectedPendingCount, 0);
-  assert.equal(receipt.expectedTotalCount, 87);
+  assert.equal(receipt.expectedPendingCount, 1);
+  assert.equal(receipt.expectedTotalCount, 88);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

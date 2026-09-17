@@ -1,19 +1,26 @@
 /* External stylesheet: inline style tags are intentionally blocked by the CSP. */
-.document-editor button {
-  min-width: 0;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  height: auto;
-  min-height: 44px;
-  padding: 10px;
-}
 .document-editor input, .document-editor textarea {
   min-width: 0;
   max-width: 100%;
 }
-.document-editor .document-mode-switch button {
-  padding: 8px 3px;
-  overflow-wrap: normal;
+.document-pages {
+  display: grid;
+  gap: 0.75rem;
+}
+/* Paper stays white in the dark theme: it is the sheet that will be printed. */
+.document-page {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: var(--shadow-card);
+}
+.document-insert {
+  transition: transform 0.2s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .document-insert { transition: none; }
 }
 @media (width < 64rem) {
   .document-insert { width: 200%; }

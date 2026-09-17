@@ -33,6 +33,8 @@ export type CertificateBranding = Readonly<{
   stampUrl: string | null;
   chairmanSignatureUrl: string | null;
   memberSignatureUrl: string | null;
+  /** The protocol is signed separately; absent in metadata from before it existed. */
+  protocolSignatureUrl?: string | null;
 }>;
 
 export type CertificateRenderMetadata = Readonly<{
@@ -91,7 +93,13 @@ const CERTIFICATE_NUMBER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,95}$/u;
 const SAFE_ASSET_PATH_PATTERN =
   /^\/certificate-assets\/font\?locale=(?:ru|zh)&v=(?:1|Sans2\.005)$/u;
 const SAFE_IMAGE_PATH_PATTERN =
-  /^\/certificate-assets\/image\?kind=(?:stamp|chairman|member)&v=[0-9]{1,12}$/u;
+  /^\/certificate-assets\/image\?kind=(?:stamp|chairman|member|protocol)&v=[0-9]{1,12}$/u;
+
+export type CertificateImageKind = 'stamp' | 'chairman' | 'member' | 'protocol';
+/** `version` is the settings version: a replaced image is never served from a browser cache. */
+export function certificateImageUrl(kind: CertificateImageKind, version: number) {
+  return `/certificate-assets/image?kind=${kind}&v=${version}`;
+}
 
 function assertString(value: unknown, code: string, maxLength: number): asserts value is string {
   if (typeof value !== 'string' || value.length < 1 || value.length > maxLength) {
@@ -169,6 +177,7 @@ export function assertCertificateBranding(value: unknown): asserts value is Cert
   assertImageUrl(branding.stampUrl, 'CERTIFICATE_ASSET_URL_INVALID');
   assertImageUrl(branding.chairmanSignatureUrl, 'CERTIFICATE_ASSET_URL_INVALID');
   assertImageUrl(branding.memberSignatureUrl, 'CERTIFICATE_ASSET_URL_INVALID');
+  assertImageUrl(branding.protocolSignatureUrl ?? null, 'CERTIFICATE_ASSET_URL_INVALID');
 }
 
 export function assertCertificateRenderMetadata(

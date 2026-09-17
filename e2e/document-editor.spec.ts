@@ -33,6 +33,8 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
     }
   });
   const manualNumber = 'EDITOR/' + Date.now();
+  // The actions are laid out twice, in the top row of a desktop and under the thumb on a phone; one is shown.
+  const saved = page.getByText('Сохранено', { exact: true }).filter({ visible: true });
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/admin/settings/certificate');
   await expect(page.getByRole('heading', { name: 'Документы', exact: true })).toBeVisible();
@@ -52,9 +54,14 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   expect(chosen, 'seeded company must include an issued certificate').not.toBeNull();
   await page.goto('/admin/settings/certificate?' + new URLSearchParams({ organization: chosen!.organization, course: chosen!.course, user: chosen!.user }));
   await expect(page.getByRole('button', { name: 'Изменить', exact: true })).toBeVisible();
+  // Rare settings are one line each until opened; what was open survives a reload.
+  await page.getByRole('radio', { name: 'Корочка', exact: true }).click();
+  await page.getByRole('button', { name: /^Размер вкладыша/ }).click();
   await page.getByLabel('Общая ширина, см', { exact: true }).fill('32');
   await page.getByLabel('Высота, см', { exact: true }).fill('10');
   await expect(page.locator('canvas').first()).toBeVisible({ timeout: 30_000 });
+  await page.getByRole('radio', { name: 'Протокол', exact: true }).click();
+  await page.getByRole('button', { name: /^Организация и комиссия/ }).click();
   await page.getByLabel('Дата', { exact: true }).fill('2026-09-08');
   await page.getByRole('button', { name: 'Номер по дате', exact: true }).click();
   await expect(page.getByLabel('Номер', { exact: true })).toHaveValue('08.09');
@@ -62,14 +69,14 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   await page.getByLabel('Дата', { exact: true }).fill('2026-09-09');
   await expect(page.getByLabel('Номер', { exact: true })).toHaveValue(manualNumber);
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(page.getByText('Настройки и реквизиты протокола сохранены.')).toBeVisible();
+  await expect(saved).toBeVisible();
   await page.reload();
   await expect(page.getByLabel('Номер', { exact: true })).toHaveValue(manualNumber);
   await expect(page.getByLabel('Дата', { exact: true })).toHaveValue('2026-09-09');
   const originalReviewer = await page.getByLabel('Проверяющий', { exact: true }).inputValue();
   await page.getByLabel('Проверяющий', { exact: true }).fill('Проверяющий локального теста');
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(page.getByText('Настройки и реквизиты протокола сохранены.')).toBeVisible();
+  await expect(saved).toBeVisible();
   await page.reload();
   await expect(page.getByLabel('Проверяющий', { exact: true })).toHaveValue('Проверяющий локального теста');
   const company = await (await page.request.get('/api/admin/documents', { params: chosen! })).json();
@@ -79,7 +86,7 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   expect(refreshed.branding.protocolNumber).toBe(manualNumber);
   await page.getByLabel('Проверяющий', { exact: true }).fill(originalReviewer);
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(page.getByText('Настройки и реквизиты протокола сохранены.')).toBeVisible();
+  await expect(saved).toBeVisible();
   const settings = (await (await page.request.get('/api/admin/settings/certificate')).json()).settings;
   const concurrent = await page.request.patch('/api/admin/settings/certificate', {
     headers: { origin: 'http://localhost:3100' },
@@ -88,29 +95,31 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   expect(concurrent.ok()).toBeTruthy();
   await page.getByLabel('Проверяющий', { exact: true }).fill('Сохранённый черновик');
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(page.getByText(/Настройки изменил другой администратор/)).toBeVisible();
+  await expect(page.getByText(/Настройки изменил другой администратор/).filter({ visible: true })).toBeVisible();
   await expect(page.getByLabel('Проверяющий', { exact: true })).toHaveValue('Сохранённый черновик');
   await page.getByLabel('Проверяющий', { exact: true }).fill(originalReviewer);
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(page.getByText('Настройки и реквизиты протокола сохранены.')).toBeVisible();
-  await page.getByRole('button', { name: 'Корочка', exact: true }).click();
+  await expect(saved).toBeVisible();
+  await page.getByRole('radio', { name: 'Корочка', exact: true }).click();
   await expect(page.locator('canvas')).toHaveCount(1, { timeout: 30_000 });
   await expect(page.getByRole('button', { name: 'Скачать PDF', exact: true })).toBeEnabled();
   await page.setViewportSize({ width: 240, height: 812 });
-  await page.getByRole('button', { name: 'Предпросмотр', exact: true }).click();
-  await page.getByRole('button', { name: 'Правая', exact: true }).click();
+  await page.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
+  await page.getByRole('radio', { name: 'Правая', exact: true }).click();
   expect(await page.locator('.document-insert').evaluate(el => getComputedStyle(el).transform)).not.toBe('none');
-  await page.getByRole('button', { name: 'Левая', exact: true }).click();
-  expect(await page.locator('.document-insert').evaluate(el => getComputedStyle(el).transform)).toBe('none');
+  await page.getByRole('radio', { name: 'Левая', exact: true }).click();
+  // The half slides into place; the check waits for it to arrive.
+  await expect.poll(() => page.locator('.document-insert').evaluate(el => getComputedStyle(el).transform)).toBe('none');
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.screenshot({ path: testInfo.outputPath('booklet-desktop.png'), fullPage: true });
-  for (let i = 0; i < 1; i++) await page.locator('canvas').nth(i).screenshot({ path: testInfo.outputPath(`booklet-side-${i + 1}.png`) });
+  // A wider frame redraws the sheet at the new sharpness; the picture is taken of the settled canvas.
+  await expect(async () => { await page.locator('canvas').first().screenshot({ path: testInfo.outputPath('booklet-side-1.png'), timeout: 5_000 }); }).toPass();
   const downloadEvent = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Скачать PDF', exact: true }).click();
   const bookletDownload = await downloadEvent;
   expect(bookletDownload.suggestedFilename()).toMatch(/\.pdf$/);
   await bookletDownload.saveAs(testInfo.outputPath('booklet.pdf'));
-  await page.getByRole('button', { name: 'Протокол', exact: true }).click();
+  await page.getByRole('radio', { name: 'Протокол', exact: true }).click();
   await expect(page.locator('canvas').first()).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('protocol-desktop.png'), fullPage: true });
   const zipEvent = page.waitForEvent('download', { timeout: 90_000 });
@@ -118,16 +127,16 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   expect((await zipEvent).suggestedFilename()).toMatch(/\.zip$/);
   const draftPerson = company.participants.find((p: { certificateId: string | null }) => !p.certificateId);
   if (draftPerson) {
-    await page.getByRole('button', { name: 'Корочка', exact: true }).click();
+    await page.getByRole('radio', { name: 'Корочка', exact: true }).click();
     await page.getByLabel('Сотрудник', { exact: true }).click();
     await page.getByRole('button', { name: draftPerson.fullName, exact: true }).click();
-    await expect(page.getByText(/Предварительный просмотр\. Удостоверение ещё не выдано/)).toBeVisible();
+    await expect(page.getByText('Удостоверение ещё не выдано', { exact: true })).toBeVisible();
     await expect(page.locator('canvas')).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Скачать PDF', exact: true })).toBeDisabled();
-    await page.getByRole('button', { name: 'Протокол', exact: true }).click();
+    await page.getByRole('radio', { name: 'Протокол', exact: true }).click();
   }
   await page.setViewportSize({ width: 240, height: 740 });
-  await page.getByRole('button', { name: 'Предпросмотр', exact: true }).click();
+  await page.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
   await expect(page.locator('canvas').first()).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   await page.screenshot({ path: testInfo.outputPath('editor-mobile.png'), fullPage: true });
@@ -137,7 +146,7 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow at ${width}`).toBeTruthy();
     await page.screenshot({ path: testInfo.outputPath(`editor-${width}.png`), fullPage: true });
     if (width < 1024) {
-      await page.getByRole('button', { name: 'Поля', exact: true }).click();
+      await page.getByRole('radio', { name: 'Поля', exact: true }).click();
       await page.evaluate(() => window.scrollTo(0, 0));
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
       expect(await page.locator('.document-editor button').evaluateAll(buttons => buttons.filter(b => b.getBoundingClientRect().height > 0).every(b => b.scrollHeight <= b.clientHeight + 1))).toBeTruthy();
@@ -148,11 +157,59 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
         await page.setViewportSize({ width, height: 812 });
       }
-      await page.getByRole('button', { name: 'Предпросмотр', exact: true }).click();
+      await page.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
     }
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   expect(errors).toEqual([]);
+});
+
+test('a photographed stamp becomes a transparent picture, stays until replaced and can be taken off', async ({ page }, testInfo) => {
+  const base = String(testInfo.project.use.baseURL);
+  if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('LOCAL_ONLY');
+  const sharp = (await import('sharp')).default;
+  const settings = async () => (await (await page.request.get('/api/admin/settings/certificate')).json()).settings;
+  const stored = (version: number) => page.request.get(`/certificate-assets/image?kind=stamp&v=${version}`);
+  const before = await settings();
+  const original = before.hasStamp ? await (await stored(before.version)).body() : null;
+  // A sheet photographed under a lamp: a blue ring on unevenly lit paper, no transparency at all.
+  const sheet = await sharp(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="420" height="320"><defs><linearGradient id="l"><stop offset="0" stop-color="#f4f1ea"/><stop offset="1" stop-color="#c9c6c0"/></linearGradient></defs><rect width="420" height="320" fill="url(#l)"/><circle cx="210" cy="160" r="96" fill="none" stroke="#2f4fb4" stroke-width="9"/></svg>')).jpeg({ quality: 90 }).toBuffer();
+  try {
+    await page.goto('/admin/settings/certificate?tab=certificate');
+    await page.getByRole('button', { name: /^Печать и подпись/ }).click();
+    const chooser = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: /^Печать: (?:загрузить|заменить)$/ }).click();
+    const upload = page.waitForResponse(response => response.url().includes('/api/admin/settings/certificate/image') && response.request().method() === 'PUT');
+    await (await chooser).setFiles({ name: 'sheet.jpg', mimeType: 'image/jpeg', buffer: sheet });
+    expect((await upload).status()).toBe(200);
+    const uploaded = await settings();
+    expect(uploaded.hasStamp).toBe(true);
+    expect(uploaded.version).toBeGreaterThan(before.version);
+    const image = await stored(uploaded.version);
+    expect(image.status()).toBe(200);
+    expect(image.headers()['content-type']).toBe('image/png');
+    const { data, info } = await sharp(await image.body()).raw().toBuffer({ resolveWithObject: true });
+    expect(info.channels).toBe(4);
+    // The paper is gone, the ring is ink: a clear centre and an opaque stroke.
+    const alpha = (x: number, y: number) => data[(y * info.width + x) * 4 + 3] ?? 0;
+    expect(alpha(Math.floor(info.width / 2), Math.floor(info.height / 2))).toBe(0);
+    expect(Math.max(...Array.from({ length: info.width }, (_, x) => alpha(x, Math.floor(info.height / 2))))).toBeGreaterThan(200);
+    // A replaced image is never served under the address of the previous one.
+    expect((await stored(before.version)).status()).toBe(404);
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Печать: заменить', exact: true })).toBeVisible();
+    const removal = page.waitForResponse(response => response.url().includes('/api/admin/settings/certificate/image') && response.request().method() === 'DELETE');
+    await page.getByRole('button', { name: 'Печать: убрать', exact: true }).click();
+    // Every document issued from now on changes, so the editor asks first.
+    await page.getByRole('button', { name: 'Убрать', exact: true }).click();
+    expect((await removal).status()).toBe(200);
+    await expect(page.getByRole('button', { name: 'Печать: загрузить', exact: true })).toBeVisible();
+    expect((await settings()).hasStamp).toBe(false);
+    const refused = await page.request.put('/api/admin/settings/certificate/image?kind=stamp', { headers: { origin: base, 'content-type': 'image/png' }, data: Buffer.from('not a picture at all') });
+    expect(refused.status()).toBe(400);
+  } finally {
+    if (original) await page.request.put('/api/admin/settings/certificate/image?kind=stamp', { headers: { origin: base, 'content-type': 'image/png' }, data: original });
+  }
 });
 
 test('a slow navigation shows a non-blocking circle and clears it on completion', async ({ page }) => {

@@ -48,7 +48,7 @@ export function wrapDocumentText(font: PDFFont, text: string, size: number, widt
 
 
 export async function generateProtocolInBrowser(group: ProtocolGroup, branding: CertificateBranding, fontUrl: string, signal?: AbortSignal): Promise<Uint8Array> {
-  const [{ PDFDocument }, fontkitModule, { loadDocumentFonts, block, rule, ink }] = await Promise.all([import('pdf-lib'), import('@pdf-lib/fontkit'), import('./document-layout.ts')]);
+  const [{ PDFDocument }, fontkitModule, { loadDocumentFonts, block, rule, ink, embedFacsimile, drawFacsimile }] = await Promise.all([import('pdf-lib'), import('@pdf-lib/fontkit'), import('./document-layout.ts')]);
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkitModule.default);
   const fonts = await loadDocumentFonts(pdf, fontUrl, group.items[0]?.verificationUrl, signal);
@@ -115,11 +115,23 @@ export async function generateProtocolInBrowser(group: ProtocolGroup, branding: 
   y += 20;
   paragraph('Лица, получившие положительные оценки, допускаются к самостоятельной работе, к выполнению соответствующих работ.');
   y += 20;
+  const [stamp, signature] = await Promise.all([
+    embedFacsimile(pdf, branding.stampUrl, group.items[0]?.verificationUrl, signal),
+    embedFacsimile(pdf, branding.protocolSignatureUrl, group.items[0]?.verificationUrl, signal),
+  ]);
+  // The stamp hangs 60 pt below the chairman's line; it must not leave the sheet.
+  if ((stamp || signature) && y + 120 > 790) nextPage();
   paragraph('Қолы / Подпись:', 9, 'left', true);
-  for (const m of [{ name: branding.chairmanName, position: 'Төраға / Председатель' }, ...documentCommission(branding).map(m => ({ name: m.name, position: 'Мүшесі / Член комиссии' }))]) {
+  for (const [i, m] of [{ name: branding.chairmanName, position: 'Төраға / Председатель' }, ...documentCommission(branding).map(m => ({ name: m.name, position: 'Мүшесі / Член комиссии' }))].entries()) {
     if (y + 28 > 790) nextPage();
     paragraph(m.position + ': ' + m.name, 9);
-    rule(page, 400, y - 6, 135); y += 9;
+    rule(page, 400, y - 6, 135);
+    if (i === 0) {
+      // A 38 mm stamp at its real size beside the chairman's signature.
+      drawFacsimile(page, stamp, 318, y - 54, 108, 108);
+      drawFacsimile(page, signature, 412, y - 40, 112, 42);
+    }
+    y += 9;
   }
   if (branding.documentDefaults?.reviewerName) paragraph('Проверяющий: ' + branding.documentDefaults.reviewerName, 9);
   y += 14;

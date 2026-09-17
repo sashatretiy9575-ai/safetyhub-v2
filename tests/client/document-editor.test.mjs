@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import test from 'node:test';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDict, PDFDocument, PDFName } from 'pdf-lib';
 import { documentDate, numberFromDate, newDocumentBatch, changeDocumentDate, DOCUMENT_DEFAULTS } from '../../lib/pdf/document-editor.ts';
 import { generateProtocolInBrowser } from '../../lib/pdf/protocol-renderer.ts';
 import { generateCertificateInBrowser } from '../../lib/pdf/certificate-renderer.ts';
@@ -25,12 +25,21 @@ test('protocol date follows Oral midnight and manual numbers survive date change
   assert.equal(changeDocumentDate({ ...batch, number: 'CUSTOM/1', automatic: false }, '2026-09-08').number, 'CUSTOM/1');
 });
 
-test('PDFs contain actual results, all company participants, signature placeholders but no signature image requests', async () => {
+// The smallest PNG there is; DOCUMENT_EDITOR_STAMP_PNG / DOCUMENT_EDITOR_SIGNATURE_PNG
+// put real pictures on the visual QA sheets without committing them.
+const PIXEL_PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+async function facsimile(url) {
+  const file = url.includes('kind=stamp') ? process.env.DOCUMENT_EDITOR_STAMP_PNG : process.env.DOCUMENT_EDITOR_SIGNATURE_PNG;
+  return file ? readFile(file) : PIXEL_PNG;
+}
+
+test('PDFs contain actual results, all company participants, the stamp and the signature of each document', async () => {
   const font = await readFile(new URL('../../lib/pdf/assets/noto-sans-latin-cyrillic.ttf', import.meta.url));
   const original = globalThis.fetch;
   const requests = [];
   globalThis.fetch = async input => {
     requests.push(String(input));
+    if (String(input).includes('/certificate-assets/image?')) return new Response(await facsimile(String(input)));
     assert.match(String(input), /font/);
     return new Response(String(input).includes('face=serif') ? await readFile(new URL('../../lib/pdf/assets/NotoSerif-' + (String(input).includes('weight=bold') ? 'Bold' : 'Regular') + '.ttf', import.meta.url)) : String(input).includes('face=sans') ? await readFile(new URL('../../lib/pdf/assets/NotoSans-Bold.ttf', import.meta.url)) : font);
   };
@@ -41,6 +50,7 @@ test('PDFs contain actual results, all company participants, signature placehold
     knowledgeTextKk: '«{program}» бағдарламасы бойынша білімін тексеру. №{protocol} хаттама.', knowledgeTextRu: 'Проверка знаний по программе «{program}». Протокол №{protocol}.',
     documentDefaults: { ...DOCUMENT_DEFAULTS, insertWidthCm: 32, insertHeightCm: 10 },
     stampUrl: '/certificate-assets/image?kind=stamp&v=1', chairmanSignatureUrl: '/certificate-assets/image?kind=chairman&v=1', memberSignatureUrl: null,
+    protocolSignatureUrl: '/certificate-assets/image?kind=protocol&v=1',
   };
   try {
     const participants = Array.from({ length: 130 }, (_, i) => ({
@@ -71,6 +81,11 @@ test('PDFs contain actual results, all company participants, signature placehold
     assert.match(text, /Проверка не пройдена/);
     assert.match(text, /Образование/);
     await task.destroy();
+    // The protocol carries the stamp and its own signature, never the booklet's.
+    assert.deepEqual(requests.filter(url => url.includes('image')).map(url => new URL(url, 'https://x').searchParams.get('kind')).sort(), ['protocol', 'stamp']);
+    const drawn = loaded.getPages().map(sheet => sheet.node.Resources().lookupMaybe(PDFName.of('XObject'), PDFDict)?.keys().length ?? 0);
+    assert.deepEqual(drawn.filter(Boolean), [2], 'both are drawn once, beside the chairman');
+    requests.length = 0;
     const certificate = await generateCertificateInBrowser({
       schemaVersion: 1, certificateId: '00000000-0000-4000-8000-000000000001', filename: 'SH-TEST.pdf', locale: 'ru',
       templateVersion: 1, templateUrl: '/certificates/template-v1.pdf', fontUrl: '/certificate-assets/font?locale=ru&v=1',
@@ -92,6 +107,6 @@ test('PDFs contain actual results, all company participants, signature placehold
     assert.match(certText, /Работа на высоте/);
     assert.match(certText, /М\.П\./);
     await certTask.destroy();
-    assert.ok(requests.every(url => !url.includes('image')));
+    assert.deepEqual(requests.filter(url => url.includes('image')).map(url => new URL(url, 'https://x').searchParams.get('kind')).sort(), ['chairman', 'stamp']);
   } finally { globalThis.fetch = original; }
 });

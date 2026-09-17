@@ -116,6 +116,7 @@ const nextConfig: NextConfig = {
     outputFileTracingIncludes: {
       '/api/certificates/*/photo': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
       '/api/admin/documents/photo/*': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
+      '/api/admin/settings/certificate/image': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
     '/api/profile/avatar': [
       './node_modules/@img/sharp-linux-x64/**/*',
       './node_modules/@img/sharp-libvips-linux-x64/**/*',

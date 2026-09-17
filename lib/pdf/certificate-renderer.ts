@@ -1,4 +1,4 @@
-import { block, rule, ink, loadDocumentFonts } from './document-layout.ts';
+import { block, rule, ink, loadDocumentFonts, embedFacsimile, drawFacsimile } from './document-layout.ts';
 import { documentCommission, documentStatement } from './document-editor.ts';
 import {
   assertCertificateRenderMetadata,
@@ -188,6 +188,15 @@ export async function generateCertificatePreview(metadata: CertificatePreviewDat
     txt(m.position + ': ' + m.name, right, y, commissionWidth, lineHeight - 3, Math.min(10, lineHeight * .6));
     rule(page, right, y + lineHeight - 1, commissionWidth);
   });
+  // The stamp covers «М.П.» and the corner of the photograph, as on the paper
+  // form; the chairman signs across the first commission line.
+  const [stamp, signature] = await Promise.all([
+    embedFacsimile(pdf, branding.stampUrl, metadata.verificationUrl, signal),
+    embedFacsimile(pdf, branding.chairmanSignatureUrl, metadata.verificationUrl, signal),
+  ]);
+  drawFacsimile(page, stamp, photoX - 86, 272, 92, 92);
+  const signatureHeight = Math.min(42, lineHeight * 1.75);
+  drawFacsimile(page, signature, right + commissionWidth - 124, 295 + lineHeight + 7 - signatureHeight, 112, signatureHeight);
   if (metadata.verificationUrl) {
     const qr = (await import('qrcode')).default.create(metadata.verificationUrl, { errorCorrectionLevel: 'M' });
     const qrSize = 57, cell = qrSize / (qr.modules.size + 8), qrX = half * 2 - margin - qrSize;

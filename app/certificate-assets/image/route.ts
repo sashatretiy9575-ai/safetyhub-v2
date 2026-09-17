@@ -1,19 +1,14 @@
 import { requireUser } from '@/server/auth/session';
 import {
+  CERTIFICATE_IMAGE_KINDS,
+  certificateImageDataUrl,
   decodeCertificateImage,
   readCertificateImagesCached,
-  type CertificateImageKind,
 } from '@/server/certificates/settings';
 import { createApiResponse } from '@/lib/security/api-response';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-const KINDS: Record<string, CertificateImageKind> = {
-  stamp: 'stamp',
-  chairman: 'chairman',
-  member: 'member',
-};
 
 /**
  * The stamp and signature PNGs the administrator uploaded, drawn onto every
@@ -32,7 +27,7 @@ export async function GET(request: Request) {
     });
   }
   const url = new URL(request.url);
-  const kind = KINDS[url.searchParams.get('kind') ?? ''];
+  const kind = CERTIFICATE_IMAGE_KINDS.find((value) => value === url.searchParams.get('kind'));
   const version = url.searchParams.get('v') ?? '';
   if (!kind || !/^[0-9]{1,12}$/u.test(version)) {
     return createApiResponse(null, {
@@ -41,13 +36,7 @@ export async function GET(request: Request) {
     });
   }
   const settings = await readCertificateImagesCached();
-  const dataUrl =
-    kind === 'stamp'
-      ? settings.stampPng
-      : kind === 'chairman'
-        ? settings.chairmanSignaturePng
-        : settings.memberSignaturePng;
-  const bytes = decodeCertificateImage(dataUrl);
+  const bytes = decodeCertificateImage(certificateImageDataUrl(settings, kind));
   if (!bytes || String(settings.version) !== version) {
     return createApiResponse(null, {
       status: 404,

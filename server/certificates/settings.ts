@@ -3,7 +3,11 @@ import 'server-only';
 import { revalidateTag, unstable_cache } from 'next/cache';
 import * as z from 'zod';
 import { requireCapability } from '@/server/auth/session';
-import type { CertificateBranding } from '@/lib/pdf/certificate-client-contract';
+import {
+  certificateImageUrl,
+  type CertificateBranding,
+  type CertificateImageKind,
+} from '@/lib/pdf/certificate-client-contract';
 import { createAdminClient } from '@/server/supabase/admin';
 import { createClient } from '@/server/supabase/server';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
@@ -43,6 +47,8 @@ export const certificateSettingsSchema = z.object({
   hasStamp: z.boolean(),
   hasChairmanSignature: z.boolean(),
   hasMemberSignature: z.boolean(),
+  // Absent until the facsimile migration is applied; the code may deploy first.
+  hasProtocolSignature: z.boolean().default(false),
   version: z.number().int().min(1),
   updatedAt: z.string(),
 });
@@ -52,10 +58,38 @@ const withImagesSchema = certificateSettingsSchema.extend({
   stampPng: z.string().nullable(),
   chairmanSignaturePng: z.string().nullable(),
   memberSignaturePng: z.string().nullable(),
+  protocolSignaturePng: z.string().nullable().default(null),
 });
 export type CertificateSettingsWithImages = z.infer<typeof withImagesSchema>;
 
-export type CertificateImageKind = 'stamp' | 'chairman' | 'member';
+export const CERTIFICATE_IMAGE_KINDS = [
+  'stamp',
+  'chairman',
+  'member',
+  'protocol',
+] as const satisfies readonly CertificateImageKind[];
+export type { CertificateImageKind };
+
+const IMAGE_PATCH_KEY = {
+  stamp: 'stampPng',
+  chairman: 'chairmanSignaturePng',
+  member: 'memberSignaturePng',
+  protocol: 'protocolSignaturePng',
+} as const satisfies Record<CertificateImageKind, keyof CertificateSettingsWithImages>;
+
+const IMAGE_FLAG = {
+  stamp: 'hasStamp',
+  chairman: 'hasChairmanSignature',
+  member: 'hasMemberSignature',
+  protocol: 'hasProtocolSignature',
+} as const satisfies Record<CertificateImageKind, keyof CertificateSettings>;
+
+export function certificateImageDataUrl(
+  settings: CertificateSettingsWithImages,
+  kind: CertificateImageKind,
+): string | null {
+  return settings[IMAGE_PATCH_KEY[kind]];
+}
 
 /** A PNG the administrator uploaded, checked by its bytes rather than its name. */
 export function decodeCertificateImage(value: unknown): Uint8Array | null {
@@ -86,7 +120,7 @@ export const certificateSettingsPatchSchema = z
     examTextRu: text(1000).optional(),
     knowledgeTextKk: text(1000).optional(),
     knowledgeTextRu: text(1000).optional(),
-    // null clears the image; a data URL replaces it; absent leaves it.
+    // An image does not fit this route's body; saveCertificateImage writes it.
     stampPng: z.never().optional(),
     chairmanSignaturePng: z.never().optional(),
     memberSignaturePng: z.never().optional(),
@@ -166,8 +200,56 @@ export async function updateCertificateSettings(
   return parsed.data;
 }
 
-export function certificateImageUrl(kind: CertificateImageKind, version: number) {
-  return `/certificate-assets/image?kind=${kind}&v=${version}`;
+/**
+ * Replaces or removes one stamp or signature. The image is its own save: it
+ * stays on every document from this moment until the administrator replaces
+ * it, whatever happens to the text fields still open in the editor.
+ */
+export async function saveCertificateImage(
+  kind: CertificateImageKind,
+  png: Uint8Array | null,
+): Promise<CertificateSettings> {
+  await requireCapability('site.settings.manage');
+  const value = png ? `data:image/png;base64,${Buffer.from(png).toString('base64')}` : null;
+  if (value && !decodeCertificateImage(value)) throw new Error('CERTIFICATE_IMAGE_INVALID');
+  const client = (await createClient()) as unknown as RpcClient;
+  // The text fields carry their own expected version; an image has nothing to
+  // merge, so it is written over whichever version is current.
+  for (let attempt = 0; ; attempt++) {
+    const current = await client.rpc('get_certificate_settings', { p_include_images: false });
+    if (current.error) throw current.error;
+    const before = certificateSettingsSchema.safeParse(current.data);
+    if (!before.success) throw new Error('CERTIFICATE_SETTINGS_INVALID');
+    const response = await client.rpc('update_certificate_settings', {
+      p_patch: { [IMAGE_PATCH_KEY[kind]]: value },
+      p_expected_version: before.data.version,
+    });
+    let payload: unknown;
+    try {
+      payload = unwrapRpcMutationResponse(response);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      if (message.includes('CERTIFICATE_SETTINGS_VERSION_CONFLICT') && attempt < 2) continue;
+      if (message.includes('CERTIFICATE_IMAGE_INVALID')) throw new Error('CERTIFICATE_IMAGE_INVALID');
+      throw error;
+    }
+    const parsed = certificateSettingsSchema.safeParse(payload);
+    if (!parsed.success) throw new Error('CERTIFICATE_SETTINGS_RESPONSE_INVALID');
+    revalidateTag(CERTIFICATE_SETTINGS_CACHE_TAG, { expire: 0 });
+    return parsed.data;
+  }
+}
+
+/** The address of every image that is set, keyed by the version that carries it. */
+export function certificateImageUrls(settings: CertificateSettings) {
+  const url = (kind: CertificateImageKind) =>
+    settings[IMAGE_FLAG[kind]] ? certificateImageUrl(kind, settings.version) : null;
+  return {
+    stampUrl: url('stamp'),
+    chairmanSignatureUrl: url('chairman'),
+    memberSignatureUrl: url('member'),
+    protocolSignatureUrl: url('protocol'),
+  };
 }
 
 /**
@@ -195,9 +277,7 @@ export function certificateBranding(
     examTextRu: settings.examTextRu,
     knowledgeTextKk: settings.knowledgeTextKk,
     knowledgeTextRu: settings.knowledgeTextRu,
-    stampUrl: null,
-    chairmanSignatureUrl: null,
-    memberSignatureUrl: null,
+    ...certificateImageUrls(settings),
   };
 }
 
