@@ -44,7 +44,9 @@ test('materials and course editors keep primary content central and protect draf
     articleEditor,
     blockEditor,
     testList,
-    testStatusControls,
+    searchPanel,
+    adminList,
+    rowDeleteAction,
     testEditor,
     actionBar,
     unsavedChangesGuard,
@@ -53,16 +55,22 @@ test('materials and course editors keep primary content central and protect draf
     read('components/admin/admin-editor.tsx'),
     read('components/admin/content-block-editor.tsx'),
     read('app/(admin)/admin/courses/page.tsx'),
-    read('components/admin/test-status-controls.tsx'),
+    read('components/admin/admin-search-panel.tsx'),
+    read('components/admin/admin-list.tsx'),
+    read('components/admin/row-delete-action.tsx'),
     read('components/admin/test-editor.tsx'),
     read('components/admin/editor-action-bar.tsx'),
     read('components/admin/use-unsaved-changes-guard.ts'),
   ]);
-  // The status filter is a select on the same line as the search, like the
-  // courses sheet, instead of a second row of tabs.
-  assert.match(materials, /<option value="">Все<\/option>/);
-  assert.match(materials, /Черновики/);
-  assert.match(materials, /Опубликованные/);
+  // The status filter is a select beside the search, in the one panel the
+  // materials and the courses share, instead of a second row of tabs.
+  assert.match(searchPanel, /<option value="">Все статусы<\/option>/);
+  assert.match(searchPanel, /Черновики/);
+  assert.match(searchPanel, /Опубликованные/);
+  for (const list of [materials, testList]) {
+    assert.match(list, /<AdminSearchPanel/);
+    assert.doesNotMatch(list, /<option/);
+  }
   assert.match(articleEditor, /setTimeout\(\(\) => \{[\s\S]+\}, 1_500\)/);
   assert.match(articleEditor, /useUnsavedChangesGuard/);
   assert.match(articleEditor, /<EditorActionBar/);
@@ -72,19 +80,26 @@ test('materials and course editors keep primary content central and protect draf
   assert.match(blockEditor, /Переместить блок выше/);
   assert.match(blockEditor, /Блок \{index \+ 1\}/);
   assert.match(testList, />Курсы<\/h1>/);
-  assert.match(testList, /min-h-16/);
-  // The edit affordance carries a visible label, not just a pencil glyph.
-  assert.match(testList, /<PencilSimple aria-hidden \/>\s*\n\s*Изменить/u);
-  assert.match(testList, /aria-label=\{`Редактировать: \$\{course\.title\}`\}/u);
-  assert.match(testStatusControls, /aria-label="В черновик"/);
-  assert.match(testStatusControls, /aria-label="Удалить курс"/);
-  assert.match(testStatusControls, /<NotePencil/);
-  assert.match(testStatusControls, /<Trash/);
-  assert.match(testStatusControls, /<DestructiveDialog/);
+  assert.match(adminList, /md:min-h-16/);
+  // The way into the editor is an icon button: the pencil keeps an accessible
+  // name and a tooltip, and the word «Изменить» is gone from the row.
+  assert.match(
+    adminList,
+    /<Button asChild size="icon" variant="outline">\s*<Link href=\{href\} aria-label=\{`Редактировать: \$\{title\}`\} title="Редактировать">\s*<PencilSimple aria-hidden \/>/u,
+  );
+  assert.doesNotMatch(adminList, /Изменить/u);
+  // A row deletes and nothing else: taking a course off the site belongs to
+  // its editor, so the archive control and its «В черновик» are gone.
+  assert.match(rowDeleteAction, /aria-label=\{`Удалить: \$\{title\}`\}/u);
+  assert.match(rowDeleteAction, /<Trash/);
+  assert.match(rowDeleteAction, /<DestructiveDialog/);
+  assert.doesNotMatch(rowDeleteAction, /В черновик|<Archive|<NotePencil/u);
   assert.match(testEditor, /Черновик хранится только в памяти до отправки/);
   assert.match(testEditor, /data-course-editor-key-boundary/);
   assert.doesNotMatch(testEditor, /readTestEditorDraft|writeTestEditorDraft|clearTestEditorDraft/);
   assert.match(testEditor, /useUnsavedChangesGuard/);
+  // Unpublishing left the list row; the editor must offer it or a live course could not be withdrawn.
+  assert.match(testEditor, /onUnpublish=/);
   assert.match(unsavedChangesGuard, /window\.addEventListener\('beforeunload'/);
   assert.match(unsavedChangesGuard, /window\.addEventListener\('popstate'/);
   assert.match(unsavedChangesGuard, /document\.addEventListener\('click'/);

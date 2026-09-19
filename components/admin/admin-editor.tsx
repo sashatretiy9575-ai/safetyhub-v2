@@ -9,6 +9,7 @@ import { ContentBlockEditor } from '@/components/admin/content-block-editor';
 import { ContentSeoEditor } from '@/components/admin/content-seo-editor';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { fieldFrameFocus } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,6 +32,8 @@ import { EditorActionBar } from '@/components/admin/editor-action-bar';
 import { EditorShell } from '@/components/admin/editor-shell';
 import { useUnsavedChangesGuard } from '@/components/admin/use-unsaved-changes-guard';
 import { DestructiveDialog } from '@/components/admin/destructive-dialog';
+import { deleteDialogCopy } from '@/components/admin/row-delete-action';
+import { useAdminListHref } from '@/components/admin/use-admin-list-href';
 import {
   CONTENT_METADATA_LIMITS,
   toContentDateInput,
@@ -104,6 +107,8 @@ export function AdminEditor({
   initialPublicationNotice?: 'incomplete' | 'failed' | null;
 }) {
   const router = useRouter();
+  // The list as it was left: «Назад» and a finished deletion return to its filters.
+  const listHref = useAdminListHref('/admin/articles');
   const editorIdRef = useRef(initialData?.id ?? '');
   const [restoredAt, setRestoredAt] = useState<Date | null>(null);
 
@@ -153,6 +158,8 @@ export function AdminEditor({
   const [draftReady, setDraftReady] = useState(false);
   const autosaveInFlightRef = useRef(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  // Shown inside the dialog: behind it, the page's own alert was out of sight.
+  const [deleteError, setDeleteError] = useState('');
 
   // Only computed while the preview is open: it parses every block through Zod,
   // and the preview is closed by default.
@@ -494,16 +501,16 @@ export function AdminEditor({
   const handleDelete = async () => {
     if (!articleId || !draftVersion) return;
     setBusy(true);
-    setError('');
+    setDeleteError('');
     try {
       await deleteArticleAction({ articleId, expectedVersion: draftVersion });
       clearEditorDraft(window.localStorage, 'article', editorIdRef.current);
       setDeleteOpen(false);
       approveNavigation();
-      router.replace('/admin/articles');
+      router.replace(listHref);
       router.refresh();
     } catch {
-      setError('Не удалось удалить статью. Обновите страницу и повторите действие.');
+      setDeleteError('Не удалось удалить материал. Обновите страницу и повторите.');
     } finally {
       setBusy(false);
     }
@@ -515,7 +522,7 @@ export function AdminEditor({
         {/* router.back() did nothing when the editor was opened by its own URL,
             and the two navigations into it use router.replace. */}
         <Button asChild variant="ghost" className="min-h-11 shrink-0">
-          <Link href="/admin/articles">Назад</Link>
+          <Link href={listHref}>Назад</Link>
         </Button>
         <div className="min-w-0">
           <h1 className="text-lg leading-tight font-bold break-words md:text-xl">
@@ -648,7 +655,7 @@ export function AdminEditor({
                         onChange={(event) => setJurisdiction(event.target.value)}
                       />
                     </div>
-                    <div className="flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)]">
+                    <div className={`flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)] ${fieldFrameFocus}`}>
                       <Label className="sr-only" htmlFor="article-effective-date">
                         Дата актуальности
                       </Label>
@@ -751,7 +758,7 @@ export function AdminEditor({
                     value={title}
                     onChange={(event) => setTitle(event.target.value)}
                     placeholder="Название статьи"
-                    className="h-auto border-0 px-0 text-xl font-bold shadow-none focus-visible:ring-0"
+                    className="h-auto border-0 px-0 text-xl font-bold shadow-none"
                   />
                 </div>
                 <div className="space-y-2">
@@ -788,10 +795,13 @@ export function AdminEditor({
 
       <DestructiveDialog
         open={deleteOpen}
-        title="Удалить статью?"
-        description="Статья удаляется безвозвратно; публичная ссылка перестанет работать."
+        {...deleteDialogCopy('article', title)}
         busy={busy}
-        onOpenChange={setDeleteOpen}
+        error={deleteError}
+        onOpenChange={(open) => {
+          setDeleteOpen(open);
+          if (!open) setDeleteError('');
+        }}
         onConfirm={() => void handleDelete()}
       />
     </EditorShell>
