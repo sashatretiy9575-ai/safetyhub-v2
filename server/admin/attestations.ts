@@ -85,7 +85,7 @@ const cursorSchema = z.object({ values: z.array(z.unknown()).max(12), id: z.stri
 const mutationReasonSchema = z
   .string()
   .max(96)
-  .regex(/^[A-Z][A-Z0-9_]{1,95}(?::[0-9]{1,10})?$/u)
+  .regex(/^(?:[A-Z][A-Z0-9_]{1,95}(?::[0-9]{1,10})?|DOCUMENT_REQUIRED_FIELDS:(?:orderNumber,orderDate,verificationKind|trainingReason|qualificationDecision|organization,position))$/u)
   .nullable();
 
 function record(value: unknown): Record<string, unknown> {

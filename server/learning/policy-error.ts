@@ -3,6 +3,7 @@ import type { AttemptPayload } from '../../lib/learning/types.ts';
 export type AttemptPolicyCode =
   | 'ACCOUNT_APPROVAL_REQUIRED'
   | 'COURSE_ACCESS_REQUIRED'
+  | 'AUTH_REALM_LOCALE_MISMATCH'
   | 'LEGAL_ACCEPTANCE_REQUIRED'
   | 'PROFILE_ONBOARDING_REQUIRED'
   | 'AVATAR_REQUIRED'
@@ -67,6 +68,7 @@ export function parseAttemptRpcError(error: { message: string; details?: string 
   const codes: AttemptPolicyCode[] = [
     'ACCOUNT_APPROVAL_REQUIRED',
     'COURSE_ACCESS_REQUIRED',
+    'AUTH_REALM_LOCALE_MISMATCH',
     'LEGAL_ACCEPTANCE_REQUIRED',
     'PROFILE_ONBOARDING_REQUIRED',
     'AVATAR_REQUIRED',
@@ -81,15 +83,17 @@ export function parseAttemptRpcError(error: { message: string; details?: string 
   if (!code) return new Error(error.message);
   return new AttemptPolicyError(
     code,
-    code === 'ACCOUNT_APPROVAL_REQUIRED' || code === 'LEGAL_ACCEPTANCE_REQUIRED'
+    code === 'ACCOUNT_APPROVAL_REQUIRED' ||
+      code === 'LEGAL_ACCEPTANCE_REQUIRED' ||
+      code === 'AUTH_REALM_LOCALE_MISMATCH'
       ? 403
       : code === 'COURSE_ACCESS_REQUIRED'
         ? 403
         : code === 'ATTEMPT_ROLLING_LIMIT' || code === 'ATTEMPT_DAILY_LIMIT'
           ? 429
-        : code === 'COURSE_CATALOG_MAINTENANCE'
-          ? 503
-          : 409,
+          : code === 'COURSE_CATALOG_MAINTENANCE'
+            ? 503
+            : 409,
     code === 'ATTEMPT_ROLLING_LIMIT' || code === 'ATTEMPT_DAILY_LIMIT'
       ? retryAtFromDetails(error.details)
       : undefined,

@@ -5,9 +5,9 @@ import { createApiResponse } from '@/lib/security/api-response';
 import { isOwnedAvatarObjectKey } from '@/server/profile/avatar-manifests';
 
 /** Call only after the request has passed its certificate or identity access gate. */
-export async function certificatePhotoResponse(userId: string, originalWebp = false) {
+export async function certificatePhotoResponse(userId: string, originalWebp = false, frozen?: { objectKey: string; legacyImported: boolean } | null) {
   const client = createAdminClient();
-  const { data, error } = await client.rpc('get_profile_avatar_manifest', { p_user_id: userId });
+  const { data, error } = frozen !== undefined ? { data: frozen, error: null } : await client.rpc('get_profile_avatar_manifest', { p_user_id: userId });
   if (error) throw error;
   const manifest = data as { objectKey?: string; legacyImported?: boolean } | null;
   const key = manifest?.objectKey;

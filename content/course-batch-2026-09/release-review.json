@@ -1,0 +1,107 @@
+{
+  "status": "passed",
+  "independentReviewer": "forms and root agents; per-artifact review provenance recorded below",
+  "reviewedAt": "2026-09-19T10:58:24.382680+00:00",
+  "entries": [
+    {
+      "slug": "svarshchik",
+      "locale": "ru",
+      "deckSha256": "78cada85a88d40db6d69b6cd8bf16cafaf9426ffda2d4be22bc54a01dea4d143",
+      "assessmentSha256": "b1657e02899cbfd1399ecc97b1d1d3bfa0d94b73ef5f1eea85c52a0304c1d684",
+      "pdfSha256": "79ce19bd984ae04762395e5e7ef84d6cf09d72fc3ef5804f89e26a9bcf414a74",
+      "visual": "passed",
+      "semantic": "passed",
+      "reviewer": "forms independent semantic review; author visual review of all final slides, corrected slide53 rechecked",
+      "reviewedSlides": 42,
+      "reviewedQuestions": 30
+    },
+    {
+      "slug": "svarshchik",
+      "locale": "kk",
+      "deckSha256": "1a3863b2775bd0a108a59dd14dd4f7e9893fc680a0c1ffee143973310b98c243",
+      "assessmentSha256": "80e7a9296df6d2092391b2e38390651fe5a61d2264c3749c7cedb7c6598bcdeb",
+      "pdfSha256": "be720968cb79773f6dec942fa604b03e4b8d74dd94a79de5877d16070870dce4",
+      "visual": "passed",
+      "semantic": "passed",
+      "reviewer": "forms independent agent",
+      "reviewedSlides": 42,
+      "reviewedQuestions": 30
+    },
+    {
+      "slug": "svarshchik",
+      "locale": "en",
+      "deckSha256": "6206521db20070195f4c351c94c0034945044d20057e59c2a4992386a1ee7d6a",
+      "assessmentSha256": "a87c0cedce0ad16646c60092a7ba10a9f1a6adec6075434d31b70d1a1d305760",
+      "pdfSha256": "4f53dbf9f5beeb7cb437a4fe9f62a5bf8327442582ac0760afbac732505f0cc1",
+      "visual": "passed",
+      "semantic": "passed",
+      "reviewer": "root independent review",
+      "reviewedSlides": 42,
+      "reviewedQuestions": 30
+    },
+    {
+      "slug": "svarshchik",
+      "locale": "zh",
+      "deckSha256": "df1b80a30a0614055d95e7d97c00b3887bc00c3e44b21458bfd551f272d75c33",
+      "assessmentSha256": "761df80a0f13b198387e1f253141b35de5023cdba02a1b895a392fde40b4aeae",
+      "pdfSha256": "264b91e94312ec62a9f9274ca955a8ae8bd13734159e0e7d2fdef74db942aa0c",
+      "visual": "passed",
+      "semantic": "passed",
+      "reviewer": "root independent review",
+      "reviewedSlides": 42,
+      "reviewedQuestions": 30,
+      "metadataReview": "Root approved exact OG title 焊工培训 to meet schema minimum3 characters; slide content and PDF unchanged."
+    },
+    {
+      "slug": "promyshlennaya-bezopasnost",
+      "locale": "ru",
+      "deckSha256": "c6db170e0baaae44f23d3744e99b492a4d542cc58d0509ea1913c0219d78afde",
+      "assessmentSha256": "38737a8c65cf16026691262bd71daaa656dc1dd6ce01757c24c30a4311b2da36",
+      "pdfSha256": "b0b52f880d7d4a33768cf89df0894a07362b2a6184c942d2f162456ef279e6cc",
+      "visual": "passed",
+      "semantic": "passed",
+      "reviewer": "forms independent semantic review; author visual review of all final slides, corrected slide53 rechecked",
+      "reviewedSlides": 55,
+      "reviewedQuestions": 30
+    },
+    {
+      "slug": "promyshlennaya-bezopasnost",
+      "locale": "kk",
+      "deckSha256": "0f091d7731d61d4bdc1662e1907cc6b9c607d9af71c429e438e6efa332437d75",
+      "assessmentSha256": "b9229bb5d46c3fbe2ad2305394d893146cdc8423788c15812fa492d492b4d878",
+      "pdfSha256": "236fd323cd0eb384fa40728b7bafffcea388dfa7ac452604c901704fa4a7a0e1",
+      "visual": "passed",
+      "semantic": "passed",
+      "reviewer": "forms independent agent",
+      "reviewedSlides": 55,
+      "reviewedQuestions": 30
+    },
+    {
+      "slug": "promyshlennaya-bezopasnost",
+      "locale": "en",
+      "deckSha256": "d0e7a2e528aff5fd2d8f1094c2e918989d3199951a161a35dd9d050902dec0b5",
+      "assessmentSha256": "e5066b1818d16c03877b157108be8afee8c850462d8022693896917bb59a0869",
+      "pdfSha256": "d1a81929318435bcf0ac2a794cc70454e9044b6b4451ab6b49cf468a428fd980",
+      "visual": "passed",
+      "semantic": "passed",
+      "reviewer": "root independent review",
+      "reviewedSlides": 55,
+      "reviewedQuestions": 30
+    },
+    {
+      "slug": "promyshlennaya-bezopasnost",
+      "locale": "zh",
+      "deckSha256": "c2f83d4faa3532cca9969cf3ea15063cb634cf37f49b96d5fd6e5b52fe94e4be",
+      "assessmentSha256": "a13823dd76b51e7c2fa4b90144fb7d443ff92ec2ccec14978c33ea72e3a29065",
+      "pdfSha256": "75ed7ad78506fc5ec6560d247e9e7acf36125df393cab8e97560f03a7679b8af",
+      "visual": "passed",
+      "semantic": "passed",
+      "reviewer": "root independent review",
+      "reviewedSlides": 55,
+      "reviewedQuestions": 30
+    }
+  ],
+  "limitations": [
+    "Course completion does not itself confer occupational qualification or site authorisation."
+  ]
+}

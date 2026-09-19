@@ -1,11 +1,11 @@
 import { spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
-import { createServer } from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import pg from 'pg';
+import { rehearseDockerRestore } from './rehearse-database-backup-docker.mjs';
 import {
   assertPhysicalPathRelationship,
   clearLinkedPostgresConnection,
@@ -22,7 +22,6 @@ import {
 
 const { Client } = pg;
 const INCLUDED_SCHEMAS = ['public', 'private', 'auth', 'storage'];
-const APPLICATION_SCHEMAS = ['public', 'private'];
 
 function argument(name) {
   const index = process.argv.indexOf(name);
@@ -68,7 +67,7 @@ await assertPhysicalPathRelationship({
 });
 const executableSuffix = process.platform === 'win32' ? '.exe' : '';
 const postgresTools = Object.fromEntries(
-  ['pg_dump', 'pg_restore', 'psql', 'initdb', 'pg_ctl'].map((name) => [
+  ['pg_dump', 'pg_restore'].map((name) => [
     name,
     path.join(postgresBin, `${name}${executableSuffix}`),
   ]),
@@ -145,202 +144,6 @@ function verifyArchiveLists(schemaList, dataList) {
     'TABLE DATA storage objects',
   ]) {
     if (!dataList.includes(required)) throw new Error(`Data archive is incomplete: ${required}.`);
-  }
-}
-
-async function freeLocalPort() {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    server.unref();
-    server.once('error', reject);
-    server.listen(0, '127.0.0.1', () => {
-      const address = server.address();
-      const port = typeof address === 'object' && address ? address.port : 0;
-      server.close((error) => (error ? reject(error) : resolve(port)));
-    });
-  });
-}
-
-async function rehearseApplicationRestore(schemaDump, dataDump, sourceCounts) {
-  await mkdir(rehearsalDirectory, { recursive: false });
-  const cluster = path.join(rehearsalDirectory, 'cluster');
-  const bootstrap = path.join(rehearsalDirectory, 'bootstrap.sql');
-  const schemaRestoreList = path.join(rehearsalDirectory, 'schema-restore.list');
-  const logPath = path.join(rehearsalDirectory, 'postgres.log');
-  const port = await freeLocalPort();
-  const localEnvironment = {
-    ...process.env,
-    PGHOST: '127.0.0.1',
-    PGPORT: String(port),
-    PGUSER: 'postgres',
-    PGDATABASE: 'postgres',
-  };
-  let started = false;
-  try {
-    runProcess(
-      postgresTools.initdb,
-      [
-        '--pgdata',
-        cluster,
-        '--username',
-        'postgres',
-        '--auth',
-        'trust',
-        '--encoding',
-        'UTF8',
-        '--no-locale',
-      ],
-      {},
-      'initdb restore rehearsal',
-    );
-    runProcess(
-      postgresTools.pg_ctl,
-      [
-        '--pgdata',
-        cluster,
-        '--options',
-        `-h 127.0.0.1 -p ${port}`,
-        '--wait',
-        '--log',
-        logPath,
-        'start',
-      ],
-      { stdio: 'ignore' },
-      'pg_ctl restore rehearsal start',
-    );
-    started = true;
-    runProcess(
-      postgresTools.psql,
-      ['--set', 'ON_ERROR_STOP=1', '--command', 'create database safetyhub_restore'],
-      { env: localEnvironment },
-      'create restore rehearsal database',
-    );
-    const roleNames = [
-      'anon',
-      'authenticated',
-      'service_role',
-      'authenticator',
-      'supabase_auth_admin',
-      'dashboard_user',
-    ];
-    const roleSql = roleNames
-      .map(
-        (role) =>
-          `if not exists (select 1 from pg_roles where rolname = '${role}') then create role ${quoteIdentifier(role)} nologin; end if;`,
-      )
-      .join('\n');
-    await writeFile(
-      bootstrap,
-      `drop schema public cascade;
-create schema public;
-create schema private;
-create schema extensions;
--- The portable EDB PostgreSQL archive does not bundle contrib modules. These
--- signatures are sufficient to validate application DDL and data restoration;
--- the encrypted dump still retains the real extension-backed definitions and
--- indexes for restoration into Supabase/PostgreSQL with pgcrypto + pg_trgm.
-create function extensions.digest(bytea, text) returns bytea
-  language sql immutable parallel safe as $$ select decode(md5($1), 'hex') $$;
-create function extensions.gen_random_bytes(integer) returns bytea
-  language sql volatile parallel safe as $$ select decode(repeat('00', $1), 'hex') $$;
-create function extensions.similarity(text, text) returns real
-  language sql immutable parallel safe as $$ select 0::real $$;
-create schema auth;
-create table auth.users(id uuid primary key);
-create function auth.uid() returns uuid language sql stable as $$
-  select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
-$$;
-do $roles$
-begin
-${roleSql}
-end;
-$roles$;
-`,
-      'utf8',
-    );
-    const standaloneSchemaList = archiveList(schemaDump)
-      .split(/\r?\n/u)
-      .filter(
-        (line) =>
-          !line.includes(' SCHEMA - public ') &&
-          !line.includes(' SCHEMA - private ') &&
-          !line.includes('profiles_full_name_trgm_idx') &&
-          !line.includes('profiles_organization_trgm_idx'),
-      )
-      .join('\n');
-    await writeFile(schemaRestoreList, `${standaloneSchemaList}\n`, 'utf8');
-    const restoreEnvironment = { ...localEnvironment, PGDATABASE: 'safetyhub_restore' };
-    runProcess(
-      postgresTools.psql,
-      ['--set', 'ON_ERROR_STOP=1', '--file', bootstrap],
-      { env: restoreEnvironment, exposeFailureOutput: true },
-      'bootstrap restore rehearsal database',
-    );
-    runProcess(
-      postgresTools.pg_restore,
-      [
-        '--exit-on-error',
-        '--no-owner',
-        '--no-privileges',
-        '--use-list',
-        schemaRestoreList,
-        ...APPLICATION_SCHEMAS.flatMap((schema) => ['--schema', schema]),
-        '--dbname',
-        'safetyhub_restore',
-        schemaDump,
-      ],
-      { env: restoreEnvironment, exposeFailureOutput: true },
-      'restore rehearsal schema',
-    );
-    runProcess(
-      postgresTools.pg_restore,
-      [
-        '--exit-on-error',
-        '--no-owner',
-        '--no-privileges',
-        '--data-only',
-        '--disable-triggers',
-        ...APPLICATION_SCHEMAS.flatMap((schema) => ['--schema', schema]),
-        '--dbname',
-        'safetyhub_restore',
-        dataDump,
-      ],
-      { env: restoreEnvironment, exposeFailureOutput: true },
-      'restore rehearsal application data',
-    );
-    let verifiedTables = 0;
-    for (const [qualifiedName, expected] of Object.entries(sourceCounts)) {
-      const [schema, table] = qualifiedName.split('.');
-      if (!APPLICATION_SCHEMAS.includes(schema)) continue;
-      const output = runProcess(
-        postgresTools.psql,
-        [
-          '--tuples-only',
-          '--no-align',
-          '--set',
-          'ON_ERROR_STOP=1',
-          '--command',
-          `select count(*) from ${quoteIdentifier(schema)}.${quoteIdentifier(table)}`,
-        ],
-        { env: restoreEnvironment },
-        `count restored ${qualifiedName}`,
-      ).trim();
-      if (Number(output) !== expected) {
-        throw new Error(`Restore rehearsal count mismatch for ${qualifiedName}.`);
-      }
-      verifiedTables += 1;
-    }
-    if (verifiedTables === 0) throw new Error('Restore rehearsal verified no application tables.');
-    return { status: 'passed', verifiedTables, postgresMajor: 17 };
-  } finally {
-    if (started) {
-      runProcess(
-        postgresTools.pg_ctl,
-        ['--pgdata', cluster, '--mode', 'fast', '--wait', 'stop'],
-        { stdio: 'ignore' },
-        'pg_ctl restore rehearsal stop',
-      );
-    }
   }
 }
 
@@ -486,7 +289,7 @@ try {
     throw new Error('Encrypted pg_dump verification did not meet the safety gate.');
   }
 
-  const restoreRehearsal = await rehearseApplicationRestore(
+  const restoreRehearsal = await rehearseDockerRestore(
     restoredSchemaPath,
     restoredDataPath,
     counts,

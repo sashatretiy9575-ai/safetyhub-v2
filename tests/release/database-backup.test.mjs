@@ -146,8 +146,12 @@ test('linked backup uses a read-only snapshot and never persists temporary crede
   assert.match(source, /repeatable read read only deferrable/u);
   assert.match(source, /pg_export_snapshot/u);
   assert.match(source, /--format=custom/u);
-  assert.match(source, /rehearseApplicationRestore/u);
-  assert.match(source, /--disable-triggers/u);
+  assert.match(source, /rehearseDockerRestore/u);
+  const rehearsal = await readFile('scripts/rehearse-database-backup-docker.mjs', 'utf8');
+  assert.match(rehearsal, /--disable-triggers/u);
+  assert.match(rehearsal, /'--network','none'/u);
+  assert.match(rehearsal, /create extension pgcrypto/u);
+  assert.match(rehearsal, /create extension pg_trgm/u);
   assert.match(source, /set local role postgres/u);
   assert.match(source, /\['public', 'private', 'auth', 'storage'\]/u);
   assert.match(source, /clearLinkedPostgresConnection\(connection\)/u);
@@ -289,6 +293,13 @@ test('PostgreSQL CA loader enforces regular CA PEM, validity, and optional SHA-2
 });
 
 test('linked PostgreSQL helper validates host, user, and URI credentials without disclosing secrets', () => {
+  const linkedOwner = parseLinkedPostgresConnection(
+    'PGHOST=aws-0-ap-south-1.pooler.supabase.com\nPGUSER=postgres.podkjjguhhdiecrgznoa\nPGPASSWORD=test-only',
+  );
+  assert.equal(linkedOwner.PGUSER, 'postgres.podkjjguhhdiecrgznoa');
+  assert.throws(() => parseLinkedPostgresConnection(
+    'PGHOST=aws-0-ap-south-1.pooler.supabase.com\nPGUSER=postgres.anotherproject\nPGPASSWORD=test-only',
+  ));
   const fromUri = parseLinkedPostgresConnection(
     'postgresql://cli_login_release:secret%3Avalue@db.project.supabase.co:5432/postgres',
     { allowUri: true },

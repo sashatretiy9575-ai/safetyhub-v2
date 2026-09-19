@@ -37,13 +37,11 @@ test('the booklet and the protocol are drawn from one settings row that browsers
   // the settings version so a replaced image is never reused from cache.
   assert.match(image, /requireUser\(\{ enforceLegal: false \}\)/u);
   assert.match(image, /status: 401/u);
-  // Kept for good only under the current version: a page opened before the last
-  // save gets today's picture uncached instead of a preview that cannot be drawn.
-  assert.match(image, /const current = String\(settings\.version\) === version;/u);
-  assert.match(
-    image,
-    /current \? 'private, max-age=31536000, immutable' : 'private, no-store'/u,
-  );
+  // Old versions resolve archived bytes; a missing archive is refused, never
+  // replaced by today's signature. Behaviour is also covered by the SQL test.
+  assert.match(image, /readArchivedDocumentSettings\(Number\(version\)\)/u);
+  assert.match(image, /if \(!parsed\.success\).*status: 404/u);
+  assert.match(image, /'Cache-Control': 'private, max-age=31536000, immutable'/u);
   // A refused save names its field, and the editor names the insert's limits
   // before anything is sent: «повторите» never helped with a size in millimetres.
   assert.match(route, /const field = parsed\.error\.issues\[0\]\?\.path\.map\(String\)\.join\('\.'\)/u);
@@ -77,10 +75,10 @@ test('the stamp and the signatures are pictures the administrator uploads, one s
   assert.match(normalizer, /failOn: 'warning'/u);
   assert.match(normalizer, /metadata\.format !== 'png'/u);
   assert.match(renderer, /embedFacsimile\(pdf, branding\.stampUrl,/u);
-  assert.match(renderer, /embedFacsimile\(pdf, branding\.chairmanSignatureUrl,/u);
+  assert.match(renderer, /branding\.commissionSignatureUrls \?\? \[branding\.chairmanSignatureUrl\]/u);
 });
 
-test('every certificate is a two-sided booklet drawn with the current settings', async () => {
+test('every certificate is a two-sided booklet drawn with its issuance snapshot', async () => {
   const [contract, renderer, server, exportHelper, metadataRoute, sample] = await Promise.all([
     read('lib/pdf/certificate-client-contract.ts'),
     read('lib/pdf/certificate-renderer.ts'),
@@ -91,10 +89,9 @@ test('every certificate is a two-sided booklet drawn with the current settings',
   ]);
   assert.match(contract, /export type CertificateBranding = Readonly<\{/u);
   assert.match(contract, /assertCertificateBranding\(item\.branding\)/u);
-  assert.match(
-    contract,
-    /SAFE_IMAGE_PATH_PATTERN =\s*\/\^\\\/certificate-assets\\\/image\\\?kind=\(\?:stamp\|chairman\|member\|protocol\)&v=\[0-9\]\{1,12\}\$\/u/u,
-  );
+  assert.match(contract, /registered\\\?id=\[0-9a-f-\]\{36\}/u);
+  assert.match(server, /snapshot \? certificateBranding\(snapshot\.settings\) : branding/u);
+  assert.match(server, /applyDocumentProfile\(stableBranding, snapshot\.profile\)/u);
   // Two A5 landscape sides, the paper form's bilingual labels, no template PDF.
   assert.match(renderer, /insertWidthCm \* 72 \/ 2\.54/u);
   // Actual two-page output is exercised by document-editor.test.mjs.
@@ -125,11 +122,11 @@ test('an export carries the workbook, one protocol per company and course, then 
   assert.match(protocol, /export function groupItemsForProtocols/u);
   assert.match(protocol, /return `protocols\/Протокол-/u);
   assert.match(protocol, /заседания комиссии по проверке знаний/u);
-  assert.match(protocol, /Результат сдачи экзаменов/u);
+  assert.match(protocol, /protocolColumns\(family\)/u);
   assert.match(protocol, /participantResult\(person\)/u);
   // The stamp and the protocol's own signature, never the booklet's.
   assert.match(protocol, /embedFacsimile\(pdf, branding\.stampUrl,/u);
-  assert.match(protocol, /embedFacsimile\(pdf, branding\.protocolSignatureUrl,/u);
+  assert.match(protocol, /branding\.commissionSignatureUrls \?\? \[branding\.protocolSignatureUrl \?\? null\]/u);
   assert.doesNotMatch(protocol, /chairmanSignatureUrl/u);
   assert.doesNotMatch(protocol, /node:(?:fs|path|crypto)|SafetyHub\.kz/u);
   for (const source of [worker, client]) {

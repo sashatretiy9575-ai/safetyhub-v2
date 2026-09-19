@@ -19,8 +19,12 @@ import {
 import { certificateFilename } from '@/lib/pdf/certificate';
 import { findCertificateDocumentBatch } from '@/server/certificates/document-editor';
 import { numberFromDate, documentDate } from '@/lib/pdf/document-editor';
+import { certificateBranding, certificateSettingsSchema } from '@/server/certificates/settings';
+import { documentProfileSchema } from '@/server/certificates/document-profiles';
+import { applyDocumentProfile } from '@/lib/pdf/document-profile';
 
 const publicCertificateSchema = z.object({
+  learningAssessment: z.boolean().default(false),
   id: z.string().uuid(),
   certificateNumber: z.string(),
   fullName: z.string(),
@@ -65,6 +69,14 @@ export const certificateDownloadPayloadSchema = z
     bestCompletedAt: z.string().datetime({ offset: true }),
     issuedAt: z.string().datetime({ offset: true }),
     templateVersion: templateVersionSchema,
+    documentSnapshot: z.object({
+      schemaVersion: z.literal(1), captureKind: z.enum(['issuance', 'legacy-cutover']),
+      capturedAt: z.string(), settings: certificateSettingsSchema,
+      profile: documentProfileSchema.nullable(),
+      protocolNumber: boundedText(64), protocolDate: z.iso.date(), education: z.string().max(200),
+      photo: z.object({ objectKey: z.string().max(256), legacyImported: z.boolean() }).nullable().optional(),
+      participantFields: z.object({ trainingReason: z.string().max(500).optional(), notes: z.string().max(500).optional(), qualificationDecision: z.string().max(500).optional(), formalExamReference: z.string().max(500).optional(), formalExamDate: z.string().optional(), formalExamResult: z.string().optional(), formalExamConfirmedBy: z.string().uuid().optional(), formalExamConfirmedAt: z.string().optional(), formalExamProfileId: z.string().optional(), formalExamProfileVersion: z.number().int().optional() }).optional(),
+    }).nullable().optional(),
   })
   .superRefine((value, context) => {
     if (value.score > value.total || value.passScore > value.total) {
@@ -102,7 +114,9 @@ const getCachedPublicCertificate = unstable_cache(
     if (data === null) return null;
     const parsed = publicCertificateSchema.safeParse(data);
     if (!parsed.success) throw new Error('INVALID_CERTIFICATE_VERIFICATION_RESULT');
-    return parsed.data;
+    const { data: record, error: recordError } = await createAdminClient().from('certificates').select('test_slug').eq('id', parsed.data.id).single();
+    if (recordError) throw recordError;
+    return { ...parsed.data, learningAssessment: record.test_slug === 'promyshlennaya-bezopasnost' };
   },
   ['public-certificate-verification-v1'],
   { revalidate: 15, tags: [CERTIFICATE_VERIFICATION_CACHE_TAG] },
@@ -141,10 +155,13 @@ export async function createCertificateRenderMetadata(
   branding: CertificateBranding,
 ): Promise<CertificateRenderMetadata> {
   const verificationToken = await getCertificateVerificationToken(data.id);
-  const profile = await createAdminClient().from('profiles').select('avatar_updated_at,education').eq('id', data.userId).single();
-  if (profile.error) throw profile.error;
-  const batch = data.organization ? await findCertificateDocumentBatch(data.organization, data.testSlug) : null;
-  const protocolDate = batch?.date ?? documentDate(new Date(data.issuedAt));
+  const snapshot = data.documentSnapshot;
+  const profile = snapshot ? null : await createAdminClient().from('profiles').select('avatar_updated_at,education').eq('id', data.userId).single();
+  if (profile?.error) throw profile.error;
+  const batch = !snapshot && data.organization ? await findCertificateDocumentBatch(data.organization, data.testSlug) : null;
+  const protocolDate = snapshot?.protocolDate ?? batch?.date ?? documentDate(new Date(data.issuedAt));
+  let stableBranding = snapshot ? certificateBranding(snapshot.settings) : branding;
+  if (snapshot?.profile) stableBranding = applyDocumentProfile(stableBranding, snapshot.profile);
   return {
     schemaVersion: CERTIFICATE_CLIENT_SCHEMA_VERSION,
     certificateId: data.id,
@@ -155,8 +172,14 @@ export async function createCertificateRenderMetadata(
     templateUrl: `/certificates/template-v${data.templateVersion}.pdf`,
     fontUrl: certificateFontUrl(data.locale),
     fullName: data.fullName,
-    photoUrl: profile.data.avatar_updated_at ? `/api/certificates/${data.id}/photo` : null,
-    education: profile.data.education,
+    photoUrl: (snapshot ? snapshot.photo : profile?.data?.avatar_updated_at) ? `/api/certificates/${data.id}/photo` : null,
+    education: snapshot?.education ?? profile?.data?.education,
+    documentDetails: snapshot?.participantFields ? {
+      trainingReason: snapshot.participantFields.trainingReason, notes: snapshot.participantFields.notes,
+      qualificationDecision: snapshot.participantFields.qualificationDecision,
+      formalExamReference: snapshot.participantFields.formalExamReference, formalExamDate: snapshot.participantFields.formalExamDate,
+      formalExamResult: snapshot.participantFields.formalExamResult,
+    } : undefined,
     position: data.job,
     organization: data.organization,
     score: data.score,
@@ -166,7 +189,7 @@ export async function createCertificateRenderMetadata(
     completedAt: data.bestCompletedAt,
     issuedAt: data.issuedAt,
     verificationUrl: certificateVerificationUrl(siteUrl, verificationToken),
-    branding: { ...branding, protocolNumber: batch?.number ?? numberFromDate(protocolDate), protocolDate },
+    branding: { ...stableBranding, protocolNumber: snapshot?.protocolNumber ?? batch?.number ?? numberFromDate(protocolDate), protocolDate },
   };
 }
 

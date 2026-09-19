@@ -88,6 +88,13 @@ const SKIP_REASON_LABELS: Record<string, string> = {
   ACCOUNT_HAS_PENDING_AUTH_OPERATIONS: 'идёт служебная операция — повторите через минуту',
   LAST_ACTIVE_SUPERADMIN_PROTECTED: 'нельзя удалить последнего администратора',
   OPERATION_SKIPPED: 'состояние строки изменилось до выполнения',
+  DOCUMENT_PROFILE_REQUIRED: 'выберите категорию слушателей в редакторе документов',
+  DOCUMENT_FORMAL_EXAM_REQUIRED: 'для промбеза внесите подтверждённые реквизиты отдельного экзамена: протокол, дата и положительный результат; учебного теста недостаточно',
+  'DOCUMENT_REQUIRED_FIELDS:orderNumber,orderDate,verificationKind': 'заполните номер и дату приказа, вид проверки в профиле БиОТ',
+  'DOCUMENT_REQUIRED_FIELDS:trainingReason': 'укажите причину обучения участника в протоколе ПТМ',
+  'DOCUMENT_REQUIRED_FIELDS:qualificationDecision': 'внесите решение квалификационной комиссии для участника',
+  'DOCUMENT_REQUIRED_FIELDS:organization,position': 'заполните организацию и должность сотрудника',
+  DOCUMENT_SIGNER_ASSET_MISMATCH: 'подпись не соответствует члену комиссии — проверьте профиль документа',
 };
 
 function skipReasonLabel(code: string | null | undefined) {

@@ -62,7 +62,7 @@ test('the shared learner gate enforces active, approval, then current legal acce
   assert.match(policyError, /\| 'LEGAL_ACCEPTANCE_REQUIRED'/u);
   assert.match(
     policyError,
-    /code === 'ACCOUNT_APPROVAL_REQUIRED' \|\| code === 'LEGAL_ACCEPTANCE_REQUIRED'[\s\S]*?\? 403/u,
+    /code === 'ACCOUNT_APPROVAL_REQUIRED'\s*\|\|\s*code === 'LEGAL_ACCEPTANCE_REQUIRED'[\s\S]*?\? 403/u,
   );
 
   const mapped = parseAttemptRpcError({ message: 'LEGAL_ACCEPTANCE_REQUIRED' });

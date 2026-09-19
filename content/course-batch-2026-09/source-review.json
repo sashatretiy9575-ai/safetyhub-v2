@@ -1,0 +1,274 @@
+{
+  "reviewedAt": "2026-09-19T10:59:37.878655+00:00",
+  "reviewer": "course_authoring",
+  "files": [
+    {
+      "id": "general",
+      "filename": "Обучение Промбезу Общий.ppt",
+      "sha256": "7c25de44d3beb317233a1056df64f782d524633a8e51d1924353c81ae4ddcac5",
+      "purpose": "учебное содержание",
+      "textRead": true,
+      "visualSlidesReviewed": 39,
+      "reviewMethod": "PowerPoint COM read-only text/table extraction and rendered slide contact sheets",
+      "issuesAndDecisions": [
+        "Повторяющиеся определения и вводные объединены.",
+        "Горные/геологоразведочные и корпоративные правила Каражыра не объявлены универсальными требованиями.",
+        "Слайд23 исходника описывает минимум60 экзаменационных вопросов; действующий п19 приказа332 дополнительно различает100/120мин для40ч и60/90мин для10ч. Пользовательский тест3×10/15мин является проверкой усвоения, а не достаточным основанием официальной выдачи по332."
+      ],
+      "usedIn": {
+        "promyshlennaya-bezopasnost": [
+          "slide-01",
+          "slide-02",
+          "slide-03",
+          "slide-04",
+          "slide-05",
+          "slide-06",
+          "slide-07",
+          "slide-08",
+          "slide-09",
+          "slide-10",
+          "slide-11",
+          "slide-13",
+          "slide-51",
+          "slide-52",
+          "slide-54",
+          "slide-55"
+        ]
+      },
+      "result": "переработано; оригинал не изменён"
+    },
+    {
+      "id": "notes",
+      "filename": "промышленная безопасность.docx",
+      "sha256": "f29f128de17ea1fc7ab2aca16b92ec4c3a426d5808329e2819bed13196c07254",
+      "purpose": "учебное содержание",
+      "textRead": true,
+      "visualSlidesReviewed": null,
+      "reviewMethod": "Complete DOCX paragraph extraction, including mixed Russian/Chinese text",
+      "issuesAndDecisions": [
+        "Русские и китайские фрагменты прочитаны; прежний китайский текст не использован как готовый перевод.",
+        "Повторы общих понятий объединены; отраслевые горные/нефтегазовые примеры не перенесены как универсальные правила."
+      ],
+      "usedIn": {
+        "promyshlennaya-bezopasnost": [
+          "slide-01",
+          "slide-04",
+          "slide-06",
+          "slide-09",
+          "slide-12",
+          "slide-13",
+          "slide-14",
+          "slide-16",
+          "slide-51",
+          "slide-52",
+          "slide-53"
+        ]
+      },
+      "result": "переработано; оригинал не изменён"
+    },
+    {
+      "id": "cranes",
+      "filename": "Презентация вебинара Грузоподъемные механизмы Ким.pptx",
+      "sha256": "6ff25ab773f111d72d105e522126b7e7bc1a56dbe490282c9c8e8ebef25ecdc8",
+      "purpose": "учебное содержание",
+      "textRead": true,
+      "visualSlidesReviewed": 27,
+      "reviewMethod": "PowerPoint COM read-only text/table extraction and rendered slide contact sheets",
+      "issuesAndDecisions": [
+        "Просмотрены таблицы освидетельствований и испытательных нагрузок.",
+        "Испытательные125/110 процентов не перенесены как разрешённая рабочая перегрузка.",
+        "Рекламное оформление и биография спикера исключены."
+      ],
+      "usedIn": {
+        "promyshlennaya-bezopasnost": [
+          "slide-02",
+          "slide-11",
+          "slide-12",
+          "slide-17",
+          "slide-18",
+          "slide-19",
+          "slide-20",
+          "slide-21",
+          "slide-22",
+          "slide-23",
+          "slide-24",
+          "slide-25",
+          "slide-26",
+          "slide-27",
+          "slide-28",
+          "slide-29",
+          "slide-55"
+        ],
+        "svarshchik": [
+          "slide-03",
+          "slide-10",
+          "slide-33",
+          "slide-35",
+          "slide-36"
+        ]
+      },
+      "result": "переработано; оригинал не изменён"
+    },
+    {
+      "id": "pressure",
+      "filename": "Презентация вебинара Сосуды под давлением.pptx",
+      "sha256": "951c852cb0c4258d2d66e944288890fbce0b836764a38f3a52bee76aad7c82d3",
+      "purpose": "учебное содержание",
+      "textRead": true,
+      "visualSlidesReviewed": 30,
+      "reviewMethod": "PowerPoint COM read-only text/table extraction and rendered slide contact sheets",
+      "issuesAndDecisions": [
+        "В таблице исходного слайда4 температура ошибочно обозначена P; обозначение не перенесено.",
+        "Повтор защитных устройств19/20 объединён.",
+        "Частные интервалы освидетельствования и расчётные параметры не превращены в универсальные сроки для всех сосудов."
+      ],
+      "usedIn": {
+        "promyshlennaya-bezopasnost": [
+          "slide-02",
+          "slide-12",
+          "slide-15",
+          "slide-17",
+          "slide-30",
+          "slide-31",
+          "slide-32",
+          "slide-33",
+          "slide-34",
+          "slide-35",
+          "slide-36",
+          "slide-37",
+          "slide-38",
+          "slide-39",
+          "slide-40",
+          "slide-55"
+        ],
+        "svarshchik": [
+          "slide-25",
+          "slide-26",
+          "slide-36"
+        ]
+      },
+      "result": "переработано; оригинал не изменён"
+    },
+    {
+      "id": "electrical",
+      "filename": "Презентация вебинара Электробезопасность - Ким - ноябрь 2025 года.pptx",
+      "sha256": "82fcc6b1425119d8a99f5abe0150fb3ea57a9c5d9a7a1849e5694165be7e029d",
+      "purpose": "учебное содержание",
+      "textRead": true,
+      "visualSlidesReviewed": 55,
+      "reviewMethod": "PowerPoint COM read-only text/table extraction and rendered slide contact sheets",
+      "issuesAndDecisions": [
+        "Просмотрены все схемы нейтрали, заземления, воздействия тока, таблицыСИЗ и организационных ролей.",
+        "Частные токи, сопротивления, напряжения и расстояния не объявлены универсальными безопасными величинами.",
+        "Последовательность подготовки сверена с п130 приказа222: отключение/защита от включения, запрещающие плакаты, проверка отсутствия напряжения, заземление, ограждения.",
+        "Монтажные и испытательные инструкции для электротехнического персонала сокращены до принципов и границ допуска."
+      ],
+      "usedIn": {
+        "promyshlennaya-bezopasnost": [
+          "slide-02",
+          "slide-10",
+          "slide-14",
+          "slide-15",
+          "slide-41",
+          "slide-42",
+          "slide-43",
+          "slide-44",
+          "slide-45",
+          "slide-46",
+          "slide-47",
+          "slide-48",
+          "slide-49",
+          "slide-50",
+          "slide-53",
+          "slide-55"
+        ],
+        "svarshchik": [
+          "slide-40"
+        ]
+      },
+      "result": "переработано; оригинал не изменён"
+    },
+    {
+      "id": "welding",
+      "filename": "Сварщик.ppt",
+      "sha256": "6e341bead7fac23d53c27d77036625d73b26238c9149bcf1b620216921a396e9",
+      "purpose": "учебное содержание",
+      "textRead": true,
+      "visualSlidesReviewed": 56,
+      "reviewMethod": "PowerPoint COM read-only text/table extraction and rendered slide contact sheets",
+      "issuesAndDecisions": [
+        "Прочитаны56 слайдов, включая изображения газовых баллонов, браковки, хранения и перевозки.",
+        "Спорное объединение сварки трением и взрывом и обещание отсутствия дефектов не перенесены.",
+        "Специальные числовые газовые режимы и случайное крепление к лесам не универсализированы.",
+        "Редкие способы сварки сокращены до назначения основных процессов; курс не обещает присвоение квалификации."
+      ],
+      "usedIn": {
+        "promyshlennaya-bezopasnost": [
+          "slide-38",
+          "slide-39"
+        ],
+        "svarshchik": [
+          "slide-01",
+          "slide-02",
+          "slide-03",
+          "slide-04",
+          "slide-05",
+          "slide-06",
+          "slide-07",
+          "slide-08",
+          "slide-09",
+          "slide-10",
+          "slide-11",
+          "slide-12",
+          "slide-13",
+          "slide-14",
+          "slide-15",
+          "slide-16",
+          "slide-17",
+          "slide-18",
+          "slide-19",
+          "slide-20",
+          "slide-21",
+          "slide-22",
+          "slide-23",
+          "slide-24",
+          "slide-25",
+          "slide-26",
+          "slide-27",
+          "slide-28",
+          "slide-29",
+          "slide-30",
+          "slide-31",
+          "slide-32",
+          "slide-33",
+          "slide-34",
+          "slide-35",
+          "slide-36",
+          "slide-37",
+          "slide-38",
+          "slide-39",
+          "slide-40",
+          "slide-41",
+          "slide-42"
+        ]
+      },
+      "result": "переработано; оригинал не изменён"
+    }
+  ],
+  "totalSourceSlidesReviewed": 207,
+  "officialReview": {
+    "trainingRules": {
+      "url": "https://old.adilet.zan.kz/rus/docs/V2100023461",
+      "paragraphs": [
+        19,
+        24,
+        25
+      ],
+      "finding": "Формальные экзамены40ч:100вопросов/120мин;10ч:60/90мин. Электронные протоколы/удостоверения требуют ЭЦП. Короткий тест платформы не подтверждает выполнение этих требований."
+    }
+  },
+  "limitations": [
+    "Реестр охватывает6 учебных файлов;22 документа/скана входят в отдельный реестр проекта.",
+    "Просмотр и переработка не означают дословный перенос каждого отраслевого или рекламного фрагмента."
+  ]
+}

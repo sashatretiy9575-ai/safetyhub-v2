@@ -1,0 +1,994 @@
+{
+  "schemaVersion": 1,
+  "slug": "promyshlennaya-bezopasnost",
+  "locale": "zh",
+  "status": "translation-awaiting-independent-review",
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "variants": [
+    {
+      "id": "b8c92d68-7292-5b38-a66d-2d6a3fd86a3d",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "fedb45c2-bfb3-5595-ab03-e51374c01038",
+          "text": "工业安全的主要目的是什么？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "de72ce7d-f66a-59d4-a4e3-9e84d816063f",
+              "text": "保护人员、财产和环境免受危险生产因素影响",
+              "displayOrder": 1
+            },
+            {
+              "id": "ee381374-1412-52d9-a1ed-3e9af76a2218",
+              "text": "仅防止手工作业伤害",
+              "displayOrder": 2
+            },
+            {
+              "id": "625d2ab2-16e8-58da-ab6b-4d69f8d91fa4",
+              "text": "仅填写日志",
+              "displayOrder": 3
+            },
+            {
+              "id": "93435aa7-a62f-51c5-acbd-7b6a053cac8c",
+              "text": "仅确保采购时设备合格",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "de72ce7d-f66a-59d4-a4e3-9e84d816063f",
+          "explanation": "工业安全保护人员、财产和环境免受危险生产因素影响。 事故预防在设备启动前开始。 应急准备包括通信、疏散和经过训练的人员行动。",
+          "slideRefs": [
+            "slide-03"
+          ]
+        },
+        {
+          "id": "b489c3d6-50c1-552a-a24b-3b882b05d0a6",
+          "text": "设备故障但无人受伤，应如何处理？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "305b4beb-74fa-5a5d-a337-be8a07d308a3",
+              "text": "重新启动后删除故障记录",
+              "displayOrder": 1
+            },
+            {
+              "id": "ee73f14e-dc9d-5bad-aca8-187a0f1c32ac",
+              "text": "报告偏差并组织分析",
+              "displayOrder": 2
+            },
+            {
+              "id": "778fb65f-2a94-5eb4-adf8-84a475284c9a",
+              "text": "无人受伤就不记录",
+              "displayOrder": 3
+            },
+            {
+              "id": "586f5d9c-dc8f-5596-abfb-06a3274058df",
+              "text": "不检查直接继续工作",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ee73f14e-dc9d-5bad-aca8-187a0f1c32ac",
+          "explanation": "结构破坏、失控爆炸或危险物质释放属于事故征兆。 设备故障或工艺偏离可能构成异常事件。 即使没有人员受伤，也应报告并分析。 隐瞒偏差会失去预防事故的机会。",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "48c72c16-c1d7-58a5-ab14-c24cd28b3613",
+          "text": "观看培训课件能证明什么？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "5896bc3f-b62d-5f6d-afd0-b96a54e5a8d6",
+              "text": "自动成为责任人",
+              "displayOrder": 1
+            },
+            {
+              "id": "55b3427f-cc1d-56b2-a421-1dbf1a74c28f",
+              "text": "有权取消现场交底",
+              "displayOrder": 2
+            },
+            {
+              "id": "c2638d03-89bc-54ec-aa9c-b045e374773a",
+              "text": "学习了材料，但不能替代规定的专项授权",
+              "displayOrder": 3
+            },
+            {
+              "id": "134cb023-f68e-57c9-a182-fccf7b4af802",
+              "text": "有权维修任何设备",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c2638d03-89bc-54ec-aa9c-b045e374773a",
+          "explanation": "培训说明危险及安全方法。 知识考核确认对要求的理解。 作业交底介绍具体任务和工作场所。 规则要求时，还需实际操作训练及作业授权。",
+          "slideRefs": [
+            "slide-10"
+          ]
+        },
+        {
+          "id": "6e57202c-73b5-5756-aaaf-12e3fb42edf1",
+          "text": "哪项操作本身不能保证检修前的能源隔离？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "955cfb0c-750c-5407-a184-7d3151aff0a0",
+              "text": "防止意外启动",
+              "displayOrder": 1
+            },
+            {
+              "id": "307cd102-e3e0-5aa0-ac99-40bc22b131b4",
+              "text": "按程序释放危险压力",
+              "displayOrder": 2
+            },
+            {
+              "id": "5927f16f-3892-5a39-a4bd-b8d7b5e3cfc9",
+              "text": "确认危险能量已消除",
+              "displayOrder": 3
+            },
+            {
+              "id": "fab20f74-3b57-5a57-ab58-3b8727b268e6",
+              "text": "按下停止按钮",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "fab20f74-3b57-5a57-ab58-3b8727b268e6",
+          "explanation": "检修前识别电能、机械能和储存能量。 停止设备并防止意外启动。 按程序泄压并固定运动部件。 由授权人员确认危险能量已消除。",
+          "slideRefs": [
+            "slide-15"
+          ]
+        },
+        {
+          "id": "4eb3bc20-244c-5e00-accf-197814799f20",
+          "text": "载荷质量未知时正确做法是什么？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "09e49165-a5c5-5ba2-abac-bf8d1d90f58d",
+              "text": "起吊前确认质量",
+              "displayOrder": 1
+            },
+            {
+              "id": "8f6b9d5d-e425-5784-aea4-1ad7ce28ece3",
+              "text": "在最大幅度处试吊",
+              "displayOrder": 2
+            },
+            {
+              "id": "7a7275ae-e42d-5a3e-a670-03ea0d2c15de",
+              "text": "只看外观选择吊索",
+              "displayOrder": 3
+            },
+            {
+              "id": "35a35348-e878-502f-a1cb-188196161ebd",
+              "text": "一直提升到限位保护动作",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "09e49165-a5c5-5ba2-abac-bf8d1d90f58d",
+          "explanation": "确认质量、重心和吊点。 选择性能适合的机械及吊具。 检查路线、落点及人员撤离情况。 约定参与人员的通信方式。",
+          "slideRefs": [
+            "slide-22"
+          ]
+        },
+        {
+          "id": "3668f50f-614f-5409-a2bf-ff9f1e5899d4",
+          "text": "吊运时失去与参与人员的通信，应怎么办？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "d83fabce-c96e-52cb-ab55-e3d8e46a9fbf",
+              "text": "把无信号视为许可",
+              "displayOrder": 1
+            },
+            {
+              "id": "d3921124-d9e5-559c-a6ba-fb4f545340be",
+              "text": "停止运动并恢复约定通信",
+              "displayOrder": 2
+            },
+            {
+              "id": "cf047ff5-0efe-5c00-a97b-7b590b860a5c",
+              "text": "凭记忆继续",
+              "displayOrder": 3
+            },
+            {
+              "id": "9e60e0a9-26ea-58bd-a53c-3317a59a4b33",
+              "text": "不恢复通信就完成已开始的下降",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "d3921124-d9e5-559c-a6ba-fb4f545340be",
+          "explanation": "事先约定清晰信号和通信方式。 失去通信时停止运动。 出现人员危险时，立即响应停止信号。 原因消除并重新协调后方可恢复。",
+          "slideRefs": [
+            "slide-25"
+          ]
+        },
+        {
+          "id": "1162cfb2-d2b4-53e7-a1df-0848bdbfbccd",
+          "text": "能否把试验压力用作正常工作压力？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "fce01c45-0bd0-5cce-ad93-e80b4c48541a",
+              "text": "压力表新就可以",
+              "displayOrder": 1
+            },
+            {
+              "id": "89d5d629-8090-5b1a-a560-b7af53227ff1",
+              "text": "前五分钟不漏就可以",
+              "displayOrder": 2
+            },
+            {
+              "id": "7e0bd68b-5884-53bd-ae13-4f816aa637b1",
+              "text": "不能，试验压力用于规定的试验程序",
+              "displayOrder": 3
+            },
+            {
+              "id": "6924c638-bc4c-5d7c-a61d-1a498cfbee79",
+              "text": "可以，始终允许长期使用",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7e0bd68b-5884-53bd-ae13-4f816aa637b1",
+          "explanation": "工作、设计、允许和试验压力用途不同。 试验压力仅用于规定试验程序。 运行限值来自设备文件及批准参数。 同时考虑温度限制和介质相容性。",
+          "slideRefs": [
+            "slide-31"
+          ]
+        },
+        {
+          "id": "2db053fc-6edc-5898-a250-fb99ff2c4a50",
+          "text": "承压设备保护动作后应如何处理？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "8ead2f66-663c-52bc-a19e-85169e60ca77",
+              "text": "将保护旁路到班次结束",
+              "displayOrder": 1
+            },
+            {
+              "id": "e491865f-dc7e-5fc1-aefc-1da724557535",
+              "text": "未经批准提高整定值",
+              "displayOrder": 2
+            },
+            {
+              "id": "d7bb90d1-8efa-5cc9-ac18-ba7c262f1884",
+              "text": "压力下降后隐瞒动作情况",
+              "displayOrder": 3
+            },
+            {
+              "id": "3ab824be-97f5-5eb2-ac5b-614259debb14",
+              "text": "查明原因并按规程处理",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "3ab824be-97f5-5eb2-ac5b-614259debb14",
+          "explanation": "安全装置限制参数危险超限。 按规定检查其完好状态和整定。 禁止擅自旁路、堵塞或改变整定。 保护动作后必须查明原因。",
+          "slideRefs": [
+            "slide-33"
+          ]
+        },
+        {
+          "id": "1fa940f3-304f-551b-a8df-2601c0fde1a7",
+          "text": "验明无电压之前，应完成什么？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "c80d0e9e-8453-56ae-a357-875a9b18f86d",
+              "text": "必要断开、防止送电及悬挂禁止标志",
+              "displayOrder": 1
+            },
+            {
+              "id": "196cb3a7-aa55-55d6-a2b6-f22386dd2610",
+              "text": "仅收拾工具",
+              "displayOrder": 2
+            },
+            {
+              "id": "409c7ac5-6309-5cf6-ad91-fb12ba56507c",
+              "text": "让设备空载运转",
+              "displayOrder": 3
+            },
+            {
+              "id": "537854d3-718e-573b-abad-a382614cd1e3",
+              "text": "拆除相邻装置全部围栏",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c80d0e9e-8453-56ae-a357-875a9b18f86d",
+          "explanation": "授权人员完成必要断开。 防止误送电并悬挂禁止标志。 验明确无电压，再执行规定接地。 设置所需围栏及其他标志。",
+          "slideRefs": [
+            "slide-44"
+          ]
+        },
+        {
+          "id": "95abaefc-c258-5ea4-a6df-bb8664a371f3",
+          "text": "事故报警首先应提供哪些信息？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "8a8fc7a7-f0ea-5444-aa88-84fbf40263b6",
+              "text": "先彻底查清原因再报告",
+              "displayOrder": 1
+            },
+            {
+              "id": "9e50c66f-b9b6-593b-a73e-a9a23daffafa",
+              "text": "地点、危险性质及已知伤员信息",
+              "displayOrder": 2
+            },
+            {
+              "id": "06da067c-e8ca-5164-ad61-14227e9ab810",
+              "text": "只说报告人姓名，不说地点",
+              "displayOrder": 3
+            },
+            {
+              "id": "09cd4f1e-8457-5e29-aa16-df77bf4b28c4",
+              "text": "猜测责任人",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "9e50c66f-b9b6-593b-a73e-a9a23daffafa",
+          "explanation": "说明位置、危险性质和已知伤员情况。 使用现场通信方式，必要时拨打112或101。 不要为自行调查原因而延迟报告。 以安全方式警告附近人员。",
+          "slideRefs": [
+            "slide-51"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aa3747dd-15b2-50e9-a7e0-c8b60a0bafb4",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "a318e9d6-3f10-5d02-ac80-94ef4f5406c0",
+          "text": "如何判定是否属于危险生产设施？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "d3972757-4791-563c-ad4f-f1c121fd82d9",
+              "text": "只看是否有有效设备护照",
+              "displayOrder": 1
+            },
+            {
+              "id": "39b5a52c-b3ce-57ae-acac-e48c68cba494",
+              "text": "不识别，只听负责人意见",
+              "displayOrder": 2
+            },
+            {
+              "id": "687504e1-076d-5618-af57-f89506075510",
+              "text": "按规定特征和识别程序",
+              "displayOrder": 3
+            },
+            {
+              "id": "e8c9df8c-c526-5a81-a459-5a3c763ddd1a",
+              "text": "按企业名称",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "687504e1-076d-5618-af57-f89506075510",
+          "explanation": "存在危险物质和工艺时，应核查危险设施判定条件。 按法律规定开展识别，不能仅凭企业名称判断。 危险技术装置按类型和参数进行管理。 员工应了解本区域危险和授权范围。",
+          "slideRefs": [
+            "slide-05"
+          ]
+        },
+        {
+          "id": "c7b9bdc7-045c-5ee8-a288-4fabba6a5963",
+          "text": "什么能确认生产监督问题已关闭？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "7b785210-6cc6-50b3-aa49-37578d805429",
+              "text": "仅达到规定期限",
+              "displayOrder": 1
+            },
+            {
+              "id": "81e397fa-0eea-5bc8-ab18-557ac3c6137e",
+              "text": "口头承诺以后整改",
+              "displayOrder": 2
+            },
+            {
+              "id": "6f631bca-0c5b-55b7-ab05-10026472e58f",
+              "text": "从日志删除问题",
+              "displayOrder": 3
+            },
+            {
+              "id": "a9cddc3e-2540-52e8-a868-8b57fe761598",
+              "text": "实际核实整改已完成",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "a9cddc3e-2540-52e8-a868-8b57fe761598",
+          "explanation": "监督应在事故前发现违规情况。 检查设备、文件、人员和工作条件。 每项问题明确措施、责任人和期限。 问题关闭须通过现场核实。",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "14c3cc83-105d-56e1-a515-dc8e2071a8c8",
+          "text": "工作条件改变后如何处理风险评估？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "7d64e1df-3063-5156-a089-6b3371a20111",
+              "text": "结合变化重新评估",
+              "displayOrder": 1
+            },
+            {
+              "id": "3e186b55-6d68-5c5b-a4a1-3418acf50fea",
+              "text": "不检查继续用原评估",
+              "displayOrder": 2
+            },
+            {
+              "id": "99300528-8536-5b71-a675-e760a77e4a47",
+              "text": "为省时取消防护",
+              "displayOrder": 3
+            },
+            {
+              "id": "8c483cf1-b881-5e30-a430-be347190dcce",
+              "text": "只在事故后评估",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7d64e1df-3063-5156-a089-6b3371a20111",
+          "explanation": "识别可能造成伤害的因素及暴露人员。 优先消除危险并采用工程防护。 组织措施和个人防护作为补充。 设备、任务或环境变化后重新评估。",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "deb6ccfc-ed29-59b4-ae2f-f9c4a8e7657a",
+          "text": "在哪里核查实际工况下允许的起重量？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "e5125a4b-0e3a-5028-aa1b-2a184bbd8bcc",
+              "text": "过去最重一次起吊经验",
+              "displayOrder": 1
+            },
+            {
+              "id": "444ef31c-d25d-5f55-a85a-8833aac1aea4",
+              "text": "所用起重设备的文件和性能资料",
+              "displayOrder": 2
+            },
+            {
+              "id": "4754f234-1bde-5ae4-a98f-a5f38e28b2fa",
+              "text": "相邻起重机的起重量",
+              "displayOrder": 3
+            },
+            {
+              "id": "30308fb6-85c2-5d11-aa57-f1eba3ea7e45",
+              "text": "吊钩尺寸",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "444ef31c-d25d-5f55-a85a-8833aac1aea4",
+          "explanation": "核对设备类型及识别编号。 检查起重量、安装条件和制造商限制。 核查检验及投入使用文件。 标识不清或相互矛盾时，先核实信息。",
+          "slideRefs": [
+            "slide-19"
+          ]
+        },
+        {
+          "id": "6831a539-ee58-51e3-a36a-5957a88ae085",
+          "text": "发现损坏吊索应如何处理？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "76f03535-152d-58c1-afe2-3407cde2a116",
+              "text": "仅用于紧急载荷",
+              "displayOrder": 1
+            },
+            {
+              "id": "5881f7af-04ca-5897-a233-edceeb7c2beb",
+              "text": "载荷价值低就允许吊运",
+              "displayOrder": 2
+            },
+            {
+              "id": "196ad355-f83b-567f-a756-59fc7d3a07dc",
+              "text": "停止使用，换用完好且适合的吊具",
+              "displayOrder": 3
+            },
+            {
+              "id": "8752a78c-6575-5bb7-ac2b-cee708470dea",
+              "text": "在损坏处打结",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "196ad355-f83b-567f-a756-59fc7d3a07dc",
+          "explanation": "检查标识及与吊装方案的适配性。 检查钢丝绳、链条、索腿、吊钩和连接件。 损坏或无法识别的吊具退出使用。 按规定保护载荷棱边。",
+          "slideRefs": [
+            "slide-23"
+          ]
+        },
+        {
+          "id": "cc5d728e-c356-5cf9-a3ad-7cb335059d1b",
+          "text": "起重设备试验采用较高载荷意味着什么？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "fc2c51b5-aa74-5b80-adae-acd2f47b9b3f",
+              "text": "允许长期超载",
+              "displayOrder": 1
+            },
+            {
+              "id": "1a206cf9-118b-54b6-a577-61d37bdf0020",
+              "text": "无需文件即可提高额定起重量",
+              "displayOrder": 2
+            },
+            {
+              "id": "ddc45260-d8d9-5d6c-ac80-387c0e2831bf",
+              "text": "取消制造商限制",
+              "displayOrder": 3
+            },
+            {
+              "id": "f4868088-17a6-5229-afec-41ad0b8722d7",
+              "text": "属于规定试验方案的一部分",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f4868088-17a6-5229-afec-41ad0b8722d7",
+          "explanation": "由合格人员按规定方案试验。 试验载荷不代表日常允许超载。 特定维修或改动后需追加检查。 试验结果和继续使用许可应形成文件。",
+          "slideRefs": [
+            "slide-27"
+          ]
+        },
+        {
+          "id": "7e29ef66-e854-5866-afe6-600a8e4c31e5",
+          "text": "承压设备维修前需要什么？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "88aec2e6-911e-5276-aa73-fd930ea155d7",
+              "text": "隔离来源并按程序确认安全状态",
+              "displayOrder": 1
+            },
+            {
+              "id": "20275cae-aa24-56b8-ad16-dbbb7420cebd",
+              "text": "仅等待噪声下降",
+              "displayOrder": 2
+            },
+            {
+              "id": "f46142f3-8c8c-5fa1-a25a-483f49e784e5",
+              "text": "仅拆下仪表盖",
+              "displayOrder": 3
+            },
+            {
+              "id": "d69bd425-125b-544d-a45f-ef7137f28b1d",
+              "text": "压力表任何零读数都可开修",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "88aec2e6-911e-5276-aa73-fd930ea155d7",
+          "explanation": "隔离压力和危险介质来源。 释放压力并确认安全状态。 必要时清洗、吹扫和检测环境。 完成措施并获得许可后开始检修。",
+          "slideRefs": [
+            "slide-36"
+          ]
+        },
+        {
+          "id": "777ddd58-ef6c-5efb-a79f-427d2c97cd4d",
+          "text": "容器检验期限已过，应怎么办？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "f5a7136c-5337-501d-a5b9-70e3ecb2bc06",
+              "text": "采用相邻容器期限",
+              "displayOrder": 1
+            },
+            {
+              "id": "488ab85d-1912-55c8-ae37-05a3486d1edf",
+              "text": "不开工，通知责任人安排检查和准入",
+              "displayOrder": 2
+            },
+            {
+              "id": "3d209ccc-e369-5dc2-a016-a5f7d6228054",
+              "text": "继续到第一次泄漏",
+              "displayOrder": 3
+            },
+            {
+              "id": "6e65559d-93bf-5f50-a648-1b7c057b61dd",
+              "text": "自行修改护照日期",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "488ab85d-1912-55c8-ae37-05a3486d1edf",
+          "explanation": "检查和试验用于评估技术状态。 周期由设备及适用要求决定。 检验逾期时不开工，通知责任人安排检查和准入。 结果写入设备文件。",
+          "slideRefs": [
+            "slide-37"
+          ]
+        },
+        {
+          "id": "283940d6-723c-50c9-a270-b816697a9ac8",
+          "text": "电气安全等级是否允许任何电气操作？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "61e488c5-cd39-5dd3-a2ce-e6a23f6b77e9",
+              "text": "操作短暂就允许",
+              "displayOrder": 1
+            },
+            {
+              "id": "6e2dd442-fce0-5a3f-ad85-397df2cd3f93",
+              "text": "旁边有同事就允许",
+              "displayOrder": 2
+            },
+            {
+              "id": "f3722995-42af-56ae-a2b3-79c64f0e531b",
+              "text": "不允许，还需相应权限、任务和许可",
+              "displayOrder": 3
+            },
+            {
+              "id": "b593ecc7-62b8-55b4-a10f-dcbd2ef88974",
+              "text": "允许，与职责无关",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f3722995-42af-56ae-a2b3-79c64f0e531b",
+          "explanation": "职责及电气安全等级决定允许操作。 等级不代表无需任务和许可即可开展所有工作。 接线、维修和倒闸由授权人员完成。 学员应遵守自身培训范围。",
+          "slideRefs": [
+            "slide-42"
+          ]
+        },
+        {
+          "id": "13275069-cf52-5000-a657-9c61e08635cf",
+          "text": "到达集合点后应做什么？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "989f8bc9-8e40-5bac-a17b-718b4c27e7b0",
+              "text": "返回取个人物品",
+              "displayOrder": 1
+            },
+            {
+              "id": "a7fd6444-b779-579e-a5bf-eb6965621d18",
+              "text": "自行批准他人返回",
+              "displayOrder": 2
+            },
+            {
+              "id": "3e9ac3b6-6a75-5a0d-a1fb-962078b62f44",
+              "text": "不通知任何人就离开",
+              "displayOrder": 3
+            },
+            {
+              "id": "facc3318-8a23-52af-a683-a091a811d778",
+              "text": "报告自身及已知缺席人员情况",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "facc3318-8a23-52af-a683-a091a811d778",
+          "explanation": "根据危险源选择安全撤离路线。 不为取物返回，也不进入封锁区域。 到集合点后报告自身及已知失联人员情况。 责任人评估后才能准许返回。",
+          "slideRefs": [
+            "slide-52"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fdd99cb8-91aa-5ea2-a25d-664fe18a4f9a",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "bb50b1ef-1970-586a-a487-284eb04b972d",
+          "text": "谁负责组织设备安全运行？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "89046548-20d0-5477-a3f8-9a42041b098c",
+              "text": "运营组织在其职责范围内负责",
+              "displayOrder": 1
+            },
+            {
+              "id": "95dcbcc0-41c9-5807-ad79-4c3cdea8dd68",
+              "text": "售后仅由制造商负责",
+              "displayOrder": 2
+            },
+            {
+              "id": "f7c830c6-f063-5d54-af20-0c1f8378f199",
+              "text": "每名员工只管自己",
+              "displayOrder": 3
+            },
+            {
+              "id": "5e65e16d-e776-5359-ae4f-ff5f1c6289b8",
+              "text": "仅由本次维修承包商负责",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "89046548-20d0-5477-a3f8-9a42041b098c",
+          "explanation": "运营组织保证设备完好并落实强制要求。 指定责任人，建立监督程序。 组织培训、知识考核和人员作业准入。 保持控制事故及消除后果的准备状态。",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "52be7b11-9f18-5770-a877-8ccbb58fa643",
+          "text": "作业票上的任务改变了，应怎么办？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "5923cbb2-5f9d-5f26-aca6-3ca531a44714",
+              "text": "完工后删除原任务",
+              "displayOrder": 1
+            },
+            {
+              "id": "7cec7e51-a789-5653-a845-8d8aed19e960",
+              "text": "按程序重新审核许可条件",
+              "displayOrder": 2
+            },
+            {
+              "id": "2f0db622-dcf6-50fe-a90a-53e3c9278445",
+              "text": "不审核，执行任何口头指令",
+              "displayOrder": 3
+            },
+            {
+              "id": "44e34eee-06f3-5212-adc7-51f6e75642c9",
+              "text": "把原签字用于其他工作",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7cec7e51-a789-5653-a845-8d8aed19e960",
+          "explanation": "按规则和程序对要求许可的作业办理作业票。 明确地点、内容、人员及防护措施。 现场实际条件必须符合许可要求。 任务变化后应重新审核条件，不能只靠口头约定。",
+          "slideRefs": [
+            "slide-14"
+          ]
+        },
+        {
+          "id": "c0389f23-fcc2-52eb-afc7-4aabf6336c58",
+          "text": "动火时为什么检查邻近房间和隐蔽空间？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "869ec6fe-96e4-591a-a421-21f9b4af84c3",
+              "text": "只检查工位附近可见表面",
+              "displayOrder": 1
+            },
+            {
+              "id": "6688d8e0-06cc-50ce-acf5-324d58a7eff0",
+              "text": "因为该检查能代替完工后监护",
+              "displayOrder": 2
+            },
+            {
+              "id": "7802ee4f-b0e4-5834-ace0-fc4eccd578d2",
+              "text": "火花可能进入并造成隐蔽阴燃",
+              "displayOrder": 3
+            },
+            {
+              "id": "bdb05db0-9857-5d3d-ab36-7110be6fbc7e",
+              "text": "仅为检查设备通路",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7802ee4f-b0e4-5834-ace0-fc4eccd578d2",
+          "explanation": "焊接、切割和加热会产生火花及高温表面。 移除可燃物或按规定保护。 检查相邻房间、孔洞和隐蔽空间。 配备灭火器材并安排完工后检查。",
+          "slideRefs": [
+            "slide-16"
+          ]
+        },
+        {
+          "id": "003cc5cb-3f8f-52bd-a2bd-1278b7c8be5e",
+          "text": "谁组织起重机安全吊运？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "159cfc42-3f02-5d90-a4fa-d9fd6abd271e",
+              "text": "附近任何课程学员",
+              "displayOrder": 1
+            },
+            {
+              "id": "f0044f4a-92f6-5644-ae12-f22f50374e07",
+              "text": "仅由远程供货商负责",
+              "displayOrder": 2
+            },
+            {
+              "id": "f5f0f385-95a4-513a-a227-ad6414cd2b12",
+              "text": "不指定组织责任人，仅由司机负责",
+              "displayOrder": 3
+            },
+            {
+              "id": "48c6141f-695f-59b8-ad22-73c2ad47f00c",
+              "text": "指定的该类作业安全责任人",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "48c6141f-695f-59b8-ad22-73c2ad47f00c",
+          "explanation": "监督人员检查安全运行情况。 设备完好责任人组织维护和维修。 安全吊运责任人组织具体作业。 司机和司索人员履行各自职责并使用约定信号。",
+          "slideRefs": [
+            "slide-21"
+          ]
+        },
+        {
+          "id": "2c6bc058-0f29-5e2b-a22a-99ee1b634e66",
+          "text": "起吊时人员不得处于哪个位置？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "ec054b7e-b09d-5eaf-ae10-d386f8854d13",
+              "text": "悬吊载荷下方",
+              "displayOrder": 1
+            },
+            {
+              "id": "fb44d282-0c0b-58e9-a035-cabdbadedc73",
+              "text": "隔离危险区外",
+              "displayOrder": 2
+            },
+            {
+              "id": "b6736498-aaac-5dd5-a940-3b2d5f52b467",
+              "text": "约定的安全指挥位置",
+              "displayOrder": 3
+            },
+            {
+              "id": "2a02b142-f7a2-5a8b-a658-bf8a46d8c551",
+              "text": "安全集合点",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ec054b7e-b09d-5eaf-ae10-d386f8854d13",
+          "explanation": "人员撤离载荷可能坠落或移动的范围。 禁止停留在悬吊载荷下方。 不得站在载荷与障碍物之间用手导向。 整个操作过程中保持区域边界。",
+          "slideRefs": [
+            "slide-24"
+          ]
+        },
+        {
+          "id": "6e515c9a-2915-5e90-a349-8b0fef0e1a70",
+          "text": "容器分类取决于什么？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "697dd4b8-aba1-5db2-a450-498cda9c9464",
+              "text": "只看制造年份",
+              "displayOrder": 1
+            },
+            {
+              "id": "38f7e248-8358-52b0-af68-e42c797a5a52",
+              "text": "参数和工作介质性质",
+              "displayOrder": 2
+            },
+            {
+              "id": "9b54201f-8e24-5ce1-aac6-13cb1cbe37f6",
+              "text": "只看工作压力，不考虑介质",
+              "displayOrder": 3
+            },
+            {
+              "id": "1d7bb1c4-5ace-53b8-a798-60cde27c2582",
+              "text": "只看容积",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "38f7e248-8358-52b0-af68-e42c797a5a52",
+          "explanation": "分类取决于参数和介质性质。 仅凭压力无法完成通用分类。 专业人员确定适用要求和检验范围。 操作人员遵守本设备已确定的限值。",
+          "slideRefs": [
+            "slide-32"
+          ]
+        },
+        {
+          "id": "2d965429-6680-5803-a636-5c726d7f8365",
+          "text": "如何检查疑似气瓶泄漏？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "27e366e8-af23-5237-a971-f7c6a131cccc",
+              "text": "用焊炬加热阀门",
+              "displayOrder": 1
+            },
+            {
+              "id": "ac85d6d2-1d63-525b-a564-9e4d2172dfa4",
+              "text": "敲击接头",
+              "displayOrder": 2
+            },
+            {
+              "id": "abbe08b8-9c58-5d5f-af46-53e480abce77",
+              "text": "采用规定的无明火安全方法",
+              "displayOrder": 3
+            },
+            {
+              "id": "b26baef9-3b8c-5a54-aa98-8c97dd227cfb",
+              "text": "使用打火机火焰",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "abbe08b8-9c58-5d5f-af46-53e480abce77",
+          "explanation": "通过标识和文件确认气体。 防止气瓶倒落、受热和阀门损坏。 使用相容的减压器及完好连接件。 不得用明火检查泄漏。",
+          "slideRefs": [
+            "slide-38"
+          ]
+        },
+        {
+          "id": "e0749f30-0d1e-5a20-a149-0da587537344",
+          "text": "移动设备电缆损坏时应怎么办？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "727a2157-85b0-5eaf-a86f-a1bc16c9cb01",
+              "text": "手持电缆继续使用",
+              "displayOrder": 1
+            },
+            {
+              "id": "6f5e6962-72a4-537c-ac1b-e3896a23df28",
+              "text": "触摸破损处检查",
+              "displayOrder": 2
+            },
+            {
+              "id": "ec8198f2-cb4d-5456-a2ff-38c1c83ffa8e",
+              "text": "表面缠绕后不检查就继续",
+              "displayOrder": 3
+            },
+            {
+              "id": "b46b4fb6-1b63-5192-a036-ad3086bd0505",
+              "text": "停止使用并安排维修或更换",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b46b4fb6-1b63-5192-a036-ad3086bd0505",
+          "explanation": "使用前检查外壳、电缆、插头和接头。 按环境条件和说明书选用。 电缆损坏或出现过热迹象时停止使用。 自制接头不能代替完好配套部件。",
+          "slideRefs": [
+            "slide-46"
+          ]
+        },
+        {
+          "id": "51c77a14-db19-5935-a3a4-4796b940ad4d",
+          "text": "在带电部分附近保持距离时应考虑什么？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "d6f7a604-0525-5f82-af60-d58493a2763f",
+              "text": "人员、工具、载荷及机械部件位置",
+              "displayOrder": 1
+            },
+            {
+              "id": "7685708f-1ca3-5542-a41a-af8811144036",
+              "text": "只看员工脚的位置",
+              "displayOrder": 2
+            },
+            {
+              "id": "c54314a0-eaec-56b4-a2c6-683ed9e65c61",
+              "text": "只要手不直接接触",
+              "displayOrder": 3
+            },
+            {
+              "id": "125a071b-2792-5bb0-a31d-13db05a6bc7a",
+              "text": "只看操作持续时间",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "d6f7a604-0525-5f82-af60-d58493a2763f",
+          "explanation": "按具体装置确定边界和安全距离。 人员、工具、载荷及机械部件均须保持距离。 不得擅自移动围栏。 条件改变时停止工作并重新评估措施。",
+          "slideRefs": [
+            "slide-48"
+          ]
+        },
+        {
+          "id": "5d2a4746-0089-5ae8-a1e4-9c5f62c2fd24",
+          "text": "救助前首要条件是什么？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "c5f1d6d4-3418-5cf4-a18c-54e9557e8132",
+              "text": "呼救前先寻找证件",
+              "displayOrder": 1
+            },
+            {
+              "id": "b7f9e623-631c-5159-ad71-cb3d1c2a4002",
+              "text": "救助者不处于危险中",
+              "displayOrder": 2
+            },
+            {
+              "id": "f3bd98ed-c40b-55f8-a0fc-bda8d7d425cd",
+              "text": "立即进入任何危险区",
+              "displayOrder": 3
+            },
+            {
+              "id": "e705fbae-fd5e-597f-ab5e-58450a491e80",
+              "text": "不评估就必须搬动伤员",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b7f9e623-631c-5159-ad71-cb3d1c2a4002",
+          "explanation": "先排除对救助者的危险。 呼叫急救并说明现场情况。 按培训范围及调度员指示行动。 无防护不得进入危险气氛或接触仍带电的伤员。",
+          "slideRefs": [
+            "slide-53"
+          ]
+        }
+      ]
+    }
+  ]
+}

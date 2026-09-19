@@ -1,0 +1,995 @@
+{
+  "schemaVersion": 1,
+  "slug": "svarshchik",
+  "locale": "en",
+  "status": "translation-awaiting-independent-review",
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "variants": [
+    {
+      "id": "def10270-b4f3-5999-a587-f3a5a6ae6cbc",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "2b328649-2ad8-5251-a156-374439b3b5f2",
+          "text": "What does completing this course provide?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "139512a9-63a8-5a6a-af1e-5dbd95f686ad",
+              "text": "Study of the material without automatic award of a vocational grade",
+              "displayOrder": 1
+            },
+            {
+              "id": "7766c014-413d-5e8e-aeb9-cabecf873728",
+              "text": "Automatic authorisation for all welded structures",
+              "displayOrder": 2
+            },
+            {
+              "id": "ec0cb450-d77f-56a5-aaab-1c0121a33fdb",
+              "text": "Authority to sign any inspection report",
+              "displayOrder": 3
+            },
+            {
+              "id": "6931ac63-c7e8-532f-a12c-bd7056fccdcf",
+              "text": "Automatic appointment as the person responsible for lifting equipment",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "139512a9-63a8-5a6a-af1e-5dbd95f686ad",
+          "explanation": "Fundamentals of welding processes and safe workplace organisation. Joint preparation, equipment, protection and inspection. A training programme for work in the Republic of Kazakhstan.",
+          "slideRefs": [
+            "slide-01"
+          ]
+        },
+        {
+          "id": "1b61a50a-a53f-5886-aade-12cf9c31b505",
+          "text": "What should be done if a welded-joint requirement is unclear?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "3e179408-434e-5b40-aae7-ebbddbaaf9f6",
+              "text": "Start and clarify after acceptance",
+              "displayOrder": 1
+            },
+            {
+              "id": "5c677c0d-1231-5cdd-a90a-a4f0eb554765",
+              "text": "Clarify the requirement before welding",
+              "displayOrder": 2
+            },
+            {
+              "id": "da4ec20a-5adc-5b1b-ab48-21b50fa856ac",
+              "text": "Choose parameters at random",
+              "displayOrder": 3
+            },
+            {
+              "id": "97d01744-2cc0-5ffc-adec-b78f83579190",
+              "text": "Repeat any previous weld",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5c677c0d-1231-5cdd-a90a-a4f0eb554765",
+          "explanation": "Read the drawing and joint requirements before work. Establish the material, edge preparation and welding position. Check the procedure, parameters and inspection requirements. Clarify unclear requirements before welding starts.",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "5e911464-268e-5c95-a561-2756f566d83f",
+          "text": "Why should an unknown coating be assessed before heating?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "f7ff90a5-9122-5c86-a392-6c0a4c5e857f",
+              "text": "To dispense with ventilation",
+              "displayOrder": 1
+            },
+            {
+              "id": "75d5ae59-826a-51dc-a1c6-24943e5e99d0",
+              "text": "Because every coating protects against fumes",
+              "displayOrder": 2
+            },
+            {
+              "id": "b8298f9c-6d0a-59f7-a2ad-0c687dee9519",
+              "text": "It may produce harmful emissions and affect quality",
+              "displayOrder": 3
+            },
+            {
+              "id": "c67e6840-9ae7-58e4-abe0-22040001fa77",
+              "text": "Only to choose the method of later painting",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b8298f9c-6d0a-59f7-a2ad-0c687dee9519",
+          "explanation": "Clean surfaces as required by the procedure. Remove contamination that could impair quality or produce harmful emissions. Check edge shape and joint gap. Secure components for stable positioning and safe access.",
+          "slideRefs": [
+            "slide-09"
+          ]
+        },
+        {
+          "id": "8f45ccc5-3018-520e-a5c7-01c0b21d9a1d",
+          "text": "How are the welding machine's power supply and permitted load selected?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "3013bd04-d9c8-5c8f-a246-0b290ffdbcc8",
+              "text": "By resemblance to a previously used machine",
+              "displayOrder": 1
+            },
+            {
+              "id": "5e66d463-d1bb-587c-ab45-b5590f0551f1",
+              "text": "From the power rating of a different machine on the site",
+              "displayOrder": 2
+            },
+            {
+              "id": "77fe3ecf-c145-5769-a9f3-8658973f4e46",
+              "text": "From cable length alone",
+              "displayOrder": 3
+            },
+            {
+              "id": "50b5314c-9e13-5e82-ac01-4acc0cf3b081",
+              "text": "From the machine passport and instructions",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "50b5314c-9e13-5e82-ac01-4acc0cf3b081",
+          "explanation": "Transformers, rectifiers and inverters have different characteristics. Verify power supply and permitted load against the equipment passport. Follow the cooling and duty-cycle instructions. Stop in the event of overheating or a fault.",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "dedc5a02-5452-53e0-a0c2-eb1159e435a3",
+          "text": "What protects the eyes during welding?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "12bbed6d-b82d-5214-a345-6adf0c701608",
+              "text": "A suitable welding shield or helmet with a filter",
+              "displayOrder": 1
+            },
+            {
+              "id": "a3628939-dde5-52a6-ab75-4de92384981c",
+              "text": "Ordinary clear glasses instead of a helmet",
+              "displayOrder": 2
+            },
+            {
+              "id": "a858613b-ef17-5adf-a4e4-bc7494705283",
+              "text": "Sunglasses without assessment",
+              "displayOrder": 3
+            },
+            {
+              "id": "113585a8-7121-51bc-a2a4-4adc65c1f4b2",
+              "text": "Limiting the time spent looking at the arc",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "12bbed6d-b82d-5214-a345-6adf0c701608",
+          "explanation": "Select a welding helmet or shield for the process and parameters. The filter must provide the required protection. Check integrity, attachments and function. Use protection against flying particles during grinding and cleaning.",
+          "slideRefs": [
+            "slide-17"
+          ]
+        },
+        {
+          "id": "3f0279e8-e0fe-56a5-ab1e-b9a449ed02d2",
+          "text": "How should welding fumes be removed?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "ebb79ec5-9de3-5a0a-a852-b40181f3b85e",
+              "text": "By smell, switching ventilation on only when the smell is strong",
+              "displayOrder": 1
+            },
+            {
+              "id": "1b7fe932-bd56-538c-a54a-58f602b31cb1",
+              "text": "By the specified ventilation with extraction at the source",
+              "displayOrder": 2
+            },
+            {
+              "id": "23e3ec4e-fe3e-54ba-a651-d3e1145a0a81",
+              "text": "Only with an open door under all conditions",
+              "displayOrder": 3
+            },
+            {
+              "id": "89ce0024-f8dd-555c-a973-9ff16576beb5",
+              "text": "Only through general air exchange without assessing local extraction",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "1b7fe932-bd56-538c-a54a-58f602b31cb1",
+          "explanation": "Remove contaminants as close to their source as possible. General ventilation supplements local extraction. Emissions depend on the metal, coatings and consumables. Select respiratory protection from a risk assessment; it does not replace required ventilation.",
+          "slideRefs": [
+            "slide-20"
+          ]
+        },
+        {
+          "id": "ddbef06a-5461-555f-a531-0eef15a14c9a",
+          "text": "How should the gas in a cylinder be identified before connection?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "d0d429b5-8c2c-56fd-aa63-df8bade46317",
+              "text": "By estimating cylinder weight visually",
+              "displayOrder": 1
+            },
+            {
+              "id": "ff378f6e-795e-5cd7-a8eb-a3d74460d13b",
+              "text": "By matching the thread without checking",
+              "displayOrder": 2
+            },
+            {
+              "id": "ac9a47f2-7fed-5037-a6d7-67e8588d3e9b",
+              "text": "From markings and documentation",
+              "displayOrder": 3
+            },
+            {
+              "id": "fe1d2b4b-66c8-51be-a345-d9aeb1478fa0",
+              "text": "Only by the cylinder colour",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ac9a47f2-7fed-5037-a6d7-67e8588d3e9b",
+          "explanation": "Identify the gas from markings and documentation. Check the shell, valve and required examination information. Do not use a defective or uncertainly identified cylinder. Colour alone is not sufficient for connection.",
+          "slideRefs": [
+            "slide-25"
+          ]
+        },
+        {
+          "id": "99bdd928-7ea9-58e5-a832-b8f3a6c70d5f",
+          "text": "Where should pressure settings for a torch or cutting torch come from?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "977b48ac-ecdd-5378-ace0-74df9f4e4f0b",
+              "text": "An arbitrary training example",
+              "displayOrder": 1
+            },
+            {
+              "id": "99d482ce-6544-5faf-a975-4e7becfe7efb",
+              "text": "The settings of a different torch",
+              "displayOrder": 2
+            },
+            {
+              "id": "11c102be-be9a-59c6-a986-d0c7ae960de9",
+              "text": "The maximum gauge reading",
+              "displayOrder": 3
+            },
+            {
+              "id": "04810264-f8ec-5281-a3c0-d38f1a861517",
+              "text": "The instructions for the actual equipment and procedure",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "04810264-f8ec-5281-a3c0-d38f1a861517",
+          "explanation": "Select a regulator for the gas and pressure range. Use compatible connections without improvised adapters. Check gauge condition and absence of damage. Set operating pressure according to the torch instructions.",
+          "slideRefs": [
+            "slide-27"
+          ]
+        },
+        {
+          "id": "591d966a-a380-52e9-a18d-5bf55940bd56",
+          "text": "Can a used container with unknown contents be welded?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "0adcb2f0-75db-518d-af45-cdd5e201f360",
+              "text": "No; identification, preparation and authorisation are required first",
+              "displayOrder": 1
+            },
+            {
+              "id": "b028aeef-c8e1-5d5e-ae06-bbf973f12bb3",
+              "text": "Yes, if it looks empty",
+              "displayOrder": 2
+            },
+            {
+              "id": "41f20ced-a45c-5beb-a88f-e7f3cbd5fa0e",
+              "text": "Yes, if the weld is short",
+              "displayOrder": 3
+            },
+            {
+              "id": "524fab5e-b003-54ee-acc6-04434f4c1835",
+              "text": "Yes, after wiping the exterior",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "0adcb2f0-75db-518d-af45-cdd5e201f360",
+          "explanation": "Before heating, establish what the container previously held. Remove residues and isolate connected services under the procedure. Test the atmosphere and complete the required authorisation measures. Do not independently weld a closed or unidentified container.",
+          "slideRefs": [
+            "slide-30"
+          ]
+        },
+        {
+          "id": "d4b840af-1c50-5b58-a554-8dac9351b784",
+          "text": "What forms part of safe completion of welding?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "d0c817e5-b90d-5bc6-a8b5-c17764e250e7",
+              "text": "Leaving immediately without inspection",
+              "displayOrder": 1
+            },
+            {
+              "id": "c579b8d1-b8ff-5715-aa2e-2201d730f01e",
+              "text": "Shutdown as instructed, area inspection and the required fire monitoring",
+              "displayOrder": 2
+            },
+            {
+              "id": "8ba63491-30c9-5fd6-a246-83d6ea9c1210",
+              "text": "Only switching off the power source without inspecting the area",
+              "displayOrder": 3
+            },
+            {
+              "id": "f7dd186b-42ec-51f8-ad2e-c09d9d4d5b50",
+              "text": "Only closing the gas supply without checking the workplace",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c579b8d1-b8ff-5715-aa2e-2201d730f01e",
+          "explanation": "Shut down equipment and the gas system as instructed. Prevent unintended starting and leaks. Inspect the work area and adjacent spaces for smouldering. Record completion and maintain the required fire monitoring.",
+          "slideRefs": [
+            "slide-37"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f3e49bd7-8232-5fbb-af01-e3c2c4839950",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "6643205d-a9ba-566b-ae4f-f67d2893a7fc",
+          "text": "Is an externally even weld sufficient to verify all its properties?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "e494ec0b-c72a-5d56-ae61-daa01482ae62",
+              "text": "Yes, if the welder is experienced",
+              "displayOrder": 1
+            },
+            {
+              "id": "d64eb2a5-11fd-5266-a1ff-2b52e00a8485",
+              "text": "Yes, if the metal is still hot",
+              "displayOrder": 2
+            },
+            {
+              "id": "bcb90b33-39a2-553f-ac76-c01eade6fda1",
+              "text": "No; acceptance requires the specified inspection",
+              "displayOrder": 3
+            },
+            {
+              "id": "d7d478ac-c154-5868-a2af-5388b643b88b",
+              "text": "Yes; an even weld is always acceptable",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "bcb90b33-39a2-553f-ac76-c01eade6fda1",
+          "explanation": "Welding creates a permanent joint between materials. Required properties depend on the material, structure and operating conditions. Weld appearance does not verify all internal properties. Acceptance follows the requirements for the specific product.",
+          "slideRefs": [
+            "slide-03"
+          ]
+        },
+        {
+          "id": "5f0ff28a-b176-585a-a6db-46af9ea5306f",
+          "text": "How are electrode classification and diameter selected?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "dae46d50-c863-51ba-aaf6-c50b17c3f98c",
+              "text": "By availability without checking material compatibility",
+              "displayOrder": 1
+            },
+            {
+              "id": "1996b4ca-c83d-548c-ab10-5f92a32625ea",
+              "text": "By electrode diameter without checking classification",
+              "displayOrder": 2
+            },
+            {
+              "id": "479f2670-c63f-5d7d-a914-db98d39742c6",
+              "text": "Always the same for every metal",
+              "displayOrder": 3
+            },
+            {
+              "id": "35b47608-c18b-5310-a5af-757f93beb13b",
+              "text": "According to the material and welding procedure",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "35b47608-c18b-5310-a5af-757f93beb13b",
+          "explanation": "The consumable electrode contributes to the weld metal. Its coating provides the intended process protection. Select the electrode classification, diameter and parameters using the welding procedure. Electrode condition affects joint quality.",
+          "slideRefs": [
+            "slide-05"
+          ]
+        },
+        {
+          "id": "cf85fb77-de10-58ee-a962-c3c5857f4d01",
+          "text": "How is an unacceptable tack-weld defect handled?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "f90e4380-012b-51fc-a959-b1de8994aea4",
+              "text": "Remove it by the established method before continuing",
+              "displayOrder": 1
+            },
+            {
+              "id": "eb333bf4-445c-5fad-aa9e-d934ece7117c",
+              "text": "Always cover it with the next layer without assessment",
+              "displayOrder": 2
+            },
+            {
+              "id": "5768c5ff-1095-5389-a8ce-0ef253b4e696",
+              "text": "Ignore it because it is not a weld",
+              "displayOrder": 3
+            },
+            {
+              "id": "0c768fc5-701e-5851-a217-13a8cb0f12de",
+              "text": "Paint over it before continuing",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f90e4380-012b-51fc-a959-b1de8994aea4",
+          "explanation": "Verify component alignment against the drawing. Make tack welds according to material and procedure requirements. Fixtures must hold components without dangerous movement. Remove unacceptable tack-weld defects using the established method.",
+          "slideRefs": [
+            "slide-10"
+          ]
+        },
+        {
+          "id": "c4a5c4ab-292d-5e0f-a089-d2dce006ec94",
+          "text": "What should be done with damaged welding-cable insulation?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "41e8e03c-cf82-5225-aad2-e4aa3da2ed79",
+              "text": "Increase current to check the contact",
+              "displayOrder": 1
+            },
+            {
+              "id": "f1017ce3-f9bf-5906-a06c-3da424a578b5",
+              "text": "Remove the defective part from use until corrected",
+              "displayOrder": 2
+            },
+            {
+              "id": "0d11c536-247e-5a30-af95-cb9a8adca09e",
+              "text": "Continue in gloves without checking",
+              "displayOrder": 3
+            },
+            {
+              "id": "760db270-e7ea-5c85-aac8-d5b6bdb450de",
+              "text": "Cover the damage with a wet cloth",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f1017ce3-f9bf-5906-a06c-3da424a578b5",
+          "explanation": "Check insulation, connections and electrode clamping. Protect cables from heat, cuts and moving vehicles. Place the holder to prevent accidental short circuits. Remove defective components from use.",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "cc5e3d6d-ead4-5a21-a0c7-e2dcd60dcec0",
+          "text": "Which clothing condition is unsuitable for welding?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "0a001c0e-6354-517b-a939-3e7d3c38edfb",
+              "text": "No exposed areas of skin",
+              "displayOrder": 1
+            },
+            {
+              "id": "da919360-a55a-566e-a8ea-c8fdbd7e0dd8",
+              "text": "Specified protection of footwear against particles",
+              "displayOrder": 2
+            },
+            {
+              "id": "14ffbd40-fcc1-5bed-a263-c8b06cbfc480",
+              "text": "Contamination with combustible substances",
+              "displayOrder": 3
+            },
+            {
+              "id": "0f734fcc-9d56-5746-a440-504edb42691d",
+              "text": "Protection against sparks and hot particles",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "14ffbd40-fcc1-5bed-a263-c8b06cbfc480",
+          "explanation": "Clothing must protect against sparks and hot particles. Use welding gloves and keep them dry. Prevent exposed skin and pockets that collect sparks. Footwear and clothing arrangement must keep hot metal out.",
+          "slideRefs": [
+            "slide-18"
+          ]
+        },
+        {
+          "id": "ce6b7857-b4a1-5600-a7e2-4e74457ad208",
+          "text": "Who connects and repairs the machine?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "cbe2e93e-db52-59d8-a660-ff4cb904101b",
+              "text": "Any learner after viewing the presentation",
+              "displayOrder": 1
+            },
+            {
+              "id": "258d991f-f547-576f-ab03-8c1054531a28",
+              "text": "Any colleague without checking authority",
+              "displayOrder": 2
+            },
+            {
+              "id": "7cfa1968-0073-58d5-a5f1-5e14067fdbf0",
+              "text": "Only whoever first notices the fault",
+              "displayOrder": 3
+            },
+            {
+              "id": "0f9e5d9f-a71a-5cf8-a23a-d3686620cd17",
+              "text": "Authorised personnel within their authorisation",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "0f9e5d9f-a71a-5cf8-a23a-d3686620cd17",
+          "explanation": "Authorised personnel connect the machine using the established method. Check protective connections and cables before work. Do not work with damaged equipment or unsafe moisture conditions. Repairs and switching require the relevant separate authorisation.",
+          "slideRefs": [
+            "slide-21"
+          ]
+        },
+        {
+          "id": "2717f202-7e3f-5ab7-a17c-71957c4eb4bf",
+          "text": "Why must oxygen fittings be kept free from oil and grease?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "7785a1a3-25fe-5b9d-aad3-b0f4ff20823b",
+              "text": "Oxygen increases fire hazards",
+              "displayOrder": 1
+            },
+            {
+              "id": "70aa978d-b9f4-5d85-a4a0-9a3a99efb456",
+              "text": "Because removing oil replaces a leak-tightness check",
+              "displayOrder": 2
+            },
+            {
+              "id": "34a1043f-9f25-5ba5-a44b-a7dd8d40c195",
+              "text": "Only to improve gauge accuracy",
+              "displayOrder": 3
+            },
+            {
+              "id": "498e92f8-c8fc-59a2-a638-6acc7d0fba3e",
+              "text": "Only to prevent mechanical wear of threads",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7785a1a3-25fe-5b9d-aad3-b0f4ff20823b",
+          "explanation": "Oxygen supports combustion and increases fire hazards. Fuel gas can form a dangerous mixture with air. Keep oxygen fittings free from oil and grease. Never use oxygen to blow off clothing or ventilate a space.",
+          "slideRefs": [
+            "slide-24"
+          ]
+        },
+        {
+          "id": "18e445f5-d52a-5e3d-ab27-1b6c6f2bb069",
+          "text": "How should a leak at a gas connection be located?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "5286603e-6e32-5954-a6fb-b9500094aa06",
+              "text": "By heating the connection until a smell appears",
+              "displayOrder": 1
+            },
+            {
+              "id": "5526d1e7-6a04-5b3f-a9d8-90771ee9a61a",
+              "text": "By an approved method without an open flame",
+              "displayOrder": 2
+            },
+            {
+              "id": "e86f6bde-ca3a-53c1-a311-a1d04896d98c",
+              "text": "With a lighter",
+              "displayOrder": 3
+            },
+            {
+              "id": "0a88ffaa-e6cc-566a-a768-a2d6ddec578c",
+              "text": "With the welding arc",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5526d1e7-6a04-5b3f-a9d8-90771ee9a61a",
+          "explanation": "Use hoses suitable for the gas and working conditions. Protect them from kinks, sparks and mechanical damage. Use the specified fasteners for connections. Check leaks by an approved method without an open flame.",
+          "slideRefs": [
+            "slide-28"
+          ]
+        },
+        {
+          "id": "056351a2-07f6-5fd4-afae-fb0681772164",
+          "text": "How is a fall-protection attachment point selected?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "18ed3c06-3ef9-5287-a030-b484eace2c58",
+              "text": "Use the first available pipeline",
+              "displayOrder": 1
+            },
+            {
+              "id": "d3b7a029-4097-5dda-a105-bab2d38747f0",
+              "text": "Use the welding cable",
+              "displayOrder": 2
+            },
+            {
+              "id": "13cb94cf-247e-5b32-a3db-6bc333858aae",
+              "text": "Follow the established system and verified anchorage points",
+              "displayOrder": 3
+            },
+            {
+              "id": "e071d34a-eb9d-5281-ab60-749cc45efa82",
+              "text": "Use any scaffold component based on appearance",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "13cb94cf-247e-5b32-a3db-6bc333858aae",
+          "explanation": "Use a safe platform and the specified fall protection. Select attachment points under the established system, not arbitrarily. Protect fall-protection components from sparks and hot metal. Barrier off the lower area against falling objects and particles.",
+          "slideRefs": [
+            "slide-32"
+          ]
+        },
+        {
+          "id": "a0a6674f-4ffa-5398-ae13-b8a5b770b471",
+          "text": "After a pop, the torch operates unstably. What should be done?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "1a4bdb8b-5989-52e2-a456-80ff397fe1bb",
+              "text": "Continue until complete failure",
+              "displayOrder": 1
+            },
+            {
+              "id": "76a8830b-1443-5481-a628-6b53962a4ac2",
+              "text": "Remove the protective valve",
+              "displayOrder": 2
+            },
+            {
+              "id": "99caea8a-2d1c-58bf-aac4-8297411276a0",
+              "text": "Independently increase pressure without checking",
+              "displayOrder": 3
+            },
+            {
+              "id": "89cff4d1-ac24-5660-aadb-5b3f460f5265",
+              "text": "Stop as instructed and correct the cause before restarting",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "89cff4d1-ac24-5660-aadb-5b3f460f5265",
+          "explanation": "Flashback carries the flame back towards the gas system. Specified valves and flashback arrestors reduce the risk. Stop according to the instructions after a pop, overheating or unstable operation. Restart only after establishing and correcting the cause.",
+          "slideRefs": [
+            "slide-29"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f3eb1d58-bdd9-5ac1-aa77-f771ab0d70af",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "015392c9-4921-5828-ad14-ebe3b2d1df87",
+          "text": "What determines the choice of welding process?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "ff361f64-eb67-5b4f-a5e2-ba05712e5875",
+              "text": "Material, thickness and the welding procedure",
+              "displayOrder": 1
+            },
+            {
+              "id": "ff02af92-8950-52db-a3a7-a2063af565bd",
+              "text": "Only the operator's preference",
+              "displayOrder": 2
+            },
+            {
+              "id": "bd2ab1e1-d7f4-5375-a7cf-9ea0b3aa1b41",
+              "text": "Only the required working speed",
+              "displayOrder": 3
+            },
+            {
+              "id": "52777aeb-bac6-5e2a-a346-9101937a1897",
+              "text": "Only the available machine, regardless of material",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ff361f64-eb67-5b4f-a5e2-ba05712e5875",
+          "explanation": "An electric arc provides heat in arc welding. Gas welding uses the flame of fuel gas and oxygen. Weld-pool protection depends on the selected process. Select the process according to material, thickness and procedure.",
+          "slideRefs": [
+            "slide-04"
+          ]
+        },
+        {
+          "id": "e0ef5c0d-049b-5686-afb7-26c56fd8d0ea",
+          "text": "What additional hazard does shielding gas create?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "93f355ae-4346-5119-a571-5394e060b4a5",
+              "text": "It eliminates all electrical hazards",
+              "displayOrder": 1
+            },
+            {
+              "id": "4fad6832-e80d-5c97-a2b4-5bcc5bc47dbe",
+              "text": "It can displace oxygen from the work area",
+              "displayOrder": 2
+            },
+            {
+              "id": "6f33981a-6c8a-5577-a44b-4b018b287f82",
+              "text": "It always makes the atmosphere safe to breathe",
+              "displayOrder": 3
+            },
+            {
+              "id": "67c549a0-67f7-5769-a56d-051afc09baad",
+              "text": "It completely removes the need for ventilation",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "4fad6832-e80d-5c97-a2b4-5bcc5bc47dbe",
+          "explanation": "The process uses wire or a non-consumable electrode, depending on its type. Gas shields the weld pool from the surrounding atmosphere. Interrupted gas supply can impair quality. Select the gas and flow rate according to the procedure and equipment. Shielding gas can displace oxygen from the work area.",
+          "slideRefs": [
+            "slide-06"
+          ]
+        },
+        {
+          "id": "6b066232-fde1-525b-a118-eb41b64788c9",
+          "text": "How should a change in welding parameters be handled?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "e9ad15b8-4f82-536e-ad65-e844dd14f0fc",
+              "text": "Always set maximum current",
+              "displayOrder": 1
+            },
+            {
+              "id": "66fad342-6076-571d-a369-d87c6dd64a82",
+              "text": "Copy parameters from any neighbouring station",
+              "displayOrder": 2
+            },
+            {
+              "id": "0202ad62-378b-5a1a-ac4b-83336a1d086b",
+              "text": "Justify it against procedure requirements",
+              "displayOrder": 3
+            },
+            {
+              "id": "8613758d-5fd6-5ae4-a677-0bc392d3a8dd",
+              "text": "Change randomly until the appearance is attractive",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "0202ad62-378b-5a1a-ac4b-83336a1d086b",
+          "explanation": "Select current, voltage and travel speed using the procedure. Account for welding position, thickness and the component's thermal condition. Any parameter change must be justified. Pass sequence helps control shape and distortion.",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "ba14206d-0f35-5edd-a5f6-205d51f3ef09",
+          "text": "Can a random pipeline replace the work return conductor?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "1d15e986-45b1-53b0-a6a6-5af105996585",
+              "text": "Yes, if the pipeline is metal",
+              "displayOrder": 1
+            },
+            {
+              "id": "7014f810-d955-5388-a113-52024c425bd7",
+              "text": "Yes, for a short weld",
+              "displayOrder": 2
+            },
+            {
+              "id": "ea97d394-8bc9-5558-acda-37299a605390",
+              "text": "Yes, if it runs closer to the machine",
+              "displayOrder": 3
+            },
+            {
+              "id": "b683b10f-1f49-5905-a664-43bd3c784474",
+              "text": "No; the intended welding circuit is required",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b683b10f-1f49-5905-a664-43bd3c784474",
+          "explanation": "Current must return through the intended welding circuit. Provide a reliable connection to the workpiece. Do not substitute random pipes or structures for the return conductor. Apply the special insulation requirements in fire or explosion hazardous conditions.",
+          "slideRefs": [
+            "slide-14"
+          ]
+        },
+        {
+          "id": "25cfd7d0-3510-543b-adf2-5898f7ad5cbb",
+          "text": "Why are screens used around the welding area?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "93e8b5e9-6802-5ba4-a401-314d9c09afa6",
+              "text": "To protect others from the arc and particles",
+              "displayOrder": 1
+            },
+            {
+              "id": "a8256ac5-e6aa-5f0b-a0f3-35b2304871d2",
+              "text": "To replace the welder's helmet",
+              "displayOrder": 2
+            },
+            {
+              "id": "c3f85e1e-c75b-5d95-afb3-88bad1211fd6",
+              "text": "To dispense with ventilation",
+              "displayOrder": 3
+            },
+            {
+              "id": "b0d05031-0be0-570f-ad48-928eca550e7d",
+              "text": "Only to conceal the work being performed",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "93e8b5e9-6802-5ba4-a401-314d9c09afa6",
+          "explanation": "Separate the welding area with the specified screens. Prevent unprotected people from looking directly at the arc. Check where sparks and particles travel. Keep access routes clear and easy to identify.",
+          "slideRefs": [
+            "slide-19"
+          ]
+        },
+        {
+          "id": "0f5df0f2-9395-56a6-a404-2457bb9f6ee4",
+          "text": "Why are openings and concealed spaces checked during hot work?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "adefeb37-5f72-5e14-a1c3-1862e800f46c",
+              "text": "To end monitoring as soon as the machine is switched off",
+              "displayOrder": 1
+            },
+            {
+              "id": "8894ff2b-fac8-514f-a24d-2c1e143d88ca",
+              "text": "Sparks can cause smouldering outside the visible area",
+              "displayOrder": 2
+            },
+            {
+              "id": "87906233-507e-501e-a1a4-7f4375ccc54b",
+              "text": "So checking adjacent spaces can replace removal of combustible materials",
+              "displayOrder": 3
+            },
+            {
+              "id": "cc882a9c-c9e6-515c-afb3-1d397a5a900c",
+              "text": "Only to check whether workers can pass through",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "8894ff2b-fac8-514f-a24d-2c1e143d88ca",
+          "explanation": "Obtain the prescribed authorisation for temporary hot work. Remove or protect combustible materials. Check openings and adjoining spaces. Provide firefighting equipment and the required monitoring.",
+          "slideRefs": [
+            "slide-23"
+          ]
+        },
+        {
+          "id": "299dc76b-fcd2-595e-a38a-4995eb9b9db4",
+          "text": "How should a gas cylinder be moved?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "ef555756-beeb-577a-a747-6fa3a27aeb75",
+              "text": "By striking its body",
+              "displayOrder": 1
+            },
+            {
+              "id": "3a9ad393-7679-51c5-add5-af15a0185061",
+              "text": "By freely rolling it down stairs",
+              "displayOrder": 2
+            },
+            {
+              "id": "e4503ad6-231d-51a6-ae8b-3aa46f25dc62",
+              "text": "With equipment intended for the purpose, protected against falling and damage",
+              "displayOrder": 3
+            },
+            {
+              "id": "d1fd470d-4b42-52f1-af1b-0cc7c682f4bf",
+              "text": "By the valve",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "e4503ad6-231d-51a6-ae8b-3aa46f25dc62",
+          "explanation": "Secure cylinders against falling and protect them from heat. Use equipment intended for cylinder handling. Do not lift by the valve or expose cylinders to impacts. Determine separation distances and co-location from current requirements.",
+          "slideRefs": [
+            "slide-26"
+          ]
+        },
+        {
+          "id": "a24f7471-3f4b-5396-abc5-bc7bf72e4665",
+          "text": "Can work continue after flashback without a check?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "2c1d5fa1-5046-5e3c-a6ab-46f46f957095",
+              "text": "Yes, if the flame has recovered",
+              "displayOrder": 1
+            },
+            {
+              "id": "5a72ab8a-bb8e-5924-a837-1119ed0b6794",
+              "text": "Yes, after removing the flashback arrestor",
+              "displayOrder": 2
+            },
+            {
+              "id": "027c41cb-78ef-58bc-a162-8bc89973c916",
+              "text": "Yes, if an extinguisher is nearby",
+              "displayOrder": 3
+            },
+            {
+              "id": "d455347a-046a-5926-a68d-26213fa5d2f2",
+              "text": "No; stop and correct the cause",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "d455347a-046a-5926-a68d-26213fa5d2f2",
+          "explanation": "Flashback carries the flame back towards the gas system. Specified valves and flashback arrestors reduce the risk. Stop according to the instructions after a pop, overheating or unstable operation. Restart only after establishing and correcting the cause.",
+          "slideRefs": [
+            "slide-29"
+          ]
+        },
+        {
+          "id": "02401bcf-8924-5b7e-a285-12c68f2a57c0",
+          "text": "What is required for welding in a confined space?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "f5bcd3b2-eea7-5fed-a0b4-1ddb3cd8a870",
+              "text": "Special preparation, authorisation, atmosphere testing and rescue measures",
+              "displayOrder": 1
+            },
+            {
+              "id": "a8d4c88e-3ec0-5e59-a418-e901e4e3f85e",
+              "text": "Only moving the machine inside",
+              "displayOrder": 2
+            },
+            {
+              "id": "f92141e6-1920-574b-ae01-e20f46c3156f",
+              "text": "Only an open hatch without assessment",
+              "displayOrder": 3
+            },
+            {
+              "id": "21b5a71a-eb6f-5ec9-aab8-57ec94559329",
+              "text": "Only a colleague's presence without communication",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f5bcd3b2-eea7-5fed-a0b4-1ddb3cd8a870",
+          "explanation": "Entry requires special preparation and established authorisation. Arrange atmosphere testing, ventilation, communication and an attendant. Plan rescue without improvisation. Stop and leave if conditions change.",
+          "slideRefs": [
+            "slide-31"
+          ]
+        },
+        {
+          "id": "1a9f561d-d423-574b-ac96-626020fb7972",
+          "text": "What confirms the outcome of a weld-defect repair?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "ef50dd32-8840-5b7f-a73a-82f69cc84dea",
+              "text": "Only rewelding without checking the result",
+              "displayOrder": 1
+            },
+            {
+              "id": "6d0cc97b-39ee-5947-a402-f6e27196fb8e",
+              "text": "The required repeat inspection",
+              "displayOrder": 2
+            },
+            {
+              "id": "99223fed-8fa9-52a4-acd7-7d13651da5dd",
+              "text": "Only a visual examination instead of the prescribed inspection scope",
+              "displayOrder": 3
+            },
+            {
+              "id": "c5bb9912-a16a-5c58-aa91-dc2ba42202e3",
+              "text": "Only grinding away visible traces",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "6d0cc97b-39ee-5947-a402-f6e27196fb8e",
+          "explanation": "Supplement visual inspection with the required methods. Record results against the specific joint. Use an agreed procedure for repair. Repeat inspection to confirm the repair result.",
+          "slideRefs": [
+            "slide-36"
+          ]
+        }
+      ]
+    }
+  ],
+  "translationSourceSha256": "e51d495f152ab9f01881af2fc10dd7a7663b86b72e70bcb98870316d3b36480b"
+}

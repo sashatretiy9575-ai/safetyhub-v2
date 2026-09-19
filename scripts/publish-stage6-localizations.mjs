@@ -196,7 +196,7 @@ function rpcEnvelopeError(data) {
   return { code, message };
 }
 
-function createSupabaseRepository({ url, serviceSecret, operatorAccessToken, root, batchHash }) {
+export function createSupabaseRepository({ url, serviceSecret, operatorAccessToken, root, batchHash, reviewedAt = '2026-09-02T00:00:00.000Z' }) {
   const clientOptions = {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     global: { fetch: boundedFetch },
@@ -307,7 +307,7 @@ function createSupabaseRepository({ url, serviceSecret, operatorAccessToken, roo
       expectedSha256: item.presentation.sha256,
       qaRoot,
       visualQaApproved: true,
-      reviewedAt: '2026-09-02T00:00:00.000Z',
+      reviewedAt,
     });
     if (
       result?.manifest?.sha256 !== item.presentation.sha256 ||

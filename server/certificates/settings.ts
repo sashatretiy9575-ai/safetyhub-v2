@@ -62,7 +62,7 @@ export const certificateSettingsSchema = z.object({
 });
 export type CertificateSettings = z.infer<typeof certificateSettingsSchema>;
 
-const withImagesSchema = certificateSettingsSchema.extend({
+export const withImagesSchema = certificateSettingsSchema.extend({
   stampPng: z.string().nullable(),
   chairmanSignaturePng: z.string().nullable(),
   memberSignaturePng: z.string().nullable(),
@@ -261,10 +261,8 @@ export function certificateImageUrls(settings: CertificateSettings) {
 }
 
 /**
- * The part of the settings a certificate is drawn with. Computed once per
- * request and copied into every certificate's render metadata, so a change in
- * the settings applies to every certificate downloaded afterwards — the owner
- * sets the booklet up once and every certificate looks the same.
+ * Converts either archived issuance settings or current preview settings into
+ * rendering inputs. Issued metadata must pass its archived row here.
  */
 export function certificateBranding(
   settings: CertificateSettingsWithImages | CertificateSettings,

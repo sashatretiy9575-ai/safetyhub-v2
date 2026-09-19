@@ -41,7 +41,7 @@ if (mode === 'test') {
   auth = await prepareReleaseE2eAuth({ environment: env });
   env.E2E_ADMIN_STORAGE_STATE = auth.adminStatePath;
   env.E2E_PARTICIPANT_STORAGE_STATE = auth.participantStatePath;
-  args = ['node_modules/@playwright/test/cli.js', 'test', 'e2e/document-editor.spec.ts', '--workers=1'];
+  args = ['node_modules/@playwright/test/cli.js', 'test', 'e2e/document-editor.spec.ts', '--workers=1', ...process.argv.slice(3)];
 } else if (mode === 'build') args = ['node_modules/next/dist/bin/next', 'build'];
 else if (mode === 'start') args = ['node_modules/next/dist/bin/next', 'start', '--hostname', 'localhost', '--port', '3100'];
 else if (mode === 'dev') args = ['node_modules/next/dist/bin/next', 'dev', '--hostname', 'localhost', '--port', '3100'];

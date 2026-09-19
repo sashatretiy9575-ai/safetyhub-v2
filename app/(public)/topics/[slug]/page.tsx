@@ -67,7 +67,8 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
   if (!topic) {
     const destination = await getTopicRedirectBySlug(slug);
     if (destination) permanentRedirect(localizePathname(`/topics/${destination}`, locale));
-    if (slug === 'industrial-safety') permanentRedirect(localizePathname('/topics', locale));
+    if (slug === 'industrial-safety')
+      permanentRedirect(localizePathname('/topics/promyshlennaya-bezopasnost', locale));
     if (slug === 'fire-safety')
       permanentRedirect(localizePathname('/topics/pozharnaya-bezopasnost', locale));
     if (slug === 'occupational-health') permanentRedirect(localizePathname('/topics/biot', locale));

@@ -1,4 +1,5 @@
 import { insertSizeProblem, type DocumentDefaults } from './document-editor.ts';
+import type { DocumentProfile } from './document-profile.ts';
 export const CERTIFICATE_CLIENT_SCHEMA_VERSION = 1 as const;
 export const CERTIFICATE_EXPORT_MAX_ITEMS = 500;
 export const CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS = 100;
@@ -9,11 +10,12 @@ export type CertificateLocale = (typeof CERTIFICATE_LOCALES)[number];
 
 /**
  * The booklet's fixed part, set once by the administrator: organization,
- * commission, statements, validity and the stamp/signature images. Copied
- * into every certificate's metadata so a download always uses the current
- * settings.
+ * commission, statements, validity and stamp/signature references. New
+ * issuances receive an immutable snapshot; current settings are for previews.
  */
 export type CertificateBranding = Readonly<{
+  documentProfile?: DocumentProfile;
+  commissionSignatureUrls?: readonly (string | null)[];
   documentDefaults?: DocumentDefaults;
   protocolDate?: string;
   organizationName: string;
@@ -49,6 +51,7 @@ export type CertificateRenderMetadata = Readonly<{
   fullName: string;
   photoUrl?: string | null;
   education?: string;
+  documentDetails?: { trainingReason?: string; notes?: string; qualificationDecision?: string; formalExamReference?: string; formalExamDate?: string; formalExamResult?: string };
   position: string | null;
   organization: string | null;
   score: number;
@@ -93,7 +96,7 @@ const CERTIFICATE_NUMBER_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,95}$/u;
 const SAFE_ASSET_PATH_PATTERN =
   /^\/certificate-assets\/font\?locale=(?:ru|zh)&v=(?:1|Sans2\.005)$/u;
 const SAFE_IMAGE_PATH_PATTERN =
-  /^\/certificate-assets\/image\?kind=(?:stamp|chairman|member|protocol)&v=[0-9]{1,12}$/u;
+  /^\/certificate-assets\/(?:image\?kind=(?:stamp|chairman|member|protocol)&v=[0-9]{1,12}|registered\?id=[0-9a-f-]{36})$/u;
 
 export type CertificateImageKind = 'stamp' | 'chairman' | 'member' | 'protocol';
 /** `version` is the settings version: a replaced image is never served from a browser cache. */
@@ -175,6 +178,10 @@ export function assertCertificateBranding(value: unknown): asserts value is Cert
   assertImageUrl(branding.chairmanSignatureUrl, 'CERTIFICATE_ASSET_URL_INVALID');
   assertImageUrl(branding.memberSignatureUrl, 'CERTIFICATE_ASSET_URL_INVALID');
   assertImageUrl(branding.protocolSignatureUrl ?? null, 'CERTIFICATE_ASSET_URL_INVALID');
+  if (branding.commissionSignatureUrls !== undefined) {
+    if (!Array.isArray(branding.commissionSignatureUrls) || branding.commissionSignatureUrls.length > 20) throw new Error('COMMISSION_INVALID');
+    for (const url of branding.commissionSignatureUrls) assertImageUrl(url, 'CERTIFICATE_ASSET_URL_INVALID');
+  }
 }
 
 export function assertCertificateRenderMetadata(

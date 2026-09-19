@@ -4,7 +4,9 @@ import {
   certificateImageDataUrl,
   decodeCertificateImage,
   readCertificateImagesCached,
+  withImagesSchema,
 } from '@/server/certificates/settings';
+import { readArchivedDocumentSettings } from '@/server/certificates/document-profiles';
 import { createApiResponse } from '@/lib/security/api-response';
 
 export const runtime = 'nodejs';
@@ -35,7 +37,11 @@ export async function GET(request: Request) {
       headers: { 'Cache-Control': 'private, no-store' },
     });
   }
-  const settings = await readCertificateImagesCached();
+  const currentSettings = await readCertificateImagesCached();
+  const archived = String(currentSettings.version) === version ? currentSettings : await readArchivedDocumentSettings(Number(version));
+  const parsed = withImagesSchema.safeParse(archived);
+  if (!parsed.success) return createApiResponse(null, { status: 404, headers: { 'Cache-Control': 'private, no-store' } });
+  const settings = parsed.data;
   const bytes = decodeCertificateImage(certificateImageDataUrl(settings, kind));
   if (!bytes) {
     return createApiResponse(null, {
@@ -43,16 +49,14 @@ export async function GET(request: Request) {
       headers: { 'Cache-Control': 'private, no-store' },
     });
   }
-  // A page opened before the last save still asks for its own version. It gets
-  // the picture that is on the documents now, and no browser keeps it under that
-  // address: an editor left open in a second tab must not lose its preview.
-  const current = String(settings.version) === version;
+  // Archived versions resolve their own bytes. Never serve a newer signature
+  // under an earlier version's immutable URL.
   return createApiResponse(Buffer.from(bytes), {
     headers: {
       'Content-Type': 'image/png',
       'Content-Length': String(bytes.byteLength),
       // Under its own version the bytes never change.
-      'Cache-Control': current ? 'private, max-age=31536000, immutable' : 'private, no-store',
+      'Cache-Control': 'private, max-age=31536000, immutable',
       'X-Content-Type-Options': 'nosniff',
     },
   });

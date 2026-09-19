@@ -1,0 +1,995 @@
+{
+  "schemaVersion": 1,
+  "slug": "promyshlennaya-bezopasnost",
+  "locale": "en",
+  "status": "translation-awaiting-independent-review",
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "variants": [
+    {
+      "id": "b8c92d68-7292-5b38-a66d-2d6a3fd86a3d",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "fedb45c2-bfb3-5595-ab03-e51374c01038",
+          "text": "What is the main purpose of industrial safety?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "de72ce7d-f66a-59d4-a4e3-9e84d816063f",
+              "text": "Protecting people, property and the environment from hazardous production factors",
+              "displayOrder": 1
+            },
+            {
+              "id": "ee381374-1412-52d9-a1ed-3e9af76a2218",
+              "text": "Only preventing injuries during manual operations",
+              "displayOrder": 2
+            },
+            {
+              "id": "625d2ab2-16e8-58da-ab6b-4d69f8d91fa4",
+              "text": "Only completing logbooks",
+              "displayOrder": 3
+            },
+            {
+              "id": "93435aa7-a62f-51c5-acbd-7b6a053cac8c",
+              "text": "Only ensuring compliance when equipment is purchased",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "de72ce7d-f66a-59d4-a4e3-9e84d816063f",
+          "explanation": "Industrial safety protects people, property and the environment from hazardous production factors. Accident prevention begins before equipment starts. Emergency preparedness includes communication, evacuation and rehearsed personnel actions.",
+          "slideRefs": [
+            "slide-03"
+          ]
+        },
+        {
+          "id": "b489c3d6-50c1-552a-a24b-3b882b05d0a6",
+          "text": "Equipment has failed, but nobody was injured. What should be done?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "305b4beb-74fa-5a5d-a337-be8a07d308a3",
+              "text": "Delete the failure record after restarting",
+              "displayOrder": 1
+            },
+            {
+              "id": "ee73f14e-dc9d-5bad-aca8-187a0f1c32ac",
+              "text": "Report the deviation and arrange a review",
+              "displayOrder": 2
+            },
+            {
+              "id": "778fb65f-2a94-5eb4-adf8-84a475284c9a",
+              "text": "Disregard events without casualties",
+              "displayOrder": 3
+            },
+            {
+              "id": "586f5d9c-dc8f-5596-abfb-06a3274058df",
+              "text": "Continue without checking",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ee73f14e-dc9d-5bad-aca8-187a0f1c32ac",
+          "explanation": "Destruction, an uncontrolled explosion or a hazardous release can indicate an accident. Equipment failure or a process deviation can constitute an incident. An event must be reported and examined even if nobody is injured. Concealing a deviation prevents the organisation from averting a later accident.",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "48c72c16-c1d7-58a5-ab14-c24cd28b3613",
+          "text": "What does viewing a training presentation demonstrate?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "5896bc3f-b62d-5f6d-afd0-b96a54e5a8d6",
+              "text": "Automatic appointment as a responsible person",
+              "displayOrder": 1
+            },
+            {
+              "id": "55b3427f-cc1d-56b2-a421-1dbf1a74c28f",
+              "text": "Permission to cancel workplace briefings",
+              "displayOrder": 2
+            },
+            {
+              "id": "c2638d03-89bc-54ec-aa9c-b045e374773a",
+              "text": "Study of material, which does not replace the required equipment-specific authorisation",
+              "displayOrder": 3
+            },
+            {
+              "id": "134cb023-f68e-57c9-a182-fccf7b4af802",
+              "text": "Permission to repair any equipment",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c2638d03-89bc-54ec-aa9c-b045e374773a",
+          "explanation": "Training explains hazards and safe work methods. Knowledge assessment verifies understanding of requirements. A briefing addresses the actual task and workplace. Practical preparation and authorisation are required where stipulated by the rules and task.",
+          "slideRefs": [
+            "slide-10"
+          ]
+        },
+        {
+          "id": "6e57202c-73b5-5756-aaaf-12e3fb42edf1",
+          "text": "Which action alone does not isolate energy before maintenance?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "955cfb0c-750c-5407-a184-7d3151aff0a0",
+              "text": "Preventing unintended starting",
+              "displayOrder": 1
+            },
+            {
+              "id": "307cd102-e3e0-5aa0-ac99-40bc22b131b4",
+              "text": "Releasing hazardous pressure under the procedure",
+              "displayOrder": 2
+            },
+            {
+              "id": "5927f16f-3892-5a39-a4bd-b8d7b5e3cfc9",
+              "text": "Verifying absence of hazardous energy",
+              "displayOrder": 3
+            },
+            {
+              "id": "fab20f74-3b57-5a57-ab58-3b8727b268e6",
+              "text": "Pressing the Stop button",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "fab20f74-3b57-5a57-ab58-3b8727b268e6",
+          "explanation": "Before maintenance, identify electrical, mechanical and stored energy. Stop equipment and prevent unintended starting. Release pressure and secure moving parts under the established procedure. Authorised personnel verify the absence of hazardous energy.",
+          "slideRefs": [
+            "slide-15"
+          ]
+        },
+        {
+          "id": "4eb3bc20-244c-5e00-accf-197814799f20",
+          "text": "The load mass is unknown. What is the correct decision?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "09e49165-a5c5-5ba2-abac-bf8d1d90f58d",
+              "text": "Establish the mass before lifting",
+              "displayOrder": 1
+            },
+            {
+              "id": "8f6b9d5d-e425-5784-aea4-1ad7ce28ece3",
+              "text": "Lift at maximum outreach to check",
+              "displayOrder": 2
+            },
+            {
+              "id": "7a7275ae-e42d-5a3e-a670-03ea0d2c15de",
+              "text": "Select a sling by appearance alone",
+              "displayOrder": 3
+            },
+            {
+              "id": "35a35348-e878-502f-a1cb-188196161ebd",
+              "text": "Lift until the limiter activates",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "09e49165-a5c5-5ba2-abac-bf8d1d90f58d",
+          "explanation": "Determine the load mass, centre of gravity and attachment points. Select equipment and accessories with suitable characteristics. Check the route, landing area and absence of people. Agree on communication between participants.",
+          "slideRefs": [
+            "slide-22"
+          ]
+        },
+        {
+          "id": "3668f50f-614f-5409-a2bf-ff9f1e5899d4",
+          "text": "Communication with a participant is lost during load movement. What should you do?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "d83fabce-c96e-52cb-ab55-e3d8e46a9fbf",
+              "text": "Treat silence as permission",
+              "displayOrder": 1
+            },
+            {
+              "id": "d3921124-d9e5-559c-a6ba-fb4f545340be",
+              "text": "Stop movement and restore agreed communication",
+              "displayOrder": 2
+            },
+            {
+              "id": "cf047ff5-0efe-5c00-a97b-7b590b860a5c",
+              "text": "Continue from memory",
+              "displayOrder": 3
+            },
+            {
+              "id": "9e60e0a9-26ea-58bd-a53c-3317a59a4b33",
+              "text": "Complete the lowering already started without restoring communication",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "d3921124-d9e5-559c-a6ba-fb4f545340be",
+          "explanation": "Agree on clear signals and the communication method in advance. Stop movement if communication is lost. A stop signal concerning danger to people requires an immediate response. Resume only after the cause is resolved and actions are coordinated.",
+          "slideRefs": [
+            "slide-25"
+          ]
+        },
+        {
+          "id": "1162cfb2-d2b4-53e7-a1df-0848bdbfbccd",
+          "text": "Can test pressure be used as the normal operating pressure?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "fce01c45-0bd0-5cce-ad93-e80b4c48541a",
+              "text": "Yes, if the gauge is new",
+              "displayOrder": 1
+            },
+            {
+              "id": "89d5d629-8090-5b1a-a560-b7af53227ff1",
+              "text": "Yes, if no leak appears in the first five minutes",
+              "displayOrder": 2
+            },
+            {
+              "id": "7e0bd68b-5884-53bd-ae13-4f816aa637b1",
+              "text": "No; test pressure applies to an established test procedure",
+              "displayOrder": 3
+            },
+            {
+              "id": "6924c638-bc4c-5d7c-a61d-1a498cfbee79",
+              "text": "Yes; it is always permissible continuously",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7e0bd68b-5884-53bd-ae13-4f816aa637b1",
+          "explanation": "Operating, design, permitted and test pressures serve different purposes. Test pressure applies to an established test procedure. Use the documented and authorised operating limits. Observe temperature restrictions and medium compatibility.",
+          "slideRefs": [
+            "slide-31"
+          ]
+        },
+        {
+          "id": "2db053fc-6edc-5898-a250-fb99ff2c4a50",
+          "text": "What should be done when pressure equipment protection activates?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "8ead2f66-663c-52bc-a19e-85169e60ca77",
+              "text": "Bypass protection until the shift ends",
+              "displayOrder": 1
+            },
+            {
+              "id": "e491865f-dc7e-5fc1-aefc-1da724557535",
+              "text": "Increase the setting without approval",
+              "displayOrder": 2
+            },
+            {
+              "id": "d7bb90d1-8efa-5cc9-ac18-ba7c262f1884",
+              "text": "Conceal the trip if pressure has fallen",
+              "displayOrder": 3
+            },
+            {
+              "id": "3ab824be-97f5-5eb2-ac5b-614259debb14",
+              "text": "Establish the cause and follow the instructions",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "3ab824be-97f5-5eb2-ac5b-614259debb14",
+          "explanation": "Safety devices limit dangerous parameter exceedances. Their condition and settings require established checks. Do not bypass, blank off or alter protection without authorisation. Investigate the cause of a protective trip.",
+          "slideRefs": [
+            "slide-33"
+          ]
+        },
+        {
+          "id": "1fa940f3-304f-551b-a8df-2601c0fde1a7",
+          "text": "What is done before verifying absence of voltage during workplace preparation?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "c80d0e9e-8453-56ae-a357-875a9b18f86d",
+              "text": "Necessary disconnections, prevention of energisation and prohibition notices",
+              "displayOrder": 1
+            },
+            {
+              "id": "196cb3a7-aa55-55d6-a2b6-f22386dd2610",
+              "text": "Only removal of tools",
+              "displayOrder": 2
+            },
+            {
+              "id": "409c7ac5-6309-5cf6-ad91-fb12ba56507c",
+              "text": "Running equipment without load",
+              "displayOrder": 3
+            },
+            {
+              "id": "537854d3-718e-573b-abad-a382614cd1e3",
+              "text": "Removing all barriers from neighbouring installations",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c80d0e9e-8453-56ae-a357-875a9b18f86d",
+          "explanation": "Authorised personnel carry out the necessary disconnections. They prevent unintended energisation and display prohibition notices. They verify absence of voltage and install the required earthing. They install the necessary barriers and other notices.",
+          "slideRefs": [
+            "slide-44"
+          ]
+        },
+        {
+          "id": "95abaefc-c258-5ea4-a6df-bb8664a371f3",
+          "text": "What information should be communicated first when reporting an emergency?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "8a8fc7a7-f0ea-5444-aa88-84fbf40263b6",
+              "text": "First establish the final cause, then report",
+              "displayOrder": 1
+            },
+            {
+              "id": "9e50c66f-b9b6-593b-a73e-a9a23daffafa",
+              "text": "Location, nature of the hazard and known casualty information",
+              "displayOrder": 2
+            },
+            {
+              "id": "06da067c-e8ca-5164-ad61-14227e9ab810",
+              "text": "Only the caller's name, without the location",
+              "displayOrder": 3
+            },
+            {
+              "id": "09cd4f1e-8457-5e29-aa16-df77bf4b28c4",
+              "text": "An assumption about who is at fault",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "9e50c66f-b9b6-593b-a73e-a9a23daffafa",
+          "explanation": "Report the location, hazard and known information about casualties. Use the site's established communication channels; call 112 or 101 where needed. Do not delay reporting while independently searching for the cause. Warn nearby people without exposing yourself to danger.",
+          "slideRefs": [
+            "slide-51"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aa3747dd-15b2-50e9-a7e0-c8b60a0bafb4",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "a318e9d6-3f10-5d02-ac80-94ef4f5406c0",
+          "text": "How is a hazardous production facility identified?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "d3972757-4791-563c-ad4f-f1c121fd82d9",
+              "text": "Only by the presence of a valid equipment passport",
+              "displayOrder": 1
+            },
+            {
+              "id": "39b5a52c-b3ce-57ae-acac-e48c68cba494",
+              "text": "Only by the manager's opinion, without identification",
+              "displayOrder": 2
+            },
+            {
+              "id": "687504e1-076d-5618-af57-f89506075510",
+              "text": "By the established criteria and identification procedure",
+              "displayOrder": 3
+            },
+            {
+              "id": "e8c9df8c-c526-5a81-a459-5a3c763ddd1a",
+              "text": "By the business name",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "687504e1-076d-5618-af57-f89506075510",
+          "explanation": "Hazardous substances and processes require checking the criteria for a hazardous facility. Identification follows legislation rather than the everyday name of a business. Hazardous technical devices are assessed according to their type and parameters. Workers must know their area's hazards and the limits of their authorisation.",
+          "slideRefs": [
+            "slide-05"
+          ]
+        },
+        {
+          "id": "c7b9bdc7-045c-5ee8-a288-4fabba6a5963",
+          "text": "What confirms closure of a production-control finding?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "7b785210-6cc6-50b3-aa49-37578d805429",
+              "text": "Only expiry of the assigned deadline",
+              "displayOrder": 1
+            },
+            {
+              "id": "81e397fa-0eea-5bc8-ab18-557ac3c6137e",
+              "text": "A verbal promise to correct it later",
+              "displayOrder": 2
+            },
+            {
+              "id": "6f631bca-0c5b-55b7-ab05-10026472e58f",
+              "text": "Removal of the finding from the log",
+              "displayOrder": 3
+            },
+            {
+              "id": "a9cddc3e-2540-52e8-a868-8b57fe761598",
+              "text": "Actual verification that the correction has been completed",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "a9cddc3e-2540-52e8-a868-8b57fe761598",
+          "explanation": "Control identifies breaches before an accident occurs. Checks cover equipment, documentation, personnel and working conditions. Each finding receives an action, an owner and a deadline. Closure requires verification that the issue has actually been corrected.",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "14c3cc83-105d-56e1-a515-dc8e2071a8c8",
+          "text": "Working conditions have changed. What should happen to the risk assessment?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "7d64e1df-3063-5156-a089-6b3371a20111",
+              "text": "Repeat the assessment to reflect the change",
+              "displayOrder": 1
+            },
+            {
+              "id": "3e186b55-6d68-5c5b-a4a1-3418acf50fea",
+              "text": "Use the previous assessment without checking",
+              "displayOrder": 2
+            },
+            {
+              "id": "99300528-8536-5b71-a675-e760a77e4a47",
+              "text": "Cancel protective measures to save time",
+              "displayOrder": 3
+            },
+            {
+              "id": "8c483cf1-b881-5e30-a430-be347190dcce",
+              "text": "Assess only after an incident",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7d64e1df-3063-5156-a089-6b3371a20111",
+          "explanation": "Identify what could cause harm and who could enter the danger zone. Prefer hazard elimination and engineering protection. Organisational measures and PPE provide additional protection. Repeat the assessment when equipment, tasks or surroundings change.",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "deb6ccfc-ed29-59b4-ae2f-f9c4a8e7657a",
+          "text": "Where is the permitted lifting capacity checked for the actual conditions?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "e5125a4b-0e3a-5028-aa1b-2a184bbd8bcc",
+              "text": "From the heaviest previous lift",
+              "displayOrder": 1
+            },
+            {
+              "id": "444ef31c-d25d-5f55-a85a-8833aac1aea4",
+              "text": "In the documentation and characteristics of the lifting equipment being used",
+              "displayOrder": 2
+            },
+            {
+              "id": "4754f234-1bde-5ae4-a98f-a5f38e28b2fa",
+              "text": "From the neighbouring crane's capacity",
+              "displayOrder": 3
+            },
+            {
+              "id": "30308fb6-85c2-5d11-aa57-f1eba3ea7e45",
+              "text": "From hook size",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "444ef31c-d25d-5f55-a85a-8833aac1aea4",
+          "explanation": "Check the equipment type and identification number. Verify lifting capacity, installation conditions and manufacturer restrictions. Check inspection records and authorisation for use. Clarify illegible or contradictory markings.",
+          "slideRefs": [
+            "slide-19"
+          ]
+        },
+        {
+          "id": "6831a539-ee58-51e3-a36a-5957a88ae085",
+          "text": "A damaged sling is found. What should be done?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "76f03535-152d-58c1-afe2-3407cde2a116",
+              "text": "Use it only for an urgent load",
+              "displayOrder": 1
+            },
+            {
+              "id": "5881f7af-04ca-5897-a233-edceeb7c2beb",
+              "text": "Allow the lift if the load is inexpensive",
+              "displayOrder": 2
+            },
+            {
+              "id": "196ad355-f83b-567f-a756-59fc7d3a07dc",
+              "text": "Remove it from service and use a suitable, serviceable accessory",
+              "displayOrder": 3
+            },
+            {
+              "id": "8752a78c-6575-5bb7-ac2b-cee708470dea",
+              "text": "Tie a knot at the damaged area",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "196ad355-f83b-567f-a756-59fc7d3a07dc",
+          "explanation": "Check identification and suitability for the chosen lifting arrangement. Inspect ropes, chains, sling legs, hooks and connections. Remove damaged or unidentifiable accessories from service. Protect load edges using the specified padding.",
+          "slideRefs": [
+            "slide-23"
+          ]
+        },
+        {
+          "id": "cc5d728e-c356-5cf9-a3ad-7cb335059d1b",
+          "text": "What does an increased load during a crane test mean?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "fc2c51b5-aa74-5b80-adae-acd2f47b9b3f",
+              "text": "Permission to overload the crane continuously",
+              "displayOrder": 1
+            },
+            {
+              "id": "1a206cf9-118b-54b6-a577-61d37bdf0020",
+              "text": "A new working capacity without documentation",
+              "displayOrder": 2
+            },
+            {
+              "id": "ddc45260-d8d9-5d6c-ac80-387c0e2831bf",
+              "text": "Cancellation of manufacturer restrictions",
+              "displayOrder": 3
+            },
+            {
+              "id": "f4868088-17a6-5229-afec-41ad0b8722d7",
+              "text": "It is part of the established test programme",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f4868088-17a6-5229-afec-41ad0b8722d7",
+          "explanation": "Qualified specialists conduct tests under the established programme. A test load does not authorise overloads during normal operation. Certain repairs or modifications require additional examination. Record the results and authorisation for continued operation.",
+          "slideRefs": [
+            "slide-27"
+          ]
+        },
+        {
+          "id": "7e29ef66-e854-5866-afe6-600a8e4c31e5",
+          "text": "What is necessary before repairing pressure equipment?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "88aec2e6-911e-5276-aa73-fd930ea155d7",
+              "text": "Isolate the sources and verify a safe condition under the procedure",
+              "displayOrder": 1
+            },
+            {
+              "id": "20275cae-aa24-56b8-ad16-dbbb7420cebd",
+              "text": "Only wait for noise to decrease",
+              "displayOrder": 2
+            },
+            {
+              "id": "f46142f3-8c8c-5fa1-a25a-483f49e784e5",
+              "text": "Only remove the instrument cover",
+              "displayOrder": 3
+            },
+            {
+              "id": "d69bd425-125b-544d-a45f-ef7137f28b1d",
+              "text": "Start whenever the gauge reads zero",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "88aec2e6-911e-5276-aa73-fd930ea155d7",
+          "explanation": "Isolate equipment from pressure sources and hazardous media. Release pressure and verify a safe condition. Clean, purge and test the atmosphere where required. Begin work after completing protective measures and authorisation.",
+          "slideRefs": [
+            "slide-36"
+          ]
+        },
+        {
+          "id": "777ddd58-ef6c-5efb-a79f-427d2c97cd4d",
+          "text": "A vessel examination is overdue. What should be done?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "f5a7136c-5337-501d-a5b9-70e3ecb2bc06",
+              "text": "Adopt the interval of a neighbouring vessel",
+              "displayOrder": 1
+            },
+            {
+              "id": "488ab85d-1912-55c8-ae37-05a3486d1edf",
+              "text": "Do not start work; notify the responsible person to arrange examination and authorisation",
+              "displayOrder": 2
+            },
+            {
+              "id": "3d209ccc-e369-5dc2-a016-a5f7d6228054",
+              "text": "Continue until the first leak",
+              "displayOrder": 3
+            },
+            {
+              "id": "6e65559d-93bf-5f50-a648-1b7c057b61dd",
+              "text": "Independently change the date in the passport",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "488ab85d-1912-55c8-ae37-05a3486d1edf",
+          "explanation": "Inspection and testing assess technical condition. Intervals depend on the device and applicable requirements. Do not start work when an examination is overdue; notify the responsible person to arrange the examination and authorisation. Record the results in the equipment documentation.",
+          "slideRefs": [
+            "slide-37"
+          ]
+        },
+        {
+          "id": "283940d6-723c-50c9-a270-b816697a9ac8",
+          "text": "Does an electrical safety group authorise any electrical operation?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "61e488c5-cd39-5dd3-a2ce-e6a23f6b77e9",
+              "text": "Yes, if the operation is brief",
+              "displayOrder": 1
+            },
+            {
+              "id": "6e2dd442-fce0-5a3f-ad85-397df2cd3f93",
+              "text": "Yes, if a colleague is nearby",
+              "displayOrder": 2
+            },
+            {
+              "id": "f3722995-42af-56ae-a2b3-79c64f0e531b",
+              "text": "No; appropriate authority, assignment and authorisation are needed",
+              "displayOrder": 3
+            },
+            {
+              "id": "b593ecc7-62b8-55b4-a10f-dcbd2ef88974",
+              "text": "Yes, regardless of duties",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f3722995-42af-56ae-a2b3-79c64f0e531b",
+          "explanation": "Duties and electrical safety qualification groups determine permitted actions. A group does not authorise every task without an assignment and authorisation. Only authorised personnel connect, repair and switch equipment. Learners must remain within the limits of their preparation.",
+          "slideRefs": [
+            "slide-42"
+          ]
+        },
+        {
+          "id": "13275069-cf52-5000-a657-9c61e08635cf",
+          "text": "What should you do after reaching the assembly point?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "989f8bc9-8e40-5bac-a17b-718b4c27e7b0",
+              "text": "Return for personal belongings",
+              "displayOrder": 1
+            },
+            {
+              "id": "a7fd6444-b779-579e-a5bf-eb6965621d18",
+              "text": "Independently authorise others to return",
+              "displayOrder": 2
+            },
+            {
+              "id": "3e9ac3b6-6a75-5a0d-a1fb-962078b62f44",
+              "text": "Leave without notifying anyone",
+              "displayOrder": 3
+            },
+            {
+              "id": "facc3318-8a23-52af-a683-a091a811d778",
+              "text": "Report your presence and known missing persons",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "facc3318-8a23-52af-a683-a091a811d778",
+          "explanation": "Use a safe escape route appropriate to the hazard. Do not return for belongings or enter a closed-off zone. At the assembly point, report your presence and known missing persons. Return only when authorised after conditions have been assessed.",
+          "slideRefs": [
+            "slide-52"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fdd99cb8-91aa-5ea2-a25d-664fe18a4f9a",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "bb50b1ef-1970-586a-a487-284eb04b972d",
+          "text": "Who organises safe equipment operation?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "89046548-20d0-5477-a3f8-9a42041b098c",
+              "text": "The operating organisation within its duties",
+              "displayOrder": 1
+            },
+            {
+              "id": "95dcbcc0-41c9-5807-ad79-4c3cdea8dd68",
+              "text": "Only the manufacturer after sale",
+              "displayOrder": 2
+            },
+            {
+              "id": "f7c830c6-f063-5d54-af20-0c1f8378f199",
+              "text": "Only each worker individually",
+              "displayOrder": 3
+            },
+            {
+              "id": "5e65e16d-e776-5359-ae4f-ff5f1c6289b8",
+              "text": "Only the contractor carrying out the next repair",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "89046548-20d0-5477-a3f8-9a42041b098c",
+          "explanation": "The organisation maintains equipment and meets mandatory requirements. It appoints responsible persons and establishes control procedures. It arranges training, knowledge assessment and personnel authorisation. It maintains readiness to contain accidents and deal with their consequences.",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "52be7b11-9f18-5770-a877-8ccbb58fa643",
+          "text": "The task specified in the work permit has changed. What should be done?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "5923cbb2-5f9d-5f26-aca6-3ca531a44714",
+              "text": "Delete the former task after completing the work",
+              "displayOrder": 1
+            },
+            {
+              "id": "7cec7e51-a789-5653-a845-8d8aed19e960",
+              "text": "Review authorisation conditions under the established procedure",
+              "displayOrder": 2
+            },
+            {
+              "id": "2f0db622-dcf6-50fe-a90a-53e3c9278445",
+              "text": "Follow any verbal instruction without review",
+              "displayOrder": 3
+            },
+            {
+              "id": "44e34eee-06f3-5212-adc7-51f6e75642c9",
+              "text": "Use the signatures for a different task",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7cec7e51-a789-5653-a845-8d8aed19e960",
+          "explanation": "Use a work permit where required by the rules and established procedures. Specify the location, task, personnel and protective measures. Actual workplace conditions must match the conditions of authorisation. A changed task requires review of the permit conditions, not an informal agreement.",
+          "slideRefs": [
+            "slide-14"
+          ]
+        },
+        {
+          "id": "c0389f23-fcc2-52eb-afc7-4aabf6336c58",
+          "text": "Why are adjacent rooms and spaces checked during hot work?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "869ec6fe-96e4-591a-a421-21f9b4af84c3",
+              "text": "To inspect only visible surfaces near the station",
+              "displayOrder": 1
+            },
+            {
+              "id": "6688d8e0-06cc-50ce-acf5-324d58a7eff0",
+              "text": "Because inspecting adjacent areas replaces monitoring after work",
+              "displayOrder": 2
+            },
+            {
+              "id": "7802ee4f-b0e4-5834-ace0-fc4eccd578d2",
+              "text": "Sparks may enter them and cause concealed smouldering",
+              "displayOrder": 3
+            },
+            {
+              "id": "bdb05db0-9857-5d3d-ab36-7110be6fbc7e",
+              "text": "Only to check unobstructed access to equipment",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7802ee4f-b0e4-5834-ace0-fc4eccd578d2",
+          "explanation": "Welding, cutting and heating produce sparks and hot surfaces. Remove combustible materials or protect them using the specified method. Check adjacent rooms, openings and concealed spaces. Provide firefighting equipment and post-work monitoring.",
+          "slideRefs": [
+            "slide-16"
+          ]
+        },
+        {
+          "id": "003cc5cb-3f8f-52bd-a2bd-1278b7c8be5e",
+          "text": "Who organises safe movement of a load by crane?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "159cfc42-3f02-5d90-a4fa-d9fd6abd271e",
+              "text": "Any nearby learner on the course",
+              "displayOrder": 1
+            },
+            {
+              "id": "f0044f4a-92f6-5644-ae12-f22f50374e07",
+              "text": "Only the load supplier remotely",
+              "displayOrder": 2
+            },
+            {
+              "id": "f5f0f385-95a4-513a-a227-ad6414cd2b12",
+              "text": "The crane operator without appointing a person responsible for organising the work",
+              "displayOrder": 3
+            },
+            {
+              "id": "48c6141f-695f-59b8-ad22-73c2ad47f00c",
+              "text": "The appointed person responsible for safe performance of these operations",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "48c6141f-695f-59b8-ad22-73c2ad47f00c",
+          "explanation": "Supervision oversees safe operation. The person responsible for serviceable condition organises maintenance and repair. The person responsible for load handling organises the safe lifting operation. The crane operator and slinger fulfil their duties and use agreed signals.",
+          "slideRefs": [
+            "slide-21"
+          ]
+        },
+        {
+          "id": "2c6bc058-0f29-5e2b-a22a-99ee1b634e66",
+          "text": "Where must a person not stand during lifting?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "ec054b7e-b09d-5eaf-ae10-d386f8854d13",
+              "text": "Beneath a suspended load",
+              "displayOrder": 1
+            },
+            {
+              "id": "fb44d282-0c0b-58e9-a035-cabdbadedc73",
+              "text": "Outside the enclosed danger zone",
+              "displayOrder": 2
+            },
+            {
+              "id": "b6736498-aaac-5dd5-a940-3b2d5f52b467",
+              "text": "At an agreed safe signalling position",
+              "displayOrder": 3
+            },
+            {
+              "id": "2a02b142-f7a2-5a8b-a658-bf8a46d8c551",
+              "text": "At a safe assembly point",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ec054b7e-b09d-5eaf-ae10-d386f8854d13",
+          "explanation": "Keep people out of the area where a load could fall or move. Do not allow anyone beneath a suspended load. Do not guide a load by hand while positioned between it and an obstacle. Maintain the zone boundaries throughout the operation.",
+          "slideRefs": [
+            "slide-24"
+          ]
+        },
+        {
+          "id": "6e515c9a-2915-5e90-a349-8b0fef0e1a70",
+          "text": "What determines vessel classification?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "697dd4b8-aba1-5db2-a450-498cda9c9464",
+              "text": "Only the year of manufacture",
+              "displayOrder": 1
+            },
+            {
+              "id": "38f7e248-8358-52b0-af68-e42c797a5a52",
+              "text": "Parameters and the nature of the working medium",
+              "displayOrder": 2
+            },
+            {
+              "id": "9b54201f-8e24-5ce1-aac6-13cb1cbe37f6",
+              "text": "Only operating pressure, without considering the medium",
+              "displayOrder": 3
+            },
+            {
+              "id": "1d7bb1c4-5ace-53b8-a798-60cde27c2582",
+              "text": "Only vessel volume",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "38f7e248-8358-52b0-af68-e42c797a5a52",
+          "explanation": "Classification depends on parameters and the nature of the medium. Pressure alone is insufficient for a universal assessment. A specialist determines applicable requirements and inspection scope. Operators use the established restrictions for their own equipment.",
+          "slideRefs": [
+            "slide-32"
+          ]
+        },
+        {
+          "id": "2d965429-6680-5803-a636-5c726d7f8365",
+          "text": "How should a suspected gas-cylinder leak be checked?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "27e366e8-af23-5237-a971-f7c6a131cccc",
+              "text": "By heating the valve with a torch",
+              "displayOrder": 1
+            },
+            {
+              "id": "ac85d6d2-1d63-525b-a564-9e4d2172dfa4",
+              "text": "By striking the connection",
+              "displayOrder": 2
+            },
+            {
+              "id": "abbe08b8-9c58-5d5f-af46-53e480abce77",
+              "text": "By the specified safe method without an open flame",
+              "displayOrder": 3
+            },
+            {
+              "id": "b26baef9-3b8c-5a54-aa98-8c97dd227cfb",
+              "text": "With a lighter flame",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "abbe08b8-9c58-5d5f-af46-53e480abce77",
+          "explanation": "Identify the gas using markings and documentation. Protect cylinders against falling, heat and valve damage. Use compatible regulators and serviceable connections. Never check leaks with an open flame.",
+          "slideRefs": [
+            "slide-38"
+          ]
+        },
+        {
+          "id": "e0749f30-0d1e-5a20-a149-0da587537344",
+          "text": "A portable device has a damaged cable. What should be done?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "727a2157-85b0-5eaf-a86f-a1bc16c9cb01",
+              "text": "Continue while holding the cable",
+              "displayOrder": 1
+            },
+            {
+              "id": "6f5e6962-72a4-537c-ac1b-e3896a23df28",
+              "text": "Check the damage by touching it",
+              "displayOrder": 2
+            },
+            {
+              "id": "ec8198f2-cb4d-5456-a2ff-38c1c83ffa8e",
+              "text": "Continue after superficial wrapping without verifying condition",
+              "displayOrder": 3
+            },
+            {
+              "id": "b46b4fb6-1b63-5192-a036-ad3086bd0505",
+              "text": "Stop using it and arrange repair or replacement",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b46b4fb6-1b63-5192-a036-ad3086bd0505",
+          "explanation": "Inspect the enclosure, cable, plug and connections before use. Select equipment for the environment and follow its instructions. Stop using equipment with a damaged cable or signs of overheating. An improvised connection does not replace a serviceable assembly.",
+          "slideRefs": [
+            "slide-46"
+          ]
+        },
+        {
+          "id": "51c77a14-db19-5935-a3a4-4796b940ad4d",
+          "text": "What must be considered when maintaining boundaries near live parts?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "d6f7a604-0525-5f82-af60-d58493a2763f",
+              "text": "The positions of people, tools, loads and equipment parts",
+              "displayOrder": 1
+            },
+            {
+              "id": "7685708f-1ca3-5542-a41a-af8811144036",
+              "text": "Only the position of the worker's feet",
+              "displayOrder": 2
+            },
+            {
+              "id": "c54314a0-eaec-56b4-a2c6-683ed9e65c61",
+              "text": "Only the absence of direct hand contact",
+              "displayOrder": 3
+            },
+            {
+              "id": "125a071b-2792-5bb0-a31d-13db05a6bc7a",
+              "text": "Only the duration of the operation",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "d6f7a604-0525-5f82-af60-d58493a2763f",
+          "explanation": "Determine boundaries and safe distances for the actual installation. Maintain them for tools, loads and equipment parts as well as people. Do not move barriers without authorisation. If conditions change, stop work until protective measures are reviewed.",
+          "slideRefs": [
+            "slide-48"
+          ]
+        },
+        {
+          "id": "5d2a4746-0089-5ae8-a1e4-9c5f62c2fd24",
+          "text": "What is the first condition before giving assistance?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "c5f1d6d4-3418-5cf4-a18c-54e9557e8132",
+              "text": "Finding documents before calling for help",
+              "displayOrder": 1
+            },
+            {
+              "id": "b7f9e623-631c-5159-ad71-cb3d1c2a4002",
+              "text": "Absence of danger to the rescuer",
+              "displayOrder": 2
+            },
+            {
+              "id": "f3bd98ed-c40b-55f8-a0fc-bda8d7d425cd",
+              "text": "Immediate entry into any danger zone",
+              "displayOrder": 3
+            },
+            {
+              "id": "e705fbae-fd5e-597f-ab5e-58450a491e80",
+              "text": "Moving the casualty without assessment in every case",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b7f9e623-631c-5159-ad71-cb3d1c2a4002",
+          "explanation": "First make sure the rescuer is not exposed to danger. Call emergency services and describe the situation. Act within your training and follow the dispatcher's instructions. Do not enter a hazardous atmosphere or touch an energised casualty without appropriate protection.",
+          "slideRefs": [
+            "slide-53"
+          ]
+        }
+      ]
+    }
+  ],
+  "translationSourceSha256": "38737a8c65cf16026691262bd71daaa656dc1dd6ce01757c24c30a4311b2da36"
+}

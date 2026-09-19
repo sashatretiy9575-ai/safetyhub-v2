@@ -3,6 +3,7 @@ import type { CertificateBranding, CertificateRenderMetadata } from './certifica
 import { formatIssueDate } from './certificate-renderer.ts';
 import { normalizePdfText, safeFilenameSegment } from './certificate.ts';
 import { documentCommission, documentStatement, participantResult, type DocumentParticipant } from './document-editor.ts';
+import { protocolColumns } from './document-profile.ts';
 
 export type ProtocolGroup = Readonly<{
   organization: string | null;
@@ -10,21 +11,22 @@ export type ProtocolGroup = Readonly<{
   items: readonly CertificateRenderMetadata[];
   participants?: readonly DocumentParticipant[];
   date?: string;
+  groupNumber?: number;
 }>;
 
 export function groupItemsForProtocols(items: readonly CertificateRenderMetadata[]): ProtocolGroup[] {
   const groups = new Map<string, { organization: string | null; courseTitle: string; items: CertificateRenderMetadata[] }>();
   for (const item of items) {
     const organization = item.organization ? normalizePdfText(item.organization) : null;
-    const key = JSON.stringify([organization?.toLocaleLowerCase('ru-RU'), item.titleSnapshot, item.branding.protocolNumber, item.branding.protocolDate]);
+    const key = JSON.stringify([organization?.toLocaleLowerCase('ru-RU'), item.titleSnapshot, item.branding]);
     const group = groups.get(key) ?? { organization, courseTitle: item.titleSnapshot, items: [] };
     group.items.push(item);
     groups.set(key, group);
   }
-  return [...groups.values()];
+  return [...groups.values()].map((group, index) => ({ ...group, groupNumber: index + 1 }));
 }
 export function protocolFilename(group: ProtocolGroup, protocolNumber: string) {
-  return `protocols/Протокол-${safeFilenameSegment(protocolNumber || 'без-номера', 24)}-${safeFilenameSegment(group.organization ?? 'без-компании', 48)}-${safeFilenameSegment(group.courseTitle, 48)}.pdf`;
+  return `protocols/Протокол-${safeFilenameSegment(protocolNumber || 'без-номера', 24)}-${safeFilenameSegment(group.organization ?? 'без-компании', 48)}-${safeFilenameSegment(group.courseTitle, 48)}${group.groupNumber ? '-' + group.groupNumber : ''}.pdf`;
 }
 
 /** Splits even unspaced names, without truncating any characters. */
@@ -83,13 +85,17 @@ export async function generateProtocolInBrowser(group: ProtocolGroup, branding: 
   paragraph('Члены комиссии:', 11);
   for (const m of documentCommission(branding)) paragraph(m.name + ' — ' + m.position, 11, 'left', false, true, '(Ф.И.О., должность)');
   paragraph('Проверка знаний проведена', 11);
+  if (branding.documentProfile?.hours) paragraph('Объём программы: ' + branding.documentProfile.hours + ' часов.', 11);
+  if (branding.documentProfile?.orderNumber) paragraph('Приказ № ' + branding.documentProfile.orderNumber + (branding.documentProfile.orderDate ? ' от ' + branding.documentProfile.orderDate : ''), 11);
   paragraph(documentStatement(branding.documentDefaults?.protocolText ?? 'В соответствии с утвержденной программой на тему: «{program}»', branding, group.courseTitle).replace(/^Проверка знаний проведена\s*/u, ''), 11, 'center', false, true, '(Наименование программы)');
   paragraph('РЕЗУЛЬТАТЫ ПРОВЕРКИ', 12, 'center', true);
   y += 12;
-  const columns = [30, 133, 150, 98, 90], left = (595.28 - 501) / 2;
-  const header = ['№', 'Ф.И.О.', 'Занимаемая должность', 'Образование', 'Результат сдачи экзаменов'];
+  const family = branding.documentProfile?.family ?? 'general';
+  const columns = family === 'ptm' ? [26, 96, 72, 94, 73, 60, 80] : family === 'biot' || family === 'qualification' ? [26, 110, 95, 80, 85, 105] : [30, 133, 150, 98, 90];
+  const left = (595.28 - 501) / 2;
+  const header = protocolColumns(family);
   const row = (cells: string[], isHeader = false) => {
-    const size = 10;
+    const size = columns.length > 5 ? 9 : 10;
     const wrapped = cells.map((text, i) => wrapDocumentText(fonts.pick(text), text, size, columns[i]! - 10));
     const height = Math.max(...wrapped.map(lines => lines.length)) * 12 + 10;
     if (height > 720) throw new Error('DOCUMENT_TEXT_OVERFLOW');
@@ -106,21 +112,28 @@ export async function generateProtocolInBrowser(group: ProtocolGroup, branding: 
   const people = group.participants ?? group.items.map((item): DocumentParticipant => ({
     userId: item.certificateId, fullName: item.fullName, position: item.position ?? '', education: item.education ?? '',
     status: item.score >= item.passScore ? 'passed' : 'failed', score: item.score, total: item.total, certificateId: item.certificateId,
+    ...item.documentDetails,
   }));
   for (const [i, person] of people.entries()) {
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
-    row([String(i + 1) + '.', person.fullName || 'ФИО не указано', person.position, person.education ?? '', participantResult(person)]);
+    const base = [String(i + 1) + '.', person.fullName || 'ФИО не указано'];
+    const org = person.organization ?? group.organization ?? '';
+    if (family === 'ptm') row([...base, person.position, org, person.trainingReason ?? '', participantResult(person), '']);
+    else if (family === 'biot') row([...base, org, person.position, person.status === 'passed' ? 'Прошёл' : 'Подлежит повторной проверке', person.notes ?? '']);
+    else if (family === 'qualification') row([...base, org, person.position, participantResult(person), person.qualificationDecision ?? '']);
+    else if (family === 'industrial') row([...base, person.position, person.education ?? '', person.formalExamResult === 'passed' ? `Сдал. ${person.formalExamReference ?? ''}${person.formalExamDate ? ' от ' + person.formalExamDate : ''}` : 'Отдельный экзамен не подтверждён']);
+    else row([...base, person.position, person.education ?? '', participantResult(person)]);
   }
   if (!people.length) { y += 12; paragraph('В компании нет участников.'); }
   y += 20;
-  paragraph('Лица, получившие положительные оценки, допускаются к самостоятельной работе, к выполнению соответствующих работ.');
+  paragraph(branding.documentProfile?.decisionText || 'Результаты проверки знаний зафиксированы настоящим протоколом. Допуск к самостоятельной работе оформляет работодатель в установленном порядке.');
   y += 20;
-  const [stamp, signature] = await Promise.all([
+  const [stamp, ...signatures] = await Promise.all([
     embedFacsimile(pdf, branding.stampUrl, group.items[0]?.verificationUrl, signal),
-    embedFacsimile(pdf, branding.protocolSignatureUrl, group.items[0]?.verificationUrl, signal),
+    ...(branding.commissionSignatureUrls ?? [branding.protocolSignatureUrl ?? null]).map(url => embedFacsimile(pdf, url, group.items[0]?.verificationUrl, signal)),
   ]);
   // The stamp hangs 60 pt below the chairman's line; it must not leave the sheet.
-  if ((stamp || signature) && y + 120 > 790) nextPage();
+  if ((stamp || signatures.some(Boolean)) && y + 120 > 790) nextPage();
   paragraph('Қолы / Подпись:', 9, 'left', true);
   for (const [i, m] of [{ name: branding.chairmanName, position: 'Төраға / Председатель' }, ...documentCommission(branding).map(m => ({ name: m.name, position: 'Мүшесі / Член комиссии' }))].entries()) {
     if (y + 28 > 790) nextPage();
@@ -129,8 +142,8 @@ export async function generateProtocolInBrowser(group: ProtocolGroup, branding: 
     if (i === 0) {
       // A 38 mm stamp at its real size beside the chairman's signature.
       drawFacsimile(page, stamp, 318, y - 54, 108, 108);
-      drawFacsimile(page, signature, 412, y - 40, 112, 42);
     }
+    drawFacsimile(page, signatures[i] ?? null, 412, y - 40, 112, 42);
     y += 9;
   }
   if (branding.documentDefaults?.reviewerName) paragraph('Проверяющий: ' + branding.documentDefaults.reviewerName, 9);

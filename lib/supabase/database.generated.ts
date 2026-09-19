@@ -1490,6 +1490,10 @@ export type Database = {
         Args: { p_certificate_id: string }
         Returns: Json
       }
+      certificate_download_payload_before_document_snapshot: {
+        Args: { p_certificate_id: string }
+        Returns: Json
+      }
       certificate_settings_payload: {
         Args: { p_include_images: boolean }
         Returns: Json
@@ -1516,6 +1520,10 @@ export type Database = {
           p_limit?: number
           p_worker_id: string
         }
+        Returns: Json
+      }
+      claim_profile_avatar_reconciliation_before_documents: {
+        Args: { p_limit?: number; p_worker_id: string }
         Returns: Json
       }
       collect_capacity_monitor_snapshot_unmetered: {
@@ -1645,6 +1653,10 @@ export type Database = {
       explanations_from_draft: { Args: { p_questions: Json }; Returns: Json }
       get_admin_learning_history_provider_internal: {
         Args: { p_actor_id: string; p_target_user_id: string }
+        Returns: Json
+      }
+      get_document_editor_data_before_profiles: {
+        Args: { p_course_slug?: string; p_organization?: string }
         Returns: Json
       }
       has_course_access: {
@@ -2692,6 +2704,24 @@ export type Database = {
         }
         Relationships: []
       }
+      certificate_settings_versions: {
+        Row: {
+          captured_at: string
+          payload: Json
+          version: number
+        }
+        Insert: {
+          captured_at?: string
+          payload: Json
+          version: number
+        }
+        Update: {
+          captured_at?: string
+          payload?: Json
+          version?: number
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           attempt_id: string | null
@@ -2699,6 +2729,7 @@ export type Database = {
           best_completed_at: string
           certificate_number: string
           course_deleted_at: string | null
+          document_snapshot: Json | null
           full_name: string
           id: string
           identity_version: number
@@ -2728,6 +2759,7 @@ export type Database = {
           best_completed_at: string
           certificate_number: string
           course_deleted_at?: string | null
+          document_snapshot?: Json | null
           full_name: string
           id?: string
           identity_version: number
@@ -2757,6 +2789,7 @@ export type Database = {
           best_completed_at?: string
           certificate_number?: string
           course_deleted_at?: string | null
+          document_snapshot?: Json | null
           full_name?: string
           id?: string
           identity_version?: number
@@ -3270,6 +3303,33 @@ export type Database = {
           },
         ]
       }
+      document_assets: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          object_key: string
+          owner_id: string
+          sha256: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          object_key: string
+          owner_id: string
+          sha256: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          object_key?: string
+          owner_id?: string
+          sha256?: string
+        }
+        Relationships: []
+      }
       document_batches: {
         Row: {
           automatic: boolean
@@ -3278,6 +3338,8 @@ export type Database = {
           id: string
           organization: string
           organization_key: string | null
+          participant_fields: Json
+          profile_id: string | null
           protocol_number: string
           updated_at: string
           updated_by: string | null
@@ -3290,6 +3352,8 @@ export type Database = {
           id?: string
           organization: string
           organization_key?: string | null
+          participant_fields?: Json
+          profile_id?: string | null
           protocol_number: string
           updated_at?: string
           updated_by?: string | null
@@ -3302,6 +3366,8 @@ export type Database = {
           id?: string
           organization?: string
           organization_key?: string | null
+          participant_fields?: Json
+          profile_id?: string | null
           protocol_number?: string
           updated_at?: string
           updated_by?: string | null
@@ -3315,7 +3381,41 @@ export type Database = {
             referencedRelation: "tests"
             referencedColumns: ["slug"]
           },
+          {
+            foreignKeyName: "document_batches_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "document_profiles"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      document_profiles: {
+        Row: {
+          audience: string
+          body: Json
+          course_slug: string
+          id: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          audience: string
+          body: Json
+          course_slug: string
+          id: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          audience?: string
+          body?: Json
+          course_slug?: string
+          id?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
       }
       legal_acceptances: {
         Row: {
@@ -5375,13 +5475,35 @@ export type Database = {
         }
         Returns: Json
       }
-      save_document_batch: {
+      save_document_batch:
+        | {
+            Args: {
+              p_automatic: boolean
+              p_course_slug: string
+              p_date: string
+              p_number: string
+              p_organization: string
+              p_version: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_automatic: boolean
+              p_course_slug: string
+              p_date: string
+              p_number: string
+              p_organization: string
+              p_profile_id: string
+              p_version: number
+            }
+            Returns: Json
+          }
+      save_document_participant_fields: {
         Args: {
-          p_automatic: boolean
-          p_course_slug: string
-          p_date: string
-          p_number: string
-          p_organization: string
+          p_batch_id: string
+          p_fields: Json
+          p_user_id: string
           p_version: number
         }
         Returns: Json
@@ -5401,6 +5523,10 @@ export type Database = {
       search_profile_organizations: {
         Args: { p_limit?: number; p_query: string }
         Returns: string[]
+      }
+      select_document_profile: {
+        Args: { p_batch_id: string; p_profile_id: string; p_version: number }
+        Returns: Json
       }
       self_purge_user_account: { Args: { p_target_id: string }; Returns: Json }
       set_article_status: {

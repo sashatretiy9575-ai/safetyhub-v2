@@ -1,0 +1,884 @@
+[
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 1
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 183.88504,
+    "shape": "Rectangle 2",
+    "slide": 1
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 1
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 2
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 156.18504,
+    "shape": "Rectangle 2",
+    "slide": 2
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 124.47,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 2
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 3
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 3
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 3
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 4
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 4
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 4
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 5
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 5
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 5
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 6
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 6
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 124.47,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 6
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 7
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 221.58504,
+    "shape": "Rectangle 2",
+    "slide": 7
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 48.66,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 7
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 8
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 8
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 8
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 9
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 9
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 9
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 10
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 10
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 10
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 11
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 11
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 11
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 12
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 12
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 12
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 13
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 13
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 13
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 14
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 14
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 14
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 15
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 15
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 15
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 16
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 16
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 16
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 17
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 17
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 17
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 18
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 18
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 18
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 19
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 19
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 19
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 20
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 20
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 20
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 21
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 221.58504,
+    "shape": "Rectangle 2",
+    "slide": 21
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 48.66,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 21
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 22
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 22
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 22
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 23
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 23
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 23
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 24
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 24
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 48.66,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 24
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 25
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 25
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 25
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 26
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 26
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 26
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 27
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 221.58504,
+    "shape": "Rectangle 2",
+    "slide": 27
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 27
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 28
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 28
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 28
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 29
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 29
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 29
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 30
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 30
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 30
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 31
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 31
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 31
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 32
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 32
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 149.74,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 32
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 33
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 33
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 33
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 34
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 34
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 34
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 35
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 35
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 35
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 36
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 36
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 36
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 37
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 37
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 37
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 38
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 38
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 38
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 39
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 193.88504,
+    "shape": "Rectangle 2",
+    "slide": 39
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 39
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 40
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 138.48505,
+    "shape": "Rectangle 2",
+    "slide": 40
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 73.93,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 40
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 41
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 41
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 99.2,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 41
+  },
+  {
+    "overflow": false,
+    "height": 48.0,
+    "boundHeight": 44.48504,
+    "shape": "SLIDE_TITLE",
+    "slide": 42
+  },
+  {
+    "overflow": false,
+    "height": 322.5,
+    "boundHeight": 166.18504,
+    "shape": "Rectangle 2",
+    "slide": 42
+  },
+  {
+    "overflow": false,
+    "height": 204.0,
+    "boundHeight": 48.66,
+    "shape": "KEY_TAKEAWAY",
+    "slide": 42
+  }
+]

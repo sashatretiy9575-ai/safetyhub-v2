@@ -10,7 +10,9 @@ declare
 begin
   select count(*) into v_localization_count
   from public.course_draft_localizations localization
-  where localization.locale in ('kk'::public.app_locale, 'en'::public.app_locale, 'zh'::public.app_locale);
+  join public.tests course on course.id=localization.test_id
+  where course.slug in ('plotnik','armaturshchik','lesomontazhnye-raboty','biot','pozharnaya-bezopasnost')
+    and localization.locale in ('kk'::public.app_locale, 'en'::public.app_locale, 'zh'::public.app_locale);
   if v_localization_count <> 15 then
     raise exception 'expected 15 seeded non-RU course localizations, got %', v_localization_count;
   end if;
@@ -49,7 +51,10 @@ begin
 
   select count(*) into v_variant_count
   from public.test_revision_variant_localizations localization
-  where localization.locale in ('kk'::public.app_locale, 'en'::public.app_locale, 'zh'::public.app_locale);
+  join public.test_revisions revision on revision.id=localization.revision_id
+  where revision.slug in ('plotnik','armaturshchik','lesomontazhnye-raboty','biot','pozharnaya-bezopasnost')
+    and revision.version=1
+    and localization.locale in ('kk'::public.app_locale, 'en'::public.app_locale, 'zh'::public.app_locale);
   if v_variant_count <> 45 then
     raise exception 'expected 45 seeded non-RU variant localizations, got %', v_variant_count;
   end if;

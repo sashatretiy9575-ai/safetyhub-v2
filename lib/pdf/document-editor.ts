@@ -18,6 +18,7 @@ export type DocumentBatch = {
   number: string;
   automatic: boolean;
   version: number;
+  profileId?: string | null;
 };
 export type DocumentParticipant = {
   userId: string;
@@ -29,6 +30,17 @@ export type DocumentParticipant = {
   score: number | null;
   total: number | null;
   certificateId: string | null;
+  workExperience?: string;
+  verificationKind?: string;
+  trainingReason?: string;
+  notes?: string;
+  qualificationDecision?: string;
+  organization?: string;
+  formalExamReference?: string;
+  formalExamDate?: string;
+  formalExamResult?: string;
+  formalExamProfileId?: string;
+  formalExamProfileVersion?: number;
 };
 export const DOCUMENT_DEFAULTS: DocumentDefaults = {
   reviewerName: 'Битемиров А.У.',
@@ -66,7 +78,7 @@ export function documentCommission(branding: CertificateBranding): CommissionMem
 }
 export function documentStatement(text: string, branding: CertificateBranding, program: string) {
   return text.replaceAll('{protocol}', branding.protocolNumber)
-    .replaceAll('{program}', program);
+    .replaceAll('{program}', branding.documentProfile?.programName ?? program);
 }
 
 export function hasInsertSize(branding: CertificateBranding) {

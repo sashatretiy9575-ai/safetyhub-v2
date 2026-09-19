@@ -16,6 +16,6 @@ export async function GET(_request: Request, context: { params: Promise<{ certif
     if (!id.success) return createApiResponse(null, { status: 404 });
     const certificate = await getCertificateDownloadPayload(id.data);
     if (!certificate) return createApiResponse(null, { status: 404 });
-    return await certificatePhotoResponse(certificate.userId);
+    return await certificatePhotoResponse(certificate.userId, false, certificate.documentSnapshot ? certificate.documentSnapshot.photo ?? null : undefined);
   } catch (error) { return apiError(error); }
 }

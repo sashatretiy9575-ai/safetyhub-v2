@@ -1,0 +1,994 @@
+{
+  "schemaVersion": 1,
+  "slug": "svarshchik",
+  "locale": "zh",
+  "status": "translation-awaiting-independent-review",
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "variants": [
+    {
+      "id": "def10270-b4f3-5999-a587-f3a5a6ae6cbc",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "2b328649-2ad8-5251-a156-374439b3b5f2",
+          "text": "完成本培训课程意味着什么？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "139512a9-63a8-5a6a-af1e-5dbd95f686ad",
+              "text": "学习相关材料，不自动授予技能等级",
+              "displayOrder": 1
+            },
+            {
+              "id": "7766c014-413d-5e8e-aeb9-cabecf873728",
+              "text": "自动获准焊接所有结构",
+              "displayOrder": 2
+            },
+            {
+              "id": "ec0cb450-d77f-56a5-aaab-1c0121a33fdb",
+              "text": "有权签署任何检验记录",
+              "displayOrder": 3
+            },
+            {
+              "id": "6931ac63-c7e8-532f-a12c-bd7056fccdcf",
+              "text": "自动成为起重设备责任人",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "139512a9-63a8-5a6a-af1e-5dbd95f686ad",
+          "explanation": "焊接工艺基础与安全工作场所组织。 接头准备、设备、防护和质量检查。 适用于哈萨克斯坦共和国的培训。",
+          "slideRefs": [
+            "slide-01"
+          ]
+        },
+        {
+          "id": "1b61a50a-a53f-5886-aade-12cf9c31b505",
+          "text": "接头要求不明确时应如何处理？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "3e179408-434e-5b40-aae7-ebbddbaaf9f6",
+              "text": "先焊接，验收后再问",
+              "displayOrder": 1
+            },
+            {
+              "id": "5c677c0d-1231-5cdd-a90a-a4f0eb554765",
+              "text": "焊接前澄清要求",
+              "displayOrder": 2
+            },
+            {
+              "id": "da4ec20a-5adc-5b1b-ab48-21b50fa856ac",
+              "text": "随意选择参数",
+              "displayOrder": 3
+            },
+            {
+              "id": "97d01744-2cc0-5ffc-adec-b78f83579190",
+              "text": "重复以前任意焊缝",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5c677c0d-1231-5cdd-a90a-a4f0eb554765",
+          "explanation": "开工前阅读图纸及接头要求。 明确材料、坡口准备和焊接位置。 核查工艺、参数及检验程序。 要求不清时先澄清再焊接。",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "5e911464-268e-5c95-a561-2756f566d83f",
+          "text": "为什么在加热前评估未知涂层？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "f7ff90a5-9122-5c86-a392-6c0a4c5e857f",
+              "text": "为了取消通风",
+              "displayOrder": 1
+            },
+            {
+              "id": "75d5ae59-826a-51dc-a1c6-24943e5e99d0",
+              "text": "因为任何涂层都能防烟",
+              "displayOrder": 2
+            },
+            {
+              "id": "b8298f9c-6d0a-59f7-a2ad-0c687dee9519",
+              "text": "可能产生有害排放并影响质量",
+              "displayOrder": 3
+            },
+            {
+              "id": "c67e6840-9ae7-58e4-abe0-22040001fa77",
+              "text": "仅为选择后续涂装方法",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b8298f9c-6d0a-59f7-a2ad-0c687dee9519",
+          "explanation": "按工艺要求清理表面。 清除影响质量或产生有害排放的污染物。 检查坡口形状和间隙。 稳固固定工件并保证安全操作空间。",
+          "slideRefs": [
+            "slide-09"
+          ]
+        },
+        {
+          "id": "8f45ccc5-3018-520e-a5c7-01c0b21d9a1d",
+          "text": "如何确定焊机供电和允许负载？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "3013bd04-d9c8-5c8f-a246-0b290ffdbcc8",
+              "text": "看起来像以前用过的焊机即可",
+              "displayOrder": 1
+            },
+            {
+              "id": "5e66d463-d1bb-587c-ab45-b5590f0551f1",
+              "text": "按现场另一种焊机的功率",
+              "displayOrder": 2
+            },
+            {
+              "id": "77fe3ecf-c145-5769-a9f3-8658973f4e46",
+              "text": "没有其他资料，只按电缆长度",
+              "displayOrder": 3
+            },
+            {
+              "id": "50b5314c-9e13-5e82-ac01-4acc0cf3b081",
+              "text": "依据本机护照和说明书",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "50b5314c-9e13-5e82-ac01-4acc0cf3b081",
+          "explanation": "变压器、整流器和逆变器特性不同。 供电及允许负载应核对设备文件。 按说明书保持冷却和工作周期。 过热或故障时停止使用。",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "dedc5a02-5452-53e0-a0c2-eb1159e435a3",
+          "text": "焊接时如何保护眼睛？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "12bbed6d-b82d-5214-a345-6adf0c701608",
+              "text": "使用合适的焊接面罩或带滤光片头盔",
+              "displayOrder": 1
+            },
+            {
+              "id": "a3628939-dde5-52a6-ab75-4de92384981c",
+              "text": "用普通透明眼镜代替面罩",
+              "displayOrder": 2
+            },
+            {
+              "id": "a858613b-ef17-5adf-a4e4-bc7494705283",
+              "text": "未经评估使用太阳镜",
+              "displayOrder": 3
+            },
+            {
+              "id": "113585a8-7121-51bc-a2a4-4adc65c1f4b2",
+              "text": "只短时间看电弧",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "12bbed6d-b82d-5214-a345-6adf0c701608",
+          "explanation": "按工艺和参数选择面罩或头盔。 滤光片应提供足够防护。 检查完整性、固定和功能。 清理时防止飞溅颗粒伤害。",
+          "slideRefs": [
+            "slide-17"
+          ]
+        },
+        {
+          "id": "3f0279e8-e0fe-56a5-ab1e-b9a449ed02d2",
+          "text": "如何组织焊接烟尘排除？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "ebb79ec5-9de3-5a0a-a852-b40181f3b85e",
+              "text": "只在强烈气味时开启通风",
+              "displayOrder": 1
+            },
+            {
+              "id": "1b7fe932-bd56-538c-a54a-58f602b31cb1",
+              "text": "采用规定通风并在污染源处抽排",
+              "displayOrder": 2
+            },
+            {
+              "id": "23e3ec4e-fe3e-54ba-a651-d3e1145a0a81",
+              "text": "任何条件下只开门",
+              "displayOrder": 3
+            },
+            {
+              "id": "89ce0024-f8dd-555c-a973-9ff16576beb5",
+              "text": "不评估局部排风，只用全面换气",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "1b7fe932-bd56-538c-a54a-58f602b31cb1",
+          "explanation": "尽可能靠近污染源进行抽排。 全面通风补充局部排风。 排放成分与金属、涂层和耗材有关。 按风险选择呼吸防护，不能代替必要通风。",
+          "slideRefs": [
+            "slide-20"
+          ]
+        },
+        {
+          "id": "ddbef06a-5461-555f-a531-0eef15a14c9a",
+          "text": "连接前如何确认气瓶气体？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "d0d429b5-8c2c-56fd-aa63-df8bade46317",
+              "text": "凭目测估计气瓶重量",
+              "displayOrder": 1
+            },
+            {
+              "id": "ff378f6e-795e-5cd7-a8eb-a3d74460d13b",
+              "text": "螺纹能接上就不检查",
+              "displayOrder": 2
+            },
+            {
+              "id": "ac9a47f2-7fed-5037-a6d7-67e8588d3e9b",
+              "text": "依据标识和文件",
+              "displayOrder": 3
+            },
+            {
+              "id": "fe1d2b4b-66c8-51be-a345-d9aeb1478fa0",
+              "text": "只看瓶体颜色",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ac9a47f2-7fed-5037-a6d7-67e8588d3e9b",
+          "explanation": "通过标识和文件确认气体。 检查瓶体、阀门及检验信息。 身份存疑或有缺陷的气瓶不得使用。 不能仅凭颜色决定连接。",
+          "slideRefs": [
+            "slide-25"
+          ]
+        },
+        {
+          "id": "99bdd928-7ea9-58e5-a832-b8f3a6c70d5f",
+          "text": "焊炬或割炬的压力设置来自哪里？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "977b48ac-ecdd-5378-ace0-74df9f4e4f0b",
+              "text": "任意培训示例",
+              "displayOrder": 1
+            },
+            {
+              "id": "99d482ce-6544-5faf-a975-4e7becfe7efb",
+              "text": "另一支焊炬的参数",
+              "displayOrder": 2
+            },
+            {
+              "id": "11c102be-be9a-59c6-a986-d0c7ae960de9",
+              "text": "直接调到压力表最大值",
+              "displayOrder": 3
+            },
+            {
+              "id": "04810264-f8ec-5281-a3c0-d38f1a861517",
+              "text": "所用设备说明书和工艺文件",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "04810264-f8ec-5281-a3c0-d38f1a861517",
+          "explanation": "按气体和压力范围选择减压器。 接头应匹配，禁止自制转换件。 检查压力表完好及无损坏。 按焊炬或割炬说明设置工作压力。",
+          "slideRefs": [
+            "slide-27"
+          ]
+        },
+        {
+          "id": "591d966a-a380-52e9-a18d-5bf55940bd56",
+          "text": "能否焊接内容物未知的旧容器？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "0adcb2f0-75db-518d-af45-cdd5e201f360",
+              "text": "不能，先识别、准备并获得许可",
+              "displayOrder": 1
+            },
+            {
+              "id": "b028aeef-c8e1-5d5e-ae06-bbf973f12bb3",
+              "text": "看起来空就可以",
+              "displayOrder": 2
+            },
+            {
+              "id": "41f20ced-a45c-5beb-a88f-e7f3cbd5fa0e",
+              "text": "焊缝短就可以",
+              "displayOrder": 3
+            },
+            {
+              "id": "524fab5e-b003-54ee-acc6-04434f4c1835",
+              "text": "擦净外表后就可以",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "0adcb2f0-75db-518d-af45-cdd5e201f360",
+          "explanation": "加热前查明容器以前盛装何物。 按程序清除残留并隔离连接管线。 检测内部环境，落实许可措施。 不得擅自焊接封闭或情况不明的容器。",
+          "slideRefs": [
+            "slide-30"
+          ]
+        },
+        {
+          "id": "d4b840af-1c50-5b58-a554-8dac9351b784",
+          "text": "安全收工包括什么？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "d0c817e5-b90d-5bc6-a8b5-c17764e250e7",
+              "text": "不检查立即离开",
+              "displayOrder": 1
+            },
+            {
+              "id": "c579b8d1-b8ff-5715-aa2e-2201d730f01e",
+              "text": "按说明停机、检查区域及规定防火监护",
+              "displayOrder": 2
+            },
+            {
+              "id": "8ba63491-30c9-5fd6-a246-83d6ea9c1210",
+              "text": "只断开电源，不检查区域",
+              "displayOrder": 3
+            },
+            {
+              "id": "f7dd186b-42ec-51f8-ad2e-c09d9d4d5b50",
+              "text": "只关气，不检查现场",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c579b8d1-b8ff-5715-aa2e-2201d730f01e",
+          "explanation": "按说明停止设备和供气系统。 防止意外启动及泄漏。 检查现场和邻近区域是否阴燃。 办理完工并继续规定的防火监护。",
+          "slideRefs": [
+            "slide-37"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f3e49bd7-8232-5fbb-af01-e3c2c4839950",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "6643205d-a9ba-566b-ae4f-f67d2893a7fc",
+          "text": "外观平整的焊缝能证明所有性能吗？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "e494ec0b-c72a-5d56-ae61-daa01482ae62",
+              "text": "焊工有经验就能",
+              "displayOrder": 1
+            },
+            {
+              "id": "d64eb2a5-11fd-5266-a1ff-2b52e00a8485",
+              "text": "金属还热就能",
+              "displayOrder": 2
+            },
+            {
+              "id": "bcb90b33-39a2-553f-ac76-c01eade6fda1",
+              "text": "不能，验收还需规定检验",
+              "displayOrder": 3
+            },
+            {
+              "id": "d7d478ac-c154-5868-a2af-5388b643b88b",
+              "text": "能，平整焊缝总是合格",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "bcb90b33-39a2-553f-ac76-c01eade6fda1",
+          "explanation": "焊接形成材料间的永久连接。 所需性能取决于材料、结构和使用条件。 焊缝外观不能证明全部内部性能。 按具体产品要求验收。",
+          "slideRefs": [
+            "slide-03"
+          ]
+        },
+        {
+          "id": "5f0ff28a-b176-585a-a6db-46af9ea5306f",
+          "text": "如何选择焊条牌号和直径？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "dae46d50-c863-51ba-aaf6-c50b17c3f98c",
+              "text": "不核对材料，只用现有焊条",
+              "displayOrder": 1
+            },
+            {
+              "id": "1996b4ca-c83d-548c-ab10-5f92a32625ea",
+              "text": "不查牌号，只看直径",
+              "displayOrder": 2
+            },
+            {
+              "id": "479f2670-c63f-5d7d-a914-db98d39742c6",
+              "text": "任何金属都用相同焊条",
+              "displayOrder": 3
+            },
+            {
+              "id": "35b47608-c18b-5310-a5af-757f93beb13b",
+              "text": "依据材料和工艺文件",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "35b47608-c18b-5310-a5af-757f93beb13b",
+          "explanation": "熔化焊条参与形成焊缝金属。 焊条药皮提供规定的工艺保护。 按工艺文件选择牌号、直径和参数。 焊条状态影响接头质量。",
+          "slideRefs": [
+            "slide-05"
+          ]
+        },
+        {
+          "id": "cf85fb77-de10-58ee-a962-c3c5857f4d01",
+          "text": "不允许的定位焊缺陷应如何处理？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "f90e4380-012b-51fc-a959-b1de8994aea4",
+              "text": "继续工作前按规定方法消除",
+              "displayOrder": 1
+            },
+            {
+              "id": "eb333bf4-445c-5fad-aa9e-d934ece7117c",
+              "text": "不评估，直接用下一层覆盖",
+              "displayOrder": 2
+            },
+            {
+              "id": "5768c5ff-1095-5389-a8ce-0ef253b4e696",
+              "text": "不是正式焊缝就忽略",
+              "displayOrder": 3
+            },
+            {
+              "id": "0c768fc5-701e-5851-a217-13a8cb0f12de",
+              "text": "继续前先涂漆",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f90e4380-012b-51fc-a959-b1de8994aea4",
+          "explanation": "按图纸检查工件相对位置。 定位焊遵守材料和工艺要求。 夹具防止工件危险位移。 按规定处理不允许的定位焊缺陷。",
+          "slideRefs": [
+            "slide-10"
+          ]
+        },
+        {
+          "id": "c4a5c4ab-292d-5e0f-a089-d2dce006ec94",
+          "text": "焊接电缆绝缘损坏时应怎么办？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "41e8e03c-cf82-5225-aad2-e4aa3da2ed79",
+              "text": "加大电流检验接触",
+              "displayOrder": 1
+            },
+            {
+              "id": "f1017ce3-f9bf-5906-a06c-3da424a578b5",
+              "text": "故障部件停用，处理后再使用",
+              "displayOrder": 2
+            },
+            {
+              "id": "0d11c536-247e-5a30-af95-cb9a8adca09e",
+              "text": "戴手套不检查继续",
+              "displayOrder": 3
+            },
+            {
+              "id": "760db270-e7ea-5c85-aac8-d5b6bdb450de",
+              "text": "用湿布包住损坏处",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f1017ce3-f9bf-5906-a06c-3da424a578b5",
+          "explanation": "检查绝缘、接头和焊条夹持。 保护电缆免受热、割伤和车辆损坏。 放置焊钳时防止意外短路。 故障部件停止使用。",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "cc5e3d6d-ead4-5a21-a0c7-e2dcd60dcec0",
+          "text": "哪种服装状态不适合焊接？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "0a001c0e-6354-517b-a939-3e7d3c38edfb",
+              "text": "无裸露皮肤",
+              "displayOrder": 1
+            },
+            {
+              "id": "da919360-a55a-566e-a8ea-c8fdbd7e0dd8",
+              "text": "鞋靴具有规定颗粒防护",
+              "displayOrder": 2
+            },
+            {
+              "id": "14ffbd40-fcc1-5bed-a263-c8b06cbfc480",
+              "text": "被可燃物污染",
+              "displayOrder": 3
+            },
+            {
+              "id": "0f734fcc-9d56-5746-a440-504edb42691d",
+              "text": "能防护火花和热颗粒",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "14ffbd40-fcc1-5bed-a263-c8b06cbfc480",
+          "explanation": "服装应防护火花和热颗粒。 使用焊接手套并保持干燥。 避免皮肤裸露及易收集火花的口袋。 鞋靴和服装穿戴应防止热金属进入。",
+          "slideRefs": [
+            "slide-18"
+          ]
+        },
+        {
+          "id": "ce6b7857-b4a1-5600-a7e2-4e74457ad208",
+          "text": "谁可以接入和维修焊机？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "cbe2e93e-db52-59d8-a660-ff4cb904101b",
+              "text": "任何看过课件的学员",
+              "displayOrder": 1
+            },
+            {
+              "id": "258d991f-f547-576f-ab03-8c1054531a28",
+              "text": "任何未核查权限的同事",
+              "displayOrder": 2
+            },
+            {
+              "id": "7cfa1968-0073-58d5-a5f1-5e14067fdbf0",
+              "text": "只能由第一个发现故障的人",
+              "displayOrder": 3
+            },
+            {
+              "id": "0f9e5d9f-a71a-5cf8-a23a-d3686620cd17",
+              "text": "在授权范围内的合格人员",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "0f9e5d9f-a71a-5cf8-a23a-d3686620cd17",
+          "explanation": "由授权人员按规定接入焊机。 作业前检查保护连接和电缆。 不使用损坏设备，不在危险潮湿条件下作业。 维修和倒闸必须符合单独授权范围。",
+          "slideRefs": [
+            "slide-21"
+          ]
+        },
+        {
+          "id": "2717f202-7e3f-5ab7-a17c-71957c4eb4bf",
+          "text": "为什么氧气阀件应防止油脂污染？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "7785a1a3-25fe-5b9d-aad3-b0f4ff20823b",
+              "text": "氧气会增大火灾危险",
+              "displayOrder": 1
+            },
+            {
+              "id": "70aa978d-b9f4-5d85-a4a0-9a3a99efb456",
+              "text": "因为去油能代替检漏",
+              "displayOrder": 2
+            },
+            {
+              "id": "34a1043f-9f25-5ba5-a44b-a7dd8d40c195",
+              "text": "仅为提高压力表精度",
+              "displayOrder": 3
+            },
+            {
+              "id": "498e92f8-c8fc-59a2-a638-6acc7d0fba3e",
+              "text": "仅为防止螺纹机械磨损",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7785a1a3-25fe-5b9d-aad3-b0f4ff20823b",
+          "explanation": "氧气支持燃烧并增大火灾危险。 可燃气体可与空气形成危险混合物。 氧气阀件不得受油脂污染。 不得用氧气吹扫衣物或通风。",
+          "slideRefs": [
+            "slide-24"
+          ]
+        },
+        {
+          "id": "18e445f5-d52a-5e3d-ab27-1b6c6f2bb069",
+          "text": "如何查找气体接头泄漏？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "5286603e-6e32-5954-a6fb-b9500094aa06",
+              "text": "加热接头直到闻到气味",
+              "displayOrder": 1
+            },
+            {
+              "id": "5526d1e7-6a04-5b3f-a9d8-90771ee9a61a",
+              "text": "使用获准的无明火方法",
+              "displayOrder": 2
+            },
+            {
+              "id": "e86f6bde-ca3a-53c1-a311-a1d04896d98c",
+              "text": "用打火机",
+              "displayOrder": 3
+            },
+            {
+              "id": "0a88ffaa-e6cc-566a-a768-a2d6ddec578c",
+              "text": "用焊接电弧",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5526d1e7-6a04-5b3f-a9d8-90771ee9a61a",
+          "explanation": "软管应适合气体和使用条件。 防止折弯、火花及机械损伤。 使用规定紧固方式连接。 采用获准的无明火方法检漏。",
+          "slideRefs": [
+            "slide-28"
+          ]
+        },
+        {
+          "id": "056351a2-07f6-5fd4-afae-fb0681772164",
+          "text": "如何选择防坠锚点？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "18ed3c06-3ef9-5287-a030-b484eace2c58",
+              "text": "选最近的管道",
+              "displayOrder": 1
+            },
+            {
+              "id": "d3b7a029-4097-5dda-a105-bab2d38747f0",
+              "text": "固定在焊接电缆上",
+              "displayOrder": 2
+            },
+            {
+              "id": "13cb94cf-247e-5b32-a3db-6bc333858aae",
+              "text": "按规定系统和确认合格的锚点",
+              "displayOrder": 3
+            },
+            {
+              "id": "e071d34a-eb9d-5281-ab60-749cc45efa82",
+              "text": "凭外观选任意脚手架杆件",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "13cb94cf-247e-5b32-a3db-6bc333858aae",
+          "explanation": "使用安全平台和规定的防坠措施。 按批准系统选择锚点，不得随意选取。 保护安全带等部件免受火花及热金属损坏。 隔离下方区域，防止坠物伤人。",
+          "slideRefs": [
+            "slide-32"
+          ]
+        },
+        {
+          "id": "a0a6674f-4ffa-5398-ae13-b8a5b770b471",
+          "text": "爆鸣后焊炬工作不稳定，应怎么办？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "1a4bdb8b-5989-52e2-a456-80ff397fe1bb",
+              "text": "继续到完全故障",
+              "displayOrder": 1
+            },
+            {
+              "id": "76a8830b-1443-5481-a628-6b53962a4ac2",
+              "text": "拆除保护阀",
+              "displayOrder": 2
+            },
+            {
+              "id": "99caea8a-2d1c-58bf-aac4-8297411276a0",
+              "text": "未经检查自行提高压力",
+              "displayOrder": 3
+            },
+            {
+              "id": "89cff4d1-ac24-5660-aadb-5b3f460f5265",
+              "text": "按规程停止，排除原因后再启动",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "89cff4d1-ac24-5660-aadb-5b3f460f5265",
+          "explanation": "回火会使火焰向供气系统传播。 规定的止回阀和阻火器降低风险。 出现爆鸣、过热或不稳定时按规程停止。 查明并消除原因后才能重新启动。",
+          "slideRefs": [
+            "slide-29"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f3eb1d58-bdd9-5ac1-aa77-f771ab0d70af",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "015392c9-4921-5828-ad14-ebe3b2d1df87",
+          "text": "选择焊接工艺依据什么？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "ff361f64-eb67-5b4f-a5e2-ba05712e5875",
+              "text": "材料、厚度和接头工艺要求",
+              "displayOrder": 1
+            },
+            {
+              "id": "ff02af92-8950-52db-a3a7-a2063af565bd",
+              "text": "只凭操作者偏好",
+              "displayOrder": 2
+            },
+            {
+              "id": "bd2ab1e1-d7f4-5375-a7cf-9ea0b3aa1b41",
+              "text": "只看所需速度",
+              "displayOrder": 3
+            },
+            {
+              "id": "52777aeb-bac6-5e2a-a346-9101937a1897",
+              "text": "不考虑材料，只看现有焊机",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ff361f64-eb67-5b4f-a5e2-ba05712e5875",
+          "explanation": "电弧焊使用电弧产生热量。 气焊使用可燃气体与氧气火焰的热量。 熔池保护方式取决于工艺。 根据材料、厚度和技术要求选择方法。",
+          "slideRefs": [
+            "slide-04"
+          ]
+        },
+        {
+          "id": "e0ef5c0d-049b-5686-afb7-26c56fd8d0ea",
+          "text": "保护气带来什么额外危险？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "93f355ae-4346-5119-a571-5394e060b4a5",
+              "text": "消除所有电气危险",
+              "displayOrder": 1
+            },
+            {
+              "id": "4fad6832-e80d-5c97-a2b4-5bcc5bc47dbe",
+              "text": "可能排挤工作区氧气",
+              "displayOrder": 2
+            },
+            {
+              "id": "6f33981a-6c8a-5577-a44b-4b018b287f82",
+              "text": "总能使空气适合呼吸",
+              "displayOrder": 3
+            },
+            {
+              "id": "67c549a0-67f7-5769-a56d-051afc09baad",
+              "text": "完全消除通风需求",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "4fad6832-e80d-5c97-a2b4-5bcc5bc47dbe",
+          "explanation": "根据工艺使用焊丝或不熔化电极。 保护气隔离熔池与周围空气。 供气异常可能降低质量。 气体种类及流量按工艺和设备要求选择。 保护气可能排挤作业区氧气。",
+          "slideRefs": [
+            "slide-06"
+          ]
+        },
+        {
+          "id": "6b066232-fde1-525b-a118-eb41b64788c9",
+          "text": "改变焊接参数时应怎么做？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "e9ad15b8-4f82-536e-ad65-e844dd14f0fc",
+              "text": "始终设置最大电流",
+              "displayOrder": 1
+            },
+            {
+              "id": "66fad342-6076-571d-a369-d87c6dd64a82",
+              "text": "复制任意邻近工位参数",
+              "displayOrder": 2
+            },
+            {
+              "id": "0202ad62-378b-5a1a-ac4b-83336a1d086b",
+              "text": "根据工艺要求说明依据",
+              "displayOrder": 3
+            },
+            {
+              "id": "8613758d-5fd6-5ae4-a677-0bc392d3a8dd",
+              "text": "随意调整到外观好看",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "0202ad62-378b-5a1a-ac4b-83336a1d086b",
+          "explanation": "按工艺选择电流、电压和速度。 考虑位置、厚度及工件温度状态。 参数调整必须有依据。 焊道顺序有助于控制形状和变形。",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "ba14206d-0f35-5edd-a5f6-205d51f3ef09",
+          "text": "能否用任意管道替代回流导体？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "1d15e986-45b1-53b0-a6a6-5af105996585",
+              "text": "管道是金属就可以",
+              "displayOrder": 1
+            },
+            {
+              "id": "7014f810-d955-5388-a113-52024c425bd7",
+              "text": "焊缝短就可以",
+              "displayOrder": 2
+            },
+            {
+              "id": "ea97d394-8bc9-5558-acda-37299a605390",
+              "text": "离电源近就可以",
+              "displayOrder": 3
+            },
+            {
+              "id": "b683b10f-1f49-5905-a664-43bd3c784474",
+              "text": "不能，应使用规定焊接回路",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b683b10f-1f49-5905-a664-43bd3c784474",
+          "explanation": "电流应沿规定的焊接回路返回。 与工件保持可靠连接。 不得用任意管道或结构代替回流导体。 爆炸和火灾危险场所还需满足专门绝缘要求。",
+          "slideRefs": [
+            "slide-14"
+          ]
+        },
+        {
+          "id": "25cfd7d0-3510-543b-adf2-5898f7ad5cbb",
+          "text": "焊接区屏障的作用是什么？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "93e8b5e9-6802-5ba4-a401-314d9c09afa6",
+              "text": "保护周围人员免受电弧和颗粒影响",
+              "displayOrder": 1
+            },
+            {
+              "id": "a8256ac5-e6aa-5f0b-a0f3-35b2304871d2",
+              "text": "代替焊工面罩",
+              "displayOrder": 2
+            },
+            {
+              "id": "c3f85e1e-c75b-5d95-afb3-88bad1211fd6",
+              "text": "取消通风",
+              "displayOrder": 3
+            },
+            {
+              "id": "b0d05031-0be0-570f-ad48-928eca550e7d",
+              "text": "仅遮挡别人观看作业",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "93e8b5e9-6802-5ba4-a401-314d9c09afa6",
+          "explanation": "使用规定屏障隔离焊接区。 禁止无防护人员直视电弧。 检查火花和颗粒飞落方向。 保持通道畅通、清晰。",
+          "slideRefs": [
+            "slide-19"
+          ]
+        },
+        {
+          "id": "0f5df0f2-9395-56a6-a404-2457bb9f6ee4",
+          "text": "为什么检查动火区孔洞和隐蔽空间？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "adefeb37-5f72-5e14-a1c3-1862e800f46c",
+              "text": "为了关机后立即结束监护",
+              "displayOrder": 1
+            },
+            {
+              "id": "8894ff2b-fac8-514f-a24d-2c1e143d88ca",
+              "text": "火花可能在不可见区域引起阴燃",
+              "displayOrder": 2
+            },
+            {
+              "id": "87906233-507e-501e-a1a4-7f4375ccc54b",
+              "text": "为了以检查替代清理可燃物",
+              "displayOrder": 3
+            },
+            {
+              "id": "cc882a9c-c9e6-515c-afb3-1d397a5a900c",
+              "text": "仅为检查人员通行",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "8894ff2b-fac8-514f-a24d-2c1e143d88ca",
+          "explanation": "为临时动火办理规定许可。 移除或保护可燃物。 检查孔洞和相邻空间。 准备灭火器材并安排监护。",
+          "slideRefs": [
+            "slide-23"
+          ]
+        },
+        {
+          "id": "299dc76b-fcd2-595e-a38a-4995eb9b9db4",
+          "text": "如何移动气瓶？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "ef555756-beeb-577a-a747-6fa3a27aeb75",
+              "text": "敲打瓶体移动",
+              "displayOrder": 1
+            },
+            {
+              "id": "3a9ad393-7679-51c5-add5-af15a0185061",
+              "text": "沿楼梯自由滚落",
+              "displayOrder": 2
+            },
+            {
+              "id": "e4503ad6-231d-51a6-ae8b-3aa46f25dc62",
+              "text": "使用专用工具并防止倒落和损坏",
+              "displayOrder": 3
+            },
+            {
+              "id": "d1fd470d-4b42-52f1-af1b-0cc7c682f4bf",
+              "text": "抓住阀门搬运",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "e4503ad6-231d-51a6-ae8b-3aa46f25dc62",
+          "explanation": "固定气瓶，防止倒落和受热。 使用专用搬运工具。 不得抓住阀门吊运或撞击气瓶。 间距和共同存放按现行要求确定。",
+          "slideRefs": [
+            "slide-26"
+          ]
+        },
+        {
+          "id": "a24f7471-3f4b-5396-abc5-bc7bf72e4665",
+          "text": "回火后能否不检查继续工作？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "2c1d5fa1-5046-5e3c-a6ab-46f46f957095",
+              "text": "火焰恢复就可以",
+              "displayOrder": 1
+            },
+            {
+              "id": "5a72ab8a-bb8e-5924-a837-1119ed0b6794",
+              "text": "拆除阻火器后可以",
+              "displayOrder": 2
+            },
+            {
+              "id": "027c41cb-78ef-58bc-a162-8bc89973c916",
+              "text": "附近有灭火器就可以",
+              "displayOrder": 3
+            },
+            {
+              "id": "d455347a-046a-5926-a68d-26213fa5d2f2",
+              "text": "不能，必须停机并消除原因",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "d455347a-046a-5926-a68d-26213fa5d2f2",
+          "explanation": "回火会使火焰向供气系统传播。 规定的止回阀和阻火器降低风险。 出现爆鸣、过热或不稳定时按规程停止。 查明并消除原因后才能重新启动。",
+          "slideRefs": [
+            "slide-29"
+          ]
+        },
+        {
+          "id": "02401bcf-8924-5b7e-a285-12c68f2a57c0",
+          "text": "受限空间焊接需要什么？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "f5bcd3b2-eea7-5fed-a0b4-1ddb3cd8a870",
+              "text": "专门准备、许可、环境检测及救援措施",
+              "displayOrder": 1
+            },
+            {
+              "id": "a8d4c88e-3ec0-5e59-a418-e901e4e3f85e",
+              "text": "只需把焊机搬入",
+              "displayOrder": 2
+            },
+            {
+              "id": "f92141e6-1920-574b-ae01-e20f46c3156f",
+              "text": "不评估，只开人孔",
+              "displayOrder": 3
+            },
+            {
+              "id": "21b5a71a-eb6f-5ec9-aab8-57ec94559329",
+              "text": "仅有同事在场，无通信",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f5bcd3b2-eea7-5fed-a0b4-1ddb3cd8a870",
+          "explanation": "进入前需专门准备现场并获得许可。 安排环境检测、通风、通信和监护。 预先建立可实施的救援方案。 条件改变时停止工作并撤出。",
+          "slideRefs": [
+            "slide-31"
+          ]
+        },
+        {
+          "id": "1a9f561d-d423-574b-ac96-626020fb7972",
+          "text": "什么确认焊缝返修结果？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "ef50dd32-8840-5b7f-a73a-82f69cc84dea",
+              "text": "只重新焊接，不检查结果",
+              "displayOrder": 1
+            },
+            {
+              "id": "6d0cc97b-39ee-5947-a402-f6e27196fb8e",
+              "text": "规定的复检",
+              "displayOrder": 2
+            },
+            {
+              "id": "99223fed-8fa9-52a4-acd7-7d13651da5dd",
+              "text": "仅目视检查代替规定范围",
+              "displayOrder": 3
+            },
+            {
+              "id": "c5bb9912-a16a-5c58-aa91-dc2ba42202e3",
+              "text": "仅打磨到看不见痕迹",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "6d0cc97b-39ee-5947-a402-f6e27196fb8e",
+          "explanation": "目视检查之外还应实施规定检测。 结果须对应具体接头。 按认可工艺返修。 复检确认维修结果。",
+          "slideRefs": [
+            "slide-36"
+          ]
+        }
+      ]
+    }
+  ]
+}

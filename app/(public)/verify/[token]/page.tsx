@@ -99,7 +99,7 @@ export default async function VerifyCertificatePage({
                 <dd className="mt-1 font-semibold">{certificate.testTitle}</dd>
               </div>
               <div>
-                <dt className="text-xs text-[var(--color-text-muted)]">{t('result')}</dt>
+                <dt className="text-xs text-[var(--color-text-muted)]">{t(certificate.learningAssessment ? 'learningAssessmentResult' : 'result')}</dt>
                 <dd className="mt-1 font-semibold">
                   {t('score', { score: certificate.score, total: certificate.total })}
                 </dd>

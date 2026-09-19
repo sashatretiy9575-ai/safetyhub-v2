@@ -11,7 +11,7 @@ import {
 const MAX_FONT_BYTES = 6 * 1024 * 1024;
 // A stamp or signature PNG the administrator uploaded; the settings route
 // refuses anything above 400 KB, this only guards the transport.
-const MAX_IMAGE_BYTES = 600 * 1024;
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 
 
 
@@ -28,12 +28,17 @@ async function fetchBoundedAsset(
 ): Promise<Uint8Array> {
   if (signal?.aborted) throw abortError();
   const existing = assetCache.get(url);
-  if (existing) return existing;
+  if (existing) {
+    const bytes = await existing;
+    if (signal?.aborted) throw abortError();
+    return bytes;
+  }
   const pending = (async () => {
     const response = await fetch(url, {
       credentials: 'same-origin',
       cache: 'force-cache',
-      signal,
+      // Shared bytes must survive cancellation of one preview while another
+      // document is waiting for the same font or immutable PNG.
     });
     if (!response.ok) throw new Error('CERTIFICATE_ASSET_UNAVAILABLE');
     const declaredLength = Number(response.headers.get('content-length'));
@@ -46,12 +51,15 @@ async function fetchBoundedAsset(
     }
     return bytes;
   })();
+  assetCache.set(url, pending);
+  if (assetCache.size > 32) assetCache.delete(assetCache.keys().next().value!);
   try {
     const bytes = await pending;
     assetCache.set(url, Promise.resolve(bytes));
+    if (signal?.aborted) throw abortError();
     return bytes;
   } catch (error) {
-    assetCache.delete(url);
+    if (!signal?.aborted) assetCache.delete(url);
     throw error;
   }
 }
@@ -178,7 +186,7 @@ export async function generateCertificatePreview(metadata: CertificatePreviewDat
   txt(statement(branding.knowledgeTextKk), right, 151, usable, 46);
   txt(statement(branding.knowledgeTextRu), right, 204, usable, 46);
   txt('Берілген күні/Дата выдачи: ' + formatIssueDate(date), right, 260, usable * .56, 30, 11);
-  txt(until ? 'Действителен до: ' + formatIssueDate(until) : 'Без ограничения срока действия', right + usable * .59, 260, usable * .41, 30, 11);
+  txt(until ? 'Действителен до: ' + formatIssueDate(until) : 'Срок действия не указан', right + usable * .59, 260, usable * .41, 30, 11);
   const members = [{ name: branding.chairmanName, position: 'Төраға / Председатель' }, ...documentCommission(branding).map(m => ({ name: m.name, position: 'Мүшесі / Член комиссии' }))];
   const commissionWidth = usable - (metadata.verificationUrl ? 68 : 0);
   const lineHeight = Math.min(24, 72 / Math.max(members.length, 1));
@@ -190,13 +198,13 @@ export async function generateCertificatePreview(metadata: CertificatePreviewDat
   });
   // The stamp covers «М.П.» and the corner of the photograph, as on the paper
   // form; the chairman signs across the first commission line.
-  const [stamp, signature] = await Promise.all([
+  const [stamp, ...signatures] = await Promise.all([
     embedFacsimile(pdf, branding.stampUrl, metadata.verificationUrl, signal),
-    embedFacsimile(pdf, branding.chairmanSignatureUrl, metadata.verificationUrl, signal),
+    ...(branding.commissionSignatureUrls ?? [branding.chairmanSignatureUrl]).map(url => embedFacsimile(pdf, url, metadata.verificationUrl, signal)),
   ]);
   drawFacsimile(page, stamp, photoX - 86, 272, 92, 92);
   const signatureHeight = Math.min(42, lineHeight * 1.75);
-  drawFacsimile(page, signature, right + commissionWidth - 124, 295 + lineHeight + 7 - signatureHeight, 112, signatureHeight);
+  signatures.forEach((signature, i) => drawFacsimile(page, signature, right + commissionWidth - 124, 295 + (i + 1) * lineHeight + 7 - signatureHeight, 112, signatureHeight));
   if (metadata.verificationUrl) {
     const qr = (await import('qrcode')).default.create(metadata.verificationUrl, { errorCorrectionLevel: 'M' });
     const qrSize = 57, cell = qrSize / (qr.modules.size + 8), qrX = half * 2 - margin - qrSize;

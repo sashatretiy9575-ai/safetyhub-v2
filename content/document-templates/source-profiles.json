@@ -1,0 +1,697 @@
+[
+  {
+    "sourceId": 10,
+    "sourceFile": "Лицо отв по надзору за безоп экспл ГПМ ШЦ.docx",
+    "sourceSha256": "6164e9bda2196bba2f2cb8438722aa80235c4347a2d9d3903ebafbba692d8dba",
+    "templateFile": "Лицо отв по надзору за безоп экспл ГПМ ШЦ.docx",
+    "templateSha256": "23cb11e8ea0368caea64bc506e8af0daba7309bef51d6c540ece0a74bf645212",
+    "family": "lifting-equipment",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "ismailov-bt",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "            Ф.И.О",
+        "Занимаемая должность",
+        "Место работы",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Ismailov initials differ across sources; signature not supplied",
+      "Historical publisher/title of order 359 requires legal verification",
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 11,
+    "sourceFile": "Лицо отв по надзору за безоп экспл ГПМ СБА.docx",
+    "sourceSha256": "15a11822753e5a4c194867efa72cc2d46d7f15dc0f4ce313b0b49fc20eb8fab5",
+    "templateFile": "Лицо отв по надзору за безоп экспл ГПМ СБА.docx",
+    "templateSha256": "5ddb612b1c9c13d8f931601c83896889f2e11542ccccb3d144047b590f632a17",
+    "family": "lifting-equipment",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "ismailov-bt",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "            Ф.И.О",
+        "Занимаемая должность",
+        "Место работы",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Ismailov initials differ across sources; signature not supplied",
+      "Historical publisher/title of order 359 requires legal verification",
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 12,
+    "sourceFile": "Лицо отв за исправное сост ГПМ.docx",
+    "sourceSha256": "4cc162d60af6a95110798e48b2d89acf7ed85cc60b88c2ee921a9abf724bd6ec",
+    "templateFile": "Лицо отв за исправное сост ГПМ.docx",
+    "templateSha256": "82d32f89e195533364e9f240c03b8c88f479ef5f5b77af67495b7db36e5398b3",
+    "family": "lifting-equipment",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "ismailov-bt",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "Ф.И.О",
+        "           Занимаемая должность",
+        "Место работы",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Ismailov initials differ across sources; signature not supplied",
+      "Historical publisher/title of order 359 requires legal verification",
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 13,
+    "sourceFile": "Лицо отв за безоп перемещ кранами.docx",
+    "sourceSha256": "140d402f217792b229f429e2ad8e9714ae2d9fa62b8956ebb4672d041e01ddd6",
+    "templateFile": "Лицо отв за безоп перемещ кранами.docx",
+    "templateSha256": "e5f73137099072bcba66aaacb666c379d2861d9f4abdd79f82d728ad3b73221a",
+    "family": "lifting-equipment",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "ismailov-bt",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "            Ф.И.О",
+        "Занимаемая должность",
+        "Место работы",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Ismailov initials differ across sources; signature not supplied",
+      "Historical publisher/title of order 359 requires legal verification",
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 14,
+    "sourceFile": "Сертификат медпомощь 1-4.docx",
+    "sourceSha256": "c98afe9e218c2d060f29bac61220d0d68200ee2316cabb058b568dfc1612e309",
+    "templateFile": "Сертификат медпомощь 1-4.docx",
+    "templateSha256": "591e71b7f1b869f608fad2ad4717c118a427f51cd0273ce751ef6e27b98b6f76",
+    "family": "first-aid",
+    "type": "certificate",
+    "category": null,
+    "hours": 8,
+    "validityYears": 1,
+    "commission": [
+      "bitemirov",
+      "lenchenko"
+    ],
+    "columns": [],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Lenchenko signature not supplied; 8 hours and 1 year are source-specific"
+    ]
+  },
+  {
+    "sourceId": 15,
+    "sourceFile": "Протокол Стропальщик.docx",
+    "sourceSha256": "3773270c6b8d78592f55b9687848a169f2b0a08dcf5b033ae209f3cadd2edec1",
+    "templateFile": "Протокол Стропальщик.docx",
+    "templateSha256": "8c3fe084ce3762e60ed31f128d0cf2ad69b5a5fcc7f41fac243736940fa9f6ab",
+    "family": "lifting-equipment",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "ismailov-gb",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "Ф.И.О.",
+        "            Занимаемая должность ",
+        "Место работы",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Ismailov initials differ across sources; signature not supplied",
+      "Historical publisher/title of order 359 requires legal verification",
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 16,
+    "sourceFile": "Работы на высоте.docx",
+    "sourceSha256": "a9c4a7c63359885ff3f11f7dcbfa85ee8f33829b5cdbd8db225233e5f201c6c5",
+    "templateFile": "Работы на высоте.docx",
+    "templateSha256": "90465a9349cb82922113039c43d5df7646588d215fde01f77a60e9bb2875ffb5",
+    "family": "height",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "Ф.И.О.",
+        "Занимаемая должность",
+        "Образование",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 17,
+    "sourceFile": "ПТМ ИТР.docx",
+    "sourceSha256": "0f7e7e9a460000b22bed46e1c4dcaf08098a5aab9bc4524ab310fa1c00ff36ff",
+    "templateFile": "ПТМ ИТР.docx",
+    "templateSha256": "d97dd00b0c06d1b43d212f555704de0b855c7c94d35f3ec813672a2243ab05a8",
+    "family": "fire-safety",
+    "type": "protocol",
+    "category": "engineering",
+    "hours": 40,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "ФИО обучающегося",
+        "Должность",
+        "Организация (участок, цех)",
+        "Причина обучения",
+        "Отметка",
+        "Подпись"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": []
+  },
+  {
+    "sourceId": 18,
+    "sourceFile": "ПТМ  Рабочий состав.docx",
+    "sourceSha256": "37f14f84b526b1c8b4c9f84b822742e7265603b6cb603485667fceec9d7eae4a",
+    "templateFile": "ПТМ  Рабочий состав.docx",
+    "templateSha256": "88e12be7cc61e598e462c5f58c7c69f9371780504176624d06f5f688a1f3926b",
+    "family": "fire-safety",
+    "type": "protocol",
+    "category": "workers",
+    "hours": 10,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "ФИО обучающегося",
+        "Должность",
+        "Организация (участок, цех)",
+        "Причина обучения",
+        "Отметка",
+        "Подпись"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": []
+  },
+  {
+    "sourceId": 19,
+    "sourceFile": "Промбез Рабочий состав.docx",
+    "sourceSha256": "871f4ef4862e40f942117e840162ae1482c3976f5c12618fa811ae3f07d06d54",
+    "templateFile": "Промбез Рабочий состав.docx",
+    "templateSha256": "eedf898b7a9b9965cdcf774be2aabe7dbdbaf2131f323d1623fa7d4061864b35",
+    "family": "industrial-safety",
+    "type": "protocol",
+    "category": "workers",
+    "hours": 10,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "Ф.И.О.",
+        "Занимаемая должность",
+        "Образование",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 20,
+    "sourceFile": "Промбез ИТР.docx",
+    "sourceSha256": "00f6dc8174026166e9d05777ae808ab8c2d303dc465c9b0600cbd04717aff967",
+    "templateFile": "Промбез ИТР.docx",
+    "templateSha256": "6fca5025544d76f3aa3e02b7ae686d8a3e6b4e1ba74e2d667cc86bd505cc3a6b",
+    "family": "industrial-safety",
+    "type": "protocol",
+    "category": "engineering",
+    "hours": 40,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "Ф.И.О.",
+        "Занимаемая должность",
+        "Образование",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 21,
+    "sourceFile": "БиОТ ИТР.docx",
+    "sourceSha256": "71c0d18231c90b84464cccb62f893c5d825b4522d10cfc390005f3f5f80cbf3e",
+    "templateFile": "БиОТ ИТР.docx",
+    "templateSha256": "d7c02948b403718751a6f905bcd3e1d439da74c3a00c632db1434a39d21f0104",
+    "family": "occupational-safety",
+    "type": "protocol",
+    "category": "engineering",
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№п/п",
+        "Тегі, аты.Фамилия,инициалы",
+        "Ұйым атауыНаименование организации",
+        "ЛауазымыДолжность",
+        "Отметка о проверке знаний (прошел, подлежит повторной проверке знаний по безопасности и охраны труда)",
+        "Примечание"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": []
+  },
+  {
+    "sourceId": 22,
+    "sourceFile": "БиОТ  Рабочий состав.docx",
+    "sourceSha256": "01673c7a0f70681981cba023838ba219c097be5d679feeb5ea28660d6bcfb967",
+    "templateFile": "БиОТ  Рабочий состав.docx",
+    "templateSha256": "4ee2492d5b44a92a38d42f429dc3df71c6fc69743b1d02dc96fd85877468efff",
+    "family": "occupational-safety",
+    "type": "protocol",
+    "category": "workers",
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№п/п",
+        "Тегі, аты.Фамилия,инициалы",
+        "Ұйым атауыНаименование организации",
+        "ЛауазымыДолжность",
+        "Отметка о проверке знаний (прошел, подлежит повторной проверке знаний по безопасности и охраны труда)",
+        "Примечание"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": []
+  },
+  {
+    "sourceId": 23,
+    "sourceFile": "Курсы.docx",
+    "sourceSha256": "6e4adb43eec49f17b6043475b0a53cda8bdff7296c19efac23281b362c9e8efd",
+    "templateFile": "Курсы.docx",
+    "templateSha256": "ba57d56202739a05e6fe264a133f51e290b001c7e926834571c41caf762ceb42",
+    "family": "catalog",
+    "type": "catalog",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [],
+    "columns": [
+      [
+        "№",
+        "Наименование курса"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": []
+  },
+  {
+    "sourceId": 24,
+    "sourceFile": "Машинист крана.docx",
+    "sourceSha256": "e7976747e2c9f8354363f41fdc5fc54b9f05f37e670532b2daf2c8b040414550",
+    "templateFile": "Машинист крана.docx",
+    "templateSha256": "116a1b67215da065ce268e5f37f71e633ff92b4b8292e6637abbb46efe9860c7",
+    "family": "lifting-equipment",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "ismailov-bt",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "            Ф.И.О.",
+        "Занимаемая должность",
+        "Место работы",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Ismailov initials differ across sources; signature not supplied",
+      "Historical publisher/title of order 359 requires legal verification",
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 25,
+    "sourceFile": "Работа в замкнутом пространстве ИТР.docx",
+    "sourceSha256": "bcbb397f3d6c030c2e5dbe5e202dcf1ae1b31b21c85130ada9047b69fb5d5144",
+    "templateFile": "Работа в замкнутом пространстве ИТР.docx",
+    "templateSha256": "51903690067aad34d271fd87a5003bbf88800bba0151f3abf006c2bf7d646b51",
+    "family": "confined-space",
+    "type": "protocol",
+    "category": "engineering",
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "",
+        "Ф.И.О.",
+        "Занимаемая должность",
+        "Образование",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 26,
+    "sourceFile": "Работа с сосудами под давлением.docx",
+    "sourceSha256": "882b6a66515c4460f089155052ef067c91bf6d570a1d289da2e877d935642cf8",
+    "templateFile": "Работа с сосудами под давлением.docx",
+    "templateSha256": "fe6aed7d06d7ea8eb88bd1e77e5b0f5618d3b796df28ff9c55d9e84985301220",
+    "family": "pressure-vessels",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "            Ф.И.О",
+        "Занимаемая должность",
+        "Место работы",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Historical publisher/title of order 358 requires legal verification",
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  },
+  {
+    "sourceId": 27,
+    "sourceFile": "Протокол Лесомонтажник.docx",
+    "sourceSha256": "bf4e1cb4a437991060407256b8979d630d93defc9ba95b74216469ec1a9afb7b",
+    "templateFile": "Протокол Лесомонтажник.docx",
+    "templateSha256": "d8523e0977b13368c6d96c6f5413021b7b6ee23c6424685ee437ccc6888ae217",
+    "family": "scaffolder",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "akhmetzhanov",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "Тегі, аты, әкесінің аты / Фамилия, имя, отчество",
+        "Ұйым атауы/ Наименование организации",
+        "Лауазымы/ Должность",
+        "Результат подготовки",
+        "Тапсырма бойынша біліктілік комиссиясының шешімі/Решение  квалификационной комиссии подготовки по  специальности"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": []
+  },
+  {
+    "sourceId": 28,
+    "sourceFile": "Слесарь ГПМ.docx",
+    "sourceSha256": "ef1ffba3031f846dc74a61d2c894430f31b108f87c5e82d24b059a898820ee01",
+    "templateFile": "Слесарь ГПМ.docx",
+    "templateSha256": "99a29ce939a06322bb23cf6f8beef4d114ec1c6825f8ee8d9ec0cf3e1102abf2",
+    "family": "lifting-equipment",
+    "type": "protocol",
+    "category": null,
+    "hours": null,
+    "validityYears": null,
+    "commission": [
+      "bitemirov",
+      "ismailov-bt",
+      "kudiyarov"
+    ],
+    "columns": [
+      [
+        "№",
+        "            Ф.И.О",
+        "Занимаемая должность",
+        "Место работы",
+        "Результат сдачи экзаменов"
+      ]
+    ],
+    "embeddedMediaCount": 0,
+    "changes": [
+      "Participant table reduced to one repeatable placeholder row; original columns retained",
+      "Historical participant data, issuance dates and numbers replaced by explicit placeholders; statutory reference dates retained",
+      "Placeholder rows compacted; duplicate automatic numbering removed; excess blank spacing removed; no extra pages"
+    ],
+    "status": "reference-template-structurally-and-visually-reviewed",
+    "automaticActivation": false,
+    "risks": [
+      "Ismailov initials differ across sources; signature not supplied",
+      "Historical publisher/title of order 359 requires legal verification",
+      "Source admission sentence is retained as source wording, not authorization to grant workplace access automatically"
+    ]
+  }
+]

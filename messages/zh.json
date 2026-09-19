@@ -641,6 +641,7 @@
     }
   },
   "Certificate": {
+    "learningAssessmentResult": "学习掌握情况测验",
     "sizeRequired": "管理员需要在文档设置中指定证书内页尺寸。",
     "downloadPdf": "下载 PDF",
     "generating": "正在准备 PDF…",

@@ -2,6 +2,14 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { AttemptPolicyError, parseAttemptRpcError } from '../../server/learning/policy-error.ts';
 
+test('realm mismatch remains an access refusal rather than a server failure', () => {
+  const error = parseAttemptRpcError({ message: 'AUTH_REALM_LOCALE_MISMATCH' });
+  assert.ok(error instanceof AttemptPolicyError);
+  assert.equal(error.code, 'AUTH_REALM_LOCALE_MISMATCH');
+  assert.equal(error.status, 403);
+  assert.equal(error.retryAt, undefined);
+});
+
 test('legacy rolling-deploy limit preserves its domain code and exact retry timestamp', () => {
   const error = parseAttemptRpcError({
     message: 'ATTEMPT_ROLLING_LIMIT',

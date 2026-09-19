@@ -156,12 +156,27 @@ begin
   select lower(pg_get_functiondef(
     'private.certificate_download_payload(uuid)'::regprocedure
   )) into v_definition;
+  if position('certificate_download_payload_before_document_snapshot' in v_definition) = 0 then
+    raise exception 'document snapshot wrapper no longer delegates to the locale payload';
+  end if;
+  select v_definition || lower(pg_get_functiondef(
+    'private.certificate_download_payload_before_document_snapshot(uuid)'::regprocedure
+  )) into v_definition;
   if position('''locale''' in v_definition) = 0
     or position('''titlesnapshot''' in v_definition) = 0
     or position('''templateversion''' in v_definition) = 0
     or position('''bestcompletedat''' in v_definition) = 0 then
     raise exception 'certificate metadata locale snapshot contract is incomplete';
   end if;
+  if exists (
+    select 1 from public.certificates c
+    cross join lateral (select private.certificate_download_payload(c.id) payload) p
+    where p.payload->>'locale' is distinct from c.locale::text
+      or p.payload->>'titleSnapshot' is distinct from c.localized_test_title
+      or (p.payload->>'templateVersion')::integer is distinct from c.template_version
+      or (p.payload->>'bestCompletedAt')::timestamptz is distinct from c.best_completed_at
+      or p.payload->'documentSnapshot' is distinct from coalesce(c.document_snapshot,'null'::jsonb)
+  ) then raise exception 'certificate metadata changed a stored locale, title, template or completion snapshot'; end if;
 
   if not exists (
     select 1 from pg_trigger trigger_definition

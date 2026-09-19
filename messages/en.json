@@ -641,6 +641,7 @@
     }
   },
   "Certificate": {
+    "learningAssessmentResult": "Learning assessment",
     "sizeRequired": "An administrator must set the certificate insert size in document settings.",
     "downloadPdf": "Download PDF",
     "generating": "Preparing PDF…",

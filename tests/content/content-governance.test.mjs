@@ -100,7 +100,7 @@ test('public course page offers presentation download before the test and preser
   );
   assert.match(
     nextConfig,
-    /source: '\/topics\/industrial-safety'.+destination: '\/topics'.+permanent: true/su,
+    /source: '\/topics\/industrial-safety'.+destination: '\/topics\/promyshlennaya-bezopasnost'.+permanent: true/su,
   );
   assert.ok(
     actions.indexOf("t('downloadPresentation')") < actions.indexOf("t('startTest')"),

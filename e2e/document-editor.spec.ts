@@ -59,6 +59,9 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
     if (chosen) break;
   }
   expect(chosen, 'seeded company must include an issued certificate').not.toBeNull();
+  const originalCompany = await (await page.request.get('/api/admin/documents', { params: chosen! })).json();
+  const originalCertificateId = originalCompany.participants.find((p: { userId: string }) => p.userId === chosen!.user).certificateId;
+  const originalMetadata = await (await page.request.get(`/api/certificates/${originalCertificateId}/metadata`)).json();
   await openEditor(page, '/admin/settings/certificate?' + new URLSearchParams({ organization: chosen!.organization, course: chosen!.course, user: chosen!.user }));
   await expect(page.getByRole('button', { name: 'Изменить', exact: true })).toBeVisible();
   // Rare settings are one line each until opened; what was open survives a reload.
@@ -91,16 +94,19 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   await expect(page.getByLabel('Номер', { exact: true })).toHaveValue(manualNumber);
   await expect(page.getByLabel('Дата', { exact: true })).toHaveValue('2026-09-09');
   const originalReviewer = await page.getByLabel('Проверяющий', { exact: true }).inputValue();
-  await page.getByLabel('Проверяющий', { exact: true }).fill('Проверяющий локального теста');
+  const changedReviewer = 'Проверяющий теста ' + Date.now();
+  await page.getByLabel('Проверяющий', { exact: true }).fill(changedReviewer);
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
   await expect(saved).toBeVisible();
   await openEditor(page);
-  await expect(page.getByLabel('Проверяющий', { exact: true })).toHaveValue('Проверяющий локального теста');
+  await expect(page.getByLabel('Проверяющий', { exact: true })).toHaveValue(changedReviewer);
   const company = await (await page.request.get('/api/admin/documents', { params: chosen! })).json();
   const certificateId = company.participants.find((p: { userId: string }) => p.userId === chosen!.user).certificateId;
   const refreshed = await (await page.request.get(`/api/certificates/${certificateId}/metadata`)).json();
-  expect(refreshed.branding.documentDefaults.reviewerName).toBe('Проверяющий локального теста');
-  expect(refreshed.branding.protocolNumber).toBe(manualNumber);
+  expect(refreshed.branding).toEqual(originalMetadata.branding);
+  expect(refreshed.branding.protocolNumber).not.toBe(manualNumber);
+  expect(refreshed.education).toEqual(originalMetadata.education);
+  expect(refreshed.photoUrl).toEqual(originalMetadata.photoUrl);
   await page.getByLabel('Проверяющий', { exact: true }).fill(originalReviewer);
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
   await expect(saved).toBeVisible();
@@ -211,12 +217,14 @@ test('a photographed stamp becomes a transparent picture, stays until replaced a
     const alpha = (x: number, y: number) => data[(y * info.width + x) * 4 + 3] ?? 0;
     expect(alpha(Math.floor(info.width / 2), Math.floor(info.height / 2))).toBe(0);
     expect(Math.max(...Array.from({ length: info.width }, (_, x) => alpha(x, Math.floor(info.height / 2))))).toBeGreaterThan(200);
-    // A page opened before the change still draws its preview: it gets today's picture,
-    // and no browser keeps it under the address of the previous one.
+    // A historical URL keeps its own exact bytes (or its original absence).
+    // It must never resolve to a signature uploaded after issuance.
     const outdated = await stored(before.version);
-    expect(outdated.status()).toBe(200);
-    expect(outdated.headers()['cache-control']).toContain('no-store');
-    expect(Buffer.compare(await outdated.body(), await image.body())).toBe(0);
+    if (original) {
+      expect(outdated.status()).toBe(200);
+      expect(outdated.headers()['cache-control']).toContain('private');
+      expect(Buffer.compare(await outdated.body(), original)).toBe(0);
+    } else expect(outdated.status()).toBe(404);
     await openEditor(page);
     await expect(page.getByRole('button', { name: 'Печать: заменить', exact: true })).toBeVisible();
     const removal = page.waitForResponse(response => response.url().includes('/api/admin/settings/certificate/image') && response.request().method() === 'DELETE');
@@ -226,6 +234,10 @@ test('a photographed stamp becomes a transparent picture, stays until replaced a
     expect((await removal).status()).toBe(200);
     await expect(page.getByRole('button', { name: 'Печать: загрузить', exact: true })).toBeVisible();
     expect((await settings()).hasStamp).toBe(false);
+    const retained = await stored(uploaded.version);
+    expect(retained.status()).toBe(200);
+    expect(retained.headers()['cache-control']).toContain('private');
+    expect(Buffer.compare(await retained.body(), await image.body())).toBe(0);
     const refused = await page.request.put('/api/admin/settings/certificate/image?kind=stamp', { headers: { origin: base, 'content-type': 'image/png' }, data: Buffer.from('not a picture at all') });
     expect(refused.status()).toBe(400);
   } finally {
@@ -233,14 +245,35 @@ test('a photographed stamp becomes a transparent picture, stays until replaced a
   }
 });
 
-test('a slow navigation shows a non-blocking circle and clears it on completion', async ({ page }) => {
+test('a slow navigation dims the viewport with a centred loader and clears on completion', async ({ page }, testInfo) => {
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
   await page.route(/\/admin\/employees(?:\?|$)/, async route => {
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await held;
     await route.continue();
   });
   await page.goto('/admin/account');
-  await page.getByRole('link', { name: 'Сотрудники', exact: true }).filter({ visible: true }).click();
-  await expect(page.getByRole('status', { name: 'Loading', exact: true }).first()).toBeVisible({ timeout: 1000 });
+  await page.getByRole('link', { name: 'Сотрудники', exact: true }).filter({ visible: true }).click({ noWaitAfter: true });
+  try {
+    const overlay = page.getByRole('status', { name: 'Loading', exact: true }).first();
+    await expect(overlay).toBeVisible({ timeout: 1000 });
+    for (const width of [1440, 375]) {
+      await page.setViewportSize({ width, height: 900 });
+      const geometry = await overlay.evaluate(element => {
+        const bounds = element.getBoundingClientRect();
+        const spinner = element.querySelector('.animate-spin')!.getBoundingClientRect();
+        const panel = element.firstElementChild!.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return { left: bounds.left, top: bounds.top, width: bounds.width, height: bounds.height, panelWidth: panel.width, panelHeight: panel.height, centreX: spinner.x + spinner.width / 2, centreY: spinner.y + spinner.height / 2, background: style.backgroundColor, pointerEvents: style.pointerEvents };
+      });
+      expect(geometry.left).toBe(0); expect(geometry.top).toBe(0);
+      expect(geometry.width).toBe(width); expect(geometry.height).toBe(900);
+      expect(geometry.panelWidth).toBe(96); expect(geometry.panelHeight).toBe(96);
+      expect(geometry.centreX).toBeCloseTo(width / 2, 0); expect(geometry.centreY).toBeCloseTo(450, 0);
+      expect(geometry.background).toMatch(/0\.35/); expect(geometry.pointerEvents).toBe('none');
+      await page.screenshot({ path: testInfo.outputPath(`navigation-loader-${width}.png`) });
+    }
+  } finally { release(); }
   await expect(page.getByRole('heading', { name: 'Сотрудники', exact: true })).toBeVisible();
   await expect(page.getByRole('status', { name: 'Loading', exact: true })).toHaveCount(0);
 });
@@ -259,4 +292,23 @@ test('anonymous and participant cannot read company documents', async ({ browser
   expect([401, 403, 307]).toContain(denied.status());
   if (denied.status() === 307) expect(denied.headers().location).toContain('/auth/login');
   await anonymous.close();
+});
+
+test('registered signatures require document ownership or document administration', async ({ page, browser }) => {
+  await openEditor(page, '/admin/settings/certificate?course=armaturshchik');
+  const asset = await page.locator('a[href^="/certificate-assets/registered?id="]').first().getAttribute('href');
+  expect(asset).toBeTruthy();
+  const allowed = await page.request.get(asset!);
+  expect(allowed.status()).toBe(200);
+  expect(allowed.headers()['content-type']).toBe('image/png');
+  const anonymous = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+  const denied = await anonymous.request.get('http://localhost:3100' + asset);
+  expect([401, 403]).toContain(denied.status());
+  await anonymous.close();
+  // The seeded participant has legacy snapshots, none referencing this newly
+  // registered PNG. Knowledge of an opaque asset ID does not grant access.
+  const participant = await browser.newContext({ storageState: process.env.E2E_PARTICIPANT_STORAGE_STATE });
+  const foreign = await participant.request.get('http://localhost:3100' + asset);
+  expect([401, 403, 404]).toContain(foreign.status());
+  await participant.close();
 });

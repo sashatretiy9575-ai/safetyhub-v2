@@ -3,6 +3,7 @@ import { open, lstat, readFile, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { checkServerIdentity } from 'node:tls';
+import { CURRENT_PRODUCTION_PROJECT_REF } from './production-operator-safety.mjs';
 
 const LINKED_DATABASE_HOST =
   /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?[.])+supabase[.](?:com|co)$/iu;
@@ -47,7 +48,8 @@ function validateLinkedConnection(connection) {
     connection.PGHOST.length > 253 ||
     !LINKED_DATABASE_HOST.test(connection.PGHOST) ||
     typeof connection.PGUSER !== 'string' ||
-    !LINKED_DATABASE_USER.test(connection.PGUSER) ||
+    !(LINKED_DATABASE_USER.test(connection.PGUSER) ||
+      connection.PGUSER === `postgres.${CURRENT_PRODUCTION_PROJECT_REF}`) ||
     connection.PGUSER.length === 'cli_login_'.length ||
     connection.PGUSER.length > 255 ||
     /[\u0000-\u001f\u007f]/u.test(connection.PGUSER) ||

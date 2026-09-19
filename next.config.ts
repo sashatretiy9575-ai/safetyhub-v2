@@ -93,7 +93,7 @@ const profilePermissions = {
 const legacyTopicRedirects = [
   { source: '/topics/fire-safety', destination: '/topics/pozharnaya-bezopasnost' },
   { source: '/topics/occupational-health', destination: '/topics/biot' },
-  { source: '/topics/industrial-safety', destination: '/topics' },
+  { source: '/topics/industrial-safety', destination: '/topics/promyshlennaya-bezopasnost' },
 ] as const;
 
 const localizedPrivateSource = (pathname: string) =>

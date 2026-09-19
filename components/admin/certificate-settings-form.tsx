@@ -51,6 +51,9 @@ import {
 } from '@/lib/pdf/document-editor';
 import { cn } from '@/lib/utils';
 import type { readDocumentEditor } from '@/server/certificates/document-editor';
+import { applyDocumentProfile, type DocumentProfile } from '@/lib/pdf/document-profile';
+import { DocumentProfileFields } from '@/components/admin/document-profile-fields';
+import { DocumentParticipantFields } from '@/components/admin/document-participant-fields';
 
 export type CertificateSettingsView = {
   organizationName: string;
@@ -131,10 +134,11 @@ function brandingOf(
   saved: CertificateSettingsView,
   fields: SettingsFields,
   batch: DocumentBatch,
+  profiles: readonly DocumentProfile[] = [],
 ): CertificateBranding {
   const image = (kind: 'stamp' | 'chairman' | 'protocol', present: boolean) =>
     present ? certificateImageUrl(kind, saved.version) : null;
-  return {
+  const branding: CertificateBranding = {
     ...saved,
     ...fields,
     protocolNumber: batch.number,
@@ -144,6 +148,8 @@ function brandingOf(
     memberSignatureUrl: null,
     protocolSignatureUrl: image('protocol', saved.hasProtocolSignature),
   };
+  const profile = profiles.find(p => p.id === batch.profileId) ?? profiles.find(p => p.courseSlug === batch.courseSlug && p.audience === 'all');
+  return profile ? applyDocumentProfile(branding, profile) : branding;
 }
 
 function download(bytes: Uint8Array, filename: string, type = 'application/pdf') {
@@ -258,10 +264,12 @@ function Section({
 export function CertificateSettingsForm({
   initialSettings,
   initialData,
+  profiles: initialProfiles = [],
   initialSelection = {},
 }: {
   initialSettings: CertificateSettingsView;
   initialData: EditorData;
+  profiles?: readonly DocumentProfile[];
   initialSelection?: { organization?: string; course?: string; user?: string; tab?: string };
 }) {
   const initialCourse =
@@ -269,6 +277,7 @@ export function CertificateSettingsForm({
       (c) => c.slug === initialSelection.course || c.id === initialSelection.course,
     )?.slug ?? '';
   const [saved, setSaved] = useState(initialSettings);
+  const [profiles, setProfiles] = useState(initialProfiles);
   const [fields, setFields] = useState(() => fieldsOf(initialSettings));
   const [data, setData] = useState(initialData);
   const [organization, setOrganization] = useState(initialSelection.organization ?? '');
@@ -335,7 +344,7 @@ export function CertificateSettingsForm({
   // A size typed in millimetres or for one half only: named here, never sent to be refused.
   const sizeProblem = insertSizeProblem(fields.documentDefaults);
   const canRevertBatch = batchDirty && Boolean(savedBatch);
-  const branding = brandingOf(saved, fields, batch);
+  const branding = brandingOf(saved, fields, batch, profiles);
   const openSections = (change: (open: Set<SectionId>) => void) =>
     setSections((current) => {
       const next = new Set(current);
@@ -484,7 +493,7 @@ export function CertificateSettingsForm({
             branding,
           };
           return generateCertificatePreview(
-            { ...(metadata ?? draft), branding },
+            metadata ?? draft,
             controller.signal,
           );
         }
@@ -662,7 +671,24 @@ export function CertificateSettingsForm({
         setMessage('Настройки изменились, обновите страницу');
         return;
       }
-      const exportBranding = brandingOf(stored.settings, fields, stored.batch ?? batch);
+      const exportBranding = brandingOf(stored.settings, fields, stored.batch ?? batch, profiles);
+      const requiresCurrentProtocol = (single && tab === 'protocol') || (!single && current.participants.some(person => !person.certificateId));
+      if (requiresCurrentProtocol && profiles.some(profile => profile.courseSlug === course) && !exportBranding.documentProfile) {
+        setMessage('Выберите категорию слушателей для протокола.'); return;
+      }
+      if (requiresCurrentProtocol && exportBranding.documentProfile) {
+        const profile = exportBranding.documentProfile;
+        const people = single ? current.participants : current.participants.filter(person => !person.certificateId);
+        if (profile.family === 'biot' && (!profile.orderNumber.trim() || !profile.orderDate || !profile.verificationKind.trim())) {
+          setMessage('Заполните номер и дату приказа, вид проверки знаний в реквизитах программы.'); return;
+        }
+        const missing = profile.family === 'ptm' ? people.find(person => !person.trainingReason.trim()) : profile.family === 'qualification' ? people.find(person => !person.qualificationDecision.trim()) : null;
+        if (missing) { setMessage(`${missing.fullName}: ${profile.family === 'ptm' ? 'укажите причину обучения' : 'внесите решение квалификационной комиссии'}.`); return; }
+        if (profile.family === 'industrial') {
+          const unverified = people.find(person => !person.formalExamReference.trim() || !person.formalExamDate || person.formalExamResult !== 'passed' || person.formalExamProfileId !== profile.id || person.formalExamProfileVersion !== profile.revision);
+          if (unverified) { setMessage(`${unverified.fullName}: внесите подтверждённые реквизиты отдельного экзамена по промбезу.`); return; }
+        }
+      }
       const needsSize = single
         ? tab === 'certificate'
         : current.participants.some((p) => p.certificateId);
@@ -673,32 +699,33 @@ export function CertificateSettingsForm({
         openSections((open) => open.add('size'));
         return;
       }
-      const { generateProtocolInBrowser } = await import('@/lib/pdf/protocol-renderer');
+      const { generateProtocolInBrowser, groupItemsForProtocols, protocolFilename } = await import('@/lib/pdf/protocol-renderer');
       const { generateCertificateInBrowser } = await import('@/lib/pdf/certificate-renderer');
       if (single && tab === 'certificate') {
         if (!selectedCertificate) throw new Error();
         const item = await metadataFor(selectedCertificate, controller.signal);
         const result = await generateCertificateInBrowser(
-          { ...item, branding: exportBranding },
+          item,
           controller.signal,
         );
         setBytes(result);
         download(result, item.filename);
         return;
       }
-      const protocol = await generateProtocolInBrowser(
+      const pendingPeople = current.participants.filter(person => !person.certificateId);
+      const protocol = single || pendingPeople.length ? await generateProtocolInBrowser(
         {
           organization,
           courseTitle: program,
           items: [],
-          participants: current.participants,
+          participants: single ? current.participants : pendingPeople,
           date: exportBranding.protocolDate,
         },
         exportBranding,
         protocolFontUrl(current.participants),
         controller.signal,
-      );
-      if (single) {
+      ) : null;
+      if (single && protocol) {
         setData(current);
         setBytes(protocol);
         download(protocol, 'Протокол.pdf');
@@ -706,17 +733,23 @@ export function CertificateSettingsForm({
       }
       const { zipSync } = await import('fflate');
       const { safeFilenameSegment } = await import('@/lib/pdf/certificate');
-      const archive: Record<string, Uint8Array> = { 'Протокол.pdf': protocol };
+      const archive: Record<string, Uint8Array> = protocol ? { 'Протокол-невыданные.pdf': protocol } : {};
+      const issuedItems: CertificateRenderMetadata[] = [];
       let count = 0;
       for (const person of current.participants) {
         if (!person.certificateId) continue;
         if (controller.signal.aborted) throw new Error();
         const item = await metadataFor(person.certificateId, controller.signal);
+        issuedItems.push(item);
         archive['Корочки/' + item.filename] = await generateCertificateInBrowser(
-          { ...item, branding: exportBranding },
+          item,
           controller.signal,
         );
         setMessage('Корочек: ' + ++count);
+      }
+      for (const group of groupItemsForProtocols(issuedItems)) {
+        const frozenBranding = group.items[0]!.branding;
+        archive[protocolFilename(group, frozenBranding.protocolNumber)] = await generateProtocolInBrowser(group, frozenBranding, protocolFontUrl(current.participants), controller.signal);
       }
       download(
         zipSync(archive),
@@ -944,7 +977,7 @@ export function CertificateSettingsForm({
               </Button>
             </div>
           )}
-          {tab === 'certificate' ? (
+          {tab === 'certificate' || ['ptm','biot','qualification','industrial'].includes(branding.documentProfile?.family ?? '') ? (
             <DocumentSelect
               label="Сотрудник"
               value={user}
@@ -961,6 +994,15 @@ export function CertificateSettingsForm({
             />
           ) : null}
 
+          {profiles.some(p => p.courseSlug === course) ? <DocumentSelect
+            label="Программа и категория слушателей"
+            value={batch.profileId ?? profiles.find(p => p.courseSlug === course && p.audience === 'all')?.id ?? ''}
+            options={profiles.filter(p => p.courseSlug === course).map(p => ({ value: p.id, label: p.label + (p.hours ? ` · ${p.hours} ч` : '') }))}
+            disabled={busy || loading}
+            onChange={profileId => { setBatch(current => ({ ...current, profileId })); setBytes(null); }}
+          /> : null}
+          {branding.documentProfile ? <DocumentProfileFields key={branding.documentProfile.id + ':' + branding.documentProfile.revision} profile={branding.documentProfile} onSaved={profile => { setProfiles(current => current.map(p => p.id === profile.id ? profile : p)); setBytes(null); }} /> : null}
+          {selectedPerson && branding.documentProfile && ['ptm','biot','qualification','industrial'].includes(branding.documentProfile.family) ? <DocumentParticipantFields key={selectedPerson.userId + ':' + batch.id} person={selectedPerson} family={branding.documentProfile.family} batch={batch} onSaved={(fields, version) => { setBatch(v => ({ ...v, version })); setSavedBatch(v => v ? { ...v, version } : v); setData(v => ({ ...v, participants: v.participants.map(p => p.userId === selectedPerson.userId ? { ...p, ...fields } : p) })); setBytes(null); }} /> : null}
           <div className="xs:grid-cols-2 grid min-w-0 gap-3">
             <Field label="Дата">
               <Input
@@ -1217,6 +1259,7 @@ export function CertificateSettingsForm({
             mobile === 'fields' && 'hidden lg:block',
           )}
         >
+          {tab === 'certificate' && selectedCertificate ? <p className="text-xs text-[var(--color-text-muted)]">Выданный документ сохраняет прежние реквизиты. Изменения применяются при новой выдаче.</p> : null}
           {tab === 'certificate' ? (
             <SegmentedControl
               label="Сторона корочки"

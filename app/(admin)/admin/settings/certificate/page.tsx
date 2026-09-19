@@ -6,11 +6,12 @@ import { CertificateSettingsForm } from '@/components/admin/certificate-settings
 import { Button } from '@/components/ui/button';
 import { readCertificateSettings } from '@/server/certificates/settings';
 import { readDocumentEditor } from '@/server/certificates/document-editor';
+import { readDocumentProfiles } from '@/server/certificates/document-profiles';
 
 export default async function AdminCertificateSettingsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
   const value = (key: string) => typeof params[key] === 'string' ? params[key] as string : undefined;
-  const [settings, data] = await Promise.all([readCertificateSettings(), readDocumentEditor(value('organization'), value('course'))]);
+  const [settings, data, profiles] = await Promise.all([readCertificateSettings(), readDocumentEditor(value('organization'), value('course')), readDocumentProfiles()]);
 
   return (
     <div className="mx-auto max-w-7xl space-y-4">
@@ -23,7 +24,7 @@ export default async function AdminCertificateSettingsPage({ searchParams }: { s
         </Button>
       </div>
 
-      <CertificateSettingsForm initialSettings={settings} initialData={data} initialSelection={{ organization: value('organization'), course: value('course'), user: value('user'), tab: value('tab') }} />
+      <CertificateSettingsForm initialSettings={settings} initialData={data} profiles={profiles} initialSelection={{ organization: value('organization'), course: value('course'), user: value('user'), tab: value('tab') }} />
     </div>
   );
 }

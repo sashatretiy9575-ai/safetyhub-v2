@@ -1,0 +1,672 @@
+{
+  "schemaVersion": 1,
+  "slug": "svarshchik",
+  "locale": "en",
+  "title": "Welder",
+  "description": "Fundamentals of welding processes and safe workplace organisation. Joint preparation, equipment, protection and inspection. A training programme for work in the Republic of Kazakhstan.",
+  "status": "translation-awaiting-independent-review",
+  "sources": [
+    {
+      "id": "general",
+      "file": "Обучение Промбезу Общий.ppt"
+    },
+    {
+      "id": "notes",
+      "file": "промышленная безопасность.docx"
+    },
+    {
+      "id": "cranes",
+      "file": "Презентация вебинара Грузоподъемные механизмы Ким.pptx"
+    },
+    {
+      "id": "pressure",
+      "file": "Презентация вебинара Сосуды под давлением.pptx"
+    },
+    {
+      "id": "electrical",
+      "file": "Презентация вебинара Электробезопасность - Ким - ноябрь 2025 года.pptx"
+    },
+    {
+      "id": "welding",
+      "file": "Сварщик.ppt"
+    },
+    {
+      "id": "law",
+      "url": "https://old.adilet.zan.kz/rus/docs/Z1400000188",
+      "title": "Закон РК «О гражданской защите»"
+    },
+    {
+      "id": "rules-cranes",
+      "url": "https://adilet.zan.kz/rus/docs/V1400010332",
+      "title": "Правила эксплуатации ГПМ, приказ № 359"
+    },
+    {
+      "id": "rules-pressure",
+      "url": "https://old.adilet.zan.kz/rus/docs/V1400010303",
+      "title": "Правила эксплуатации оборудования под давлением, приказ № 358"
+    },
+    {
+      "id": "rules-electrical",
+      "url": "https://old.adilet.zan.kz/rus/docs/V1500010889",
+      "title": "Правила техники безопасности при эксплуатации электроустановок потребителей, приказ № 222"
+    },
+    {
+      "id": "rules-fire",
+      "url": "https://old.adilet.zan.kz/rus/docs/V2200026867",
+      "title": "Правила пожарной безопасности, приказ № 55"
+    }
+  ],
+  "slides": [
+    {
+      "id": "slide-01",
+      "title": "Welder",
+      "body": [
+        "Fundamentals of welding processes and safe workplace organisation.",
+        "Joint preparation, equipment, protection and inspection.",
+        "A training programme for work in the Republic of Kazakhstan."
+      ],
+      "callout": "This course does not automatically award a vocational grade.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-02",
+      "title": "Course content",
+      "body": [
+        "The course covers arc welding, gas flame processes and equipment.",
+        "Separate sections address electrical, gas and fire hazards.",
+        "Practical scenarios connect preparation, execution and completion."
+      ],
+      "callout": "The welding procedure specifies parameters for the actual task.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-03",
+      "title": "Purpose of a welded joint",
+      "body": [
+        "Welding creates a permanent joint between materials.",
+        "Required properties depend on the material, structure and operating conditions.",
+        "Weld appearance does not verify all internal properties.",
+        "Acceptance follows the requirements for the specific product."
+      ],
+      "callout": "Structural safety depends on joint quality.",
+      "sourceRefs": [
+        "welding",
+        "cranes"
+      ]
+    },
+    {
+      "id": "slide-04",
+      "title": "Main processes",
+      "body": [
+        "An electric arc provides heat in arc welding.",
+        "Gas welding uses the flame of fuel gas and oxygen.",
+        "Weld-pool protection depends on the selected process.",
+        "Select the process according to material, thickness and procedure."
+      ],
+      "callout": "One set of parameters cannot apply to every process.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-05",
+      "title": "Manual metal arc welding",
+      "body": [
+        "The consumable electrode contributes to the weld metal.",
+        "Its coating provides the intended process protection.",
+        "Select the electrode classification, diameter and parameters using the welding procedure.",
+        "Electrode condition affects joint quality."
+      ],
+      "callout": "Damp or unsuitable materials must be replaced.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-06",
+      "title": "Gas-shielded welding",
+      "body": [
+        "The process uses wire or a non-consumable electrode, depending on its type.",
+        "Gas shields the weld pool from the surrounding atmosphere.",
+        "Interrupted gas supply can impair quality.",
+        "Select the gas and flow rate according to the procedure and equipment."
+      ],
+      "callout": "Shielding gas can displace oxygen from the work area.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-07",
+      "title": "Gas welding and cutting",
+      "body": [
+        "The torch or cutting torch must match the gas used.",
+        "Gas welding and oxygen cutting perform different tasks.",
+        "Select parameters and equipment according to the material and manufacturer's instructions.",
+        "Use the lighting and shutdown sequence for the actual equipment."
+      ],
+      "callout": "There is no universal pressure setting for all torches.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-08",
+      "title": "Task documentation",
+      "body": [
+        "Read the drawing and joint requirements before work.",
+        "Establish the material, edge preparation and welding position.",
+        "Check the procedure, parameters and inspection requirements.",
+        "Clarify unclear requirements before welding starts."
+      ],
+      "callout": "An informal assumption cannot replace the specified procedure.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-09",
+      "title": "Preparing components",
+      "body": [
+        "Clean surfaces as required by the procedure.",
+        "Remove contamination that could impair quality or produce harmful emissions.",
+        "Check edge shape and joint gap.",
+        "Secure components for stable positioning and safe access."
+      ],
+      "callout": "Assess an unknown coating before heating it.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-10",
+      "title": "Assembly and tack welds",
+      "body": [
+        "Verify component alignment against the drawing.",
+        "Make tack welds according to material and procedure requirements.",
+        "Fixtures must hold components without dangerous movement.",
+        "Remove unacceptable tack-weld defects using the established method."
+      ],
+      "callout": "Tack welds also affect joint quality.",
+      "sourceRefs": [
+        "welding",
+        "cranes"
+      ]
+    },
+    {
+      "id": "slide-11",
+      "title": "Parameters and sequence",
+      "body": [
+        "Select current, voltage and travel speed using the procedure.",
+        "Account for welding position, thickness and the component's thermal condition.",
+        "Any parameter change must be justified.",
+        "Pass sequence helps control shape and distortion."
+      ],
+      "callout": "Guessing parameters is especially dangerous for safety-critical structures.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-12",
+      "title": "Welding power sources",
+      "body": [
+        "Transformers, rectifiers and inverters have different characteristics.",
+        "Verify power supply and permitted load against the equipment passport.",
+        "Follow the cooling and duty-cycle instructions.",
+        "Stop in the event of overheating or a fault."
+      ],
+      "callout": "A compact machine still requires correct connection.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-13",
+      "title": "Cables and electrode holder",
+      "body": [
+        "Check insulation, connections and electrode clamping.",
+        "Protect cables from heat, cuts and moving vehicles.",
+        "Place the holder to prevent accidental short circuits.",
+        "Remove defective components from use."
+      ],
+      "callout": "Correct damaged insulation before energising.",
+      "sourceRefs": [
+        "welding",
+        "rules-fire"
+      ]
+    },
+    {
+      "id": "slide-14",
+      "title": "Work return conductor",
+      "body": [
+        "Current must return through the intended welding circuit.",
+        "Provide a reliable connection to the workpiece.",
+        "Do not substitute random pipes or structures for the return conductor.",
+        "Apply the special insulation requirements in fire or explosion hazardous conditions."
+      ],
+      "callout": "The welding circuit and protective earthing serve different purposes.",
+      "sourceRefs": [
+        "welding",
+        "rules-fire"
+      ]
+    },
+    {
+      "id": "slide-15",
+      "title": "Permanent and temporary welding stations",
+      "body": [
+        "A permanent station is equipped for repeated operations.",
+        "A temporary station requires assessment of the actual task location.",
+        "Access, lighting and equipment positioning must be safe.",
+        "Coordinate nearby activities before starting."
+      ],
+      "callout": "Moving the machine creates a new workplace.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-16",
+      "title": "Main welding hazards",
+      "body": [
+        "The arc creates radiation and electrical shock hazards.",
+        "Sparks and hot metal cause burns and fires.",
+        "Fumes and gases affect breathing.",
+        "Handling components, noise and awkward posture create additional risks."
+      ],
+      "callout": "Select protection for all hazards of the task.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-17",
+      "title": "Eye and face protection",
+      "body": [
+        "Select a welding helmet or shield for the process and parameters.",
+        "The filter must provide the required protection.",
+        "Check integrity, attachments and function.",
+        "Use protection against flying particles during grinding and cleaning."
+      ],
+      "callout": "Ordinary glasses cannot replace a welding filter.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-18",
+      "title": "Clothing and hand protection",
+      "body": [
+        "Clothing must protect against sparks and hot particles.",
+        "Use welding gloves and keep them dry.",
+        "Prevent exposed skin and pockets that collect sparks.",
+        "Footwear and clothing arrangement must keep hot metal out."
+      ],
+      "callout": "Clothing contaminated with combustible substances is unsuitable.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-19",
+      "title": "Protecting other people",
+      "body": [
+        "Separate the welding area with the specified screens.",
+        "Prevent unprotected people from looking directly at the arc.",
+        "Check where sparks and particles travel.",
+        "Keep access routes clear and easy to identify."
+      ],
+      "callout": "Arc hazards extend beyond the welding station.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-20",
+      "title": "Fumes and ventilation",
+      "body": [
+        "Remove contaminants as close to their source as possible.",
+        "General ventilation supplements local extraction.",
+        "Emissions depend on the metal, coatings and consumables.",
+        "Select respiratory protection from a risk assessment; it does not replace required ventilation."
+      ],
+      "callout": "The absence of a strong smell does not prove clean air.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-21",
+      "title": "Electrical safety for welders",
+      "body": [
+        "Authorised personnel connect the machine using the established method.",
+        "Check protective connections and cables before work.",
+        "Do not work with damaged equipment or unsafe moisture conditions.",
+        "Repairs and switching require the relevant separate authorisation."
+      ],
+      "callout": "An electrical safety group does not authorise every operation.",
+      "sourceRefs": [
+        "welding",
+        "rules-electrical"
+      ]
+    },
+    {
+      "id": "slide-22",
+      "title": "Pre-shift checks",
+      "body": [
+        "Clarify the task, documentation and authorisation.",
+        "Inspect the machine, cables, fixtures and protective equipment.",
+        "Check ventilation, screens and fire precautions.",
+        "Correct deficiencies before welding."
+      ],
+      "callout": "The check applies to today's location and task.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-23",
+      "title": "Preparing hot work",
+      "body": [
+        "Obtain the prescribed authorisation for temporary hot work.",
+        "Remove or protect combustible materials.",
+        "Check openings and adjoining spaces.",
+        "Provide firefighting equipment and the required monitoring."
+      ],
+      "callout": "Sparks can cause smouldering out of sight.",
+      "sourceRefs": [
+        "welding",
+        "rules-fire"
+      ]
+    },
+    {
+      "id": "slide-24",
+      "title": "Oxygen and fuel gases",
+      "body": [
+        "Oxygen supports combustion and increases fire hazards.",
+        "Fuel gas can form a dangerous mixture with air.",
+        "Keep oxygen fittings free from oil and grease.",
+        "Never use oxygen to blow off clothing or ventilate a space."
+      ],
+      "callout": "Each gas requires compatible equipment.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-25",
+      "title": "Identifying a cylinder",
+      "body": [
+        "Identify the gas from markings and documentation.",
+        "Check the shell, valve and required examination information.",
+        "Do not use a defective or uncertainly identified cylinder.",
+        "Colour alone is not sufficient for connection."
+      ],
+      "callout": "Uncertainty about the contents rules out connection.",
+      "sourceRefs": [
+        "welding",
+        "pressure"
+      ]
+    },
+    {
+      "id": "slide-26",
+      "title": "Positioning and moving cylinders",
+      "body": [
+        "Secure cylinders against falling and protect them from heat.",
+        "Use equipment intended for cylinder handling.",
+        "Do not lift by the valve or expose cylinders to impacts.",
+        "Determine separation distances and co-location from current requirements."
+      ],
+      "callout": "Valve damage can cause a sudden release.",
+      "sourceRefs": [
+        "welding",
+        "pressure"
+      ]
+    },
+    {
+      "id": "slide-27",
+      "title": "Regulators and gauges",
+      "body": [
+        "Select a regulator for the gas and pressure range.",
+        "Use compatible connections without improvised adapters.",
+        "Check gauge condition and absence of damage.",
+        "Set operating pressure according to the torch instructions."
+      ],
+      "callout": "A value from someone else's example is not a setting.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-28",
+      "title": "Hoses and connections",
+      "body": [
+        "Use hoses suitable for the gas and working conditions.",
+        "Protect them from kinks, sparks and mechanical damage.",
+        "Use the specified fasteners for connections.",
+        "Check leaks by an approved method without an open flame."
+      ],
+      "callout": "A smell or suspected leak requires stopping.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-29",
+      "title": "Flashback and protection",
+      "body": [
+        "Flashback carries the flame back towards the gas system.",
+        "Specified valves and flashback arrestors reduce the risk.",
+        "Stop according to the instructions after a pop, overheating or unstable operation.",
+        "Restart only after establishing and correcting the cause."
+      ],
+      "callout": "A safety device does not replace a serviceable system.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-30",
+      "title": "Welding containers",
+      "body": [
+        "Before heating, establish what the container previously held.",
+        "Remove residues and isolate connected services under the procedure.",
+        "Test the atmosphere and complete the required authorisation measures.",
+        "Do not independently weld a closed or unidentified container."
+      ],
+      "callout": "An apparently empty container may contain flammable vapours.",
+      "sourceRefs": [
+        "welding",
+        "rules-fire"
+      ]
+    },
+    {
+      "id": "slide-31",
+      "title": "Confined spaces",
+      "body": [
+        "Entry requires special preparation and established authorisation.",
+        "Arrange atmosphere testing, ventilation, communication and an attendant.",
+        "Plan rescue without improvisation.",
+        "Stop and leave if conditions change."
+      ],
+      "callout": "Shielding gas can create an oxygen-deficient atmosphere.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-32",
+      "title": "Work at height",
+      "body": [
+        "Use a safe platform and the specified fall protection.",
+        "Select attachment points under the established system, not arbitrarily.",
+        "Protect fall-protection components from sparks and hot metal.",
+        "Barrier off the lower area against falling objects and particles."
+      ],
+      "callout": "A random scaffold component is not a verified anchorage.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-33",
+      "title": "Handling components",
+      "body": [
+        "Determine mass and the handling method beforehand.",
+        "Use suitable lifting equipment and stable supports.",
+        "Keep hands clear of potential trapping points.",
+        "Identify hot components and place them safely."
+      ],
+      "callout": "Metal appearance does not always reveal its temperature.",
+      "sourceRefs": [
+        "welding",
+        "cranes"
+      ]
+    },
+    {
+      "id": "slide-34",
+      "title": "Making the weld",
+      "body": [
+        "Maintain the parameters and sequence specified by the procedure.",
+        "Monitor process stability and equipment condition.",
+        "Carry out the required cleaning between passes.",
+        "Do not continue if equipment fails or protection is lost."
+      ],
+      "callout": "Stop for unsafe conditions before a defective joint results.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-35",
+      "title": "Visible joint defects",
+      "body": [
+        "Cracks, undercut, overlap and unfilled craters require assessment.",
+        "Weld size and shape must match the documentation.",
+        "Porosity and lack of penetration can have different causes.",
+        "Determine acceptance from requirements, not personal impressions."
+      ],
+      "callout": "Grinding does not prove removal of an internal defect.",
+      "sourceRefs": [
+        "welding",
+        "cranes"
+      ]
+    },
+    {
+      "id": "slide-36",
+      "title": "Inspection and repair",
+      "body": [
+        "Supplement visual inspection with the required methods.",
+        "Record results against the specific joint.",
+        "Use an agreed procedure for repair.",
+        "Repeat inspection to confirm the repair result."
+      ],
+      "callout": "Unauthorised repair can conceal the cause of a defect.",
+      "sourceRefs": [
+        "welding",
+        "cranes",
+        "pressure"
+      ]
+    },
+    {
+      "id": "slide-37",
+      "title": "Breaks and completion",
+      "body": [
+        "Shut down equipment and the gas system as instructed.",
+        "Prevent unintended starting and leaks.",
+        "Inspect the work area and adjacent spaces for smouldering.",
+        "Record completion and maintain the required fire monitoring."
+      ],
+      "callout": "Cooling and concealed smouldering require attention after welding.",
+      "sourceRefs": [
+        "welding",
+        "rules-fire"
+      ]
+    },
+    {
+      "id": "slide-38",
+      "title": "Faults or leakage",
+      "body": [
+        "Stop work and carry out a safe shutdown.",
+        "Warn people and notify the responsible person.",
+        "Do not search for gas leaks with a flame or repair under pressure.",
+        "Resume only after the cause has been confirmed as corrected."
+      ],
+      "callout": "Repeated popping is not normal operation.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-39",
+      "title": "Fire and emergency notification",
+      "body": [
+        "Report the exact location and nature of the hazard.",
+        "Call for help under the established procedure; use 112 or 101 where necessary.",
+        "Maintain a safe escape route.",
+        "Attempt firefighting only with suitable training and safe conditions."
+      ],
+      "callout": "Evacuate when fire threatens to spread.",
+      "sourceRefs": [
+        "welding",
+        "rules-fire"
+      ]
+    },
+    {
+      "id": "slide-40",
+      "title": "First aid and safety",
+      "body": [
+        "First stop harmful exposure without endangering yourself.",
+        "Call emergency services and act within your training.",
+        "For electrical injury, do not touch the person until electrical exposure is safely removed.",
+        "Do not enter a hazardous atmosphere without protection to attempt rescue."
+      ],
+      "callout": "Assistance requires safe conditions.",
+      "sourceRefs": [
+        "welding",
+        "electrical"
+      ]
+    },
+    {
+      "id": "slide-41",
+      "title": "Scenario: an unidentified container",
+      "body": [
+        "You are asked to weld an attachment onto a used container.",
+        "Its previous contents are unknown.",
+        "Stop until identification, preparation and authorisation are complete.",
+        "External cleanliness does not prove absence of hazardous residues."
+      ],
+      "callout": "Heat only after safe conditions are verified.",
+      "sourceRefs": [
+        "welding"
+      ]
+    },
+    {
+      "id": "slide-42",
+      "title": "Final knowledge assessment",
+      "body": [
+        "The welding procedure determines materials, preparation and parameters.",
+        "Check equipment and protective measures before work.",
+        "Faults, leaks and changed conditions require stopping.",
+        "Select Start test."
+      ],
+      "callout": "Safe completion is part of every welding task.",
+      "sourceRefs": [
+        "welding"
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Welder Training in Kazakhstan | Work Safety",
+    "description": "Welding fundamentals, equipment, hot-work precautions and safe working practices. Study the course and test your knowledge.",
+    "ogTitle": "Welder Training in Kazakhstan | Work Safety",
+    "ogDescription": "Welding fundamentals, equipment, hot-work precautions and safe working practices. Study the course and test your knowledge.",
+    "ogImage": "/images/course-batch/svarshchik-en.webp",
+    "indexable": true
+  },
+  "translationSourceSha256": "78cada85a88d40db6d69b6cd8bf16cafaf9426ffda2d4be22bc54a01dea4d143"
+}

@@ -13,6 +13,7 @@ export type LegalAcceptanceSource = 'registration' | 'profile';
 // The locales are declared once, in i18n/config.ts; this file re-exports the
 // type so the database row types can name it without restating the list.
 import type { AppLocale } from '@/i18n/config';
+import type { Database as GeneratedDatabase } from './database.generated';
 
 export type { AppLocale };
 export type AccountApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
@@ -267,6 +268,7 @@ export type AttestationRow = {
 };
 
 export type CertificateRow = {
+  document_snapshot?: Json | null;
   id: string;
   certificate_number: string;
   user_id: string;
@@ -334,10 +336,14 @@ type JsonRpc = { Args: Record<string, unknown>; Returns: Json };
 export type Database = {
   public: {
     Tables: {
+      document_profiles: GeneratedDatabase['public']['Tables']['document_profiles'];
+      document_assets: GeneratedDatabase['public']['Tables']['document_assets'];
+      certificate_settings_versions: GeneratedDatabase['public']['Tables']['certificate_settings_versions'];
       document_batches: Table<{
         id: string; organization: string; organization_key: string; course_slug: string;
         document_date: string; protocol_number: string; automatic: boolean; version: number;
         updated_at: string; updated_by: string | null;
+        profile_id: string | null; participant_fields: Json;
       }>;
       profiles: Table<ProfileRow>;
       organizations: Table<{
@@ -569,6 +575,8 @@ export type Database = {
     };
     Views: Record<never, never>;
     Functions: {
+      select_document_profile: GeneratedDatabase['public']['Functions']['select_document_profile'];
+      save_document_participant_fields: GeneratedDatabase['public']['Functions']['save_document_participant_fields'];
       get_my_capabilities: { Args: Record<PropertyKey, never>; Returns: string[] };
       get_auth_context: { Args: Record<PropertyKey, never>; Returns: AuthContextRpcRow[] };
       complete_zh_username_registration: {
