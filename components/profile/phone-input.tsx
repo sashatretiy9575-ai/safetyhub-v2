@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import type { CountryCode } from 'libphonenumber-js';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import type { PhoneCountryOption, PhoneInputValue } from '@/lib/phone/countries';
 
 export type PhoneFieldValue = PhoneInputValue;
@@ -55,7 +56,7 @@ export function PhoneInput({
       <label className="sr-only" htmlFor={`${id}-country`}>
         {t('phoneCountry')}
       </label>
-      <select
+      <Select
         id={`${id}-country`}
         value={value.countryIso2}
         disabled={disabled}
@@ -68,14 +69,13 @@ export function PhoneInput({
             nationalNumber: formatNationalNumber(countryIso2, value.nationalNumber),
           });
         }}
-        className="flex min-h-11 w-full rounded-[var(--radius-control)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 text-base text-[var(--color-text)] transition outline-none focus:border-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
       >
         {countryOptions.map((option) => (
           <option key={option.countryIso2} value={option.countryIso2}>
             {option.flag} {option.label} ({option.callingCode})
           </option>
         ))}
-      </select>
+      </Select>
       <Input
         id={id}
         type="tel"

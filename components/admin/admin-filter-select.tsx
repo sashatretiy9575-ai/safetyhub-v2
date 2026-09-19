@@ -1,6 +1,6 @@
 'use client';
 
-import type { SelectHTMLAttributes } from 'react';
+import { Select, type SelectProps } from '@/components/ui/select';
 
 /**
  * A `<select>` that submits its owning form on change.
@@ -10,15 +10,6 @@ import type { SelectHTMLAttributes } from 'react';
  * whole section falls back to the admin error boundary. Keeping the handler in
  * this tiny client island preserves the one-tap filtering behaviour.
  */
-export function AdminFilterSelect({
-  className = '',
-  ...props
-}: SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select
-      {...props}
-      onChange={(event) => event.target.form?.requestSubmit()}
-      className={`min-h-11 cursor-pointer rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm ${className}`}
-    />
-  );
+export function AdminFilterSelect(props: SelectProps) {
+  return <Select {...props} onChange={(event) => event.target.form?.requestSubmit()} />;
 }

@@ -21,11 +21,14 @@ async function sourceFiles(directory) {
 // The type scale lives in globals.css as fluid tokens; a component that reaches
 // for text-[NNpx] again would bypass the 320 px floor and the 52 px ceiling
 // the whole site now shares. Breakpoints are the Tailwind names plus xs and
-// wide; the only pixel media query left is the course card's 280 px badge
-// swap, and the admin tables keep their 760 px container query plus the 920 px
-// step where the narrow sheet widens into the full one.
+// wide; the only pixel media queries left are the course card's 280 px badge
+// swap and the admin dock's 360 px step (from there its five captions fit one
+// row like the site's dock; measured against the shipped Manrope at 11 px), and
+// the admin tables keep their 760 px container query plus the 920 px step
+// where the narrow sheet widens into the full one.
 const ALLOWED_PIXEL_QUERIES = new Set([
   'min-[280px]:',
+  'min-[360px]:',
   '@min-[480px]:',
   '@min-[760px]:',
   '@min-[920px]:',

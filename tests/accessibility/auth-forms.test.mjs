@@ -107,14 +107,25 @@ test('email-code form exposes inline errors and focuses the first invalid field'
 });
 
 test('mobile fields prevent zoom and keep OTP controls accessible', async () => {
-  const [input, textarea, flow] = await Promise.all([
+  const [input, textarea, select, field, flow] = await Promise.all([
     read('components/ui/input.tsx'),
     read('components/ui/textarea.tsx'),
+    read('components/ui/select.tsx'),
+    read('components/ui/field.ts'),
     read('components/auth/email-otp-flow.tsx'),
   ]);
 
-  assert.match(input, /text-base[\s\S]*sm:text-sm/u);
-  assert.match(textarea, /text-base[\s\S]*sm:text-sm/u);
+  // 16 px on a phone keeps iOS from zooming into a focused field. The size
+  // lives in the frame every field shares, so each primitive must use it.
+  assert.match(field, /fieldBase =\s*'[^']*text-base[^']*sm:text-sm/u);
+  for (const [name, source] of [
+    ['input', input],
+    ['textarea', textarea],
+    ['select', select],
+  ]) {
+    assert.match(source, /cn\([\s\S]*fieldBase/u, `${name} does not use the shared field frame`);
+    assert.doesNotMatch(source, /\btext-(?:xs|sm)\b(?![^'"]*sm:)/u, `${name} shrinks its text on phones`);
+  }
   assert.match(input, /aria-invalid=\{invalid \|\| undefined\}/u);
   assert.match(textarea, /aria-invalid=\{invalid \|\| undefined\}/u);
   assert.match(flow, /inputMode="numeric"/u);

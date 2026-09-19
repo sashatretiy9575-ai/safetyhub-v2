@@ -103,6 +103,8 @@ test('form and action primitives retain an opaque focus outline', async () => {
     'components/ui/button.tsx',
     'components/ui/input.tsx',
     'components/ui/textarea.tsx',
+    'components/ui/select.tsx',
+    'components/ui/field.ts',
     'components/ui/dropdown-menu.tsx',
   ]) {
     assert.doesNotMatch(await read(file), /outline-none/u, `${file} suppresses keyboard focus`);

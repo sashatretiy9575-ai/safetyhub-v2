@@ -568,7 +568,7 @@ export function AvatarUploader({
           ref={cropPanelRef}
           tabIndex={-1}
           aria-labelledby={cropTitleId}
-          className="mx-auto max-w-sm space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)]"
+          className="mx-auto max-w-sm space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 text-left"
         >
           <div className="space-y-1">
             <h3 id={cropTitleId} className="font-display text-base font-bold">

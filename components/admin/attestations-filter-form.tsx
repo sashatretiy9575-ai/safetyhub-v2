@@ -7,6 +7,7 @@ import { MagnifyingGlass } from '@phosphor-icons/react/dist/csr/MagnifyingGlass'
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import { Button } from '@/components/ui/button';
 import { AdminOverlay } from '@/components/admin/admin-overlay';
+import { fieldFrameFocus } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useAttestationsModalFocus } from './use-attestations-modal-focus';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
@@ -338,7 +339,7 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
             {/* A date input draws its own dd.mm.yyyy, so a placeholder cannot
                 name it. The two fields share one frame that reads "с … по …"
                 instead of carrying a caption each. */}
-            <div className="flex min-h-11 items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)] md:col-span-2">
+            <div className={`flex min-h-11 items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)] md:col-span-2 ${fieldFrameFocus}`}>
               <span aria-hidden className="text-caption text-[var(--color-text-subtle)]">
                 с
               </span>

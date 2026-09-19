@@ -169,7 +169,8 @@
   --color-primary-hover: #105936;
   --color-primary-foreground: #ffffff;
   --color-primary-soft: #e9f2ed;
-  --color-primary-ring: #176b43;
+  /* The soft halo around a focused field, flush against its primary border. */
+  --color-primary-ring: #176b4347;
   --color-on-primary-soft: #145d3b;
   --color-focus: #0b63ce;
 
@@ -292,7 +293,7 @@
     --color-primary-hover: #72ce96;
     --color-primary-foreground: #0a0e0c;
     --color-primary-soft: #182b20;
-    --color-primary-ring: #58bd81;
+    --color-primary-ring: #58bd8159;
     --color-on-primary-soft: #8ad9a8;
     --color-focus: #78aeff;
 
@@ -363,10 +364,11 @@
     border: 3px solid var(--color-bg);
   }
 
+  /* The outline follows the element's own corners. Setting a radius here
+     reshaped pills and round buttons the moment they took focus. */
   :focus-visible {
     outline: 3px solid var(--color-focus);
     outline-offset: 3px;
-    border-radius: var(--radius-sm);
   }
 
   h1,
@@ -427,11 +429,6 @@
 
   [data-admin-shell] dialog {
     max-height: min(92dvh, 60rem);
-  }
-
-  [data-admin-shell] :is(button, a, input, select, textarea, summary):focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--color-primary) 65%, transparent);
-    outline-offset: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -20,6 +20,7 @@ export function EditorActionBar({
   busy,
   preview,
   statusLabel,
+  statusTone,
   published,
   hasDraftChanges = false,
   progress,
@@ -34,6 +35,8 @@ export function EditorActionBar({
   busy: boolean;
   preview: boolean;
   statusLabel: string;
+  /** Overrides the badge colour when the label is not about publication, e.g. unsaved edits on a live course. */
+  statusTone?: 'success' | 'warning' | 'default';
   published: boolean;
   hasDraftChanges?: boolean;
   progress?: string;
@@ -53,7 +56,10 @@ export function EditorActionBar({
     >
       <div className="flex min-w-0 items-center gap-1.5">
         {progress ? <Badge variant="default">{progress}</Badge> : null}
-        <Badge variant={published ? 'success' : 'default'} className="min-w-0 truncate">
+        <Badge
+          variant={statusTone ?? (published ? 'success' : 'default')}
+          className="min-w-0 truncate"
+        >
           {statusLabel}
         </Badge>
         {hasDraftChanges ? (
@@ -67,19 +73,23 @@ export function EditorActionBar({
         </span>
 
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="min-h-11 min-w-11 sm:w-auto sm:px-3"
-            aria-label={preview ? 'Вернуться к форме' : 'Открыть предпросмотр'}
-            title={preview ? 'Вернуться к форме' : 'Предпросмотр'}
-            disabled={busy}
-            onClick={onTogglePreview}
-          >
-            {preview ? <Pencil aria-hidden="true" /> : <Eye aria-hidden="true" />}
-            <span className="hidden sm:inline">{preview ? 'Редактор' : 'Просмотр'}</span>
-          </Button>
+          {/* Four 44 px buttons do not fit a 240 px screen beside the status:
+              there the preview moves into the menu, which then always exists. */}
+          <span className="hidden min-[280px]:inline">
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="min-h-11 min-w-11 sm:w-auto sm:px-3"
+              aria-label={preview ? 'Вернуться к форме' : 'Открыть предпросмотр'}
+              title={preview ? 'Вернуться к форме' : 'Предпросмотр'}
+              disabled={busy}
+              onClick={onTogglePreview}
+            >
+              {preview ? <Pencil aria-hidden="true" /> : <Eye aria-hidden="true" />}
+              <span className="hidden sm:inline">{preview ? 'Редактор' : 'Просмотр'}</span>
+            </Button>
+          </span>
           <Button
             type="button"
             size="icon"
@@ -105,7 +115,7 @@ export function EditorActionBar({
             <UploadSimple aria-hidden="true" />
             <span className="hidden sm:inline">Опубликовать</span>
           </Button>
-          {hasOverflow ? (
+          <span className={hasOverflow ? undefined : 'min-[280px]:hidden'}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -121,6 +131,9 @@ export function EditorActionBar({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem className="min-[280px]:hidden" onSelect={onTogglePreview}>
+                  {preview ? 'Вернуться к форме' : 'Предпросмотр'}
+                </DropdownMenuItem>
                 {onUnpublish ? (
                   <DropdownMenuItem disabled={!published} onSelect={onUnpublish}>
                     Снять с публикации
@@ -133,7 +146,7 @@ export function EditorActionBar({
                 ) : null}
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : null}
+          </span>
         </div>
       </div>
     </div>

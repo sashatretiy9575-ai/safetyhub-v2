@@ -581,7 +581,7 @@ export function AccountApprovalQueue({
                 type="button"
                 disabled={resolved}
                 onClick={() => setOpenId(item.id)}
-                className="flex min-w-0 flex-1 items-center gap-3 rounded-xl text-left focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:outline-none"
+                className="flex min-w-0 flex-1 items-center gap-3 rounded-xl text-left"
                 aria-label={`Открыть заявку: ${label}`}
               >
                 <Avatar item={item} size={48} />

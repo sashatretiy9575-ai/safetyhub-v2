@@ -61,7 +61,8 @@ export function SegmentedControl<T extends string>({
       aria-label={label}
       className={cn(
         // The track is the 44 px touch target; a segment fills all but its rim.
-        'grid min-w-0 auto-cols-fr grid-flow-col gap-0.5 rounded-[var(--radius-control)] bg-[var(--color-surface-soft)] p-0.5',
+        // Its border makes the segments read as one switch rather than loose words.
+        'grid min-w-0 auto-cols-fr grid-flow-col gap-0.5 rounded-[var(--radius-control)] border border-[var(--color-border-strong)] bg-[var(--color-surface-muted)] p-0.5',
         className,
       )}
     >
@@ -81,7 +82,7 @@ export function SegmentedControl<T extends string>({
               'flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-2 text-sm font-semibold transition-colors sm:px-3 [&_svg]:size-4 [&_svg]:shrink-0',
               checked
                 ? 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-[var(--shadow-soft)]'
-                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]',
+                : 'text-[var(--color-text)] hover:bg-[var(--color-surface)]',
             )}
           >
             {option.icon}

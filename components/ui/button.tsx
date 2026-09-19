@@ -17,6 +17,8 @@ const buttonVariants = cva(
         ghost: 'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
         danger:
           'bg-[var(--color-danger)] text-[var(--color-danger-foreground)] hover:brightness-90',
+        // The way into a destructive dialog: red, but quiet until it is pointed at.
+        dangerGhost: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
       },
       size: {
         sm: 'h-11 min-h-11 rounded-[var(--radius-control)] px-4 text-sm',

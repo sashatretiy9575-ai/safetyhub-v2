@@ -5,6 +5,7 @@ import { AdminLocaleTabs } from '@/components/admin/admin-locale-tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { fieldFrameFocus } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -660,7 +661,7 @@ export function LegalLocalizationsEditor({ versions }: { versions: LegalLocaliza
                 onChange={(event) => setBodyRevision(event.target.value)}
               />
             </div>
-            <div className="flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)]">
+            <div className={`flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)] ${fieldFrameFocus}`}>
               <Label className="sr-only" htmlFor="legal-stage-effective-date">
                 Дата вступления в силу
               </Label>

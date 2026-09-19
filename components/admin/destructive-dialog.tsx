@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { AdminOverlay } from '@/components/admin/admin-overlay';
 
-const DEFAULT_ACKNOWLEDGEMENT = 'Да, удалить без возможности восстановления';
+const DEFAULT_ACKNOWLEDGEMENT = 'Подтверждаю удаление';
 
 /**
  * The one confirmation dialog of the admin panel. It started as the deletion
@@ -47,6 +47,15 @@ export function DestructiveDialog({
   const confirmRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [confirmed, setConfirmed] = useState(false);
+  // Read through refs: callers pass a fresh `onOpenChange` on every render, and
+  // an effect keyed on it re-ran on each of them — focus jumped back to the
+  // checkbox the moment an error appeared or the action started.
+  const busyRef = useRef(busy);
+  const closeRef = useRef(onOpenChange);
+  useEffect(() => {
+    busyRef.current = busy;
+    closeRef.current = onOpenChange;
+  });
   const needsAcknowledgement = acknowledgement !== null;
   const resolvedConfirmLabel = confirmLabel ?? (tone === 'danger' ? 'Удалить' : 'Продолжить');
   const resolvedBusyLabel = busyLabel ?? (tone === 'danger' ? 'Удаляем…' : 'Выполняем…');
@@ -56,12 +65,13 @@ export function DestructiveDialog({
       setConfirmed(false);
       return;
     }
+    // Taken here, before the panel exists: the overlay portals its children one
+    // render after it mounts, so this is still the control that opened the dialog.
     const previous = document.activeElement as HTMLElement | null;
-    (checkboxRef.current ?? confirmRef.current)?.focus();
     const keydown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !busy) {
+      if (event.key === 'Escape' && !busyRef.current) {
         event.preventDefault();
-        onOpenChange(false);
+        closeRef.current(false);
         return;
       }
       if (event.key !== 'Tab' || !panelRef.current) return;
@@ -86,7 +96,16 @@ export function DestructiveDialog({
       document.removeEventListener('keydown', keydown);
       previous?.focus();
     };
-  }, [busy, onOpenChange, open]);
+  }, [open]);
+
+  // Focus enters when the panel really attaches. The effect above runs while the
+  // overlay has not portalled anything yet — its refs were still empty, focus
+  // stayed on the trigger and Tab walked the page behind the dialog. Stable, so
+  // it fires once per opening and never pulls focus back on a later render.
+  const attachPanel = useCallback((node: HTMLDivElement | null) => {
+    panelRef.current = node;
+    if (node) (checkboxRef.current ?? confirmRef.current)?.focus();
+  }, []);
 
   if (!open) return null;
 
@@ -99,14 +118,14 @@ export function DestructiveDialog({
         }}
       >
         <div
-          ref={panelRef}
+          ref={attachPanel}
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
           aria-describedby={descriptionId}
           className="w-full max-w-md rounded-[var(--radius-group)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 shadow-2xl"
         >
-          <h2 id={titleId} className="text-xl font-bold">
+          <h2 id={titleId} className="text-xl font-bold break-words">
             {title}
           </h2>
           <p id={descriptionId} className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
