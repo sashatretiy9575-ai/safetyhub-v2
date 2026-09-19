@@ -4,8 +4,14 @@ import {
   parsePhoneNumberFromString,
   type CountryCode,
 } from 'libphonenumber-js/min';
+import { isPhoneCountryCode } from './country-codes.ts';
+export { isPhoneCountryCode } from './country-codes.ts';
 
-export const PRIORITY_PHONE_COUNTRIES = ['KZ', 'RU', 'CN'] as const satisfies readonly CountryCode[];
+export const PRIORITY_PHONE_COUNTRIES = [
+  'KZ',
+  'RU',
+  'CN',
+] as const satisfies readonly CountryCode[];
 
 export type PhoneInputValue = Readonly<{
   countryIso2: CountryCode;
@@ -18,10 +24,6 @@ export type PhoneCountryOption = Readonly<{
   label: string;
   callingCode: string;
 }>;
-
-export function isPhoneCountryCode(value: string): value is CountryCode {
-  return (getCountries() as readonly string[]).includes(value);
-}
 
 export function countryFlag(country: CountryCode) {
   return String.fromCodePoint(...[...country].map((letter) => 0x1f1a5 + letter.charCodeAt(0)));
@@ -39,7 +41,9 @@ export function phoneCountries(locale = 'ru'): CountryCode[] {
   const priority = PRIORITY_PHONE_COUNTRIES.filter((country) => isPhoneCountryCode(country));
   const rest = getCountries()
     .filter((country) => !priority.includes(country as (typeof priority)[number]))
-    .sort((left, right) => countryLabel(left, locale).localeCompare(countryLabel(right, locale), locale));
+    .sort((left, right) =>
+      countryLabel(left, locale).localeCompare(countryLabel(right, locale), locale),
+    );
   return [...priority, ...rest];
 }
 

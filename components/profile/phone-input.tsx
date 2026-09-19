@@ -4,11 +4,7 @@ import { useRef } from 'react';
 import type { CountryCode } from 'libphonenumber-js';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
-import {
-  phoneCallingCode,
-  type PhoneCountryOption,
-  type PhoneInputValue,
-} from '@/lib/phone/countries';
+import type { PhoneCountryOption, PhoneInputValue } from '@/lib/phone/countries';
 
 export type PhoneFieldValue = PhoneInputValue;
 
@@ -38,6 +34,8 @@ export function PhoneInput({
   // spaces while typing. It now loads on the first interaction with the field;
   // until it resolves the value is shown unformatted, which is still correct.
   const formatterRef = useRef<typeof import('libphonenumber-js/min') | null>(null);
+  const callingCode =
+    countryOptions.find((option) => option.countryIso2 === value.countryIso2)?.callingCode ?? '';
 
   const ensureFormatter = () => {
     if (formatterRef.current) return;
@@ -70,7 +68,7 @@ export function PhoneInput({
             nationalNumber: formatNationalNumber(countryIso2, value.nationalNumber),
           });
         }}
-        className="flex min-h-11 w-full rounded-[var(--radius-control)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 text-base text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
+        className="flex min-h-11 w-full rounded-[var(--radius-control)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 text-base text-[var(--color-text)] transition outline-none focus:border-[var(--color-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
       >
         {countryOptions.map((option) => (
           <option key={option.countryIso2} value={option.countryIso2}>
@@ -97,8 +95,8 @@ export function PhoneInput({
         disabled={disabled}
         placeholder={
           optional
-            ? `${t('phonePlaceholder', { code: phoneCallingCode(value.countryIso2) })} ${t('optional')}`
-            : t('phonePlaceholder', { code: phoneCallingCode(value.countryIso2) })
+            ? `${t('phonePlaceholder', { code: callingCode })} ${t('optional')}`
+            : t('phonePlaceholder', { code: callingCode })
         }
         required={!optional}
       />

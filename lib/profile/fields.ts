@@ -1,4 +1,5 @@
-import { isPhoneCountryCode, type PhoneInputValue } from '@/lib/phone/countries';
+import { isPhoneCountryCode } from '@/lib/phone/country-codes';
+import type { PhoneInputValue } from '@/lib/phone/countries';
 
 export type ProfileValues = Readonly<{
   name: string;
