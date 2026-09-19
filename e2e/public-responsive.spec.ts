@@ -65,6 +65,15 @@ test('marketing cards peek below 1200px and become an equal three-column grid at
   page,
 }) => {
   await blockRemoteIntegrations(page);
+  await page.goto('/topics', { waitUntil: 'domcontentloaded' });
+  const catalogCards = page.locator('[data-course-card]');
+  await expect(catalogCards.first()).toBeVisible();
+  const publishedLinks = await catalogCards.evaluateAll((cards) =>
+    cards.map((card) => card.getAttribute('href')).sort(),
+  );
+  // Geometry needs three cards; the published catalog may grow beyond the seed.
+  expect(publishedLinks.length).toBeGreaterThanOrEqual(3);
+  expect(new Set(publishedLinks).size).toBe(publishedLinks.length);
   for (const width of [390, 768, 1200] as const) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -72,7 +81,12 @@ test('marketing cards peek below 1200px and become an equal three-column grid at
     const slider = page.getByRole('region', { name: 'Программы обучения' });
     await expect(slider).toBeVisible();
     const slides = slider.getByRole('listitem');
-    await expect(slides).toHaveCount(5);
+    await expect(slides).toHaveCount(publishedLinks.length);
+    expect(
+      await slider
+        .locator('[data-course-card]')
+        .evaluateAll((cards) => cards.map((card) => card.getAttribute('href')).sort()),
+    ).toEqual(publishedLinks);
 
     const geometry = await Promise.all([
       slider.boundingBox(),

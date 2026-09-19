@@ -1,6 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
+import { resetLocalDocumentSettingsQuota } from './helpers/local-document-settings-quota';
 
 test.use({ storageState: process.env.E2E_ADMIN_STORAGE_STATE, channel: 'chrome' });
+
+// Each scenario/retry starts with its own synthetic actor budget. The product
+// limit remains intact during the scenario and is tested separately.
+test.beforeEach(async ({ page }, testInfo) => {
+  if (/company protocol|photographed stamp/.test(testInfo.title)) {
+    await resetLocalDocumentSettingsQuota(page.request, String(testInfo.project.use.baseURL));
+  }
+});
 
 // A click that lands before React hydrates is lost, and on a CI runner that window is seconds wide.
 async function openEditor(page: Page, url?: string) {
@@ -30,6 +39,7 @@ test('protected photo route returns JPEG from a real private storage manifest', 
 
 test('company protocol, individual booklet, persistence and mobile preview', async ({ page }, testInfo) => {
   test.setTimeout(180_000);
+  page.setDefaultTimeout(30_000);
   const base = testInfo.project.use.baseURL;
   if (!base || !['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('LOCAL_ONLY');
   const errors: string[] = [];
@@ -62,6 +72,8 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   const originalCompany = await (await page.request.get('/api/admin/documents', { params: chosen! })).json();
   const originalCertificateId = originalCompany.participants.find((p: { userId: string }) => p.userId === chosen!.user).certificateId;
   const originalMetadata = await (await page.request.get(`/api/certificates/${originalCertificateId}/metadata`)).json();
+  expect(originalMetadata.branding.documentDefaults?.insertWidthCm, 'seeded issuance must capture insert width before its immutable snapshot is created').toBeGreaterThan(0);
+  expect(originalMetadata.branding.documentDefaults?.insertHeightCm, 'seeded issuance must capture insert height before its immutable snapshot is created').toBeGreaterThan(0);
   await openEditor(page, '/admin/settings/certificate?' + new URLSearchParams({ organization: chosen!.organization, course: chosen!.course, user: chosen!.user }));
   await expect(page.getByRole('button', { name: 'Изменить', exact: true })).toBeVisible();
   // Rare settings are one line each until opened; what was open survives a reload.
@@ -137,7 +149,7 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   await page.screenshot({ path: testInfo.outputPath('booklet-desktop.png'), fullPage: true });
   // A wider frame redraws the sheet at the new sharpness; the picture is taken of the settled canvas.
   await expect(async () => { await page.locator('canvas').first().screenshot({ path: testInfo.outputPath('booklet-side-1.png'), timeout: 5_000 }); }).toPass();
-  const downloadEvent = page.waitForEvent('download');
+  const downloadEvent = page.waitForEvent('download', { timeout: 45_000 });
   await page.getByRole('button', { name: 'Скачать PDF', exact: true }).click();
   const bookletDownload = await downloadEvent;
   expect(bookletDownload.suggestedFilename()).toMatch(/\.pdf$/);
@@ -197,6 +209,20 @@ test('a photographed stamp becomes a transparent picture, stays until replaced a
   const original = before.hasStamp ? await (await stored(before.version)).body() : null;
   // A sheet photographed under a lamp: a blue ring on unevenly lit paper, no transparency at all.
   const sheet = await sharp(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="420" height="320"><defs><linearGradient id="l"><stop offset="0" stop-color="#f4f1ea"/><stop offset="1" stop-color="#c9c6c0"/></linearGradient></defs><rect width="420" height="320" fill="url(#l)"/><circle cx="210" cy="160" r="96" fill="none" stroke="#2f4fb4" stroke-width="9"/></svg>')).jpeg({ quality: 90 }).toBuffer();
+  // The persisted RPC quota must return its retry contract, not a generic 500.
+  // Only the disposable local actor's bucket is set; product limits are unchanged.
+  await resetLocalDocumentSettingsQuota(page.request, base, 10);
+  try {
+    const limited = await page.request.put('/api/admin/settings/certificate/image?kind=stamp', { headers: { origin: base, 'content-type': 'image/png' }, data: await sharp(sheet).png().toBuffer() });
+    expect(limited.status()).toBe(429);
+    const quota = await limited.json();
+    expect(quota.error).toBe('RATE_LIMITED');
+    expect(quota.retryAfter).toBeGreaterThan(0);
+    expect(limited.headers()['retry-after']).toBe(String(quota.retryAfter));
+    expect((await settings()).version).toBe(before.version);
+  } finally {
+    await resetLocalDocumentSettingsQuota(page.request, base);
+  }
   try {
     await openEditor(page, '/admin/settings/certificate?tab=certificate');
     await page.getByRole('button', { name: /^Печать и подпись/ }).click();

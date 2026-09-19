@@ -326,6 +326,48 @@ if (!revisions.length) {
     'Created accounts, profiles and companies; run supabase/seed.sql first to seed course revisions.',
   );
 } else {
+  // Issuance captures these dimensions in an immutable snapshot. Configure the
+  // synthetic insert before certificates are inserted, never repair old snapshots.
+  const documentSettings = must(
+    'read synthetic document dimensions',
+    await supabase
+      .from('certificate_settings')
+      .select('version,document_defaults')
+      .eq('singleton', true)
+      .single(),
+  );
+  const defaults = documentSettings.document_defaults;
+  if (!defaults.insertWidthCm || !defaults.insertHeightCm) {
+    const link = must(
+      'create synthetic administrator session',
+      await supabase.auth.admin.generateLink({ type: 'magiclink', email: admin.email }),
+    );
+    const operator = createClient(url, secret, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    must(
+      'authenticate synthetic administrator',
+      await operator.auth.verifyOtp({
+        token_hash: link.properties.hashed_token,
+        type: 'magiclink',
+      }),
+    );
+    const updated = must(
+      'configure synthetic document dimensions',
+      await operator.rpc('update_certificate_settings', {
+        p_expected_version: documentSettings.version,
+        p_patch: {
+          documentDefaults: {
+            ...defaults,
+            insertWidthCm: defaults.insertWidthCm || 32,
+            insertHeightCm: defaults.insertHeightCm || 10,
+          },
+        },
+      }),
+    );
+    if (updated?.__safetyhubRpcError)
+      throw new Error(`Synthetic document dimensions: ${updated.__safetyhubRpcError.message}`);
+  }
   const attempts = [];
   const attestations = [];
   const certificates = [];

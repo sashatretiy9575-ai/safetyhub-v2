@@ -1,3 +1,4 @@
+import { normalizeRateLimitError } from '@/server/security/rate-limit';
 import 'server-only';
 
 import { revalidateTag, unstable_cache } from 'next/cache';
@@ -200,7 +201,7 @@ export async function updateCertificateSettings(
     if (error instanceof Error && error.message.includes('CERTIFICATE_SETTINGS_VERSION_CONFLICT')) {
       throw new CertificateSettingsConflictError();
     }
-    throw error;
+    normalizeRateLimitError(error);
   }
   const parsed = certificateSettingsSchema.safeParse(payload);
   if (!parsed.success) throw new Error('CERTIFICATE_SETTINGS_RESPONSE_INVALID');
@@ -239,7 +240,7 @@ export async function saveCertificateImage(
       const message = error instanceof Error ? error.message : '';
       if (message.includes('CERTIFICATE_SETTINGS_VERSION_CONFLICT') && attempt < 2) continue;
       if (message.includes('CERTIFICATE_IMAGE_INVALID')) throw new Error('CERTIFICATE_IMAGE_INVALID');
-      throw error;
+      normalizeRateLimitError(error);
     }
     const parsed = certificateSettingsSchema.safeParse(payload);
     if (!parsed.success) throw new Error('CERTIFICATE_SETTINGS_RESPONSE_INVALID');
