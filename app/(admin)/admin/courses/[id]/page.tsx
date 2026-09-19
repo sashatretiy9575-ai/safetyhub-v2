@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getTestEditorSeed } from '@/server/admin/management';
 import { getCourseEditorLocalizations } from '@/server/admin/localizations';
+import { courseLocaleBlockers } from '@/lib/admin/course-readiness';
 import { TestEditor } from '@/components/admin/test-editor';
 import { CourseLocalizationsEditor } from '@/components/admin/course-localizations-editor';
 
@@ -25,9 +26,16 @@ export default async function EditCoursePage({
   const localizations = localizationsResult.value;
   return (
     <section className="space-y-6">
-      <h1 className="font-display text-h3 font-bold">Новая редакция курса</h1>
       <TestEditor
         initial={seed}
+        // The heading sits beside «Назад», which only a client component can
+        // point at the list as it was left.
+        heading={
+          <h1 className="font-display text-h3 font-bold break-words">Новая редакция курса</h1>
+        }
+        // What stops publication in each language, computed from the saved rows:
+        // the same check the publish route repeats.
+        localeBlockers={courseLocaleBlockers(localizations)}
         initialPublicationNotice={
           query.publication === 'incomplete' || query.publication === 'failed'
             ? query.publication

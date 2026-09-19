@@ -104,3 +104,28 @@ test('each language keeps its own wording rather than a Russian fallback', () =>
     assert.doesNotMatch(seo.description, /Практический материал SafetyHub/u);
   }
 });
+
+test('a translated course page never falls back to Russian SEO wording', async () => {
+  // The five older courses store no SEO block. The public page then built one
+  // from the generic default, whose filler is Russian: a Chinese one-line summary
+  // (28–35 characters) is under its 40-character floor and got a Russian tail,
+  // and a two-character Chinese title became «Материал SafetyHub».
+  const zhSummary = '木工作业安全操作规程与个人防护要点，适用于施工现场木工岗位。';
+  assert.ok(zhSummary.length < 40);
+  for (const [locale, title, description] of [
+    ['zh', '木工', zhSummary],
+    ['kk', 'Ағаш ұстасы', 'Қысқа сипаттама.'],
+    ['en', 'Carpenter', 'Short summary.'],
+  ]) {
+    const seo = courseSeoDefaults(locale, title, description);
+    assert.equal(contentSeoSchema.safeParse(seo).success, true, locale);
+    for (const value of [seo.title, seo.description, seo.ogTitle, seo.ogDescription]) {
+      assert.doesNotMatch(value, /Материал SafetyHub|Практический материал/u, `${locale}: ${value}`);
+    }
+  }
+  assert.match(courseSeoDefaults('zh', '木工', zhSummary).title, /^木工/u);
+
+  const topics = await readFile(path.join(repositoryRoot, 'server/content/topics.ts'), 'utf8');
+  assert.match(topics, /locale === DEFAULT_LOCALE\s*\?\s*defaultContentSeo\(title, description\)\s*:\s*courseSeoDefaults\(locale, title, description\)/u);
+  assert.match(topics, /topicSeo\(value\.seo, value\.title, value\.description, locale\)/u);
+});

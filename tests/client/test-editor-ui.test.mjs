@@ -123,7 +123,15 @@ test('course editor exposes presentation, policy, three variants, stable ids and
   assert.match(component, /Array\.from\(\{ length: TEST_EDITOR_LIMITS\.optionCount \}/);
   assert.match(component, /correctOptionId/);
   assert.match(component, /crypto\.randomUUID\(\)/);
-  assert.match(component, /\$\{TEST_EDITOR_TOTAL_QUESTIONS\} заполненных вопросов/);
+  // A failed validation names the first field to fix and counts the rest,
+  // instead of a sentence about «30 заполненных вопросов» that named nothing.
+  assert.match(
+    component,
+    /setError\(`\$\{firstAndMore\(\[\.\.\.new Set\(Object\.values\(effectiveValidation\.fieldErrors\)\)\]\)\}\.`\)/,
+  );
+  assert.match(component, / и ещё \$\{rest\.length\}/);
+  assert.doesNotMatch(component, /заполненных вопросов/);
+  assert.match(component, /\$\{validation\.completedCount\}\/\$\{TEST_EDITOR_TOTAL_QUESTIONS\}/);
   assert.match(component, /attemptResetTimezone: 'Asia\/Oral'/);
   assert.match(component, /clientRequest\('\/api\/admin\/courses'/);
   assert.match(component, /router\.replace\(`\/admin\/courses\//);
@@ -139,6 +147,23 @@ test('course editor exposes presentation, policy, three variants, stable ids and
   assert.doesNotMatch(component, /localStorage\.getItem|localStorage\.setItem/);
   assert.match(component, /useUnsavedChangesGuard\(dirty\)/);
   assert.match(component, /<EditorActionBar/);
+  // The way back leads to the list as it was left, and being a link it is
+  // covered by the unsaved-changes guard.
+  assert.match(component, /useAdminListHref\('\/admin\/courses'\)/);
+  assert.match(component, /<Link href=\{listHref\}>Назад<\/Link>/);
+  // A course can be withdrawn from its own editor; the list row no longer does it.
+  assert.match(component, /onUnpublish=\{course\.id \? \(\) => void unpublish\(\) : undefined\}/);
+  assert.match(component, /title: 'Снять курс с публикации\?'/);
+  assert.match(component, /\/status`,\s*\{\s*method: 'PATCH',/);
+  assert.match(component, /body: JSON\.stringify\(\{ status: 'draft' \}\)/);
+  // The status badge tells five states apart, unsaved edits first.
+  assert.match(
+    component,
+    /const statusLabel = dirty\s*\? 'Не сохранено'\s*: publicationState === 'published' && liveRevision\s*\? `Опубликована редакция \$\{liveRevision\}`\s*: PUBLICATION_LABEL\[publicationState\];/,
+  );
+  for (const label of ['Опубликован · есть черновик', 'Снят с публикации', 'Не опубликован']) {
+    assert.match(component, new RegExp(`'${label}'`));
+  }
   assert.match(component, /7\. Проверка перед публикацией/);
   assert.match(component, /8\. История редакций/);
   assert.match(component, /Это предупреждение не блокирует публикацию/);

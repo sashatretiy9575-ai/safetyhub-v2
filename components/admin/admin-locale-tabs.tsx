@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { AppLocale } from '@/lib/supabase/types';
 import {
@@ -10,15 +10,26 @@ import {
   type AdminLocalizationStatus,
 } from '@/lib/admin/localization-contract';
 
+export type AdminLocaleTabBadge = {
+  label: string;
+  variant: NonNullable<BadgeProps['variant']>;
+};
+
 export function AdminLocaleTabs({
   activeLocale,
   statuses,
+  badges,
   onChange,
   label = 'Языки локализации',
   idPrefix = 'localization',
 }: {
   activeLocale: AppLocale;
   statuses: Record<AppLocale, AdminLocalizationStatus>;
+  /**
+   * An editor that knows more than the four stored statuses — the course editor
+   * tells a live version with gaps from a complete one — names the state itself.
+   */
+  badges?: Record<AppLocale, AdminLocaleTabBadge>;
   onChange: (locale: AppLocale) => void;
   label?: string;
   idPrefix?: string;
@@ -27,6 +38,7 @@ export function AdminLocaleTabs({
     <div role="tablist" aria-label={label} className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
       {ADMIN_CONTENT_LOCALES.map((locale) => {
         const status = statuses[locale];
+        const badge = badges?.[locale];
         const localeIndex = ADMIN_CONTENT_LOCALES.indexOf(locale);
         return (
           <button
@@ -40,7 +52,10 @@ export function AdminLocaleTabs({
             id={`${idPrefix}-tab-${locale}`}
             tabIndex={locale === activeLocale ? 0 : -1}
             className={cn(
-              'flex min-h-14 min-w-0 items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left',
+              'flex min-w-0 items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left',
+              // «Опубликовано не полностью» takes two lines in a narrow tab. The
+              // taller tab holds either, so a change of state does not move it.
+              badge ? 'min-h-16' : 'min-h-14',
               locale === activeLocale
                 ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)]'
                 : 'bg-[var(--color-surface)] hover:bg-[var(--color-surface-muted)]',
@@ -77,16 +92,18 @@ export function AdminLocaleTabs({
             </span>
             <Badge
               variant={
-                status === 'published'
-                  ? 'success'
-                  : status === 'complete'
-                    ? 'sapphire'
-                    : status === 'draft'
-                      ? 'warning'
-                      : 'default'
+                badge
+                  ? badge.variant
+                  : status === 'published'
+                    ? 'success'
+                    : status === 'complete'
+                      ? 'sapphire'
+                      : status === 'draft'
+                        ? 'warning'
+                        : 'default'
               }
             >
-              {ADMIN_LOCALIZATION_STATUS_LABELS[status]}
+              {badge ? badge.label : ADMIN_LOCALIZATION_STATUS_LABELS[status]}
             </Badge>
           </button>
         );

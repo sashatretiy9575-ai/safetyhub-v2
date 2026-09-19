@@ -98,6 +98,104 @@ test('browser locale editor cannot read or submit persisted assessment identifie
   assert.match(packageJson, /content:assessment-localization:import/u);
 });
 
+test('course readiness is counted on the server and only the counts reach the browser', async () => {
+  const [contract, server, management, route, page, component, tabs, editor] = await Promise.all([
+    read('lib/admin/localization-contract.ts'),
+    read('server/admin/localizations.ts'),
+    read('server/admin/management.ts'),
+    read('app/api/admin/courses/[courseId]/localizations/publish/route.ts'),
+    read('app/(admin)/admin/courses/[id]/page.tsx'),
+    read('components/admin/course-localizations-editor.tsx'),
+    read('components/admin/admin-locale-tabs.tsx'),
+    read('components/admin/test-editor.tsx'),
+  ]);
+  const browserContract = sourceBetween(
+    contract,
+    'export type CourseLocalizationEditorItem',
+    'export type ArticleLocalizationEditorItem',
+  );
+  const editorRead = sourceBetween(
+    server,
+    'export async function getCourseEditorLocalizations',
+    'async function courseLocalizationSource',
+  );
+  const publisher = sourceBetween(
+    server,
+    'export async function publishCourseLocalizations',
+    'export async function getArticleEditorLocalizations',
+  );
+  const seoFallback = sourceBetween(server, 'function normalizedSeo', 'function normalizedSources');
+  const explanationIds = sourceBetween(
+    management,
+    'export async function readCourseExplanationIds',
+    'export async function getTestEditorSeed',
+  );
+
+  // The browser item gains the stored SEO and four numbers, nothing textual.
+  assert.match(browserContract, /seoStored:\s*\{ title: string; description: string \}/u);
+  assert.match(
+    browserContract,
+    /assessmentGaps:\s*\{\s*total: number;\s*emptyTexts: number;\s*missingExplanations: number;\s*russianTexts: number;\s*\} \| null/u,
+  );
+
+  // The stored question sets are read and counted on the server by the shared
+  // pure function; the row handed on carries the counts and not the column.
+  assert.match(editorRead, /\.select\('locale,question_variants'\)/u);
+  assert.match(editorRead, /readCourseExplanationIds\(courseId\)/u);
+  assert.match(editorRead, /assessmentGaps:[\s\S]{0,120}courseAssessmentGaps\(row\.locale,/u);
+  assert.match(editorRead, /seoStored: storedSeo\(row\.seo\)/u);
+  assert.doesNotMatch(editorRead, /question_variants:|questionVariants/u);
+  // A withdrawn course keeps its revision pointer; its locales are not live.
+  assert.match(editorRead, /current\.data\?\.status === 'published'/u);
+
+  // Parity with the Russian explanations travels as identifiers, through the
+  // cached capability-gated bank read and outside the editor seed.
+  assert.match(explanationIds, /requireCapability\('test\.manage'\)/u);
+  assert.match(explanationIds, /readCourseQuestionBank\(testId, actor\.user\.id\)/u);
+  assert.match(explanationIds, /\.map\(\(question\) => question\.id\)/u);
+  assert.doesNotMatch(explanationIds, /correctOptionId|question\.text|options/u);
+
+  // Russian filler is no longer handed to a translation: only the source
+  // language reaches `defaultContentSeo`, and nowhere else in the module.
+  assert.match(
+    seoFallback,
+    /if \(locale === 'ru'\) return defaultContentSeo\(title, description\);/u,
+  );
+  assert.equal(server.match(/defaultContentSeo\(/gu)?.length, 1);
+  assert.match(
+    server,
+    /seo: normalizedSeo\(row\.locale, row\.seo, row\.title, row\.description\)/u,
+  );
+  assert.doesNotMatch(server, /normalizedSeo\(row\.seo,/u);
+
+  // The publisher repeats the check on saved rows before the atomic RPC, and
+  // the route names what it found.
+  assert.ok(
+    publisher.indexOf('coursePublicationBlockers(') >= 0 &&
+      publisher.indexOf('coursePublicationBlockers(') <
+        publisher.indexOf("authenticatedRpc('publish_course_revision_v4'"),
+  );
+  assert.match(publisher, /throw new CourseLocalizationsIncompleteError\(blockers\)/u);
+  assert.match(route, /error: 'COURSE_LOCALIZATIONS_INCOMPLETE',/u);
+  assert.match(
+    route,
+    /blockers: error instanceof CourseLocalizationsIncompleteError \? error\.blockers : \[\]/u,
+  );
+  assert.match(route, /\{ status: 409 \}/u);
+
+  // The page computes the blockers on the server; both editors show states and
+  // lines from the shared module instead of a generic sentence.
+  assert.match(page, /localeBlockers=\{courseLocaleBlockers\(localizations\)\}/u);
+  assert.match(tabs, /badges\?: Record<AppLocale, AdminLocaleTabBadge>/u);
+  assert.match(component, /badges=\{byLocale\(\(locale\) => readiness\[locale\]\.state\)\}/u);
+  assert.match(component, /courseLocaleGaps\(savedItems\[locale\], savedItems\.ru, 'bare'\)/u);
+  assert.match(component, /router\.refresh\(\);/u);
+  assert.doesNotMatch(component, /Статус: <strong>/u);
+  assert.match(editor, /setRefusedBlockers\(refused\)/u);
+  assert.match(editor, /data-course-publication-blockers/u);
+  assert.doesNotMatch(editor, /подготовьте RU, KK, EN и ZH/u);
+});
+
 test('offline assessment importer accepts only strict public wording and emits a bounded receipt', async () => {
   const directory = await mkdtemp(path.join(tmpdir(), 'safetyhub-locale-import-'));
   const validPath = path.join(directory, 'valid.json');

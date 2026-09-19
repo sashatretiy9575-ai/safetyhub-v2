@@ -42,7 +42,20 @@ export type CourseLocalizationEditorItem = {
   description: string;
   content: Record<string, unknown>;
   assessment: { variantCount: number; questionCounts: number[] } | null;
+  /**
+   * Counts only, taken on the server: the browser learns how many texts are
+   * blank, unexplained or still Russian, never which ones or what they say.
+   */
+  assessmentGaps: {
+    total: number;
+    emptyTexts: number;
+    missingExplanations: number;
+    russianTexts: number;
+  } | null;
+  /** What the form shows: for a translation, blank wherever nothing is stored. */
   seo: ContentSeo;
+  /** The SEO exactly as stored, before a default is offered in the form. */
+  seoStored: { title: string; description: string };
   sources: ContentSource[];
   contentHash: string | null;
   reviewedContentHash: string | null;

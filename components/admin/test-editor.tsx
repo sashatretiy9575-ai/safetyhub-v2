@@ -1,8 +1,10 @@
 'use client';
 
 import { ArrowDown, ArrowUp } from '@phosphor-icons/react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { APP_LOCALES, type AppLocale } from '@/i18n/config';
 import type {
   AdminTestQuestion,
   AdminTestVariant,
@@ -21,6 +23,13 @@ import {
   TEST_EDITOR_TOTAL_QUESTIONS,
   validateTestEditor,
 } from '@/lib/admin/course-test-editor';
+import {
+  COURSE_UNSAVED_LOCALES_EVENT,
+  courseLocaleBlockers,
+  courseLocaleGaps,
+  courseLocaleUnsavedNotice,
+  type CourseLocaleBlockers,
+} from '@/lib/admin/course-readiness';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { defaultContentSeo } from '@/lib/validation/content-seo';
 import { withCourseSeoDefaults } from '@/lib/validation/course-seo-defaults';
@@ -31,15 +40,18 @@ import { CoursePresentationInput } from '@/components/admin/course-presentation-
 import { EditorActionBar } from '@/components/admin/editor-action-bar';
 import { EditorShell } from '@/components/admin/editor-shell';
 import { useUnsavedChangesGuard } from '@/components/admin/use-unsaved-changes-guard';
+import { useAdminListHref } from '@/components/admin/use-admin-list-href';
 import { cn, formatDateTime } from '@/lib/utils';
 import { confirmDialog } from '@/components/admin/confirm-dialog';
 
 type PublicationState = NonNullable<TestEditorPayload['publicationState']>;
+// «Опубликован» used to stand for a live course with and without a newer draft
+// alike. A live course names its revision instead; see `statusLabel` below.
 const PUBLICATION_LABEL: Record<PublicationState, string> = {
-  never_published: 'Ещё не публиковался',
+  never_published: 'Не опубликован',
   draft: 'Снят с публикации',
   published: 'Опубликован',
-  published_with_draft_changes: 'Опубликован',
+  published_with_draft_changes: 'Опубликован · есть черновик',
 };
 
 function newQuestion(): AdminTestQuestion {
@@ -161,14 +173,46 @@ function errorNoun(count: number) {
   return ERROR_NOUNS[RU_PLURAL_RULES.select(count)];
 }
 
+const REASON_NOUNS: Record<Intl.LDMLPluralRule, string> = {
+  zero: 'причин',
+  one: 'причина',
+  two: 'причины',
+  few: 'причины',
+  many: 'причин',
+  other: 'причины',
+};
+
+/**
+ * The message area names the first thing to fix and counts the rest; the whole
+ * list is in step 7. The sentences this replaced told the administrator to
+ * prepare all four languages and never said which part of which one was missing.
+ */
+function firstAndMore(messages: readonly string[]) {
+  const [first, ...rest] = messages;
+  if (!first) return '';
+  const lead = first.replace(/\.$/u, '');
+  return rest.length > 0 ? `${lead} и ещё ${rest.length}` : lead;
+}
+
+function blockedMessage(blockers: readonly string[]) {
+  return `Черновик сохранён. ${firstAndMore(blockers) || 'Публикация заблокирована'}.`;
+}
+
 export function TestEditor({
   initial,
   initialPublicationNotice = null,
+  localeBlockers,
+  heading,
 }: {
   initial?: TestEditorSeed;
   initialPublicationNotice?: 'incomplete' | 'failed' | null;
+  /** What stops publication in each language, from the saved rows. Absent for a course not saved yet. */
+  localeBlockers?: CourseLocaleBlockers;
+  /** The page's heading, shown beside «Назад». */
+  heading?: ReactNode;
 }) {
   const router = useRouter();
+  const listHref = useAdminListHref('/admin/courses');
   const normalizedInitial = useMemo(() => freshTestFromSeed(initial), [initial]);
   const bankLoaded = Boolean(initial?.questionVariants);
   // The bank could not be read at all (the read path is missing in this
@@ -184,14 +228,21 @@ export function TestEditor({
   const [activeQuestion, setActiveQuestion] = useState(0);
   const [preview, setPreview] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(
+  // A course that was never saved has no translations yet, and says so.
+  const savedBlockers = useMemo(() => localeBlockers ?? courseLocaleBlockers([]), [localeBlockers]);
+  const [error, setError] = useState(() =>
     initialPublicationNotice === 'incomplete'
-      ? 'Черновик сохранён, но публикация заблокирована: подготовьте RU, KK, EN и ZH.'
+      ? blockedMessage(APP_LOCALES.flatMap((locale) => savedBlockers[locale]))
       : initialPublicationNotice === 'failed'
-        ? 'Черновик сохранён, но четыре локализации опубликовать не удалось.'
+        ? 'Черновик сохранён. Опубликовать не удалось.'
         : '',
   );
   const [validationAttempted, setValidationAttempted] = useState(false);
+  // What the publish route refused with, until the refreshed page replaces it.
+  const [refusedBlockers, setRefusedBlockers] = useState<string[] | null>(null);
+  // Locale tabs below that hold unsaved work. They are a sibling component under
+  // a server page, so they announce themselves on `window`.
+  const [unsavedLocales, setUnsavedLocales] = useState<readonly AppLocale[]>([]);
 
   const snapshot = useMemo(() => serializeTestEditorPayload(course), [course]);
   const dirty = snapshot !== savedSnapshot;
@@ -210,6 +261,76 @@ export function TestEditor({
   );
   const currentVariant = course.questionVariants[activeVariant];
   const currentQuestion = currentVariant?.questions[activeQuestion];
+
+  // Russian is judged by the open form — it is saved before every publication
+  // attempt — and only once the form validates: until then the count below
+  // already speaks for it. The translations are judged by their saved rows, and
+  // a tab with unsaved work is named instead of rows that are about to change.
+  const blockers = useMemo(() => {
+    if (refusedBlockers) return refusedBlockers;
+    return APP_LOCALES.flatMap((locale) => {
+      if (locale !== 'ru') {
+        return unsavedLocales.includes(locale)
+          ? [courseLocaleUnsavedNotice(locale)]
+          : savedBlockers[locale];
+      }
+      if (!validation.valid) return [];
+      return courseLocaleGaps(
+        {
+          locale,
+          status: 'complete',
+          title: course.title,
+          description: course.description,
+          seoStored: { title: course.seo.title, description: course.seo.description },
+          presentation: course.presentation ? { status: course.presentation.status } : null,
+          assessmentImported: true,
+          assessmentGaps: {
+            total: validation.completedCount,
+            emptyTexts: 0,
+            missingExplanations: 0,
+            russianTexts: 0,
+          },
+        },
+        null,
+      );
+    });
+  }, [
+    course.description,
+    course.presentation,
+    course.seo.description,
+    course.seo.title,
+    course.title,
+    refusedBlockers,
+    savedBlockers,
+    unsavedLocales,
+    validation.completedCount,
+    validation.valid,
+  ]);
+
+  useEffect(() => {
+    const onUnsavedLocales = (event: Event) => {
+      const detail: unknown = (event as CustomEvent).detail;
+      setUnsavedLocales(
+        Array.isArray(detail)
+          ? APP_LOCALES.filter((locale) => locale !== 'ru' && detail.includes(locale))
+          : [],
+      );
+    };
+    window.addEventListener(COURSE_UNSAVED_LOCALES_EVENT, onUnsavedLocales);
+    return () => window.removeEventListener(COURSE_UNSAVED_LOCALES_EVENT, onUnsavedLocales);
+  }, []);
+
+  // `router.refresh()` after a save, a publication or a withdrawal brings a new
+  // seed. The form keeps what is being typed; the revision history is the
+  // server's alone — it is not even part of the unsaved-changes comparison — and
+  // the refusal the refreshed list of blockers now covers is dropped.
+  const seededRef = useRef(normalizedInitial);
+  useEffect(() => {
+    if (seededRef.current === normalizedInitial) return;
+    seededRef.current = normalizedInitial;
+    setCourse((current) => ({ ...current, revisionHistory: normalizedInitial.revisionHistory }));
+    setRefusedBlockers(null);
+  }, [normalizedInitial]);
 
   useEffect(() => {
     // Previous releases stored full question sets (including answer keys) in
@@ -323,9 +444,7 @@ export function TestEditor({
       ? validation
       : validateTestEditor(course, { publish: false });
     if (!effectiveValidation.valid) {
-      setError(
-        `Исправьте отмеченные поля. Для публикации нужны готовая PDF-презентация и ${TEST_EDITOR_TOTAL_QUESTIONS} заполненных вопросов.`,
-      );
+      setError(`${firstAndMore([...new Set(Object.values(effectiveValidation.fieldErrors))])}.`);
       if (effectiveValidation.firstInvalidVariantIndex !== null)
         setActiveVariant(effectiveValidation.firstInvalidVariantIndex);
       if (effectiveValidation.firstInvalidQuestionIndex !== null)
@@ -337,6 +456,12 @@ export function TestEditor({
             ?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
         0,
       );
+      return;
+    }
+    // The publish route judges saved rows and cannot see a locale tab that was
+    // edited and not saved: the revision would go live without that work.
+    if (publish && unsavedLocales.length > 0) {
+      setError(`${firstAndMore(unsavedLocales.map(courseLocaleUnsavedNotice))}.`);
       return;
     }
     if (
@@ -383,26 +508,30 @@ export function TestEditor({
       // Only the fields the server owns are merged back, on top of whatever the
       // form holds now. Replacing the whole object with the snapshot taken when
       // the request started silently discarded every edit made while it ran.
+      const live =
+        course.publicationState === 'published' ||
+        course.publicationState === 'published_with_draft_changes';
       const savedFields = {
         id: payload.id,
         draftVersion: payload.draftVersion ?? course.draftVersion,
         contentHash: payload.contentHash ?? course.contentHash,
         // Saving a draft does not withdraw a published course. The state is
-        // whether the published revision still matches what was just saved.
-        publicationState:
-          course.publicationState === 'published' &&
-          course.revisionHistory?.find((revision) => revision.current)?.contentHash ===
+        // whether the published revision still matches what was just saved: a
+        // live course with a newer draft used to come back as `draft`, which the
+        // badge reads as «Снят с публикации».
+        publicationState: live
+          ? course.revisionHistory?.find((revision) => revision.current)?.contentHash ===
             payload.contentHash
             ? ('published' as const)
-            : course.publicationState === 'published'
-              ? ('draft' as const)
-              : (course.publicationState ?? ('never_published' as const)),
+            : ('published_with_draft_changes' as const)
+          : (course.publicationState ?? ('never_published' as const)),
       };
       setCourse((current) => ({ ...current, ...savedFields }));
       setSavedSnapshot(
         serializeTestEditorPayload({ ...course, ...savedFields } as TestEditorPayload),
       );
       let next: TestEditorPayload = { ...course, ...savedFields };
+      let publishedRevision: TestEditorPayload['revisionHistory'][number] | null = null;
       if (publish) {
         const publication = await clientRequest(
           `/api/admin/courses/${encodeURIComponent(payload.id)}/localizations/publish`,
@@ -412,30 +541,66 @@ export function TestEditor({
             body: JSON.stringify({ expectedContentHash: payload.contentHash }),
           },
         );
-        const publicationPayload = await readClientResponseJson<{ error?: string }>(
-          publication.response,
-        );
+        const publicationPayload = await readClientResponseJson<{
+          error?: string;
+          blockers?: string[];
+          revisionId?: string;
+          version?: number | null;
+        }>(publication.response);
         if (!publication.ok) {
-          setError(
-            publicationPayload?.error === 'COURSE_LOCALIZATIONS_INCOMPLETE'
-              ? 'Публикация заблокирована: подготовьте RU, KK, EN и ZH, включая PDF и защищённый импорт вопросов.'
-              : clientRequestMessage(
-                  publication.error,
-                  'Черновик сохранён, но четыре локализации опубликовать не удалось.',
-                ),
-          );
+          const incomplete = publicationPayload?.error === 'COURSE_LOCALIZATIONS_INCOMPLETE';
+          if (incomplete) {
+            // The route names what is missing in the saved rows; step 7 lists it.
+            const refused = (publicationPayload?.blockers ?? []).filter(
+              (line) => typeof line === 'string',
+            );
+            setRefusedBlockers(refused);
+            setError(blockedMessage(refused));
+          } else {
+            setError(
+              clientRequestMessage(
+                publication.error,
+                'Черновик сохранён. Опубликовать не удалось.',
+              ),
+            );
+          }
           if (!course.id) {
             approveNavigation();
             router.replace(
-              `/admin/courses/${payload.id}?publication=${publicationPayload?.error === 'COURSE_LOCALIZATIONS_INCOMPLETE' ? 'incomplete' : 'failed'}`,
+              `/admin/courses/${payload.id}?publication=${incomplete ? 'incomplete' : 'failed'}`,
             );
           } else router.refresh();
           return;
         }
         next = { ...next, publicationState: 'published' };
+        // The badge names the live revision. The refreshed page brings the real
+        // history a moment later; until then the number just published is shown
+        // rather than the previous one.
+        if (publicationPayload?.revisionId && publicationPayload.version) {
+          publishedRevision = {
+            id: publicationPayload.revisionId,
+            version: publicationPayload.version,
+            publishedAt: new Date().toISOString(),
+            contentHash: payload.contentHash,
+            presentationId: course.presentationId,
+            current: true,
+          };
+        }
       }
+      const revision = publishedRevision;
       const publishedFields = { publicationState: next.publicationState };
-      setCourse((current) => ({ ...current, ...publishedFields }));
+      setCourse((current) => ({
+        ...current,
+        ...publishedFields,
+        ...(revision
+          ? {
+              revisionHistory: [
+                revision,
+                ...current.revisionHistory.map((entry) => ({ ...entry, current: false })),
+              ],
+            }
+          : {}),
+      }));
       setSavedSnapshot(serializeTestEditorPayload(next));
       if (!course.id) {
         approveNavigation();
@@ -457,21 +622,82 @@ export function TestEditor({
   const saveDraft = () => persistDraftOrPublish(false);
   const publishRevision = () => persistDraftOrPublish(true);
 
+  // The list row used to be the only place a course could be withdrawn from.
+  const unpublish = async () => {
+    const courseId = course.id;
+    if (!courseId) return;
+    if (
+      !(await confirmDialog({
+        title: 'Снять курс с публикации?',
+        description:
+          'Курс перейдёт в статус черновика и временно перестанет быть доступен учащимся на портале. Опубликовать его снова можно из редактора.',
+        confirmLabel: 'Снять с публикации',
+        busyLabel: 'Снимаем…',
+        tone: 'danger',
+      }))
+    ) {
+      return;
+    }
+    setBusy(true);
+    setError('');
+    try {
+      const result = await clientRequest(
+        `/api/admin/courses/${encodeURIComponent(courseId)}/status`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'draft' }),
+        },
+      );
+      if (!result.ok) {
+        setError(clientRequestMessage(result.error, 'Не удалось снять курс с публикации.'));
+        return;
+      }
+      const withdrawn = { publicationState: 'draft' } satisfies Partial<TestEditorPayload>;
+      setCourse((current) => ({ ...current, ...withdrawn }));
+      // The state is part of the unsaved-changes comparison. Only that field is
+      // moved in the saved side, so edits made before the withdrawal stay unsaved.
+      setSavedSnapshot((saved) => JSON.stringify({ ...JSON.parse(saved), ...withdrawn }));
+      router.refresh();
+    } catch (statusError) {
+      setError(clientRequestMessage(statusError, 'Не удалось снять курс с публикации.'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const publicationState =
     dirty && course.publicationState === 'published'
       ? 'published_with_draft_changes'
       : (course.publicationState ?? 'never_published');
+  const liveRevision = course.revisionHistory.find((revision) => revision.current)?.version;
+  // By precedence: unsaved edits, the live revision, a live course with a newer
+  // draft, a withdrawn course, a course that was never published.
+  const statusLabel = dirty
+    ? 'Не сохранено'
+    : publicationState === 'published' && liveRevision
+      ? `Опубликована редакция ${liveRevision}`
+      : PUBLICATION_LABEL[publicationState];
 
   return (
     <EditorShell>
+      <div className="flex min-w-0 items-center gap-2">
+        {/* The same way back the article editor has, to the list as it was
+            left. It is a link, so the unsaved-changes guard asks first. */}
+        <Button asChild variant="ghost" className="min-h-11 shrink-0">
+          <Link href={listHref}>Назад</Link>
+        </Button>
+        {heading ? <div className="min-w-0">{heading}</div> : null}
+      </div>
+
       <EditorActionBar
         busy={busy || bankUnreadable}
         preview={preview}
-        statusLabel={PUBLICATION_LABEL[publicationState]}
+        statusLabel={statusLabel}
+        statusTone={dirty ? 'warning' : undefined}
         published={
           publicationState === 'published' || publicationState === 'published_with_draft_changes'
         }
-        hasDraftChanges={publicationState === 'published_with_draft_changes'}
         progress={`${validation.completedCount}/${TEST_EDITOR_TOTAL_QUESTIONS}`}
         liveMessage={
           bankUnreadable
@@ -485,6 +711,7 @@ export function TestEditor({
         onTogglePreview={() => setPreview((value) => !value)}
         onSave={() => void saveDraft()}
         onPublish={() => void publishRevision()}
+        onUnpublish={course.id ? () => void unpublish() : undefined}
       />
 
       {/* Only states that change what the administrator can do are worth a line
@@ -957,19 +1184,33 @@ export function TestEditor({
                 role="status"
                 className={cn(
                   'rounded-xl p-3 text-sm font-semibold',
-                  validation.valid
+                  validation.valid && blockers.length === 0
                     ? 'bg-[var(--color-primary-soft)] text-[var(--color-on-primary-soft)]'
                     : 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]',
                 )}
               >
-                {validation.valid
-                  ? 'Курс готов к публикации новой неизменяемой редакции.'
-                  : `Публикация заблокирована: исправьте ${validationMessages.length} ${errorNoun(validationMessages.length)}.`}
+                {!validation.valid
+                  ? `Публикация заблокирована: исправьте ${validationMessages.length} ${errorNoun(validationMessages.length)}.`
+                  : blockers.length > 0
+                    ? `Публикация заблокирована: ${blockers.length} ${REASON_NOUNS[RU_PLURAL_RULES.select(blockers.length)]}.`
+                    : 'Курс готов к публикации новой неизменяемой редакции.'}
               </div>
               {!validation.valid && validationAttempted ? (
                 <ul className="list-disc space-y-1 pl-5 text-sm text-[var(--color-danger)]">
                   {validationMessages.slice(0, 8).map((message) => (
                     <li key={message}>{message}</li>
+                  ))}
+                </ul>
+              ) : null}
+              {/* What the other languages lack is known before any attempt, so it
+                  is listed at once rather than after a refused publication. */}
+              {blockers.length > 0 ? (
+                <ul
+                  data-course-publication-blockers
+                  className="list-disc space-y-1 pl-5 text-sm text-[var(--color-danger)]"
+                >
+                  {blockers.map((blocker) => (
+                    <li key={blocker}>{blocker}</li>
                   ))}
                 </ul>
               ) : null}

@@ -1,5 +1,8 @@
 import * as z from 'zod';
-import { publishCourseLocalizations } from '@/server/admin/localizations';
+import {
+  CourseLocalizationsIncompleteError,
+  publishCourseLocalizations,
+} from '@/server/admin/localizations';
 import { localizedPublicationSchema } from '@/lib/admin/localization-contract';
 import { apiError } from '@/server/auth/api-error';
 import { invalidOriginResponse } from '@/server/http/request-origin';
@@ -30,7 +33,15 @@ export async function POST(request: Request, context: { params: Promise<{ course
   } catch (error) {
     const message = error instanceof Error ? error.message : '';
     if (message.includes('COURSE_LOCALIZATIONS_INCOMPLETE')) {
-      return NextResponse.json({ error: 'COURSE_LOCALIZATIONS_INCOMPLETE' }, { status: 409 });
+      return NextResponse.json(
+        {
+          error: 'COURSE_LOCALIZATIONS_INCOMPLETE',
+          // Named by the saved-data check. The database raises the same code
+          // for a state that check cannot see, and then there is nothing to name.
+          blockers: error instanceof CourseLocalizationsIncompleteError ? error.blockers : [],
+        },
+        { status: 409 },
+      );
     }
     return apiError(error);
   }

@@ -378,6 +378,27 @@ const readCourseQuestionBank = cache(async (testId: string, actorId: string) => 
   };
 });
 
+/**
+ * Which Russian questions carry an explanation — identifiers only. A
+ * translation is held to parity with this set: a gap exists where Russian
+ * explains a question and the translation does not. It goes through the same
+ * cached, capability-gated read as the editor seed, so a page render still makes
+ * one call. `null` means the bank could not be read or is incomplete, and the
+ * caller skips the parity check instead of guessing.
+ */
+export async function readCourseExplanationIds(testId: string): Promise<Set<string> | null> {
+  const actor = await requireCapability('test.manage');
+  const bank = await readCourseQuestionBank(testId, actor.user.id);
+  if (!bank.variants) return null;
+  return new Set(
+    bank.variants.flatMap((variant) =>
+      variant.questions
+        .filter((question) => question.explanation.trim().length > 0)
+        .map((question) => question.id),
+    ),
+  );
+}
+
 export async function getTestEditorSeed(testId: string): Promise<TestEditorSeed | null> {
   const actor = await requireCapability('test.manage');
   const admin = createAdminClient();

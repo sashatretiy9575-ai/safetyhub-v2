@@ -18,6 +18,7 @@ import { createPublicClient } from '@/server/supabase/public';
 import { isContentSlug } from '@/lib/content/slug';
 import { coerceContentMetadata, type ContentMetadata } from '@/lib/content/content-metadata';
 import { contentSeoSchema, defaultContentSeo, type ContentSeo } from '@/lib/validation/content-seo';
+import { courseSeoDefaults } from '@/lib/validation/course-seo-defaults';
 import { APP_LOCALES, DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
 import { QUIZ_POLICY } from '@/lib/constants';
 import type { Json } from '@/lib/supabase/types';
@@ -51,9 +52,22 @@ export interface Course extends ContentMetadata {
 /** @deprecated Public URLs retain the historical “topic” name for compatibility. */
 export type Topic = Course;
 
-function topicSeo(value: unknown, title: string, description: string): ContentSeo {
+function topicSeo(
+  value: unknown,
+  title: string,
+  description: string,
+  locale: AppLocale = DEFAULT_LOCALE,
+): ContentSeo {
   const parsed = contentSeoSchema.safeParse(value);
-  return parsed.success ? parsed.data : defaultContentSeo(title, description);
+  if (parsed.success) return parsed.data;
+  // The generic default pads a short title or description with Russian wording.
+  // A Chinese one-line summary is naturally under its 40-character floor, so a
+  // translated page without a stored block got a Russian tail in its meta
+  // description. A translation falls back to wording in its own language; the
+  // Russian page keeps the exact fallback it always had.
+  return locale === DEFAULT_LOCALE
+    ? defaultContentSeo(title, description)
+    : courseSeoDefaults(locale, title, description);
 }
 
 
@@ -420,7 +434,7 @@ function localizedTopicFromRecord(value: LocalizedCourseRecord, locale: AppLocal
     attemptResetTimezone: value.resetTimezone,
     presentation: presentationFromRecord(value.presentation, value.slug, locale),
     updatedAt: value.publishedAt,
-    seo: topicSeo(value.seo, value.title, value.description),
+    seo: topicSeo(value.seo, value.title, value.description, locale),
     ...metadataFields(value as unknown as Record<string, unknown>),
   };
 }

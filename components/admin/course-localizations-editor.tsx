@@ -2,7 +2,8 @@
 
 import { useUnsavedChangesGuard } from '@/components/admin/use-unsaved-changes-guard';
 import { Plus, Trash } from '@phosphor-icons/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArticleRenderer } from '@/components/article-renderer';
 import { AdminLocaleTabs } from '@/components/admin/admin-locale-tabs';
 import { ContentSeoEditor } from '@/components/admin/content-seo-editor';
@@ -16,9 +17,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  COURSE_UNSAVED_LOCALES_EVENT,
+  courseLocaleGaps,
+  courseLocaleState,
+} from '@/lib/admin/course-readiness';
+import {
   ADMIN_CONTENT_LOCALES,
   ADMIN_LOCALE_LABELS,
-  ADMIN_LOCALIZATION_STATUS_LABELS,
   type CourseLocalizationEditorItem,
 } from '@/lib/admin/localization-contract';
 import type { AdminPresentation } from '@/lib/admin/types';
@@ -38,14 +43,33 @@ type SaveResponse = {
   error?: string;
 };
 
+type ItemMap = Record<AppLocale, CourseLocalizationEditorItem>;
+
 function cloneItem(item: CourseLocalizationEditorItem): CourseLocalizationEditorItem {
   return structuredClone(item);
 }
 
-function statusRecord(items: Record<AppLocale, CourseLocalizationEditorItem>) {
+function byLocale<T>(value: (locale: AppLocale) => T) {
   return Object.fromEntries(
-    ADMIN_CONTENT_LOCALES.map((locale) => [locale, items[locale].status]),
-  ) as Record<AppLocale, CourseLocalizationEditorItem['status']>;
+    ADMIN_CONTENT_LOCALES.map((locale) => [locale, value(locale)]),
+  ) as Record<AppLocale, T>;
+}
+
+function itemMap(initial: CourseLocalizationEditorItem[]): ItemMap {
+  return byLocale((locale) => {
+    const item = initial.find((entry) => entry.locale === locale);
+    if (!item) throw new Error(`COURSE_LOCALIZATION_${locale.toUpperCase()}_MISSING`);
+    // Localizations inherited the same empty SEO object as their course, so
+    // every language showed blank fields and the public pages fell back to a
+    // bare one-word title. Fill the gaps from this locale's own title and
+    // description; anything already written wins. What is offered here is not
+    // stored until the locale is saved — `seoStored` keeps saying so.
+    const clone = cloneItem(item);
+    return {
+      ...clone,
+      seo: withCourseSeoDefaults(locale, clone.title, clone.description, clone.seo),
+    };
+  });
 }
 
 function saveErrorMessage(code: string) {
@@ -114,34 +138,77 @@ export function CourseLocalizationsEditor({
   courseId: string;
   initial: CourseLocalizationEditorItem[];
 }) {
-  const initialMap = useMemo(
-    () =>
-      Object.fromEntries(
-        ADMIN_CONTENT_LOCALES.map((locale) => {
-          const item = initial.find((entry) => entry.locale === locale);
-          if (!item) throw new Error(`COURSE_LOCALIZATION_${locale.toUpperCase()}_MISSING`);
-          // Localizations inherited the same empty SEO object as their course,
-          // so every language showed blank fields and the public pages fell back
-          // to a bare one-word title. Fill the gaps from this locale's own title
-          // and description; anything already written wins.
-          const clone = cloneItem(item);
-          return [
-            locale,
-            {
-              ...clone,
-              seo: withCourseSeoDefaults(locale, clone.title, clone.description, clone.seo),
-            },
-          ];
-        }),
-      ) as Record<AppLocale, CourseLocalizationEditorItem>,
-    [initial],
-  );
+  const router = useRouter();
+  const initialMap = useMemo(() => itemMap(initial), [initial]);
   const [items, setItems] = useState(initialMap);
+  // What the server holds for each locale. The form is compared with it tab by
+  // tab — one fingerprint for all four used to call every tab saved as soon as
+  // one of them was — and readiness is judged by it alone, so the list of gaps
+  // stays put while a field above it is being typed into.
+  const [savedItems, setSavedItems] = useState(initialMap);
+  const unsaved = useMemo(
+    () =>
+      byLocale((locale) => JSON.stringify(items[locale]) !== JSON.stringify(savedItems[locale])),
+    [items, savedItems],
+  );
+  const unsavedLocales = ADMIN_CONTENT_LOCALES.filter((locale) => unsaved[locale]).join(',');
   // The two editors beside this one already refuse to leave with unsaved work.
   // Here a stray click on the sidebar discarded a translation with no warning.
-  const [savedFingerprint, setSavedFingerprint] = useState(() => JSON.stringify(initialMap));
   // Nothing here navigates on its own, so the approval callback is unused.
-  useUnsavedChangesGuard(JSON.stringify(items) !== savedFingerprint);
+  useUnsavedChangesGuard(unsavedLocales !== '');
+
+  // `router.refresh()` after a save — here or in the course form above — brings
+  // fresh rows. A tab with unsaved work keeps its text and takes only the
+  // counts the server owns; every other tab, the read-only Russian one
+  // included, is replaced, or it would go on showing the state before the save.
+  const seededRef = useRef(initialMap);
+  useEffect(() => {
+    if (seededRef.current === initialMap) return;
+    seededRef.current = initialMap;
+    const refreshed = (current: ItemMap) =>
+      byLocale((locale) => {
+        const fresh = initialMap[locale];
+        return unsaved[locale]
+          ? {
+              ...current[locale],
+              assessment: fresh.assessment,
+              assessmentGaps: fresh.assessmentGaps,
+              assessmentImported: fresh.assessmentImported,
+            }
+          : fresh;
+      });
+    setItems(refreshed);
+    setSavedItems(refreshed);
+  }, [initialMap, unsaved]);
+
+  // The course form above publishes; it cannot see these tabs, and publishing
+  // over unsaved work here would quietly leave that work out of the revision.
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent(COURSE_UNSAVED_LOCALES_EVENT, {
+        detail: unsavedLocales ? unsavedLocales.split(',') : [],
+      }),
+    );
+  }, [unsavedLocales]);
+  useEffect(
+    () => () => {
+      window.dispatchEvent(new CustomEvent(COURSE_UNSAVED_LOCALES_EVENT, { detail: [] }));
+    },
+    [],
+  );
+
+  const readiness = useMemo(
+    () =>
+      byLocale((locale) => {
+        // Listed under the language's own tab, so the lines do not name it again.
+        const gaps = courseLocaleGaps(savedItems[locale], savedItems.ru, 'bare');
+        return {
+          gaps,
+          state: courseLocaleState({ ...savedItems[locale], unsaved: unsaved[locale] }, gaps),
+        };
+      }),
+    [savedItems, unsaved],
+  );
   const [activeLocale, setActiveLocale] = useState<AppLocale>('ru');
   const [preview, setPreview] = useState(false);
   const [completeRequested, setCompleteRequested] = useState(false);
@@ -170,25 +237,31 @@ export function CourseLocalizationsEditor({
   };
 
   const save = async () => {
-    if (activeLocale === 'ru' || !active.presentation?.id) return;
+    // The tab can change and the fields stay editable while the request runs:
+    // what was sent is what becomes the saved state, under the locale it was
+    // sent for.
+    const locale = activeLocale;
+    const sent = active;
+    const presentationId = sent.presentation?.id;
+    if (locale === 'ru' || !presentationId) return;
     setBusy(true);
     setError('');
     setMessage('');
     try {
       const result = await clientRequest(
-        `/api/admin/courses/${encodeURIComponent(courseId)}/localizations/${activeLocale}`,
+        `/api/admin/courses/${encodeURIComponent(courseId)}/localizations/${locale}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            locale: activeLocale,
-            expectedVersion: active.draftVersion,
-            title: active.title,
-            description: active.description,
-            content: active.content,
-            seo: active.seo,
-            sources: active.sources,
-            presentationId: active.presentation.id,
+            locale,
+            expectedVersion: sent.draftVersion,
+            title: sent.title,
+            description: sent.description,
+            content: sent.content,
+            seo: sent.seo,
+            sources: sent.sources,
+            presentationId,
             complete: completeRequested,
           }),
         },
@@ -206,23 +279,25 @@ export function CourseLocalizationsEditor({
         );
         return;
       }
-      const saved = {
-        ...items,
-        [activeLocale]: {
-          ...items[activeLocale],
-          status: payload.status!,
-          draftVersion: payload.draftVersion!,
-          contentHash: payload.contentHash!,
-          reviewedContentHash: payload.status === 'complete' ? payload.contentHash! : null,
-        },
+      const stored = {
+        status: payload.status,
+        draftVersion: payload.draftVersion,
+        contentHash: payload.contentHash,
+        reviewedContentHash: payload.status === 'complete' ? payload.contentHash : null,
+        // The offered SEO is stored from now on.
+        seoStored: { title: sent.seo.title, description: sent.seo.description },
       };
-      setItems(saved);
-      setSavedFingerprint(JSON.stringify(saved));
+      // Only what the server decided is merged into the form, on top of whatever
+      // it holds now; the saved state is what was sent.
+      setItems((current) => ({ ...current, [locale]: { ...current[locale], ...stored } }));
+      setSavedItems((current) => ({ ...current, [locale]: { ...sent, ...stored } }));
       setMessage(
         payload.status === 'complete'
           ? 'Локализация сохранена и отмечена готовой.'
           : 'Черновик локализации сохранён.',
       );
+      // The course form above lists what blocks publication from the saved rows.
+      router.refresh();
     } catch (saveError) {
       setError(clientRequestMessage(saveError, saveErrorMessage('')));
     } finally {
@@ -239,7 +314,8 @@ export function CourseLocalizationsEditor({
         <AdminLocaleTabs
           idPrefix="course-localization"
           activeLocale={activeLocale}
-          statuses={statusRecord(items)}
+          statuses={byLocale((locale) => items[locale].status)}
+          badges={byLocale((locale) => readiness[locale].state)}
           onChange={(locale) => {
             setActiveLocale(locale);
             setPreview(false);
@@ -257,18 +333,27 @@ export function CourseLocalizationsEditor({
           aria-labelledby={`course-localization-tab-${activeLocale}`}
           className="space-y-5"
         >
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-[var(--color-surface-muted)] p-3">
-            <p className="text-sm">
-              Статус: <strong>{ADMIN_LOCALIZATION_STATUS_LABELS[active.status]}</strong>
-            </p>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => setPreview((value) => !value)}
-            >
-              {preview ? 'Вернуться к полям' : 'Предпросмотр языка'}
-            </Button>
+          <div className="rounded-xl bg-[var(--color-surface-muted)] p-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Badge variant={readiness[activeLocale].state.variant}>
+                {readiness[activeLocale].state.label}
+              </Badge>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setPreview((value) => !value)}
+              >
+                {preview ? 'Вернуться к полям' : 'Предпросмотр языка'}
+              </Button>
+            </div>
+            {readiness[activeLocale].gaps.length > 0 ? (
+              <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">
+                {readiness[activeLocale].gaps.map((gap) => (
+                  <li key={gap}>{gap}</li>
+                ))}
+              </ul>
+            ) : null}
           </div>
 
           {preview ? (

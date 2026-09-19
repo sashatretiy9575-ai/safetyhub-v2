@@ -5,10 +5,9 @@ export default async function NewCoursePage() {
   await requireCapability('test.manage');
   return (
     <section className="space-y-6">
-      <div>
-        <h1 className="font-display text-h3 font-bold">Новый курс</h1>
-      </div>
-      <TestEditor />
+      <TestEditor
+        heading={<h1 className="font-display text-h3 font-bold break-words">Новый курс</h1>}
+      />
     </section>
   );
 }

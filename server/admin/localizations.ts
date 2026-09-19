@@ -15,10 +15,12 @@ import {
   type LegalLocalizationVersion,
   type LegalVersionStageInput,
 } from '@/lib/admin/localization-contract';
+import { courseAssessmentGaps, coursePublicationBlockers } from '@/lib/admin/course-readiness';
 import { CONTENT_CACHE_TAG, TOPICS_CACHE_TAG } from '@/lib/content/cache-policy';
 import { contentMetadataSchema } from '@/lib/content/content-metadata';
-import { defaultContentSeo, contentSeoSchema } from '@/lib/validation/content-seo';
+import { defaultContentSeo, contentSeoSchema, type ContentSeo } from '@/lib/validation/content-seo';
 import { articleBlocksSchema } from '@/lib/validation/article';
+import { readCourseExplanationIds } from '@/server/admin/management';
 import { createAdminClient } from '@/server/supabase/admin';
 import { createClient } from '@/server/supabase/server';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
@@ -120,9 +122,39 @@ async function authenticatedRpc(name: string, args: Record<string, unknown>) {
   return unwrapRpcMutationResponse(await untyped(await createClient()).rpc(name, args));
 }
 
-function normalizedSeo(value: unknown, title: string, description: string) {
-  const parsed = contentSeoSchema.safeParse(value);
-  return parsed.success ? parsed.data : defaultContentSeo(title, description);
+function storedText(stored: RawRecord, key: string) {
+  const field = stored[key];
+  return typeof field === 'string' ? field : '';
+}
+
+/** The SEO a row really holds, read before any fallback can disguise an empty one. */
+function storedSeo(stored: RawRecord) {
+  return { title: storedText(stored, 'title'), description: storedText(stored, 'description') };
+}
+
+/**
+ * `defaultContentSeo` writes Russian filler — «Материал SafetyHub…» — for a
+ * short title or description. It used to be handed to every locale, so a
+ * Chinese course opened with Russian SEO and the next save stored it. Only the
+ * Russian source keeps these defaults; a translation gets what is stored and
+ * blanks for the rest, which the editor reports as a gap.
+ */
+function normalizedSeo(
+  locale: AppLocale,
+  stored: RawRecord,
+  title: string,
+  description: string,
+): ContentSeo {
+  const parsed = contentSeoSchema.safeParse(stored);
+  if (parsed.success) return parsed.data;
+  if (locale === 'ru') return defaultContentSeo(title, description);
+  return {
+    ...storedSeo(stored),
+    ogTitle: storedText(stored, 'ogTitle'),
+    ogDescription: storedText(stored, 'ogDescription'),
+    ogImage: storedText(stored, 'ogImage'),
+    indexable: stored.indexable !== false,
+  };
 }
 
 function normalizedSources(value: unknown) {
@@ -158,29 +190,47 @@ export async function getCourseEditorLocalizations(
 ): Promise<CourseLocalizationEditorItem[]> {
   const actor = await requireCapability('test.manage');
   const admin = createAdminClient();
-  // The editor rows and the published revision pointer are independent reads.
-  const [rawPayload, current] = await Promise.all([
+  // The editor rows, the published revision pointer, the stored question sets
+  // and the Russian explanation ids are independent reads.
+  const [rawPayload, current, storedSets, explainedIds] = await Promise.all([
     authenticatedRpc('get_course_editor_localizations', {
       p_actor_id: actor.user.id,
       p_test_id: courseId,
     }),
-    admin.from('tests').select('current_revision_id').eq('id', courseId).maybeSingle(),
+    admin.from('tests').select('current_revision_id,status').eq('id', courseId).maybeSingle(),
+    // This column holds question, answer and explanation texts and no correct
+    // options — the database refuses a row that carries one. It is read here
+    // only to be counted: nothing but the counts leaves this function.
+    admin
+      .from('course_draft_localizations')
+      .select('locale,question_variants')
+      .eq('test_id', courseId),
+    readCourseExplanationIds(courseId),
   ]);
   const payload = editorEnvelopeSchema(courseEditorRowSchema, 'courseId').parse(rawPayload) as {
     courseId: string;
     localizations: z.infer<typeof courseEditorRowSchema>[];
   };
   if (current.error) throw current.error;
-  const published = current.data?.current_revision_id
+  if (storedSets.error) throw storedSets.error;
+  // A course taken off publication keeps its revision pointer, and its locales
+  // used to go on reading «Опубликовано» while no learner could open them.
+  const liveRevisionId =
+    current.data?.status === 'published' ? current.data.current_revision_id : null;
+  const published = liveRevisionId
     ? await admin
         .from('test_revision_localizations')
         .select('locale,content_hash')
-        .eq('revision_id', current.data.current_revision_id)
+        .eq('revision_id', liveRevisionId)
     : { data: [], error: null };
   if (published.error) throw published.error;
   const publishedHash = new Map(
     (published.data ?? []).map((row) => [row.locale as AppLocale, row.content_hash]),
   );
+  const storedByLocale = new Map(
+    (storedSets.data ?? []).map((row) => [row.locale as AppLocale, row.question_variants]),
+  );
+  const russian = { stored: storedByLocale.get('ru') ?? null, explainedIds };
 
   return payload.localizations.map((row) => ({
     locale: row.locale,
@@ -189,7 +239,11 @@ export async function getCourseEditorLocalizations(
     description: row.description,
     content: row.content,
     assessment: row.assessment,
-    seo: normalizedSeo(row.seo, row.title, row.description),
+    assessmentGaps: storedByLocale.has(row.locale)
+      ? courseAssessmentGaps(row.locale, storedByLocale.get(row.locale), russian)
+      : null,
+    seo: normalizedSeo(row.locale, row.seo, row.title, row.description),
+    seoStored: storedSeo(row.seo),
     sources: normalizedSources(row.sources),
     contentHash: row.contentHash,
     reviewedContentHash: row.reviewedContentHash,
@@ -291,8 +345,25 @@ export async function saveCourseLocalization(
   };
 }
 
+/** Carries the named gaps to the route; the message is the code the database raises too. */
+export class CourseLocalizationsIncompleteError extends Error {
+  readonly blockers: string[];
+
+  constructor(blockers: string[]) {
+    super('COURSE_LOCALIZATIONS_INCOMPLETE');
+    this.name = 'CourseLocalizationsIncompleteError';
+    this.blockers = blockers;
+  }
+}
+
 export async function publishCourseLocalizations(courseId: string, expectedContentHash: string) {
   const actor = await requireCapability('test.manage');
+  // The database answers one code for every incomplete state and knows nothing
+  // of SEO, explanations or untranslated text. The same check the editor shows
+  // runs here on the saved rows, so a refusal names what is missing. The batch
+  // publisher script calls the RPC directly and is not affected.
+  const blockers = coursePublicationBlockers(await getCourseEditorLocalizations(courseId));
+  if (blockers.length > 0) throw new CourseLocalizationsIncompleteError(blockers);
   const result = (await authenticatedRpc('publish_course_revision_v4', {
     p_actor_id: actor.user.id,
     p_test_id: courseId,
@@ -301,7 +372,12 @@ export async function publishCourseLocalizations(courseId: string, expectedConte
   const revisionId = uuidSchema.parse(result.revisionId);
   const slug = typeof result.slug === 'string' ? result.slug : null;
   invalidateLocalizedContent('course', slug);
-  return { revisionId, locales: [...ADMIN_CONTENT_LOCALES] };
+  return {
+    revisionId,
+    // The editor names the live revision in its status badge.
+    version: typeof result.version === 'number' ? result.version : null,
+    locales: [...ADMIN_CONTENT_LOCALES],
+  };
 }
 
 export async function getArticleEditorLocalizations(
@@ -341,7 +417,7 @@ export async function getArticleEditorLocalizations(
       title: row.title,
       description: row.description,
       blocks: blocks.success ? blocks.data : [],
-      seo: normalizedSeo(row.seo, row.title, row.description),
+      seo: normalizedSeo(row.locale, row.seo, row.title, row.description),
       sources: normalizedSources(row.sources),
       contentHash: row.contentHash,
       reviewedContentHash: row.reviewedContentHash,
