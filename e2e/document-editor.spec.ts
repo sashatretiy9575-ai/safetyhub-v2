@@ -294,21 +294,71 @@ test('anonymous and participant cannot read company documents', async ({ browser
   await anonymous.close();
 });
 
-test('registered signatures require document ownership or document administration', async ({ page, browser }) => {
-  await openEditor(page, '/admin/settings/certificate?course=armaturshchik');
-  const asset = await page.locator('a[href^="/certificate-assets/registered?id="]').first().getAttribute('href');
-  expect(asset).toBeTruthy();
-  const allowed = await page.request.get(asset!);
-  expect(allowed.status()).toBe(200);
-  expect(allowed.headers()['content-type']).toBe('image/png');
-  const anonymous = await browser.newContext({ storageState: { cookies: [], origins: [] } });
-  const denied = await anonymous.request.get('http://localhost:3100' + asset);
-  expect([401, 403]).toContain(denied.status());
-  await anonymous.close();
-  // The seeded participant has legacy snapshots, none referencing this newly
-  // registered PNG. Knowledge of an opaque asset ID does not grant access.
-  const participant = await browser.newContext({ storageState: process.env.E2E_PARTICIPANT_STORAGE_STATE });
-  const foreign = await participant.request.get('http://localhost:3100' + asset);
-  expect([401, 403, 404]).toContain(foreign.status());
-  await participant.close();
+test('registered signatures require document ownership or document administration', async ({ page, browser }, testInfo) => {
+  const base = String(testInfo.project.use.baseURL);
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const databaseUrl = process.env.SAFETYHUB_LOCAL_DATABASE_URL ?? 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+  expect(['localhost', '127.0.0.1']).toContain(new URL(base).hostname);
+  expect(['localhost', '127.0.0.1']).toContain(new URL(url).hostname);
+  expect(databaseUrl).toBe('postgresql://postgres:postgres@127.0.0.1:54322/postgres');
+  const { randomUUID, createHash } = await import('node:crypto');
+  const { createClient } = await import('@supabase/supabase-js');
+  const { createRequire } = await import('node:module');
+  const pg = createRequire(import.meta.url)('pg');
+  const sharp = (await import('sharp')).default;
+  const assetId = randomUUID();
+  const owner = 'e2e-' + randomUUID();
+  // A labelled geometric fixture, never an actual person's signature or a private source file.
+  const bytes = await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="240" height="60"><rect x="5" y="5" width="230" height="50" fill="none" stroke="blue"/><text x="10" y="35" font-size="12">TEST ${assetId}</text></svg>`)).png().toBuffer();
+  const sha256 = createHash('sha256').update(bytes).digest('hex');
+  const objectKey = sha256 + '.png';
+  const client = createClient(url, process.env.SUPABASE_SECRET_KEY!, { auth: { persistSession: false } });
+  const db = new pg.Client({ connectionString: databaseUrl });
+  await db.connect();
+  const profileId = 'armaturshchik-all';
+  const original = (await db.query('select * from public.document_profiles where course_slug=$1 and audience=$2', ['armaturshchik', 'all'])).rows[0];
+  const activeProfileId = original?.id ?? profileId;
+  const body = {
+    ...(original?.body ?? { id: profileId, courseSlug: 'armaturshchik', audience: 'all', label: 'Арматурщик — тест', programName: 'Арматурщик', family: 'general', hours: null, validityMonths: 0, protocolText: 'Тестовая программа {program}.', decisionText: 'Тестовый профиль.', orderNumber: '', orderDate: '', verificationKind: '', stampAssetId: null }),
+    commission: [{ signerId: owner, name: 'Тестовый подписант', position: 'Тестовая комиссия', assetId }],
+  };
+  let profileInstalled = false;
+  const contexts = [];
+  try {
+    const upload = await client.storage.from('document-facsimiles').upload(objectKey, bytes, { contentType: 'image/png', upsert: false });
+    expect(upload.error).toBeNull();
+    await db.query('insert into public.document_assets(id,owner_id,kind,sha256,object_key) values($1,$2,$3,$4,$5)', [assetId, owner, 'signature', sha256, objectKey]);
+    if (original) await db.query('update public.document_profiles set body=$1 where id=$2', [body, activeProfileId]);
+    else await db.query('insert into public.document_profiles(id,course_slug,audience,body) values($1,$2,$3,$4)', [activeProfileId, 'armaturshchik', 'all', body]);
+    profileInstalled = true;
+    await openEditor(page, '/admin/settings/certificate?course=armaturshchik');
+    const asset = '/certificate-assets/registered?id=' + assetId;
+    await expect(page.locator(`a[href="${asset}"]`)).toBeAttached();
+    const allowed = await page.request.get(asset);
+    expect(allowed.status()).toBe(200);
+    expect(allowed.headers()['content-type']).toBe('image/png');
+    expect(Buffer.compare(await allowed.body(), bytes)).toBe(0);
+    const anonymous = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+    contexts.push(anonymous);
+    const denied = await anonymous.request.get(base + asset);
+    expect([401, 403]).toContain(denied.status());
+    // No issued snapshot references this unique fixture, including on a reused local DB.
+    const participant = await browser.newContext({ storageState: process.env.E2E_PARTICIPANT_STORAGE_STATE });
+    contexts.push(participant);
+    const foreign = await participant.request.get(base + asset);
+    expect([401, 403, 404]).toContain(foreign.status());
+  } finally {
+    await Promise.all(contexts.map(context => context.close()));
+    try {
+      if (profileInstalled) {
+        const cleaned = original
+          ? await db.query('update public.document_profiles set body=$1 where id=$2 and body=$3', [original.body, activeProfileId, body])
+          : await db.query('delete from public.document_profiles where id=$1 and body=$2', [activeProfileId, body]);
+        expect(cleaned.rowCount, 'only the unchanged fixture may be restored/removed').toBe(1);
+      }
+      await db.query('delete from public.document_assets where id=$1 and owner_id=$2 and sha256=$3', [assetId, owner, sha256]);
+      const removed = await client.storage.from('document-facsimiles').remove([objectKey]);
+      expect(removed.error).toBeNull();
+    } finally { await db.end(); }
+  }
 });
