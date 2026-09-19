@@ -77,10 +77,10 @@ test('bulk mutation reasons accept only bounded machine tokens', async () => {
   assert.match(source, /const mutationReasonSchema/);
   assert.match(source, /\.max\(96\)/);
   const definition = source.slice(source.indexOf('const mutationReasonSchema'), source.indexOf('function record'));
-  const pattern = definition.match(/\.regex\(\/(.+)\/u\)/u);
+  const pattern = definition.match(/\.regex\(\s*\/(.+)\/u\s*,?\s*\)/u);
   assert.ok(pattern, 'reason whitelist remains an anchored regular expression');
   const whitelist = new RegExp(pattern[1], 'u');
-  for (const code of ['IDENTITY_NOT_VERIFIED', 'RATE_LIMITED:60', 'DOCUMENT_PROFILE_REQUIRED', 'DOCUMENT_REQUIRED_FIELDS:trainingReason', 'DOCUMENT_REQUIRED_FIELDS:orderNumber,orderDate,verificationKind']) assert.equal(whitelist.test(code), true, code);
+  for (const code of ['IDENTITY_NOT_VERIFIED', 'RATE_LIMITED:60', 'DOCUMENT_PROFILE_REQUIRED', 'DOCUMENT_REQUIRED_FIELDS:education', 'DOCUMENT_REQUIRED_FIELDS:trainingReason', 'DOCUMENT_REQUIRED_FIELDS:orderNumber,orderDate,verificationKind']) assert.equal(whitelist.test(code), true, code);
   for (const unsafe of ['Database error: user@example.com', '<script>', 'DOCUMENT_REQUIRED_FIELDS:email', 'DOCUMENT_REQUIRED_FIELDS:trainingReason,secret', ' identity ', 'CODE:free text']) assert.equal(whitelist.test(unsafe), false, unsafe);
   assert.match(source, /reason: mutationReasonSchema/);
 });

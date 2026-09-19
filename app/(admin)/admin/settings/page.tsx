@@ -7,7 +7,6 @@ import {
   CaretRight,
   Certificate,
   ClockCounterClockwise,
-  User,
   UsersThree,
 } from '@phosphor-icons/react/dist/ssr';
 import { requireCapability } from '@/server/auth/session';
@@ -27,21 +26,6 @@ export default async function AdminSettingsPage() {
         aria-label="Разделы настроек"
         className="divide-y divide-[var(--color-border)] overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]"
       >
-        <Link
-          href="/admin/account"
-          className="group flex min-h-12 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-surface-muted)]"
-        >
-          <div className="flex items-center gap-3">
-            <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-              <User size={18} />
-            </span>
-            <span className="text-sm font-semibold">Мой аккаунт</span>
-          </div>
-          <CaretRight
-            size={16}
-            className="text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
-          />
-        </Link>
         <Link
           href="/admin/organizations/cleanup"
           className="group flex min-h-12 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-surface-muted)]"

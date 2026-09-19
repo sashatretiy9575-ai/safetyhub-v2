@@ -9,11 +9,13 @@ export function AdminDetailDialog({
   description,
   triggerLabel = 'Открыть детали',
   children,
+  readable = false,
 }: {
   title: string;
   description?: string;
   triggerLabel?: string;
   children: ReactNode;
+  readable?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -34,10 +36,20 @@ export function AdminDetailDialog({
     <>
       <Button
         ref={triggerRef}
+        className={
+          readable
+            ? 'h-auto min-h-11 text-base [overflow-wrap:anywhere] whitespace-normal'
+            : undefined
+        }
         type="button"
         size="sm"
         variant="outline"
-        onClick={() => setOpen(true)}
+        onClick={(event) => {
+          // Safari does not focus buttons on pointer activation. Give the native
+          // dialog a real return target before it records the previous focus.
+          event.currentTarget.focus({ preventScroll: true });
+          setOpen(true);
+        }}
       >
         {triggerLabel}
       </Button>
@@ -51,7 +63,13 @@ export function AdminDetailDialog({
         }}
         onClose={() => {
           setOpen(false);
-          triggerRef.current?.focus();
+          // Let native modal focus restoration finish before restoring ours.
+          requestAnimationFrame(() => {
+            const trigger = triggerRef.current;
+            if (!dialogRef.current?.open && trigger?.isConnected) {
+              trigger.focus({ preventScroll: true });
+            }
+          });
         }}
         onClick={(event) => {
           if (event.target === dialogRef.current) close();
@@ -63,14 +81,18 @@ export function AdminDetailDialog({
             <h2 id={titleId} className="text-lg font-bold break-words">
               {title}
             </h2>
-            {description ? (
-              <p id={descriptionId} className="mt-1 text-sm text-[var(--color-text-muted)]">
+            {description && !readable ? (
+              <p
+                id={descriptionId}
+                className="mt-1 text-sm [overflow-wrap:anywhere] text-[var(--color-text-muted)]"
+              >
                 {description}
               </p>
             ) : null}
           </div>
           <Button
             type="button"
+            className="shrink-0"
             size="icon"
             variant="ghost"
             aria-label="Закрыть детали"
@@ -79,7 +101,17 @@ export function AdminDetailDialog({
             <X aria-hidden="true" />
           </Button>
         </div>
-        <div className="p-4 sm:p-5">{children}</div>
+        <div className="p-4 sm:p-5">
+          {description && readable ? (
+            <p
+              id={descriptionId}
+              className="mb-4 text-base [overflow-wrap:anywhere] text-[var(--color-text-muted)]"
+            >
+              {description}
+            </p>
+          ) : null}
+          {children}
+        </div>
       </dialog>
     </>
   );

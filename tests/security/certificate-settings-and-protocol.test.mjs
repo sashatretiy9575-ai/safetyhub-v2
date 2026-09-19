@@ -122,7 +122,7 @@ test('an export carries the workbook, one protocol per company and course, then 
   assert.match(protocol, /export function groupItemsForProtocols/u);
   assert.match(protocol, /return `protocols\/Протокол-/u);
   assert.match(protocol, /заседания комиссии по проверке знаний/u);
-  assert.match(protocol, /protocolColumns\(family\)/u);
+  assert.match(protocol, /protocolColumns\(family, branding\.protocolLayoutVersion\)/u);
   assert.match(protocol, /participantResult\(person\)/u);
   // The stamp and the protocol's own signature, never the booklet's.
   assert.match(protocol, /embedFacsimile\(pdf, branding\.stampUrl,/u);

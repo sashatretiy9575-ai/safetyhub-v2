@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { DownloadSimple, Gauge, User, UserGear } from '@phosphor-icons/react';
+import {
+  ClockCounterClockwise,
+  DownloadSimple,
+  Gauge,
+  Gear,
+  User,
+  UserGear,
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -24,10 +31,19 @@ export type UserMenuProps = {
   email: string;
   fullName?: string;
   isAdmin?: boolean;
+  canManageSiteSettings?: boolean;
+  canReadAudit?: boolean;
   avatarUrl?: string | null;
 };
 
-export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps) {
+export function UserMenu({
+  email,
+  fullName,
+  isAdmin,
+  canManageSiteSettings = false,
+  canReadAudit = false,
+  avatarUrl,
+}: UserMenuProps) {
   const router = useRouter();
   const locale = useLocale();
   const translations = useTranslations('Shell.userMenu');
@@ -90,20 +106,20 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="glass-strong min-w-56 rounded-[var(--radius-card)] border-[var(--glass-border)] p-2 shadow-[var(--shadow-pop)]"
+        className="glass-strong max-h-[var(--radix-dropdown-menu-content-available-height)] w-56 max-w-[calc(100vw-1rem)] min-w-0 overflow-y-auto rounded-[var(--radius-card)] border-[var(--glass-border)] p-2 shadow-[var(--shadow-pop)]"
       >
         <DropdownMenuItem
           asChild
           className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
         >
           <Link href={isAdmin ? ROUTES.admin : localizePathname(ROUTES.profile, locale)}>
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               {isAdmin ? (
                 <Gauge size={18} weight="regular" className="text-[var(--color-text-muted)]" />
               ) : (
                 <User size={18} weight="regular" className="text-[var(--color-text-muted)]" />
               )}
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium [overflow-wrap:anywhere] whitespace-normal">
                 {isAdmin ? translations('admin') : translations('profile')}
               </span>
             </div>
@@ -116,10 +132,49 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
             className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
           >
             <Link href={ROUTES.adminAccount}>
-              <div className="flex items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <User size={18} weight="regular" className="text-[var(--color-text-muted)]" />
-                <span className="text-sm font-medium">{translations('account')}</span>
+                <span className="text-sm font-medium [overflow-wrap:anywhere] whitespace-normal">
+                  {translations('account')}
+                </span>
               </div>
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
+
+        {isAdmin && canManageSiteSettings ? (
+          <DropdownMenuItem
+            asChild
+            className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
+          >
+            <Link
+              href="/admin/settings"
+              className="flex min-w-0 items-center gap-3 [overflow-wrap:anywhere] whitespace-normal"
+            >
+              <Gear size={18} className="shrink-0 text-[var(--color-text-muted)]" />
+              <span className="text-sm font-medium [overflow-wrap:anywhere] whitespace-normal">
+                {translations('siteSettings')}
+              </span>
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
+
+        {isAdmin && canReadAudit && !canManageSiteSettings ? (
+          <DropdownMenuItem
+            asChild
+            className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
+          >
+            <Link
+              href="/admin/audit"
+              className="flex min-w-0 items-center gap-3 [overflow-wrap:anywhere] whitespace-normal"
+            >
+              <ClockCounterClockwise
+                size={18}
+                className="shrink-0 text-[var(--color-text-muted)]"
+              />
+              <span className="text-sm font-medium [overflow-wrap:anywhere] whitespace-normal">
+                {translations('history')}
+              </span>
             </Link>
           </DropdownMenuItem>
         ) : null}
@@ -129,13 +184,15 @@ export function UserMenu({ email, fullName, isAdmin, avatarUrl }: UserMenuProps)
             className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
             onSelect={() => void handleInstall()}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <DownloadSimple
                 size={18}
                 weight="regular"
                 className="text-[var(--color-text-muted)]"
               />
-              <span className="text-sm font-medium">{translations('install')}</span>
+              <span className="text-sm font-medium [overflow-wrap:anywhere] whitespace-normal">
+                {translations('install')}
+              </span>
             </div>
           </DropdownMenuItem>
         ) : null}

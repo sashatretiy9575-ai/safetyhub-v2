@@ -30,7 +30,7 @@ export function AttestationSelectionBanner({
         type="button"
         disabled={selectingAll}
         onClick={onSelectAllFiltered}
-        className="min-h-9 font-medium text-[var(--color-primary)] underline hover:no-underline disabled:opacity-50"
+        className="min-h-11 max-w-full text-left font-medium [overflow-wrap:anywhere] text-[var(--color-primary)] underline hover:no-underline disabled:opacity-50"
       >
         {selectingAll ? 'Выбираем…' : `Выбрать все ${totalFiltered} по фильтру`}
       </button>

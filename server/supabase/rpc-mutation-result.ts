@@ -4,7 +4,8 @@ import { normalizeRateLimitError } from '@/server/security/rate-limit';
 
 const RPC_ERROR_KEY = '__safetyhubRpcError';
 const SQLSTATE_PATTERN = /^[0-9A-Z]{5}$/;
-const MESSAGE_PATTERN = /^[A-Z][A-Z0-9_]{1,95}(?::[0-9]{1,10})?$/;
+const MESSAGE_PATTERN =
+  /^(?:[A-Z][A-Z0-9_]{1,95}(?::[0-9]{1,10})?|DOCUMENT_REQUIRED_FIELDS:education)$/;
 const ISO_TIMESTAMP_PATTERN =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/;
 
@@ -63,6 +64,7 @@ export function getRpcMutationError(value: unknown): RpcMutationError | null {
     payload?.version !== 1 ||
     !SQLSTATE_PATTERN.test(code) ||
     !MESSAGE_PATTERN.test(message) ||
+    (message === 'DOCUMENT_REQUIRED_FIELDS:education' && code !== '22023') ||
     keys.join('\0') !== allowedKeys.sort().join('\0')
   ) {
     return new RpcMutationError('P0001', 'RPC_MUTATION_FAILED');

@@ -67,7 +67,10 @@ export default async function AdminEmployeesPage({
   const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
 
   const permissions = {
-    canManageDocuments: actor.capabilities.includes('site.settings.manage') && actor.capabilities.includes('certificate.read') && actor.capabilities.includes('results.export'),
+    canManageDocuments:
+      actor.capabilities.includes('site.settings.manage') &&
+      actor.capabilities.includes('certificate.read') &&
+      actor.capabilities.includes('results.export'),
     canReadUser: actor.capabilities.includes('user.read'),
     canReadIdentity: actor.capabilities.includes('identity.read'),
     canReadCertificate: actor.capabilities.includes('certificate.read'),
@@ -83,7 +86,9 @@ export default async function AdminEmployeesPage({
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-h3 font-bold">Сотрудники</h1>
+        <h1 className="font-display text-h3 min-w-0 font-bold [overflow-wrap:anywhere]">
+          Сотрудники
+        </h1>
         <div className="flex flex-wrap items-center gap-3">
           {result.state === 'ready' ? (
             <p className="text-sm font-bold text-[var(--color-text-muted)] tabular-nums">
@@ -101,7 +106,7 @@ export default async function AdminEmployeesPage({
       {queueResult.state === 'ready' ? (
         <nav
           aria-label="Рабочие очереди"
-          className="grid overflow-hidden rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm sm:grid-cols-2"
+          className="grid min-w-0 grid-cols-1 rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm sm:grid-cols-2"
         >
           {[
             {
@@ -120,12 +125,12 @@ export default async function AdminEmployeesPage({
             <Link
               key={href}
               href={href}
-              className="group flex min-h-12 items-center gap-3 border-b px-4 py-2.5 text-sm font-semibold transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:border-r sm:border-b-0 sm:last:border-r-0"
+              className="group flex min-h-12 min-w-0 items-center gap-2 border-b px-3 py-2.5 text-sm font-semibold transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:border-r sm:border-b-0 sm:last:border-r-0"
             >
               <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                 <Icon aria-hidden size={18} />
               </span>
-              <span className="min-w-0 flex-1 truncate">{label}</span>
+              <span className="min-w-0 flex-1 break-words">{label}</span>
               <strong className="text-base font-bold tabular-nums">{count}</strong>
             </Link>
           ))}

@@ -16,6 +16,7 @@ export function AdminPagination({
   previousHref,
   nextHref,
   pageSize = 25,
+  readable = false,
 }: {
   total: number;
   visible: number;
@@ -25,6 +26,7 @@ export function AdminPagination({
   previousHref: string | null;
   nextHref: string | null;
   pageSize?: number;
+  readable?: boolean;
 }) {
   const totalPages = Math.max(1, Math.ceil(total / Math.max(1, pageSize)));
   const currentPage = Math.min(pageIndex + 1, totalPages);
@@ -44,7 +46,13 @@ export function AdminPagination({
         из <strong className="text-[var(--color-text)] tabular-nums">{total}</strong>
       </p>
 
-      <div className="flex items-center gap-1.5">
+      <div
+        className={
+          readable
+            ? 'flex min-w-0 flex-wrap items-center gap-2 [&_a]:text-base [&_span]:text-base'
+            : 'flex min-w-0 flex-wrap items-center gap-1.5'
+        }
+      >
         {pageIndex > 0 ? (
           <Button asChild size="sm" variant="ghost" className="min-h-11 px-3 text-sm">
             <Link href={firstHref} prefetch={false}>
@@ -74,13 +82,13 @@ export function AdminPagination({
         {nextHref ? (
           <Button asChild size="sm" variant="outline" className="min-h-11 gap-1 px-3 text-sm">
             <Link href={nextHref} prefetch={false} rel="next">
-              Вперёд
+              {readable ? 'Далее' : 'Вперёд'}
               <CaretRight aria-hidden size={15} weight="bold" />
             </Link>
           </Button>
         ) : (
           <span className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-[var(--color-border)] px-3 text-sm text-[var(--color-text-subtle)]">
-            Вперёд
+            {readable ? 'Далее' : 'Вперёд'}
             <CaretRight aria-hidden size={15} weight="bold" />
           </span>
         )}

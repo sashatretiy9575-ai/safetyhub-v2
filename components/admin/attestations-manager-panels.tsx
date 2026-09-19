@@ -15,6 +15,7 @@ import { WhatsappLogo } from '@phosphor-icons/react/dist/csr/WhatsappLogo';
 import { Phone } from '@phosphor-icons/react/dist/csr/Phone';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import type { AdminAttestationRow } from '@/lib/admin/types';
+import { attestationNeedsIssuance } from '@/lib/admin/attestation-issuance';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { formatDateTime } from '@/lib/utils';
 import { formatPhoneDisplay, phoneHref, whatsappChatHref } from '@/lib/site-contacts';
@@ -28,11 +29,20 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-const LearningHistoryControl = dynamic(() => import('@/components/admin/learning-history-control').then(module => module.LearningHistoryControl), { loading: () => <p role="status">Загружаем действия…</p> });
-const CourseAccessControl = dynamic(() => import('@/components/admin/course-access-control').then(module => module.CourseAccessControl), { loading: () => <p role="status">Загружаем допуски…</p> });
+const LearningHistoryControl = dynamic(
+  () =>
+    import('@/components/admin/learning-history-control').then(
+      (module) => module.LearningHistoryControl,
+    ),
+  { loading: () => <p role="status">Загружаем действия…</p> },
+);
+const CourseAccessControl = dynamic(
+  () =>
+    import('@/components/admin/course-access-control').then((module) => module.CourseAccessControl),
+  { loading: () => <p role="status">Загружаем допуски…</p> },
+);
 
 export type AttestationPermissions = {
   canManageDocuments?: boolean;
@@ -162,7 +172,7 @@ export function AttestationWorkflowBadge({
         className={`max-w-full ${className ?? ''}`}
         title={status.label}
       >
-        <span className="min-w-0 truncate">{status.label}</span>
+        <span className="min-w-0 [overflow-wrap:anywhere] whitespace-normal">{status.label}</span>
       </Badge>
       {row.courseDeleted ? (
         <Badge variant="outline" className={`max-w-full ${className ?? ''}`}>
@@ -241,12 +251,13 @@ function nextAttestationStep(
     }
     return { label: 'Подтвердить данные', action: { kind: 'confirm' } };
   }
-  if (
-    permissions.canIssue &&
-    (row.certificateState === 'ready' || row.certificateState === 'revoked')
-  ) {
+  if (permissions.canIssue && attestationNeedsIssuance(row)) {
     return {
-      label: row.certificateState === 'revoked' ? 'Выдать сертификат заново' : 'Выдать сертификат',
+      label: row.scoreImproved
+        ? 'Выдать по улучшенному результату'
+        : row.certificateState === 'revoked'
+          ? 'Выдать сертификат заново'
+          : 'Выдать сертификат',
       action: { kind: 'issue' },
     };
   }
@@ -263,10 +274,8 @@ export function AttestationRowActions({
   openAction: (action: AttestationPendingAction) => void;
 }) {
   const nextStep = nextAttestationStep(row, permissions);
-  // "Open the card" and "fix the name" were two thirds of this menu, and a
-  // click anywhere on the row already does both. What is left is the step the
-  // row is waiting for and the irreversible one; with neither, no button.
-  if (!nextStep && !permissions.canDeleteUser) return null;
+  // Deletion belongs to the selection panel and the bottom of the person card.
+  if (!nextStep) return null;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -279,32 +288,21 @@ export function AttestationRowActions({
           <DotsThree weight="bold" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64">
+      <DropdownMenuContent
+        align="end"
+        className="w-64 max-w-[calc(100vw-1rem)] [overflow-wrap:anywhere]"
+      >
         {nextStep ? (
           <DropdownMenuItem onSelect={() => openAction(nextStep.action)}>
             {nextStep.label}
           </DropdownMenuItem>
-        ) : null}
-        {permissions.canDeleteUser ? (
-          <>
-            {nextStep ? <DropdownMenuSeparator /> : null}
-            <DropdownMenuItem
-              className="text-[var(--color-danger)]"
-              onSelect={() => openAction({ kind: 'bulk-delete' })}
-            >
-              Удалить сотрудника и все его данные
-            </DropdownMenuItem>
-          </>
         ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-/**
- * Bulk actions: one combined primary action, an export, and the rest behind
- * «Ещё». Selection is cleared from the banner above the table.
- */
+/** Direct selection actions, with destructive work separated below. */
 export function AttestationBulkActionButtons({
   summary,
   permissions,
@@ -367,54 +365,49 @@ export function AttestationBulkActionButtons({
   }
 
   return (
-    <div className={compact ? 'grid gap-2' : 'flex flex-wrap items-center gap-2'}>
-      {primary.map((item) => (
-        <Button
-          key={item.key}
-          size={compact ? 'md' : 'sm'}
-          variant={item.variant}
-          disabled={item.disabled}
-          onClick={() => onAction(item.action)}
-          className={compact ? 'w-full' : undefined}
-        >
-          {item.icon} {item.label}
-        </Button>
-      ))}
+    <div className="min-w-0 space-y-3">
+      <div
+        className={
+          compact
+            ? 'grid min-w-0 gap-2'
+            : 'grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-2'
+        }
+      >
+        {primary.map((item) => (
+          <Button
+            key={item.key}
+            size={compact ? 'md' : 'sm'}
+            variant={item.variant}
+            disabled={busy || item.disabled}
+            onClick={() => onAction(item.action)}
+            className="h-auto min-h-12 w-full min-w-0 px-3 py-3 [overflow-wrap:anywhere] whitespace-normal"
+          >
+            {item.icon} {item.label}
+          </Button>
+        ))}
 
-      {permissions.canManageIdentity || permissions.canDeleteUser ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              size={compact ? 'md' : 'sm'}
-              variant="ghost"
-              className={compact ? 'w-full justify-start' : undefined}
-            >
-              <DotsThree size={20} weight="bold" /> Ещё
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-72">
-            {permissions.canManageIdentity ? (
-              <DropdownMenuItem
-                disabled={summary.people === 0}
-                onSelect={() => onAction({ kind: 'bulk-update', field: 'organization' })}
-              >
-                <Buildings /> Переименовать компанию у {summary.people} чел.
-              </DropdownMenuItem>
-            ) : null}
-            {permissions.canDeleteUser ? (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  disabled={summary.people === 0}
-                  className="text-[var(--color-danger)]"
-                  onSelect={() => onAction({ kind: 'bulk-delete' })}
-                >
-                  <Trash /> Удалить {summary.people} чел. со всеми данными
-                </DropdownMenuItem>
-              </>
-            ) : null}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {permissions.canManageIdentity ? (
+          <Button
+            variant="outline"
+            disabled={busy || summary.people === 0}
+            className="h-auto min-h-12 w-full min-w-0 px-3 py-3 [overflow-wrap:anywhere] whitespace-normal"
+            onClick={() => onAction({ kind: 'bulk-update', field: 'organization' })}
+          >
+            <Buildings /> Переименовать компанию
+          </Button>
+        ) : null}
+      </div>
+      {permissions.canDeleteUser ? (
+        <div className="border-t border-[var(--color-border)] pt-3">
+          <Button
+            variant="outline"
+            disabled={busy || summary.people === 0}
+            className="h-auto min-h-11 max-w-full px-3 py-2 [overflow-wrap:anywhere] whitespace-normal text-[var(--color-danger)]"
+            onClick={() => onAction({ kind: 'bulk-delete' })}
+          >
+            <Trash /> Удалить сотрудников ({summary.people})
+          </Button>
+        </div>
       ) : null}
     </div>
   );
@@ -440,14 +433,40 @@ function AttestationIdentityForm({
 
   const [education, setEducation] = useState<string | null>(null);
   const [savedEducation, setSavedEducation] = useState('');
+  const [educationRequired, setEducationRequired] = useState<boolean | null>(null);
+  const educationInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (error === 'Заполните образование перед новой выдачей документа.')
+      educationInputRef.current?.focus();
+  }, [error, educationRequired]);
   useEffect(() => {
     const controller = new AbortController();
-    void fetch(`/api/admin/users/${row.userId}/identity`, { signal: controller.signal, cache: 'no-store' })
-      .then(async r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(value => { if (!controller.signal.aborted) { setEducation(value.education ?? ''); setSavedEducation(value.education ?? ''); } })
-      .catch(() => { if (!controller.signal.aborted) setError('Не удалось загрузить образование. Закройте и повторите редактирование.'); });
+    void fetch(
+      `/api/admin/users/${row.userId}/identity${row.testId ? `?testId=${encodeURIComponent(row.testId)}` : ''}`,
+      {
+        signal: controller.signal,
+        cache: 'no-store',
+      },
+    )
+      .then(async (r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then((value) => {
+        if (!controller.signal.aborted) {
+          setEducation(value.education ?? '');
+          setSavedEducation(value.education ?? '');
+          setEducationRequired(
+            typeof value.educationRequired === 'boolean' ? value.educationRequired : null,
+          );
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted)
+          setError('Не удалось загрузить образование. Закройте и повторите редактирование.');
+      });
     return () => controller.abort();
-  }, [row.userId]);
+  }, [row.userId, row.testId]);
 
   const update =
     (field: keyof AttestationIdentityFields) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -480,11 +499,21 @@ function AttestationIdentityForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'verify', ...normalized, education }),
       });
-      const payload = await readClientResponseJson<{ status?: string; error?: string }>(
-        result.response,
-      );
+      const payload = await readClientResponseJson<{
+        status?: string;
+        error?: string;
+        fields?: string[];
+      }>(result.response);
       if (!result.ok) {
-        setError(clientRequestMessage(result.error, 'Не удалось сохранить данные.'));
+        const missingEducation =
+          payload?.fields?.includes('education') ||
+          payload?.error === 'DOCUMENT_REQUIRED_FIELDS:education';
+        if (missingEducation) setEducationRequired(true);
+        setError(
+          missingEducation
+            ? 'Заполните образование перед новой выдачей документа.'
+            : clientRequestMessage(result.error, 'Не удалось сохранить данные.'),
+        );
         return;
       }
       if (!payload?.status) {
@@ -511,7 +540,7 @@ function AttestationIdentityForm({
         {(Object.keys(attestationFieldLabels) as Array<keyof AttestationIdentityFields>).map(
           (field, index) => (
             <div key={field}>
-              <Label className="sr-only" htmlFor={`attestation-${field}-${row.userId}`}>
+              <Label htmlFor={`attestation-${field}-${row.userId}`}>
                 {attestationFieldLabels[field]}
               </Label>
               <Input
@@ -528,13 +557,34 @@ function AttestationIdentityForm({
           ),
         )}
       </div>
-      <Input aria-label="Образование" placeholder="Образование (необязательно)" value={education ?? ''} disabled={busy || education === null} maxLength={200} onChange={e => setEducation(e.target.value)} />
+      {educationRequired !== false ? (
+        <div className="space-y-1">
+          <Label htmlFor={`education-${row.userId}`}>
+            Образование{educationRequired ? ' · для новой выдачи' : ''}
+          </Label>
+          <Input
+            id={`education-${row.userId}`}
+            ref={educationInputRef}
+            aria-label="Образование"
+            aria-describedby={`education-hint-${row.userId}`}
+            value={education ?? ''}
+            disabled={busy || education === null}
+            maxLength={200}
+            onChange={(e) => setEducation(e.target.value)}
+          />
+          <p id={`education-hint-${row.userId}`} className="text-sm text-[var(--color-text-muted)]">
+            {educationRequired
+              ? 'Заполните перед новой выдачей: образование печатается в этой форме.'
+              : 'Обязательность зависит от формы нового документа.'}
+          </p>
+        </div>
+      ) : null}
       {error ? (
         <p role="alert" className="text-sm text-[var(--color-danger)]">
           {error}
         </p>
       ) : null}
-      <div className="flex gap-2">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-2">
         <Button
           type="submit"
           size="sm"
@@ -679,34 +729,15 @@ function AttestationDetailContent({
   const canEdit = canManageIdentity && !courseDeleted;
 
   return (
-    <div className="flex h-full max-h-[inherit] flex-col">
+    <div className="flex h-full max-h-[inherit] min-w-0 flex-col [overflow-wrap:anywhere]">
       <header className="flex min-h-14 shrink-0 items-center gap-1 border-b border-[var(--color-border)] pt-[var(--safe-area-top)] pr-2 pl-4 sm:pt-0 sm:pr-3 sm:pl-5">
         <h2
           id={titleId}
-          className="min-w-0 flex-1 truncate py-2 text-base font-bold sm:text-lg"
+          className="min-w-0 flex-1 py-2 text-base font-bold sm:text-lg"
           title={row.fullName}
         >
           {row.fullName}
         </h2>
-        {canEdit ? (
-          <Button
-            ref={pencilRef}
-            type="button"
-            size="icon"
-            variant="ghost"
-            aria-pressed={mode === 'edit'}
-            aria-label="Исправить данные"
-            title="Исправить данные"
-            className={
-              mode === 'edit'
-                ? 'bg-[var(--color-surface-muted)] text-[var(--color-primary)]'
-                : undefined
-            }
-            onClick={() => setMode((current) => (current === 'edit' ? 'view' : 'edit'))}
-          >
-            <PencilSimple />
-          </Button>
-        ) : null}
         <Button
           type="button"
           size="icon"
@@ -719,10 +750,14 @@ function AttestationDetailContent({
         </Button>
       </header>
 
-      <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div
+        data-attestation-detail-body
+        ref={bodyRef}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+      >
         <div className="grid grid-cols-1 gap-6 p-4 sm:p-5 lg:grid-cols-2 lg:items-start lg:gap-8">
           {/* The person: who it is, how to reach them, what they may open. */}
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             {mode === 'edit' ? (
               <AttestationIdentityForm
                 row={row}
@@ -736,7 +771,7 @@ function AttestationDetailContent({
               <div className="flex items-start gap-4">
                 <ProfileAvatar row={row} canReadIdentity={canReadIdentity} />
                 <div className="min-w-0 flex-1 space-y-0.5 pt-1">
-                  <p className="font-semibold break-words">{row.job || '—'}</p>
+                  <p className="font-semibold break-words">{row.fullName}</p>
                   <p className="text-sm break-words text-[var(--color-text-muted)]">
                     {row.organization || '—'}
                   </p>
@@ -749,7 +784,7 @@ function AttestationDetailContent({
                     <a
                       href={`mailto:${contact.email}`}
                       title={contact.email}
-                      className="block truncate pt-1 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:underline"
+                      className="block pt-1 text-sm break-all text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:underline"
                     >
                       {contact.email}
                     </a>
@@ -758,20 +793,46 @@ function AttestationDetailContent({
               </div>
             )}
 
+            {canEdit ? (
+              <Button
+                ref={pencilRef}
+                type="button"
+                size="sm"
+                variant="ghost"
+                aria-pressed={mode === 'edit'}
+                aria-label="Изменить данные"
+                title="Изменить данные"
+                className={'h-auto min-h-11 w-full px-3 py-2 whitespace-normal'}
+                onClick={() => setMode((current) => (current === 'edit' ? 'view' : 'edit'))}
+              >
+                <PencilSimple /> {mode === 'edit' ? 'Закрыть редактирование' : 'Изменить данные'}
+              </Button>
+            ) : null}
+
             {contact.phoneE164 ? (
-              <div className="flex gap-2">
-                <Button asChild className="min-w-0 flex-1 px-3">
-                  <a href={whatsappChatHref(contact.phoneE164)} target="_blank" rel="noopener noreferrer"><WhatsappLogo aria-hidden="true" /> WhatsApp</a>
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-2">
+                <Button asChild className="h-auto min-h-11 min-w-0 px-3 py-2 whitespace-normal">
+                  <a
+                    href={whatsappChatHref(contact.phoneE164)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <WhatsappLogo aria-hidden="true" /> WhatsApp
+                  </a>
                 </Button>
                 {/* A new tab, so the card stays open behind the chat.
                     `noopener` keeps that tab from reaching back here. */}
-                <Button asChild variant="outline" size="icon">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-auto min-h-11 px-3 py-2 whitespace-normal"
+                >
                   <a
                     href={phoneHref(contact.phoneE164)}
                     aria-label={'Позвонить: ' + formatPhoneDisplay(contact.phoneE164)}
                     title={formatPhoneDisplay(contact.phoneE164)}
                   >
-                    <Phone aria-hidden="true" />
+                    <Phone aria-hidden="true" /> Позвонить
                   </a>
                 </Button>
               </div>
@@ -779,6 +840,19 @@ function AttestationDetailContent({
               <p role="alert" className="text-sm text-[var(--color-danger)]">
                 Контакты не загрузились.
               </p>
+            ) : null}
+
+            {contact.email ? (
+              <Button
+                asChild
+                variant="outline"
+                className="h-auto min-h-11 w-full px-3 py-2 whitespace-normal"
+              >
+                <a href={`mailto:${contact.email}`}>Написать на почту</a>
+              </Button>
+            ) : null}
+            {contact.phoneE164 ? (
+              <p className="text-sm break-words">{formatPhoneDisplay(contact.phoneE164)}</p>
             ) : null}
 
             {canReadIdentity || canManageIdentity ? (
@@ -791,7 +865,8 @@ function AttestationDetailContent({
           </div>
 
           {/* The work: this course's result and its certificate. */}
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
+            <h3 className="font-bold">Обучение и документы</h3>
             <section
               aria-labelledby={`${titleId}-course`}
               className="space-y-3 rounded-[var(--radius-group)] bg-[var(--color-surface-muted)] p-4"
@@ -838,7 +913,32 @@ function AttestationDetailContent({
               ) : null}
             </section>
 
-            {permissions.canManageDocuments && row.organization && !courseDeleted ? <div className="grid gap-2 sm:grid-cols-2">{(['certificate', 'protocol'] as const).map(tab => <Button key={tab} asChild variant="outline" className="h-auto min-h-11 whitespace-normal text-center"><a href={'/admin/settings/certificate?' + new URLSearchParams({ organization: row.organization!, course: row.testId ?? '', user: row.userId, tab })}>{tab === 'certificate' ? 'Редактировать корочку' : 'Протокол компании'}</a></Button>)}</div> : null}
+            {permissions.canManageDocuments && row.organization && !courseDeleted ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {(['certificate', 'protocol'] as const).map((tab) => (
+                  <Button
+                    key={tab}
+                    asChild
+                    variant="outline"
+                    className="h-auto min-h-11 max-w-full min-w-0 px-3 text-center [overflow-wrap:anywhere] whitespace-normal"
+                  >
+                    <a
+                      href={
+                        '/admin/settings/certificate?' +
+                        new URLSearchParams({
+                          organization: row.organization!,
+                          course: row.testId ?? '',
+                          user: row.userId,
+                          tab,
+                        })
+                      }
+                    >
+                      {tab === 'certificate' ? 'Редактировать удостоверение' : 'Протокол компании'}
+                    </a>
+                  </Button>
+                ))}
+              </div>
+            ) : null}
             {canReadCertificate && !courseDeleted ? (
               <details className="group rounded-[var(--radius-group)] border border-[var(--color-border)]">
                 <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-semibold [&::-webkit-details-marker]:hidden">
@@ -868,7 +968,7 @@ function AttestationDetailContent({
                       {history.items.map((certificate) => (
                         <li
                           key={certificate.id}
-                          className="flex items-center justify-between gap-3 py-2.5 text-sm"
+                          className="flex flex-wrap items-center justify-between gap-3 py-2.5 text-sm"
                         >
                           <div className="min-w-0">
                             <p className="truncate font-mono font-semibold">
@@ -902,43 +1002,59 @@ function AttestationDetailContent({
                 </div>
               </details>
             ) : null}
-
-            {mode === 'delete-history' ? (
-              <div ref={dangerRef}>
-                <LearningHistoryControl
-                  variant="confirm"
-                  userId={row.userId}
-                  userLabel={row.fullName}
-                  onCancel={() => setMode('view')}
-                  onDeleted={onHistoryDeleted}
-                />
-              </div>
-            ) : canDeleteHistory || canDeleteUser ? (
-              <div className="flex flex-wrap gap-x-6 border-t border-[var(--color-border)] pt-1">
-                {canDeleteHistory ? (
-                  <button
-                    ref={deleteHistoryRef}
-                    type="button"
-                    className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--color-danger)] hover:underline"
-                    onClick={() => setMode('delete-history')}
-                  >
-                    <Trash size={18} aria-hidden="true" />
-                    Удалить учебную историю
-                  </button>
-                ) : null}
-                {canDeleteUser ? (
-                  <button
-                    type="button"
-                    className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--color-danger)] hover:underline"
-                    onClick={() => onAction(row, { kind: 'bulk-delete' })}
-                  >
-                    <Trash size={18} aria-hidden="true" />
-                    Удалить сотрудника
-                  </button>
-                ) : null}
-              </div>
-            ) : null}
           </div>
+          <details className="min-w-0 rounded-[var(--radius-group)] border border-[var(--color-border)] p-3 lg:col-span-2">
+            <summary className="min-h-11 cursor-pointer py-2 font-semibold">
+              Дополнительные сведения
+            </summary>
+            <p className="py-2 text-sm">Должность: {row.job || '—'}</p>
+          </details>
+          {canDeleteHistory || canDeleteUser ? (
+            <section
+              aria-label="Удаление данных"
+              className="min-w-0 space-y-3 border-t border-[var(--color-danger)]/30 pt-6 lg:col-span-2"
+            >
+              <h3 className="font-semibold text-[var(--color-danger)]">Удаление данных</h3>
+              {mode === 'delete-history' ? (
+                <div
+                  ref={dangerRef}
+                  className="min-w-0 [&_button]:h-auto [&_button]:min-h-11 [&_button]:max-w-full [&_button]:px-3 [&_button]:py-2 [&_button]:whitespace-normal"
+                >
+                  <LearningHistoryControl
+                    variant="confirm"
+                    userId={row.userId}
+                    userLabel={row.fullName}
+                    onCancel={() => setMode('view')}
+                    onDeleted={onHistoryDeleted}
+                  />
+                </div>
+              ) : canDeleteHistory || canDeleteUser ? (
+                <div className="flex flex-wrap gap-x-6 border-t border-[var(--color-border)] pt-1">
+                  {canDeleteHistory ? (
+                    <button
+                      ref={deleteHistoryRef}
+                      type="button"
+                      className="inline-flex min-h-11 max-w-full min-w-0 items-center gap-2 text-left text-sm font-semibold text-[var(--color-danger)] hover:underline"
+                      onClick={() => setMode('delete-history')}
+                    >
+                      <Trash size={18} aria-hidden="true" />
+                      Удалить учебную историю
+                    </button>
+                  ) : null}
+                  {canDeleteUser ? (
+                    <button
+                      type="button"
+                      className="inline-flex min-h-11 max-w-full min-w-0 items-center gap-2 text-left text-sm font-semibold text-[var(--color-danger)] hover:underline"
+                      onClick={() => onAction(row, { kind: 'bulk-delete' })}
+                    >
+                      <Trash size={18} aria-hidden="true" />
+                      Удалить сотрудника
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+            </section>
+          ) : null}
         </div>
       </div>
 
@@ -946,7 +1062,7 @@ function AttestationDetailContent({
         <footer className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-surface)] px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-bottom))] sm:flex sm:justify-end sm:px-5 sm:pb-3">
           <Button
             type="button"
-            className="w-full sm:w-auto"
+            className="h-auto min-h-11 w-full px-3 py-2 whitespace-normal sm:w-auto"
             onClick={() => onAction(row, nextStep.action)}
           >
             {nextStep.label}

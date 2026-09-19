@@ -193,6 +193,7 @@ function buildProfile(user, index, timestamp) {
     name: `Ученик ${String(index + 1).padStart(4, '0')}`,
     surname: `Тестовый ${String((index % 200) + 1).padStart(3, '0')}`,
     job: index % 3 === 0 ? 'Инженер по безопасности' : 'Специалист',
+    education: 'Тестовое образование',
     organization: `ТОО Нагрузочная компания ${String(organizationIndex).padStart(2, '0')}`,
     phone_country_iso2: 'KZ',
     phone_e164: `+7701${String(index + 1).padStart(7, '0')}`,

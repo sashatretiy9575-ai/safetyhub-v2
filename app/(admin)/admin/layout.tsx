@@ -7,9 +7,7 @@ import { CheckSquareOffset } from '@phosphor-icons/react/dist/ssr/CheckSquareOff
 import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
 import { UserCircleCheck } from '@phosphor-icons/react/dist/ssr/UserCircleCheck';
 import { House } from '@phosphor-icons/react/dist/ssr/House';
-import { Gear } from '@phosphor-icons/react/dist/ssr/Gear';
 import { Users } from '@phosphor-icons/react/dist/ssr/Users';
-import { AdminMoreMenu } from '@/components/admin/admin-more-menu';
 import { AdminNavLink } from '@/components/admin/admin-nav-link';
 import {
   AdminNotificationInboxButton,
@@ -43,7 +41,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: employeeHref, icon: Users, label: 'Сотрудники', shortLabel: 'Люди' },
     { href: '/admin/courses', icon: ClipboardText, label: 'Курсы' },
     { href: '/admin/articles', icon: Article, label: 'Материалы' },
-    { href: '/admin/settings', icon: Gear, label: 'Настройки' },
   ];
 
   const fullName = `${actor.profile.name ?? ''} ${actor.profile.surname ?? ''}`.trim() || undefined;
@@ -65,7 +62,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       >
         <a
           href="#admin-main"
-          className="fixed top-2 left-2 z-[70] -translate-y-24 rounded-lg bg-[var(--color-surface)] px-4 py-3 font-bold shadow-[var(--shadow-pop)] focus:translate-y-0"
+          className="fixed top-2 left-2 z-[70] w-fit max-w-[calc(100vw-1rem)] min-w-0 -translate-y-[calc(100%+1rem)] rounded-lg bg-[var(--color-surface)] px-4 py-3 font-bold [overflow-wrap:anywhere] whitespace-normal shadow-[var(--shadow-pop)] focus:translate-y-0"
         >
           К содержанию
         </a>
@@ -101,6 +98,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 email={actor.user.email ?? ''}
                 fullName={fullName}
                 isAdmin
+                canManageSiteSettings={actor.capabilities.includes('site.settings.manage')}
+                canReadAudit={actor.capabilities.includes('audit.read')}
                 avatarUrl={avatarUrl}
               />
             </div>
@@ -115,11 +114,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </aside>
 
         <div className="min-w-0">
-          <header className="sticky top-0 z-40 flex min-h-14 items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 pt-[var(--safe-area-top)] pr-[max(1rem,var(--safe-area-right))] pl-[max(1rem,var(--safe-area-left))] backdrop-blur-xl lg:hidden">
-            <Link href="/admin" className="min-w-0 py-2">
+          <header
+            data-admin-mobile-header
+            className="sticky top-0 z-40 flex min-h-14 min-w-0 flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 pt-[var(--safe-area-top)] pr-[max(1rem,var(--safe-area-right))] pl-[max(1rem,var(--safe-area-left))] backdrop-blur-xl lg:hidden"
+          >
+            <Link href="/admin" className="min-w-0 flex-1 py-2">
               <span className="block truncate text-sm font-black">SafetyHub Admin</span>
             </Link>
-            <div className="flex items-center gap-1">
+            <div className="flex max-w-full min-w-0 flex-wrap items-center justify-end gap-1">
               <AdminNotificationInboxButton placement="mobile" />
               <Link
                 href="/"
@@ -132,6 +134,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 email={actor.user.email ?? ''}
                 fullName={fullName}
                 isAdmin
+                canManageSiteSettings={actor.capabilities.includes('site.settings.manage')}
+                canReadAudit={actor.capabilities.includes('audit.read')}
                 avatarUrl={avatarUrl}
               />
             </div>
@@ -143,7 +147,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             // focus on <body>, and without the scroll margin the heading it
             // jumps to sits under the sticky header.
             tabIndex={-1}
-            className="min-w-0 scroll-mt-[calc(3.5rem+var(--safe-area-top))] pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)] outline-none lg:scroll-mt-0 lg:pb-0"
+            className="max-xs:pb-[calc(var(--mobile-fixed-bottom-space)+5rem)] min-w-0 scroll-mt-[calc(3.5rem+var(--safe-area-top))] pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)] outline-none lg:scroll-mt-0 lg:pb-0"
           >
             <Container
               size="admin"
@@ -155,16 +159,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </main>
 
           <nav
+            data-admin-mobile-nav
             aria-label="Мобильная навигация админ-панели"
             className="fixed inset-x-0 bottom-0 z-50 overflow-x-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)]/95 pb-[var(--safe-area-bottom)] backdrop-blur-xl lg:hidden"
           >
-            <div className="grid min-h-[var(--mobile-tab-height)] grid-cols-5 px-[max(.25rem,var(--safe-area-left))] py-1 pr-[max(.25rem,var(--safe-area-right))]">
-              {items.slice(0, 4).map(({ href, icon: Icon, label, shortLabel }) => (
+            <div className="xs:grid-cols-5 grid min-h-[var(--mobile-tab-height)] grid-cols-3 px-[max(.25rem,var(--safe-area-left))] py-1 pr-[max(.25rem,var(--safe-area-right))]">
+              {items.map(({ href, icon: Icon, label, shortLabel }) => (
                 <AdminNavLink key={href} href={href} label={label} shortLabel={shortLabel} mobile>
                   <Icon size={20} />
                 </AdminNavLink>
               ))}
-              <AdminMoreMenu items={items.slice(4).map(({ href, label }) => ({ href, label }))} />
             </div>
           </nav>
         </div>

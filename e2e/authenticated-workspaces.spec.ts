@@ -98,7 +98,9 @@ async function assertAuthenticatedLanding(page: Page, expectedLanding: 'admin' |
  */
 function assertNoPageErrors(pageErrors: readonly string[]) {
   if (pageErrors.length === 0) return;
-  throw new Error(`page threw ${pageErrors.length} uncaught error(s): ${pageErrors.join(' | ')}`.slice(0, 400));
+  throw new Error(
+    `page threw ${pageErrors.length} uncaught error(s): ${pageErrors.join(' | ')}`.slice(0, 400),
+  );
 }
 
 async function expectNoPageOverflow(page: Page, label: string) {
@@ -120,16 +122,12 @@ async function expectNoPageOverflow(page: Page, label: string) {
 }
 
 async function waitForEmployeesWorkspace(page: Page) {
-  await expect(page.locator('[data-attestations-filter-form]')).toHaveAttribute(
-    'data-client-ready',
-    'true',
-    { timeout: 20_000 },
-  );
-  await expect(page.locator('[data-attestations-manager]')).toHaveAttribute(
-    'data-client-ready',
-    'true',
-    { timeout: 20_000 },
-  );
+  await expect(
+    page.locator('[data-attestations-filter-form]').filter({ visible: true }),
+  ).toHaveAttribute('data-client-ready', 'true', { timeout: 20_000 });
+  await expect(
+    page.locator('[data-attestations-manager]').filter({ visible: true }),
+  ).toHaveAttribute('data-client-ready', 'true', { timeout: 20_000 });
 }
 
 async function captureViewport(
@@ -181,7 +179,9 @@ test.describe('authenticated operator and participant workspaces', () => {
 
       await page.goto('/admin/employees');
       await expect(page.getByRole('heading', { name: 'Сотрудники' })).toBeVisible();
-      await expect(page.getByLabel('Поиск по ФИО, компании или номеру сертификата')).toBeVisible();
+      await expect(
+        page.getByLabel('Поиск по ФИО, компании или номеру сертификата').filter({ visible: true }),
+      ).toBeVisible();
       await waitForEmployeesWorkspace(page);
       assertNoPageErrors(pageErrors);
 
@@ -219,8 +219,15 @@ test.describe('authenticated operator and participant workspaces', () => {
 
       const rowCheckbox = page.getByRole('checkbox', { name: /^Выбрать:/u }).first();
       await rowCheckbox.check();
-      const bulkActions = page.getByRole('complementary', { name: 'Массовые действия' });
+      const bulkActions = page.getByRole('complementary', { name: 'Выбранные сотрудники' });
       await expect(bulkActions).toBeVisible();
+      await expect(
+        bulkActions.getByRole('button', { name: 'Подтвердить и выдать', exact: true }),
+      ).toBeVisible();
+      await expect(
+        bulkActions.getByRole('button', { name: 'Переименовать компанию', exact: true }),
+      ).toBeVisible();
+      await expect(bulkActions.getByRole('button', { name: 'Ещё', exact: true })).toHaveCount(0);
       await bulkActions.getByRole('button', { name: /Снять выделение/u }).click();
     });
 
@@ -231,7 +238,10 @@ test.describe('authenticated operator and participant workspaces', () => {
       await page.setViewportSize({ width: 568, height: 320 });
       await page.goto('/admin/employees', { waitUntil: 'domcontentloaded' });
       await waitForEmployeesWorkspace(page);
-      await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+      await page.evaluate(() =>
+        document.documentElement.style.setProperty('font-size', '200%', 'important'),
+      );
+      await expect(page.locator('html')).toHaveCSS('font-size', '32px');
       await expectNoPageOverflow(page, 'admin at 200% text');
 
       const filters = page.getByRole('button', { name: /^Фильтры/u });
@@ -265,6 +275,7 @@ test.describe('authenticated operator and participant workspaces', () => {
         const tableHeader = page.getByRole('columnheader', { name: 'Сотрудник' });
         const contentWidth = await page
           .locator('.admin-workspace-container')
+          .filter({ visible: true })
           .evaluate((element) => {
             const style = getComputedStyle(element);
             return (
@@ -357,13 +368,13 @@ test.describe('authenticated operator and participant workspaces', () => {
           .getAttribute('href');
         expect(href).toBeTruthy();
         await page.goto(href!, { waitUntil: 'domcontentloaded' });
-        await expect(page.locator('[data-editor-shell]')).toBeVisible();
+        await expect(page.locator('[data-editor-shell]').filter({ visible: true })).toBeVisible();
 
         if (editor.snapshot === 'admin-course-editor') {
           // The saved question bank has to actually arrive: an empty first
           // question means the editor is back to inventing 30 blank ones and a
           // save would wipe the stored bank.
-          const firstQuestion = page.locator('#variant-0-question-0');
+          const firstQuestion = page.locator('#variant-0-question-0').filter({ visible: true });
           await expect(firstQuestion).toBeVisible();
           await expect(firstQuestion).not.toHaveValue('');
           const firstAnswer = page.getByRole('radio', { name: /^Ответ 1 правильный$/u });
@@ -375,7 +386,7 @@ test.describe('authenticated operator and participant workspaces', () => {
           { width: 1440, height: 900 },
         ]) {
           await page.setViewportSize(viewport);
-          const actionBar = page.locator('[data-editor-action-bar]');
+          const actionBar = page.locator('[data-editor-action-bar]').filter({ visible: true });
           await expect(actionBar).toBeVisible();
           const box = await actionBar.boundingBox();
           expect(box).toBeTruthy();

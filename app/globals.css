@@ -456,3 +456,39 @@
     }
   }
 }
+
+/* Override fixed-height utilities only where a short admin window needs page scrolling. */
+@media (max-height: 30rem) {
+  .document-editor [data-document-toolbar],
+  .document-editor [data-document-preview] {
+    position: static;
+  }
+
+  [data-admin-shell] > aside {
+    position: static;
+    height: auto;
+    align-self: start;
+  }
+  [data-admin-shell] > aside > nav {
+    overflow: visible;
+  }
+
+  /* Keep short windows scrollable instead of reserving their entire height
+     for fixed controls. Navigation stays before the content in this mode. */
+  [data-admin-shell] > div {
+    display: flex;
+    flex-direction: column;
+  }
+  [data-admin-mobile-header],
+  [data-admin-mobile-nav] {
+    position: static;
+  }
+  [data-admin-mobile-nav] {
+    order: 1;
+  }
+  [data-admin-shell] #admin-main {
+    order: 2;
+    scroll-margin-top: 0;
+    padding-bottom: 1.5rem;
+  }
+}

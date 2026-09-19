@@ -117,17 +117,17 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const localMigrations = inventory;
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
-  // 19 September: all three reviewed document migrations are applied.
+  // Reviewed production prefix plus issuance and fixed-selection recovery.
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 91);
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 3);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 94);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(receipt.matchedCount, 91);
-  assert.equal(receipt.pendingCount, 0);
+  assert.equal(receipt.pendingCount, 3);
   assert.equal(receipt.expectedBaseCount, 91);
-  assert.equal(receipt.expectedPendingCount, 0);
-  assert.equal(receipt.expectedTotalCount, 91);
+  assert.equal(receipt.expectedPendingCount, 3);
+  assert.equal(receipt.expectedTotalCount, 94);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

@@ -62,7 +62,7 @@ test('approved production budgets fail closed at the first byte over a limit', (
       'course test',
     ],
   );
-  assert.equal(CSS_BUDGET, 20 * 1_024);
+  assert.equal(CSS_BUDGET, 21 * 1_024);
   for (const budget of BUNDLE_BUDGETS) {
     assert.deepEqual(
       budgetViolations({ initial: budget.initial, route: budget.route, css: CSS_BUDGET }, budget),

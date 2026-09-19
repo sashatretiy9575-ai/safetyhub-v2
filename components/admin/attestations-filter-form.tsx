@@ -136,10 +136,9 @@ export function AttestationsFilterForm({ values }: { values: FilterValues }) {
         Поиск и фильтры
       </h2>
 
-      {/* One line on every screen: the field takes the room, the two buttons
-          keep their width. Stacked, they cost three rows of a small phone. */}
-      <div className="flex gap-2">
-        <div className="relative min-w-0 flex-1">
+      {/* Keep one line when it fits; enlarged text and narrow windows may wrap. */}
+      <div className="flex flex-wrap gap-2">
+        <div className="relative min-w-0 flex-1 basis-[min(100%,8rem)]">
           <MagnifyingGlass
             aria-hidden
             size={18}

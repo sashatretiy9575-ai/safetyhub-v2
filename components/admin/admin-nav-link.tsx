@@ -33,7 +33,7 @@ export function AdminNavLink({
           ? 'bg-[var(--color-surface-muted)] text-[var(--color-text)]'
           : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
         mobile
-          ? 'text-micro w-full min-w-0 flex-col justify-center gap-0.5 px-0.5 py-1 leading-none'
+          ? 'xs:last:col-span-1 w-full min-w-0 flex-col justify-center gap-0.5 px-0.5 py-1 text-sm leading-tight last:col-span-2'
           : 'px-3 py-2 text-sm',
       )}
     >
@@ -42,13 +42,20 @@ export function AdminNavLink({
       </span>
       {mobile && shortLabel ? (
         <>
-          <span aria-hidden="true" className="max-w-20 truncate">
+          <span
+            aria-hidden="true"
+            className="w-full text-center [overflow-wrap:anywhere] whitespace-normal"
+          >
             {shortLabel}
           </span>
           <span className="sr-only">{label}</span>
         </>
       ) : (
-        <span className={cn(mobile && 'max-w-20 truncate')}>{label}</span>
+        <span
+          className={cn(mobile && 'w-full text-center [overflow-wrap:anywhere] whitespace-normal')}
+        >
+          {label}
+        </span>
       )}
     </Link>
   );

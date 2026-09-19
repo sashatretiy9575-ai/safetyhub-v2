@@ -7,38 +7,36 @@ import {
   revokeUserIdentity,
   verifyUserIdentity,
 } from '@/server/identity/verification';
-import {
-  identityActionSchema,
-  identityUserIdSchema,
-} from '@/lib/validation/identity';
+import { identityActionSchema, identityUserIdSchema } from '@/lib/validation/identity';
 import { requestSecurityMetadata } from '@/server/security/request-metadata';
 import { consumeAdminMutationQuota } from '@/server/security/rate-limit';
 import { readJsonBody } from '@/lib/security/request-body';
+import { educationRequirement } from '@/server/certificates/education-requirement';
 
 async function targetId(context: { params: Promise<{ userId: string }> }) {
   const { userId } = await context.params;
   return identityUserIdSchema.safeParse(userId);
 }
 
-export async function GET(
-  _request: Request,
-  context: { params: Promise<{ userId: string }> },
-) {
+export async function GET(_request: Request, context: { params: Promise<{ userId: string }> }) {
   try {
     await requireAnyCapability(['identity.read', 'identity.manage']);
     const parsedId = await targetId(context);
-    if (!parsedId.success)
+    if (!parsedId.success) return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
+    const testId = new URL(_request.url).searchParams.get('testId');
+    if (testId && !identityUserIdSchema.safeParse(testId).success)
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
-    return NextResponse.json(await getUserIdentity(parsedId.data));
+    const identity = await getUserIdentity(parsedId.data);
+    return NextResponse.json({
+      ...identity,
+      educationRequired: testId ? await educationRequirement(parsedId.data, testId) : null,
+    });
   } catch (error) {
     return identityApiError(error);
   }
 }
 
-export async function PATCH(
-  request: Request,
-  context: { params: Promise<{ userId: string }> },
-) {
+export async function PATCH(request: Request, context: { params: Promise<{ userId: string }> }) {
   try {
     const invalidOrigin = invalidOriginResponse(request);
     if (invalidOrigin) return invalidOrigin;

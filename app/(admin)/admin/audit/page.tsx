@@ -1,6 +1,13 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
+import { CalendarBlank } from '@phosphor-icons/react/dist/ssr/CalendarBlank';
+import {
+  AUDIT_TIME_ZONE,
+  auditDateValue,
+  auditInclusiveEndValue,
+  auditRecentPeriod,
+} from '@/lib/admin/audit-dates';
 import { requireCapability } from '@/server/auth/session';
 import {
   ADMIN_PAGE_SIZE,
@@ -26,10 +33,42 @@ const actionLabels: Record<string, string> = {
   'account.approval.approved': 'Регистрация подтверждена',
   'course.access.changed': 'Изменён доступ к курсам',
   'test.passed': 'Тест пройден',
-  'certificate.issued': 'Сертификат выдан',
-  'user.self_delete_requested': 'Пользователь удалил учётную запись',
-  'user.purged': 'Администратор удалил учётную запись',
-  'role.changed': 'Назначен администратор',
+  'certificate.issued': 'Документ выдан',
+  'certificate.revoked': 'Документ отозван',
+  'certificate.exported': 'Документы экспортированы',
+  'certificate.export_job.created': 'Подготовлен экспорт документов',
+  'certificate.export_job.downloaded': 'Архив документов скачан',
+  'identity.verified': 'Данные сотрудника подтверждены',
+  'identity.revoked': 'Подтверждение данных отменено',
+  'identity.bulk_confirm': 'Подтверждены данные выбранных сотрудников',
+  'identity.education.update': 'Изменены сведения об образовании',
+  'identity.organization_merge': 'Изменена компания сотрудника',
+  'organization.merged': 'Компании объединены',
+  'organization.merge': 'Объединение компаний',
+  'learning_history.deleted': 'Учебная история удалена',
+  'user.invited': 'Сотрудник приглашён',
+  'user.self_purged': 'Учётная запись удалена пользователем',
+  'course.completed': 'Курс завершён',
+  'course.deleted': 'Курс удалён',
+  'course.draft_saved': 'Черновик курса сохранён',
+  'course.draft_reviewed': 'Черновик курса проверен',
+  'course.draft_restored_from_revision': 'Черновик курса восстановлен',
+  'course.localization_saved': 'Перевод курса сохранён',
+  'course.localizations_published': 'Переводы курса опубликованы',
+  'course.localization_assessment_imported': 'Загружен перевод вопросов',
+  'course.presentation_finalized': 'Презентация курса подготовлена',
+  'course.presentation_retired': 'Презентация курса снята с публикации',
+  'course.published': 'Курс опубликован',
+  'course.question_bank_read': 'Просмотрены вопросы курса',
+  'course.slug_changed': 'Изменён адрес курса',
+  'course.unused_draft_deleted': 'Неиспользуемый черновик удалён',
+  'test.draft_saved': 'Черновик теста сохранён',
+  'test.published': 'Тест опубликован',
+  'test.status_changed': 'Изменён статус теста',
+
+  'user.self_delete_requested': 'Запрошено удаление учётной записи',
+  'user.purged': 'Учётная запись удалена',
+  'role.changed': 'Изменена роль пользователя',
   'role.changed_directly': 'Роль изменена напрямую в базе',
   'admin.provisioned_by_email': 'Администратор назначен по адресу почты',
   'superadmin.bootstrapped': 'Создан первый администратор',
@@ -47,13 +86,12 @@ const quickFilters = [
   { value: 'approval', label: 'Регистрации' },
   { value: 'test', label: 'Тесты' },
   { value: 'certificate', label: 'Сертификаты' },
-  { value: 'user', label: 'Удаления' },
+  { value: 'user', label: 'Аккаунты' },
 ] as const;
 
 function readableAction(action: string) {
   if (actionLabels[action]) return actionLabels[action];
-  const words = action.replace(/[._]/g, ' ');
-  return words.charAt(0).toUpperCase() + words.slice(1);
+  return 'Другое действие';
 }
 
 function nested(details: Record<string, unknown>, key: 'before' | 'after') {
@@ -124,14 +162,19 @@ const categoryStyles: Record<EventCategory, { label: string; className: string }
 
 function auditFilterParams(query: ReturnType<typeof parseAdminAuditQuery>) {
   const params = new URLSearchParams();
+  if (query.localDates) params.set('tz', 'local');
   if (query.actor) params.set('actor', query.actor);
   if (query.target) params.set('target', query.target);
   if (query.action) params.set('action', query.action);
-  if (query.from) params.set('from', query.from.slice(0, 10));
+  if (query.from)
+    params.set('from', query.localDates ? auditDateValue(query.from) : query.from.slice(0, 10));
   if (query.to) {
     const to = new Date(query.to);
     to.setUTCDate(to.getUTCDate() - 1);
-    params.set('to', to.toISOString().slice(0, 10));
+    params.set(
+      'to',
+      query.localDates ? auditInclusiveEndValue(query.to) : to.toISOString().slice(0, 10),
+    );
   }
   return params;
 }
@@ -184,16 +227,13 @@ export default async function AuditPage({
   const currentToken =
     query.cursorAt && query.cursorId ? `${query.cursorAt}|${query.cursorId}` : '';
   const previousToken = trail.length > 0 ? (trail[trail.length - 1] ?? '') : null;
-  const fromValue = query.from ? query.from.slice(0, 10) : '';
-  const toValue = query.to
-    ? new Date(new Date(query.to).setUTCDate(new Date(query.to).getUTCDate() - 1))
-        .toISOString()
-        .slice(0, 10)
-    : '';
+  const filterParams = auditFilterParams(query);
+  const fromValue = filterParams.get('from') ?? '';
+  const toValue = filterParams.get('to') ?? '';
   const hasFilters = Boolean(query.actor || query.target || query.action || query.from || query.to);
 
   return (
-    <section className="space-y-5">
+    <section data-audit-workspace className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-h3 font-bold">История действий</h1>
@@ -201,10 +241,12 @@ export default async function AuditPage({
         {auditResult.state === 'ready' ? (
           <ResultsExport
             filename="audit-page"
+            label="Скачать CSV"
             rows={auditResult.data.items.map((event) => ({
               время: event.createdAt,
               автор: event.actorLabel,
               действие: readableAction(event.action),
+              action_code: event.action,
               цель: event.targetLabel,
               correlation_id: event.correlationId,
               детали: event.details,
@@ -214,7 +256,7 @@ export default async function AuditPage({
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5 text-xs">
+      <div className="flex flex-wrap items-center gap-2 text-base">
         {quickFilters.map(({ value, label }) => {
           const active = (query.action ?? '') === value;
           return (
@@ -234,56 +276,90 @@ export default async function AuditPage({
         })}
       </div>
 
-      <form className="grid gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 sm:grid-cols-2 sm:items-end lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_9.5rem_9.5rem_auto_auto]">
+      <form
+        key={filterParams.toString()}
+        action={basePath}
+        className="grid min-w-0 gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 sm:grid-cols-2 xl:grid-cols-4"
+      >
         {query.action ? <input type="hidden" name="action" value={query.action} /> : null}
-        <div className="space-y-1">
-          <Label className="sr-only" htmlFor="audit-actor">
-            Кто (инициатор)
-          </Label>
+        {query.localDates ? <input type="hidden" name="tz" value="local" /> : null}
+        <div className="min-w-0 space-y-2">
+          <Label htmlFor="audit-actor">Кто выполнил действие</Label>
           <Input
-          placeholder="Кто (инициатор)" id="audit-actor" name="actor" defaultValue={query.actor} maxLength={100} />
-        </div>
-        <div className="space-y-1">
-          <Label className="sr-only" htmlFor="audit-target">
-            Над кем / над чем
-          </Label>
-          <Input
-          placeholder="Над кем / над чем" id="audit-target" name="target" defaultValue={query.target} maxLength={100} />
-        </div>
-        {/* A date input draws its own dd.mm.yyyy, so the pair shares one frame
-            that reads "с … по …" instead of a caption over each field. */}
-        <div className="flex min-h-11 items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)]">
-          <span aria-hidden className="text-caption text-[var(--color-text-subtle)]">
-            с
-          </span>
-          <input
-            id="audit-from"
-            name="from"
-            type="date"
-            defaultValue={fromValue}
-            aria-label="С даты"
-            className="min-w-0 flex-1 bg-transparent text-sm text-[var(--color-text)] outline-none"
-          />
-          <span aria-hidden className="text-caption text-[var(--color-text-subtle)]">
-            по
-          </span>
-          <input
-            id="audit-to"
-            name="to"
-            type="date"
-            defaultValue={toValue}
-            aria-label="По дату"
-            className="min-w-0 flex-1 bg-transparent text-sm text-[var(--color-text)] outline-none"
+            className="min-w-0 text-base"
+            placeholder="Имя или почта"
+            id="audit-actor"
+            name="actor"
+            defaultValue={query.actor}
+            maxLength={100}
           />
         </div>
-        <Button type="submit" size="sm" className="h-11">
-          Показать
-        </Button>
-        {hasFilters ? (
-          <Button asChild type="button" size="sm" variant="outline" className="h-11">
-            <Link href={basePath}>Сбросить</Link>
+        <div className="min-w-0 space-y-2">
+          <Label htmlFor="audit-target">Сотрудник или объект</Label>
+          <Input
+            className="min-w-0 text-base"
+            placeholder="Имя или название"
+            id="audit-target"
+            name="target"
+            defaultValue={query.target}
+            maxLength={100}
+          />
+        </div>
+        {[
+          { id: 'from', label: 'С даты', value: fromValue },
+          { id: 'to', label: 'По дату включительно', value: toValue },
+        ].map(({ id, label, value }) => (
+          <div key={id} className="min-w-0 space-y-2">
+            <Label htmlFor={`audit-${id}`} className="flex items-center gap-2">
+              <CalendarBlank aria-hidden size={18} className="shrink-0" />
+              {label}
+            </Label>
+            <input
+              id={`audit-${id}`}
+              name={id}
+              type="date"
+              defaultValue={value}
+              className="block min-h-11 w-full max-w-full min-w-0 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-base text-[var(--color-text)] focus-visible:outline-2 focus-visible:outline-[var(--color-primary)]"
+            />
+          </div>
+        ))}
+        <div className="min-w-0 space-y-2 sm:col-span-2 xl:col-span-4">
+          <p className="text-sm text-[var(--color-text-muted)]">
+            Даты и время: {query.localDates ? 'Казахстан, UTC+5' : 'UTC (сохранённый фильтр)'}
+          </p>
+          <div className="flex flex-wrap gap-2" aria-label="Быстрый выбор периода">
+            {[
+              { days: 1, label: 'Сегодня' },
+              { days: 7, label: '7 дней' },
+              { days: 30, label: '30 дней' },
+            ].map(({ days, label }) => {
+              const period = auditRecentPeriod(days);
+              const periodParams = auditFilterParams(query);
+              periodParams.set('tz', 'local');
+              periodParams.set('from', period.from);
+              periodParams.set('to', period.to);
+              return (
+                <Link
+                  key={days}
+                  href={`${basePath}?${periodParams.toString()}`}
+                  className="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-3 text-base font-medium hover:bg-[var(--color-surface-muted)]"
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:col-span-2 xl:col-span-4">
+          <Button type="submit" className="min-h-11 text-base">
+            Показать
           </Button>
-        ) : null}
+          {hasFilters ? (
+            <Button asChild type="button" variant="outline" className="min-h-11 text-base">
+              <Link href={basePath}>Сбросить</Link>
+            </Button>
+          ) : null}
+        </div>
       </form>
 
       {auditResult.state === 'failed' ? (
@@ -292,18 +368,14 @@ export default async function AuditPage({
           message="Журнал временно не загрузился. Повторите запрос."
         />
       ) : auditResult.data.items.length === 0 ? (
-        <AdminEmptyState>События по выбранным фильтрам не найдены.</AdminEmptyState>
+        <AdminEmptyState>
+          {hasFilters
+            ? 'События по выбранным фильтрам не найдены.'
+            : 'В журнале пока нет действий.'}
+        </AdminEmptyState>
       ) : (
         <>
           <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
-            <div className="hidden min-h-10 grid-cols-[9.5rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1.2fr)_5rem] items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 text-xs font-bold text-[var(--color-text-muted)] lg:grid">
-              <span>Когда</span>
-              <span>Что произошло</span>
-              <span>Кто</span>
-              <span>Над кем / над чем</span>
-              <span className="text-right">Детали</span>
-            </div>
-
             {auditResult.data.items.map((event) => {
               const category = eventCategory(event.action, event.details);
               const style = categoryStyles[category];
@@ -314,29 +386,12 @@ export default async function AuditPage({
               return (
                 <div
                   key={event.id}
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1 border-b border-[var(--color-border)] px-3 py-2.5 text-xs transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)]/60 lg:min-h-12 lg:grid-cols-[9.5rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1.2fr)_5rem] lg:items-center"
+                  className="grid min-w-0 gap-3 border-b border-[var(--color-border)] p-4 text-base last:border-b-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]"
                 >
-                  <time
-                    dateTime={event.createdAt}
-                    className="text-micro order-2 font-mono whitespace-nowrap text-[var(--color-text-subtle)] lg:order-none"
-                  >
-                    {created.toLocaleDateString('ru-RU', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: '2-digit',
-                    })}
-                    <span className="ml-1.5 text-[var(--color-text-muted)]">
-                      {created.toLocaleTimeString('ru-RU', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  </time>
-
-                  <div className="order-1 col-span-2 min-w-0 lg:order-none lg:col-span-1">
+                  <div className="min-w-0 xl:order-2">
                     <div className="flex min-w-0 flex-wrap items-center gap-1.5">
                       <span
-                        className={`text-micro inline-flex shrink-0 items-center rounded-full px-2 py-0.5 font-bold ${style.className}`}
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-sm font-bold ${style.className}`}
                       >
                         {style.label}
                       </span>
@@ -344,98 +399,123 @@ export default async function AuditPage({
                         {readableAction(event.action)}
                       </span>
                       {status ? (
-                        <span className="text-micro shrink-0 text-[var(--color-text-muted)]">
-                          · {status}
-                        </span>
+                        <span className="text-sm text-[var(--color-text-muted)]">· {status}</span>
                       ) : null}
                     </div>
                     {reason ? (
-                      <p className="text-micro mt-0.5 truncate text-[var(--color-text-subtle)]">
-                        {reason}
-                      </p>
+                      <p className="mt-2 text-sm text-[var(--color-text-subtle)]">{reason}</p>
                     ) : null}
                   </div>
 
-                  <div
-                    className="order-3 min-w-0 truncate text-[var(--color-text-muted)] lg:order-none lg:text-[var(--color-text)]"
-                    title={event.actorLabel}
-                  >
+                  <div className="min-w-0 xl:order-1" title={event.actorLabel}>
+                    <span className="block text-sm text-[var(--color-text-muted)]">Кто</span>
                     {event.actorLabel}
                   </div>
 
-                  <div
-                    className="order-4 col-span-2 min-w-0 truncate text-[var(--color-text-muted)] lg:order-none lg:col-span-1 lg:text-[var(--color-text)]"
-                    title={event.targetLabel}
-                  >
+                  <div className="min-w-0 xl:order-3" title={event.targetLabel}>
+                    <span className="block text-sm text-[var(--color-text-muted)]">
+                      Сотрудник или объект
+                    </span>
                     {event.targetLabel}
                   </div>
 
-                  <div className="order-2 flex justify-end lg:order-none">
+                  <div className="min-w-0 space-y-3 xl:order-4">
+                    <span className="block text-sm text-[var(--color-text-muted)]">Когда</span>
+                    <time
+                      dateTime={event.createdAt}
+                      className="block text-sm text-[var(--color-text-muted)]"
+                    >
+                      {created.toLocaleDateString('ru-RU', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        timeZone: query.localDates ? AUDIT_TIME_ZONE : 'UTC',
+                      })}
+                      <span className="ml-1.5 text-[var(--color-text-muted)]">
+                        {created.toLocaleTimeString('ru-RU', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          timeZone: query.localDates ? AUDIT_TIME_ZONE : 'UTC',
+                        })}
+                      </span>
+                    </time>
+
                     <AdminDetailDialog
                       title={readableAction(event.action)}
                       description={`${event.actorLabel} → ${event.targetLabel}`}
-                      triggerLabel="Детали"
+                      triggerLabel="Подробности"
+                      readable
                     >
-                      <div className="space-y-4 text-sm">
+                      <div className="space-y-4 text-base">
                         <dl className="grid gap-3 sm:grid-cols-2">
                           <div>
-                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                            <dt className="text-sm font-semibold text-[var(--color-text-subtle)]">
                               Кто
                             </dt>
                             <dd className="mt-1 break-words">{event.actorLabel}</dd>
                           </div>
                           <div>
-                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                            <dt className="text-sm font-semibold text-[var(--color-text-subtle)]">
                               Над кем / над чем
                             </dt>
                             <dd className="mt-1 break-words">{event.targetLabel}</dd>
                           </div>
                           {status ? (
                             <div>
-                              <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                              <dt className="text-sm font-semibold text-[var(--color-text-subtle)]">
                                 Статус
                               </dt>
                               <dd className="mt-1">{status}</dd>
                             </div>
                           ) : null}
                           <div>
-                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                            <dt className="text-sm font-semibold text-[var(--color-text-subtle)]">
                               Когда
                             </dt>
-                            <dd className="mt-1">{created.toLocaleString('ru-RU')}</dd>
+                            <dd className="mt-1">
+                              {created.toLocaleString('ru-RU', {
+                                timeZone: query.localDates ? AUDIT_TIME_ZONE : 'UTC',
+                              })}
+                            </dd>
                           </div>
                           {reason ? (
                             <div className="sm:col-span-2">
-                              <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
+                              <dt className="text-sm font-semibold text-[var(--color-text-subtle)]">
                                 Причина
                               </dt>
                               <dd className="mt-1 break-words">{reason}</dd>
                             </div>
                           ) : null}
-                          <div className="sm:col-span-2">
-                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
-                              Код обращения
-                            </dt>
-                            <dd className="mt-1 font-mono text-xs break-all">
-                              {event.correlationId}
-                            </dd>
-                          </div>
-                          <div className="sm:col-span-2">
-                            <dt className="text-xs font-semibold text-[var(--color-text-subtle)]">
-                              Технические идентификаторы
-                            </dt>
-                            <dd className="mt-1 font-mono text-xs break-all">
-                              Action: {event.action} · Target: {event.targetId ?? '—'} · Event:{' '}
-                              {event.id}
-                            </dd>
-                          </div>
                         </dl>
-                        <div>
-                          <h3 className="text-xs font-semibold">Данные события</h3>
+                        <details className="min-w-0">
+                          <summary className="min-h-11 cursor-pointer py-3 text-base font-semibold">
+                            Технические сведения
+                          </summary>
+                          <dl className="space-y-3">
+                            {' '}
+                            <div className="sm:col-span-2">
+                              <dt className="text-sm font-semibold text-[var(--color-text-subtle)]">
+                                Код обращения
+                              </dt>
+                              <dd className="mt-1 font-mono text-sm break-all">
+                                {event.correlationId}
+                              </dd>
+                            </div>
+                            <div className="sm:col-span-2">
+                              <dt className="text-sm font-semibold text-[var(--color-text-subtle)]">
+                                Технические идентификаторы
+                              </dt>
+                              <dd className="mt-1 font-mono text-sm break-all">
+                                Action: {event.action} · Target: {event.targetId ?? '—'} · Event:{' '}
+                                {event.id}
+                              </dd>
+                            </div>
+                          </dl>
+                          <h3 className="text-sm font-semibold">Данные события</h3>
                           <pre className="mt-2 max-h-72 overflow-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3 text-xs break-words whitespace-pre-wrap">
                             {JSON.stringify(event.details, null, 2)}
                           </pre>
-                        </div>
+                        </details>
                       </div>
                     </AdminDetailDialog>
                   </div>
@@ -445,6 +525,7 @@ export default async function AuditPage({
           </div>
 
           <AdminPagination
+            readable
             total={auditResult.data.total}
             visible={auditResult.data.items.length}
             pageIndex={trail.length}

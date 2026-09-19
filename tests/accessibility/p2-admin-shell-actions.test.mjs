@@ -8,7 +8,23 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const read = (file) => readFile(path.join(root, file), 'utf8');
 const h1Count = (source) => source.match(/<h1(?:\s|>)/g)?.length ?? 0;
 
-test('admin shell exposes six product sections and switches chrome at the laptop breakpoint', async () => {
+test('avatar destinations preserve separate settings and audit permissions', async () => {
+  const [menu, settings, audit, layout] = await Promise.all([
+    read('components/shared/user-menu.tsx'),
+    read('app/(admin)/admin/settings/page.tsx'),
+    read('app/(admin)/admin/audit/page.tsx'),
+    read('app/(admin)/admin/layout.tsx'),
+  ]);
+  assert.match(menu, /isAdmin && canManageSiteSettings/);
+  assert.match(menu, /isAdmin && canReadAudit && !canManageSiteSettings/);
+  assert.match(layout, /canReadAudit=\{actor\.capabilities\.includes\('audit.read'\)\}/);
+  assert.match(settings, /requireCapability\('site.settings.manage'\)/);
+  assert.match(audit, /requireCapability\('audit.read'\)/);
+  assert.doesNotMatch(settings, /href="\/admin\/account"/);
+  assert.match(menu, /href=\{ROUTES.adminAccount\}/);
+});
+
+test('admin shell exposes five operational sections and switches chrome at the laptop breakpoint', async () => {
   const [group, layout, navLink, rootLayout, publicShell, globals] = await Promise.all([
     read('app/(admin)/layout.tsx'),
     read('app/(admin)/admin/layout.tsx'),
@@ -26,7 +42,6 @@ test('admin shell exposes six product sections and switches chrome at the laptop
     ['/admin/approvals', 'Заявки'],
     ['/admin/courses', 'Курсы'],
     ['/admin/articles', 'Материалы'],
-    ['/admin/settings', 'Настройки'],
   ]) {
     assert.match(layout, new RegExp(`href: '${href.replaceAll('/', '\\/')}'.+label: '${label}'`));
   }
@@ -44,11 +59,15 @@ test('admin shell exposes six product sections and switches chrome at the laptop
   assert.match(layout, /<aside[\s\S]+lg:flex/);
   assert.match(layout, /<header[\s\S]+lg:hidden/);
   assert.match(layout, /<nav[\s\S]+fixed inset-x-0 bottom-0[\s\S]+lg:hidden/);
-  // Six 55px cells on a 360px phone clipped every caption. Four sections keep a
-  // tab of their own; the rest live behind "Ещё", so the sidebar still lists all six.
-  assert.match(layout, /grid[^"\n]*grid-cols-5/);
-  assert.match(layout, /items\.slice\(0, 4\)\.map/);
-  assert.match(layout, /<AdminMoreMenu items=\{items\.slice\(4\)/);
+  // Materials is a direct destination; settings belongs to the capability-gated avatar menu.
+  assert.match(layout, /grid-cols-3/);
+  assert.match(layout, /xs:grid-cols-5/);
+  assert.match(layout, /items\.map/);
+  assert.doesNotMatch(layout, /AdminMoreMenu/);
+  assert.match(
+    layout,
+    /canManageSiteSettings=\{actor\.capabilities\.includes\('site.settings.manage'\)\}/,
+  );
   assert.doesNotMatch(layout, /overflow-x-auto/);
   assert.match(layout, /size="admin"/);
   assert.match(layout, /admin-workspace-container/);
@@ -111,7 +130,7 @@ test('dangerous operator payloads are bounded, reasoned and idempotent', async (
   assert.match(validation, /idempotencyKey: z\.string\(\)\.uuid\(\)/);
   assert.match(validation, /max\(ADMIN_PURGE_BULK_LIMIT\)/);
   assert.match(validation, /confirmation: z\.literal\('УДАЛИТЬ'\)/u);
-  assert.match(manager, /УДАЛИТЬ \$\{selectionSummary\.people\}/);
+  assert.match(manager, /УДАЛИТЬ \$\{actionSummary\.people\}/);
   assert.match(manager, /crypto\.randomUUID\(\)/);
 });
 

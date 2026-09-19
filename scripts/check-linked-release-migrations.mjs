@@ -15,8 +15,8 @@ const MIGRATION_FILENAME = /^([0-9]{14})_([a-z0-9_]+)[.]sql$/u;
 const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 
 // This is an explicit approval record for the post-localization forward delta,
-// not a generic migration policy. Production now holds every reviewed migration,
-// so the pending tail is empty and the whole history is a pinned receipt. Adding
+// not a generic migration policy. Production holds the reviewed base;
+// issuance and selection recovery form the exact hash-pinned pending tail. Adding
 // a migration means adding it here too, with its hash; an open-ended local tail
 // would defeat this preflight.
 export const REVIEWED_BASE_MIGRATION_COUNT = 91;
@@ -131,7 +131,18 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
   }),
 ]);
 export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
-
+  Object.freeze({
+    filename: '20260919140000_new_issuance_education.sql',
+    sha256: '757f22ea6ec52d614073d933ddeafd6015cb37677e191bbf56df6179dc364afb',
+  }),
+  Object.freeze({
+    filename: '20260919141000_preserve_training_on_education_refusal.sql',
+    sha256: '970c0b773373d5c2f5a5323d3802d17a6d143102d9a309553836a167202e1efe',
+  }),
+  Object.freeze({
+    filename: '20260919142000_refresh_selected_attestation_summary.sql',
+    sha256: 'd26847294d29ae771405d12594f1a26dd77ab87fe10ac93e3d79680ea2491863',
+  }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;

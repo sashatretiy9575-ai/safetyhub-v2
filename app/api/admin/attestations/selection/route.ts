@@ -4,6 +4,8 @@ import { invalidOriginResponse } from '@/server/http/request-origin';
 import {
   ADMIN_ATTESTATION_BULK_LIMIT,
   adminAttestationFilterInputSchema,
+  adminAttestationSelectionRefreshSchema,
+  refreshAdminAttestationSelection,
   resolveAdminAttestationSelection,
 } from '@/server/admin/attestations';
 import { readJsonBody } from '@/lib/security/request-body';
@@ -17,9 +19,15 @@ export async function POST(request: Request) {
     // The resolver runs an arbitrary filter across the whole register, so it is
     // metered like any other expensive administrative read.
     await consumeCoarseQuota('admin.read.query', requestSecurityMetadata(request).ipHash);
-    const parsed = adminAttestationFilterInputSchema.safeParse(
-      await readJsonBody(request),
-    );
+    const body = await readJsonBody(request);
+    if (body && typeof body === 'object' && 'recordIds' in body) {
+      const selected = adminAttestationSelectionRefreshSchema.safeParse(body);
+      if (!selected.success) {
+        return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
+      }
+      return NextResponse.json(await refreshAdminAttestationSelection(selected.data.recordIds));
+    }
+    const parsed = adminAttestationFilterInputSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }

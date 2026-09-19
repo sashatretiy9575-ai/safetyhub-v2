@@ -5,6 +5,7 @@ import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
 import * as z from 'zod';
 import { requireCapability } from '@/server/auth/session';
 import { createClient } from '@/server/supabase/server';
+import { auditDateBoundary } from '@/lib/admin/audit-dates';
 import { exclusiveRangeEnd, inclusiveRangeStart } from '@/server/admin/date-range';
 import type {
   AdminAccountApprovalItem,
@@ -20,6 +21,7 @@ export const ADMIN_PAGE_SIZE = 25;
 export type RawAdminSearchParams = Record<string, string | string[] | undefined>;
 
 export type AdminAuditQuery = {
+  localDates?: boolean;
   actor: string;
   target: string;
   action: string;
@@ -148,7 +150,6 @@ function boundedText(params: RawAdminSearchParams, key: string) {
   return (first(params, key) ?? '').trim().slice(0, 100);
 }
 
-
 function cursorDate(params: RawAdminSearchParams, key = 'cursorAt') {
   const value = first(params, key);
   return value && !Number.isNaN(Date.parse(value)) ? new Date(value).toISOString() : null;
@@ -170,12 +171,20 @@ function pairedCursor(at: string | null, id: string | null) {
 
 export function parseAdminAuditQuery(params: RawAdminSearchParams): AdminAuditQuery {
   const cursor = pairedCursor(cursorDate(params), bigintCursor(params));
+  // Keep existing bookmarked UTC date ranges; new controls opt into local dates.
+  const localDates =
+    first(params, 'tz') === 'local' || (!first(params, 'from') && !first(params, 'to'));
   return {
+    localDates,
     actor: boundedText(params, 'actor'),
     target: boundedText(params, 'target'),
     action: boundedText(params, 'action'),
-    from: inclusiveRangeStart(first(params, 'from')),
-    to: exclusiveRangeEnd(first(params, 'to')),
+    from: localDates
+      ? auditDateBoundary(first(params, 'from'))
+      : inclusiveRangeStart(first(params, 'from')),
+    to: localDates
+      ? auditDateBoundary(first(params, 'to'), true)
+      : exclusiveRangeEnd(first(params, 'to')),
     cursorAt: cursor.at,
     cursorId: cursor.id,
   };

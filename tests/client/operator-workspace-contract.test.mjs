@@ -164,7 +164,8 @@ test('workspace seed provides at least one hundred participants and authenticate
   assert.match(e2e, /expectNoPageOverflow/);
   assert.match(e2e, /E2E_SCREENSHOT_REGRESSION/);
   assert.match(e2e, /page\.keyboard\.press\('Escape'\)/);
-  assert.match(e2e, /font-size: 200%/);
+  assert.match(e2e, /setProperty\('font-size', '200%', 'important'\)/);
+  assert.match(e2e, /toHaveCSS\('font-size', '32px'\)/);
   assert.match(e2e, /forcedColors: 'active'/);
   assert.match(e2e, /toBeFocused\(\)/);
   assert.match(e2e, /const learningDashboard = page\.locator\('\[data-learning-dashboard\]'\)/);

@@ -1,8 +1,20 @@
 import type { CertificateBranding } from './certificate-client-contract.ts';
 
-export const DOCUMENT_FAMILIES = ['general', 'biot', 'ptm', 'industrial', 'qualification', 'first-aid'] as const;
-export type DocumentFamily = typeof DOCUMENT_FAMILIES[number];
-export type DocumentSigner = { signerId: string; name: string; position: string; assetId: string | null };
+export const DOCUMENT_FAMILIES = [
+  'general',
+  'biot',
+  'ptm',
+  'industrial',
+  'qualification',
+  'first-aid',
+] as const;
+export type DocumentFamily = (typeof DOCUMENT_FAMILIES)[number];
+export type DocumentSigner = {
+  signerId: string;
+  name: string;
+  position: string;
+  assetId: string | null;
+};
 export type DocumentProfile = {
   revision?: number;
   id: string;
@@ -27,22 +39,31 @@ export function registeredDocumentAssetUrl(id: string) {
 }
 
 /** A profile contains explicit identity-to-image links; never infer a signature by row number. */
-export function applyDocumentProfile(branding: CertificateBranding, profile: DocumentProfile): CertificateBranding {
+export function applyDocumentProfile(
+  branding: CertificateBranding,
+  profile: DocumentProfile,
+): CertificateBranding {
   const [chairman, ...members] = profile.commission;
-  const signature = (person: DocumentSigner | undefined) => person?.assetId ? registeredDocumentAssetUrl(person.assetId) : null;
+  const signature = (person: DocumentSigner | undefined) =>
+    person?.assetId ? registeredDocumentAssetUrl(person.assetId) : null;
   return {
     ...branding,
     documentProfile: profile,
-    chairmanName: chairman?.name ?? '', chairmanPosition: chairman?.position ?? '',
-    memberName: members[0]?.name ?? '', memberPosition: members[0]?.position ?? '',
-    secondMemberName: members[1]?.name ?? '', secondMemberPosition: members[1]?.position ?? '',
+    chairmanName: chairman?.name ?? '',
+    chairmanPosition: chairman?.position ?? '',
+    memberName: members[0]?.name ?? '',
+    memberPosition: members[0]?.position ?? '',
+    secondMemberName: members[1]?.name ?? '',
+    secondMemberPosition: members[1]?.position ?? '',
     validityMonths: profile.validityMonths,
     stampUrl: profile.stampAssetId ? registeredDocumentAssetUrl(profile.stampAssetId) : null,
-    chairmanSignatureUrl: signature(chairman), protocolSignatureUrl: signature(chairman),
+    chairmanSignatureUrl: signature(chairman),
+    protocolSignatureUrl: signature(chairman),
     memberSignatureUrl: signature(members[0]),
     commissionSignatureUrls: profile.commission.map(signature),
     documentDefaults: {
-      reviewerName: '', companyName: '',
+      reviewerName: '',
+      companyName: '',
       ...branding.documentDefaults,
       programName: profile.programName,
       protocolText: profile.protocolText,
@@ -51,9 +72,36 @@ export function applyDocumentProfile(branding: CertificateBranding, profile: Doc
   };
 }
 
-export function protocolColumns(family: DocumentFamily) {
-  if (family === 'ptm') return ['№', 'ФИО обучающегося', 'Должность', 'Организация (участок, цех)', 'Причина обучения', 'Отметка', 'Подпись'];
-  if (family === 'biot') return ['№ п/п', 'Тегі, аты / Фамилия, инициалы', 'Ұйым атауы / Наименование организации', 'Лауазымы / Должность', 'Отметка о проверке знаний', 'Примечание'];
-  if (family === 'qualification') return ['№', 'Тегі, аты, әкесінің аты / Фамилия, имя, отчество', 'Ұйым атауы / Наименование организации', 'Лауазымы / Должность', 'Результат подготовки', 'Решение квалификационной комиссии по специальности'];
+export function protocolColumns(family: DocumentFamily, layoutVersion?: 2) {
+  if (family === 'first-aid' && layoutVersion === 2)
+    return ['№', 'Ф.И.О.', 'Занимаемая должность', 'Организация', 'Результат сдачи экзаменов'];
+  if (family === 'ptm')
+    return [
+      '№',
+      'ФИО обучающегося',
+      'Должность',
+      'Организация (участок, цех)',
+      'Причина обучения',
+      'Отметка',
+      'Подпись',
+    ];
+  if (family === 'biot')
+    return [
+      '№ п/п',
+      'Тегі, аты / Фамилия, инициалы',
+      'Ұйым атауы / Наименование организации',
+      'Лауазымы / Должность',
+      'Отметка о проверке знаний',
+      'Примечание',
+    ];
+  if (family === 'qualification')
+    return [
+      '№',
+      'Тегі, аты, әкесінің аты / Фамилия, имя, отчество',
+      'Ұйым атауы / Наименование организации',
+      'Лауазымы / Должность',
+      'Результат подготовки',
+      'Решение квалификационной комиссии по специальности',
+    ];
   return ['№', 'Ф.И.О.', 'Занимаемая должность', 'Образование', 'Результат сдачи экзаменов'];
 }

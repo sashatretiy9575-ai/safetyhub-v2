@@ -39,10 +39,15 @@ test('the rename dialog waits for the selection it will act on', () => {
 });
 
 test('idempotency keys follow what they authorize', () => {
+  assert.match(
+    manager,
+    /const targetUserIds = singleTarget \? \[singleTarget\.userId\] : userIds/u,
+  );
+  assert.match(manager, /chunks\.push\(targetUserIds\.slice/u);
   // Keyed only on the chunk count, editing the reason and pressing delete again
   // replayed a key against a different request: the database refuses that, and
   // the panel had no way out of the refusal but a page reload.
-  assert.match(manager, /const purgeSignature = `\$\{reason\}::\$\{userIds\.join\(','\)\}`/u);
+  assert.match(manager, /const purgeSignature = `\$\{reason\}::\$\{targetUserIds\.join\(','\)\}`/u);
   assert.match(manager, /purgeSignatureRef\.current !== purgeSignature/u);
   assert.match(manager, /payload\?\.error === 'IDEMPOTENCY_KEY_REUSED'/u);
 });
@@ -56,7 +61,11 @@ test('a partial deletion reports what it did', async () => {
   const apiError = await read('server/auth/api-error.ts');
   // These codes are what the panel explains in its own words; the catch-all
   // below used to flatten them into PROTECTED_OPERATION.
-  for (const code of ['IDEMPOTENCY_KEY_REUSED', 'LAST_ACTIVE_ADMIN_PROTECTED', 'CANNOT_DELETE_SELF']) {
+  for (const code of [
+    'IDEMPOTENCY_KEY_REUSED',
+    'LAST_ACTIVE_ADMIN_PROTECTED',
+    'CANNOT_DELETE_SELF',
+  ]) {
     assert.ok(apiError.includes(`'${code}'`), `${code} loses its identity`);
   }
 });
@@ -64,7 +73,10 @@ test('a partial deletion reports what it did', async () => {
 test('work started on the page stops when the page is left', () => {
   // The certificate worker kept rendering PDFs and finished by starting a
   // download on a screen the operator had already navigated away from.
-  assert.match(manager, /exportAbortRef\.current\?\.abort\(\);\s*\n\s*exportAbortRef\.current = null;/u);
+  assert.match(
+    manager,
+    /exportAbortRef\.current\?\.abort\(\);\s*\n\s*exportAbortRef\.current = null;/u,
+  );
 });
 
 test('list rendering does not rebuild a formatter per cell', async () => {
@@ -88,6 +100,28 @@ test('company similarity normalizes each name once', () => {
 
 test('one unreadable notification does not blank the inbox', async () => {
   const inbox = await read('components/admin/admin-notification-inbox.tsx');
-  assert.match(inbox, /\.filter\(\(event\): event is NonNullable<typeof event> => event !== null\)/u);
+  assert.match(
+    inbox,
+    /\.filter\(\(event\): event is NonNullable<typeof event> => event !== null\)/u,
+  );
   assert.doesNotMatch(inbox, /if \(items\.some\(\(event\) => event === null\)\) return null;/u);
+});
+test('learning-history deletion clears every selected course for its user, matching SQL scope', async () => {
+  const source = await readFile(
+    new URL('../../components/admin/attestations-manager.tsx', import.meta.url),
+    'utf8',
+  );
+  const sql = await readFile(
+    new URL('../../supabase/migrations/20260825000000_course_catalog_v3.sql', import.meta.url),
+    'utf8',
+  );
+  assert.match(sql, /delete from public\.attestations where user_id = p_target_user_id;/);
+  assert.match(
+    source,
+    /onHistoryDeleted=\{async \(\) => \{\s*if \(detail\) await pruneDeletedUser\(detail\.userId\);/,
+  );
+  assert.match(
+    source,
+    /const pruneDeletedUser = async \(userId: string\) => \{[\s\S]*?\.filter\(\(row\) => row\.userId === userId\)[\s\S]*?await refreshResolvedSelections\(\[userId\]\);/,
+  );
 });

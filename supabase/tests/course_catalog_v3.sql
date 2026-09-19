@@ -760,7 +760,8 @@ begin
 
   update public.user_roles set role = 'admin' where user_id = v_admin_id;
   update public.profiles
-  set name = case id
+  set education = 'Среднее профессиональное',
+      name = case id
         when v_participant_a then 'Участник'
         when v_participant_b then 'Лимит'
         else 'Администратор'

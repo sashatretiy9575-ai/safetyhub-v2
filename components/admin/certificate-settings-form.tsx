@@ -53,6 +53,7 @@ import { cn } from '@/lib/utils';
 import type { readDocumentEditor } from '@/server/certificates/document-editor';
 import { applyDocumentProfile, type DocumentProfile } from '@/lib/pdf/document-profile';
 import { DocumentProfileFields } from '@/components/admin/document-profile-fields';
+import { requiresDocumentEducation } from '@/lib/pdf/document-education';
 import { DocumentParticipantFields } from '@/components/admin/document-participant-fields';
 
 export type CertificateSettingsView = {
@@ -139,6 +140,7 @@ function brandingOf(
   const image = (kind: 'stamp' | 'chairman' | 'protocol', present: boolean) =>
     present ? certificateImageUrl(kind, saved.version) : null;
   const branding: CertificateBranding = {
+    protocolLayoutVersion: 2,
     ...saved,
     ...fields,
     protocolNumber: batch.number,
@@ -148,7 +150,9 @@ function brandingOf(
     memberSignatureUrl: null,
     protocolSignatureUrl: image('protocol', saved.hasProtocolSignature),
   };
-  const profile = profiles.find(p => p.id === batch.profileId) ?? profiles.find(p => p.courseSlug === batch.courseSlug && p.audience === 'all');
+  const profile =
+    profiles.find((p) => p.id === batch.profileId) ??
+    profiles.find((p) => p.courseSlug === batch.courseSlug && p.audience === 'all');
   return profile ? applyDocumentProfile(branding, profile) : branding;
 }
 
@@ -191,18 +195,16 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className={cn('relative block min-w-0', className)}>
-      <span className="pointer-events-none absolute top-1.5 right-4 left-4 z-10 truncate text-xs text-[var(--color-text-muted)]">
-        {label}
-      </span>
+    <label className={cn('grid min-w-0 gap-1.5', className)}>
+      <span className="text-sm break-words text-[var(--color-text-muted)]">{label}</span>
       {children}
     </label>
   );
 }
-const FIELD_INPUT = 'h-14 pt-5';
+const FIELD_INPUT = 'min-h-12 min-w-0 w-full text-base';
 /** A 240 px screen has room for the word or for the icon, not for both. */
 const NARROW_HIDDEN = 'hidden min-[280px]:inline';
-const FIELD_TEXTAREA = 'pt-6';
+const FIELD_TEXTAREA = 'min-w-0 w-full text-base';
 
 /** A rarely touched group of settings: one line until it is opened. */
 function Section({
@@ -236,11 +238,11 @@ function Section({
           {icon}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold break-words">{title}</span>
+          <span className="block text-base font-semibold break-words">{title}</span>
           {hint ? (
             <span
               className={cn(
-                'block truncate text-xs',
+                'block text-sm break-words',
                 alert ? 'text-[var(--color-danger)]' : 'text-[var(--color-text-muted)]',
               )}
             >
@@ -492,10 +494,7 @@ export function CertificateSettingsForm({
             issuedAt: batch.date + 'T12:00:00+05:00',
             branding,
           };
-          return generateCertificatePreview(
-            metadata ?? draft,
-            controller.signal,
-          );
+          return generateCertificatePreview(metadata ?? draft, controller.signal);
         }
         const { generateProtocolInBrowser } = await import('@/lib/pdf/protocol-renderer');
         return generateProtocolInBrowser(
@@ -672,21 +671,56 @@ export function CertificateSettingsForm({
         return;
       }
       const exportBranding = brandingOf(stored.settings, fields, stored.batch ?? batch, profiles);
-      const requiresCurrentProtocol = (single && tab === 'protocol') || (!single && current.participants.some(person => !person.certificateId));
-      if (requiresCurrentProtocol && profiles.some(profile => profile.courseSlug === course) && !exportBranding.documentProfile) {
-        setMessage('Выберите категорию слушателей для протокола.'); return;
+      const requiresCurrentProtocol =
+        (single && tab === 'protocol') ||
+        (!single && current.participants.some((person) => !person.certificateId));
+      if (
+        requiresCurrentProtocol &&
+        profiles.some((profile) => profile.courseSlug === course) &&
+        !exportBranding.documentProfile
+      ) {
+        setMessage('Выберите категорию слушателей для протокола.');
+        return;
       }
       if (requiresCurrentProtocol && exportBranding.documentProfile) {
         const profile = exportBranding.documentProfile;
-        const people = single ? current.participants : current.participants.filter(person => !person.certificateId);
-        if (profile.family === 'biot' && (!profile.orderNumber.trim() || !profile.orderDate || !profile.verificationKind.trim())) {
-          setMessage('Заполните номер и дату приказа, вид проверки знаний в реквизитах программы.'); return;
+        const people = single
+          ? current.participants
+          : current.participants.filter((person) => !person.certificateId);
+        if (
+          profile.family === 'biot' &&
+          (!profile.orderNumber.trim() || !profile.orderDate || !profile.verificationKind.trim())
+        ) {
+          setMessage('Заполните номер и дату приказа, вид проверки знаний в реквизитах программы.');
+          return;
         }
-        const missing = profile.family === 'ptm' ? people.find(person => !person.trainingReason.trim()) : profile.family === 'qualification' ? people.find(person => !person.qualificationDecision.trim()) : null;
-        if (missing) { setMessage(`${missing.fullName}: ${profile.family === 'ptm' ? 'укажите причину обучения' : 'внесите решение квалификационной комиссии'}.`); return; }
+        const missing =
+          profile.family === 'ptm'
+            ? people.find((person) => !person.trainingReason.trim())
+            : profile.family === 'qualification'
+              ? people.find((person) => !person.qualificationDecision.trim())
+              : null;
+        if (missing) {
+          setMessage(
+            `${missing.fullName}: ${profile.family === 'ptm' ? 'укажите причину обучения' : 'внесите решение квалификационной комиссии'}.`,
+          );
+          return;
+        }
         if (profile.family === 'industrial') {
-          const unverified = people.find(person => !person.formalExamReference.trim() || !person.formalExamDate || person.formalExamResult !== 'passed' || person.formalExamProfileId !== profile.id || person.formalExamProfileVersion !== profile.revision);
-          if (unverified) { setMessage(`${unverified.fullName}: внесите подтверждённые реквизиты отдельного экзамена по промбезу.`); return; }
+          const unverified = people.find(
+            (person) =>
+              !person.formalExamReference.trim() ||
+              !person.formalExamDate ||
+              person.formalExamResult !== 'passed' ||
+              person.formalExamProfileId !== profile.id ||
+              person.formalExamProfileVersion !== profile.revision,
+          );
+          if (unverified) {
+            setMessage(
+              `${unverified.fullName}: внесите подтверждённые реквизиты отдельного экзамена по промбезу.`,
+            );
+            return;
+          }
         }
       }
       const needsSize = single
@@ -699,32 +733,33 @@ export function CertificateSettingsForm({
         openSections((open) => open.add('size'));
         return;
       }
-      const { generateProtocolInBrowser, groupItemsForProtocols, protocolFilename } = await import('@/lib/pdf/protocol-renderer');
+      const { generateProtocolInBrowser, groupItemsForProtocols, protocolFilename } =
+        await import('@/lib/pdf/protocol-renderer');
       const { generateCertificateInBrowser } = await import('@/lib/pdf/certificate-renderer');
       if (single && tab === 'certificate') {
         if (!selectedCertificate) throw new Error();
         const item = await metadataFor(selectedCertificate, controller.signal);
-        const result = await generateCertificateInBrowser(
-          item,
-          controller.signal,
-        );
+        const result = await generateCertificateInBrowser(item, controller.signal);
         setBytes(result);
         download(result, item.filename);
         return;
       }
-      const pendingPeople = current.participants.filter(person => !person.certificateId);
-      const protocol = single || pendingPeople.length ? await generateProtocolInBrowser(
-        {
-          organization,
-          courseTitle: program,
-          items: [],
-          participants: single ? current.participants : pendingPeople,
-          date: exportBranding.protocolDate,
-        },
-        exportBranding,
-        protocolFontUrl(current.participants),
-        controller.signal,
-      ) : null;
+      const pendingPeople = current.participants.filter((person) => !person.certificateId);
+      const protocol =
+        single || pendingPeople.length
+          ? await generateProtocolInBrowser(
+              {
+                organization,
+                courseTitle: program,
+                items: [],
+                participants: single ? current.participants : pendingPeople,
+                date: exportBranding.protocolDate,
+              },
+              exportBranding,
+              protocolFontUrl(current.participants),
+              controller.signal,
+            )
+          : null;
       if (single && protocol) {
         setData(current);
         setBytes(protocol);
@@ -733,7 +768,9 @@ export function CertificateSettingsForm({
       }
       const { zipSync } = await import('fflate');
       const { safeFilenameSegment } = await import('@/lib/pdf/certificate');
-      const archive: Record<string, Uint8Array> = protocol ? { 'Протокол-невыданные.pdf': protocol } : {};
+      const archive: Record<string, Uint8Array> = protocol
+        ? { 'Протокол-невыданные.pdf': protocol }
+        : {};
       const issuedItems: CertificateRenderMetadata[] = [];
       let count = 0;
       for (const person of current.participants) {
@@ -749,7 +786,13 @@ export function CertificateSettingsForm({
       }
       for (const group of groupItemsForProtocols(issuedItems)) {
         const frozenBranding = group.items[0]!.branding;
-        archive[protocolFilename(group, frozenBranding.protocolNumber)] = await generateProtocolInBrowser(group, frozenBranding, protocolFontUrl(current.participants), controller.signal);
+        archive[protocolFilename(group, frozenBranding.protocolNumber)] =
+          await generateProtocolInBrowser(
+            group,
+            frozenBranding,
+            protocolFontUrl(current.participants),
+            controller.signal,
+          );
       }
       download(
         zipSync(archive),
@@ -819,62 +862,61 @@ export function CertificateSettingsForm({
   // One set of actions, shown where the hand is: under the thumb on a phone, in the top row on a desktop.
   const actions = (
     <>
-      <p
-        role="status"
-        className={cn(
-          'min-w-0 flex-1 basis-full px-2 text-sm sm:basis-0 lg:text-right',
-          !message && 'hidden sm:block',
-        )}
-      >
-        {message}
-      </p>
-      <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
+      {message ? (
+        <p
+          role="status"
+          className="min-w-0 basis-full px-2 text-sm [overflow-wrap:anywhere] lg:text-right"
+        >
+          {message}
+        </p>
+      ) : null}
+      <div className="grid min-w-0 flex-1 grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-2 [&>button>span]:min-w-0 [&>button>span]:[overflow-wrap:anywhere]">
         <Button
           size="sm"
-          className="min-w-0 flex-1 sm:flex-none"
+          className="h-auto min-h-12 min-w-0 whitespace-normal"
           aria-label="Сохранить настройки"
           disabled={busy || loading || !valid || !(dirty || batchDirty) || !batch.number.trim()}
           onClick={() => void save()}
         >
           <FloppyDisk aria-hidden="true" />
-          <span className={NARROW_HIDDEN}>Сохранить</span>
+          <span>Сохранить</span>
         </Button>
         <Button
           size="sm"
           variant="outline"
-          className="xs:w-auto xs:px-4 w-11 shrink-0 px-0"
+          className="h-auto min-h-12 min-w-0 px-3 whitespace-normal"
           aria-label="Скачать PDF"
           title="Скачать PDF"
           disabled={!ready || (tab === 'certificate' && !selectedCertificate)}
           onClick={() => void exportCompany(true)}
         >
           <FilePdf aria-hidden="true" />
-          <span className="xs:inline hidden">PDF</span>
+          <span>Скачать PDF</span>
         </Button>
         {exporting ? (
           <Button
             size="sm"
             variant="outline"
-            className="xs:w-auto xs:px-4 w-11 shrink-0 px-0"
+            className="h-auto min-h-12 min-w-0 px-3 whitespace-normal"
             aria-label="Отменить"
             title="Отменить"
             onClick={() => exportAbort.current?.abort()}
           >
             <X aria-hidden="true" />
-            <span className="xs:inline hidden">Отменить</span>
+            <span>Отменить</span>
           </Button>
         ) : (
           <Button
             size="sm"
             variant="outline"
-            className="xs:w-auto xs:px-4 w-11 shrink-0 px-0"
+            className="h-auto min-h-12 min-w-0 px-3 whitespace-normal"
             aria-label="Скачать комплект компании"
             title="Скачать комплект компании"
             disabled={busy || loading || !valid || !organization || !course}
             onClick={() => void exportCompany()}
           >
             <FileZip aria-hidden="true" />
-            <span className="xs:inline hidden">Комплект</span>
+            <span>Комплект компании</span>
           </Button>
         )}
       </div>
@@ -882,17 +924,23 @@ export function CertificateSettingsForm({
   );
 
   return (
-    <div className="document-editor min-w-0 space-y-4" data-hydrated={hydrated ? '' : undefined}>
-      <div className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-[var(--z-sticky)] -mx-1 flex min-w-0 flex-col gap-2 bg-[var(--color-bg)]/92 px-1 py-2 backdrop-blur-xl min-[280px]:flex-row min-[280px]:items-center lg:top-0">
+    <div
+      className="document-editor min-w-0 space-y-4 [&_[role=radio]]:min-h-11 [&_[role=radio]_span]:overflow-visible [&_[role=radio]_span]:break-words [&_[role=radio]_span]:text-clip [&_[role=radio]_span]:whitespace-normal"
+      data-hydrated={hydrated ? '' : undefined}
+    >
+      <div
+        data-document-toolbar
+        className="-mx-1 flex min-w-0 flex-col gap-2 bg-[var(--color-bg)]/92 px-1 py-2 sm:flex-row sm:flex-wrap sm:items-center"
+      >
         <SegmentedControl
           label="Вид документа"
-          className="min-[280px]:flex-1 sm:max-w-sm"
+          className="xs:grid-flow-col xs:grid-cols-none max-w-full min-w-0 grid-flow-row grid-cols-1 sm:w-80 sm:flex-none"
           value={tab}
           onChange={switchTab}
           options={[
             {
               value: 'certificate',
-              label: 'Корочка',
+              label: 'Удостоверение',
               icon: <IdentificationCard aria-hidden="true" className={NARROW_HIDDEN} />,
             },
             {
@@ -904,25 +952,23 @@ export function CertificateSettingsForm({
         />
         <SegmentedControl
           label="Режим"
-          className="lg:hidden"
+          className="xs:grid-flow-col xs:grid-cols-none grid-flow-row grid-cols-1 lg:hidden"
           value={mobile}
           onChange={setMobile}
           options={[
             {
               value: 'fields',
-              label: 'Поля',
+              label: 'Изменить',
               icon: <PencilSimple aria-hidden="true" />,
-              labelHidden: 'compact',
             },
             {
               value: 'preview',
               label: 'Предпросмотр',
               icon: <Eye aria-hidden="true" />,
-              labelHidden: 'compact',
             },
           ]}
         />
-        <div className="hidden min-w-0 flex-1 items-center justify-end gap-2 lg:flex">
+        <div className="hidden min-w-0 grow basis-[32rem] flex-wrap items-center justify-end gap-2 lg:flex">
           {actions}
         </div>
       </div>
@@ -977,7 +1023,10 @@ export function CertificateSettingsForm({
               </Button>
             </div>
           )}
-          {tab === 'certificate' || ['ptm','biot','qualification','industrial'].includes(branding.documentProfile?.family ?? '') ? (
+          {tab === 'certificate' ||
+          ['ptm', 'biot', 'qualification', 'industrial'].includes(
+            branding.documentProfile?.family ?? '',
+          ) ? (
             <DocumentSelect
               label="Сотрудник"
               value={user}
@@ -994,15 +1043,86 @@ export function CertificateSettingsForm({
             />
           ) : null}
 
-          {profiles.some(p => p.courseSlug === course) ? <DocumentSelect
-            label="Программа и категория слушателей"
-            value={batch.profileId ?? profiles.find(p => p.courseSlug === course && p.audience === 'all')?.id ?? ''}
-            options={profiles.filter(p => p.courseSlug === course).map(p => ({ value: p.id, label: p.label + (p.hours ? ` · ${p.hours} ч` : '') }))}
-            disabled={busy || loading}
-            onChange={profileId => { setBatch(current => ({ ...current, profileId })); setBytes(null); }}
-          /> : null}
-          {branding.documentProfile ? <DocumentProfileFields key={branding.documentProfile.id + ':' + branding.documentProfile.revision} profile={branding.documentProfile} onSaved={profile => { setProfiles(current => current.map(p => p.id === profile.id ? profile : p)); setBytes(null); }} /> : null}
-          {selectedPerson && branding.documentProfile && ['ptm','biot','qualification','industrial'].includes(branding.documentProfile.family) ? <DocumentParticipantFields key={selectedPerson.userId + ':' + batch.id} person={selectedPerson} family={branding.documentProfile.family} batch={batch} onSaved={(fields, version) => { setBatch(v => ({ ...v, version })); setSavedBatch(v => v ? { ...v, version } : v); setData(v => ({ ...v, participants: v.participants.map(p => p.userId === selectedPerson.userId ? { ...p, ...fields } : p) })); setBytes(null); }} /> : null}
+          {organization &&
+          course &&
+          data.participants.length > 0 &&
+          requiresDocumentEducation(branding.documentProfile?.family) ? (
+            <section
+              aria-label="Образование для новой выдачи"
+              className="min-w-0 rounded-xl border border-[var(--color-border)] p-3 text-base break-words"
+            >
+              <p>Образование нужно для новой выдачи этой формы.</p>
+              {data.participants.filter((person) => !person.education.trim()).length ? (
+                <details className="mt-2">
+                  <summary className="min-h-11 cursor-pointer py-2 font-medium">
+                    Не заполнено:{' '}
+                    {data.participants.filter((person) => !person.education.trim()).length}
+                  </summary>
+                  <ul className="space-y-2">
+                    {data.participants
+                      .filter((person) => !person.education.trim())
+                      .map((person) => (
+                        <li key={person.userId}>
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex min-h-11 items-center underline"
+                            href={'/admin/employees?q=' + encodeURIComponent(person.fullName)}
+                          >
+                            {person.fullName || 'Сотрудник без ФИО'} — заполнить данные
+                          </a>
+                        </li>
+                      ))}
+                  </ul>
+                </details>
+              ) : (
+                <p className="mt-1 text-sm">У участников заполнено.</p>
+              )}
+            </section>
+          ) : null}
+
+          {profiles.some((p) => p.courseSlug === course) ? (
+            <DocumentSelect
+              label="Программа и категория слушателей"
+              value={
+                batch.profileId ??
+                profiles.find((p) => p.courseSlug === course && p.audience === 'all')?.id ??
+                ''
+              }
+              options={profiles
+                .filter((p) => p.courseSlug === course)
+                .map((p) => ({ value: p.id, label: p.label + (p.hours ? ` · ${p.hours} ч` : '') }))}
+              disabled={busy || loading}
+              onChange={(profileId) => {
+                setBatch((current) => ({ ...current, profileId }));
+                setBytes(null);
+              }}
+            />
+          ) : null}
+
+          {selectedPerson &&
+          branding.documentProfile &&
+          ['ptm', 'biot', 'qualification', 'industrial'].includes(
+            branding.documentProfile.family,
+          ) ? (
+            <DocumentParticipantFields
+              key={selectedPerson.userId + ':' + batch.id}
+              person={selectedPerson}
+              family={branding.documentProfile.family}
+              batch={batch}
+              onSaved={(fields, version) => {
+                setBatch((v) => ({ ...v, version }));
+                setSavedBatch((v) => (v ? { ...v, version } : v));
+                setData((v) => ({
+                  ...v,
+                  participants: v.participants.map((p) =>
+                    p.userId === selectedPerson.userId ? { ...p, ...fields } : p,
+                  ),
+                }));
+                setBytes(null);
+              }}
+            />
+          ) : null}
           <div className="xs:grid-cols-2 grid min-w-0 gap-3">
             <Field label="Дата">
               <Input
@@ -1032,7 +1152,7 @@ export function CertificateSettingsForm({
                   }
                 />
               </Field>
-              <div className="absolute inset-y-0 right-1 flex items-center">
+              <div className="absolute right-1 bottom-0 flex h-12 items-center">
                 {/* Inside the field's own padding: appearing moves nothing. */}
                 {canRevertBatch ? (
                   <Button
@@ -1066,6 +1186,16 @@ export function CertificateSettingsForm({
             </div>
           </div>
 
+          {branding.documentProfile ? (
+            <DocumentProfileFields
+              key={branding.documentProfile.id + ':' + branding.documentProfile.revision}
+              profile={branding.documentProfile}
+              onSaved={(profile) => {
+                setProfiles((current) => current.map((p) => (p.id === profile.id ? profile : p)));
+                setBytes(null);
+              }}
+            />
+          ) : null}
           <div className="divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
             <Section
               icon={<Stamp aria-hidden="true" />}
@@ -1154,7 +1284,7 @@ export function CertificateSettingsForm({
 
             <Section
               icon={<TextAa aria-hidden="true" />}
-              title={tab === 'certificate' ? 'Тексты корочки' : 'Текст протокола'}
+              title={tab === 'certificate' ? 'Тексты удостоверения' : 'Текст протокола'}
               hint={
                 tab === 'certificate'
                   ? fields.validityMonths
@@ -1194,7 +1324,7 @@ export function CertificateSettingsForm({
               ) : (
                 defaultsField('protocolText', 'Текст протокола', 3)
               )}
-              <p className="text-xs text-[var(--color-text-muted)]">
+              <p className="text-sm break-words text-[var(--color-text-muted)]">
                 {'{program} — программа, {protocol} — номер протокола'}
               </p>
               {defaultsField('companyName', 'Компания образца', 2)}
@@ -1216,7 +1346,7 @@ export function CertificateSettingsForm({
                 open={sections.has('size')}
                 onToggle={() => toggle('size')}
               >
-                <div className="grid min-w-0 grid-cols-2 gap-3">
+                <div className="xs:grid-cols-2 grid min-w-0 gap-3">
                   {(['insertWidthCm', 'insertHeightCm'] as const).map((key) => {
                     const label = key === 'insertWidthCm' ? 'Общая ширина, см' : 'Высота, см';
                     return (
@@ -1244,7 +1374,7 @@ export function CertificateSettingsForm({
                     );
                   })}
                 </div>
-                <p className="text-xs text-[var(--color-text-muted)]">
+                <p className="text-sm break-words text-[var(--color-text-muted)]">
                   Вкладыш в развёрнутом виде, обе половины вместе
                 </p>
               </Section>
@@ -1253,16 +1383,21 @@ export function CertificateSettingsForm({
         </fieldset>
 
         <section
+          data-document-preview
           aria-label="Предпросмотр документа"
           className={cn(
             'min-w-0 space-y-2 lg:sticky lg:top-16',
             mobile === 'fields' && 'hidden lg:block',
           )}
         >
-          {tab === 'certificate' && selectedCertificate ? <p className="text-xs text-[var(--color-text-muted)]">Выданный документ сохраняет прежние реквизиты. Изменения применяются при новой выдаче.</p> : null}
+          {tab === 'certificate' && selectedCertificate ? (
+            <p className="text-sm break-words text-[var(--color-text-muted)]">
+              Выданный документ сохраняет прежние реквизиты. Изменения применяются при новой выдаче.
+            </p>
+          ) : null}
           {tab === 'certificate' ? (
             <SegmentedControl
-              label="Сторона корочки"
+              label="Сторона удостоверения"
               className="lg:hidden"
               value={half}
               onChange={setHalf}
@@ -1339,7 +1474,7 @@ export function CertificateSettingsForm({
         </section>
       </div>
 
-      <div className="sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+1rem)] z-[var(--z-sticky)] lg:hidden">
+      <div className="lg:hidden">
         <div className="glass-strong flex min-w-0 flex-wrap items-center gap-2 rounded-[var(--radius-group)] p-2 shadow-[var(--shadow-pop)]">
           {actions}
         </div>

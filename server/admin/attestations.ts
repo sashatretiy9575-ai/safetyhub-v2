@@ -71,6 +71,7 @@ type UntypedRpcClient = {
       | 'get_admin_work_queue'
       | 'get_admin_attestation_by_certificate_number'
       | 'resolve_admin_attestation_selection'
+      | 'refresh_admin_attestation_selection'
       | 'confirm_admin_identities'
       | 'bulk_update_participants'
       | 'issue_certificates'
@@ -81,11 +82,16 @@ type UntypedRpcClient = {
 
 const isoDateSchema = z.string().datetime({ offset: true });
 const uuidArraySchema = z.array(z.string().uuid()).max(ADMIN_ATTESTATION_BULK_LIMIT);
+export const adminAttestationSelectionRefreshSchema = z
+  .object({ recordIds: uuidArraySchema.min(1) })
+  .strict();
 const cursorSchema = z.object({ values: z.array(z.unknown()).max(12), id: z.string().min(1) });
 const mutationReasonSchema = z
   .string()
   .max(96)
-  .regex(/^(?:[A-Z][A-Z0-9_]{1,95}(?::[0-9]{1,10})?|DOCUMENT_REQUIRED_FIELDS:(?:orderNumber,orderDate,verificationKind|trainingReason|qualificationDecision|organization,position))$/u)
+  .regex(
+    /^(?:[A-Z][A-Z0-9_]{1,95}(?::[0-9]{1,10})?|DOCUMENT_REQUIRED_FIELDS:(?:orderNumber,orderDate,verificationKind|trainingReason|qualificationDecision|organization,position|education))$/u,
+  )
   .nullable();
 
 function record(value: unknown): Record<string, unknown> {
@@ -461,6 +467,15 @@ export async function resolveAdminAttestationSelection(
   await requireCapability('results.read');
   return selectionSchema.parse(
     await rpc('resolve_admin_attestation_selection', filterArgs(filters)),
+  );
+}
+
+export async function refreshAdminAttestationSelection(
+  recordIds: string[],
+): Promise<AdminAttestationSelection> {
+  await requireCapability('results.read');
+  return selectionSchema.parse(
+    await rpc('refresh_admin_attestation_selection', { p_record_ids: recordIds }),
   );
 }
 

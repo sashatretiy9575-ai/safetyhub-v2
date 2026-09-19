@@ -1,7 +1,8 @@
 'use client';
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { attestationNeedsIssuance } from '@/lib/admin/attestation-issuance';
 import { CaretDown } from '@phosphor-icons/react/dist/csr/CaretDown';
 import { PencilSimple } from '@phosphor-icons/react/dist/csr/PencilSimple';
 import { X } from '@phosphor-icons/react/dist/csr/X';
@@ -13,7 +14,6 @@ import type {
 } from '@/lib/admin/types';
 import { ADMIN_PURGE_BULK_LIMIT } from '@/lib/constants';
 import { ADMIN_ATTESTATION_BULK_LIMIT } from '@/lib/constants';
-import { AdminOverlay } from '@/components/admin/admin-overlay';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { organizationArchiveFilename } from '@/lib/pdf/certificate-export-groups';
 import {
@@ -27,7 +27,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { AttestationSelectionBanner } from './attestation-selection-banner';
 import { AttestationTableRow } from './attestation-table-row';
-import { useAttestationsModalFocus } from './use-attestations-modal-focus';
 import {
   AttestationBulkActionButtons,
   AttestationDetailDrawer,
@@ -88,13 +87,18 @@ const SKIP_REASON_LABELS: Record<string, string> = {
   ACCOUNT_HAS_PENDING_AUTH_OPERATIONS: 'идёт служебная операция — повторите через минуту',
   LAST_ACTIVE_SUPERADMIN_PROTECTED: 'нельзя удалить последнего администратора',
   OPERATION_SKIPPED: 'состояние строки изменилось до выполнения',
+  'DOCUMENT_REQUIRED_FIELDS:education': 'заполните образование сотрудника перед новой выдачей',
   DOCUMENT_PROFILE_REQUIRED: 'выберите категорию слушателей в редакторе документов',
-  DOCUMENT_FORMAL_EXAM_REQUIRED: 'для промбеза внесите подтверждённые реквизиты отдельного экзамена: протокол, дата и положительный результат; учебного теста недостаточно',
-  'DOCUMENT_REQUIRED_FIELDS:orderNumber,orderDate,verificationKind': 'заполните номер и дату приказа, вид проверки в профиле БиОТ',
+  DOCUMENT_FORMAL_EXAM_REQUIRED:
+    'для промбеза внесите подтверждённые реквизиты отдельного экзамена: протокол, дата и положительный результат; учебного теста недостаточно',
+  'DOCUMENT_REQUIRED_FIELDS:orderNumber,orderDate,verificationKind':
+    'заполните номер и дату приказа, вид проверки в профиле БиОТ',
   'DOCUMENT_REQUIRED_FIELDS:trainingReason': 'укажите причину обучения участника в протоколе ПТМ',
-  'DOCUMENT_REQUIRED_FIELDS:qualificationDecision': 'внесите решение квалификационной комиссии для участника',
+  'DOCUMENT_REQUIRED_FIELDS:qualificationDecision':
+    'внесите решение квалификационной комиссии для участника',
   'DOCUMENT_REQUIRED_FIELDS:organization,position': 'заполните организацию и должность сотрудника',
-  DOCUMENT_SIGNER_ASSET_MISMATCH: 'подпись не соответствует члену комиссии — проверьте профиль документа',
+  DOCUMENT_SIGNER_ASSET_MISMATCH:
+    'подпись не соответствует члену комиссии — проверьте профиль документа',
 };
 
 function skipReasonLabel(code: string | null | undefined) {
@@ -248,7 +252,9 @@ export function AttestationsManager({
   );
   const allFilteredSelected = resolvedSelections.some((entry) => entry.key === ALL_FILTERED_KEY);
   const [selectingAll, setSelectingAll] = useState(false);
+  const [selectionRefreshFailed, setSelectionRefreshFailed] = useState(false);
   const [pending, setPending] = useState<AttestationPendingAction | null>(null);
+  const [singleTarget, setSingleTarget] = useState<AdminAttestationRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -257,17 +263,14 @@ export function AttestationsManager({
     null,
   );
   const [detail, setDetail] = useState<AdminAttestationRow | null>(null);
-  const [bulkActionsOpen, setBulkActionsOpen] = useState(false);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
-  const bulkActionsTriggerRef = useRef<HTMLButtonElement>(null);
-  const bulkActionsPanelRef = useRef<HTMLElement>(null);
-  const closeBulkActions = useCallback(() => setBulkActionsOpen(false), []);
   const idempotencyKeyRef = useRef('');
   const purgeKeysRef = useRef<string[]>([]);
   const purgeSignatureRef = useRef('');
   const exportAbortRef = useRef<AbortController | null>(null);
   const selectionRequestRef = useRef(0);
   const selectionAbortRef = useRef<AbortController | null>(null);
+  const dirtySelectionKeysRef = useRef(new Set<string>());
   useEffect(() => {
     setClientReady(true);
   }, []);
@@ -286,12 +289,6 @@ export function AttestationsManager({
   useEffect(() => {
     idempotencyKeyRef.current = pending ? crypto.randomUUID() : '';
   }, [pending]);
-  useAttestationsModalFocus({
-    open: bulkActionsOpen,
-    panelRef: bulkActionsPanelRef,
-    triggerRef: bulkActionsTriggerRef,
-    onClose: closeBulkActions,
-  });
 
   // The list is a company sheet: rows are banded by company and the company
   // column disappears from the rows themselves, because the band already names it.
@@ -340,11 +337,7 @@ export function AttestationsManager({
       pendingIdentity: unique(
         selectedRows.filter((row) => row.identityState !== 'verified').map((row) => row.userId),
       ).length,
-      readyToIssue: selectedRows.filter(
-        (row) =>
-          !row.courseDeleted &&
-          (row.certificateState === 'ready' || row.certificateState === 'revoked'),
-      ).length,
+      readyToIssue: selectedRows.filter(attestationNeedsIssuance).length,
       issued,
       exportable: issued,
     };
@@ -542,23 +535,118 @@ export function AttestationsManager({
   };
 
   const clearSelection = () => {
+    selectionRequestRef.current++;
+    selectionAbortRef.current?.abort();
+    setSelectingAll(false);
     setSelected(new Set());
     setResolvedSelections([]);
+    dirtySelectionKeysRef.current.clear();
+    setSelectionRefreshFailed(false);
     setMessage('');
     setMessageReasons([]);
-    setBulkActionsOpen(false);
+  };
+
+  const refreshResolvedSelections = async (affectedUserIds: readonly string[] = []) => {
+    const snapshot = resolvedSelections.filter(
+      (entry) =>
+        dirtySelectionKeysRef.current.has(entry.key) ||
+        affectedUserIds.some((id) => entry.selection.userIds.includes(id)),
+    );
+    if (!snapshot.length) {
+      dirtySelectionKeysRef.current.clear();
+      setSelectionRefreshFailed(false);
+      return true;
+    }
+    snapshot.forEach((entry) => dirtySelectionKeysRef.current.add(entry.key));
+    const requestId = ++selectionRequestRef.current;
+    selectionAbortRef.current?.abort();
+    const controller = new AbortController();
+    selectionAbortRef.current = controller;
+    setSelectingAll(true);
+    try {
+      const refreshed = await Promise.all(
+        snapshot.map(async (entry) => {
+          const result = await clientRequest(
+            '/api/admin/attestations/selection',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ recordIds: entry.selection.recordIds }),
+            },
+            { signal: controller.signal },
+          );
+          const selection = await readClientResponseJson<AdminAttestationSelection>(
+            result.response,
+          );
+          if (!result.ok || !selection || !Array.isArray(selection.recordIds))
+            throw new Error('Не удалось обновить сводку выбранных сотрудников.');
+          return { ...entry, selection };
+        }),
+      );
+      if (requestId !== selectionRequestRef.current || controller.signal.aborted) return false;
+      // Only replace the exact entries we requested; a later deselection must win.
+      setResolvedSelections((current) =>
+        current.flatMap((entry) => {
+          const index = snapshot.indexOf(entry);
+          if (index < 0) return [entry];
+          const updated = refreshed[index]!;
+          return updated.selection.recordIds.length ? [updated] : [];
+        }),
+      );
+      const survivingIds = new Set(refreshed.flatMap((entry) => entry.selection.recordIds));
+      const removedIds = new Set(
+        snapshot
+          .flatMap((entry) => entry.selection.recordIds)
+          .filter((id) => !survivingIds.has(id)),
+      );
+      setSelected((current) => new Set([...current].filter((id) => !removedIds.has(id))));
+      snapshot.forEach((entry) => dirtySelectionKeysRef.current.delete(entry.key));
+      setSelectionRefreshFailed(dirtySelectionKeysRef.current.size > 0);
+      return true;
+    } catch {
+      if (requestId === selectionRequestRef.current && !controller.signal.aborted)
+        setSelectionRefreshFailed(true);
+      return false;
+    } finally {
+      if (requestId === selectionRequestRef.current) setSelectingAll(false);
+    }
   };
 
   const openSingleAction = (row: AdminAttestationRow, action: AttestationPendingAction) => {
+    if (busy) return;
     if (action.kind === 'confirm-issue') {
       void runConfirmIssueDirect(row);
       return;
     }
-    setSelected(new Set([row.recordId]));
-    setResolvedSelections([]);
+    setSingleTarget(row);
     setPending(action);
     setError('');
-    setBulkActionsOpen(false);
+  };
+
+  const actionSummary = useMemo<AttestationSelectionSummary>(
+    () =>
+      singleTarget
+        ? {
+            total: 1,
+            people: 1,
+            pendingIdentity: singleTarget.identityState === 'verified' ? 0 : 1,
+            readyToIssue: attestationNeedsIssuance(singleTarget) ? 1 : 0,
+            issued: singleTarget.certificateState === 'issued' ? 1 : 0,
+            exportable:
+              singleTarget.certificateId && singleTarget.certificateState === 'issued' ? 1 : 0,
+          }
+        : selectionSummary,
+    [singleTarget, selectionSummary],
+  );
+
+  const pruneDeletedUser = async (userId: string) => {
+    const removedIds = new Set(
+      page.items.filter((row) => row.userId === userId).map((row) => row.recordId),
+    );
+    if (!resolvedSelections.some((entry) => entry.selection.userIds.includes(userId)))
+      setSelected((current) => new Set([...current].filter((id) => !removedIds.has(id))));
+    // Refresh the fixed selection so colleagues in the same company remain selected.
+    await refreshResolvedSelections([userId]);
   };
 
   const dialogConfig = useMemo<AttestationDialogConfig | null>(() => {
@@ -566,21 +654,21 @@ export function AttestationsManager({
     if (pending.kind === 'confirm') {
       return {
         title: 'Подтвердить данные',
-        description: `Будут подтверждены данные: ${selectionSummary.pendingIdentity} чел.`,
-        confirmLabel: `Подтвердить ${selectionSummary.pendingIdentity}`,
+        description: `Будут подтверждены данные: ${actionSummary.pendingIdentity} чел.`,
+        confirmLabel: `Подтвердить ${actionSummary.pendingIdentity}`,
       };
     }
     if (pending.kind === 'confirm-issue') {
       return {
         title: 'Подтвердить и выдать',
-        description: `Данные будут подтверждены, сертификаты выданы: ${selectionSummary.total}.`,
-        confirmLabel: `Подтвердить и выдать ${selectionSummary.total}`,
+        description: `Данные будут подтверждены, сертификаты выданы: ${actionSummary.total}.`,
+        confirmLabel: `Подтвердить и выдать ${actionSummary.total}`,
       };
     }
     if (pending.kind === 'bulk-update') {
       return {
         title: `Изменить поле «${attestationFieldLabels[pending.field]}»`,
-        description: `Значение применится к ${selectionSummary.people} чел.; действующие сертификаты перевыпускаются.`,
+        description: `Значение применится к ${actionSummary.people} чел.; действующие сертификаты перевыпускаются.`,
         confirmLabel: 'Сохранить изменение',
         input: {
           label: `Новое значение: ${attestationFieldLabels[pending.field]}`,
@@ -589,22 +677,22 @@ export function AttestationsManager({
       };
     }
     if (pending.kind === 'issue') {
-      const typoWarnings = findCompanyTypoWarnings(selectedRows);
+      const typoWarnings = findCompanyTypoWarnings(singleTarget ? [singleTarget] : selectedRows);
       const firstWarning = typoWarnings[0];
       const warningText = firstWarning
         ? ` ⚠️ Похожие компании: «${firstWarning.primary}» и «${firstWarning.typo}» — проверьте перед выдачей.`
         : '';
       return {
         title: 'Выдать сертификаты',
-        description: `Выдача: ${selectionSummary.readyToIssue} из ${selectionSummary.total} выбранных.${warningText}`,
-        confirmLabel: `Выдать ${selectionSummary.readyToIssue}`,
+        description: `Выдача: ${actionSummary.readyToIssue} из ${actionSummary.total} выбранных.${warningText}`,
+        confirmLabel: `Выдать ${actionSummary.readyToIssue}`,
       };
     }
     if (pending.kind === 'bulk-delete') {
       return {
         title: 'Удалить сотрудников',
-        description: `Будет удалено человек: ${selectionSummary.people}. Аккаунт, попытки и сертификаты удаляются безвозвратно.`,
-        confirmLabel: `Удалить ${selectionSummary.people} чел.`,
+        description: `Будет удалено человек: ${actionSummary.people}. Аккаунт, попытки и сертификаты удаляются безвозвратно.`,
+        confirmLabel: `Удалить ${actionSummary.people} чел.`,
         tone: 'danger',
         reason: {
           label: 'Причина удаления (останется в истории действий)',
@@ -612,7 +700,7 @@ export function AttestationsManager({
           placeholder: 'Например: уволен, данные удалены по заявлению',
         },
         confirmationPhrase:
-          selectionSummary.people >= 5 ? `УДАЛИТЬ ${selectionSummary.people}` : undefined,
+          actionSummary.people >= 5 ? `УДАЛИТЬ ${actionSummary.people}` : undefined,
       };
     }
     const companies = exportCompanies;
@@ -620,14 +708,14 @@ export function AttestationsManager({
       title: 'Скачать пакет документов',
       description:
         companies === null
-          ? `Сертификатов: ${selectionSummary.exportable} из ${selectionSummary.total}. Архивы формируются по одному на компанию, в каждом — сертификаты и сводный отчёт.`
+          ? `Сертификатов: ${actionSummary.exportable} из ${actionSummary.total}. Архивы формируются по одному на компанию, в каждом — сертификаты и сводный отчёт.`
           : companies > 1
-            ? `Сертификатов: ${selectionSummary.exportable} из ${selectionSummary.total}. Будет сформировано ${companies} ZIP — по одному на компанию, в каждом свой сводный отчёт. Браузер может запросить разрешение на скачивание нескольких файлов.`
-            : `Сертификатов в ZIP: ${selectionSummary.exportable} из ${selectionSummary.total} + сводный отчёт.`,
+            ? `Сертификатов: ${actionSummary.exportable} из ${actionSummary.total}. Будет сформировано ${companies} ZIP — по одному на компанию, в каждом свой сводный отчёт. Браузер может запросить разрешение на скачивание нескольких файлов.`
+            : `Сертификатов в ZIP: ${actionSummary.exportable} из ${actionSummary.total} + сводный отчёт.`,
       confirmLabel:
         companies !== null && companies > 1 ? `Сформировать ${companies} ZIP` : 'Сформировать ZIP',
     };
-  }, [exportCompanies, pending, selectedRows, selectionSummary]);
+  }, [exportCompanies, pending, selectedRows, actionSummary, singleTarget]);
 
   const mutationSummary = (
     items: AdminAttestationMutationItem[],
@@ -664,19 +752,20 @@ export function AttestationsManager({
    * while claiming the rest had been deleted.
    */
   const purgeSelectedUsers = async (reason: string) => {
-    if (userIds.length === 0) return;
+    const targetUserIds = singleTarget ? [singleTarget.userId] : userIds;
+    if (targetUserIds.length === 0) return;
     setBusy(true);
     setError('');
     const chunks: string[][] = [];
-    for (let offset = 0; offset < userIds.length; offset += ADMIN_PURGE_BULK_LIMIT) {
-      chunks.push(userIds.slice(offset, offset + ADMIN_PURGE_BULK_LIMIT));
+    for (let offset = 0; offset < targetUserIds.length; offset += ADMIN_PURGE_BULK_LIMIT) {
+      chunks.push(targetUserIds.slice(offset, offset + ADMIN_PURGE_BULK_LIMIT));
     }
     // One stable key per chunk, so a retry of the same click replays instead of
     // deleting twice. The keys are tied to what they authorize: the database
     // refuses a key replayed with a different request, so keying only on the
     // chunk count meant that editing the reason and pressing delete again hit
     // IDEMPOTENCY_KEY_REUSED forever, with no way out but a page reload.
-    const purgeSignature = `${reason}::${userIds.join(',')}`;
+    const purgeSignature = `${reason}::${targetUserIds.join(',')}`;
     if (purgeSignatureRef.current !== purgeSignature) {
       purgeSignatureRef.current = purgeSignature;
       purgeKeysRef.current = chunks.map(() => crypto.randomUUID());
@@ -739,7 +828,11 @@ export function AttestationsManager({
       purgeSignatureRef.current = '';
       setPending(null);
       setDetail(null);
-      clearSelection();
+      if (singleTarget) {
+        if (items.some((item) => item.id === singleTarget.userId && item.status !== 'skipped'))
+          await pruneDeletedUser(singleTarget.userId);
+        setSingleTarget(null);
+      } else clearSelection();
       setMessage(summary.headline);
       setMessageReasons(summary.reasons);
       router.refresh();
@@ -753,6 +846,8 @@ export function AttestationsManager({
   const runAttestationAction = async (
     body: Record<string, unknown>,
     actionKind: AttestationPendingAction['kind'],
+    preserveSelection = false,
+    affectedUserIds: readonly string[] = [],
   ) => {
     setBusy(true);
     setError('');
@@ -777,7 +872,9 @@ export function AttestationsManager({
       const summary = mutationSummary(payload.items, actionKind);
       setPending(null);
       setDetail(null);
-      clearSelection();
+      if (!preserveSelection) clearSelection();
+      else await refreshResolvedSelections(affectedUserIds);
+      setSingleTarget(null);
       setMessage(summary.headline);
       setMessageReasons(summary.reasons);
       router.refresh();
@@ -801,25 +898,40 @@ export function AttestationsManager({
     }
     const idempotencyKey = idempotencyKeyRef.current || crypto.randomUUID();
     idempotencyKeyRef.current = idempotencyKey;
+    const targetUserIds = singleTarget ? [singleTarget.userId] : userIds;
+    const targetAttestationIds = singleTarget
+      ? singleTarget.attestationId
+        ? [singleTarget.attestationId]
+        : []
+      : attestationIds;
     const body =
       pending.kind === 'confirm'
-        ? { action: 'confirm', userIds, idempotencyKey }
+        ? { action: 'confirm', userIds: targetUserIds, idempotencyKey }
         : pending.kind === 'confirm-issue'
-          ? { action: 'confirm_and_issue', attestationIds, idempotencyKey }
+          ? { action: 'confirm_and_issue', attestationIds: targetAttestationIds, idempotencyKey }
           : pending.kind === 'bulk-update'
-            ? { action: 'update', userIds, field: pending.field, value, idempotencyKey }
-            : { action: 'issue', attestationIds, idempotencyKey };
-    await runAttestationAction(body, pending.kind);
+            ? {
+                action: 'update',
+                userIds: targetUserIds,
+                field: pending.field,
+                value,
+                idempotencyKey,
+              }
+            : { action: 'issue', attestationIds: targetAttestationIds, idempotencyKey };
+    await runAttestationAction(
+      body,
+      pending.kind,
+      Boolean(singleTarget),
+      singleTarget ? [singleTarget.userId] : [],
+    );
   };
 
   // Single-row "confirm + issue" has no inputs, so it skips the dialog entirely.
   const runConfirmIssueDirect = async (row: AdminAttestationRow) => {
-    if (!row.attestationId) return;
-    setSelected(new Set([row.recordId]));
-    setResolvedSelections([]);
+    if (busy || !row.attestationId) return;
+    setSingleTarget(null);
     setPending(null);
     setDetail(null);
-    setBulkActionsOpen(false);
     await runAttestationAction(
       {
         action: 'confirm_and_issue',
@@ -827,6 +939,8 @@ export function AttestationsManager({
         idempotencyKey: crypto.randomUUID(),
       },
       'confirm-issue',
+      true,
+      [row.userId],
     );
   };
 
@@ -961,6 +1075,56 @@ export function AttestationsManager({
       // selected made the whole page jump on the first tick of a checkbox.
       className="space-y-3 pb-28 @min-[760px]:pb-36"
     >
+      {selectedCount > 0 ? (
+        <aside
+          aria-label="Выбранные сотрудники"
+          className="min-w-0 space-y-3 rounded-[var(--radius-group)] border-2 border-[var(--color-primary)] bg-[var(--color-primary-soft)] p-3 shadow-[var(--shadow-pop)] sm:p-4"
+        >
+          <div className="flex min-w-0 items-start justify-between gap-2">
+            <p role="status" className="min-w-0 py-2 font-bold [overflow-wrap:anywhere]">
+              Выбрано: {selectionSummary.total}
+            </p>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={clearSelection}
+              aria-label="Снять выделение"
+            >
+              <X />
+            </Button>
+          </div>
+          <AttestationSelectionBanner
+            selectedCount={selectedCount}
+            totalFiltered={page.total}
+            pageSize={page.items.length}
+            isAllFilteredSelected={allFilteredSelected}
+            selectingAll={selectingAll}
+            onSelectAllFiltered={selectAllFiltered}
+          />
+          {selectionRefreshFailed ? (
+            <div role="status" className="min-w-0 space-y-2 text-sm [overflow-wrap:anywhere]">
+              <p>Выбор сохранён. Не удалось обновить его сводку после изменения данных.</p>
+              <Button
+                variant="outline"
+                disabled={busy || selectingAll}
+                className="h-auto min-h-11 max-w-full whitespace-normal"
+                onClick={() => void refreshResolvedSelections()}
+              >
+                Обновить сводку выбора
+              </Button>
+            </div>
+          ) : null}
+          <AttestationBulkActionButtons
+            summary={selectionSummary}
+            permissions={permissions}
+            busy={busy || selectingAll || selectionRefreshFailed}
+            onAction={(action) => {
+              setSingleTarget(null);
+              setPending(action);
+            }}
+          />
+        </aside>
+      ) : null}
       <div
         role="table"
         aria-label="Аттестации сотрудников"
@@ -1025,7 +1189,7 @@ export function AttestationsManager({
                   >
                     <div
                       role="cell"
-                      className="flex min-h-12 items-center gap-1 px-1.5 @min-[760px]:min-h-10"
+                      className="flex min-h-12 flex-wrap items-center gap-1 px-1.5 @min-[760px]:min-h-10"
                     >
                       <button
                         type="button"
@@ -1065,7 +1229,7 @@ export function AttestationsManager({
                         onClick={() =>
                           void setOrganizationGroupSelected(row.organization, !groupFullySelected)
                         }
-                        className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg px-1.5 text-left transition-colors hover:bg-[var(--color-band-foreground)]/10 @min-[760px]:min-h-9"
+                        className="flex min-h-11 min-w-0 flex-1 basis-[min(100%,6rem)] flex-wrap items-center gap-2.5 rounded-lg px-1.5 text-left transition-colors hover:bg-[var(--color-band-foreground)]/10 @min-[760px]:min-h-9"
                       >
                         <span
                           aria-hidden
@@ -1077,14 +1241,28 @@ export function AttestationsManager({
                         >
                           {groupFullySelected ? '✓' : ''}
                         </span>
-                        <span className="min-w-0 text-base font-bold break-words @min-[760px]:text-sm">
+                        <span className="min-w-0 flex-1 text-base font-bold [overflow-wrap:anywhere] @min-[760px]:text-sm">
                           {row.organization || 'Компания не указана'}
                         </span>
                         <span className="shrink-0 rounded-full bg-[var(--color-band-foreground)]/15 px-2 py-0.5 text-xs font-semibold tabular-nums">
                           {row.organizationGroupCount}
                         </span>
                       </button>
-                      {permissions.canManageDocuments && row.organization ? <a className="px-2 text-sm underline" href={'/admin/settings/certificate?' + new URLSearchParams({ organization: row.organization, course: row.testId ?? '', tab: 'protocol' })}>Протокол</a> : null}
+                      {permissions.canManageDocuments && row.organization ? (
+                        <a
+                          className="min-h-11 max-w-full px-2 py-2 text-sm [overflow-wrap:anywhere] underline"
+                          href={
+                            '/admin/settings/certificate?' +
+                            new URLSearchParams({
+                              organization: row.organization,
+                              course: row.testId ?? '',
+                              tab: 'protocol',
+                            })
+                          }
+                        >
+                          Протокол
+                        </a>
+                      ) : null}
                       {permissions.canManageIdentity ? (
                         <Button
                           type="button"
@@ -1139,15 +1317,6 @@ export function AttestationsManager({
           checkbox. The list reserves the strip's height at all times, so
           selecting, exporting or finishing an action never moves a row. */}
       <div className="sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+1rem)] z-[var(--z-sticky)] space-y-2 lg:bottom-4">
-        <AttestationSelectionBanner
-          selectedCount={selectedCount}
-          totalFiltered={page.total}
-          pageSize={page.items.length}
-          isAllFilteredSelected={allFilteredSelected}
-          selectingAll={selectingAll}
-          onSelectAllFiltered={selectAllFiltered}
-        />
-
         {message ? (
           <div
             role="status"
@@ -1179,103 +1348,6 @@ export function AttestationsManager({
             </Button>
           </div>
         ) : null}
-
-        {selectedCount > 0 ? (
-          <>
-            <aside
-              aria-label="Выбранные аттестации"
-              className="glass-strong flex items-center gap-3 rounded-[var(--radius-group)] border p-3 shadow-[var(--shadow-pop)] @min-[760px]:hidden"
-            >
-              <p className="min-w-0 flex-1 font-bold tabular-nums">Выбрано: {selectedCount}</p>
-              <Button
-                ref={bulkActionsTriggerRef}
-                size="sm"
-                onClick={() => setBulkActionsOpen(true)}
-              >
-                Действия
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={clearSelection}
-                aria-label="Снять выделение"
-              >
-                <X />
-              </Button>
-            </aside>
-
-            <aside
-              aria-label="Массовые действия"
-              className="glass-strong hidden rounded-[var(--radius-group)] border p-4 shadow-[var(--shadow-pop)] @min-[760px]:block"
-            >
-              <div className="flex flex-wrap items-center gap-3">
-                <strong className="text-sm tabular-nums">Выбрано: {selectionSummary.total}</strong>
-                <AttestationBulkActionButtons
-                  summary={selectionSummary}
-                  permissions={permissions}
-                  busy={busy}
-                  onAction={setPending}
-                />
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="ml-auto"
-                  onClick={clearSelection}
-                  aria-label="Снять выделение"
-                  title="Снять выделение"
-                >
-                  <X />
-                </Button>
-              </div>
-            </aside>
-
-            {bulkActionsOpen ? (
-              <AdminOverlay>
-                <div
-                  className="fixed inset-0 z-[var(--z-overlay)] grid items-end bg-black/45 @min-[760px]:hidden"
-                  role="presentation"
-                  onMouseDown={(event) => {
-                    if (event.target === event.currentTarget) closeBulkActions();
-                  }}
-                >
-                  <section
-                    ref={bulkActionsPanelRef}
-                    tabIndex={-1}
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="bulk-actions-title"
-                    className="max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-[var(--color-surface)] p-4 pb-[calc(1rem+var(--safe-area-bottom))] shadow-[var(--shadow-pop)]"
-                  >
-                    <header className="mb-4 flex items-start justify-between gap-3">
-                      <h2 id="bulk-actions-title" className="text-lg font-bold">
-                        Действия · {selectionSummary.total}
-                      </h2>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={closeBulkActions}
-                        aria-label="Закрыть действия"
-                        data-modal-initial-focus
-                      >
-                        <X />
-                      </Button>
-                    </header>
-                    <AttestationBulkActionButtons
-                      summary={selectionSummary}
-                      permissions={permissions}
-                      busy={busy}
-                      onAction={(action) => {
-                        setBulkActionsOpen(false);
-                        setPending(action);
-                      }}
-                      compact
-                    />
-                  </section>
-                </div>
-              </AdminOverlay>
-            ) : null}
-          </>
-        ) : null}
       </div>
 
       <AttestationDetailDrawer
@@ -1294,11 +1366,12 @@ export function AttestationsManager({
                 }
               : current,
           );
+          void refreshResolvedSelections([row.userId]);
           router.refresh();
         }}
-        onHistoryDeleted={() => {
+        onHistoryDeleted={async () => {
+          if (detail) await pruneDeletedUser(detail.userId);
           setDetail(null);
-          clearSelection();
           router.refresh();
         }}
       />
@@ -1307,6 +1380,7 @@ export function AttestationsManager({
         busy={busy}
         error={error}
         onCancel={() => {
+          setSingleTarget(null);
           setPending(null);
           setError('');
         }}

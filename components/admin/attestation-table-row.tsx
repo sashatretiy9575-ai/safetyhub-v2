@@ -80,7 +80,7 @@ export function AttestationTableRow({
       //   From 47.5rem it is the spreadsheet, one line per person. Below
       //   57.5rem (a 1024 px laptop with the sidebar) the sheet leaves out the
       //   position column and the time, so names and course titles stay whole.
-      className="@min-[760px]:text-caption relative flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-0.5 rounded-xl border border-[var(--color-border)]/55 bg-[var(--color-surface)] py-2.5 pr-10 pl-10 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:grid @min-[760px]:min-h-11 @min-[760px]:grid-cols-[32px_minmax(0,1.2fr)_minmax(0,1.2fr)_4.75rem_44px_minmax(10.75rem,1fr)_44px] @min-[920px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(10.75rem,1fr)_44px] @min-[760px]:gap-x-2 @min-[760px]:gap-y-0 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:border-[var(--color-border)]/55 @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:shadow-none"
+      className="@min-[760px]:text-caption relative flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-0.5 rounded-xl border border-[var(--color-border)]/55 bg-[var(--color-surface)] py-2.5 pr-10 pl-10 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--color-surface-muted)]/60 @min-[760px]:grid @min-[760px]:min-h-11 @min-[760px]:grid-cols-[32px_minmax(0,1.2fr)_minmax(0,1.2fr)_4.75rem_44px_minmax(10.75rem,1fr)_44px] @min-[760px]:gap-x-2 @min-[760px]:gap-y-0 @min-[760px]:rounded-none @min-[760px]:border-0 @min-[760px]:border-t @min-[760px]:border-[var(--color-border)]/55 @min-[760px]:p-0 @min-[760px]:px-1.5 @min-[760px]:shadow-none @min-[920px]:grid-cols-[32px_minmax(0,1.25fr)_minmax(0,0.95fr)_minmax(0,1.25fr)_6.5rem_44px_minmax(10.75rem,1fr)_44px]"
       onClick={(event) => {
         const target = event.target as HTMLElement;
         // `label` too: a tap on the checkbox's padding used to tick the box and
@@ -115,7 +115,7 @@ export function AttestationTableRow({
           type="button"
           onClick={onOpenDetails}
           aria-label={`Открыть сведения: ${row.fullName}`}
-          className="block max-w-full min-w-0 truncate text-left font-semibold hover:underline"
+          className="block max-w-full min-w-0 text-left font-semibold [overflow-wrap:anywhere] break-words hover:underline @min-[760px]:truncate"
           title={row.fullName}
         >
           {row.fullName}
@@ -200,7 +200,7 @@ export function AttestationTableRow({
       {/* 7. Status */}
       <div
         role="cell"
-        className={`order-5 flex shrink-0 items-center justify-end @min-[760px]:col-start-6 @min-[760px]:row-start-1 @min-[760px]:justify-start @min-[920px]:col-start-7 ${CELL}`}
+        className={`order-5 flex max-w-full items-center justify-end @min-[760px]:col-start-6 @min-[760px]:row-start-1 @min-[760px]:justify-start @min-[920px]:col-start-7 ${CELL}`}
       >
         <AttestationWorkflowBadge row={row} className={STATUS_BADGE} />
       </div>
@@ -210,11 +210,7 @@ export function AttestationTableRow({
         role="cell"
         className="absolute inset-y-0 right-0 grid w-10 place-items-center @min-[760px]:static @min-[760px]:col-start-7 @min-[760px]:row-start-1 @min-[760px]:w-auto @min-[920px]:col-start-8"
       >
-        <AttestationRowActions
-          row={row}
-          permissions={permissions}
-          openAction={onSingleAction}
-        />
+        <AttestationRowActions row={row} permissions={permissions} openAction={onSingleAction} />
       </div>
     </article>
   );

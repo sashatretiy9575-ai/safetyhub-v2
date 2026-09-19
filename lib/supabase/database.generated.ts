@@ -5229,6 +5229,10 @@ export type Database = {
         Args: { p_limit?: number }
         Returns: Json
       }
+      refresh_admin_attestation_selection: {
+        Args: { p_record_ids: string[] }
+        Returns: Json
+      }
       release_course_presentation_download_lease: {
         Args: { p_actor_id: string; p_lease_id: string }
         Returns: boolean

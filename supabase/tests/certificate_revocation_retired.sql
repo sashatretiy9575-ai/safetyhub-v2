@@ -41,6 +41,8 @@ begin
     raise exception 'a superseded certificate without a successor still verifies';
   end if;
 
+  update public.profiles set education = 'Среднее профессиональное' where id = v_certificate.user_id;
+
   insert into public.certificates (
     certificate_number, user_id, revision_id, attestation_id, attempt_id, identity_version,
     full_name, job, organization, test_slug, test_title, localized_test_title, locale,

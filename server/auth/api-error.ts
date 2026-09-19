@@ -7,11 +7,21 @@ import { RequestBodyError } from '@/lib/security/request-body';
 import { RpcMutationError } from '@/server/supabase/rpc-mutation-result';
 
 export function apiError(error: unknown) {
-  const documentMessage = error && typeof error === 'object' && 'message' in error ? String(error.message) : '';
-  if (documentMessage === 'DOCUMENT_PROFILE_REQUIRED') return NextResponse.json({ error: documentMessage }, { status: 409 });
-  if (['DOCUMENT_FORMAL_EXAM_REQUIRED', 'DOCUMENT_FORMAL_EXAM_INVALID'].includes(documentMessage)) return NextResponse.json({ error: documentMessage }, { status: 409 });
-  if (/^DOCUMENT_REQUIRED_FIELDS:(?:orderNumber,orderDate,verificationKind|trainingReason|qualificationDecision|organization,position)$/u.test(documentMessage)) {
-    return NextResponse.json({ error: 'DOCUMENT_REQUIRED_FIELDS', fields: documentMessage.split(':')[1]!.split(',') }, { status: 409 });
+  const documentMessage =
+    error && typeof error === 'object' && 'message' in error ? String(error.message) : '';
+  if (documentMessage === 'DOCUMENT_PROFILE_REQUIRED')
+    return NextResponse.json({ error: documentMessage }, { status: 409 });
+  if (['DOCUMENT_FORMAL_EXAM_REQUIRED', 'DOCUMENT_FORMAL_EXAM_INVALID'].includes(documentMessage))
+    return NextResponse.json({ error: documentMessage }, { status: 409 });
+  if (
+    /^DOCUMENT_REQUIRED_FIELDS:(?:orderNumber,orderDate,verificationKind|trainingReason|qualificationDecision|organization,position|education)$/u.test(
+      documentMessage,
+    )
+  ) {
+    return NextResponse.json(
+      { error: 'DOCUMENT_REQUIRED_FIELDS', fields: documentMessage.split(':')[1]!.split(',') },
+      { status: 409 },
+    );
   }
   if (error instanceof AuthenticationError) {
     return NextResponse.json({ error: error.code }, { status: error.status });

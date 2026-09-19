@@ -79,10 +79,10 @@ export function DocumentSelect({
         className="flex min-h-14 w-full min-w-0 items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-1.5 text-left shadow-[var(--shadow-soft)] transition disabled:cursor-not-allowed disabled:opacity-60"
       >
         <span className="min-w-0 flex-1">
-          <span className="block text-xs text-[var(--color-text-muted)]">{label}</span>
+          <span className="block text-sm text-[var(--color-text-muted)]">{label}</span>
           <span
             className={cn(
-              'block text-sm break-words',
+              'block text-base break-words',
               selected ? 'text-[var(--color-text)]' : 'text-[var(--color-text-subtle)]',
             )}
           >
@@ -110,7 +110,7 @@ export function DocumentSelect({
                 onChange={(event) => setQuery(event.target.value)}
                 aria-label={`${label}: поиск`}
                 placeholder="Поиск"
-                className="h-11 w-full rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] pr-3 pl-9 text-base text-[var(--color-text)] placeholder:text-[var(--color-text-subtle)] sm:text-sm"
+                className="h-11 w-full rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] pr-3 pl-9 text-base text-[var(--color-text)] placeholder:text-[var(--color-text-subtle)]"
               />
             </label>
           ) : null}
@@ -122,7 +122,7 @@ export function DocumentSelect({
                   aria-current={option.value === value ? 'true' : undefined}
                   onClick={() => choose(option.value)}
                   className={cn(
-                    'flex min-h-11 w-full items-center gap-2 rounded-[var(--radius-sm)] px-3 py-2 text-left text-sm break-words hover:bg-[var(--color-surface-muted)]',
+                    'flex min-h-11 w-full items-center gap-2 rounded-[var(--radius-sm)] px-3 py-2 text-left text-base break-words hover:bg-[var(--color-surface-muted)]',
                     option.value === value &&
                       'bg-[var(--color-primary-soft)] font-semibold text-[var(--color-on-primary-soft)]',
                   )}

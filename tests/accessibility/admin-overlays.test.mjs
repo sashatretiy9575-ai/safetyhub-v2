@@ -18,12 +18,17 @@ test('overlays render outside the query container', async () => {
 
   for (const file of [
     'components/admin/destructive-dialog.tsx',
-    'components/admin/attestations-manager.tsx',
     'components/admin/attestations-filter-form.tsx',
     'components/admin/admin-notification-inbox.tsx',
     'components/profile/avatar-uploader.tsx',
   ]) {
     assert.match(await read(file), /AdminOverlay/u, `${file} must lift its overlay out`);
+  }
+  // The employee card and its action confirmation use the browser top layer.
+  for (const file of ['components/admin/attestations-manager-panels.tsx', 'components/admin/attestations-action-dialog.tsx']) {
+    const source = await read(file);
+    assert.match(source, /<dialog/u);
+    assert.match(source, /\.showModal\(\)/u);
   }
 });
 

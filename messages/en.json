@@ -61,6 +61,8 @@
       "profile": "Profile",
       "admin": "Admin panel",
       "account": "My account",
+      "siteSettings": "Site settings",
+      "history": "Activity history",
       "install": "Install app",
       "signOut": "Sign out and clear data from this device",
       "signOutShort": "Sign out",

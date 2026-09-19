@@ -76,7 +76,7 @@ export function AttestationsActionDialog({
       onClose={() => {
         if (config && !busy) onCancel();
       }}
-      className="m-auto w-[min(34rem,calc(100vw-1.5rem))] rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55"
+      className="m-auto w-[min(34rem,calc(100vw-1.5rem))] min-w-0 rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface)] p-0 [overflow-wrap:anywhere] text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/55 [&_button]:h-auto [&_button]:min-h-11 [&_button]:px-3 [&_button]:py-2 [&_button]:whitespace-normal"
     >
       {config ? (
         <form
@@ -86,7 +86,7 @@ export function AttestationsActionDialog({
             void onConfirm({ value: value.trim(), reason: reason.trim() });
           }}
         >
-          <div className="space-y-2 border-b border-[var(--color-border)] p-5">
+          <div className="space-y-2 border-b border-[var(--color-border)] p-3 sm:p-5">
             <h2 id={titleId} className="text-lg font-bold">
               {config.title}
             </h2>
@@ -94,10 +94,10 @@ export function AttestationsActionDialog({
               {config.description}
             </p>
           </div>
-          <div className="space-y-4 p-5">
+          <div className="min-w-0 space-y-4 p-3 sm:p-5">
             {config.input ? (
               <div className="space-y-2">
-                <Label className="sr-only" htmlFor={`${titleId}-value`}>{config.input.label}</Label>
+                <Label htmlFor={`${titleId}-value`}>{config.input.label}</Label>
                 <Input
                   id={`${titleId}-value`}
                   value={value}
@@ -112,7 +112,7 @@ export function AttestationsActionDialog({
             ) : null}
             {config.reason ? (
               <div className="space-y-2">
-                <Label className="sr-only" htmlFor={`${titleId}-reason`}>{config.reason.label}</Label>
+                <Label htmlFor={`${titleId}-reason`}>{config.reason.label}</Label>
                 <Textarea
                   id={`${titleId}-reason`}
                   value={reason}
@@ -121,9 +121,7 @@ export function AttestationsActionDialog({
                   maxLength={500}
                   required
                   autoFocus
-                  placeholder={
-                    config.reason.placeholder ?? 'Укажите причину для журнала действий'
-                  }
+                  placeholder={config.reason.placeholder ?? 'Укажите причину для журнала действий'}
                 />
               </div>
             ) : null}
@@ -155,9 +153,7 @@ export function AttestationsActionDialog({
                 variant={config.tone === 'danger' ? 'danger' : 'primary'}
                 disabled={
                   busy ||
-                  Boolean(
-                    config.confirmationPhrase && confirmation !== config.confirmationPhrase,
-                  )
+                  Boolean(config.confirmationPhrase && confirmation !== config.confirmationPhrase)
                 }
               >
                 {busy ? 'Выполняем…' : config.confirmLabel}

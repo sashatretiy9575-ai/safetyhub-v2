@@ -61,6 +61,8 @@
       "profile": "个人资料",
       "admin": "管理后台",
       "account": "我的账户",
+      "siteSettings": "网站设置",
+      "history": "操作历史",
       "install": "安装应用",
       "signOut": "退出并清除此设备上的 SafetyHub 数据",
       "signOutShort": "退出登录",

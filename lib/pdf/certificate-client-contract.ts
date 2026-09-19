@@ -14,6 +14,7 @@ export type CertificateLocale = (typeof CERTIFICATE_LOCALES)[number];
  * issuances receive an immutable snapshot; current settings are for previews.
  */
 export type CertificateBranding = Readonly<{
+  protocolLayoutVersion?: 2;
   documentProfile?: DocumentProfile;
   commissionSignatureUrls?: readonly (string | null)[];
   documentDefaults?: DocumentDefaults;
@@ -51,7 +52,14 @@ export type CertificateRenderMetadata = Readonly<{
   fullName: string;
   photoUrl?: string | null;
   education?: string;
-  documentDetails?: { trainingReason?: string; notes?: string; qualificationDecision?: string; formalExamReference?: string; formalExamDate?: string; formalExamResult?: string };
+  documentDetails?: {
+    trainingReason?: string;
+    notes?: string;
+    qualificationDecision?: string;
+    formalExamReference?: string;
+    formalExamDate?: string;
+    formalExamResult?: string;
+  };
   position: string | null;
   organization: string | null;
   score: number;
@@ -145,10 +153,18 @@ function assertImageUrl(value: unknown, code: string): asserts value is string |
 export function assertCertificateBranding(value: unknown): asserts value is CertificateBranding {
   if (!value || typeof value !== 'object') throw new Error('CERTIFICATE_BRANDING_INVALID');
   const branding = value as Record<string, unknown>;
-  if (branding.protocolDate !== undefined && (typeof branding.protocolDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/u.test(branding.protocolDate))) throw new Error('PROTOCOL_DATE_INVALID');
+  if (branding.protocolLayoutVersion !== undefined && branding.protocolLayoutVersion !== 2)
+    throw new Error('PROTOCOL_LAYOUT_INVALID');
+  if (
+    branding.protocolDate !== undefined &&
+    (typeof branding.protocolDate !== 'string' ||
+      !/^\d{4}-\d{2}-\d{2}$/u.test(branding.protocolDate))
+  )
+    throw new Error('PROTOCOL_DATE_INVALID');
   if (branding.documentDefaults !== undefined) {
     const defaults = branding.documentDefaults as DocumentDefaults;
-    if (!defaults || !Array.isArray(defaults.commission) || defaults.commission.length > 20) throw new Error('COMMISSION_INVALID');
+    if (!defaults || !Array.isArray(defaults.commission) || defaults.commission.length > 20)
+      throw new Error('COMMISSION_INVALID');
     assertBoundedText(defaults.reviewerName, 'COMMISSION_INVALID', 200);
     assertBoundedText(defaults.companyName, 'DOCUMENT_DEFAULTS_INVALID', 200);
     assertBoundedText(defaults.programName, 'DOCUMENT_DEFAULTS_INVALID', 240);
@@ -179,8 +195,13 @@ export function assertCertificateBranding(value: unknown): asserts value is Cert
   assertImageUrl(branding.memberSignatureUrl, 'CERTIFICATE_ASSET_URL_INVALID');
   assertImageUrl(branding.protocolSignatureUrl ?? null, 'CERTIFICATE_ASSET_URL_INVALID');
   if (branding.commissionSignatureUrls !== undefined) {
-    if (!Array.isArray(branding.commissionSignatureUrls) || branding.commissionSignatureUrls.length > 20) throw new Error('COMMISSION_INVALID');
-    for (const url of branding.commissionSignatureUrls) assertImageUrl(url, 'CERTIFICATE_ASSET_URL_INVALID');
+    if (
+      !Array.isArray(branding.commissionSignatureUrls) ||
+      branding.commissionSignatureUrls.length > 20
+    )
+      throw new Error('COMMISSION_INVALID');
+    for (const url of branding.commissionSignatureUrls)
+      assertImageUrl(url, 'CERTIFICATE_ASSET_URL_INVALID');
   }
 }
 
@@ -217,8 +238,16 @@ export function assertCertificateRenderMetadata(
     throw new Error('CERTIFICATE_ASSET_URL_INVALID');
   }
   assertString(item.fullName, 'CERTIFICATE_NAME_INVALID', 200);
-  if (item.photoUrl != null && (typeof item.photoUrl !== 'string' || !/^\/api\/(?:certificates\/[0-9a-f-]{36}\/photo|admin\/documents\/photo\/[0-9a-f-]{36})$/u.test(item.photoUrl))) throw new Error('CERTIFICATE_PHOTO_URL_INVALID');
-  if (item.education !== undefined) assertBoundedText(item.education, 'CERTIFICATE_EDUCATION_INVALID', 200);
+  if (
+    item.photoUrl != null &&
+    (typeof item.photoUrl !== 'string' ||
+      !/^\/api\/(?:certificates\/[0-9a-f-]{36}\/photo|admin\/documents\/photo\/[0-9a-f-]{36})$/u.test(
+        item.photoUrl,
+      ))
+  )
+    throw new Error('CERTIFICATE_PHOTO_URL_INVALID');
+  if (item.education !== undefined)
+    assertBoundedText(item.education, 'CERTIFICATE_EDUCATION_INVALID', 200);
   assertOptionalString(item.position, 'CERTIFICATE_POSITION_INVALID', 160);
   assertOptionalString(item.organization, 'CERTIFICATE_ORGANIZATION_INVALID', 200);
   assertInteger(item.score, 'CERTIFICATE_SCORE_INVALID', 0, 10_000);

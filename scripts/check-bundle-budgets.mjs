@@ -108,7 +108,9 @@ export const BUNDLE_BUDGETS = [
  * Keep real headroom so this catches a regression (a new icon set, a duplicated
  * design system, an unpurged dependency) instead of routine work.
  */
-export const CSS_BUDGET = 20 * KIB;
+// The 240px/200%-text admin controls bring the measured shared sheet to 20 KiB.
+// Keep one KiB of headroom for ordinary UI work while retaining the hard gate.
+export const CSS_BUDGET = 21 * KIB;
 
 export function parseClientReferenceManifest(source, label = 'route') {
   const assignment = source.lastIndexOf('globalThis.__RSC_MANIFEST[');
