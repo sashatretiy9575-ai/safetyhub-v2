@@ -67,4 +67,52 @@ begin
  if exists(select 1 from public.certificates where document_snapshot#>>'{settings,stampPng}' is not null) then raise exception 'Image bytes copied to certificates'; end if;
 end;
 $test$;
+
+-- Replacing a registered signature or stamp rebinds profiles by version. What
+-- was issued before keeps the asset ids it was issued with; only a document
+-- issued afterwards draws the new image.
+do $rebind$
+declare prior public.certificates; issued public.certificates; successor public.certificates;
+ old_signature uuid; new_signature uuid; old_stamp uuid; new_stamp uuid; v bigint; n integer; snapshots jsonb;
+begin
+ select * into strict prior from public.certificates where certificate_number='SH-DOCUMENT-SNAPSHOT-TEST';
+ insert into public.document_assets(owner_id,kind,sha256,object_key) values('fixture','signature',repeat('a',64),repeat('a',64)||'.png') returning id into old_signature;
+ insert into public.document_assets(owner_id,kind,sha256,object_key) values('fixture','signature',repeat('b',64),repeat('b',64)||'.png') returning id into new_signature;
+ insert into public.document_assets(owner_id,kind,sha256,object_key) values('fixture-organization','stamp',repeat('c',64),repeat('c',64)||'.png') returning id into old_stamp;
+ insert into public.document_assets(owner_id,kind,sha256,object_key) values('fixture-organization','stamp',repeat('d',64),repeat('d',64)||'.png') returning id into new_stamp;
+ update public.document_profiles set audience='all',version=version+1,
+   body=body||jsonb_build_object('audience','all','family','general','stampAssetId',old_stamp,
+     'commission',jsonb_build_array(jsonb_build_object('signerId','fixture','name','Проверяющий','position','Комиссия','assetId',old_signature)))
+ where id='regression-all';
+ insert into public.certificates(certificate_number,user_id,revision_id,attestation_id,attempt_id,identity_version,full_name,job,organization,test_slug,test_title,localized_test_title,locale,score,total,pass_score,best_completed_at,issue_source)
+ values('SH-DOCUMENT-REBIND-TEST',prior.user_id,prior.revision_id,prior.attestation_id,prior.attempt_id,prior.identity_version,prior.full_name,prior.job,prior.organization,prior.test_slug,prior.test_title,prior.localized_test_title,prior.locale,prior.score,prior.total,prior.pass_score,prior.best_completed_at,'manual') returning * into issued;
+ if issued.document_snapshot#>>'{profile,commission,0,assetId}'<>old_signature::text or issued.document_snapshot#>>'{profile,stampAssetId}'<>old_stamp::text then raise exception 'Issuance did not capture the bound assets'; end if;
+ select jsonb_object_agg(id::text,document_snapshot) into snapshots from public.certificates;
+
+ -- The statement the server runs: compare-and-swap on the version it read.
+ select version into strict v from public.document_profiles where id='regression-all';
+ update public.document_profiles set version=v+1,updated_at=now(),
+   body=jsonb_set(jsonb_set(body,'{commission,0,assetId}',to_jsonb(new_signature::text)),'{stampAssetId}',to_jsonb(new_stamp::text))
+ where id='regression-all' and version=v;
+ get diagnostics n=row_count;
+ if n<>1 then raise exception 'Rebinding the current version wrote % rows',n; end if;
+ update public.document_profiles set version=v+1,body=jsonb_set(body,'{stampAssetId}','null') where id='regression-all' and version=v;
+ get diagnostics n=row_count;
+ if n<>0 then raise exception 'A stale version overwrote a rebound profile'; end if;
+
+ if (select jsonb_object_agg(id::text,document_snapshot) from public.certificates) is distinct from snapshots then raise exception 'Rebinding a profile rewrote an issued snapshot'; end if;
+ if private.certificate_download_payload(issued.id)#>>'{documentSnapshot,profile,commission,0,assetId}'<>old_signature::text then raise exception 'An issued document lost the signature it was issued with'; end if;
+ update public.certificates set revoked_at=statement_timestamp(),revoke_reason='rebind regression successor' where id=issued.id;
+ insert into public.certificates(certificate_number,user_id,revision_id,attestation_id,attempt_id,identity_version,full_name,job,organization,test_slug,test_title,localized_test_title,locale,score,total,pass_score,best_completed_at,issue_source)
+ values('SH-DOCUMENT-REBOUND-TEST',prior.user_id,prior.revision_id,prior.attestation_id,prior.attempt_id,prior.identity_version,prior.full_name,prior.job,prior.organization,prior.test_slug,prior.test_title,prior.localized_test_title,prior.locale,prior.score,prior.total,prior.pass_score,prior.best_completed_at,'manual') returning * into successor;
+ if successor.document_snapshot#>>'{profile,commission,0,assetId}'<>new_signature::text or successor.document_snapshot#>>'{profile,stampAssetId}'<>new_stamp::text then raise exception 'A new issuance did not draw the replaced images'; end if;
+ if (select document_snapshot from public.certificates where id=issued.id) is distinct from issued.document_snapshot then raise exception 'Revocation or reissue rewrote the earlier snapshot'; end if;
+ -- The registry is written by the server alone; a browser role reaches neither table.
+ if exists(select 1 from unnest(array['anon','authenticated']) r, unnest(array['select','insert','update','delete']) p
+   where has_table_privilege(r,'public.document_assets',p) or has_table_privilege(r,'public.document_profiles',p)) then raise exception 'Browser roles can reach the asset registry'; end if;
+ -- A registered picture is added and read, never rewritten: issued documents keep its id.
+ if exists(select 1 from unnest(array['update','delete','truncate']) p where has_table_privilege('service_role','public.document_assets',p)) then raise exception 'The server role can rewrite registered assets'; end if;
+ if not (has_table_privilege('service_role','public.document_assets','select') and has_table_privilege('service_role','public.document_assets','insert')) then raise exception 'The server role lost the registry it writes'; end if;
+end;
+$rebind$;
 rollback;

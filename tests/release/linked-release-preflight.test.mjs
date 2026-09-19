@@ -117,17 +117,18 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const localMigrations = inventory;
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
-  // Production includes the reviewed issuance and fixed-selection recovery.
+  // Production includes the reviewed issuance and fixed-selection recovery;
+  // pending: registered document pictures become immutable for the server role.
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 94);
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 95);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(receipt.matchedCount, 94);
-  assert.equal(receipt.pendingCount, 0);
+  assert.equal(receipt.pendingCount, 1);
   assert.equal(receipt.expectedBaseCount, 94);
-  assert.equal(receipt.expectedPendingCount, 0);
-  assert.equal(receipt.expectedTotalCount, 94);
+  assert.equal(receipt.expectedPendingCount, 1);
+  assert.equal(receipt.expectedTotalCount, 95);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

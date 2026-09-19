@@ -1,0 +1,12 @@
+-- Registered signatures and the stamp are content-addressed and never change:
+-- an issued document keeps the id of the picture it was drawn with, and that
+-- row must go on naming the same bytes for as long as the document exists.
+--
+-- 20260919120000 meant this ("grant select,insert ... to service_role"), but a
+-- grant adds to what a role already holds, and the default privileges of the
+-- public schema had handed service_role everything. The table could be
+-- rewritten and emptied by the one role the application writes with; only the
+-- absence of such a statement in the code protected the history. The database
+-- says it now. Replacing a picture is a new row and a new binding in the
+-- profiles, which is all the application ever does.
+revoke update, delete, truncate on public.document_assets from service_role;
