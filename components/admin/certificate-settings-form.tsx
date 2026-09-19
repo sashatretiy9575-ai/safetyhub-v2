@@ -227,6 +227,12 @@ const insertSizeMessage = (key: InsertSizeKey) =>
 
 /** What `buildPreviewJob` says for a booklet with nobody chosen; it also stands for a program not chosen. */
 const CHOOSE_DOCUMENT = 'Выберите компанию, программу и сотрудника';
+// A program that separates workers from engineers has a profile for each and no
+// common one, so nothing is bound until the category is chosen. Drawing the
+// settings' own commission instead would show a document with neither the stamp
+// nor the signatures, and issuing it is refused by the database anyway.
+const CHOOSE_AUDIENCE =
+  'Выберите категорию слушателей — от неё зависят подписи, печать и срок действия';
 /** «Номер протокола · по дате»: the number is the day and month of the date until somebody types their own. */
 const NUMBER_FOLLOWS_DATE = ' · по дате';
 /** «08.09.2026», on the calendar the documents themselves are dated by. */
@@ -431,9 +437,13 @@ export function CertificateSettingsForm({
   // A program with a profile is drawn from it: its commission, its texts, its term and
   // its registered images replace the settings' own, so those are not offered beside it.
   const governed = Boolean(branding.documentProfile);
+  // A program whose profiles all name a category: until one is chosen nothing is
+  // bound, and the settings' own images must not stand in for the registry's.
+  const audienceRequired =
+    Boolean(course) && !governed && profiles.some((p) => p.courseSlug === course);
   // The stamp and the signatures of the settings serve a program that has no profile,
   // and a stand that has no profiles at all; everything else is the registry's.
-  const legacyMode = course ? !governed : profiles.length === 0;
+  const legacyMode = course ? !governed && !audienceRequired : profiles.length === 0;
   // The profile sets the term of its program. A term of the settings left out of range
   // stays in sight even then: it is what keeps «Сохранить» switched off.
   const legacyTerm = !governed || !valid;
@@ -541,20 +551,22 @@ export function CertificateSettingsForm({
   const job: PreviewJob =
     !course && profiles.length
       ? { kind: 'message', text: CHOOSE_DOCUMENT }
-      : buildPreviewJob({
-          tab,
-          loading,
-          person: selectedPerson,
-          metadata,
-          metadataMessage: metadataProblem,
-          sizeMessage: sizeProblem ? insertSizeMessage(sizeProblem) : null,
-          branding,
-          program,
-          organization,
-          sampleOrganization: fields.documentDefaults.companyName,
-          batch,
-          participants: data.participants,
-        });
+      : audienceRequired
+        ? { kind: 'message', text: CHOOSE_AUDIENCE }
+        : buildPreviewJob({
+            tab,
+            loading,
+            person: selectedPerson,
+            metadata,
+            metadataMessage: metadataProblem,
+            sizeMessage: sizeProblem ? insertSizeMessage(sizeProblem) : null,
+            branding,
+            program,
+            organization,
+            sampleOrganization: fields.documentDefaults.companyName,
+            batch,
+            participants: data.participants,
+          });
   const key = jobKey(job);
   const fresh = shown?.key === key;
   const bytes = job.kind === 'message' ? null : (shown?.bytes ?? null);
