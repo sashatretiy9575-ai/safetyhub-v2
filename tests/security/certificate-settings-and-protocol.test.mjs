@@ -53,7 +53,7 @@ test('the stamp and the signatures are pictures the administrator uploads, one s
     read('supabase/migrations/20260917120000_document_facsimiles.sql'),
     read('server/certificates/settings.ts'),
     read('app/api/admin/settings/certificate/image/route.ts'),
-    read('server/certificates/facsimile-image.ts'),
+    read('server/certificates/facsimile-normalize.ts'),
     read('lib/pdf/certificate-renderer.ts'),
   ]);
   // The editor migration switched images off; this one switches them back on

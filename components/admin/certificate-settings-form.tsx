@@ -5,6 +5,7 @@ import {
   ArrowCounterClockwise,
   ArrowSquareOut,
   ArrowsClockwise,
+  Buildings,
   CaretDown,
   Check,
   Eye,
@@ -22,12 +23,14 @@ import {
   UsersThree,
   X,
 } from '@phosphor-icons/react';
+import { DocumentAssetRegistry } from '@/components/admin/document-asset-registry';
 import {
   DocumentImageTiles,
   type DocumentImageSlot,
 } from '@/components/admin/document-image-tiles';
 import { DocumentPdfPreview } from '@/components/admin/document-pdf-preview';
 import { DocumentSelect } from '@/components/admin/document-select';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SegmentedControl } from '@/components/ui/segmented-control';
@@ -40,6 +43,10 @@ import {
   type CertificateRenderMetadata,
 } from '@/lib/pdf/certificate-client-contract';
 import {
+  buildDocumentAssetRegistry,
+  type DocumentAssetInfo,
+} from '@/lib/pdf/document-asset-registry';
+import {
   INSERT_SIZE_LIMITS,
   changeDocumentDate,
   insertSizeProblem,
@@ -49,6 +56,17 @@ import {
   type DocumentDefaults,
   type InsertSizeKey,
 } from '@/lib/pdf/document-editor';
+import {
+  abortableDelay,
+  buildPreviewJob,
+  createBytesCache,
+  createSessionCache,
+  isDiscreteChange,
+  jobKey,
+  protocolFontUrl,
+  retryAfterSeconds,
+  type PreviewJob,
+} from '@/lib/pdf/document-preview-job';
 import { cn } from '@/lib/utils';
 import type { readDocumentEditor } from '@/server/certificates/document-editor';
 import { applyDocumentProfile, type DocumentProfile } from '@/lib/pdf/document-profile';
@@ -81,9 +99,11 @@ export type CertificateSettingsView = {
 };
 type EditorData = Awaited<ReturnType<typeof readDocumentEditor>>;
 type DocumentTab = 'protocol' | 'certificate';
-const SECTION_IDS = ['images', 'commission', 'texts', 'size'] as const;
+const SECTION_IDS = ['profile', 'images', 'commission', 'texts', 'size'] as const;
 type SectionId = (typeof SECTION_IDS)[number];
 const SECTIONS_KEY = 'document-editor-sections';
+/** Long enough to fold a burst of picks into one generation, short enough to read as instant. */
+const DISCRETE_RENDER_DELAY_MS = 150;
 type SettingsFields = Pick<
   CertificateSettingsView,
   | 'organizationName'
@@ -165,38 +185,77 @@ function download(bytes: Uint8Array, filename: string, type = 'application/pdf')
   setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
 
+/** `certificate.pdf` allows 20 reads a minute; the 21st says how long to wait. */
+class RetryLater extends Error {
+  seconds: number;
+  constructor(seconds: number) {
+    super('RATE_LIMITED');
+    this.seconds = seconds;
+  }
+}
+const retryLaterMessage = (error: RetryLater) => `Повторите через ${error.seconds} с`;
+
 async function metadataFor(id: string, signal?: AbortSignal): Promise<CertificateRenderMetadata> {
   const response = await clientFetch(`/api/certificates/${id}/metadata`, {
     signal,
     cache: 'no-store',
   });
+  if (response.status === 429)
+    throw new RetryLater(retryAfterSeconds(response.headers.get('Retry-After')));
   if (!response.ok) throw new Error('CERTIFICATE_UNAVAILABLE');
   const data: unknown = await response.json();
   assertCertificateRenderMetadata(data);
   return data;
 }
 
+/** A company kit reads one certificate per person and outruns the quota: it waits the window out. */
+async function metadataForKit(id: string, signal: AbortSignal, onWait: (seconds: number) => void) {
+  for (let waits = 0; ; waits++) {
+    try {
+      return await metadataFor(id, signal);
+    } catch (error) {
+      if (!(error instanceof RetryLater) || waits >= 3) throw error;
+      onWait(error.seconds);
+      await abortableDelay(error.seconds * 1000, signal);
+    }
+  }
+}
+
 /** Why a filled-in side of the insert is refused, with the limits the administrator can act on. */
 const insertSizeMessage = (key: InsertSizeKey) =>
   `${key === 'insertWidthCm' ? 'Общая ширина' : 'Высота'} вкладыша: от ${INSERT_SIZE_LIMITS[key][0]} до ${INSERT_SIZE_LIMITS[key][1]} см`;
 
-const protocolFontUrl = (people: EditorData['participants']) =>
-  '/certificate-assets/font?locale=' +
-  (people.some((person) => /[㐀-鿿]/u.test(person.fullName)) ? 'zh&v=Sans2.005' : 'ru&v=1');
+/** What `buildPreviewJob` says for a booklet with nobody chosen; it also stands for a program not chosen. */
+const CHOOSE_DOCUMENT = 'Выберите компанию, программу и сотрудника';
+/** «Номер протокола · по дате»: the number is the day and month of the date until somebody types their own. */
+const NUMBER_FOLLOWS_DATE = ' · по дате';
+/** «08.09.2026», on the calendar the documents themselves are dated by. */
+const issueDay = new Intl.DateTimeFormat('ru-RU', {
+  timeZone: 'Asia/Oral',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
 
 /** The name of a field lives inside the field, above what is typed into it. */
 function Field({
   label,
+  state,
   className,
   children,
 }: {
   label: string;
+  /** What the name gains and loses with the field's mode. Its room is kept, so the field never moves. */
+  state?: { text: string; on: boolean };
   className?: string;
   children: React.ReactNode;
 }) {
   return (
     <label className={cn('grid min-w-0 gap-1.5', className)}>
-      <span className="text-sm break-words text-[var(--color-text-muted)]">{label}</span>
+      <span className="text-sm break-words text-[var(--color-text-muted)]">
+        {label}
+        {state ? <span className={cn(!state.on && 'invisible')}>{state.text}</span> : null}
+      </span>
       {children}
     </label>
   );
@@ -213,6 +272,7 @@ function Section({
   hint,
   alert,
   open,
+  keepMounted,
   onToggle,
   children,
 }: {
@@ -221,6 +281,8 @@ function Section({
   hint?: string;
   alert?: boolean;
   open: boolean;
+  /** For content that holds a draft of its own: folding the line away must not discard it. */
+  keepMounted?: boolean;
   onToggle(): void;
   children: React.ReactNode;
 }) {
@@ -257,7 +319,7 @@ function Section({
         />
       </button>
       <div id={panel} hidden={!open} className="space-y-3 pt-1 pb-4">
-        {open ? children : null}
+        {open || keepMounted ? children : null}
       </div>
     </section>
   );
@@ -267,11 +329,14 @@ export function CertificateSettingsForm({
   initialSettings,
   initialData,
   profiles: initialProfiles = [],
+  assets: initialAssets = [],
   initialSelection = {},
 }: {
   initialSettings: CertificateSettingsView;
   initialData: EditorData;
   profiles?: readonly DocumentProfile[];
+  /** Whose the registered images named by the profiles are, and since when. */
+  assets?: readonly DocumentAssetInfo[];
   initialSelection?: { organization?: string; course?: string; user?: string; tab?: string };
 }) {
   const initialCourse =
@@ -280,6 +345,7 @@ export function CertificateSettingsForm({
     )?.slug ?? '';
   const [saved, setSaved] = useState(initialSettings);
   const [profiles, setProfiles] = useState(initialProfiles);
+  const [assets, setAssets] = useState(initialAssets);
   const [fields, setFields] = useState(() => fieldsOf(initialSettings));
   const [data, setData] = useState(initialData);
   const [organization, setOrganization] = useState(initialSelection.organization ?? '');
@@ -301,9 +367,24 @@ export function CertificateSettingsForm({
   );
   const [savedBatch, setSavedBatch] = useState<DocumentBatch | null>(initialData.batch);
   const [metadata, setMetadata] = useState<CertificateRenderMetadata | null>(null);
-  const [bytes, setBytes] = useState<Uint8Array | null>(null);
+  const [metadataProblem, setMetadataProblem] = useState('');
+  // The PDF on the screen and the job it answers: a download is offered only while they match.
+  const [shown, setShown] = useState<{
+    key: string;
+    job: PreviewJob;
+    bytes: Uint8Array;
+    photoFailed: boolean;
+  } | null>(null);
+  const [renderProblem, setRenderProblem] = useState<{ key: string; text: string } | null>(null);
+  // `/api/*` is no-store: the open editor is the only cache of what it has already fetched or drawn.
+  const [caches] = useState(() => ({
+    bytes: createBytesCache(),
+    photos: createSessionCache<Uint8Array>(24),
+    metadata: createSessionCache<CertificateRenderMetadata>(64),
+  }));
+  const lastJob = useRef<PreviewJob | null>(null);
+  const lastPhotoUrl = useRef<string | null>(null);
   const [message, setMessage] = useState('');
-  const [previewMessage, setPreviewMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -311,7 +392,7 @@ export function CertificateSettingsForm({
   const [metadataLoading, setMetadataLoading] = useState(false);
   const [previewRetry, setPreviewRetry] = useState(0);
   const exportAbort = useRef<AbortController | null>(null);
-  const swipeStart = useRef<number | null>(null);
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
   const sizeInputs = useRef<Partial<Record<InsertSizeKey, HTMLInputElement | null>>>({});
   const refusedSize = useRef<InsertSizeKey | null>(null);
   useEffect(() => () => exportAbort.current?.abort(), []);
@@ -347,6 +428,15 @@ export function CertificateSettingsForm({
   const sizeProblem = insertSizeProblem(fields.documentDefaults);
   const canRevertBatch = batchDirty && Boolean(savedBatch);
   const branding = brandingOf(saved, fields, batch, profiles);
+  // A program with a profile is drawn from it: its commission, its texts, its term and
+  // its registered images replace the settings' own, so those are not offered beside it.
+  const governed = Boolean(branding.documentProfile);
+  // The stamp and the signatures of the settings serve a program that has no profile,
+  // and a stand that has no profiles at all; everything else is the registry's.
+  const legacyMode = course ? !governed : profiles.length === 0;
+  // The profile sets the term of its program. A term of the settings left out of range
+  // stays in sight even then: it is what keeps «Сохранить» switched off.
+  const legacyTerm = !governed || !valid;
   const openSections = (change: (open: Set<SectionId>) => void) =>
     setSections((current) => {
       const next = new Set(current);
@@ -373,11 +463,6 @@ export function CertificateSettingsForm({
         n === index ? { ...member, ...patch } : member,
       ),
     });
-  const switchTab = (next: DocumentTab) => {
-    if (next === tab) return;
-    setBytes(null);
-    setTab(next);
-  };
 
   const loadedSelection = useRef(JSON.stringify([organization, course]));
   useEffect(() => {
@@ -385,7 +470,6 @@ export function CertificateSettingsForm({
     if (loadedSelection.current === selection) return;
     const controller = new AbortController();
     setLoading(true);
-    setBytes(null);
     setMetadata(null);
     setMessage('');
     const params = new URLSearchParams({ organization, course });
@@ -400,6 +484,10 @@ export function CertificateSettingsForm({
       .then((next) => {
         if (controller.signal.aborted) return;
         loadedSelection.current = selection;
+        // People were read again: a photo or a certificate may have changed meanwhile.
+        caches.photos.clear();
+        caches.metadata.clear();
+        caches.bytes.clear();
         setData(next);
         setBatch(next.batch ?? newDocumentBatch(organization, course));
         setSavedBatch(next.batch);
@@ -418,125 +506,151 @@ export function CertificateSettingsForm({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [organization, course]);
+  }, [organization, course, caches]);
 
   useEffect(() => {
     const controller = new AbortController();
     setMetadata(null);
+    setMetadataProblem('');
     setMetadataLoading(Boolean(selectedCertificate));
     if (selectedCertificate) {
-      void metadataFor(selectedCertificate, controller.signal)
+      // The download is shared and not tied to this employee's signal: coming back
+      // to somebody already looked at costs nothing of the 20 reads a minute.
+      void caches.metadata
+        .get(selectedCertificate, () => metadataFor(selectedCertificate), controller.signal)
         .then((value) => {
           if (!controller.signal.aborted) setMetadata(value);
         })
-        .catch(() => {
-          if (!controller.signal.aborted) setPreviewMessage('Удостоверение недоступно');
+        .catch((error) => {
+          if (controller.signal.aborted) return;
+          setMetadataProblem(
+            error instanceof RetryLater ? retryLaterMessage(error) : 'Удостоверение недоступно',
+          );
         })
         .finally(() => {
           if (!controller.signal.aborted) setMetadataLoading(false);
         });
     }
     return () => controller.abort();
-  }, [selectedCertificate, previewRetry]);
+  }, [selectedCertificate, previewRetry, caches]);
 
-  const renderKey = JSON.stringify({
-    branding,
-    people: data.participants,
-    metadata,
-    program,
-    organization,
-    tab,
-    loading,
-    user,
-    batch,
-    previewRetry,
-  });
+  // The job is the generator's arguments and nothing else: an issued certificate is
+  // its frozen metadata, so typing in the fields does not even ask for its PDF again.
+  // Where programs have profiles, no program means no document: the sample that
+  // would be drawn is made of the settings' own commission, which no profile uses.
+  const job: PreviewJob =
+    !course && profiles.length
+      ? { kind: 'message', text: CHOOSE_DOCUMENT }
+      : buildPreviewJob({
+          tab,
+          loading,
+          person: selectedPerson,
+          metadata,
+          metadataMessage: metadataProblem,
+          sizeMessage: sizeProblem ? insertSizeMessage(sizeProblem) : null,
+          branding,
+          program,
+          organization,
+          sampleOrganization: fields.documentDefaults.companyName,
+          batch,
+          participants: data.participants,
+        });
+  const key = jobKey(job);
+  const fresh = shown?.key === key;
+  const bytes = job.kind === 'message' ? null : (shown?.bytes ?? null);
+  // The same document being retyped keeps its pages, dimmed; another document
+  // only keeps the height of the box until its own pages are ready.
+  const pending =
+    fresh || job.kind === 'message'
+      ? null
+      : isDiscreteChange(shown?.job, job)
+        ? 'replace'
+        : 'refresh';
+  const previewMessage =
+    job.kind === 'message' ? job.text : renderProblem?.key === key ? renderProblem.text : '';
   useEffect(() => {
+    const previous = lastJob.current;
+    lastJob.current = job;
+    setRenderProblem(null);
+    if (job.kind === 'message' || job.kind === 'wait') {
+      // A message takes the pages away for good: they are not drawn again behind the next document.
+      if (job.kind === 'message') setShown(null);
+      setRendering(false);
+      return;
+    }
+    const cached = caches.bytes.get(key);
+    if (cached) {
+      // Back to a document already drawn: no spinner, no generator, no pause.
+      setShown({ key, job, bytes: cached, photoFailed: false });
+      setRendering(false);
+      return;
+    }
     const controller = new AbortController();
     setRendering(true);
-    setPreviewMessage('');
-    const timer = setTimeout(() => {
-      void (async () => {
-        if (loading) return null;
-        if (tab === 'certificate') {
-          if (!selectedPerson) {
-            setPreviewMessage('Выберите компанию, программу и сотрудника');
-            return null;
+    const timer = setTimeout(
+      () => {
+        void (async () => {
+          let photoFailed = false;
+          let result: Uint8Array;
+          if (job.kind === 'certificate') {
+            const { generateCertificatePreview, loadCertificatePhotoBytes } =
+              await import('@/lib/pdf/certificate-renderer');
+            result = await generateCertificatePreview(job.input, controller.signal, {
+              loadPhoto: (url, signal) => {
+                lastPhotoUrl.current = url;
+                return caches.photos.get(url, () => loadCertificatePhotoBytes(url), signal);
+              },
+              onPhotoError: () => {
+                photoFailed = true;
+              },
+            });
+          } else {
+            const { generateProtocolInBrowser } = await import('@/lib/pdf/protocol-renderer');
+            result = await generateProtocolInBrowser(
+              job.input,
+              job.branding,
+              job.fontUrl,
+              controller.signal,
+            );
           }
-          if (sizeProblem) {
-            setPreviewMessage(insertSizeMessage(sizeProblem));
-            return null;
-          }
-          if (
-            selectedCertificate &&
-            (!metadata || metadata.certificateId !== selectedCertificate)
-          ) {
-            return null;
-          }
-          const { generateCertificatePreview } = await import('@/lib/pdf/certificate-renderer');
-          const draft = {
-            schemaVersion: 1 as const,
-            filename: 'Предпросмотр.pdf',
-            locale: 'ru' as const,
-            templateVersion: 1,
-            templateUrl: '/certificate-assets/template',
-            fontUrl: '/certificate-assets/font?locale=ru&v=1',
-            fullName: selectedPerson.fullName,
-            position: selectedPerson.position,
-            organization,
-            titleSnapshot: program,
-            photoUrl: selectedPerson.photoUrl,
-            score: selectedPerson.score ?? 0,
-            total: selectedPerson.total ?? 0,
-            passScore: 0,
-            certificateNumber: 'ПРЕДПРОСМОТР',
-            completedAt: batch.date,
-            issuedAt: batch.date + 'T12:00:00+05:00',
-            branding,
-          };
-          return generateCertificatePreview(metadata ?? draft, controller.signal);
-        }
-        const { generateProtocolInBrowser } = await import('@/lib/pdf/protocol-renderer');
-        return generateProtocolInBrowser(
-          {
-            organization: organization || fields.documentDefaults.companyName,
-            courseTitle: program,
-            date: batch.date,
-            items: [],
-            participants: data.participants,
-          },
-          branding,
-          protocolFontUrl(data.participants),
-          controller.signal,
-        );
-      })()
-        .then((result) => {
-          if (!controller.signal.aborted && result) setBytes(result);
-        })
-        .catch((error) => {
           if (controller.signal.aborted) return;
-          setPreviewMessage(
-            error instanceof Error && error.message === 'DOCUMENT_TEXT_OVERFLOW'
-              ? 'Текст не помещается: сократите тексты или состав комиссии'
-              : 'PDF не сформирован',
-          );
-        })
-        .finally(() => {
-          if (!controller.signal.aborted) setRendering(false);
-        });
-    }, 300);
+          // A preview without its photo is shown but not kept: the next look asks for the photo again.
+          if (!photoFailed) caches.bytes.set(key, result);
+          setShown({ key, job, bytes: result, photoFailed });
+        })()
+          .catch((error) => {
+            if (controller.signal.aborted) return;
+            setRenderProblem({
+              key,
+              text:
+                error instanceof Error && error.message === 'DOCUMENT_TEXT_OVERFLOW'
+                  ? 'Текст не помещается: сократите тексты или состав комиссии'
+                  : 'PDF не сформирован',
+            });
+          })
+          .finally(() => {
+            if (!controller.signal.aborted) setRendering(false);
+          });
+      },
+      // Typing waits for a pause. A choice waits only long enough to see whether
+      // another follows: generation cannot be interrupted once it has started, so
+      // drawing each of six quick employee picks at once queued six of them on the
+      // main thread (measured: 3.5 s of work against 0.7 s, and the picker itself
+      // stuttered). A document already drawn never reaches this timer.
+      isDiscreteChange(previous, job) ? DISCRETE_RENDER_DELAY_MS : 300,
+    );
     return () => {
       clearTimeout(timer);
       controller.abort();
     };
-    // The serialized key tracks the complete render input, including unsaved fields.
+    // The key is the complete render input; `job` and `caches` are read through it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [renderKey]);
+  }, [key, previewRetry]);
 
   /** Says which side of the insert is wrong and opens its field, wherever the administrator is. */
   function refuseSize(key: InsertSizeKey) {
     setMessage(insertSizeMessage(key));
-    switchTab('certificate');
+    setTab('certificate');
     setMobile('fields');
     openSections((open) => {
       open.add('size');
@@ -739,9 +853,7 @@ export function CertificateSettingsForm({
       if (single && tab === 'certificate') {
         if (!selectedCertificate) throw new Error();
         const item = await metadataFor(selectedCertificate, controller.signal);
-        const result = await generateCertificateInBrowser(item, controller.signal);
-        setBytes(result);
-        download(result, item.filename);
+        download(await generateCertificateInBrowser(item, controller.signal), item.filename);
         return;
       }
       const pendingPeople = current.participants.filter((person) => !person.certificateId);
@@ -762,7 +874,6 @@ export function CertificateSettingsForm({
           : null;
       if (single && protocol) {
         setData(current);
-        setBytes(protocol);
         download(protocol, 'Протокол.pdf');
         return;
       }
@@ -776,7 +887,9 @@ export function CertificateSettingsForm({
       for (const person of current.participants) {
         if (!person.certificateId) continue;
         if (controller.signal.aborted) throw new Error();
-        const item = await metadataFor(person.certificateId, controller.signal);
+        const item = await metadataForKit(person.certificateId, controller.signal, (seconds) =>
+          setMessage(`Корочек: ${count}, пауза ${seconds} с`),
+        );
         issuedItems.push(item);
         archive['Корочки/' + item.filename] = await generateCertificateInBrowser(
           item,
@@ -800,8 +913,14 @@ export function CertificateSettingsForm({
         'application/zip',
       );
       setMessage(`Протокол на ${current.participants.length}, корочек ${count}`);
-    } catch {
-      setMessage(controller.signal.aborted ? 'Отменено' : 'Не скачано, повторите');
+    } catch (error) {
+      setMessage(
+        controller.signal.aborted
+          ? 'Отменено'
+          : error instanceof RetryLater
+            ? retryLaterMessage(error)
+            : 'Не скачано, повторите',
+      );
     } finally {
       setBusy(false);
       setExporting(false);
@@ -847,8 +966,8 @@ export function CertificateSettingsForm({
   }
 
   const working = loading || rendering || metadataLoading;
-  const ready =
-    Boolean(bytes) && !previewMessage && !busy && !working && valid && organization && course;
+  // `fresh`: the pages on the screen are the document that would be downloaded, not the one before it.
+  const ready = fresh && !previewMessage && !busy && !working && valid && organization && course;
   const commission = fields.documentDefaults.commission;
   const imageSlots: DocumentImageSlot[] = [
     { kind: 'stamp', label: 'Печать', present: saved.hasStamp },
@@ -857,7 +976,37 @@ export function CertificateSettingsForm({
       : { kind: 'protocol', label: 'Подпись', present: saved.hasProtocolSignature },
   ];
   const missingImages = imageSlots.filter((slot) => !slot.present).map((slot) => slot.label);
+  // One entry per signer and per stamp across every program, named by the open program's wording.
+  const registry = legacyMode
+    ? []
+    : buildDocumentAssetRegistry(profiles, assets, branding.documentProfile?.id);
+  const withoutPicture = registry.filter((entry) => !entry.assetId);
+  const imagesHint = legacyMode
+    ? missingImages.length
+      ? 'Нет: ' + missingImages.join(', ').toLowerCase()
+      : 'Загружены'
+    : withoutPicture.length
+      ? // A title opens with a person's name, so it keeps its capitals.
+        'Нет: ' + withoutPicture.map((entry) => entry.title).join(', ')
+      : registry.some((entry) => entry.behind.length)
+        ? 'Не во всех программах'
+        : 'Загружены';
   const size = fields.documentDefaults;
+  const withoutEducation = data.participants.filter((person) => !person.education.trim());
+  // What the pages are: a document already issued, which keeps the requisites it was
+  // issued with whatever is typed here, or the next one, which the open fields describe.
+  const issuance = !selectedPerson ? null : !selectedCertificate ? (
+    <Badge>Новая выдача</Badge>
+  ) : metadata?.certificateId === selectedCertificate ? (
+    <Badge variant="primary" className="min-w-0 [overflow-wrap:anywhere]">
+      Выдано {issueDay.format(new Date(metadata.issuedAt))} · № {metadata.certificateNumber}
+    </Badge>
+  ) : metadataProblem ? null : (
+    <span
+      aria-hidden="true"
+      className="h-7 w-56 max-w-full animate-pulse rounded-full bg-[var(--color-surface-muted)] motion-reduce:animate-none"
+    />
+  );
 
   // One set of actions, shown where the hand is: under the thumb on a phone, in the top row on a desktop.
   const actions = (
@@ -933,10 +1082,10 @@ export function CertificateSettingsForm({
         className="-mx-1 flex min-w-0 flex-col gap-2 bg-[var(--color-bg)]/92 px-1 py-2 sm:flex-row sm:flex-wrap sm:items-center"
       >
         <SegmentedControl
-          label="Вид документа"
-          className="xs:grid-flow-col xs:grid-cols-none max-w-full min-w-0 grid-flow-row grid-cols-1 sm:w-80 sm:flex-none"
+          label="Документ"
+          className="max-w-full min-w-0 grid-flow-row grid-cols-1 min-[360px]:grid-flow-col min-[360px]:grid-cols-none sm:w-80 sm:flex-none"
           value={tab}
-          onChange={switchTab}
+          onChange={setTab}
           options={[
             {
               value: 'certificate',
@@ -952,13 +1101,14 @@ export function CertificateSettingsForm({
         />
         <SegmentedControl
           label="Режим"
-          className="xs:grid-flow-col xs:grid-cols-none grid-flow-row grid-cols-1 lg:hidden"
+          className="grid-flow-row grid-cols-1 min-[360px]:grid-flow-col min-[360px]:grid-cols-none lg:hidden"
           value={mobile}
           onChange={setMobile}
           options={[
             {
+              // Not «Изменить»: that is the name of the pencil beside the company.
               value: 'fields',
-              label: 'Изменить',
+              label: 'Поля',
               icon: <PencilSimple aria-hidden="true" />,
             },
             {
@@ -1036,7 +1186,6 @@ export function CertificateSettingsForm({
               }))}
               disabled={busy || loading}
               onChange={(value) => {
-                setBytes(null);
                 setMetadata(null);
                 setUser(value);
               }}
@@ -1051,32 +1200,28 @@ export function CertificateSettingsForm({
               aria-label="Образование для новой выдачи"
               className="min-w-0 rounded-xl border border-[var(--color-border)] p-3 text-base break-words"
             >
-              <p>Образование нужно для новой выдачи этой формы.</p>
-              {data.participants.filter((person) => !person.education.trim()).length ? (
-                <details className="mt-2">
+              {withoutEducation.length ? (
+                <details>
                   <summary className="min-h-11 cursor-pointer py-2 font-medium">
-                    Не заполнено:{' '}
-                    {data.participants.filter((person) => !person.education.trim()).length}
+                    Образование не заполнено: {withoutEducation.length}
                   </summary>
                   <ul className="space-y-2">
-                    {data.participants
-                      .filter((person) => !person.education.trim())
-                      .map((person) => (
-                        <li key={person.userId}>
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex min-h-11 items-center underline"
-                            href={'/admin/employees?q=' + encodeURIComponent(person.fullName)}
-                          >
-                            {person.fullName || 'Сотрудник без ФИО'} — заполнить данные
-                          </a>
-                        </li>
-                      ))}
+                    {withoutEducation.map((person) => (
+                      <li key={person.userId}>
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex min-h-11 items-center underline"
+                          href={'/admin/employees?q=' + encodeURIComponent(person.fullName)}
+                        >
+                          {person.fullName || 'Сотрудник без ФИО'}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </details>
               ) : (
-                <p className="mt-1 text-sm">У участников заполнено.</p>
+                <p className="flex min-h-11 items-center font-medium">Образование заполнено</p>
               )}
             </section>
           ) : null}
@@ -1093,10 +1238,7 @@ export function CertificateSettingsForm({
                 .filter((p) => p.courseSlug === course)
                 .map((p) => ({ value: p.id, label: p.label + (p.hours ? ` · ${p.hours} ч` : '') }))}
               disabled={busy || loading}
-              onChange={(profileId) => {
-                setBatch((current) => ({ ...current, profileId }));
-                setBytes(null);
-              }}
+              onChange={(profileId) => setBatch((current) => ({ ...current, profileId }))}
             />
           ) : null}
 
@@ -1119,15 +1261,15 @@ export function CertificateSettingsForm({
                     p.userId === selectedPerson.userId ? { ...p, ...fields } : p,
                   ),
                 }));
-                setBytes(null);
               }}
             />
           ) : null}
-          <div className="xs:grid-cols-2 grid min-w-0 gap-3">
-            <Field label="Дата">
+          {/* Bottom-aligned: a name that wraps in one column does not push its field below the other. */}
+          <div className="xs:grid-cols-2 grid min-w-0 items-end gap-3">
+            <Field label="Дата протокола">
               <Input
                 type="date"
-                aria-label="Дата"
+                aria-label="Дата протокола"
                 className={FIELD_INPUT}
                 value={batch.date}
                 onChange={(e) => {
@@ -1137,9 +1279,12 @@ export function CertificateSettingsForm({
               />
             </Field>
             <div className="relative min-w-0">
-              <Field label="Номер">
+              <Field
+                label="Номер протокола"
+                state={{ text: NUMBER_FOLLOWS_DATE, on: batch.automatic }}
+              >
                 <Input
-                  aria-label="Номер"
+                  aria-label={'Номер протокола' + (batch.automatic ? NUMBER_FOLLOWS_DATE : '')}
                   maxLength={64}
                   className={cn(FIELD_INPUT, canRevertBatch ? 'pr-24' : 'pr-12')}
                   value={batch.number}
@@ -1158,7 +1303,7 @@ export function CertificateSettingsForm({
                   <Button
                     size="icon"
                     variant="ghost"
-                    aria-label="Вернуть сохранённые дату и номер"
+                    aria-label="Вернуть сохранённые дату и номер протокола"
                     title="Вернуть сохранённые"
                     onClick={() => savedBatch && setBatch(savedBatch)}
                   >
@@ -1169,7 +1314,8 @@ export function CertificateSettingsForm({
                   size="icon"
                   variant="ghost"
                   aria-label="Номер по дате"
-                  title="Номер по дате"
+                  // The number the press would write, before it is pressed.
+                  title={'Номер по дате: ' + numberFromDate(batch.date)}
                   aria-pressed={batch.automatic}
                   className={cn(batch.automatic && 'text-[var(--color-primary)]')}
                   onClick={() =>
@@ -1186,150 +1332,191 @@ export function CertificateSettingsForm({
             </div>
           </div>
 
-          {branding.documentProfile ? (
-            <DocumentProfileFields
-              key={branding.documentProfile.id + ':' + branding.documentProfile.revision}
-              profile={branding.documentProfile}
-              onSaved={(profile) => {
-                setProfiles((current) => current.map((p) => (p.id === profile.id ? profile : p)));
-                setBytes(null);
-              }}
-            />
-          ) : null}
           <div className="divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
+            {branding.documentProfile ? (
+              <Section
+                icon={<UsersThree aria-hidden="true" />}
+                title="Реквизиты программы и комиссия"
+                hint={branding.documentProfile.commission.map((person) => person.name).join(', ')}
+                open={sections.has('profile')}
+                keepMounted
+                onToggle={() => toggle('profile')}
+              >
+                {/* Keyed by the program alone: a replaced signature moves the revision on, and
+                    what is being typed into these fields has to outlive that. */}
+                <DocumentProfileFields
+                  key={branding.documentProfile.id}
+                  profile={branding.documentProfile}
+                  onSaved={(profile) =>
+                    setProfiles((current) =>
+                      current.map((p) => (p.id === profile.id ? profile : p)),
+                    )
+                  }
+                />
+              </Section>
+            ) : null}
+
             <Section
               icon={<Stamp aria-hidden="true" />}
-              title="Печать и подпись"
-              hint={
-                missingImages.length
-                  ? 'Нет: ' + missingImages.join(', ').toLowerCase()
-                  : 'Загружены'
-              }
+              title="Подписи и печать"
+              hint={imagesHint}
               open={sections.has('images')}
               onToggle={() => toggle('images')}
             >
-              <DocumentImageTiles<CertificateSettingsView>
-                slots={imageSlots}
-                version={saved.version}
-                disabled={busy}
-                onSaved={setSaved}
-              />
+              {legacyMode ? (
+                <DocumentImageTiles<CertificateSettingsView>
+                  slots={imageSlots}
+                  version={saved.version}
+                  disabled={busy}
+                  onSaved={setSaved}
+                />
+              ) : (
+                <DocumentAssetRegistry
+                  entries={registry}
+                  disabled={busy}
+                  onReplaced={({ asset, profiles: next }) => {
+                    setProfiles(next);
+                    setAssets((current) =>
+                      current.some((known) => known.id === asset.id)
+                        ? current
+                        : [...current, asset],
+                    );
+                    // The kept PDFs carry the image that was replaced: the next look draws anew.
+                    caches.bytes.clear();
+                  }}
+                />
+              )}
             </Section>
 
             <Section
-              icon={<UsersThree aria-hidden="true" />}
-              title="Организация и комиссия"
-              hint={[fields.chairmanName, ...commission.map((member) => member.name)]
-                .filter(Boolean)
-                .join(', ')}
+              icon={governed ? <Buildings aria-hidden="true" /> : <UsersThree aria-hidden="true" />}
+              title={governed ? 'Организация' : 'Организация и комиссия'}
+              hint={
+                governed
+                  ? fields.organizationName
+                  : [fields.chairmanName, ...commission.map((member) => member.name)]
+                      .filter(Boolean)
+                      .join(', ')
+              }
               open={sections.has('commission')}
               onToggle={() => toggle('commission')}
             >
               {textField('organizationName', 'Учебная организация')}
               {textField('bin', 'БИН')}
-              <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                {textField('chairmanName', 'Председатель')}
-                {textField('chairmanPosition', 'Должность председателя')}
-              </div>
+              {governed ? null : (
+                <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                  {textField('chairmanName', 'Председатель')}
+                  {textField('chairmanPosition', 'Должность председателя')}
+                </div>
+              )}
               {tab === 'protocol' ? defaultsField('reviewerName', 'Проверяющий') : null}
-              {commission.map((member, i) => (
-                <div key={i} className="flex min-w-0 items-start gap-1">
-                  <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                    <Field label={`Член комиссии ${i + 1}`}>
-                      <Input
-                        aria-label={`Член комиссии ${i + 1}`}
-                        className={FIELD_INPUT}
-                        value={member.name}
-                        maxLength={200}
-                        onChange={(e) => setMember(i, { name: e.target.value })}
-                      />
-                    </Field>
-                    <Field label="Должность">
-                      <Input
-                        aria-label={`Должность члена комиссии ${i + 1}`}
-                        className={FIELD_INPUT}
-                        value={member.position}
-                        maxLength={200}
-                        onChange={(e) => setMember(i, { position: e.target.value })}
-                      />
-                    </Field>
-                  </div>
+              {governed ? null : (
+                <>
+                  {commission.map((member, i) => (
+                    <div key={i} className="flex min-w-0 items-start gap-1">
+                      <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                        <Field label={`Член комиссии ${i + 1}`}>
+                          <Input
+                            aria-label={`Член комиссии ${i + 1}`}
+                            className={FIELD_INPUT}
+                            value={member.name}
+                            maxLength={200}
+                            onChange={(e) => setMember(i, { name: e.target.value })}
+                          />
+                        </Field>
+                        <Field label="Должность">
+                          <Input
+                            aria-label={`Должность члена комиссии ${i + 1}`}
+                            className={FIELD_INPUT}
+                            value={member.position}
+                            maxLength={200}
+                            onChange={(e) => setMember(i, { position: e.target.value })}
+                          />
+                        </Field>
+                      </div>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="mt-1.5 hover:text-[var(--color-danger)]"
+                        aria-label={`Удалить члена комиссии ${i + 1}`}
+                        title="Удалить"
+                        onClick={() =>
+                          setDefaults({ commission: commission.filter((_, n) => n !== i) })
+                        }
+                      >
+                        <Trash aria-hidden="true" />
+                      </Button>
+                    </div>
+                  ))}
                   <Button
-                    size="icon"
+                    size="sm"
                     variant="ghost"
-                    className="mt-1.5 hover:text-[var(--color-danger)]"
-                    aria-label={`Удалить члена комиссии ${i + 1}`}
-                    title="Удалить"
+                    disabled={commission.length >= 20}
+                    aria-label="Добавить участника комиссии"
                     onClick={() =>
-                      setDefaults({ commission: commission.filter((_, n) => n !== i) })
+                      setDefaults({ commission: [...commission, { name: '', position: '' }] })
                     }
                   >
-                    <Trash aria-hidden="true" />
+                    <Plus aria-hidden="true" />
+                    Добавить
                   </Button>
-                </div>
-              ))}
-              <Button
-                size="sm"
-                variant="ghost"
-                disabled={commission.length >= 20}
-                aria-label="Добавить участника комиссии"
-                onClick={() =>
-                  setDefaults({ commission: [...commission, { name: '', position: '' }] })
-                }
-              >
-                <Plus aria-hidden="true" />
-                Добавить
-              </Button>
+                </>
+              )}
             </Section>
 
-            <Section
-              icon={<TextAa aria-hidden="true" />}
-              title={tab === 'certificate' ? 'Тексты удостоверения' : 'Текст протокола'}
-              hint={
-                tab === 'certificate'
-                  ? fields.validityMonths
-                    ? `Срок действия ${fields.validityMonths} мес.`
-                    : 'Без срока действия'
-                  : undefined
-              }
-              alert={!valid}
-              open={sections.has('texts')}
-              onToggle={() => toggle('texts')}
-            >
-              {tab === 'certificate' ? (
-                <>
-                  {textField('examTextKk', 'Левая сторона, казахский', true)}
-                  {textField('examTextRu', 'Левая сторона, русский', true)}
-                  {textField('knowledgeTextKk', 'Правая сторона, казахский', true)}
-                  {textField('knowledgeTextRu', 'Правая сторона, русский', true)}
-                  <Field label="Срок действия, месяцев (0 — без срока)">
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      min={0}
-                      max={120}
-                      invalid={!valid}
-                      aria-label="Срок действия, месяцев"
-                      className={FIELD_INPUT}
-                      value={fields.validityMonths}
-                      onChange={(e) =>
-                        setFields((current) => ({
-                          ...current,
-                          validityMonths: Number(e.target.value),
-                        }))
-                      }
-                    />
-                  </Field>
-                </>
-              ) : (
-                defaultsField('protocolText', 'Текст протокола', 3)
-              )}
-              <p className="text-sm break-words text-[var(--color-text-muted)]">
-                {'{program} — программа, {protocol} — номер протокола'}
-              </p>
-              {defaultsField('companyName', 'Компания образца', 2)}
-              {defaultsField('programName', 'Программа образца')}
-            </Section>
+            {/* The profile owns the protocol's text: with it, this tab has no text left to edit here. */}
+            {tab === 'protocol' && governed ? null : (
+              <Section
+                icon={<TextAa aria-hidden="true" />}
+                title={tab === 'certificate' ? 'Тексты удостоверения' : 'Текст протокола'}
+                hint={
+                  tab === 'certificate' && legacyTerm
+                    ? fields.validityMonths
+                      ? `Срок действия ${fields.validityMonths} мес.`
+                      : 'Без срока действия'
+                    : undefined
+                }
+                alert={!valid}
+                open={sections.has('texts')}
+                onToggle={() => toggle('texts')}
+              >
+                {tab === 'certificate' ? (
+                  <>
+                    {textField('examTextKk', 'Левая сторона, казахский', true)}
+                    {textField('examTextRu', 'Левая сторона, русский', true)}
+                    {textField('knowledgeTextKk', 'Правая сторона, казахский', true)}
+                    {textField('knowledgeTextRu', 'Правая сторона, русский', true)}
+                    {legacyTerm ? (
+                      <Field label="Срок действия, месяцев (0 — без срока)">
+                        <Input
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          max={120}
+                          invalid={!valid}
+                          aria-label="Срок действия, месяцев"
+                          className={FIELD_INPUT}
+                          value={fields.validityMonths}
+                          onChange={(e) =>
+                            setFields((current) => ({
+                              ...current,
+                              validityMonths: Number(e.target.value),
+                            }))
+                          }
+                        />
+                      </Field>
+                    ) : null}
+                  </>
+                ) : (
+                  defaultsField('protocolText', 'Текст протокола', 3)
+                )}
+                <p className="text-sm break-words text-[var(--color-text-muted)]">
+                  {'{program} — программа, {protocol} — номер протокола'}
+                </p>
+                {defaultsField('companyName', 'Компания образца', 2)}
+                {defaultsField('programName', 'Программа образца')}
+              </Section>
+            )}
 
             {tab === 'certificate' ? (
               <Section
@@ -1346,9 +1533,11 @@ export function CertificateSettingsForm({
                 open={sections.has('size')}
                 onToggle={() => toggle('size')}
               >
-                <div className="xs:grid-cols-2 grid min-w-0 gap-3">
+                <div className="xs:grid-cols-2 grid min-w-0 items-end gap-3">
                   {(['insertWidthCm', 'insertHeightCm'] as const).map((key) => {
-                    const label = key === 'insertWidthCm' ? 'Общая ширина, см' : 'Высота, см';
+                    // The whole open spread, both halves together: the name says which width is meant.
+                    const label =
+                      key === 'insertWidthCm' ? 'Общая ширина разворота, см' : 'Высота, см';
                     return (
                       <Field key={key} label={label}>
                         <Input
@@ -1374,9 +1563,6 @@ export function CertificateSettingsForm({
                     );
                   })}
                 </div>
-                <p className="text-sm break-words text-[var(--color-text-muted)]">
-                  Вкладыш в развёрнутом виде, обе половины вместе
-                </p>
               </Section>
             ) : null}
           </div>
@@ -1390,35 +1576,42 @@ export function CertificateSettingsForm({
             mobile === 'fields' && 'hidden lg:block',
           )}
         >
-          {tab === 'certificate' && selectedCertificate ? (
-            <p className="text-sm break-words text-[var(--color-text-muted)]">
-              Выданный документ сохраняет прежние реквизиты. Изменения применяются при новой выдаче.
-            </p>
+          {tab === 'certificate' ? (
+            // As tall as the chip at its longest, on two lines of a phone, whoever is
+            // chosen: the pages under it stay where they are when the chip arrives.
+            <div role="status" className="flex min-h-12 min-w-0 items-center">
+              {issuance}
+            </div>
           ) : null}
           {tab === 'certificate' ? (
+            // Side by side at every width, like the halves themselves: a long name wraps inside its half.
             <SegmentedControl
-              label="Сторона удостоверения"
+              label="Половина разворота"
               className="lg:hidden"
               value={half}
               onChange={setHalf}
               options={[
-                { value: 'left', label: 'Левая' },
-                { value: 'right', label: 'Правая' },
+                { value: 'left', label: 'Левая половина' },
+                { value: 'right', label: 'Правая половина' },
               ]}
             />
           ) : null}
           <div
             className="relative min-h-24 rounded-[var(--radius-group)] bg-[var(--color-surface-soft)] p-2 sm:p-3 lg:max-h-[calc(100dvh-11rem)] lg:overflow-y-auto"
             onTouchStart={(event) => {
-              swipeStart.current = event.touches[0]?.clientX ?? null;
+              const touch = event.touches[0];
+              swipeStart.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
             }}
             onTouchEnd={(event) => {
               const from = swipeStart.current;
-              const to = event.changedTouches[0]?.clientX;
+              const to = event.changedTouches[0];
               swipeStart.current = null;
-              if (tab !== 'certificate' || from === null || to === undefined) return;
-              if (to - from < -48) setHalf('right');
-              if (to - from > 48) setHalf('left');
+              if (tab !== 'certificate' || !from || !to) return;
+              const dx = to.clientX - from.x;
+              const dy = to.clientY - from.y;
+              // Scrolling the page with a thumb drifts sideways; a swipe is mostly horizontal.
+              if (Math.abs(dx) > 48 && Math.abs(dx) > 2 * Math.abs(dy))
+                setHalf(dx < 0 ? 'right' : 'left');
             }}
           >
             <div className="overflow-hidden">
@@ -1429,7 +1622,7 @@ export function CertificateSettingsForm({
                     : undefined
                 }
               >
-                <DocumentPdfPreview bytes={bytes} />
+                <DocumentPdfPreview bytes={bytes} pending={pending} />
               </div>
             </div>
             {working ? (
@@ -1451,7 +1644,13 @@ export function CertificateSettingsForm({
                   variant="ghost"
                   aria-label="Повторить предпросмотр"
                   title="Повторить"
-                  onClick={() => setPreviewRetry((value) => value + 1)}
+                  onClick={() => {
+                    // «Повторить» means «ask the server again», not «show me the same failure».
+                    caches.bytes.delete(key);
+                    if (lastPhotoUrl.current) caches.photos.delete(lastPhotoUrl.current);
+                    if (selectedCertificate) caches.metadata.delete(selectedCertificate);
+                    setPreviewRetry((value) => value + 1);
+                  }}
                 >
                   <ArrowsClockwise aria-hidden="true" />
                 </Button>
@@ -1460,8 +1659,8 @@ export function CertificateSettingsForm({
           </div>
           {tab === 'certificate' && selectedPerson ? (
             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 px-1 text-sm text-[var(--color-text-muted)]">
-              {selectedCertificate ? null : <p role="status">Удостоверение ещё не выдано</p>}
               {selectedPerson.photoUrl ? null : <p role="status">Нет фотографии в профиле</p>}
+              {fresh && shown?.photoFailed ? <p role="status">Фото не загрузилось</p> : null}
               <a
                 className="ml-auto inline-flex min-h-11 items-center gap-1.5 font-semibold text-[var(--color-text)] hover:underline"
                 href={'/admin/employees?q=' + encodeURIComponent(selectedPerson.fullName)}

@@ -1,30 +1,27 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Trash, UploadSimple } from '@phosphor-icons/react';
 import { confirmDialog } from '@/components/admin/confirm-dialog';
+import {
+  FacsimilePicture,
+  FacsimileSpinner,
+  facsimileFailure,
+  facsimilePaper,
+  useFacsimileSource,
+} from '@/components/admin/facsimile-tile';
 import { clientFetch } from '@/lib/client-request';
 import {
   certificateImageUrl,
   type CertificateImageKind,
 } from '@/lib/pdf/certificate-client-contract';
-import { FACSIMILE_INPUT_TYPES, prepareFacsimilePng } from '@/lib/pdf/facsimile-browser';
-import { cn } from '@/lib/utils';
+import { prepareFacsimilePng } from '@/lib/pdf/facsimile-browser';
 
 export type DocumentImageSlot = {
   kind: Exclude<CertificateImageKind, 'member'>;
   /** «Печать», «Подпись»: what the tile holds, and its name for a screen reader. */
   label: string;
   present: boolean;
-};
-
-const FAILURES: Record<string, string> = {
-  FACSIMILE_TYPE: 'Нужен файл PNG или JPG',
-  FACSIMILE_TOO_LARGE: 'Файл больше 20 МБ',
-  FACSIMILE_UNREADABLE: 'Файл не открывается как картинка',
-  FACSIMILE_EMPTY: 'На картинке не видно чернил',
-  CERTIFICATE_IMAGE_INVALID: 'Картинка не подошла, нужен PNG',
-  RATE_LIMITED: 'Слишком часто, повторите через минуту',
 };
 
 /**
@@ -46,8 +43,6 @@ export function DocumentImageTiles<Settings extends { version: number }>({
 }) {
   const [busy, setBusy] = useState<DocumentImageSlot['kind'] | null>(null);
   const [failure, setFailure] = useState('');
-  const [over, setOver] = useState<DocumentImageSlot['kind'] | null>(null);
-  const inputs = useRef(new Map<string, HTMLInputElement>());
 
   async function send(kind: DocumentImageSlot['kind'], file: File | null) {
     if (busy) return;
@@ -69,9 +64,7 @@ export function DocumentImageTiles<Settings extends { version: number }>({
       }
       onSaved(result.settings);
     } catch (error) {
-      setFailure(
-        FAILURES[error instanceof Error ? error.message : ''] ?? 'Не сохранилось, повторите',
-      );
+      setFailure(facsimileFailure(error, 'Не сохранилось, повторите'));
     } finally {
       setBusy(null);
     }
@@ -93,95 +86,78 @@ export function DocumentImageTiles<Settings extends { version: number }>({
     <div className="space-y-2">
       <div className="grid grid-cols-2 gap-3">
         {slots.map((slot) => (
-          <div key={slot.kind} className="relative min-w-0">
-            <input
-              ref={(element) => {
-                if (element) inputs.current.set(slot.kind, element);
-                else inputs.current.delete(slot.kind);
-              }}
-              type="file"
-              accept={FACSIMILE_INPUT_TYPES}
-              className="sr-only"
-              tabIndex={-1}
-              aria-hidden="true"
-              onChange={(event) => {
-                const file = event.target.files?.[0] ?? null;
-                event.target.value = '';
-                if (file) void send(slot.kind, file);
-              }}
-            />
-            <button
-              type="button"
-              disabled={disabled || busy !== null}
-              aria-label={`${slot.label}: ${slot.present ? 'заменить' : 'загрузить'}`}
-              onClick={() => inputs.current.get(slot.kind)?.click()}
-              onDragOver={(event) => {
-                event.preventDefault();
-                setOver(slot.kind);
-              }}
-              onDragLeave={() => setOver(null)}
-              onDrop={(event) => {
-                event.preventDefault();
-                setOver(null);
-                const file = event.dataTransfer.files?.[0];
-                if (file) void send(slot.kind, file);
-              }}
-              className={cn(
-                // Ink is judged on paper, so the tile is white in the dark theme too.
-                'relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[var(--radius-md)] border bg-white text-neutral-500 transition disabled:cursor-not-allowed',
-                slot.present
-                  ? 'border-[var(--color-border)]'
-                  : 'border-dashed border-[var(--color-border-strong)]',
-                over === slot.kind &&
-                  'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)]',
-              )}
-            >
-              {slot.present ? (
-                // A private, versioned image behind the session; next/image has nothing to optimise.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={certificateImageUrl(slot.kind, version)}
-                  alt=""
-                  className="size-full object-contain p-2"
-                  draggable={false}
-                />
-              ) : (
-                <UploadSimple aria-hidden="true" size={28} />
-              )}
-              {busy === slot.kind ? (
-                <span className="absolute inset-0 flex items-center justify-center bg-white/80">
-                  <span
-                    role="status"
-                    aria-label="Сохраняем"
-                    className="size-6 animate-spin rounded-full border-2 border-neutral-700 border-r-transparent motion-reduce:animate-none"
-                  />
-                </span>
-              ) : null}
-            </button>
-            {/* Under the picture, not over it: the bin never hides a stroke of the signature. */}
-            <div className="flex min-h-11 min-w-0 items-center gap-1">
-              <p className="min-w-0 flex-1 truncate text-xs text-[var(--color-text-muted)]">
-                {slot.label}
-              </p>
-              {slot.present ? (
-                <button
-                  type="button"
-                  disabled={disabled || busy !== null}
-                  aria-label={`${slot.label}: убрать`}
-                  title="Убрать"
-                  onClick={() => void remove(slot)}
-                  className="flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-danger)] disabled:opacity-50"
-                >
-                  <Trash aria-hidden="true" size={18} />
-                </button>
-              ) : null}
-            </div>
-          </div>
+          <ImageTile
+            key={slot.kind}
+            slot={slot}
+            version={version}
+            blocked={disabled || busy !== null}
+            busy={busy === slot.kind}
+            onFile={(file) => void send(slot.kind, file)}
+            onRemove={() => void remove(slot)}
+          />
         ))}
       </div>
       <p role="alert" className="min-h-5 text-sm text-[var(--color-danger)]">
         {failure}
       </p>
+    </div>
+  );
+}
+
+function ImageTile({
+  slot,
+  version,
+  blocked,
+  busy,
+  onFile,
+  onRemove,
+}: {
+  slot: DocumentImageSlot;
+  version: number;
+  /** The form is saving, or one of the tiles is: nothing can be picked, dropped or taken off. */
+  blocked: boolean;
+  /** This tile's own picture is on its way. */
+  busy: boolean;
+  onFile(file: File): void;
+  onRemove(): void;
+}) {
+  const source = useFacsimileSource(onFile, blocked);
+  return (
+    <div className="relative min-w-0">
+      <input {...source.input} />
+      <button
+        type="button"
+        disabled={blocked}
+        aria-label={`${slot.label}: ${slot.present ? 'заменить' : 'загрузить'}`}
+        onClick={source.choose}
+        {...source.drop}
+        className={facsimilePaper(slot.present, source.over)}
+      >
+        {slot.present ? (
+          <FacsimilePicture src={certificateImageUrl(slot.kind, version)} />
+        ) : (
+          <UploadSimple aria-hidden="true" size={28} />
+        )}
+        {busy ? <FacsimileSpinner /> : null}
+      </button>
+      {/* Under the picture, not over it: the bin never hides a stroke of the signature. */}
+      <div className="flex min-h-11 min-w-0 items-center gap-1">
+        <p className="min-w-0 flex-1 truncate text-xs text-[var(--color-text-muted)]">
+          {slot.label}
+        </p>
+        {slot.present ? (
+          <button
+            type="button"
+            disabled={blocked}
+            aria-label={`${slot.label}: убрать`}
+            title="Убрать"
+            onClick={onRemove}
+            className="flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-danger)] disabled:opacity-50"
+          >
+            <Trash aria-hidden="true" size={18} />
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }

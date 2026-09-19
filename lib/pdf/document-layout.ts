@@ -1,7 +1,7 @@
 import type { PDFDocument, PDFFont, PDFImage, PDFPage } from 'pdf-lib';
 import { rgb } from 'pdf-lib';
 import { loadCertificateFontBytes, loadCertificateImageBytes, resolveAssetUrl } from './certificate-renderer.ts';
-import { wrapDocumentText } from './protocol-renderer.ts';
+import { documentTextWidth, wrapDocumentText } from './protocol-renderer.ts';
 
 export const ink = rgb(0, 0, 0);
 export async function loadDocumentFonts(pdf: PDFDocument, fallbackUrl: string, origin?: string, signal?: AbortSignal) {
@@ -15,7 +15,7 @@ export function block(page: PDFPage, text: string, font: PDFFont, x: number, top
   for (let s = size; s >= minSize; s -= .25) {
     const lines = text.split(/\r?\n/u).flatMap(line => wrapDocumentText(font, line, s, width));
     if (lines.length * s * 1.2 > height) continue;
-    lines.forEach((line, i) => page.drawText(line, { x: x + (align === 'center' ? (width - font.widthOfTextAtSize(line, s)) / 2 : align === 'right' ? width - font.widthOfTextAtSize(line, s) : 0), y: page.getHeight() - top - s - i * s * 1.2, size: s, font, color: ink }));
+    lines.forEach((line, i) => page.drawText(line, { x: x + (align === 'center' ? (width - documentTextWidth(font, line, s)) / 2 : align === 'right' ? width - documentTextWidth(font, line, s) : 0), y: page.getHeight() - top - s - i * s * 1.2, size: s, font, color: ink }));
     return lines.length * s * 1.2;
   }
   throw new Error('DOCUMENT_TEXT_OVERFLOW');

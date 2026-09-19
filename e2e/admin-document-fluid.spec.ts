@@ -83,18 +83,14 @@ if (process.env.E2E_ADMIN_DOCUMENT_SWEEP === '1') {
         await expect(editor).toHaveAttribute('data-hydrated', '', { timeout: 120_000 });
         await page.setViewportSize({ width: 240, height: 640 });
         if (kind === 'certificate' && mode === 'fields') {
-          await editor
-            .getByRole('textbox', { name: 'Номер', exact: true })
-            .fill('Проверка-未保存-Ұзын-Long');
+          // «Номер протокола», or «Номер протокола · по дате» until somebody types a number of their own.
+          const protocolNumber = editor.getByRole('textbox', { name: /^Номер протокола/ });
+          await protocolNumber.fill('Проверка-未保存-Ұзын-Long');
           await editor.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
-          await editor.getByRole('radio', { name: 'Изменить', exact: true }).click();
-          await expect(editor.getByRole('textbox', { name: 'Номер', exact: true })).toHaveValue(
-            'Проверка-未保存-Ұзын-Long',
-          );
+          await editor.getByRole('radio', { name: 'Поля', exact: true }).click();
+          await expect(protocolNumber).toHaveValue('Проверка-未保存-Ұзын-Long');
           await page.setViewportSize({ width: 640, height: 240 });
-          await expect(editor.getByRole('textbox', { name: 'Номер', exact: true })).toHaveValue(
-            'Проверка-未保存-Ұзын-Long',
-          );
+          await expect(protocolNumber).toHaveValue('Проверка-未保存-Ұзын-Long');
           await page.screenshot({ path: info.outputPath('editor-landscape-640x240.png') });
         }
 
@@ -139,6 +135,11 @@ if (process.env.E2E_ADMIN_DOCUMENT_SWEEP === '1') {
                 (node as HTMLCanvasElement).width > 0 && (node as HTMLCanvasElement).height > 0,
             ),
           ).toBeTruthy();
+          // The chosen employee holds an issued document: the chip says so at every width swept below.
+          if (kind === 'certificate')
+            await expect(
+              editor.getByText(/^Выдано \d{2}\.\d{2}\.\d{4} · № /).filter({ visible: true }),
+            ).toHaveCount(1);
         }
         const widthOverride = process.env.E2E_UX_WIDTHS;
         const widths = widthOverride
@@ -301,7 +302,7 @@ if (process.env.E2E_ADMIN_DOCUMENT_SWEEP === '1') {
         await page.setViewportSize({ width: 240, height: 640 });
         await page.screenshot({ path: info.outputPath(`${kind}-${mode}-240x640.png`) });
         if (mode === 'preview')
-          await editor.getByRole('radio', { name: 'Изменить', exact: true }).click();
+          await editor.getByRole('radio', { name: 'Поля', exact: true }).click();
       });
     }
   test.describe('mocked document request', () => {

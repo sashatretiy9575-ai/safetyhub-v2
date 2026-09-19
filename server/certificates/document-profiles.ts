@@ -20,7 +20,9 @@ export const documentProfileSchema = z.object({
 export async function readDocumentProfiles() {
   await requireCapability('site.settings.manage');
   const client = createAdminClient();
-  const { data, error } = await client.from('document_profiles').select('body,version');
+  // Every save moves a row to the end of the heap; without an order the list
+  // (and the registry of signatures built from it) would reshuffle after one.
+  const { data, error } = await client.from('document_profiles').select('body,version').order('id');
   if (error) throw error;
   return (data ?? []).map(row => ({ ...documentProfileSchema.parse(row.body), revision: row.version }));
 }

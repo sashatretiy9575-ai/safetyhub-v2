@@ -111,6 +111,33 @@ export function loadCertificateImageBytes(url: string, signal?: AbortSignal) {
   return fetchBoundedAsset(url, MAX_IMAGE_BYTES, signal);
 }
 
+/**
+ * A participant's photo is private and can be replaced at any moment: always a
+ * fresh download, never `assetCache`. An editor that redraws one preview many
+ * times keeps it for its own session through `CertificatePreviewOptions.loadPhoto`.
+ */
+export async function loadCertificatePhotoBytes(url: string, signal?: AbortSignal): Promise<Uint8Array> {
+  const response = await fetch(url, { signal, credentials: 'same-origin', cache: 'no-store' });
+  if (!response.ok) throw new Error('CERTIFICATE_PHOTO_UNAVAILABLE');
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  if (!bytes.length || bytes.length > MAX_IMAGE_BYTES) throw new Error('CERTIFICATE_PHOTO_UNAVAILABLE');
+  return bytes;
+}
+
+/** Where a `doc:*` span starts. Declared as functions: the protocol renderer reaches them through an import cycle. */
+export function spanStart() {
+  return typeof performance === 'undefined' ? 0 : performance.now();
+}
+/** A user-timing span for DevTools (`doc:job`, `doc:fonts`, …); a document never fails because it could not be timed. */
+export function measureSpan(name: string, start: number) {
+  if (typeof performance === 'undefined') return;
+  try {
+    performance.measure(name, { start, end: performance.now() });
+  } catch {
+    // An engine without measure options simply records no spans.
+  }
+}
+
 
 export function formatIssueDate(date: Date) {
   return new Intl.DateTimeFormat('ru-RU', { timeZone: 'Asia/Oral', day: '2-digit', month: 'long', year: 'numeric' }).format(date);
@@ -131,12 +158,32 @@ export type CertificatePreviewData = Omit<CertificateRenderMetadata, 'certificat
   certificateId?: string; certificateNumber: string; verificationUrl?: string;
 };
 
-export async function generateCertificatePreview(metadata: CertificatePreviewData, signal?: AbortSignal): Promise<Uint8Array> {
+type PhotoLoader = (url: string, signal?: AbortSignal) => Promise<Uint8Array>;
+export type CertificatePreviewOptions = Readonly<{
+  /** Replaces the fresh download, so an editor keeps a participant's photo for its session. */
+  loadPhoto?: PhotoLoader;
+  /** The preview is drawn without the photo it could not get; this is how the caller learns of it. */
+  onPhotoError?: (error: unknown) => void;
+}>;
+
+/**
+ * `onPhotoError` decides what a missing photo means: a preview reports it and is
+ * drawn without it, a download (`null`) fails, because it is the document itself.
+ */
+async function renderCertificate(
+  metadata: CertificatePreviewData,
+  signal: AbortSignal | undefined,
+  loadPhoto: PhotoLoader,
+  onPhotoError: ((error: unknown) => void) | null,
+): Promise<Uint8Array> {
   if (signal?.aborted) throw abortError();
+  const jobStarted = spanStart();
   const [{ PDFDocument }, fontkitModule] = await Promise.all([import('pdf-lib'), import('@pdf-lib/fontkit')]);
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkitModule.default);
+  const fontsStarted = spanStart();
   const fonts = await loadDocumentFonts(pdf, metadata.fontUrl, metadata.verificationUrl, signal);
+  measureSpan('doc:fonts', fontsStarted);
   const d = metadata.branding.documentDefaults;
   // Uncalibrated preview uses reference proportions, not a guessed paper size.
   const width = d?.insertWidthCm && d?.insertHeightCm ? d.insertWidthCm * 72 / 2.54 : 1200;
@@ -171,13 +218,18 @@ export async function generateCertificatePreview(metadata: CertificatePreviewDat
   txt('М.О.\nМ.П.', photoX - 32, 341, 30, 24, 10);
   page.drawRectangle({ x: photoX, y: 10, width: photoWidth, height: photoHeight, borderColor: ink, borderWidth: .5 });
   if (metadata.photoUrl) {
-    const response = await fetch(resolveAssetUrl(metadata.photoUrl, metadata.verificationUrl), { signal, credentials: 'same-origin', cache: 'no-store' });
-    if (!response.ok) throw new Error('CERTIFICATE_PHOTO_UNAVAILABLE');
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    if (!bytes.length || bytes.length > MAX_IMAGE_BYTES) throw new Error('CERTIFICATE_PHOTO_UNAVAILABLE');
-    const photo = await pdf.embedJpg(bytes);
-    const fit = Math.min((photoWidth - 2) / photo.width, (photoHeight - 2) / photo.height);
-    page.drawImage(photo, { x: photoX + (photoWidth - photo.width * fit) / 2, y: 10 + (photoHeight - photo.height * fit) / 2, width: photo.width * fit, height: photo.height * fit });
+    const photoStarted = spanStart();
+    try {
+      const photo = await pdf.embedJpg(await loadPhoto(resolveAssetUrl(metadata.photoUrl, metadata.verificationUrl), signal));
+      const fit = Math.min((photoWidth - 2) / photo.width, (photoHeight - 2) / photo.height);
+      page.drawImage(photo, { x: photoX + (photoWidth - photo.width * fit) / 2, y: 10 + (photoHeight - photo.height * fit) / 2, width: photo.width * fit, height: photo.height * fit });
+    } catch (error) {
+      // 403 without `identity.read`, 503 for an avatar too large to re-encode: the
+      // rest of the preview is still worth seeing. A cancelled job is not a failure.
+      if (!onPhotoError || signal?.aborted) throw error;
+      onPhotoError(error);
+    }
+    measureSpan('doc:photo', photoStarted);
   }
   const right = half + margin;
   block(page, 'Білімін тексеру туралы мәліметтер\nСведения о проверке знаний', fonts.sansBold, right, 33, usable, 40, 15, 'center');
@@ -198,10 +250,12 @@ export async function generateCertificatePreview(metadata: CertificatePreviewDat
   });
   // The stamp covers «М.П.» and the corner of the photograph, as on the paper
   // form; the chairman signs across the first commission line.
+  const facsimilesStarted = spanStart();
   const [stamp, ...signatures] = await Promise.all([
     embedFacsimile(pdf, branding.stampUrl, metadata.verificationUrl, signal),
     ...(branding.commissionSignatureUrls ?? [branding.chairmanSignatureUrl]).map(url => embedFacsimile(pdf, url, metadata.verificationUrl, signal)),
   ]);
+  measureSpan('doc:facsimiles', facsimilesStarted);
   drawFacsimile(page, stamp, photoX - 86, 272, 92, 92);
   const signatureHeight = Math.min(42, lineHeight * 1.75);
   signatures.forEach((signature, i) => drawFacsimile(page, signature, right + commissionWidth - 124, 295 + (i + 1) * lineHeight + 7 - signatureHeight, 112, signatureHeight));
@@ -217,10 +271,20 @@ export async function generateCertificatePreview(metadata: CertificatePreviewDat
   pdf.setAuthor(branding.organizationName);
   pdf.setCreationDate(date);
   if (signal?.aborted) throw abortError();
-  return pdf.save({ useObjectStreams: true });
+  const saveStarted = spanStart();
+  const bytes = await pdf.save({ useObjectStreams: true });
+  measureSpan('doc:save', saveStarted);
+  measureSpan('doc:job', jobStarted);
+  return bytes;
 }
+
+/** What the editor shows: a photo that did not load leaves its frame empty and is reported, never fatal. */
+export function generateCertificatePreview(metadata: CertificatePreviewData, signal?: AbortSignal, options: CertificatePreviewOptions = {}): Promise<Uint8Array> {
+  return renderCertificate(metadata, signal, options.loadPhoto ?? loadCertificatePhotoBytes, options.onPhotoError ?? (() => {}));
+}
+/** What is downloaded: the photo is fetched fresh every time, and the document is refused without it. */
 export async function generateCertificateInBrowser(metadata: CertificateRenderMetadata, signal?: AbortSignal): Promise<Uint8Array> {
   assertCertificateRenderMetadata(metadata);
   if (!metadata.branding.documentDefaults?.insertWidthCm || !metadata.branding.documentDefaults?.insertHeightCm) throw new Error('INSERT_SIZE_REQUIRED');
-  return generateCertificatePreview(metadata, signal);
+  return renderCertificate(metadata, signal, loadCertificatePhotoBytes, null);
 }

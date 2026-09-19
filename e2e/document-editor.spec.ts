@@ -18,6 +18,23 @@ async function openEditor(page: Page, url?: string) {
   await expect(page.locator('.document-editor[data-hydrated]')).toBeVisible();
 }
 
+/** Two looks a second apart find the very same canvases: whatever was being drawn has landed. */
+async function settledCanvases(page: Page) {
+  const look = () =>
+    page.locator('canvas').evaluateAll((nodes) =>
+      nodes.map((node) => {
+        node.id ||= 'e2e-canvas-' + Math.random().toString(36).slice(2);
+        return node.id;
+      }),
+    );
+  await expect(async () => {
+    const seen = await look();
+    expect(seen.length).toBeGreaterThan(0);
+    await page.waitForTimeout(1_000);
+    expect(await look()).toEqual(seen);
+  }).toPass({ timeout: 30_000 });
+}
+
 test('protected photo route returns JPEG from a real private storage manifest', async ({
   page,
 }, testInfo) => {
@@ -139,14 +156,12 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
     if (request.method() === 'PATCH' && request.url().endsWith('/api/admin/settings/certificate'))
       refusedSaves++;
   });
-  await page.getByLabel('Общая ширина, см', { exact: true }).fill('320');
+  const spreadWidth = page.getByLabel('Общая ширина разворота, см', { exact: true });
+  await spreadWidth.fill('320');
   await expect(page.getByRole('button', { name: /^Размер вкладыша/ })).toContainText(
     'Общая ширина вкладыша: от 8 до 60 см',
   );
-  await expect(page.getByLabel('Общая ширина, см', { exact: true })).toHaveAttribute(
-    'aria-invalid',
-    'true',
-  );
+  await expect(spreadWidth).toHaveAttribute('aria-invalid', 'true');
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
   await expect(
     page
@@ -154,24 +169,35 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
       .filter({ hasText: 'Общая ширина вкладыша: от 8 до 60 см', visible: true })
       .first(),
   ).toBeVisible();
-  await expect(page.getByLabel('Общая ширина, см', { exact: true })).toBeFocused();
+  await expect(spreadWidth).toBeFocused();
   expect(refusedSaves).toBe(0);
-  await page.getByLabel('Общая ширина, см', { exact: true }).fill('32');
+  await spreadWidth.fill('32');
   await page.getByLabel('Высота, см', { exact: true }).fill('10');
   await expect(page.locator('canvas').first()).toBeVisible({ timeout: 30_000 });
+  // The chip over the pages says which document they are: this one is issued and frozen.
+  await expect(
+    page.getByText(`· № ${originalMetadata.certificateNumber}`).filter({ visible: true }),
+  ).toHaveText(/^Выдано \d{2}\.\d{2}\.\d{4} · № /);
   await page.getByRole('radio', { name: 'Протокол', exact: true }).click();
-  await page.getByRole('button', { name: /^Организация и комиссия/ }).click();
-  await page.getByLabel('Дата', { exact: true }).fill('2026-09-08');
-  await page.getByRole('button', { name: 'Номер по дате', exact: true }).click();
-  await expect(page.getByLabel('Номер', { exact: true })).toHaveValue('08.09');
-  await page.getByLabel('Номер', { exact: true }).fill(manualNumber);
-  await page.getByLabel('Дата', { exact: true }).fill('2026-09-09');
-  await expect(page.getByLabel('Номер', { exact: true })).toHaveValue(manualNumber);
+  // «Организация» where the program has a profile, «Организация и комиссия» where it has none.
+  await page.getByRole('button', { name: /^Организация/ }).click();
+  // The name of the number says whether it follows the date; whichever it says, it is one field.
+  const protocolDate = page.getByLabel('Дата протокола', { exact: true });
+  const protocolNumber = page.getByLabel(/^Номер протокола/);
+  await protocolDate.fill('2026-09-08');
+  const numberByDate = page.getByRole('button', { name: 'Номер по дате', exact: true });
+  await expect(numberByDate).toHaveAttribute('title', 'Номер по дате: 08.09');
+  await numberByDate.click();
+  await expect(page.getByLabel('Номер протокола · по дате', { exact: true })).toHaveValue('08.09');
+  await protocolNumber.fill(manualNumber);
+  await expect(page.getByLabel('Номер протокола', { exact: true })).toHaveValue(manualNumber);
+  await protocolDate.fill('2026-09-09');
+  await expect(protocolNumber).toHaveValue(manualNumber);
   await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
   await expect(saved).toBeVisible();
   await openEditor(page);
-  await expect(page.getByLabel('Номер', { exact: true })).toHaveValue(manualNumber);
-  await expect(page.getByLabel('Дата', { exact: true })).toHaveValue('2026-09-09');
+  await expect(protocolNumber).toHaveValue(manualNumber);
+  await expect(protocolDate).toHaveValue('2026-09-09');
   const originalReviewer = await page.getByLabel('Проверяющий', { exact: true }).inputValue();
   const changedReviewer = 'Проверяющий теста ' + Date.now();
   await page.getByLabel('Проверяющий', { exact: true }).fill(changedReviewer);
@@ -223,11 +249,22 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
   await expect(page.getByRole('button', { name: 'Скачать PDF', exact: true })).toBeEnabled();
   await page.setViewportSize({ width: 240, height: 812 });
   await page.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
-  await page.getByRole('radio', { name: 'Правая', exact: true }).click();
+  // Going to the fields and back draws nothing again: the very same canvas is still on the page.
+  await settledCanvases(page);
+  const keptCanvas = await page.locator('canvas').first().getAttribute('id');
+  for (let round = 0; round < 2; round++) {
+    await page.getByRole('radio', { name: 'Поля', exact: true }).click();
+    await expect(page.locator('canvas').first()).toBeHidden();
+    await page.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
+  }
+  await settledCanvases(page);
+  await expect(page.locator('canvas').first()).toHaveAttribute('id', keptCanvas!);
+  const halves = page.getByRole('radiogroup', { name: 'Половина разворота', exact: true });
+  await halves.getByRole('radio', { name: 'Правая половина', exact: true }).click();
   expect(
     await page.locator('.document-insert').evaluate((el) => getComputedStyle(el).transform),
   ).not.toBe('none');
-  await page.getByRole('radio', { name: 'Левая', exact: true }).click();
+  await halves.getByRole('radio', { name: 'Левая половина', exact: true }).click();
   // The half slides into place; the check waits for it to arrive.
   await expect
     .poll(() => page.locator('.document-insert').evaluate((el) => getComputedStyle(el).transform))
@@ -259,7 +296,7 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
     await page.getByRole('radio', { name: 'Удостоверение', exact: true }).click();
     await page.getByLabel('Сотрудник', { exact: true }).click();
     await page.getByRole('button', { name: draftPerson.fullName, exact: true }).click();
-    await expect(page.getByText('Удостоверение ещё не выдано', { exact: true })).toBeVisible();
+    await expect(page.getByText('Новая выдача', { exact: true })).toBeVisible();
     await expect(page.locator('canvas')).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Скачать PDF', exact: true })).toBeDisabled();
     await page.getByRole('radio', { name: 'Протокол', exact: true }).click();
@@ -280,7 +317,7 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
     ).toBeTruthy();
     await page.screenshot({ path: testInfo.outputPath(`editor-${width}.png`), fullPage: true });
     if (width < 1024) {
-      await page.getByRole('radio', { name: 'Изменить', exact: true }).click();
+      await page.getByRole('radio', { name: 'Поля', exact: true }).click();
       await page.evaluate(() => window.scrollTo(0, 0));
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
@@ -297,7 +334,7 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
       await page.screenshot({ path: testInfo.outputPath(`fields-${width}.png`), fullPage: true });
       if (width === 240) {
         await page.setViewportSize({ width, height: 390 });
-        await page.getByLabel('Номер', { exact: true }).focus();
+        await protocolNumber.focus();
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
         ).toBeTruthy();
@@ -351,16 +388,39 @@ test('a photographed stamp becomes a transparent picture, stays until replaced a
   }
   try {
     await openEditor(page, '/admin/settings/certificate?tab=certificate');
-    await page.getByRole('button', { name: /^Печать и подпись/ }).click();
-    const chooser = page.waitForEvent('filechooser');
-    await page.getByRole('button', { name: /^Печать: (?:загрузить|заменить)$/ }).click();
-    const upload = page.waitForResponse(
-      (response) =>
-        response.url().includes('/api/admin/settings/certificate/image') &&
-        response.request().method() === 'PUT',
-    );
-    await (await chooser).setFiles({ name: 'sheet.jpg', mimeType: 'image/jpeg', buffer: sheet });
-    expect((await upload).status()).toBe(200);
+    await page.getByRole('button', { name: /^Подписи и печать/ }).click();
+    // The settings' own stamp has a tile only where no program has a profile. Where
+    // profiles exist the section is the registry of their images (its own spec), and
+    // the stamp of the settings is reached through its route alone.
+    const stampTile = page.getByRole('button', { name: /^Печать: (?:загрузить|заменить)$/ });
+    const registryTile = page.getByRole('button', { name: /^(?:Загрузить|Заменить)$/ });
+    await expect(stampTile.or(registryTile).first()).toBeVisible();
+    const legacy = (await stampTile.count()) > 0;
+    if (legacy) {
+      const chooser = page.waitForEvent('filechooser');
+      await stampTile.click();
+      const upload = page.waitForResponse(
+        (response) =>
+          response.url().includes('/api/admin/settings/certificate/image') &&
+          response.request().method() === 'PUT',
+      );
+      await (await chooser).setFiles({ name: 'sheet.jpg', mimeType: 'image/jpeg', buffer: sheet });
+      expect((await upload).status()).toBe(200);
+    } else {
+      // Taking the paper off a photograph is the browser's work; the route takes the cut-out it makes.
+      const cutOut = await sharp(
+        Buffer.from(
+          '<svg xmlns="http://www.w3.org/2000/svg" width="420" height="320"><circle cx="210" cy="160" r="96" fill="none" stroke="#2f4fb4" stroke-width="9"/></svg>',
+        ),
+      )
+        .png()
+        .toBuffer();
+      const upload = await page.request.put('/api/admin/settings/certificate/image?kind=stamp', {
+        headers: { origin: base, 'content-type': 'image/png' },
+        data: cutOut,
+      });
+      expect(upload.status(), await upload.text()).toBe(200);
+    }
     const uploaded = await settings();
     expect(uploaded.hasStamp).toBe(true);
     expect(uploaded.version).toBeGreaterThan(before.version);
@@ -387,20 +447,30 @@ test('a photographed stamp becomes a transparent picture, stays until replaced a
       expect(outdated.headers()['cache-control']).toContain('private');
       expect(Buffer.compare(await outdated.body(), original)).toBe(0);
     } else expect(outdated.status()).toBe(404);
-    await openEditor(page);
-    await expect(page.getByRole('button', { name: 'Печать: заменить', exact: true })).toBeVisible();
-    const removal = page.waitForResponse(
-      (response) =>
-        response.url().includes('/api/admin/settings/certificate/image') &&
-        response.request().method() === 'DELETE',
-    );
-    await page.getByRole('button', { name: 'Печать: убрать', exact: true }).click();
-    // Every document issued from now on changes, so the editor asks first.
-    await page.getByRole('button', { name: 'Убрать', exact: true }).click();
-    expect((await removal).status()).toBe(200);
-    await expect(
-      page.getByRole('button', { name: 'Печать: загрузить', exact: true }),
-    ).toBeVisible();
+    if (legacy) {
+      await openEditor(page);
+      await expect(
+        page.getByRole('button', { name: 'Печать: заменить', exact: true }),
+      ).toBeVisible();
+      const removal = page.waitForResponse(
+        (response) =>
+          response.url().includes('/api/admin/settings/certificate/image') &&
+          response.request().method() === 'DELETE',
+      );
+      await page.getByRole('button', { name: 'Печать: убрать', exact: true }).click();
+      // Every document issued from now on changes, so the editor asks first.
+      await page.getByRole('button', { name: 'Убрать', exact: true }).click();
+      expect((await removal).status()).toBe(200);
+      await expect(
+        page.getByRole('button', { name: 'Печать: загрузить', exact: true }),
+      ).toBeVisible();
+    } else {
+      const removal = await page.request.delete(
+        '/api/admin/settings/certificate/image?kind=stamp',
+        { headers: { origin: base } },
+      );
+      expect(removal.status(), await removal.text()).toBe(200);
+    }
     expect((await settings()).hasStamp).toBe(false);
     const retained = await stored(uploaded.version);
     expect(retained.status()).toBe(200);
@@ -597,7 +667,9 @@ test('registered signatures require document ownership or document administratio
     profileInstalled = true;
     await openEditor(page, '/admin/settings/certificate?course=armaturshchik');
     const asset = '/certificate-assets/registered?id=' + assetId;
-    await expect(page.locator(`a[href="${asset}"]`)).toBeAttached();
+    // The signer's picture is a tile of «Подписи и печать», not a link among the profile's fields.
+    await page.getByRole('button', { name: /^Подписи и печать/ }).click();
+    await expect(page.locator(`img[src*="${asset}"]`).filter({ visible: true })).toHaveCount(1);
     const allowed = await page.request.get(asset);
     expect(allowed.status()).toBe(200);
     expect(allowed.headers()['content-type']).toBe('image/png');

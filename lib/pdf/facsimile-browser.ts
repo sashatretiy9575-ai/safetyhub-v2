@@ -7,6 +7,27 @@ import {
 
 export const FACSIMILE_INPUT_TYPES = 'image/png,image/jpeg,image/webp';
 const FACSIMILE_INPUT_MAX_BYTES = 20 * 1024 * 1024;
+// What the upload routes read and what their decoder accepts
+// (server/certificates/facsimile-normalize.ts); a file within both goes as it is.
+const FACSIMILE_AS_IS_MAX_BYTES = 2 * 1024 * 1024;
+const FACSIMILE_AS_IS_MAX_PIXELS = 4096 * 4096;
+const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+
+/**
+ * A PNG may carry an EXIF orientation. The canvas applies it
+ * (`imageOrientation: 'from-image'`) and the server does not, so only a file
+ * without one, whose chunks can be followed to the end, may skip the canvas.
+ */
+export function isUprightPng(bytes: Uint8Array): boolean {
+  if (!PNG_SIGNATURE.every((byte, at) => bytes[at] === byte)) return false;
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  for (let at = 8; at + 12 <= bytes.length; at += 12 + view.getUint32(at)) {
+    const type = String.fromCharCode(...bytes.subarray(at + 4, at + 8));
+    if (type === 'eXIf') return false;
+    if (type === 'IEND') return true;
+  }
+  return false;
+}
 
 function canvasOf(width: number, height: number) {
   const canvas = document.createElement('canvas');
@@ -35,8 +56,21 @@ export async function prepareFacsimilePng(file: File): Promise<Blob> {
     source.context.imageSmoothingQuality = 'high';
     source.context.drawImage(bitmap, 0, 0, width, height);
     const pixels = source.context.getImageData(0, 0, width, height);
+    const transparent = hasTransparency(pixels);
+    // A ready cut-out is already what the documents draw. Redrawing it on a
+    // canvas would resample it once here and once more on the server, which
+    // trims and sizes whatever arrives; the original reaches it untouched.
+    if (
+      transparent &&
+      file.type === 'image/png' &&
+      file.size <= FACSIMILE_AS_IS_MAX_BYTES &&
+      bitmap.width * bitmap.height <= FACSIMILE_AS_IS_MAX_PIXELS &&
+      isUprightPng(new Uint8Array(await file.arrayBuffer()))
+    ) {
+      return file;
+    }
     let output = source.canvas;
-    if (!hasTransparency(pixels)) {
+    if (!transparent) {
       const ink = extractInk(pixels);
       if (!ink) throw new Error('FACSIMILE_EMPTY');
       const target = canvasOf(ink.width, ink.height);

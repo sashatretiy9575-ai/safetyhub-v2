@@ -49,7 +49,10 @@ type BusinessQuotaAction =
   | 'avatar.upload'
   | 'certificate.pdf'
   | 'presentation.download'
-  | 'profile.update';
+  | 'profile.update'
+  // A registered signature or stamp is written through the service role, so no
+  // RPC charges the administrator for it the way the settings RPCs do.
+  | 'site.settings.update';
 
 type QuotaPayload = { allowed?: unknown; retryAfter?: unknown };
 type RpcClient = {

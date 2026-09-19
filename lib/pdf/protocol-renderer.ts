@@ -3,7 +3,7 @@ import type {
   CertificateBranding,
   CertificateRenderMetadata,
 } from './certificate-client-contract.ts';
-import { formatIssueDate } from './certificate-renderer.ts';
+import { formatIssueDate, measureSpan, spanStart } from './certificate-renderer.ts';
 import { normalizePdfText, safeFilenameSegment } from './certificate.ts';
 import {
   documentCommission,
@@ -46,6 +46,34 @@ export function protocolFilename(group: ProtocolGroup, protocolNumber: string) {
   return `protocols/Протокол-${safeFilenameSegment(protocolNumber || 'без-номера', 24)}-${safeFilenameSegment(group.organization ?? 'без-компании', 48)}-${safeFilenameSegment(group.courseTitle, 48)}${group.groupNumber ? '-' + group.groupNumber : ''}.pdf`;
 }
 
+/**
+ * What the font itself would answer, without asking it twice. An embedded font
+ * shapes the whole string for every measurement, and a width is that one sum
+ * scaled by the size — so the sum is kept per font and string, and a block that
+ * tries seventeen sizes shapes its text once. The first answer of every font is
+ * checked against the font's own; a font that disagrees is simply asked directly.
+ */
+const measuredText = new WeakMap<PDFFont, Map<string, number> | null>();
+export function documentTextWidth(font: PDFFont, text: string, size: number): number {
+  let known = measuredText.get(font);
+  if (known === null) return font.widthOfTextAtSize(text, size);
+  if (known === undefined) {
+    const probe = 'Протокол 0123 Wg';
+    known =
+      font.widthOfTextAtSize(probe, 1000) * (11.25 / 1000) === font.widthOfTextAtSize(probe, 11.25)
+        ? new Map()
+        : null;
+    measuredText.set(font, known);
+    if (known === null) return font.widthOfTextAtSize(text, size);
+  }
+  let total = known.get(text);
+  if (total === undefined) {
+    total = font.widthOfTextAtSize(text, 1000);
+    known.set(text, total);
+  }
+  return total * (size / 1000);
+}
+
 /** Splits even unspaced names, without truncating any characters. */
 export function wrapDocumentText(
   font: PDFFont,
@@ -56,12 +84,21 @@ export function wrapDocumentText(
   const lines: string[] = [];
   let line = '';
   for (const word of normalizePdfText(text).split(' ')) {
-    if (line && font.widthOfTextAtSize(line + ' ' + word, size) > width) {
+    if (line && documentTextWidth(font, line + ' ' + word, size) > width) {
       lines.push(line);
       line = '';
     }
+    // A word that fits is taken whole. Measuring it letter by letter shaped the
+    // growing line once per character — a thirteen-person protocol spent most of
+    // a second here on every keystroke. Only a word wider than the column is
+    // still broken between letters.
+    const next = line ? line + ' ' + word : word;
+    if (documentTextWidth(font, next, size) <= width) {
+      line = next;
+      continue;
+    }
     for (const character of (line ? ' ' : '') + word) {
-      if (line && font.widthOfTextAtSize(line + character, size) > width) {
+      if (line && documentTextWidth(font, line + character, size) > width) {
         lines.push(line);
         line = '';
       }
@@ -78,6 +115,7 @@ export async function generateProtocolInBrowser(
   fontUrl: string,
   signal?: AbortSignal,
 ): Promise<Uint8Array> {
+  const jobStarted = spanStart();
   const [
     { PDFDocument },
     fontkitModule,
@@ -89,7 +127,9 @@ export async function generateProtocolInBrowser(
   ]);
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkitModule.default);
+  const fontsStarted = spanStart();
   const fonts = await loadDocumentFonts(pdf, fontUrl, group.items[0]?.verificationUrl, signal);
+  measureSpan('doc:fonts', fontsStarted);
   let page = pdf.addPage([595.28, 841.89]),
     y = 22;
   const nextPage = () => {
@@ -297,12 +337,14 @@ export async function generateProtocolInBrowser(
       'Результаты проверки знаний зафиксированы настоящим протоколом. Допуск к самостоятельной работе оформляет работодатель в установленном порядке.',
   );
   y += 20;
+  const facsimilesStarted = spanStart();
   const [stamp, ...signatures] = await Promise.all([
     embedFacsimile(pdf, branding.stampUrl, group.items[0]?.verificationUrl, signal),
     ...(branding.commissionSignatureUrls ?? [branding.protocolSignatureUrl ?? null]).map((url) =>
       embedFacsimile(pdf, url, group.items[0]?.verificationUrl, signal),
     ),
   ]);
+  measureSpan('doc:facsimiles', facsimilesStarted);
   // The stamp hangs 60 pt below the chairman's line; it must not leave the sheet.
   if ((stamp || signatures.some(Boolean)) && y + 120 > 790) nextPage();
   paragraph('Қолы / Подпись:', 9, 'left', true);
@@ -343,5 +385,9 @@ export async function generateProtocolInBrowser(
         'right',
       );
   }
-  return pdf.save({ useObjectStreams: true });
+  const saveStarted = spanStart();
+  const bytes = await pdf.save({ useObjectStreams: true });
+  measureSpan('doc:save', saveStarted);
+  measureSpan('doc:job', jobStarted);
+  return bytes;
 }
