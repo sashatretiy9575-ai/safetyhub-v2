@@ -26,3 +26,20 @@ export function auditRecentPeriod(days: number, now = new Date()) {
   const start = auditDateBoundary(to)!;
   return { from: auditDateValue(new Date(new Date(start).getTime() - (days - 1) * DAY_MS)), to };
 }
+
+/** Day counts behind the «Сегодня / 7 дней / 30 дней» shortcuts. */
+export const AUDIT_QUICK_PERIODS = [1, 7, 30] as const;
+
+/**
+ * The shortcut whose dates the filter currently carries, so the page can mark
+ * it as applied. Both ends have to match: a hand-picked range that merely
+ * starts or ends on the same day is not a shortcut.
+ */
+export function auditActivePeriod(from: string, to: string, now = new Date()) {
+  return (
+    AUDIT_QUICK_PERIODS.find((days) => {
+      const period = auditRecentPeriod(days, now);
+      return period.from === from && period.to === to;
+    }) ?? null
+  );
+}

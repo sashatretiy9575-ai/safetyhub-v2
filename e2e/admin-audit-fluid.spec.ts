@@ -43,7 +43,8 @@ if (process.env.E2E_ADMIN_AUDIT_SWEEP === '1') {
           : [surface];
       for (const root of roots) {
         const controls = [
-          ...root.querySelectorAll<HTMLElement>('button,a,input,summary,[role="menuitem"]'),
+          // `^=` so the theme row (a menuitemcheckbox) is measured with the other menu rows.
+          ...root.querySelectorAll<HTMLElement>('button,a,input,summary,[role^="menuitem"]'),
         ].filter((node) => {
           const rect = node.getBoundingClientRect();
           return (
@@ -283,6 +284,17 @@ if (process.env.E2E_ADMIN_AUDIT_SWEEP === '1') {
     await page.getByRole('link', { name: '7 дней', exact: true }).click();
     await expect(page).toHaveURL(/\/admin\/settings\/history\?.*tz=local/);
     await expect(page.locator('#audit-from')).not.toHaveValue('');
+    // Only the applied shortcut is marked. The positive check goes first: it
+    // waits for the new render, while the negative ones also hold on the old page.
+    await expect(page.getByRole('link', { name: '7 дней', exact: true })).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
+    for (const name of ['Сегодня', '30 дней'])
+      await expect(page.getByRole('link', { name, exact: true })).not.toHaveAttribute(
+        'aria-current',
+        'true',
+      );
     await page.locator('#audit-actor').fill('Нет такого сотрудника ЖҰҰ 中文 very-long-name');
     await page.getByRole('button', { name: 'Показать', exact: true }).click();
     await expect(page.getByText('События по выбранным фильтрам не найдены.')).toBeVisible();

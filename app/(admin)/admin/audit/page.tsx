@@ -3,12 +3,16 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { CalendarBlank } from '@phosphor-icons/react/dist/ssr/CalendarBlank';
 import {
+  AUDIT_QUICK_PERIODS,
   AUDIT_TIME_ZONE,
+  auditActivePeriod,
   auditDateValue,
   auditInclusiveEndValue,
   auditRecentPeriod,
 } from '@/lib/admin/audit-dates';
+import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
 import { requireCapability } from '@/server/auth/session';
+import { createAdminClient } from '@/server/supabase/admin';
 import {
   ADMIN_PAGE_SIZE,
   getAdminAuditPage,
@@ -89,6 +93,14 @@ const quickFilters = [
   { value: 'user', label: 'Аккаунты' },
 ] as const;
 
+// Keyed by the helper's own day counts: a shortcut cannot be offered here
+// without `auditActivePeriod` also being able to mark it as applied.
+const quickPeriodLabels: Record<(typeof AUDIT_QUICK_PERIODS)[number], string> = {
+  1: 'Сегодня',
+  7: '7 дней',
+  30: '30 дней',
+};
+
 function readableAction(action: string) {
   if (actionLabels[action]) return actionLabels[action];
   return 'Другое действие';
@@ -122,6 +134,67 @@ function detailStatus(details: Record<string, unknown>) {
 
 function detailReason(details: Record<string, unknown>) {
   return typeof details.reason === 'string' && details.reason.trim() ? details.reason : null;
+}
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function courseIdList(value: unknown) {
+  return Array.isArray(value) &&
+    value.every((id): id is string => typeof id === 'string' && UUID_PATTERN.test(id))
+    ? value
+    : null;
+}
+
+/**
+ * `set_course_access` replaces a learner's whole set of courses and logs both
+ * sets as `before.courseIds` / `after.courseIds`. What the administrator
+ * actually did is the difference between the two.
+ */
+function courseAccessChange(action: string, details: Record<string, unknown>) {
+  if (action !== 'course.access.changed') return null;
+  const before = courseIdList(nested(details, 'before')?.courseIds);
+  const after = courseIdList(nested(details, 'after')?.courseIds);
+  if (!before || !after) return null;
+  const hadBefore = new Set(before);
+  const hasAfter = new Set(after);
+  return {
+    opened: [...hasAfter].filter((id) => !hadBefore.has(id)),
+    closed: [...hadBefore].filter((id) => !hasAfter.has(id)),
+  };
+}
+
+/**
+ * One service-role read names every course the visible page mentions: the
+ * catalogue is reference data, not a per-actor read model. Rows arrive in
+ * catalogue order, the one the course pickers use. `null` means the lookup
+ * itself failed, which must not be passed off as «курс удалён».
+ */
+async function courseTitlesById(ids: string[]) {
+  if (ids.length === 0) return new Map<string, string>();
+  try {
+    const { data, error } = await createAdminClient()
+      .from('tests')
+      .select('id, title')
+      .in('id', ids)
+      .order('display_order', { ascending: true })
+      .order('title', { ascending: true });
+    if (error) throw error;
+    return new Map<string, string>((data ?? []).map((row) => [row.id, row.title]));
+  } catch (error) {
+    console.error('ADMIN_AUDIT_COURSE_TITLES_FAILED', {
+      cause: safeErrorDiagnosticCode(error, 'UNKNOWN_ADMIN_DATA_ERROR'),
+    });
+    return null;
+  }
+}
+
+function courseNames(ids: string[], titles: Map<string, string>) {
+  const wanted = new Set(ids);
+  return [
+    ...[...titles].filter(([id]) => wanted.has(id)).map(([id, title]) => ({ id, title })),
+    // A course deleted since then has no row left to take a title from.
+    ...ids.filter((id) => !titles.has(id)).map((id) => ({ id, title: 'курс удалён' })),
+  ];
 }
 
 type EventCategory = 'user' | 'test' | 'certificate' | 'technical';
@@ -222,6 +295,14 @@ export default async function AuditPage({
   const query = parseAdminAuditQuery(params);
   await requireCapability('audit.read');
   const auditResult = await getAdminAuditPage(query);
+  const courseTitles = await courseTitlesById([
+    ...new Set(
+      (auditResult.state === 'ready' ? auditResult.data.items : []).flatMap((event) => {
+        const access = courseAccessChange(event.action, event.details);
+        return access ? [...access.opened, ...access.closed] : [];
+      }),
+    ),
+  ]);
 
   const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
   const currentToken =
@@ -231,6 +312,11 @@ export default async function AuditPage({
   const fromValue = filterParams.get('from') ?? '';
   const toValue = filterParams.get('to') ?? '';
   const hasFilters = Boolean(query.actor || query.target || query.action || query.from || query.to);
+  // One clock for the shortcut links and for the mark on the applied one. A
+  // bookmarked UTC range can spell the same dates yet cover other hours, so
+  // only local-date filters may light a shortcut up.
+  const now = new Date();
+  const activePeriod = query.localDates ? auditActivePeriod(fromValue, toValue, now) : null;
 
   return (
     <section data-audit-workspace className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
@@ -328,23 +414,25 @@ export default async function AuditPage({
             Даты и время: {query.localDates ? 'Казахстан, UTC+5' : 'UTC (сохранённый фильтр)'}
           </p>
           <div className="flex flex-wrap gap-2" aria-label="Быстрый выбор периода">
-            {[
-              { days: 1, label: 'Сегодня' },
-              { days: 7, label: '7 дней' },
-              { days: 30, label: '30 дней' },
-            ].map(({ days, label }) => {
-              const period = auditRecentPeriod(days);
+            {AUDIT_QUICK_PERIODS.map((days) => {
+              const period = auditRecentPeriod(days, now);
               const periodParams = auditFilterParams(query);
               periodParams.set('tz', 'local');
               periodParams.set('from', period.from);
               periodParams.set('to', period.to);
+              const active = activePeriod === days;
               return (
                 <Link
                   key={days}
                   href={`${basePath}?${periodParams.toString()}`}
-                  className="inline-flex min-h-11 items-center rounded-lg border border-[var(--color-border)] px-3 text-base font-medium hover:bg-[var(--color-surface-muted)]"
+                  aria-current={active ? 'true' : undefined}
+                  className={`inline-flex min-h-11 items-center rounded-lg border px-3 text-base font-medium ${
+                    active
+                      ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
+                      : 'border-[var(--color-border)] hover:bg-[var(--color-surface-muted)]'
+                  }`}
                 >
-                  {label}
+                  {quickPeriodLabels[days]}
                 </Link>
               );
             })}
@@ -381,6 +469,7 @@ export default async function AuditPage({
               const style = categoryStyles[category];
               const status = detailStatus(event.details);
               const reason = detailReason(event.details);
+              const access = courseAccessChange(event.action, event.details);
               const created = new Date(event.createdAt);
 
               return (
@@ -401,6 +490,11 @@ export default async function AuditPage({
                       {status ? (
                         <span className="text-sm text-[var(--color-text-muted)]">· {status}</span>
                       ) : null}
+                      {access ? (
+                        <span className="min-w-0">
+                          · открыто {access.opened.length}, закрыто {access.closed.length}
+                        </span>
+                      ) : null}
                     </div>
                     {reason ? (
                       <p className="mt-2 text-sm text-[var(--color-text-subtle)]">{reason}</p>
@@ -420,25 +514,29 @@ export default async function AuditPage({
                   </div>
 
                   <div className="min-w-0 space-y-3 xl:order-4">
-                    <span className="block text-sm text-[var(--color-text-muted)]">Когда</span>
-                    <time
-                      dateTime={event.createdAt}
-                      className="block text-sm text-[var(--color-text-muted)]"
-                    >
-                      {created.toLocaleDateString('ru-RU', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        timeZone: query.localDates ? AUDIT_TIME_ZONE : 'UTC',
-                      })}
-                      <span className="ml-1.5 text-[var(--color-text-muted)]">
-                        {created.toLocaleTimeString('ru-RU', {
-                          hour: '2-digit',
-                          minute: '2-digit',
+                    {/* Label and value stay one block, as in the other columns;
+                        the column's spacing only sets the button apart. */}
+                    <div>
+                      <span className="block text-sm text-[var(--color-text-muted)]">Когда</span>
+                      <time
+                        dateTime={event.createdAt}
+                        className="block text-base text-[var(--color-text)]"
+                      >
+                        {created.toLocaleDateString('ru-RU', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
                           timeZone: query.localDates ? AUDIT_TIME_ZONE : 'UTC',
                         })}
-                      </span>
-                    </time>
+                        <span className="ml-1.5">
+                          {created.toLocaleTimeString('ru-RU', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            timeZone: query.localDates ? AUDIT_TIME_ZONE : 'UTC',
+                          })}
+                        </span>
+                      </time>
+                    </div>
 
                     <AdminDetailDialog
                       title={readableAction(event.action)}
@@ -478,6 +576,27 @@ export default async function AuditPage({
                               })}
                             </dd>
                           </div>
+                          {access && courseTitles
+                            ? [
+                                { label: 'Открыты', ids: access.opened },
+                                { label: 'Закрыты', ids: access.closed },
+                              ].map(({ label, ids }) =>
+                                ids.length > 0 ? (
+                                  <div key={label} className="sm:col-span-2">
+                                    <dt className="text-sm font-semibold text-[var(--color-text-subtle)]">
+                                      {label}
+                                    </dt>
+                                    <dd className="mt-1">
+                                      <ul className="list-disc space-y-1 pl-5 [overflow-wrap:anywhere]">
+                                        {courseNames(ids, courseTitles).map(({ id, title }) => (
+                                          <li key={id}>{title}</li>
+                                        ))}
+                                      </ul>
+                                    </dd>
+                                  </div>
+                                ) : null,
+                              )
+                            : null}
                           {reason ? (
                             <div className="sm:col-span-2">
                               <dt className="text-sm font-semibold text-[var(--color-text-subtle)]">
