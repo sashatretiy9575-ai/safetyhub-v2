@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import Link from '@/components/shared/navigation-link';
 import { usePathname } from 'next/navigation';
+import { DockItem } from '@/components/layout/dock-item';
 import { cn } from '@/lib/utils';
 
 export function AdminNavLink({
@@ -23,40 +24,38 @@ export function AdminNavLink({
   const active =
     href === '/admin' ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
+  // The phone dock is the public site's dock, item for item. Below 360 px five
+  // captions do not fit one row, so the grid wraps to 3 + 2 and the last item
+  // takes the rest of the second row.
+  if (mobile) {
+    return (
+      <DockItem
+        href={href}
+        label={label}
+        shortLabel={shortLabel}
+        active={active}
+        className="last:col-span-2 min-[360px]:last:col-span-1"
+      >
+        {children}
+      </DockItem>
+    );
+  }
+
   return (
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'group flex min-h-11 items-center gap-3 rounded-xl font-bold transition-colors',
+        'group flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold transition-colors',
         active
           ? 'bg-[var(--color-surface-muted)] text-[var(--color-text)]'
           : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
-        mobile
-          ? 'xs:last:col-span-1 w-full min-w-0 flex-col justify-center gap-0.5 px-0.5 py-1 text-sm leading-tight last:col-span-2'
-          : 'px-3 py-2 text-sm',
       )}
     >
-      <span aria-hidden="true" className={cn('grid shrink-0 place-items-center', mobile && 'h-6')}>
+      <span aria-hidden="true" className="grid shrink-0 place-items-center">
         {children}
       </span>
-      {mobile && shortLabel ? (
-        <>
-          <span
-            aria-hidden="true"
-            className="w-full text-center [overflow-wrap:anywhere] whitespace-normal"
-          >
-            {shortLabel}
-          </span>
-          <span className="sr-only">{label}</span>
-        </>
-      ) : (
-        <span
-          className={cn(mobile && 'w-full text-center [overflow-wrap:anywhere] whitespace-normal')}
-        >
-          {label}
-        </span>
-      )}
+      <span>{label}</span>
     </Link>
   );
 }

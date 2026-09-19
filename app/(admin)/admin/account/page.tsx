@@ -65,7 +65,7 @@ export default async function AdminAccountPage() {
       <Card>
         <CardContent className="space-y-4 p-5 sm:p-6">
           <h2 className="text-xl font-bold">Действия с аккаунтом</h2>
-          <SignOutAction />
+          <SignOutAction compact />
           <AccountDeletion />
         </CardContent>
       </Card>

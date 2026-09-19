@@ -16,8 +16,9 @@ export function SignOutAction({
   compact = false,
   className,
 }: {
+  /** A menu row: always the short wording — the long one wrapped to three lines in the menu. */
   menuItem?: boolean;
-  /** Compact header controls keep the full device-clear wording on profile/menu surfaces. */
+  /** The short wording on a button. Without it the button spells out that the device is cleared too. */
   compact?: boolean;
   className?: string;
 }) {
@@ -26,6 +27,7 @@ export function SignOutAction({
   const tErrors = useTranslations('Common.errors');
   const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState('');
+  const label = menuItem || compact ? t('signOutShort') : t('signOut');
 
   const signOut = async () => {
     if (signingOut) return;
@@ -69,9 +71,7 @@ export function SignOutAction({
             weight="regular"
             className="transition-transform group-hover:translate-x-0.5"
           />
-          <span className="text-sm font-medium">
-            {signingOut ? t('signingOut') : compact ? t('signOutShort') : t('signOut')}
-          </span>
+          <span className="text-sm font-medium">{signingOut ? t('signingOut') : label}</span>
         </DropdownMenuItem>
         {error ? (
           <p role="alert" className="px-2 pt-2 text-xs text-[var(--color-danger)]">
@@ -96,7 +96,7 @@ export function SignOutAction({
         )}
       >
         <SignOut size={17} />
-        {signingOut ? t('signingOut') : compact ? t('signOutShort') : t('signOut')}
+        {signingOut ? t('signingOut') : label}
       </Button>
       {error ? (
         <p role="alert" className="text-xs text-[var(--color-danger)]">

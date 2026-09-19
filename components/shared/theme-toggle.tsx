@@ -1,45 +1,12 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
 import { Moon, Sun } from '@phosphor-icons/react';
-import { applyDocumentTheme } from '@/lib/theme';
-
-const THEME_CHANGE_EVENT = 'safetyhub:theme-change';
-
-function subscribeToTheme(onStoreChange: () => void) {
-  const observer = new MutationObserver(onStoreChange);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-  window.addEventListener('storage', onStoreChange);
-  window.addEventListener(THEME_CHANGE_EVENT, onStoreChange);
-
-  return () => {
-    observer.disconnect();
-    window.removeEventListener('storage', onStoreChange);
-    window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange);
-  };
-}
-
-function getThemeSnapshot() {
-  return document.documentElement.classList.contains('dark');
-}
-
-function toggleTheme() {
-  const root = document.documentElement;
-  const dark = !root.classList.contains('dark');
-  applyDocumentTheme(dark);
-
-  try {
-    window.localStorage.setItem('theme', dark ? 'dark' : 'light');
-  } catch {
-    // The selected theme still applies for the current session.
-  }
-
-  window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
-}
+import { useIsDarkTheme } from '@/components/shared/use-theme';
+import { toggleTheme } from '@/lib/theme';
 
 export function ThemeToggle() {
-  const isDark = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, () => false);
+  const isDark = useIsDarkTheme();
   const translations = useTranslations('Shell.theme');
 
   return (

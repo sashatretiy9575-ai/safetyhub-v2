@@ -58,10 +58,24 @@ test('admin shell exposes five operational sections and switches chrome at the l
   assert.match(layout, /data-admin-shell/);
   assert.match(layout, /<aside[\s\S]+lg:flex/);
   assert.match(layout, /<header[\s\S]+lg:hidden/);
-  assert.match(layout, /<nav[\s\S]+fixed inset-x-0 bottom-0[\s\S]+lg:hidden/);
+  // The phone dock is the public site's floating pill, not a full-bleed bar. It
+  // has no fixed height: below 360 px the five items wrap to two rows.
+  assert.match(
+    layout,
+    /<nav\s+data-admin-mobile-nav[\s\S]+?className="glass-strong fixed [^"]*bottom-\[var\(--safe-area-bottom\)\][^"]*max-w-\[32\.5rem\] rounded-\[var\(--radius-dock\)\][^"]*lg:hidden"/,
+  );
+  assert.doesNotMatch(layout, /fixed inset-x-0 bottom-0/);
+  const dockClasses = layout.match(/data-admin-mobile-nav[\s\S]+?className="([^"]+)"/)?.[1] ?? '';
+  assert.doesNotMatch(dockClasses, /(?:^| )h-\[|(?:^| )w-full(?: |$)/);
   // Materials is a direct destination; settings belongs to the capability-gated avatar menu.
   assert.match(layout, /grid-cols-3/);
-  assert.match(layout, /xs:grid-cols-5/);
+  assert.match(layout, /min-\[360px\]:grid-cols-5/);
+  assert.doesNotMatch(layout, /xs:grid-cols-5|max-xs:pb-/);
+  assert.match(
+    layout,
+    /pb-\[calc\(var\(--mobile-fixed-bottom-space\)\+5rem\)\][^"]*min-\[360px\]:pb-\[calc\(var\(--mobile-fixed-bottom-space\)\+1\.5rem\)\]/,
+  );
+  assert.match(layout, /<Icon size=\{21\} weight="regular" \/>/);
   assert.match(layout, /items\.map/);
   assert.doesNotMatch(layout, /AdminMoreMenu/);
   assert.match(

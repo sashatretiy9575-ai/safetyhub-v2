@@ -5,10 +5,12 @@ import test from 'node:test';
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
 test('public shell uses neutral glass chrome and the 1024px navigation breakpoint', async () => {
-  const [css, header, tabs, shell] = await Promise.all([
+  const [css, header, tabs, dockItem, adminNavLink, shell] = await Promise.all([
     read('app/globals.css'),
     read('components/layout/header.tsx'),
     read('components/layout/bottom-tab-bar.tsx'),
+    read('components/layout/dock-item.tsx'),
+    read('components/admin/admin-nav-link.tsx'),
     read('components/layout/app-shell.tsx'),
   ]);
 
@@ -28,8 +30,27 @@ test('public shell uses neutral glass chrome and the 1024px navigation breakpoin
   // The owner asked for the quiet dock back: one weight for every icon, the
   // small dot, and a neutral surface tint rather than a green pill.
   assert.match(tabs, /weight="regular"/);
-  assert.match(tabs, /size-1 rounded-full bg-\[var\(--color-primary\)\]/);
-  assert.match(tabs, /bg-\[var\(--color-surface-muted\)\] text-\[var\(--color-text\)\]/);
+  // The item is one component for the site and the admin panel, so the admin
+  // dock cannot grow its own sizes and active state again.
+  for (const caller of [tabs, adminNavLink]) {
+    assert.match(caller, /import \{ DockItem \} from '@\/components\/layout\/dock-item';/);
+    assert.match(caller, /<DockItem\b/);
+  }
+  assert.match(dockItem, /size-1 rounded-full bg-\[var\(--color-primary\)\]/);
+  assert.match(dockItem, /bg-\[var\(--color-surface-muted\)\] text-\[var\(--color-text\)\]/);
+  assert.match(
+    dockItem,
+    /'group text-micro relative flex min-h-14 min-w-11 flex-1 flex-col items-center justify-center gap-0\.5 rounded-\[18px\] /,
+  );
+  assert.match(
+    dockItem,
+    /<span aria-hidden="true" className="flex h-7 items-center justify-center">/,
+  );
+  // The dot is never the only cue, and a shortened caption never replaces the
+  // accessible name.
+  assert.match(dockItem, /aria-current=\{active \? 'page' : undefined\}/);
+  assert.match(dockItem, /<span className="sr-only">\{label\}<\/span>/);
+  assert.doesNotMatch(dockItem, /[Ѐ-ӿ]/u);
   assert.match(tabs, /lg:hidden/);
   // Above the dock breakpoint the footer reserves only the install card's
   // space, which is zero unless the card is showing on a landscape tablet.

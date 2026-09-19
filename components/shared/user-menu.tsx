@@ -25,6 +25,7 @@ import { ROUTES } from '@/lib/constants';
 import { usePWA } from '@/components/shared/pwa-provider';
 import { detectInstallPlatform } from '@/components/shared/install-platform';
 import { SignOutAction } from '@/components/shared/sign-out-action';
+import { ThemeMenuItem } from '@/components/shared/theme-menu-item';
 import { localizePathname } from '@/i18n/config';
 
 export type UserMenuProps = {
@@ -34,6 +35,11 @@ export type UserMenuProps = {
   canManageSiteSettings?: boolean;
   canReadAudit?: boolean;
   avatarUrl?: string | null;
+  /**
+   * Only for a shell with no theme switch of its own. The site header already
+   * has one next to this menu; the admin panel has nowhere else to put it.
+   */
+  showThemeToggle?: boolean;
 };
 
 export function UserMenu({
@@ -43,6 +49,7 @@ export function UserMenu({
   canManageSiteSettings = false,
   canReadAudit = false,
   avatarUrl,
+  showThemeToggle = false,
 }: UserMenuProps) {
   const router = useRouter();
   const locale = useLocale();
@@ -196,6 +203,8 @@ export function UserMenu({
             </div>
           </DropdownMenuItem>
         ) : null}
+
+        {showThemeToggle ? <ThemeMenuItem /> : null}
 
         <DropdownMenuSeparator className="my-2 bg-[var(--color-border)]" />
 

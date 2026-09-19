@@ -101,6 +101,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 canManageSiteSettings={actor.capabilities.includes('site.settings.manage')}
                 canReadAudit={actor.capabilities.includes('audit.read')}
                 avatarUrl={avatarUrl}
+                showThemeToggle
               />
             </div>
             <Link
@@ -137,6 +138,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 canManageSiteSettings={actor.capabilities.includes('site.settings.manage')}
                 canReadAudit={actor.capabilities.includes('audit.read')}
                 avatarUrl={avatarUrl}
+                showThemeToggle
               />
             </div>
           </header>
@@ -147,7 +149,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             // focus on <body>, and without the scroll margin the heading it
             // jumps to sits under the sticky header.
             tabIndex={-1}
-            className="max-xs:pb-[calc(var(--mobile-fixed-bottom-space)+5rem)] min-w-0 scroll-mt-[calc(3.5rem+var(--safe-area-top))] pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)] outline-none lg:scroll-mt-0 lg:pb-0"
+            // The reserve follows the dock: two rows of it below 360 px, one above.
+            className="min-w-0 scroll-mt-[calc(3.5rem+var(--safe-area-top))] pb-[calc(var(--mobile-fixed-bottom-space)+5rem)] outline-none min-[360px]:pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)] lg:scroll-mt-0 lg:pb-0"
           >
             <Container
               size="admin"
@@ -158,15 +161,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </Container>
           </main>
 
+          {/* The public site's dock, without its fixed height: below 360 px the
+              five items wrap to two rows and the pill grows with them. A short
+              window un-sticks it (globals.css); the side insets stop applying
+              there, so `mx-auto` keeps it centred and `mt-2` lifts it off the
+              header — a top margin does not move a box pinned by its bottom. */}
           <nav
             data-admin-mobile-nav
             aria-label="Мобильная навигация админ-панели"
-            className="fixed inset-x-0 bottom-0 z-50 overflow-x-hidden border-t border-[var(--color-border)] bg-[var(--color-surface)]/95 pb-[var(--safe-area-bottom)] backdrop-blur-xl lg:hidden"
+            className="glass-strong fixed right-[max(.625rem,var(--safe-area-right))] bottom-[var(--safe-area-bottom)] left-[max(.625rem,var(--safe-area-left))] z-50 mx-auto mt-2 max-w-[32.5rem] rounded-[var(--radius-dock)] p-0.5 lg:hidden"
           >
-            <div className="xs:grid-cols-5 grid min-h-[var(--mobile-tab-height)] grid-cols-3 px-[max(.25rem,var(--safe-area-left))] py-1 pr-[max(.25rem,var(--safe-area-right))]">
+            <div className="grid grid-cols-3 gap-0.5 min-[360px]:grid-cols-5">
               {items.map(({ href, icon: Icon, label, shortLabel }) => (
                 <AdminNavLink key={href} href={href} label={label} shortLabel={shortLabel} mobile>
-                  <Icon size={20} />
+                  <Icon size={21} weight="regular" />
                 </AdminNavLink>
               ))}
             </div>
