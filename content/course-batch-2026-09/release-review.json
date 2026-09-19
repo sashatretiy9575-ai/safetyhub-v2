@@ -18,31 +18,33 @@
     {
       "slug": "svarshchik",
       "locale": "kk",
-      "deckSha256": "1a3863b2775bd0a108a59dd14dd4f7e9893fc680a0c1ffee143973310b98c243",
+      "deckSha256": "b20a48667bc65acd7969a7b3016edac2d487a0dfff064a214525dd6329e77421",
       "assessmentSha256": "80e7a9296df6d2092391b2e38390651fe5a61d2264c3749c7cedb7c6598bcdeb",
       "pdfSha256": "be720968cb79773f6dec942fa604b03e4b8d74dd94a79de5877d16070870dce4",
       "visual": "passed",
       "semantic": "passed",
       "reviewer": "forms independent agent",
       "reviewedSlides": 42,
-      "reviewedQuestions": 30
+      "reviewedQuestions": 30,
+      "sourceTitlesLocalized": true
     },
     {
       "slug": "svarshchik",
       "locale": "en",
-      "deckSha256": "6206521db20070195f4c351c94c0034945044d20057e59c2a4992386a1ee7d6a",
+      "deckSha256": "b3b72a7e0483bd417fe1a20f4115f824e403b93fa092c93ae0c05c17f3e68609",
       "assessmentSha256": "a87c0cedce0ad16646c60092a7ba10a9f1a6adec6075434d31b70d1a1d305760",
       "pdfSha256": "4f53dbf9f5beeb7cb437a4fe9f62a5bf8327442582ac0760afbac732505f0cc1",
       "visual": "passed",
       "semantic": "passed",
       "reviewer": "root independent review",
       "reviewedSlides": 42,
-      "reviewedQuestions": 30
+      "reviewedQuestions": 30,
+      "sourceTitlesLocalized": true
     },
     {
       "slug": "svarshchik",
       "locale": "zh",
-      "deckSha256": "df1b80a30a0614055d95e7d97c00b3887bc00c3e44b21458bfd551f272d75c33",
+      "deckSha256": "375d3a939746aa1b00649fc7684c5c4920ccb0a1c0eff4ed97de3aaef2c7a1aa",
       "assessmentSha256": "761df80a0f13b198387e1f253141b35de5023cdba02a1b895a392fde40b4aeae",
       "pdfSha256": "264b91e94312ec62a9f9274ca955a8ae8bd13734159e0e7d2fdef74db942aa0c",
       "visual": "passed",
@@ -50,7 +52,8 @@
       "reviewer": "root independent review",
       "reviewedSlides": 42,
       "reviewedQuestions": 30,
-      "metadataReview": "Root approved exact OG title 焊工培训 to meet schema minimum3 characters; slide content and PDF unchanged."
+      "metadataReview": "Root approved exact OG title 焊工培训 to meet schema minimum3 characters; slide content and PDF unchanged.",
+      "sourceTitlesLocalized": true
     },
     {
       "slug": "promyshlennaya-bezopasnost",
@@ -67,41 +70,50 @@
     {
       "slug": "promyshlennaya-bezopasnost",
       "locale": "kk",
-      "deckSha256": "0f091d7731d61d4bdc1662e1907cc6b9c607d9af71c429e438e6efa332437d75",
+      "deckSha256": "95a428a5889fc29ca9c2b054ae331b233eb7180462c40509242ec767889b420a",
       "assessmentSha256": "b9229bb5d46c3fbe2ad2305394d893146cdc8423788c15812fa492d492b4d878",
       "pdfSha256": "236fd323cd0eb384fa40728b7bafffcea388dfa7ac452604c901704fa4a7a0e1",
       "visual": "passed",
       "semantic": "passed",
       "reviewer": "forms independent agent",
       "reviewedSlides": 55,
-      "reviewedQuestions": 30
+      "reviewedQuestions": 30,
+      "sourceTitlesLocalized": true
     },
     {
       "slug": "promyshlennaya-bezopasnost",
       "locale": "en",
-      "deckSha256": "d0e7a2e528aff5fd2d8f1094c2e918989d3199951a161a35dd9d050902dec0b5",
+      "deckSha256": "6d3a98c7031e9ec54c47f82bf8203c6501c41a0a088e7721eae57c31b8567434",
       "assessmentSha256": "e5066b1818d16c03877b157108be8afee8c850462d8022693896917bb59a0869",
       "pdfSha256": "d1a81929318435bcf0ac2a794cc70454e9044b6b4451ab6b49cf468a428fd980",
       "visual": "passed",
       "semantic": "passed",
       "reviewer": "root independent review",
       "reviewedSlides": 55,
-      "reviewedQuestions": 30
+      "reviewedQuestions": 30,
+      "sourceTitlesLocalized": true
     },
     {
       "slug": "promyshlennaya-bezopasnost",
       "locale": "zh",
-      "deckSha256": "c2f83d4faa3532cca9969cf3ea15063cb634cf37f49b96d5fd6e5b52fe94e4be",
+      "deckSha256": "04bf7c8723394f00874bffa11a6e00dde5e9d90b96ef7e5ec308ac6aa2ac3bb3",
       "assessmentSha256": "a13823dd76b51e7c2fa4b90144fb7d443ff92ec2ccec14978c33ea72e3a29065",
       "pdfSha256": "75ed7ad78506fc5ec6560d247e9e7acf36125df393cab8e97560f03a7679b8af",
       "visual": "passed",
       "semantic": "passed",
       "reviewer": "root independent review",
       "reviewedSlides": 55,
-      "reviewedQuestions": 30
+      "reviewedQuestions": 30,
+      "sourceTitlesLocalized": true
     }
   ],
   "limitations": [
     "Course completion does not itself confer occupational qualification or site authorisation."
-  ]
+  ],
+  "sourceTitleLocalization": {
+    "appliedAt": "2026-09-19T22:13:07.428Z",
+    "scope": "the five linked legal acts in the kk, en and zh decks of both courses",
+    "reviewer": "owner request, 20 Sep 2026: every language shows its own wording",
+    "unchanged": "slides, assessments and rendered presentations — the acts are not cited on any slide"
+  }
 }

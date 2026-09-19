@@ -164,13 +164,13 @@ async function rpc(client, name, args) {
   return data;
 }
 
-async function operatorSession(service, url, secret, local) {
+export async function operatorSession(service, url, secret, local, email = null) {
   let token = process.env.SAFETYHUB_CONTENT_OPERATOR_ACCESS_TOKEN;
   // Generate and consume a link only for the synthetic LOCAL operator. No mail is sent.
-  if (!token && local) {
+  if (!token && (local || email)) {
     const link = await service.auth.admin.generateLink({
       type: 'magiclink',
-      email: 'admin@safetyhub.local',
+      email: email ?? 'admin@safetyhub.local',
     });
     if (link.error) throw new Error('LOCAL_OPERATOR_MISSING');
     const auth = createClient(url, secret, {
@@ -264,10 +264,14 @@ export async function publishCourseBatch({ batch, target, receiptPath, confirmHa
     let entry = receipt.courses[slug];
     const found = catalog.data.find((c) => c.slug === slug);
     if (found) assert(entry?.id === found.id, 'EXISTING_COURSE_REQUIRES_MATCHING_RECEIPT');
-    const sources = ru.deck.sources
-      .filter((s) => s.url && s.title)
-      .map(({ title, url }) => ({ title, url }))
-      .sort((a, b) => (a.title < b.title ? -1 : a.title > b.title ? 1 : 0));
+    // Every language cites the same acts, each under its own title, so the sources travel
+    // with the deck they belong to. The course-level metadata keeps the Russian list.
+    const deckSources = (deck) =>
+      deck.sources
+        .filter((s) => s.url && s.title)
+        .map(({ title, url }) => ({ title, url }))
+        .sort((a, b) => (a.title < b.title ? -1 : a.title > b.title ? 1 : 0));
+    const sources = deckSources(ru.deck);
     const saveArgs = (id, version, presentationId, displayOrder) => ({
       p_actor_id: actorId,
       p_test_id: id,
@@ -341,7 +345,7 @@ export async function publishCourseBatch({ batch, target, receiptPath, confirmHa
         p_content: { modules: [] },
         p_question_variants: [],
         p_seo: item.deck.seo,
-        p_sources: sources,
+        p_sources: deckSources(item.deck),
         p_reviewed_content_hash: null,
         p_translation_qa: qa,
         p_presentation_id: presentations[item.locale].id,
