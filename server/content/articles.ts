@@ -27,6 +27,7 @@ import {
   type ArticleLifecycleStatus,
 } from '@/lib/validation/article';
 import { contentSeoSchema, defaultContentSeo, type ContentSeo } from '@/lib/validation/content-seo';
+import { articleSeoDefaults } from '@/lib/validation/article-seo-defaults';
 import { APP_LOCALES, DEFAULT_LOCALE, type AppLocale } from '@/i18n/config';
 import type { Json } from '@/lib/supabase/types';
 import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
@@ -323,6 +324,24 @@ function localizedArticleKey(locale: AppLocale, slug: string) {
   return `${locale}:${slug}`;
 }
 
+function articleSeo(
+  value: unknown,
+  title: string,
+  description: string,
+  ogImage: string,
+  locale: AppLocale = DEFAULT_LOCALE,
+): ContentSeo {
+  const parsed = contentSeoSchema.safeParse(value);
+  if (parsed.success) return parsed.data;
+  // The generic default pads a short description with Russian wording, which a
+  // Chinese summary always triggers: it is dense enough to stay under the
+  // 40-character floor. A translation falls back to its own language; the
+  // Russian page keeps the exact wording it always had. Same fix as `topicSeo`.
+  return locale === DEFAULT_LOCALE
+    ? defaultContentSeo(title, description, ogImage)
+    : articleSeoDefaults(locale, title, description, ogImage);
+}
+
 function localizedArticleSummary(
   value: Record<string, unknown>,
   locale: AppLocale,
@@ -345,9 +364,7 @@ function localizedArticleSummary(
     coverImage,
     createdAt: typeof value.publishedAt === 'string' ? value.publishedAt : undefined,
     updatedAt: typeof value.publishedAt === 'string' ? value.publishedAt : undefined,
-    seo: contentSeoSchema.safeParse(value.seo).success
-      ? contentSeoSchema.parse(value.seo)
-      : defaultContentSeo(value.title, value.description, coverImage),
+    seo: articleSeo(value.seo, value.title, value.description, coverImage, locale),
     ...metadataFields(value),
   };
 }

@@ -4,6 +4,7 @@ import {
   htmlLanguage,
   isAppLocale,
   localizePathname,
+  type AppLocale,
 } from '@/i18n/config';
 import { loadMessages } from '@/i18n/messages';
 import { rolloutFeatureEnabled } from '@/lib/rollout-flags';
@@ -13,6 +14,35 @@ export const dynamicParams = false;
 export function generateStaticParams() {
   return APP_LOCALES.map((locale) => ({ locale }));
 }
+
+const OFFLINE_FALLBACK: Record<
+  AppLocale,
+  { title: string; description: string; home: string }
+> = {
+  ru: {
+    title: 'Нет подключения',
+    description:
+      'Проверьте интернет и повторите попытку. Открытые тесты не сохраняются в офлайн-режиме.',
+    home: 'На главную',
+  },
+  kk: {
+    title: 'Интернет байланысы жоқ',
+    description:
+      'Интернетті тексеріп, әрекетті қайталаңыз. Ашық тесттер офлайн режимінде сақталмайды.',
+    home: 'Басты бетке',
+  },
+  en: {
+    title: 'You’re offline',
+    description:
+      'Check your internet connection and try again. Open tests are not saved while offline.',
+    home: 'Go to home',
+  },
+  zh: {
+    title: '网络连接已断开',
+    description: '请检查网络连接后重试。离线时不会保存正在进行的测试。',
+    home: '返回首页',
+  },
+};
 
 function escapeHtml(value: string) {
   return value
@@ -30,9 +60,13 @@ export async function GET(_request: Request, context: { params: Promise<{ locale
     return new Response('Not found', { status: 404 });
   }
 
-  let title = 'Нет подключения к интернету';
-  let description = 'Проверьте соединение с сетью. Сохранённые данные и материалы доступны офлайн.';
-  let home = 'На главную';
+  // The page a visitor reaches without a network cannot ask for a translation,
+  // so the last resort carries its own copy in every language instead of
+  // showing Russian to a Chinese reader.
+  const fallback = OFFLINE_FALLBACK[candidate];
+  let title = escapeHtml(fallback.title);
+  let description = escapeHtml(fallback.description);
+  let home = escapeHtml(fallback.home);
   const homeUrl = escapeHtml(localizePathname('/', candidate));
 
   try {

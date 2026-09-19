@@ -73,8 +73,17 @@ test('offline action, splash, shortcuts, and automatic install prompt match thei
   ]);
   const manifest = JSON.parse(manifestSource);
 
-  assert.match(offline, />На главную<\/a>/);
-  assert.doesNotMatch(offline, />Повторить<\/a>/);
+  // The last-resort shell is reached only when the localized offline page is
+  // missing from the cache, so it cannot know the reader's language and names
+  // the one action in all four. It stays a link home, never a retry button.
+  assert.match(offline, /<a href="\/">[^<]*На главную[^<]*<\/a>/u);
+  for (const home of ['На главную', 'Басты бетке', 'Home', '返回首页']) {
+    assert.match(offline, new RegExp(`<a href="/">[^<]*${home}[^<]*</a>`, 'u'), home);
+  }
+  for (const title of ['Нет подключения', 'Интернет байланысы жоқ', 'You’re offline', '网络连接已断开']) {
+    assert.ok(offline.includes(title), title);
+  }
+  assert.doesNotMatch(offline, />Повторить<\/a>/u);
   assert.equal(manifest.background_color, '#f7f8fa');
   assert.equal(manifest.lang, 'ru-KZ');
   assert.equal(manifest.orientation, undefined);
