@@ -19,20 +19,8 @@ const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 // issuance and selection recovery form the exact hash-pinned pending tail. Adding
 // a migration means adding it here too, with its hash; an open-ended local tail
 // would defeat this preflight.
-export const REVIEWED_BASE_MIGRATION_COUNT = 91;
+export const REVIEWED_BASE_MIGRATION_COUNT = 94;
 export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
-  Object.freeze({
-    filename: '20260903200000_course_seo_fill_and_republish.sql',
-    sha256: 'ccfeb07a4ec8a3c4dca484bab9e0d1d23bc65d4b664ea837aaa877e1f19f2382',
-  }),
-  Object.freeze({
-    filename: '20260903220000_presentation_service_role_grant.sql',
-    sha256: '74293956a2ab53f2758fcb9eddad6f9abba351bad3fae8e7c7107c8cdc3ef5f6',
-  }),
-  Object.freeze({
-    filename: '20260905100000_immediate_admin_account_purge.sql',
-    sha256: '90f9fbc139659a0a4d70c7ce67304b0fd03e481dd6528700c94e6f6196e50907',
-  }),
   Object.freeze({
     filename: '20260905101000_deletion_pending_admin_read_filters.sql',
     sha256: 'fe4e9a23b12ba4f067c986b0e369ffc5cd4b6edcd03e1c0100e705b9c712d3e5',
@@ -129,8 +117,6 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
     filename: '20260919122000_industrial_formal_exam_evidence.sql',
     sha256: '9eb90a001c681f34fbfa7238542e8fe004d8af84859954fe44f68655ff5eba35',
   }),
-]);
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260919140000_new_issuance_education.sql',
     sha256: '757f22ea6ec52d614073d933ddeafd6015cb37677e191bbf56df6179dc364afb',
@@ -143,6 +129,9 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
     filename: '20260919142000_refresh_selected_attestation_summary.sql',
     sha256: 'd26847294d29ae771405d12594f1a26dd77ab87fe10ac93e3d79680ea2491863',
   }),
+]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;
