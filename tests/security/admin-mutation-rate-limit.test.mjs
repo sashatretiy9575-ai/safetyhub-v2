@@ -9,6 +9,7 @@ const read = (file) => readFile(path.join(root, file), 'utf8');
 
 const guardedRoutes = new Map([
   ['app/api/admin/users/[userId]/identity/route.ts', 'admin.identity.mutate'],
+  ['app/api/admin/users/[userId]/course-access/route.ts', 'admin.identity.mutate'],
   ['app/api/admin/users/purge/route.ts', 'admin.purge'],
   ['app/api/admin/operators/route.ts', 'admin.access.mutate'],
   ['app/api/admin/courses/route.ts', 'admin.test.mutate'],
@@ -21,6 +22,7 @@ const guardedRoutes = new Map([
   ['app/api/admin/attestations/actions/route.ts', 'admin.attestation.mutate'],
   ['app/api/admin/organizations/merge/route.ts', 'admin.attestation.mutate'],
   ['app/api/admin/settings/contacts/route.ts', 'site.settings.update'],
+  ['app/api/admin/documents/assets/route.ts', 'site.settings.update'],
 ]);
 
 test('every live privileged mutation applies same-origin and shared actor/IP quotas', async () => {

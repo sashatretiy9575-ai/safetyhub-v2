@@ -117,6 +117,7 @@ const nextConfig: NextConfig = {
       '/api/certificates/*/photo': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
       '/api/admin/documents/photo/*': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
       '/api/admin/settings/certificate/image': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
+      '/api/admin/documents/assets': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
     '/api/profile/avatar': [
       './node_modules/@img/sharp-linux-x64/**/*',
       './node_modules/@img/sharp-libvips-linux-x64/**/*',
@@ -202,7 +203,14 @@ const nextConfig: NextConfig = {
         headers: [...securityHeaders, restrictedPermissions],
       },
       {
-        source: '/api/:path*',
+        // Every API response is private and never stored. The one exception
+        // is the admin employee photo: its handler answers `private, no-cache`
+        // with an ETag, so a repeat view is a bodiless 304 that still passes
+        // the access check. `next start` and `next dev` keep a header set here
+        // and drop the handler's (Vercel does the opposite), so the rule steps
+        // aside for exactly that path; its error responses stay no-store
+        // through the API response facade.
+        source: '/api/:path((?!admin/attestations/avatar/).*)',
         headers: privateNoStoreHeaders,
       },
       {

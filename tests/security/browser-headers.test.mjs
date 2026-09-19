@@ -152,7 +152,13 @@ test('all responses receive baseline browser hardening headers', async () => {
   assert.match(config, /poweredByHeader: false/u);
   assert.match(config, /productionBrowserSourceMaps: false/u);
   assert.match(config, /const privateNoStoreHeaders[\s\S]*private, no-store/u);
-  assert.match(config, /source: '\/api\/:path\*'[\s\S]*headers: privateNoStoreHeaders/u);
+  assert.match(
+    config,
+    /source: '\/api\/:path\(\(\?!admin\/attestations\/avatar\/\)\.\*\)'[\s\S]*headers: privateNoStoreHeaders/u,
+  );
+  // The no-store rule steps aside for one path only; widening it is a decision, not a typo.
+  assert.equal(config.match(/source: '\/api\/[^']*'/gu)?.length, 1);
+  assert.doesNotMatch(config, /source: '\/api\/:path\*'/u);
   assert.match(config, /const privateNoStoreHeaders[\s\S]*Referrer-Policy'[\s\S]*no-referrer/u);
   assert.match(config, /source: '\/callback'[\s\S]*headers: privateNoStoreHeaders/u);
   assert.match(config, /source: '\/auth\/:path\*'[\s\S]*headers: privateNoStoreHeaders/u);
