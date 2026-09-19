@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { ADMIN_COURSE_ACCESS_LIMIT } from '../../lib/constants.ts';
 
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 
@@ -104,11 +105,12 @@ test('the queue ticks courses per application and reaches the applicant on Whats
 });
 
 test('the employee card edits the open courses through a capability-gated endpoint', async () => {
-  const [panels, control, route, feature] = await Promise.all([
+  const [panels, control, route, feature, selection] = await Promise.all([
     read('components/admin/attestations-manager-panels.tsx'),
     read('components/admin/course-access-control.tsx'),
     read('app/api/admin/users/[userId]/course-access/route.ts'),
     read('server/admin/course-access.ts'),
+    read('lib/admin/course-access-selection.ts'),
   ]);
   assert.match(panels, /<CourseAccessControl/u);
   assert.match(panels, /canManage=\{permissions\.canManageIdentity\}/u);
@@ -121,6 +123,77 @@ test('the employee card edits the open courses through a capability-gated endpoi
   assert.match(route, /rpc\(\s*'set_course_access'/u);
   assert.match(feature, /\.eq\('status', 'published'\)/u);
   assert.match(feature, /from\('course_access_grants'\)/u);
+
+  // One request at a time: a single PUT call site, no parallel fan-out, one
+  // save loop per card, and the loop waits for each answer before it asks again.
+  assert.equal(control.match(/method: 'PUT'/gu)?.length, 1);
+  assert.doesNotMatch(control, /Promise\.all\(/u);
+  assert.doesNotMatch(selection, /Promise\.all\(/u);
+  assert.match(control, /if \(savingRef\.current\) return;\s*savingRef\.current = true;/u);
+  assert.match(control, /put: \(request\) => putCourseAccess\(userId, request\)/u);
+  assert.match(
+    selection,
+    /for \(;;\) \{\s*const \{ confirmed, pending \} = io\.read\(\);\s*const request = buildRequest\(pending, confirmed\);/u,
+  );
+  assert.match(selection, /const outcome = await io\.put\(request\);/u);
+  // The body is the delta, never the whole ticked set.
+  assert.match(control, /body: JSON\.stringify\(request\)/u);
+  assert.doesNotMatch(control, /courseIds: \[/u);
+  // A card opened again waits for the save its previous opening left behind.
+  assert.match(
+    control,
+    /await inflightSaves\.get\(userId\);[\s\S]{0,120}getCourseAccess\(userId, controller\.signal\)/u,
+  );
+  // Search, and bulk actions that reach only what the search shows.
+  assert.match(control, /type="search"/u);
+  assert.match(control, /Выбрать все найденные — /u);
+  assert.match(control, /Снять найденные — /u);
+  assert.match(control, /bulkChange\(visible, target, /u);
+  // Escape empties the search instead of closing the card's <dialog>.
+  assert.match(
+    control,
+    /event\.key !== 'Escape' \|\| !query\) return;\s*event\.preventDefault\(\);\s*event\.stopPropagation\(\);/u,
+  );
+
+  // The RPC replaces the whole set, so the route applies the change to the
+  // grants it reads at that moment — unpublished courses and a second
+  // administrator's ticks survive — and only then calls the RPC.
+  const put = route.slice(route.indexOf('export async function PUT'));
+  const readCurrent = put.indexOf('await listGrantedCourseIds(userId)');
+  assert.ok(readCurrent > 0 && readCurrent < put.indexOf('.rpc('), 'grants are read before rpc(');
+  assert.ok(
+    put.indexOf('await consumeAdminMutationQuota') < readCurrent,
+    'quota precedes the read',
+  );
+  assert.match(
+    feature,
+    /export async function listGrantedCourseIds\([\s\S]{0,200}from\('course_access_grants'\)\s*\.select\('test_id'\)\s*\.eq\('user_id', userId\)/u,
+  );
+  assert.match(put, /applyCourseAccessRequest\(current, change\)/u);
+  assert.match(put, /p_course_ids: next \}/u);
+  // A tab opened before the delta existed still sends `{ courseIds }`.
+  assert.match(feature, /kind: 'replace', courseIds: legacy\.data/u);
+  assert.match(put, /replaceListedCourseAccess\(/u);
+  // The limit is one number for the database, the route and the card.
+  assert.equal(ADMIN_COURSE_ACCESS_LIMIT, 200);
+  assert.match(feature, /\.max\(ADMIN_COURSE_ACCESS_LIMIT\)/u);
+  assert.match(
+    put,
+    /next\.length > ADMIN_COURSE_ACCESS_LIMIT\) return refuse\('COURSE_ACCESS_LIMIT'\)/u,
+  );
+  assert.match(selection, /openCourseTotal\(confirmed, pending\) > ADMIN_COURSE_ACCESS_LIMIT/u);
+  assert.match(control, /exceedsCourseAccessLimit\(confirmedRef\.current, nextPending\)/u);
+  // Refusals keep their names; the shared mapper turned the first two into
+  // SERVER_ERROR 500, which the card would have taken for a lost answer.
+  assert.match(put, /return courseAccessError\(error\);/u);
+  for (const code of [
+    'COURSE_ACCESS_COURSE_UNKNOWN',
+    'ACCOUNT_UNAVAILABLE',
+    'COURSE_ACCESS_LIMIT',
+  ]) {
+    assert.match(route, new RegExp(`'${code}'`, 'u'), code);
+    assert.match(control, new RegExp(`^  ${code}: `, 'mu'), code);
+  }
 });
 
 test('a locked course is refused by name on every learner surface', async () => {

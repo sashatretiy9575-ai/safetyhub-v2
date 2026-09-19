@@ -12,7 +12,8 @@ import {
 type AttestationTableRowProps = {
   row: AdminAttestationRow;
   selected: boolean;
-  onSelectChange: (checked: boolean) => void;
+  /** `source` is the checkbox itself: the list keeps it where it was ticked. */
+  onSelectChange: (checked: boolean, source: Element) => void;
   onOpenDetails: () => void;
   permissions: AttestationPermissions;
   onSingleAction: (action: AttestationPendingAction) => void;
@@ -97,7 +98,7 @@ export function AttestationTableRow({
           <input
             type="checkbox"
             checked={selected}
-            onChange={(event) => onSelectChange(event.target.checked)}
+            onChange={(event) => onSelectChange(event.target.checked, event.target)}
             className="size-4.5 accent-[var(--color-primary)]"
           />
           <span className="sr-only">
@@ -113,6 +114,9 @@ export function AttestationTableRow({
       >
         <button
           type="button"
+          // A card reopened from `?card=` focuses this button first, so closing
+          // the card returns the keyboard to its row.
+          data-card-trigger={row.recordId}
           onClick={onOpenDetails}
           aria-label={`Открыть сведения: ${row.fullName}`}
           className="block max-w-full min-w-0 text-left font-semibold [overflow-wrap:anywhere] break-words hover:underline @min-[760px]:truncate"

@@ -76,3 +76,10 @@ export const CERTIFICATE_EXPORT_SYNC_LIMIT = 100;
 export const CERTIFICATE_EXPORT_JOB_LIMIT = 500;
 
 export const ADMIN_PURGE_BULK_LIMIT = 50;
+
+/**
+ * How many courses one learner may have open. `set_course_access` refuses a
+ * longer list, so the route and the employee card check the same number and
+ * can name the limit before the database does.
+ */
+export const ADMIN_COURSE_ACCESS_LIMIT = 200;

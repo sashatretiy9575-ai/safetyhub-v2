@@ -195,6 +195,83 @@ test('attestation list keeps personal details compact and loads the avatar only 
   // and never a sentence claiming the phone is optional.
   assert.doesNotMatch(managerSurface, />(?:Контакт|Телефон)</u);
   assert.doesNotMatch(managerSurface, />Письмо<|необязателен при регистрации/u);
+  // The owner asked twice for the mail button to go: the address is the one
+  // `mailto:` link pinned above, and nothing else in the card writes to it.
+  assert.doesNotMatch(managerSurface, /Написать на почту/u);
+  assert.equal((managerSurface.match(/mailto:/gu) ?? []).length, 1);
+  // The position stands beside the company instead of being the only line of
+  // a collapsed section, and the name is the card's heading alone.
+  assert.doesNotMatch(panels, /<details[\s\S]{0,400}Дополнительные сведения/u);
+  assert.doesNotMatch(panels, /Дополнительные сведения/u);
+  assert.match(panels, /Должность: \{row\.job \|\| 'не указана'\}/u);
+  assert.doesNotMatch(panels, /<p[^>]*>\{row\.fullName\}<\/p>/u);
+  // The way into the form is not a toggle any more: the form has its own
+  // «Отмена», so the button never says one thing and announces another.
+  assert.doesNotMatch(panels, /Закрыть редактирование|aria-pressed=\{mode === 'edit'\}/u);
+  // A link is only built from a number it can dial; anything else is text.
+  assert.match(panels, /isDialablePhone\(contact\.phoneE164\)/u);
+  assert.match(panels, /Телефон не указан/u);
+  assert.match(panels, /role="group"\s+aria-label="Связаться"/u);
+  // The photo is a plain <img> over initials that are always there, asked for
+  // at once: Radix kept the fallback hidden while a lazy image was pending.
+  assert.doesNotMatch(panels, /AvatarImage|@\/components\/ui\/avatar/u);
+  assert.doesNotMatch(panels, /loading="lazy"/u);
+  assert.match(panels, /fetchPriority="high"/u);
+  assert.match(panels, /onError=\{\(\) => setPhotoState\('failed'\)\}/u);
+  assert.match(panels, /title="Открыть фото"/u);
+  // The card's lazy chunk is fetched while the browser is idle, and every read
+  // in the card is bounded: a raw `fetch` left the education field disabled
+  // for good when the answer never came.
+  assert.match(
+    panels,
+    /export const preloadAttestationCard = \(\) =>\s*void import\('@\/components\/admin\/course-access-control'\)/u,
+  );
+  assert.match(manager, /window\.requestIdleCallback\(preloadAttestationCard\)/u);
+  assert.match(manager, /window\.setTimeout\(preloadAttestationCard, /u);
+  assert.doesNotMatch(panels, /(?:void|await)\s+fetch\s*\(/u);
+  // A refused save says what was refused.
+  assert.match(panels, /Данные сотрудника не сохранены\. \$\{clientRequestMessage\(/u);
+  assert.match(
+    panels,
+    /result\.error\.status === 400\s*\?\s*'Данные сотрудника не сохранены: сервер отклонил значения полей\. Проверьте имя, фамилию, должность и компанию\.'/u,
+  );
+  assert.doesNotMatch(panels, /Не удалось сохранить данные/u);
+  // Two administrators on one card: the save names the identity version it
+  // was opened on, and the route compares it after the quota and before the
+  // write, so the second save is refused instead of overwriting the first.
+  const [identityRoute, identityValidation] = await Promise.all([
+    read('app/api/admin/users/[userId]/identity/route.ts'),
+    read('lib/validation/identity.ts'),
+  ]);
+  assert.match(
+    identityValidation,
+    /expectedVersion: z\.number\(\)\.int\(\)\.nonnegative\(\)\.optional\(\)/u,
+  );
+  assert.match(identityRoute, /current\.version !== parsedBody\.data\.expectedVersion/u);
+  assert.match(identityRoute, /\{ error: 'IDENTITY_CHANGED' \}, \{ status: 409 \}/u);
+  const quotaAt = identityRoute.indexOf('await consumeAdminMutationQuota');
+  const conflictAt = identityRoute.indexOf("'IDENTITY_CHANGED'");
+  const writeAt = identityRoute.indexOf('await verifyUserIdentity(');
+  assert.ok(quotaAt >= 0 && quotaAt < conflictAt && conflictAt < writeAt);
+  assert.match(panels, /expectedVersion: versionRef\.current/u);
+  assert.match(panels, /payload\?\.error === 'IDENTITY_CHANGED'/u);
+  assert.match(panels, /их уже изменил другой администратор/u);
+  assert.match(panels, /Показать актуальные/u);
+  // An issuance refused for the person's own data keeps the card open on the
+  // fields at fault; the document profile calls the position `position`.
+  assert.match(manager, /position: 'job'/u);
+  assert.match(
+    manager,
+    /message: `Сертификат не выдан: \$\{skipReasonLabel\(only\?\.reason\)\}\.`/u,
+  );
+  assert.match(panels, /if \(issue && canEdit\) setMode\('edit'\)/u);
+  assert.match(panels, /invalid=\{issueFields\.includes\(field\)\}/u);
+  assert.match(panels, /\[aria-invalid="true"\]:enabled/u);
+  // What was typed and not saved survives closing the card, and «Отмена» and a
+  // successful save are what drop it.
+  assert.match(panels, /canEdit && \(issue \|\| getDraft\(row\.recordId\)\) \? 'edit' : 'view'/u);
+  assert.match(panels, /onDraft\(row\.recordId, null\);\s*\n\s*setMode\('view'\);/u);
+  assert.match(panels, /onDraft\(null\);\s*\n\s*onSaved\(row, normalized\);/u);
   assert.match(managerSurface, /phoneHref\(contact\.phoneE164\)/);
   assert.match(managerSurface, /formatPhoneDisplay\(contact\.phoneE164\)/);
   assert.match(
@@ -209,16 +286,18 @@ test('attestation list keeps personal details compact and loads the avatar only 
   assert.match(contactRoute, /select\('phone_e164, phone_country_iso2'\)/);
   assert.match(contactRoute, /@\/lib\/security\/api-response/);
   assert.match(historyRoute, /requireCapability\('user\.read'\)/);
-  // The address comes from the product's own disclosure rule, not from a
-  // second privileged Auth Admin lookup whose result was discarded.
-  assert.match(historyRoute, /rpc\('get_safe_user_email'/);
+  // The card reads the address from the contact endpoint above, so the history
+  // payload carries certificates only: no address lookup of any kind is left.
+  assert.doesNotMatch(historyRoute, /get_safe_user_email|\bemail\b/);
   assert.doesNotMatch(historyRoute, /auth\.admin\.getUserById/);
   assert.match(avatarRoute, /requireAnyCapability\(\['identity\.read', 'identity\.manage'\]\)/);
   assert.match(avatarRoute, /rpc\('get_profile_avatar_manifest'/);
   assert.match(avatarRoute, /isOwnedAvatarObjectKey\(/);
-  assert.match(avatarRoute, /createSignedUrl\(manifest\.data\.objectKey, 10 \* 60\)/);
+  // The route streams the photo itself and revalidates it by ETag, so no
+  // signed Storage URL is minted for the card any more.
+  assert.doesNotMatch(avatarRoute, /createSignedUrl|redirect\(/);
+  assert.match(avatarRoute, /createPrivateRevalidatedResponse\(/);
   assert.match(avatarRoute, /@\/lib\/security\/api-response/);
-  assert.match(avatarRoute, /private, no-store/);
 });
 
 test('admin navigation makes employees the primary operational workspace', async () => {

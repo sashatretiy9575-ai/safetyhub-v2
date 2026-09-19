@@ -25,6 +25,15 @@ export function normalizePhoneE164(value: string): string | null {
   return E164_PATTERN.test(normalized) ? normalized : null;
 }
 
+/**
+ * True only for a canonical E.164 number. A stored phone that fails this is
+ * shown as plain text: a `tel:` or WhatsApp link built from it would open the
+ * dialer on a number nobody can reach.
+ */
+export function isDialablePhone(value: string): boolean {
+  return E164_PATTERN.test(value);
+}
+
 export function formatPhoneDisplay(e164: string): string {
   if (/^\+7[0-9]{10}$/.test(e164)) {
     return `${e164.slice(0, 2)} ${e164.slice(2, 5)} ${e164.slice(5, 8)} ${e164.slice(8)}`;

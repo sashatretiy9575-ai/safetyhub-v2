@@ -330,12 +330,225 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
       await context.close();
     }
   });
+  test('an open card survives a reload and leaves with the list it belongs to', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    const manager = page.locator('[data-attestations-manager]');
+    // History entry one is a filtered list; removing the filter makes entry two.
+    await page.goto('/admin/employees?q=%D0%B0', { timeout: 120_000 });
+    await page.getByRole('link', { name: /Убрать фильтр/u }).click();
+    await expect(page).not.toHaveURL(/[?&]q=/u);
+    await expect(manager).toHaveAttribute('data-client-ready', 'true');
+
+    const trigger = page.getByRole('button', { name: /^Открыть сведения:/u }).nth(1);
+    const recordId = await trigger.getAttribute('data-card-trigger');
+    expect(recordId).toMatch(/^[0-9a-f-]{36}$/u);
+    const fullName = ((await trigger.getAttribute('aria-label')) ?? '').replace(
+      'Открыть сведения: ',
+      '',
+    );
+    const withCard = new RegExp(`[?&]card=${recordId}(?:&|$)`, 'u');
+    await trigger.click();
+    const card = page.getByRole('dialog', { name: fullName, exact: true });
+    await expect(card).toBeVisible();
+    await expect(page).toHaveURL(withCard);
+
+    await page.reload();
+    await expect(manager).toHaveAttribute('data-client-ready', 'true');
+    await expect(card).toBeVisible();
+    await expect(page).toHaveURL(withCard);
+    // Closing takes the parameter away and hands the keyboard back to the row,
+    // exactly as if the card had been opened with its button.
+    await page.keyboard.press('Escape');
+    await expect(card).toBeHidden();
+    await expect(page).not.toHaveURL(/[?&]card=/u);
+    await expect(page.locator(`[data-card-trigger="${recordId}"]`)).toBeFocused();
+
+    // The card belongs to the list under it: back on the filtered list there is
+    // no card and no parameter, because no filter link ever carries it.
+    await trigger.click();
+    await expect(card).toBeVisible();
+    await expect(page).toHaveURL(withCard);
+    await page.goBack();
+    await expect(page).toHaveURL(/[?&]q=/u);
+    await expect(page).not.toHaveURL(/[?&]card=/u);
+    await expect(page.getByRole('dialog')).toBeHidden();
+
+    // Only an identifier of a row on this page opens anything.
+    for (const value of ['not-a-uuid', '00000000-0000-4000-8000-000000000000']) {
+      await page.goto(`/admin/employees?card=${value}`, { timeout: 120_000 });
+      await expect(manager).toHaveAttribute('data-client-ready', 'true');
+      await expect(page).not.toHaveURL(/[?&]card=/u);
+      await expect(page.getByRole('dialog')).toBeHidden();
+    }
+  });
+  test('the first tick and the last one keep the ticked row where it is', async ({ page }) => {
+    test.setTimeout(120_000);
+    const panel = page.getByRole('complementary', { name: 'Выбранные сотрудники' });
+    const checks = page.getByRole('checkbox', { name: /^Выбрать:/u });
+    const top = (index: number) =>
+      checks.nth(index).evaluate((node) => node.getBoundingClientRect().top);
+    for (const viewport of [
+      { width: 1440, height: 800 },
+      { width: 375, height: 800 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/admin/employees', { timeout: 120_000 });
+      // The visible one: on a repeated load React can leave the segment's streamed
+      // HTML behind in its `hidden` container, which an unfiltered locator also sees.
+      await expect(
+        page.locator('[data-attestations-manager]').filter({ visible: true }),
+      ).toHaveAttribute('data-client-ready', 'true');
+      // Row 1 is ticked at the very top of the page, where the browser's scroll
+      // anchoring does not apply; a row below the fold is ticked after scrolling,
+      // where it does. The panel that appears above the list must move neither.
+      const far = Math.min((await checks.count()) - 1, 20);
+      expect(far).toBeGreaterThan(1);
+      for (const index of [1, far]) {
+        const label = `row ${index} at ${viewport.width}px`;
+        // A trial run does Playwright's own scrolling first, so the two
+        // measurements differ only by what the page did.
+        await checks.nth(index).check({ trial: true });
+        const before = await top(index);
+        await checks.nth(index).check();
+        await expect(panel).toBeVisible();
+        expect(Math.abs((await top(index)) - before), `first tick, ${label}`).toBeLessThanOrEqual(
+          2,
+        );
+        await checks.nth(index).uncheck({ trial: true });
+        const ticked = await top(index);
+        await checks.nth(index).uncheck();
+        await expect(panel).toBeHidden();
+        expect(Math.abs((await top(index)) - ticked), `last untick, ${label}`).toBeLessThanOrEqual(
+          2,
+        );
+      }
+    }
+  });
+  test.describe('mocked avatar response', () => {
+    test.use({ serviceWorkers: 'block' });
+    /**
+     * The seeded people have no photos, so the list is told that everyone has
+     * one; the photo route itself is mocked by each test. `avatarAvailable`
+     * travels in the page's own payload (escaped inside the HTML, plain in a
+     * refresh), which is why the document is rewritten instead of an API.
+     */
+    async function pretendEveryoneHasPhoto(page: Page) {
+      await page.route(/\/admin\/employees(?:\?[^#]*)?$/u, async (route) => {
+        const response = await route.fetch();
+        const body = (await response.text()).replace(/(\\?"avatarAvailable\\?":)false/gu, '$1true');
+        await route.fulfill({ response, body });
+      });
+    }
+    test('a photo that does not arrive leaves the initials and stops pulsing', async ({ page }) => {
+      test.setTimeout(120_000);
+      let photoRequests = 0;
+      await page.route('**/api/admin/attestations/avatar/*', async (route) => {
+        photoRequests++;
+        await route.fulfill({
+          status: 404,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'NOT_FOUND' }),
+        });
+      });
+      await pretendEveryoneHasPhoto(page);
+      try {
+        await page.goto('/admin/employees', { timeout: 120_000 });
+        await expect(page.locator('[data-attestations-manager]')).toHaveAttribute(
+          'data-client-ready',
+          'true',
+        );
+        await page
+          .getByRole('button', { name: /^Открыть сведения:/u })
+          .first()
+          .click();
+        const dialog = page.getByRole('dialog');
+        const avatar = dialog.locator('[data-profile-avatar]');
+        // Without this the test would pass on a card that never asked for a photo.
+        await expect.poll(() => photoRequests).toBeGreaterThan(0);
+        await expect(avatar.locator('img')).toHaveCount(0);
+        await expect(avatar).not.toHaveClass(/animate-pulse/u);
+        await expect(avatar).toHaveText(/^.{1,2}$/u);
+        // No link to a photo that is not there.
+        await expect(dialog.locator('a[title="Открыть фото"]')).toHaveCount(0);
+        for (const width of [240, 1440]) {
+          await page.setViewportSize({ width, height: 800 });
+          expect(await inspect(page), `missing photo ${width}x800`).toEqual([]);
+        }
+      } finally {
+        await page.unrouteAll({ behavior: 'wait' });
+      }
+    });
+    test('a slow photo holds back neither the contacts nor the course list', async ({ page }) => {
+      test.setTimeout(120_000);
+      let release: () => void = () => {};
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      let photoRequested = false;
+      await page.route('**/api/admin/attestations/avatar/*', async (route) => {
+        photoRequested = true;
+        await gate;
+        await route.fulfill({
+          status: 404,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'NOT_FOUND' }),
+        });
+      });
+      await page.route('**/api/admin/attestations/contact/*', (route) =>
+        route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ email: 'slow.photo@example.test', phoneE164: '+77011234567' }),
+        }),
+      );
+      await pretendEveryoneHasPhoto(page);
+      try {
+        await page.goto('/admin/employees', { timeout: 120_000 });
+        await expect(page.locator('[data-attestations-manager]')).toHaveAttribute(
+          'data-client-ready',
+          'true',
+        );
+        await page
+          .getByRole('button', { name: /^Открыть сведения:/u })
+          .first()
+          .click();
+        const dialog = page.getByRole('dialog');
+        const avatar = dialog.locator('[data-profile-avatar]');
+        await expect.poll(() => photoRequested).toBe(true);
+        // Everything the card is opened for is there while the photo is still
+        // on its way: the initials stand in its box, which pulses.
+        await expect(
+          dialog.getByRole('link', { name: 'Позвонить: +7 701 123 4567' }),
+        ).toBeVisible();
+        await expect(
+          dialog.getByRole('link', { name: 'slow.photo@example.test', exact: true }),
+        ).toBeVisible();
+        await expect(dialog.getByRole('checkbox').first()).toBeVisible();
+        await expect(avatar).toHaveClass(/animate-pulse/u);
+        await expect(avatar).toHaveText(/^.{1,2}$/u);
+        const box = await avatar.boundingBox();
+        release();
+        await expect(avatar).not.toHaveClass(/animate-pulse/u);
+        // The box had its final size from the first paint.
+        expect(await avatar.boundingBox()).toEqual(box);
+      } finally {
+        release();
+        await page.unrouteAll({ behavior: 'wait' });
+      }
+    });
+  });
   test.describe('mocked contacts response', () => {
     test.use({ serviceWorkers: 'block' });
+    const longAddress = `${'long.contact.'.repeat(8)}example@example.test`;
+    // Stored, but not the canonical form a `tel:` or WhatsApp link needs.
+    const undialablePhone = '8 (701) 123-45-67';
     for (const transient of [
       'loading',
       'failed',
       'empty',
+      'invalid-phone',
       'long-data',
       'identity-failed',
     ] as const) {
@@ -346,6 +559,9 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
           release = resolve;
         });
         let intercepted = false;
+        // Flipped right before «Повторить»: counting requests instead would
+        // break under a development server, where effects run twice.
+        let contactsRecovered = false;
         await page.route(
           transient === 'identity-failed'
             ? '**/api/admin/users/*/identity*'
@@ -353,15 +569,23 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
           async (route) => {
             intercepted = true;
             if (transient === 'loading') await gate;
+            const failed =
+              transient === 'identity-failed' || (transient === 'failed' && !contactsRecovered);
             await route.fulfill({
-              status: transient === 'failed' || transient === 'identity-failed' ? 500 : 200,
+              status: failed ? 500 : 200,
               contentType: 'application/json',
               body: JSON.stringify(
                 transient === 'empty'
                   ? { email: null, phoneE164: null }
                   : {
-                      email: `${'long.contact.'.repeat(8)}example@example.test`,
-                      phoneE164: '+77011234567',
+                      // The two transients that watch the answer arrive use an
+                      // address of ordinary length: one line, like the
+                      // placeholder that held its place.
+                      email:
+                        transient === 'loading' || transient === 'failed'
+                          ? 'contact@example.test'
+                          : longAddress,
+                      phoneE164: transient === 'invalid-phone' ? undialablePhone : '+77011234567',
                     },
               ),
             });
@@ -378,41 +602,98 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
             .first()
             .click();
           const dialog = page.getByRole('dialog');
-          if (transient === 'identity-failed' || transient === 'long-data')
+          const contacts = dialog.getByRole('group', { name: 'Связаться', exact: true });
+          const contactLinks = dialog.locator('a[href^="tel:"], a[href*="wa.me"]');
+          const boundaryWidths = [
+            240, 265, 385, 395, 399, 400, 401, 405, 415, 625, 635, 639, 640, 641, 645, 655, 768,
+            1009, 1019, 1023, 1024, 1025, 1029, 1039, 3840,
+          ];
+          let checked = 0;
+          const sweep = async (label: string) => {
+            for (const height of [240, 800])
+              for (const width of boundaryWidths) {
+                await page.setViewportSize({ width, height });
+                expect(await inspect(page), `${label} ${width}x${height}`).toEqual([]);
+                checked++;
+              }
+          };
+          if (transient === 'identity-failed')
             await dialog.getByRole('button', { name: 'Изменить данные', exact: true }).click();
           await expect.poll(() => intercepted).toBe(true);
+          if (transient === 'loading') {
+            // Placeholders of the final size and nothing to press yet.
+            await expect(contacts).toBeVisible();
+            await expect(contactLinks).toHaveCount(0);
+          }
           if (transient === 'failed')
             await expect(dialog.getByText('Контакты не загрузились.')).toBeVisible();
+          if (transient === 'empty') {
+            await expect(contacts.getByText('Телефон не указан', { exact: true })).toBeVisible();
+            await expect(contactLinks).toHaveCount(0);
+            await expect(dialog.locator('a[href^="mailto:"]')).toHaveCount(0);
+          }
+          if (transient === 'invalid-phone') {
+            // Shown as typed, with no link that would dial a number nobody has.
+            await expect(contacts.getByText(undialablePhone, { exact: true })).toBeVisible();
+            await expect(contactLinks).toHaveCount(0);
+          }
           if (transient === 'identity-failed')
             await expect(dialog.getByRole('alert')).toContainText(
               'Не удалось загрузить образование',
             );
           if (transient === 'long-data') {
+            // The address is the one text link; the mail button is gone for good.
+            const address = dialog.getByRole('link', { name: longAddress, exact: true });
+            await expect(address).toBeVisible();
+            await expect(address).toHaveAttribute('href', `mailto:${longAddress}`);
+            await expect(dialog.locator('a[href^="mailto:"]')).toHaveCount(1);
+            await expect(dialog.getByText('Написать на почту')).toHaveCount(0);
+            await expect(
+              contacts.getByRole('link', { name: 'Написать в WhatsApp: +7 701 123 4567' }),
+            ).toHaveAttribute('href', 'https://wa.me/77011234567');
+            await expect(
+              contacts.getByRole('link', { name: 'Позвонить: +7 701 123 4567' }),
+            ).toHaveAttribute('href', 'tel:+77011234567');
+            // Printed once: the two links carry it in their names, not as text.
+            await expect(dialog.getByText('+7 701 123 4567', { exact: true })).toHaveCount(1);
+            // The long address is swept while it is on screen, then the form is.
+            await sweep(`${transient} view`);
+            await dialog.getByRole('button', { name: 'Изменить данные', exact: true }).click();
             await dialog
               .getByLabel('Имя', { exact: true })
               .fill('ДлинноеИмяҰзынАтыLongName姓名'.repeat(2));
             await dialog
               .getByLabel('Компания', { exact: true })
               .fill('КомпанияҰйымCompany企业'.repeat(6));
-            await expect(
-              dialog.getByRole('link', { name: 'Написать на почту', exact: true }),
-            ).toBeVisible();
           }
-          const boundaryWidths = [
-            240, 265, 385, 395, 399, 400, 401, 405, 415, 625, 635, 639, 640, 641, 645, 655, 768,
-            1009, 1019, 1023, 1024, 1025, 1029, 1039, 3840,
-          ];
-          for (const height of [240, 800])
-            for (const width of boundaryWidths) {
-              await page.setViewportSize({ width, height });
-              expect(await inspect(page), `${transient} ${width}x${height}`).toEqual([]);
+          await sweep(transient);
+          if (transient === 'loading' || transient === 'failed') {
+            // The contacts row and the address line above it hold their place
+            // in every state, so the answer moves nothing under them.
+            await page.setViewportSize({ width: 1440, height: 800 });
+            const before = await contacts.boundingBox();
+            expect(before).not.toBeNull();
+            if (transient === 'loading') release();
+            else {
+              contactsRecovered = true;
+              await contacts.getByRole('button', { name: 'Повторить', exact: true }).click();
             }
+            await expect(
+              contacts.getByRole('link', { name: 'Позвонить: +7 701 123 4567' }),
+            ).toBeVisible();
+            await expect(
+              dialog.getByRole('link', { name: 'contact@example.test', exact: true }),
+            ).toBeVisible();
+            const after = await contacts.boundingBox();
+            expect(Math.abs(after!.height - before!.height)).toBeLessThanOrEqual(1);
+            expect(Math.abs(after!.y - before!.y)).toBeLessThanOrEqual(1);
+          }
           await testInfo.attach('boundary-summary', {
             body: JSON.stringify({
               transient,
               boundaryWidths,
               heights: [240, 800],
-              checked: boundaryWidths.length * 2,
+              checked,
             }),
             contentType: 'application/json',
           });
@@ -560,12 +841,18 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
       ).toBeDisabled();
       await selected.getByRole('button', { name: 'Обновить сводку выбора' }).click();
       await expect(selected.getByRole('button', { name: 'Обновить сводку выбора' })).toBeHidden();
-      await expect(
-        selected.getByRole('button', { name: 'Подтвердить и выдать', exact: true }),
-      ).toBeEnabled();
+      // The refreshed summary has everyone issued: the export is what is left
+      // to do, and «Подтвердить и выдать» has nobody to confirm and nothing to
+      // issue, so it stays disabled instead of opening a dialog that skips all.
       await expect(
         selected.getByRole('button', { name: 'Скачать пакет документов', exact: true }),
       ).toBeEnabled();
+      await expect(
+        selected.getByRole('button', { name: 'Подтвердить и выдать', exact: true }),
+      ).toBeDisabled();
+      await expect(selected.getByRole('status').first()).toHaveText(
+        `Выбрано: ${original!.total} · с сертификатом ${original!.total}`,
+      );
       expect(refreshedIds).toEqual([original!.recordIds, original!.recordIds]);
       await expect(selected).toContainText(`Выбрано: ${original!.total}`);
       await selected.getByRole('button', { name: 'Скачать пакет документов', exact: true }).click();
@@ -612,6 +899,147 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
       await expect(dialog.getByLabel('Имя', { exact: true })).toHaveValue(
         'СохранитьРедактирование',
       );
+      // The draft outlives the card: closed by accident and opened again, the
+      // form is back with what was typed. «Отмена» is what drops it.
+      const open = page.getByRole('button', { name: /^Открыть сведения:/u }).first();
+      const edit = dialog.getByRole('button', { name: 'Изменить данные', exact: true });
+      await dialog.getByRole('button', { name: 'Закрыть', exact: true }).click();
+      await expect(dialog).toBeHidden();
+      await open.click();
+      await expect(dialog.getByLabel('Имя', { exact: true })).toHaveValue(
+        'СохранитьРедактирование',
+      );
+      await expect(edit).toHaveCount(0);
+      await dialog.getByRole('button', { name: 'Отмена', exact: true }).click();
+      await expect(edit).toBeFocused();
+      await dialog.getByRole('button', { name: 'Закрыть', exact: true }).click();
+      await expect(dialog).toBeHidden();
+      await open.click();
+      await expect(edit).toBeVisible();
+      await expect(dialog.getByLabel('Имя', { exact: true })).toHaveCount(0);
+    });
+    test('a save from a stale card is refused and the card returns to the current data', async ({
+      page,
+    }) => {
+      test.setTimeout(120_000);
+      const saves: Array<Record<string, unknown>> = [];
+      await page.route('**/api/admin/users/*/identity*', (route) => {
+        if (route.request().method() === 'GET')
+          return route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ education: '', educationRequired: false, version: 3 }),
+          });
+        saves.push(route.request().postDataJSON());
+        return route.fulfill({
+          status: 409,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'IDENTITY_CHANGED' }),
+        });
+      });
+      await page.goto('/admin/employees', { timeout: 120_000 });
+      await expect(page.locator('[data-attestations-manager]')).toHaveAttribute(
+        'data-client-ready',
+        'true',
+      );
+      await page
+        .getByRole('button', { name: /^Открыть сведения:/u })
+        .first()
+        .click();
+      const dialog = page.getByRole('dialog');
+      const edit = dialog.getByRole('button', { name: 'Изменить данные', exact: true });
+      await edit.click();
+      await dialog.getByLabel('Имя', { exact: true }).fill('ПравкаПоверхЧужой');
+      await expect(dialog.getByRole('button', { name: 'Сохранить данные' })).toBeEnabled();
+      await dialog.getByRole('button', { name: 'Сохранить данные' }).click();
+      await expect(dialog.getByRole('alert')).toContainText(
+        'Данные сотрудника не сохранены: их уже изменил другой администратор.',
+      );
+      // The save named the version the form was opened on.
+      expect(saves).toHaveLength(1);
+      expect(saves[0]).toMatchObject({ action: 'verify', expectedVersion: 3 });
+      for (const width of [240, 1440]) {
+        await page.setViewportSize({ width, height: 800 });
+        expect(await inspect(page), `identity conflict ${width}x800`).toEqual([]);
+      }
+      await dialog.getByRole('button', { name: 'Показать актуальные', exact: true }).click();
+      // Back to reading, with the keyboard on the way in and no draft kept.
+      await expect(edit).toBeFocused();
+      await edit.click();
+      await expect(dialog.getByLabel('Имя', { exact: true })).not.toHaveValue('ПравкаПоверхЧужой');
+    });
+    test('an issuance refused for the person’s own data opens the card on those fields', async ({
+      page,
+    }) => {
+      test.setTimeout(120_000);
+      let release: () => void = () => {};
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const keys: string[] = [];
+      await page.route('**/api/admin/attestations/actions', async (route) => {
+        const body = route.request().postDataJSON();
+        keys.push(body.idempotencyKey);
+        await gate;
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            items: (body.attestationIds ?? body.userIds).map((id: string) => ({
+              id,
+              status: 'skipped',
+              reason: 'DOCUMENT_REQUIRED_FIELDS:organization,position',
+            })),
+          }),
+        });
+      });
+      try {
+        await page.goto('/admin/employees', { timeout: 120_000 });
+        await expect(page.locator('[data-attestations-manager]')).toHaveAttribute(
+          'data-client-ready',
+          'true',
+        );
+        await page
+          .getByRole('row')
+          .filter({ has: page.getByText('Ожидает проверки', { exact: true }) })
+          .first()
+          .getByRole('button', { name: /^Открыть сведения:/u })
+          .click();
+        const dialog = page.getByRole('dialog');
+        const action = dialog.getByRole('button', { name: 'Подтвердить и выдать', exact: true });
+        // Both halves of a double click land before the button is disabled;
+        // only one request may leave, and the card waits for its answer.
+        await action.dblclick();
+        await expect(action).toBeDisabled();
+        await expect(dialog).toBeVisible();
+        release();
+        await expect(dialog.getByRole('alert')).toHaveText(
+          'Сертификат не выдан: заполните организацию и должность сотрудника.',
+        );
+        expect(keys).toHaveLength(1);
+        const company = dialog.getByLabel('Компания', { exact: true });
+        await expect(company).toBeFocused();
+        await expect(company).toHaveAttribute('aria-invalid', 'true');
+        await expect(dialog.getByLabel('Должность', { exact: true })).toHaveAttribute(
+          'aria-invalid',
+          'true',
+        );
+        await expect(dialog.getByLabel('Имя', { exact: true })).not.toHaveAttribute(
+          'aria-invalid',
+          'true',
+        );
+        for (const width of [240, 1440]) {
+          await page.setViewportSize({ width, height: 800 });
+          expect(await inspect(page), `refused issuance ${width}x800`).toEqual([]);
+        }
+        // Typing answers the refusal: the message and the marks go.
+        await company.fill('ТОО Исправленная компания');
+        await expect(dialog.getByRole('alert')).toHaveCount(0);
+        await expect(company).not.toHaveAttribute('aria-invalid', 'true');
+      } finally {
+        release();
+        await page.unrouteAll({ behavior: 'wait' });
+      }
     });
   });
 }

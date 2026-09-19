@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { attestationNeedsIssuance } from '@/lib/admin/attestation-issuance';
 import { CaretDown } from '@phosphor-icons/react/dist/csr/CaretDown';
@@ -32,6 +32,9 @@ import {
   AttestationDetailDrawer,
   attestationFieldLabels,
   attestationFieldMaxLengths,
+  preloadAttestationCard,
+  type AttestationCardIssue,
+  type AttestationIdentityDraft,
   type AttestationIdentityFields,
   type AttestationPendingAction,
   type AttestationPermissions,
@@ -104,6 +107,41 @@ const SKIP_REASON_LABELS: Record<string, string> = {
 function skipReasonLabel(code: string | null | undefined) {
   if (!code) return SKIP_REASON_LABELS.OPERATION_SKIPPED as string;
   return SKIP_REASON_LABELS[code] ?? `код ${code}`;
+}
+
+/** The document profile's names for the fields the person's card can edit. */
+const CARD_ISSUE_FIELDS: Record<string, AttestationCardIssue['fields'][number]> = {
+  organization: 'organization',
+  position: 'job',
+  education: 'education',
+};
+
+/** Which of the card's own fields a refused issuance asks for, if any. */
+function cardIssueFields(reason: string | null | undefined): AttestationCardIssue['fields'] {
+  const prefix = 'DOCUMENT_REQUIRED_FIELDS:';
+  if (!reason?.startsWith(prefix)) return [];
+  return reason
+    .slice(prefix.length)
+    .split(',')
+    .flatMap((name) => CARD_ISSUE_FIELDS[name] ?? []);
+}
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * The open card lives in the address as `?card=<recordId>`, so a reload lands
+ * on the same person. `replaceState`, not `router.replace`: nothing on the
+ * server reads the parameter, and opening a card must not fetch the list again.
+ * Filter and pagination links are built without it, which is what closes the
+ * card when the list under it changes.
+ */
+function writeCardParam(recordId: string | null) {
+  const url = new URL(window.location.href);
+  if (recordId) url.searchParams.set('card', recordId);
+  else url.searchParams.delete('card');
+  if (url.href === window.location.href) return;
+  // A null state: Next.js copies its own router state into the entry.
+  window.history.replaceState(null, '', url);
 }
 
 function organizationGroupKey(value: string) {
@@ -263,6 +301,7 @@ export function AttestationsManager({
     null,
   );
   const [detail, setDetail] = useState<AdminAttestationRow | null>(null);
+  const [detailIssue, setDetailIssue] = useState<AttestationCardIssue | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const idempotencyKeyRef = useRef('');
   const purgeKeysRef = useRef<string[]>([]);
@@ -271,9 +310,76 @@ export function AttestationsManager({
   const selectionRequestRef = useRef(0);
   const selectionAbortRef = useRef<AbortController | null>(null);
   const dirtySelectionKeysRef = useRef(new Set<string>());
+  // `busy` is state: it disables the buttons one paint later, and both halves
+  // of a double click arrive before that paint. This flag is read synchronously.
+  const inFlightRef = useRef(false);
+  // «Подтвердить и выдать» on one row has no dialog to hold its key, so the key
+  // waits here until the server answers: a retry after a timeout replays it.
+  const directKeysRef = useRef(new Map<string, string>());
+  // Unsaved card edits, per row, in memory only: personal data is never put
+  // into browser storage.
+  const draftsRef = useRef(new Map<string, AttestationIdentityDraft>());
+  const anchorRef = useRef<{ el: Element; top: number } | null>(null);
+  const cardRestoredRef = useRef(false);
+  // Which card is open when a request comes back, not when it was sent.
+  const detailRef = useRef<AdminAttestationRow | null>(null);
+  useEffect(() => {
+    detailRef.current = detail;
+  }, [detail]);
+  const canSeeCourses = permissions.canReadIdentity || permissions.canManageIdentity;
   useEffect(() => {
     setClientReady(true);
   }, []);
+  useEffect(() => {
+    if (!canSeeCourses) return;
+    // The card's lazy chunk is fetched while the browser has nothing to do, so
+    // the first card does not open on a download. Safari has no idle callback.
+    if (typeof window.requestIdleCallback === 'function') {
+      const idle = window.requestIdleCallback(preloadAttestationCard);
+      return () => window.cancelIdleCallback(idle);
+    }
+    const timer = window.setTimeout(preloadAttestationCard, 1_500);
+    return () => window.clearTimeout(timer);
+  }, [canSeeCourses]);
+  useEffect(() => {
+    if (cardRestoredRef.current) return;
+    cardRestoredRef.current = true;
+    const recordId = new URLSearchParams(window.location.search).get('card');
+    if (!recordId) return;
+    const row = UUID_PATTERN.test(recordId)
+      ? page.items.find((item) => item.recordId === recordId)
+      : undefined;
+    if (!row) {
+      // Another page of the list, another filter, or not an identifier at all.
+      writeCardParam(null);
+      return;
+    }
+    // A native dialog hands focus back to whatever held it when it opened, so
+    // the row's own button takes it first, as if it had been pressed.
+    document
+      .querySelector<HTMLElement>(`[data-card-trigger="${recordId}"]`)
+      ?.focus({ preventScroll: true });
+    setDetail(row);
+  }, [page.items]);
+  // `router.refresh()` brings new rows; the open card follows its own one, so
+  // it shows what the server now holds instead of the row it was opened from.
+  useEffect(() => {
+    setDetail((current) =>
+      current ? (page.items.find((row) => row.recordId === current.recordId) ?? current) : current,
+    );
+  }, [page.items]);
+  // The panel above the list appears on the first tick and leaves on the last.
+  // Where the browser's scroll anchoring has already kept the ticked row still
+  // the difference is zero; at the top of the page, where anchoring does not
+  // apply, and in Safari, which has none, the page is scrolled by that much.
+  useLayoutEffect(() => {
+    const anchor = anchorRef.current;
+    if (!anchor) return;
+    anchorRef.current = null;
+    if (!anchor.el.isConnected) return;
+    const delta = anchor.el.getBoundingClientRect().top - anchor.top;
+    if (delta) window.scrollBy(0, delta);
+  });
   useEffect(
     () => () => {
       // Leaving the page must stop the work it started: the certificate worker
@@ -359,7 +465,15 @@ export function AttestationsManager({
     return keys.size;
   }, [allFilteredSelected, filters.organization, resolvedSelections, selectedRows]);
 
-  const setRowSelected = (row: AdminAttestationRow, checked: boolean) => {
+  const setRowSelected = (row: AdminAttestationRow, checked: boolean, source?: Element) => {
+    // Where the ticked box stands now; the layout effect above puts it back
+    // there once the selection panel has pushed the list. The row passes its
+    // checkbox because a tap does not focus it in Safari; anything outside a
+    // row (the page body) would measure the scroll itself and undo it.
+    const el = source ?? document.activeElement;
+    anchorRef.current = el?.closest('[role="row"]')
+      ? { el, top: el.getBoundingClientRect().top }
+      : null;
     // "All rows matching the filter" arrives from the server as aggregates and
     // cannot be narrowed here, so touching one checkbox drops it entirely.
     // Silently, this turned «Выбрано: 480» into the size of one page.
@@ -612,6 +726,20 @@ export function AttestationsManager({
     }
   };
 
+  const openDetail = (row: AdminAttestationRow) => {
+    setDetail(row);
+    setDetailIssue(null);
+    // The card's footer shows the last refusal; it belonged to another person.
+    setError('');
+    writeCardParam(row.recordId);
+  };
+
+  const closeDetail = () => {
+    setDetail(null);
+    setDetailIssue(null);
+    writeCardParam(null);
+  };
+
   const openSingleAction = (row: AdminAttestationRow, action: AttestationPendingAction) => {
     if (busy) return;
     if (action.kind === 'confirm-issue') {
@@ -816,7 +944,7 @@ export function AttestationsManager({
               `${partial.headline} Обработано пачек: ${index} из ${chunks.length}. Выделение сохранено — повторите удаление, чтобы завершить остальные.`,
             );
             setMessageReasons(partial.reasons);
-            setDetail(null);
+            closeDetail();
             router.refresh();
           }
           return;
@@ -827,7 +955,7 @@ export function AttestationsManager({
       purgeKeysRef.current = [];
       purgeSignatureRef.current = '';
       setPending(null);
-      setDetail(null);
+      closeDetail();
       if (singleTarget) {
         if (items.some((item) => item.id === singleTarget.userId && item.status !== 'skipped'))
           await pruneDeletedUser(singleTarget.userId);
@@ -843,14 +971,33 @@ export function AttestationsManager({
     }
   };
 
+  /**
+   * Resolves to true once the server has given an answer that a retry would
+   * not change, which is when a caller may let go of its idempotency key.
+   */
   const runAttestationAction = async (
     body: Record<string, unknown>,
     actionKind: AttestationPendingAction['kind'],
     preserveSelection = false,
     affectedUserIds: readonly string[] = [],
+    // The one row the action was started for, and whether it runs without the
+    // confirmation dialog («Подтвердить и выдать» from a card or a row menu).
+    target: AdminAttestationRow | null = null,
+    direct = false,
   ) => {
+    if (inFlightRef.current) return false;
+    inFlightRef.current = true;
     setBusy(true);
     setError('');
+    const fail = (text: string) => {
+      // The dialog shows `error`, and so does the footer of the open card. A
+      // row menu has neither, and a card may have been closed meanwhile; the
+      // refusal then goes to the strip under the list.
+      if (direct && detailRef.current?.recordId !== target?.recordId) {
+        setMessage(text);
+        setMessageReasons([]);
+      } else setError(text);
+    };
     try {
       const result = await clientRequest('/api/admin/attestations/actions', {
         method: 'POST',
@@ -862,25 +1009,42 @@ export function AttestationsManager({
         items?: AdminAttestationMutationItem[];
       }>(result.response);
       if (!result.ok) {
-        setError(clientRequestMessage(result.error, 'Операция не выполнена. Проверьте выбор.'));
-        return;
+        fail(clientRequestMessage(result.error, 'Операция не выполнена. Проверьте выбор.'));
+        return !result.error.retryable;
       }
       if (!payload?.items) {
-        setError('Сервер вернул неполный результат. Обновите страницу и проверьте данные.');
-        return;
+        fail('Сервер вернул неполный результат. Обновите страницу и проверьте данные.');
+        return false;
       }
       const summary = mutationSummary(payload.items, actionKind);
+      const [only] = payload.items;
+      const issueFields =
+        target && payload.items.length === 1 && only?.status === 'skipped'
+          ? cardIssueFields(only.reason)
+          : [];
       setPending(null);
-      setDetail(null);
+      if (target && issueFields.length > 0) {
+        // The refusal names this person's own data. The card stays, or opens,
+        // on exactly those fields instead of leaving a line under the list.
+        setDetail((current) => (current?.recordId === target.recordId ? current : target));
+        setDetailIssue({
+          fields: issueFields,
+          message: `Сертификат не выдан: ${skipReasonLabel(only?.reason)}.`,
+        });
+        writeCardParam(target.recordId);
+      } else closeDetail();
       if (!preserveSelection) clearSelection();
       else await refreshResolvedSelections(affectedUserIds);
       setSingleTarget(null);
       setMessage(summary.headline);
       setMessageReasons(summary.reasons);
       router.refresh();
+      return true;
     } catch (requestError) {
-      setError(clientRequestMessage(requestError, 'Операция не выполнена.'));
+      fail(clientRequestMessage(requestError, 'Операция не выполнена.'));
+      return false;
     } finally {
+      inFlightRef.current = false;
       setBusy(false);
     }
   };
@@ -923,6 +1087,7 @@ export function AttestationsManager({
       pending.kind,
       Boolean(singleTarget),
       singleTarget ? [singleTarget.userId] : [],
+      singleTarget,
     );
   };
 
@@ -931,17 +1096,24 @@ export function AttestationsManager({
     if (busy || !row.attestationId) return;
     setSingleTarget(null);
     setPending(null);
-    setDetail(null);
-    await runAttestationAction(
-      {
-        action: 'confirm_and_issue',
-        attestationIds: [row.attestationId],
-        idempotencyKey: crypto.randomUUID(),
-      },
+    // The card is not closed here any more: closed before the answer, it left
+    // a failed request with nowhere to say so. One key per row is kept until
+    // the server has answered, so pressing again after a timeout replays the
+    // same operation instead of starting a second one.
+    let idempotencyKey = directKeysRef.current.get(row.recordId);
+    if (!idempotencyKey) {
+      idempotencyKey = crypto.randomUUID();
+      directKeysRef.current.set(row.recordId, idempotencyKey);
+    }
+    const answered = await runAttestationAction(
+      { action: 'confirm_and_issue', attestationIds: [row.attestationId], idempotencyKey },
       'confirm-issue',
       true,
       [row.userId],
+      row,
+      true,
     );
+    if (answered) directKeysRef.current.delete(row.recordId);
   };
 
   const downloadZip = async () => {
@@ -1081,8 +1253,20 @@ export function AttestationsManager({
           className="min-w-0 space-y-3 rounded-[var(--radius-group)] border-2 border-[var(--color-primary)] bg-[var(--color-primary-soft)] p-3 shadow-[var(--shadow-pop)] sm:p-4"
         >
           <div className="flex min-w-0 items-start justify-between gap-2">
-            <p role="status" className="min-w-0 py-2 font-bold [overflow-wrap:anywhere]">
-              Выбрано: {selectionSummary.total}
+            {/* Counters, not a sentence: what the buttons below would act on. */}
+            <p
+              role="status"
+              className="min-w-0 py-2 font-bold [overflow-wrap:anywhere] tabular-nums"
+            >
+              {[
+                `Выбрано: ${selectionSummary.total}`,
+                selectionSummary.pendingIdentity > 0 &&
+                  `к проверке ${selectionSummary.pendingIdentity}`,
+                selectionSummary.readyToIssue > 0 && `к выдаче ${selectionSummary.readyToIssue}`,
+                selectionSummary.issued > 0 && `с сертификатом ${selectionSummary.issued}`,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
             </p>
             <Button
               size="icon"
@@ -1298,8 +1482,8 @@ export function AttestationsManager({
                   <AttestationTableRow
                     row={row}
                     selected={selected.has(row.recordId)}
-                    onSelectChange={(checked) => setRowSelected(row, checked)}
-                    onOpenDetails={() => setDetail(row)}
+                    onSelectChange={(checked, source) => setRowSelected(row, checked, source)}
+                    onOpenDetails={() => openDetail(row)}
                     permissions={permissions}
                     onSingleAction={(action) => openSingleAction(row, action)}
                     organizationHref={(org) => organizationHref(filters, org)}
@@ -1315,8 +1499,11 @@ export function AttestationsManager({
       {/* Everything that comes and goes lives in this strip: a banner above the
           list pushed every company down the screen on the first tick of a
           checkbox. The list reserves the strip's height at all times, so
-          selecting, exporting or finishing an action never moves a row. */}
-      <div className="sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+1rem)] z-[var(--z-sticky)] space-y-2 lg:bottom-4">
+          selecting, exporting or finishing an action never moves a row.
+          It floats above the dock, and below 360 px the dock is two rows of
+          buttons: 3.5rem taller, the same figure the page reserve in the admin
+          layout adds for it. */}
+      <div className="sticky bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+4.5rem)] z-[var(--z-sticky)] space-y-2 min-[360px]:bottom-[calc(var(--mobile-tab-height)+var(--safe-area-bottom)+1rem)] lg:bottom-4">
         {message ? (
           <div
             role="status"
@@ -1353,9 +1540,20 @@ export function AttestationsManager({
       <AttestationDetailDrawer
         row={detail}
         permissions={permissions}
+        issue={detailIssue ?? undefined}
+        busy={busy}
+        // While a confirmation dialog is open the refusal is shown there.
+        error={pending ? '' : error}
+        getDraft={(recordId) => draftsRef.current.get(recordId)}
+        onDraft={(recordId, draft) => {
+          if (draft) draftsRef.current.set(recordId, draft);
+          else draftsRef.current.delete(recordId);
+        }}
         onAction={(row, action) => openSingleAction(row, action)}
-        onClose={() => setDetail(null)}
+        onClose={closeDetail}
         onSaved={(row, fields: AttestationIdentityFields) => {
+          // Saved data answers the refusal the card was opened on.
+          setDetailIssue(null);
           setDetail((current) =>
             current?.userId === row.userId
               ? {
@@ -1369,9 +1567,15 @@ export function AttestationsManager({
           void refreshResolvedSelections([row.userId]);
           router.refresh();
         }}
+        onStale={() => {
+          // Another administrator saved first. The rows are read again and the
+          // open card follows its own one (see the effect on `page.items`).
+          setDetailIssue(null);
+          router.refresh();
+        }}
         onHistoryDeleted={async () => {
           if (detail) await pruneDeletedUser(detail.userId);
-          setDetail(null);
+          closeDetail();
           router.refresh();
         }}
       />

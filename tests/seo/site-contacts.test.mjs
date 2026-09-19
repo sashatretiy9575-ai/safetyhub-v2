@@ -7,6 +7,7 @@ import {
   contactPhoneHref,
   contactWhatsappHref,
   formatPhoneDisplay,
+  isDialablePhone,
   normalizePhoneE164,
 } from '../../lib/site-contacts.ts';
 
@@ -28,6 +29,39 @@ test('contact normalization accepts local formatting and produces canonical link
   };
   assert.equal(contactPhoneHref(contacts), 'tel:+77017290349');
   assert.equal(contactWhatsappHref(contacts), 'https://wa.me/77017290349');
+});
+
+test('only a canonical E.164 number becomes a dial or WhatsApp link', () => {
+  // Kazakhstan, Russia and China: the three phone plans accounts register with.
+  for (const phone of ['+77017290349', '+79161234567', '+8613800138000']) {
+    assert.equal(isDialablePhone(phone), true, phone);
+  }
+  for (const phone of [
+    '',
+    '+7701',
+    '+7701729034a',
+    'телефон',
+    // Readable, and exactly what a legacy profile may hold, but `tel:` and
+    // wa.me need the canonical form.
+    '+7 701 729 03 49',
+    '+7 (701) 729-03-49',
+    '8 701 729 03 49',
+    '87017290349',
+    '77017290349',
+    '+07017290349',
+    ' +77017290349',
+    '+77017290349 ',
+    '+7701729034912345',
+  ]) {
+    assert.equal(isDialablePhone(phone), false, JSON.stringify(phone));
+  }
+  // Whatever normalization accepts is dialable, so a number saved through the
+  // product's own forms always gets its links.
+  for (const typed of ['+7 (701) 729-03-49', '8 701 729 03 49', '+86 138 0013 8000']) {
+    const normalized = normalizePhoneE164(typed);
+    assert.ok(normalized, typed);
+    assert.equal(isDialablePhone(normalized), true, typed);
+  }
 });
 
 test('public contacts are server cached and rendered into all locale SEO shells', async () => {

@@ -54,6 +54,65 @@ test('only content-addressed public media may use immutable API caching', async 
   }
 });
 
+async function sourceFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = await Promise.all(
+    entries.map(async (entry) => {
+      const absolute = path.join(directory, entry.name);
+      if (entry.isDirectory()) return sourceFiles(absolute);
+      return /\.(?:ts|tsx|mts)$/u.test(entry.name) ? [absolute] : [];
+    }),
+  );
+  return files.flat();
+}
+
+test('only the admin avatar route may let a browser keep and revalidate a private response', async () => {
+  // The helper is the one way past `no-store` for authenticated data, so its
+  // callers are counted across the whole application, not just under app/api:
+  // a server module answering on a route's behalf would be the same exception.
+  const callers = [];
+  for (const directory of ['app', 'components', 'lib', 'server']) {
+    for (const file of await sourceFiles(path.join(root, directory))) {
+      const source = await readFile(file, 'utf8');
+      if (!source.includes('createPrivateRevalidatedResponse')) continue;
+      callers.push(path.relative(root, file).split(path.sep).join('/'));
+    }
+  }
+  assert.deepEqual(callers.sort(), [
+    'app/api/admin/attestations/avatar/[userId]/route.ts',
+    'lib/security/api-response.ts',
+  ]);
+
+  // Revalidation is only as private as the check in front of it: the browser
+  // keeps the bytes, so every request — a conditional one included — has to be
+  // authorised again, and the validator has to be bound to the content.
+  const route = await readFile(
+    path.join(root, 'app/api/admin/attestations/avatar/[userId]/route.ts'),
+    'utf8',
+  );
+  assert.match(route, /await requireAnyCapability\(\['identity\.read', 'identity\.manage'\]\)/);
+  assert.match(route, /sha256/);
+  assert.doesNotMatch(route, /createImmutableAssetResponse|createSignedUrl/);
+
+  // A Windows checkout holds this file with CRLF endings.
+  const facade = (
+    await readFile(path.join(root, 'lib/security/api-response.ts'), 'utf8')
+  ).replaceAll('\r\n', '\n');
+  const start = facade.indexOf('export function createPrivateRevalidatedResponse');
+  const end = facade.indexOf('\n}\n', start);
+  assert.ok(start !== -1 && end > start, 'the helper is defined');
+  const helper = facade.slice(start, end);
+  assert.match(helper, /if \(!response\.headers\.has\('ETag'\)\) \{\s*throw new Error/);
+  assert.match(helper, /'Cache-Control', 'private, no-cache, must-revalidate'/);
+  assert.match(helper, /'CDN-Cache-Control', 'no-store'/);
+  assert.match(helper, /'Vercel-CDN-Cache-Control', 'no-store'/);
+  assert.match(helper, /'Vary', 'Cookie'/);
+  assert.match(helper, /'X-Content-Type-Options', 'nosniff'/);
+  assert.match(helper, /'Referrer-Policy', 'no-referrer'/);
+  // Nothing in it may make the response shareable or fresh without asking.
+  assert.doesNotMatch(helper, /public|max-age|s-maxage|immutable|stale-/);
+});
+
 test('API response facade disables browser and CDN storage', async () => {
   const source = await readFile(path.join(root, 'lib/security/no-store.ts'), 'utf8');
   assert.match(source, /Cache-Control['"]?: ['"]private, no-store, max-age=0/);

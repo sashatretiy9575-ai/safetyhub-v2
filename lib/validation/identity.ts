@@ -17,6 +17,12 @@ export const verifyIdentitySchema = z.object({
   job: profileField(PROFILE_FIELD_LIMITS.job),
   organization: profileField(PROFILE_FIELD_LIMITS.organization),
   education: z.string().trim().max(200).regex(/^[^\u0000-\u001f\u007f]*$/u).optional(),
+  /**
+   * The identity version the card was opened on. Optional, so callers that do
+   * not edit from a form keep working; when present, a save made from a card
+   * that another administrator has since changed is refused.
+   */
+  expectedVersion: z.number().int().nonnegative().optional(),
 });
 
 export const revokeIdentitySchema = z.object({

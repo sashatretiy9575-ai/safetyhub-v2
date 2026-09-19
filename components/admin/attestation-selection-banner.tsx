@@ -25,15 +25,16 @@ export function AttestationSelectionBanner({
   if (selectedCount === 0 || isAllFilteredSelected || totalFiltered <= pageSize) return null;
 
   return (
-    <div className="rounded-xl border border-[var(--color-primary)] bg-[var(--color-primary-soft)] px-4 py-2 text-sm">
-      <button
-        type="button"
-        disabled={selectingAll}
-        onClick={onSelectAllFiltered}
-        className="min-h-11 max-w-full text-left font-medium [overflow-wrap:anywhere] text-[var(--color-primary)] underline hover:no-underline disabled:opacity-50"
-      >
-        {selectingAll ? 'Выбираем…' : `Выбрать все ${totalFiltered} по фильтру`}
-      </button>
-    </div>
+    // No frame of its own: it sits inside the selection panel, which already
+    // has the same border and tint, and a border inside a border reads as a
+    // second panel.
+    <button
+      type="button"
+      disabled={selectingAll}
+      onClick={onSelectAllFiltered}
+      className="block min-h-11 max-w-full text-left text-sm font-medium [overflow-wrap:anywhere] text-[var(--color-primary)] underline hover:no-underline disabled:opacity-50"
+    >
+      {selectingAll ? 'Выбираем…' : `Выбрать все ${totalFiltered} по фильтру`}
+    </button>
   );
 }

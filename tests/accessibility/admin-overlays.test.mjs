@@ -64,9 +64,11 @@ test('desktop sticky rails clear the mobile chrome that is still on screen', asy
   // The table switches to its desktop form by container width — about 808 px of
   // viewport — while the mobile header and dock only disappear at 1024 px. In
   // between, both were on screen and the desktop rails sat underneath them.
+  // Below 360 px the dock stands in two rows (3 + 2), so the strip clears the
+  // taller dock there and returns to the one-row offset from 360 px up.
   assert.match(
     manager,
-    /sticky bottom-\[calc\(var\(--mobile-tab-height\)\+var\(--safe-area-bottom\)\+1rem\)\][\s\S]*lg:bottom-4/u,
+    /sticky bottom-\[calc\(var\(--mobile-tab-height\)\+var\(--safe-area-bottom\)\+4\.5rem\)\][\s\S]*min-\[360px\]:bottom-\[calc\(var\(--mobile-tab-height\)\+var\(--safe-area-bottom\)\+1rem\)\][\s\S]*lg:bottom-4/u,
   );
   assert.match(manager, /sticky top-\[calc\(3\.5rem\+var\(--safe-area-top\)\)\][\s\S]*lg:top-0/u);
   // A hidden overflow on the sheet made it the header's scroll container, so

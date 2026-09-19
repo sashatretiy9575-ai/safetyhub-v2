@@ -52,6 +52,18 @@ export async function PATCH(request: Request, context: { params: Promise<{ userI
       requestSecurityMetadata(request).ipHash,
     );
 
+    // Two administrators may have the same card open. Every verification that
+    // changes something bumps the identity version, so a save made from a card
+    // opened on an older version is refused instead of silently overwriting the
+    // other correction. The comparison is not atomic with the write: it closes
+    // the minutes between opening a card and saving it, which is where this
+    // happens, and leaves the write itself to the locked row in the RPC.
+    if (parsedBody.data.action === 'verify' && parsedBody.data.expectedVersion !== undefined) {
+      const current = await getUserIdentity(parsedId.data);
+      if (current.version !== parsedBody.data.expectedVersion)
+        return NextResponse.json({ error: 'IDENTITY_CHANGED' }, { status: 409 });
+    }
+
     const identity =
       parsedBody.data.action === 'verify'
         ? await verifyUserIdentity(parsedId.data, parsedBody.data)

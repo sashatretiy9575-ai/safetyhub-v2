@@ -52,6 +52,69 @@ test('idempotency keys follow what they authorize', () => {
   assert.match(manager, /payload\?\.error === 'IDEMPOTENCY_KEY_REUSED'/u);
 });
 
+test('a double click cannot send the same action twice', () => {
+  // `busy` is state: it disables the buttons one paint later, and both halves
+  // of a double click arrive before that paint. The guard is a ref, read and
+  // set synchronously, and released where `busy` is.
+  const action = manager.slice(manager.indexOf('const runAttestationAction = async'));
+  assert.match(
+    action,
+    /if \(inFlightRef\.current\) return false;\s*\n\s*inFlightRef\.current = true;\s*\n\s*setBusy\(true\);/u,
+  );
+  assert.match(action, /finally \{\s*\n\s*inFlightRef\.current = false;\s*\n\s*setBusy\(false\);/u);
+});
+
+test('single-row confirm-and-issue replays one key and keeps its card until the answer', () => {
+  const direct = manager.slice(
+    manager.indexOf('const runConfirmIssueDirect = async'),
+    manager.indexOf('const downloadZip = async'),
+  );
+  // The key used to be minted inside the request body, so pressing again after
+  // a timeout started a second operation instead of replaying the first.
+  assert.match(manager, /const directKeysRef = useRef\(new Map<string, string>\(\)\)/u);
+  assert.match(direct, /directKeysRef\.current\.get\(row\.recordId\)/u);
+  assert.match(direct, /directKeysRef\.current\.set\(row\.recordId, idempotencyKey\)/u);
+  assert.match(direct, /if \(answered\) directKeysRef\.current\.delete\(row\.recordId\)/u);
+  assert.doesNotMatch(direct, /idempotencyKey: crypto\.randomUUID\(\)/u);
+  // Closed before the response, the card left a failed request with nowhere
+  // to report to.
+  assert.doesNotMatch(direct, /closeDetail\(\)|setDetail\(null\)/u);
+  // A key is let go only after an answer a retry would not change.
+  assert.match(manager, /return !result\.error\.retryable;/u);
+});
+
+test('the open card lives in the address and every close goes through one door', async () => {
+  // The list's own links never carry the parameter: the manager's `key` stays
+  // what it was, and a changed filter or page leaves the card behind.
+  for (const file of [
+    'app/(admin)/admin/employees/page.tsx',
+    'components/admin/attestations-filter-form.tsx',
+    'components/admin/admin-pagination.tsx',
+  ]) {
+    assert.doesNotMatch(await read(file), /['"`]card['"`]/u, `${file} must not carry ?card=`);
+  }
+  assert.match(manager, /url\.searchParams\.set\('card', recordId\)/u);
+  assert.match(manager, /url\.searchParams\.delete\('card'\)/u);
+  assert.match(manager, /new URLSearchParams\(window\.location\.search\)\.get\('card'\)/u);
+  // A null state: Next.js copies its own router state into the entry, which a
+  // state object of ours would replace.
+  assert.match(manager, /window\.history\.replaceState\(null, '', url\)/u);
+  // Not through the router: nothing on the server reads the parameter, and
+  // opening a card must not fetch the list again.
+  const writer = manager.slice(manager.indexOf('function writeCardParam'));
+  assert.doesNotMatch(writer.slice(0, writer.indexOf('\n}')), /router\.|pushState/u);
+  // Only an identifier that is on this page opens a card.
+  assert.match(manager, /UUID_PATTERN\.test\(recordId\)/u);
+  // `closeDetail` is the single place that clears the card, its refusal and
+  // the address together; a bare `setDetail(null)` would leave `?card=` behind.
+  assert.equal((manager.match(/setDetail\(null\)/gu) ?? []).length, 1);
+  assert.match(manager, /const closeDetail = \(\) => \{\s*\n\s*setDetail\(null\);/u);
+  assert.match(manager, /onClose=\{closeDetail\}/u);
+  // Drafts are personal data: memory only.
+  assert.match(manager, /const draftsRef = useRef\(new Map<string, AttestationIdentityDraft>\(\)\)/u);
+  assert.doesNotMatch(manager, /localStorage|sessionStorage/u);
+});
+
 test('a partial deletion reports what it did', async () => {
   // The earlier chunks had already deleted people. Reporting "nothing happened"
   // and leaving the list untouched invited the operator to delete them twice.

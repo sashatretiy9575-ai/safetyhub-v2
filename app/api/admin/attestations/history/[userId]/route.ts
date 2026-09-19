@@ -10,13 +10,6 @@ const paramsSchema = z.object({
   testVersion: z.coerce.number().int().positive(),
 });
 
-type SafeEmailRpcClient = {
-  rpc(
-    name: 'get_safe_user_email',
-    args: { p_user_id: string },
-  ): PromiseLike<{ data: unknown; error: { message: string } | null }>;
-};
-
 export async function GET(
   request: Request,
   context: { params: Promise<{ userId: string }> },
@@ -34,25 +27,17 @@ export async function GET(
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
     const admin = createAdminClient();
-    // The address comes from `get_safe_user_email`, which applies the product's
-    // own disclosure rules. A second lookup through the Auth Admin API returned
-    // a value nothing read, while adding a privileged call and one more way for
-    // this page to fail when Supabase Auth is slow.
-    const [{ data: revision, error: revisionError }, safeEmailResult] = await Promise.all([
-      admin
-        .from('test_revisions')
-        .select('id')
-        .eq('test_id', parsed.data.testId)
-        .eq('version', parsed.data.testVersion)
-        .maybeSingle(),
-      (admin as unknown as SafeEmailRpcClient).rpc('get_safe_user_email', {
-        p_user_id: parsed.data.userId,
-      }),
-    ]);
+    // Certificates only. The card asks the contact endpoint how to reach the
+    // person, so the address lookup that used to ride along here returned a
+    // value nothing read, and its failure took the whole history down with it.
+    const { data: revision, error: revisionError } = await admin
+      .from('test_revisions')
+      .select('id')
+      .eq('test_id', parsed.data.testId)
+      .eq('version', parsed.data.testVersion)
+      .maybeSingle();
     if (revisionError) throw revisionError;
-    if (safeEmailResult.error) throw safeEmailResult.error;
-    const email = typeof safeEmailResult.data === 'string' ? safeEmailResult.data : null;
-    if (!revision) return NextResponse.json({ email, items: [] });
+    if (!revision) return NextResponse.json({ items: [] });
 
     const { data, error } = await admin
       .from('certificates')
@@ -63,7 +48,6 @@ export async function GET(
       .limit(25);
     if (error) throw error;
     return NextResponse.json({
-      email,
       items: (data ?? []).map((certificate) => ({
         id: certificate.id,
         certificateNumber: certificate.certificate_number,

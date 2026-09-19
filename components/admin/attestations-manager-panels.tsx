@@ -18,8 +18,12 @@ import type { AdminAttestationRow } from '@/lib/admin/types';
 import { attestationNeedsIssuance } from '@/lib/admin/attestation-issuance';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { formatDateTime } from '@/lib/utils';
-import { formatPhoneDisplay, phoneHref, whatsappChatHref } from '@/lib/site-contacts';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  formatPhoneDisplay,
+  isDialablePhone,
+  phoneHref,
+  whatsappChatHref,
+} from '@/lib/site-contacts';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +47,13 @@ const CourseAccessControl = dynamic(
     import('@/components/admin/course-access-control').then((module) => module.CourseAccessControl),
   { loading: () => <p role="status">Загружаем допуски…</p> },
 );
+
+/**
+ * Fetches the card's lazy chunk ahead of the first click. The list asks for it
+ * once the browser is idle, so opening a person no longer starts with a
+ * download; the same specifier as above resolves to the same chunk.
+ */
+export const preloadAttestationCard = () => void import('@/components/admin/course-access-control');
 
 export type AttestationPermissions = {
   canManageDocuments?: boolean;
@@ -126,6 +137,18 @@ export type AttestationIdentityFields = {
   organization: string;
 };
 
+/** What the operator has typed and not saved; `education` is null until it loads. */
+export type AttestationIdentityDraft = {
+  fields: AttestationIdentityFields;
+  education: string | null;
+};
+
+/** A refused issuance that the person's own data can fix, opened on the fields at fault. */
+export type AttestationCardIssue = {
+  fields: Array<'organization' | 'job' | 'education'>;
+  message: string;
+};
+
 function identityVariant(state: AdminAttestationRow['identityState']): BadgeProps['variant'] {
   if (state === 'verified') return 'success';
   if (state === 'changed' || state === 'revoked') return 'warning';
@@ -195,22 +218,39 @@ function ProfileAvatar({
   canReadIdentity: boolean;
 }) {
   const src = `/api/admin/attestations/avatar/${row.userId}`;
-  const photo = row.avatarAvailable && canReadIdentity;
+  const [photoState, setPhotoState] = useState<'loading' | 'ready' | 'failed'>('loading');
+  // A photo that did not arrive counts as absent: the initials stay and the box
+  // stops pulsing, so a missing file never reads as an endless loader.
+  const photo = row.avatarAvailable && canReadIdentity && photoState !== 'failed';
   const avatar = (
-    <Avatar className="size-20 rounded-[var(--radius-group)]">
+    // The box has its final size before anything loads and the initials are
+    // always in it, so the card never waits for the photo and nothing moves
+    // when it arrives.
+    <span
+      data-profile-avatar
+      className={`relative grid size-20 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-group)] bg-[var(--color-primary-soft)] text-xl font-medium text-[var(--color-primary-hover)] ${
+        photo && photoState === 'loading' ? 'animate-pulse' : ''
+      }`}
+    >
+      <span aria-hidden="true">{initials(row)}</span>
       {photo ? (
-        <AvatarImage
+        // A private image behind the session; next/image has nothing to optimise.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           src={src}
           alt={`Фото: ${row.fullName}`}
-          className="rounded-[var(--radius-group)] object-cover"
-          loading="lazy"
+          width={80}
+          height={80}
           decoding="async"
+          fetchPriority="high"
+          onLoad={() => setPhotoState('ready')}
+          onError={() => setPhotoState('failed')}
+          className={`absolute inset-0 size-full object-cover transition-opacity ${
+            photoState === 'ready' ? '' : 'opacity-0'
+          }`}
         />
       ) : null}
-      <AvatarFallback className="rounded-[var(--radius-group)] text-xl">
-        {initials(row)}
-      </AvatarFallback>
-    </Avatar>
+    </span>
   );
   // The photo is what the name is checked against, so a tap opens it full size.
   return photo ? (
@@ -330,7 +370,9 @@ export function AttestationBulkActionButtons({
       key: 'confirm-issue',
       label: 'Подтвердить и выдать',
       icon: <CheckCircle />,
-      disabled: summary.total === 0,
+      // Nobody to confirm and nothing to issue: the button would only open a
+      // dialog that ends in "Пропущено: N".
+      disabled: summary.pendingIdentity === 0 && summary.readyToIssue === 0,
       variant: 'primary',
       action: { kind: 'confirm-issue' },
     });
@@ -358,7 +400,8 @@ export function AttestationBulkActionButtons({
       key: 'export',
       label: 'Скачать пакет документов',
       icon: <DownloadSimple />,
-      disabled: busy,
+      // Without a live certificate in the selection the dialog read "0 из N".
+      disabled: summary.exportable === 0,
       variant: 'outline',
       action: { kind: 'export' },
     });
@@ -413,70 +456,126 @@ export function AttestationBulkActionButtons({
   );
 }
 
+const EDUCATION_REQUIRED_MESSAGE = 'Заполните образование перед новой выдачей документа.';
+const IDENTITY_CHANGED_MESSAGE =
+  'Данные сотрудника не сохранены: их уже изменил другой администратор.';
+
+function identitySaveFailure(error: unknown, code?: string) {
+  return `Данные сотрудника не сохранены. ${clientRequestMessage(
+    error,
+    code ? `Код: ${code}.` : 'Обновите страницу и повторите.',
+  )}`;
+}
+
 function AttestationIdentityForm({
   row,
+  issue,
+  getDraft,
+  onDraft,
   onSaved,
+  onStale,
   onCancel,
 }: {
   row: AdminAttestationRow;
+  issue: AttestationCardIssue | undefined;
+  /** Asked once, when the form opens: what was typed here and never saved. */
+  getDraft: () => AttestationIdentityDraft | undefined;
+  onDraft: (draft: AttestationIdentityDraft | null) => void;
   onSaved: (row: AdminAttestationRow, fields: AttestationIdentityFields) => void;
+  /** Another administrator saved first: leave the form for the current data. */
+  onStale: () => void;
   onCancel: () => void;
 }) {
-  const [fields, setFields] = useState<AttestationIdentityFields>({
-    name: row.name,
-    surname: row.surname,
-    job: row.job,
-    organization: row.organization,
-  });
+  const [draft] = useState(getDraft);
+  const [fields, setFields] = useState<AttestationIdentityFields>(
+    draft?.fields ?? {
+      name: row.name,
+      surname: row.surname,
+      job: row.job,
+      organization: row.organization,
+    },
+  );
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(issue?.message ?? '');
 
-  const [education, setEducation] = useState<string | null>(null);
+  const [education, setEducation] = useState<string | null>(draft?.education ?? null);
   const [savedEducation, setSavedEducation] = useState('');
-  const [educationRequired, setEducationRequired] = useState<boolean | null>(null);
+  const [educationRequired, setEducationRequired] = useState<boolean | null>(
+    issue?.fields.includes('education') ? true : null,
+  );
   const educationInputRef = useRef<HTMLInputElement>(null);
+  // The identity version this form was opened on; the save names it, so a card
+  // that another administrator has changed meanwhile is refused, not overwritten.
+  const versionRef = useRef<number | undefined>(undefined);
+  // The fields a refused issuance points at, for as long as its message stands.
+  const issueFields: readonly string[] = issue && error === issue.message ? issue.fields : [];
+  const educationLoaded = education !== null;
+  const focusEducation = error === EDUCATION_REQUIRED_MESSAGE || issueFields[0] === 'education';
   useEffect(() => {
-    if (error === 'Заполните образование перед новой выдачей документа.')
-      educationInputRef.current?.focus();
-  }, [error, educationRequired]);
+    // The field is disabled until its value loads, and a disabled field cannot
+    // take focus, so this waits for the value as well as for the message.
+    if (focusEducation && educationLoaded) educationInputRef.current?.focus();
+  }, [focusEducation, educationRequired, educationLoaded]);
   useEffect(() => {
     const controller = new AbortController();
-    void fetch(
-      `/api/admin/users/${row.userId}/identity${row.testId ? `?testId=${encodeURIComponent(row.testId)}` : ''}`,
-      {
-        signal: controller.signal,
-        cache: 'no-store',
-      },
-    )
-      .then(async (r) => {
-        if (!r.ok) throw new Error();
-        return r.json();
-      })
-      .then((value) => {
-        if (!controller.signal.aborted) {
-          setEducation(value.education ?? '');
-          setSavedEducation(value.education ?? '');
-          setEducationRequired(
-            typeof value.educationRequired === 'boolean' ? value.educationRequired : null,
-          );
-        }
-      })
-      .catch(() => {
-        if (!controller.signal.aborted)
-          setError('Не удалось загрузить образование. Закройте и повторите редактирование.');
-      });
+    void (async () => {
+      // `clientRequest`, not `fetch`: a response that never comes now ends in
+      // the message below instead of a field that stays disabled for good.
+      const result = await clientRequest(
+        `/api/admin/users/${row.userId}/identity${row.testId ? `?testId=${encodeURIComponent(row.testId)}` : ''}`,
+        {},
+        { signal: controller.signal },
+      );
+      if (controller.signal.aborted) return;
+      const value = await readClientResponseJson<{
+        education?: string | null;
+        educationRequired?: boolean | null;
+        version?: number;
+      }>(result.response);
+      if (controller.signal.aborted) return;
+      if (!result.ok || !value) {
+        setError('Не удалось загрузить образование. Закройте и повторите редактирование.');
+        return;
+      }
+      versionRef.current = typeof value.version === 'number' ? value.version : undefined;
+      // A draft typed on an earlier visit outlives the reload of the saved value.
+      setEducation((current) => current ?? value.education ?? '');
+      setSavedEducation(value.education ?? '');
+      // Once a refusal has named the education, the field stays whatever this
+      // answer says: it may have been sent before the refusal arrived.
+      setEducationRequired((current) =>
+        current === true
+          ? true
+          : typeof value.educationRequired === 'boolean'
+            ? value.educationRequired
+            : null,
+      );
+    })();
     return () => controller.abort();
   }, [row.userId, row.testId]);
 
+  const differs = (next: AttestationIdentityFields) =>
+    (Object.keys(next) as Array<keyof AttestationIdentityFields>).some(
+      (field) => next[field].trim() !== row[field],
+    );
+  // Reported upward on every keystroke and kept in memory only, so closing the
+  // card by accident does not cost the operator what they typed.
+  const report = (nextFields: AttestationIdentityFields, nextEducation: string | null) =>
+    onDraft(
+      differs(nextFields) || (nextEducation !== null && nextEducation !== savedEducation)
+        ? { fields: nextFields, education: nextEducation }
+        : null,
+    );
+
   const update =
     (field: keyof AttestationIdentityFields) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const next = { ...fields, [field]: event.target.value };
       setError('');
-      setFields((current) => ({ ...current, [field]: event.target.value }));
+      setFields(next);
+      report(next, education);
     };
 
-  const dirty = (Object.keys(fields) as Array<keyof AttestationIdentityFields>).some(
-    (field) => fields[field].trim() !== row[field],
-  );
+  const dirty = differs(fields);
 
   const save = async () => {
     if (busy || education === null) return;
@@ -497,7 +596,13 @@ function AttestationIdentityForm({
       const result = await clientRequest(`/api/admin/users/${row.userId}/identity`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'verify', ...normalized, education }),
+        body: JSON.stringify({
+          action: 'verify',
+          ...normalized,
+          education,
+          // Left out while the version is unknown; the server then skips the check.
+          expectedVersion: versionRef.current,
+        }),
       });
       const payload = await readClientResponseJson<{
         status?: string;
@@ -509,10 +614,17 @@ function AttestationIdentityForm({
           payload?.fields?.includes('education') ||
           payload?.error === 'DOCUMENT_REQUIRED_FIELDS:education';
         if (missingEducation) setEducationRequired(true);
+        // The API validates the same four fields the form shows and answers a
+        // bare 400, so that case names them; "не удалось сохранить" sent the
+        // operator into a second identical attempt.
         setError(
           missingEducation
-            ? 'Заполните образование перед новой выдачей документа.'
-            : clientRequestMessage(result.error, 'Не удалось сохранить данные.'),
+            ? EDUCATION_REQUIRED_MESSAGE
+            : payload?.error === 'IDENTITY_CHANGED'
+              ? IDENTITY_CHANGED_MESSAGE
+              : result.error.status === 400
+                ? 'Данные сотрудника не сохранены: сервер отклонил значения полей. Проверьте имя, фамилию, должность и компанию.'
+                : identitySaveFailure(result.error, payload?.error),
         );
         return;
       }
@@ -520,9 +632,10 @@ function AttestationIdentityForm({
         setError('Сервер вернул неполный ответ. Обновите страницу и проверьте данные.');
         return;
       }
+      onDraft(null);
       onSaved(row, normalized);
     } catch (requestError) {
-      setError(clientRequestMessage(requestError, 'Не удалось сохранить данные.'));
+      setError(identitySaveFailure(requestError));
     } finally {
       setBusy(false);
     }
@@ -550,7 +663,9 @@ function AttestationIdentityForm({
                 maxLength={attestationFieldMaxLengths[field]}
                 onChange={update(field)}
                 autoComplete="off"
-                autoFocus={index === 0}
+                // A refused issuance opens the form on the field at fault.
+                autoFocus={issueFields.length > 0 ? issueFields[0] === field : index === 0}
+                invalid={issueFields.includes(field)}
                 disabled={busy}
               />
             </div>
@@ -568,9 +683,14 @@ function AttestationIdentityForm({
             aria-label="Образование"
             aria-describedby={`education-hint-${row.userId}`}
             value={education ?? ''}
+            invalid={issueFields.includes('education')}
             disabled={busy || education === null}
             maxLength={200}
-            onChange={(e) => setEducation(e.target.value)}
+            onChange={(e) => {
+              setError('');
+              setEducation(e.target.value);
+              report(fields, e.target.value);
+            }}
           />
           <p id={`education-hint-${row.userId}`} className="text-sm text-[var(--color-text-muted)]">
             {educationRequired
@@ -580,8 +700,22 @@ function AttestationIdentityForm({
         </div>
       ) : null}
       {error ? (
-        <p role="alert" className="text-sm text-[var(--color-danger)]">
+        <p
+          role="alert"
+          className="flex flex-wrap items-center gap-x-2 text-sm text-[var(--color-danger)]"
+        >
           {error}
+          {error === IDENTITY_CHANGED_MESSAGE ? (
+            // The way out of the conflict: drop what was typed over stale
+            // values and read what the other administrator saved.
+            <button
+              type="button"
+              className="min-h-11 font-semibold underline underline-offset-4"
+              onClick={onStale}
+            >
+              Показать актуальные
+            </button>
+          ) : null}
         </p>
       ) : null}
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-2">
@@ -604,8 +738,18 @@ function AttestationIdentityForm({
 
 type DetailProps = {
   permissions: AttestationPermissions;
+  /** A refused issuance this person's data can fix: the card opens on those fields. */
+  issue?: AttestationCardIssue;
+  /** True while the action started from this card is on its way. */
+  busy?: boolean;
+  /** Why that action failed; it has no dialog of its own to say so. */
+  error?: string;
+  getDraft: (recordId: string) => AttestationIdentityDraft | undefined;
+  onDraft: (recordId: string, draft: AttestationIdentityDraft | null) => void;
   onClose: () => void;
   onSaved: (row: AdminAttestationRow, fields: AttestationIdentityFields) => void;
+  /** The card's data is older than the server's: the list has to be read again. */
+  onStale: () => void;
   onHistoryDeleted: () => void;
   onAction: (row: AdminAttestationRow, action: AttestationPendingAction) => void;
 };
@@ -614,15 +758,25 @@ function AttestationDetailContent({
   row,
   titleId,
   permissions,
+  issue,
+  busy = false,
+  error = '',
+  getDraft,
+  onDraft,
   onClose,
   onSaved,
+  onStale,
   onHistoryDeleted,
   onAction,
 }: DetailProps & { row: AdminAttestationRow; titleId: string }) {
+  const canEdit = permissions.canManageIdentity && !row.courseDeleted;
   // One card, three states: reading it, correcting the person's data in place,
   // and confirming the deletion of their learning history where the delete
-  // link was pressed. A new person always opens in the first.
-  const [mode, setMode] = useState<'view' | 'edit' | 'delete-history'>('view');
+  // link was pressed. A person opens in the first, unless there is something
+  // of theirs to finish: an unsaved draft, or a refused issuance to fix.
+  const [mode, setMode] = useState<'view' | 'edit' | 'delete-history'>(() =>
+    canEdit && (issue || getDraft(row.recordId)) ? 'edit' : 'view',
+  );
   const [contact, setContact] = useState<{
     state: 'idle' | 'loading' | 'failed' | 'ready';
     email: string | null;
@@ -632,6 +786,9 @@ function AttestationDetailContent({
     state: 'idle' | 'loading' | 'failed' | 'ready';
     items: CertificateHistoryItem[];
   }>({ state: 'idle', items: [] });
+  // Counters, as the course list uses: «Повторить» asks again by bumping one.
+  const [contactAttempt, setContactAttempt] = useState(0);
+  const [historyAttempt, setHistoryAttempt] = useState(0);
   const bodyRef = useRef<HTMLDivElement>(null);
   const dangerRef = useRef<HTMLDivElement>(null);
   const pencilRef = useRef<HTMLButtonElement>(null);
@@ -679,7 +836,7 @@ function AttestationDetailContent({
       }
     });
     return () => controller.abort();
-  }, [canReadUser, row.userId]);
+  }, [canReadUser, contactAttempt, row.userId]);
 
   useEffect(() => {
     if (courseDeleted || !testId || testVersion === null || !canReadCertificate || !canReadUser) {
@@ -707,7 +864,20 @@ function AttestationDetailContent({
       if (!controller.signal.aborted) setHistory({ state: 'failed', items: [] });
     });
     return () => controller.abort();
-  }, [canReadCertificate, canReadUser, courseDeleted, testId, testVersion, row.userId]);
+  }, [
+    canReadCertificate,
+    canReadUser,
+    courseDeleted,
+    historyAttempt,
+    testId,
+    testVersion,
+    row.userId,
+  ]);
+
+  // The refusal arrives while the card is already open and being read.
+  useEffect(() => {
+    if (issue && canEdit) setMode('edit');
+  }, [issue, canEdit]);
 
   // The eye follows the change: editing starts at the top of the card, the
   // deletion confirmation opens where its link was. Coming back, focus returns
@@ -726,7 +896,9 @@ function AttestationDetailContent({
   }, [mode]);
 
   const nextStep = nextAttestationStep(row, permissions);
-  const canEdit = canManageIdentity && !courseDeleted;
+  // `idle` is the render before the request starts; it shows the same
+  // placeholders as `loading`, so the first paint already has its final height.
+  const contactPending = canReadUser && contact.state !== 'ready' && contact.state !== 'failed';
 
   return (
     <div className="flex h-full max-h-[inherit] min-w-0 flex-col [overflow-wrap:anywhere]">
@@ -761,24 +933,49 @@ function AttestationDetailContent({
             {mode === 'edit' ? (
               <AttestationIdentityForm
                 row={row}
-                onCancel={() => setMode('view')}
+                issue={issue}
+                getDraft={() => getDraft(row.recordId)}
+                onDraft={(draft) => onDraft(row.recordId, draft)}
+                onCancel={() => {
+                  // «Отмена» means the saved values: the draft goes with it.
+                  onDraft(row.recordId, null);
+                  setMode('view');
+                }}
                 onSaved={(savedRow, fields) => {
                   setMode('view');
                   onSaved(savedRow, fields);
                 }}
+                onStale={() => {
+                  // The card goes back to reading, and the list is asked again:
+                  // what the other administrator saved appears in its place.
+                  onDraft(row.recordId, null);
+                  setMode('view');
+                  onStale();
+                }}
               />
             ) : (
-              <div className="flex items-start gap-4">
+              // Wraps: at 240 px with enlarged text the photo leaves no room
+              // beside it, and the lines go under it instead of into a strip
+              // one letter wide.
+              <div className="flex flex-wrap items-start gap-4">
                 <ProfileAvatar row={row} canReadIdentity={canReadIdentity} />
-                <div className="min-w-0 flex-1 space-y-0.5 pt-1">
-                  <p className="font-semibold break-words">{row.fullName}</p>
-                  <p className="text-sm break-words text-[var(--color-text-muted)]">
-                    {row.organization || '—'}
+                {/* The name is the card's heading, so it is not printed again. */}
+                <div className="min-w-0 grow basis-24 space-y-0.5 pt-1">
+                  <p className="font-semibold break-words">
+                    {row.organization || 'Компания не указана'}
                   </p>
-                  {contact.state === 'loading' ? (
+                  <p className="text-sm break-words text-[var(--color-text-muted)]">
+                    Должность: {row.job || 'не указана'}
+                  </p>
+                  {contactPending || contact.state === 'failed' ? (
+                    // The address line keeps its place while it loads, and
+                    // after a failure too, so «Повторить» does not push the
+                    // rows under it down when the address finally arrives.
                     <span
                       aria-hidden="true"
-                      className="mt-2 block h-4 w-40 max-w-full animate-pulse rounded bg-[var(--color-surface-muted)]"
+                      className={`mt-2 block h-4 w-40 max-w-full rounded ${
+                        contactPending ? 'animate-pulse bg-[var(--color-surface-muted)]' : ''
+                      }`}
                     />
                   ) : contact.email ? (
                     <a
@@ -793,66 +990,95 @@ function AttestationDetailContent({
               </div>
             )}
 
-            {canEdit ? (
+            {/* The form has its own «Отмена», so the way in is shown only while
+                the card is being read. */}
+            {canEdit && mode === 'view' ? (
               <Button
                 ref={pencilRef}
                 type="button"
-                size="sm"
-                variant="ghost"
-                aria-pressed={mode === 'edit'}
-                aria-label="Изменить данные"
-                title="Изменить данные"
-                className={'h-auto min-h-11 w-full px-3 py-2 whitespace-normal'}
-                onClick={() => setMode((current) => (current === 'edit' ? 'view' : 'edit'))}
+                variant="secondary"
+                className="h-auto min-h-11 w-full px-4 py-2 whitespace-normal sm:w-auto"
+                onClick={() => setMode('edit')}
               >
-                <PencilSimple /> {mode === 'edit' ? 'Закрыть редактирование' : 'Изменить данные'}
+                <PencilSimple /> Изменить данные
               </Button>
             ) : null}
 
-            {contact.phoneE164 ? (
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-2">
-                <Button asChild className="h-auto min-h-11 min-w-0 px-3 py-2 whitespace-normal">
-                  <a
-                    href={whatsappChatHref(contact.phoneE164)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+            {/* One row of one height in every state, so nothing under it moves
+                when the answer arrives. The number is printed once; the address
+                is the link above, without a button of its own. */}
+            {canReadUser ? (
+              <div
+                role="group"
+                aria-label="Связаться"
+                className="flex min-h-11 flex-wrap items-center gap-2"
+              >
+                {contact.state === 'failed' ? (
+                  <p
+                    role="alert"
+                    className="flex flex-wrap items-center gap-x-2 text-sm text-[var(--color-danger)]"
                   >
-                    <WhatsappLogo aria-hidden="true" /> WhatsApp
-                  </a>
-                </Button>
-                {/* A new tab, so the card stays open behind the chat.
-                    `noopener` keeps that tab from reaching back here. */}
-                <Button
-                  asChild
-                  variant="outline"
-                  className="h-auto min-h-11 px-3 py-2 whitespace-normal"
-                >
-                  <a
-                    href={phoneHref(contact.phoneE164)}
-                    aria-label={'Позвонить: ' + formatPhoneDisplay(contact.phoneE164)}
-                    title={formatPhoneDisplay(contact.phoneE164)}
-                  >
-                    <Phone aria-hidden="true" /> Позвонить
-                  </a>
-                </Button>
+                    Контакты не загрузились.
+                    <button
+                      type="button"
+                      className="min-h-11 font-semibold underline underline-offset-4"
+                      onClick={() => setContactAttempt((value) => value + 1)}
+                    >
+                      Повторить
+                    </button>
+                  </p>
+                ) : contactPending ? (
+                  <>
+                    <span
+                      aria-hidden="true"
+                      className="size-11 shrink-0 animate-pulse rounded-[var(--radius-control)] bg-[var(--color-surface-muted)]"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="size-11 shrink-0 animate-pulse rounded-[var(--radius-control)] bg-[var(--color-surface-muted)]"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="h-6 w-32 max-w-full animate-pulse rounded bg-[var(--color-surface-muted)]"
+                    />
+                  </>
+                ) : !contact.phoneE164 ? (
+                  <p className="text-sm text-[var(--color-text-muted)]">Телефон не указан</p>
+                ) : isDialablePhone(contact.phoneE164) ? (
+                  <>
+                    {/* A new tab, so the card stays open behind the chat.
+                        `noopener` keeps that tab from reaching back here. */}
+                    <Button asChild size="icon">
+                      <a
+                        href={whatsappChatHref(contact.phoneE164)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={'Написать в WhatsApp: ' + formatPhoneDisplay(contact.phoneE164)}
+                        title="WhatsApp"
+                      >
+                        <WhatsappLogo aria-hidden />
+                      </a>
+                    </Button>
+                    <Button asChild size="icon" variant="outline">
+                      <a
+                        href={phoneHref(contact.phoneE164)}
+                        aria-label={'Позвонить: ' + formatPhoneDisplay(contact.phoneE164)}
+                        title="Позвонить"
+                      >
+                        <Phone aria-hidden />
+                      </a>
+                    </Button>
+                    <span className="min-w-0 text-base font-semibold tabular-nums">
+                      {formatPhoneDisplay(contact.phoneE164)}
+                    </span>
+                  </>
+                ) : (
+                  // Stored, but not a number a link could dial: shown as typed.
+                  <span className="min-w-0 text-base font-semibold tabular-nums">
+                    {contact.phoneE164}
+                  </span>
+                )}
               </div>
-            ) : contact.state === 'failed' ? (
-              <p role="alert" className="text-sm text-[var(--color-danger)]">
-                Контакты не загрузились.
-              </p>
-            ) : null}
-
-            {contact.email ? (
-              <Button
-                asChild
-                variant="outline"
-                className="h-auto min-h-11 w-full px-3 py-2 whitespace-normal"
-              >
-                <a href={`mailto:${contact.email}`}>Написать на почту</a>
-              </Button>
-            ) : null}
-            {contact.phoneE164 ? (
-              <p className="text-sm break-words">{formatPhoneDisplay(contact.phoneE164)}</p>
             ) : null}
 
             {canReadIdentity || canManageIdentity ? (
@@ -958,8 +1184,18 @@ function AttestationDetailContent({
                 </summary>
                 <div className="border-t border-[var(--color-border)] px-4 py-1">
                   {history.state === 'failed' ? (
-                    <p role="alert" className="py-2.5 text-sm text-[var(--color-danger)]">
+                    <p
+                      role="alert"
+                      className="flex flex-wrap items-center gap-x-2 text-sm text-[var(--color-danger)]"
+                    >
                       История не загрузилась.
+                      <button
+                        type="button"
+                        className="min-h-11 font-semibold underline underline-offset-4"
+                        onClick={() => setHistoryAttempt((value) => value + 1)}
+                      >
+                        Повторить
+                      </button>
                     </p>
                   ) : history.state !== 'ready' ? (
                     <p className="py-2.5 text-sm text-[var(--color-text-muted)]">Загружаем…</p>
@@ -1003,12 +1239,7 @@ function AttestationDetailContent({
               </details>
             ) : null}
           </div>
-          <details className="min-w-0 rounded-[var(--radius-group)] border border-[var(--color-border)] p-3 lg:col-span-2">
-            <summary className="min-h-11 cursor-pointer py-2 font-semibold">
-              Дополнительные сведения
-            </summary>
-            <p className="py-2 text-sm">Должность: {row.job || '—'}</p>
-          </details>
+          {/* Destructive work stays last, under everything the card is read for. */}
           {canDeleteHistory || canDeleteUser ? (
             <section
               aria-label="Удаление данных"
@@ -1028,40 +1259,51 @@ function AttestationDetailContent({
                     onDeleted={onHistoryDeleted}
                   />
                 </div>
-              ) : canDeleteHistory || canDeleteUser ? (
-                <div className="flex flex-wrap gap-x-6 border-t border-[var(--color-border)] pt-1">
+              ) : (
+                // The same look as «Удалить сотрудников» in the selection panel:
+                // one destructive style across the screen.
+                <div className="flex flex-wrap gap-2">
                   {canDeleteHistory ? (
-                    <button
+                    <Button
                       ref={deleteHistoryRef}
                       type="button"
-                      className="inline-flex min-h-11 max-w-full min-w-0 items-center gap-2 text-left text-sm font-semibold text-[var(--color-danger)] hover:underline"
+                      variant="outline"
+                      className="h-auto min-h-11 max-w-full px-3 py-2 [overflow-wrap:anywhere] whitespace-normal text-[var(--color-danger)]"
                       onClick={() => setMode('delete-history')}
                     >
-                      <Trash size={18} aria-hidden="true" />
-                      Удалить учебную историю
-                    </button>
+                      <Trash /> Удалить учебную историю
+                    </Button>
                   ) : null}
                   {canDeleteUser ? (
-                    <button
+                    <Button
                       type="button"
-                      className="inline-flex min-h-11 max-w-full min-w-0 items-center gap-2 text-left text-sm font-semibold text-[var(--color-danger)] hover:underline"
+                      variant="outline"
+                      className="h-auto min-h-11 max-w-full px-3 py-2 [overflow-wrap:anywhere] whitespace-normal text-[var(--color-danger)]"
                       onClick={() => onAction(row, { kind: 'bulk-delete' })}
                     >
-                      <Trash size={18} aria-hidden="true" />
-                      Удалить сотрудника
-                    </button>
+                      <Trash /> Удалить сотрудника
+                    </Button>
                   ) : null}
                 </div>
-              ) : null}
+              )}
             </section>
           ) : null}
         </div>
       </div>
 
       {nextStep && mode === 'view' ? (
-        <footer className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-surface)] px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-bottom))] sm:flex sm:justify-end sm:px-5 sm:pb-3">
+        <footer className="flex shrink-0 flex-col gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface)] px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-bottom))] sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:px-5 sm:pb-3">
+          {/* «Подтвердить и выдать» runs without a dialog, and the card stays
+              open until the answer comes, so its refusal is reported here. */}
+          {error ? (
+            <p role="alert" className="min-w-0 text-sm text-[var(--color-danger)]">
+              {error}
+            </p>
+          ) : null}
           <Button
             type="button"
+            disabled={busy}
+            aria-busy={busy || undefined}
             className="h-auto min-h-11 w-full px-3 py-2 whitespace-normal sm:w-auto"
             onClick={() => onAction(row, nextStep.action)}
           >
@@ -1075,12 +1317,9 @@ function AttestationDetailContent({
 
 export function AttestationDetailDrawer({
   row,
-  permissions,
-  onClose,
-  onSaved,
-  onHistoryDeleted,
-  onAction,
+  ...props
 }: DetailProps & { row: AdminAttestationRow | null }) {
+  const { onClose } = props;
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -1089,8 +1328,12 @@ export function AttestationDetailDrawer({
     if (row && dialog && !dialog.open) {
       dialog.showModal();
       // Focus lands on "close", not on the first button in the header, which
-      // would put the card into edit mode on an accidental Enter.
-      dialog.querySelector<HTMLElement>('[data-dialog-initial-focus]')?.focus();
+      // would put the card into edit mode on an accidental Enter. A card that
+      // opens on a refused issuance starts on the field at fault instead.
+      (
+        dialog.querySelector<HTMLElement>('[aria-invalid="true"]:enabled') ??
+        dialog.querySelector<HTMLElement>('[data-dialog-initial-focus]')
+      )?.focus();
     }
     if (!row && dialog?.open) dialog.close();
   }, [row]);
@@ -1115,16 +1358,7 @@ export function AttestationDetailDrawer({
       className="m-0 size-full max-h-none! max-w-none overflow-hidden border-0 bg-[var(--color-surface)] p-0 text-[var(--color-text)] shadow-[var(--shadow-pop)] backdrop:bg-black/50 sm:m-auto sm:h-fit sm:max-h-[calc(100dvh-3rem)]! sm:w-[min(40rem,calc(100vw-3rem))] sm:rounded-[var(--radius-group)] sm:border sm:border-[var(--color-border)] lg:w-[min(60rem,calc(100vw-4rem))]"
     >
       {row ? (
-        <AttestationDetailContent
-          key={row.recordId}
-          row={row}
-          titleId={titleId}
-          permissions={permissions}
-          onClose={onClose}
-          onSaved={onSaved}
-          onHistoryDeleted={onHistoryDeleted}
-          onAction={onAction}
-        />
+        <AttestationDetailContent key={row.recordId} row={row} titleId={titleId} {...props} />
       ) : null}
     </dialog>
   );
