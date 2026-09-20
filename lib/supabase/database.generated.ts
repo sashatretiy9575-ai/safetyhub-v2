@@ -1862,6 +1862,10 @@ export type Database = {
         }
         Returns: Json
       }
+      purge_clears_user_column: {
+        Args: { p_column: string; p_new: Json; p_old: Json }
+        Returns: boolean
+      }
       purge_user_account_immediate: {
         Args: {
           p_actor_id: string
