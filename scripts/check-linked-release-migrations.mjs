@@ -19,16 +19,8 @@ const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 // issuance and selection recovery form the exact hash-pinned pending tail. Adding
 // a migration means adding it here too, with its hash; an open-ended local tail
 // would defeat this preflight.
-export const REVIEWED_BASE_MIGRATION_COUNT = 96;
+export const REVIEWED_BASE_MIGRATION_COUNT = 98;
 export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
-  Object.freeze({
-    filename: '20260905120000_retire_certificate_revocation_surface.sql',
-    sha256: '1987b4ae86616837b166c6f7f13cb76ea5b7c84298c8b06f841355e444fbbb93',
-  }),
-  Object.freeze({
-    filename: '20260905130000_distinguishable_certificate_issue_refusals.sql',
-    sha256: '0b27d75f48ea6bacf95e4a96ce9648819300373f52c54de1c43363a54952d1a7',
-  }),
   Object.freeze({
     filename: '20260905140000_audit_event_whitelist_and_retention.sql',
     sha256: '104a95972b6ef01c1a6c61d2ba1c85b17cfdc9f051b33bd99f4c43ff49da5d7f',
@@ -129,12 +121,17 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
     filename: '20260920120000_recapture_legacy_cutover_profiles.sql',
     sha256: 'd943c48ed47ab54e7c1493fa212ec9118417c83735149e7df6f7d455bc5f0741',
   }),
-]);
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260920140000_purge_clears_article_publisher.sql',
     sha256: '17fbb2df8e2564e173ef5a866b8b125170370a912c036153b304994a0cac9e7c',
   }),
+  Object.freeze({
+    filename: '20260920150000_purge_clears_remaining_user_references.sql',
+    sha256: '3cff6de8af824e984776b42896563090d72d225df1dc1be4ddb0104e4451ea13',
+  }),
+]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =
   REVIEWED_BASE_MIGRATION_COUNT + REVIEWED_PENDING_MIGRATIONS.length;

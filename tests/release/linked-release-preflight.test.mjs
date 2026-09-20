@@ -117,18 +117,18 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const localMigrations = inventory;
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
-  // Production includes the recaptured pre-registry certificates, applied
-  // 20 September; pending: deleting an account that published an article.
+  // Everything reviewed is applied: the release of 20 September went out with
+  // the account deletion fixes, so the pending tail is empty.
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 97);
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 98);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 96);
-  assert.equal(receipt.pendingCount, 1);
-  assert.equal(receipt.expectedBaseCount, 96);
-  assert.equal(receipt.expectedPendingCount, 1);
-  assert.equal(receipt.expectedTotalCount, 97);
+  assert.equal(receipt.matchedCount, 98);
+  assert.equal(receipt.pendingCount, 0);
+  assert.equal(receipt.expectedBaseCount, 98);
+  assert.equal(receipt.expectedPendingCount, 0);
+  assert.equal(receipt.expectedTotalCount, 98);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),
