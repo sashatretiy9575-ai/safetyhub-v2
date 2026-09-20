@@ -118,18 +118,17 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  // Two migrations wait for the next release: education as a field every
-  // participant fills in, and the defaults that let a document be issued
-  // without retyping what the paper form already says.
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 2);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 100);
+  // One migration waits for the next release: «Примечание» is printed as an
+  // empty cell whatever an operator once typed into it.
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 101);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 98);
-  assert.equal(receipt.pendingCount, 2);
-  assert.equal(receipt.expectedBaseCount, 98);
-  assert.equal(receipt.expectedPendingCount, 2);
-  assert.equal(receipt.expectedTotalCount, 100);
+  assert.equal(receipt.matchedCount, 100);
+  assert.equal(receipt.pendingCount, 1);
+  assert.equal(receipt.expectedBaseCount, 100);
+  assert.equal(receipt.expectedPendingCount, 1);
+  assert.equal(receipt.expectedTotalCount, 101);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

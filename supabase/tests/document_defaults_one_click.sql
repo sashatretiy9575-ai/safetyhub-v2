@@ -49,6 +49,12 @@ begin
  if (profile->>'validityMonths')::int<>36 then raise exception 'BIOT_VALIDITY: %',profile->>'validityMonths'; end if;
  if coalesce(btrim(profile->>'protocolText'),'')='' or coalesce(btrim(profile->>'decisionText'),'')='' then raise exception 'BIOT_TEXTS_EMPTY'; end if;
  if coalesce(c.document_snapshot#>>'{participantFields,notes}','X')<>'' then raise exception 'BIOT_NOTES_NOT_EMPTY'; end if;
+ -- Even a note somebody stored earlier is printed as an empty cell.
+ update public.document_batches set participant_fields=jsonb_build_object(c.user_id::text,jsonb_build_object('notes','Что значит примечание тут?'))
+ where organization_key=lower(btrim(c.organization)) and course_slug=c.test_slug;
+ update public.certificates set revoked_at=statement_timestamp(),revoke_reason='notes regression' where id=c.id;
+ c:=pg_temp.issuance_fixture('Плотник');
+ if coalesce(c.document_snapshot#>>'{participantFields,notes}','X')<>'' then raise exception 'BIOT_STORED_NOTE_PRINTED: %',c.document_snapshot#>>'{participantFields,notes}'; end if;
 
  -- «Причина обучения» of a fire-safety protocol, and its volume in hours.
  delete from public.document_profiles where course_slug='plotnik';
