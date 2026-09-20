@@ -89,7 +89,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
             locale,
             credentialName: courseT('credentialAwarded'),
             durationMinutes: topic.durationMinutes,
-            image: getCourseCoverImage(topic.slug, topic.seo.ogImage),
+            image: getCourseCoverImage(topic.slug, locale, topic.seo.ogImage),
           }),
           breadcrumbsJsonLd([
             { name: t('breadcrumbHome'), url: absoluteUrl(localizePathname('/', locale)) },

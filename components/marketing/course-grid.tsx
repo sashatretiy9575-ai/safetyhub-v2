@@ -38,7 +38,7 @@ export async function CourseGrid() {
               locale,
               credentialName: courseT('credentialAwarded'),
               durationMinutes: topic.durationMinutes,
-              image: getCourseCoverImage(topic.slug, topic.seo.ogImage),
+              image: getCourseCoverImage(topic.slug, locale, topic.seo.ogImage),
             }),
           })),
         }}
@@ -64,7 +64,7 @@ export async function CourseGrid() {
                   title={topic.title}
                   description={topic.description}
                   icon={topic.icon}
-                  coverImage={getCourseCoverImage(topic.slug, topic.seo.ogImage)}
+                  coverImage={getCourseCoverImage(topic.slug, locale, topic.seo.ogImage)}
                   durationMinutes={topic.durationMinutes}
                   questionCount={topic.questionCount}
                   pageCount={topic.presentation?.pageCount}

@@ -1,20 +1,28 @@
-const COURSE_COVER_IMAGES: Readonly<Record<string, string>> = {
-  plotnik: '/images/generated/topic-plotnik-v2.webp',
-  armaturshchik: '/images/generated/topic-armaturshchik-v2.webp',
-  'lesomontazhnye-raboty': '/images/generated/topic-lesomontazhnye-raboty-v2.webp',
-  biot: '/images/generated/topic-occupational-health-v2.webp',
-  'pozharnaya-bezopasnost': '/images/generated/topic-fire-safety-v2.webp',
-};
+import { DEFAULT_LOCALE, type AppLocale } from '../../i18n/config.ts';
+import manifest from './course-cover-manifest.json' with { type: 'json' };
 
 /**
- * Catalog cover for a course.
+ * Catalog cover for a course: the first page of the course's own presentation.
  *
- * The five launch courses ship a hand-made cover in the bundle. Every other
- * course has no cover of its own in the schema, so the picture an editor
- * actually uploads in the course editor — the SEO/Open Graph image — is used
- * instead. Without this fallback an uploaded image was stored, previewed and
- * then silently ignored by the catalog.
+ * The five launch courses used to carry hand-drawn illustrations that had
+ * nothing to do with the material a learner then opened, while the two courses
+ * of September already showed their own title slide. Every cover is now
+ * exported from the presentation it belongs to, in the language it is read in
+ * — `scripts/export-course-covers.mjs` writes both the files and the manifest
+ * below, so a course with no exported cover falls back to its Russian one and
+ * then to the picture an editor uploaded, instead of pointing at nothing.
  */
-export function getCourseCoverImage(slug: string, uploadedImage?: string | null) {
-  return COURSE_COVER_IMAGES[slug] ?? (uploadedImage ? uploadedImage : undefined);
+const COVERS: ReadonlySet<string> = new Set(manifest as readonly string[]);
+
+const coverPath = (slug: string, locale: AppLocale) =>
+  `/images/course-covers/${slug}-${locale}.webp`;
+
+export function getCourseCoverImage(
+  slug: string,
+  locale: AppLocale = DEFAULT_LOCALE,
+  uploadedImage?: string | null,
+) {
+  if (COVERS.has(`${slug}/${locale}`)) return coverPath(slug, locale);
+  if (COVERS.has(`${slug}/${DEFAULT_LOCALE}`)) return coverPath(slug, DEFAULT_LOCALE);
+  return uploadedImage ? uploadedImage : undefined;
 }

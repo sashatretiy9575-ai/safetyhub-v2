@@ -56,7 +56,7 @@ export default async function TopicsPage() {
                   title={topic.title}
                   description={topic.description}
                   icon={topic.icon}
-                  coverImage={getCourseCoverImage(topic.slug, topic.seo.ogImage)}
+                  coverImage={getCourseCoverImage(topic.slug, locale, topic.seo.ogImage)}
                   durationMinutes={topic.durationMinutes}
                   questionCount={topic.questionCount}
                   pageCount={topic.presentation?.pageCount}

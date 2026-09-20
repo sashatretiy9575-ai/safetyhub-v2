@@ -5,26 +5,35 @@ import test from 'node:test';
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
 test('homepage topics and resources use the shared published content APIs', async () => {
-  const [courses, catalog, resources, covers] = await Promise.all([
+  const [courses, catalog, resources, covers, manifest] = await Promise.all([
     read('components/marketing/course-grid.tsx'),
     read('app/(public)/topics/page.tsx'),
     read('components/marketing/resources.tsx'),
     read('lib/content/course-cover-images.ts'),
+    read('lib/content/course-cover-manifest.json'),
   ]);
 
   assert.match(courses, /await getTopics\(locale\)/);
   assert.doesNotMatch(courses, /const TOPICS =/);
-  assert.match(courses, /getCourseCoverImage\(topic\.slug, topic\.seo\.ogImage\)/);
-  assert.match(catalog, /getCourseCoverImage\(topic\.slug, topic\.seo\.ogImage\)/);
+  // The cover is the presentation's own title slide, in the language the card is
+  // read in, so the locale travels with the slug.
+  assert.match(courses, /getCourseCoverImage\(topic\.slug, locale, topic\.seo\.ogImage\)/);
+  assert.match(catalog, /getCourseCoverImage\(topic\.slug, locale, topic\.seo\.ogImage\)/);
   assert.doesNotMatch(`${courses}\n${catalog}`, /presentation\?\.thumbnailUrl/);
+  assert.match(covers, /\/images\/course-covers\/\$\{slug\}-\$\{locale\}\.webp/);
+  const exported = JSON.parse(manifest);
   for (const slug of [
     'plotnik',
     'armaturshchik',
     'lesomontazhnye-raboty',
     'biot',
     'pozharnaya-bezopasnost',
+    'svarshchik',
+    'promyshlennaya-bezopasnost',
   ]) {
-    assert.match(covers, new RegExp(`['\"]?${slug}['\"]?:`));
+    for (const locale of ['ru', 'kk', 'en', 'zh']) {
+      assert.ok(exported.includes(`${slug}/${locale}`), `${slug}/${locale}`);
+    }
   }
   assert.match(resources, /await getArticles\(locale\)/);
   assert.doesNotMatch(resources, /const POSTS =/);
