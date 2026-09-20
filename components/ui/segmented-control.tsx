@@ -60,9 +60,10 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-label={label}
       className={cn(
-        // The track is the 44 px touch target; a segment fills all but its rim.
-        // Its border makes the segments read as one switch rather than loose words.
-        'grid min-w-0 auto-cols-fr grid-flow-col gap-0.5 rounded-[var(--radius-control)] border border-[var(--color-border-strong)] bg-[var(--color-surface-muted)] p-0.5',
+        // The track is the 44 px touch target and a filled surface, not an
+        // outline: an outlined track inside an outlined panel read as a box in a
+        // box, which is exactly what the owner asked us to stop drawing.
+        'grid min-w-0 auto-cols-fr grid-flow-col gap-1 rounded-[var(--radius-group)] bg-[var(--color-surface-muted)] p-1',
         className,
       )}
     >
@@ -79,10 +80,12 @@ export function SegmentedControl<T extends string>({
             onClick={() => onChange(option.value)}
             onKeyDown={(event) => move(event, index)}
             className={cn(
-              'flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-2 text-sm font-semibold transition-colors sm:px-3 [&_svg]:size-4 [&_svg]:shrink-0',
+              // The chosen half lifts off the track and the other half stays flat:
+              // the switch shows its state by depth, not by a second outline.
+              'flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[calc(var(--radius-group)-0.25rem)] px-2 text-sm font-semibold transition-[background-color,color,box-shadow] duration-200 ease-out sm:px-3 [&_svg]:size-4 [&_svg]:shrink-0',
               checked
-                ? 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-[var(--shadow-soft)]'
-                : 'text-[var(--color-text)] hover:bg-[var(--color-surface)]',
+                ? 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-[var(--shadow-card)]'
+                : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]',
             )}
           >
             {option.icon}

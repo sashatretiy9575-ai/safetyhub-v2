@@ -22,15 +22,6 @@ export default async function ContactsPage() {
     getTranslations('Contacts'),
     getTranslations('Shell.footer'),
   ]);
-  const details = [
-    {
-      icon: MapPin,
-      label: t('city'),
-      value: shellT('city'),
-      href: 'https://www.google.com/maps/search/?api=1&query=Almaty%2C%20Kazakhstan',
-    },
-    { icon: Clock, label: t('hours'), value: shellT('hours') },
-  ] as const;
   return (
     <>
       {/* The heading is the whole introduction: the eyebrow repeated the menu
@@ -39,54 +30,26 @@ export default async function ContactsPage() {
 
       <section aria-label={t('title')} className="py-8 sm:py-11 lg:py-14">
         <Container size="wide">
-          <div className="grid gap-7 lg:grid-cols-[minmax(0,0.76fr)_minmax(25rem,1.24fr)] lg:items-start lg:gap-10">
-            <div className="max-w-xl">
-              <ContactActions contacts={contacts} />
-            </div>
+          <div className="max-w-xl">
+            <ContactActions contacts={contacts} />
 
-            <dl className="grid overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)]/76 shadow-[0_16px_40px_-28px_rgba(15,23,18,0.28)] backdrop-blur-xl sm:grid-cols-2">
-              {details.map(({ icon: Icon, label, value, ...item }, index) => (
-                // A description list groups a term and its value in a `div` that
-                // may contain nothing but `dt` and `dd`. The icon and an extra
-                // wrapper used to sit in there too, which is invalid markup and
-                // was reported as a serious accessibility violation, so the icon
-                // now lives inside the term it labels.
-                // The icon has to live inside `dt`, because a `dl` group may
-                // contain nothing but `dt` and `dd` — putting it back outside
-                // reopens a serious accessibility violation. Positioning it
-                // against the whole cell instead centres it on the label *and*
-                // the value, rather than leaving the value hanging below it.
-                <div
-                  key={label}
-                  className={`relative p-5 pl-[4.75rem] ${
-                    index === 0
-                      ? 'border-b border-[var(--color-border)] sm:border-r sm:border-b-0'
-                      : ''
-                  }`}
-                >
-                  <dt className="min-w-0 text-xs font-bold tracking-[0.08em] text-[var(--color-text-subtle)] uppercase">
-                    <span className="absolute top-1/2 left-5 grid size-11 -translate-y-1/2 place-items-center rounded-2xl border border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                      <Icon size={22} weight="duotone" aria-hidden="true" />
-                    </span>
-                    {label}
-                  </dt>
-                  <dd className="text-body-sm mt-1 min-w-0 leading-6 font-semibold break-words">
-                    {'href' in item ? (
-                      <a
-                        href={item.href}
-                        target={item.href.startsWith('http') ? '_blank' : undefined}
-                        rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                        className="transition hover:text-[var(--color-primary)]"
-                      >
-                        {value}
-                      </a>
-                    ) : (
-                      value
-                    )}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            {/* Where we are and when we answer is one sentence. It used to be a
+                framed panel of two labelled cells split by a rule, which asked
+                the reader to parse a table for two short facts. */}
+            <p className="text-body-sm mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-[var(--color-text-muted)]">
+              <MapPin aria-hidden="true" className="size-4 shrink-0" />
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Almaty%2C%20Kazakhstan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-4 transition-colors hover:text-[var(--color-primary)]"
+              >
+                {shellT('city')}
+              </a>
+              <span aria-hidden="true">·</span>
+              <Clock aria-hidden="true" className="size-4 shrink-0" />
+              {shellT('hours')}
+            </p>
           </div>
         </Container>
       </section>

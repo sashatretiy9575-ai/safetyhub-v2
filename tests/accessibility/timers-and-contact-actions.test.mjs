@@ -64,3 +64,20 @@ test('WhatsApp contact actions use the shared brand-green token and retain expli
   assert.match(contacts, /min-h-14/);
   assert.match(footer, /min-h-11/);
 });
+
+test('the contact surfaces are buttons with one outline each, never a frame inside a frame', async () => {
+  const [contacts, page] = await Promise.all([
+    read('components/shared/contact-actions.tsx'),
+    read('app/(public)/contacts/page.tsx'),
+  ]);
+
+  // The two actions were bordered cards, each holding a bordered circle around
+  // its icon, and the page wrapped the city and the hours in a third panel with
+  // a corner radius of its own. Every radius now comes from the button
+  // primitive, so nothing here may round or outline anything.
+  assert.equal((contacts.match(/<Button\b/gu) ?? []).length, 2);
+  assert.equal((contacts.match(/asChild/gu) ?? []).length, 2);
+  assert.doesNotMatch(contacts, /rounded-/u);
+  assert.doesNotMatch(page, /rounded-/u);
+  assert.doesNotMatch(page, /border/u);
+});

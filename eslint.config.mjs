@@ -18,6 +18,9 @@ const eslintConfig = defineConfig([
     'playwright-report/**',
     'node_modules/**',
     'next-env.d.ts',
+    // Working notes and one-off scripts, git-ignored by design: they never ship,
+    // and lint errors in them hid the state of the code that does.
+    'artifacts/**',
     // Deno edge functions are checked by the Supabase toolchain.
     'supabase/**',
   ]),

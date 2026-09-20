@@ -133,7 +133,7 @@ export function DestructiveDialog({
           </p>
 
           {needsAcknowledgement ? (
-            <label className="mt-5 flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] p-3 text-sm font-semibold">
+            <label className="mt-5 flex min-h-12 cursor-pointer items-start gap-3 rounded-[var(--radius-control)] bg-[var(--color-danger-soft)] p-3 text-sm font-semibold">
               <input
                 ref={checkboxRef}
                 type="checkbox"
@@ -149,7 +149,7 @@ export function DestructiveDialog({
           {error ? (
             <p
               role="alert"
-              className="mt-4 rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] p-3 text-sm font-medium text-[var(--color-danger)]"
+              className="mt-4 rounded-[var(--radius-control)] bg-[var(--color-danger-soft)] p-3 text-sm font-medium text-[var(--color-danger)]"
             >
               {error}
             </p>

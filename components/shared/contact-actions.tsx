@@ -1,9 +1,15 @@
 import { PhoneCall, WhatsappLogo } from '@phosphor-icons/react/dist/ssr';
 import { ContactLink } from '@/components/shared/contact-link';
+import { Button } from '@/components/ui/button';
 import type { SiteContactSettings } from '@/lib/site-contacts';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 
+/**
+ * Two buttons of one shape and one radius. They used to be tiles: a bordered
+ * card with a bordered circle inside it, each with its own corner, which the
+ * owner reads as a frame inside a frame rather than as something to press.
+ */
 export function ContactActions({
   contacts,
   compact = false,
@@ -14,41 +20,26 @@ export function ContactActions({
   const t = useTranslations('Contacts');
   return (
     <div className={cn('grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2', compact ? '' : 'w-full')}>
-      <ContactLink
-        kind="phone"
-        contacts={contacts}
-        className="group flex min-h-14 min-w-0 items-center justify-start gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-left text-[var(--color-text)] shadow-[var(--shadow-soft)] transition-colors hover:border-[var(--color-primary)]/50 hover:bg-[var(--color-surface-muted)] focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)] sm:min-h-16 sm:p-4"
+      <Button
+        asChild
+        variant="secondary"
+        size="xl"
+        className="min-h-14 min-w-0 px-4 [&_svg]:size-5"
       >
-        <span className="grid size-10 shrink-0 place-items-center rounded-full border border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-          <PhoneCall size={20} weight="bold" aria-hidden="true" />
-        </span>
-        <span className="min-w-0">
-          <span className="block text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
-            {t('call')}
+        <ContactLink kind="phone" contacts={contacts}>
+          <PhoneCall weight="bold" aria-hidden="true" className="text-[var(--color-primary)]" />
+          <span className="min-w-0">
+            {t('call')} <span className="whitespace-nowrap">{contacts.phoneDisplay}</span>
           </span>
-          <span className="mt-0.5 block truncate text-base font-bold text-[var(--color-text)]">
-            {contacts.phoneDisplay}
-          </span>
-        </span>
-      </ContactLink>
+        </ContactLink>
+      </Button>
 
-      <ContactLink
-        kind="whatsapp"
-        contacts={contacts}
-        className="group flex min-h-14 min-w-0 items-center justify-start gap-3 rounded-2xl border border-[var(--color-primary)]/40 bg-[var(--color-primary-soft)]/40 px-3 py-2 text-left text-[var(--color-text)] shadow-[var(--shadow-soft)] transition-colors hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-[var(--color-focus)] sm:min-h-16 sm:p-4"
-      >
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--color-primary)] text-[var(--color-primary-foreground)]">
-          <WhatsappLogo size={22} weight="fill" aria-hidden="true" />
-        </span>
-        <span className="min-w-0">
-          <span className="block text-base font-bold text-[var(--color-text)] leading-tight">
-            WhatsApp
-          </span>
-          <span className="mt-0.5 block truncate text-xs font-medium text-[var(--color-text-muted)]">
-            {t('chat')}
-          </span>
-        </span>
-      </ContactLink>
+      <Button asChild variant="primary" size="xl" className="min-h-14 min-w-0 px-4 [&_svg]:size-5">
+        <ContactLink kind="whatsapp" contacts={contacts}>
+          <WhatsappLogo weight="fill" aria-hidden="true" />
+          <span className="min-w-0">{t('chatAction')}</span>
+        </ContactLink>
+      </Button>
     </div>
   );
 }
