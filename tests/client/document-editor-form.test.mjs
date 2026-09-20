@@ -155,7 +155,10 @@ test('«Подписи и печать» is one section: the registry where prog
   assert.match(form, /title="Реквизиты программы и комиссия"/u);
   assert.match(form, /<DocumentProfileFields\n\s+key=\{branding\.documentProfile\.id\}/u);
   assert.match(form, /open=\{sections\.has\('profile'\)\}\n\s+keepMounted/u);
-  assert.match(form, /const SECTION_IDS = \['profile', 'images', 'commission', 'texts', 'size'\] as const;/u);
+  assert.match(
+    form,
+    /const SECTION_IDS = \['profile', 'note', 'images', 'commission', 'texts', 'size'\] as const;/u,
+  );
 
   // Where programs have profiles, no program means no document rather than a sample nobody issues.
   assert.match(
@@ -171,9 +174,14 @@ test('«Подписи и печать» is one section: the registry where prog
     /p\.courseSlug === batch\.courseSlug && p\.audience === documentAudienceForPosition\(position\)/u,
   );
   assert.doesNotMatch(form, /audienceRequired|CHOOSE_AUDIENCE/u);
-  // «Примечание», «Причина обучения» and «Решение комиссии» are the wording of the
-  // paper form, not a question for the operator: nothing is typed per listener.
+  // «Причина обучения» and «Решение комиссии» are the wording of the paper form,
+  // not a question for the operator. «Примечание» is a column somebody may still
+  // need, so it keeps a field — folded away, never in the path of an issuance.
   assert.doesNotMatch(form, /DocumentParticipantFields/u);
+  assert.match(form, /title="Примечание в протоколе"/u);
+  assert.match(form, /hint=\{selectedPerson\.notes\?\.trim\(\) \|\| 'Пусто — так и печатается'\}/u);
+  assert.match(form, /open=\{sections\.has\('note'\)\}\n\s+keepMounted/u);
+  assert.match(form, /ensureBatch=\{async \(\) => \(await persist\(\)\)\?\.batch \?\? null\}/u);
 
   // The index follows the profiles it is read for; the other two reads wait for neither.
   assert.match(

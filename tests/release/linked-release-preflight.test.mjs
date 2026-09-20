@@ -118,17 +118,17 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  // One migration waits for the next release: «Примечание» is printed as an
-  // empty cell whatever an operator once typed into it.
+  // One migration waits for the next release: «Примечание» prints empty unless
+  // somebody deliberately wrote one.
   assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 101);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 102);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 100);
+  assert.equal(receipt.matchedCount, 101);
   assert.equal(receipt.pendingCount, 1);
-  assert.equal(receipt.expectedBaseCount, 100);
+  assert.equal(receipt.expectedBaseCount, 101);
   assert.equal(receipt.expectedPendingCount, 1);
-  assert.equal(receipt.expectedTotalCount, 101);
+  assert.equal(receipt.expectedTotalCount, 102);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

@@ -49,12 +49,15 @@ begin
  if (profile->>'validityMonths')::int<>36 then raise exception 'BIOT_VALIDITY: %',profile->>'validityMonths'; end if;
  if coalesce(btrim(profile->>'protocolText'),'')='' or coalesce(btrim(profile->>'decisionText'),'')='' then raise exception 'BIOT_TEXTS_EMPTY'; end if;
  if coalesce(c.document_snapshot#>>'{participantFields,notes}','X')<>'' then raise exception 'BIOT_NOTES_NOT_EMPTY'; end if;
- -- Even a note somebody stored earlier is printed as an empty cell.
- update public.document_batches set participant_fields=jsonb_build_object(c.user_id::text,jsonb_build_object('notes','Что значит примечание тут?'))
- where organization_key=lower(btrim(c.organization)) and course_slug=c.test_slug;
+ -- Empty is the default, not the only possibility: a note somebody deliberately
+ -- wrote for one listener is printed in their row.
+ insert into public.document_batches(organization,course_slug,document_date,protocol_number,participant_fields)
+ values(c.organization,c.test_slug,current_date,'NOTE-REGRESSION',jsonb_build_object(c.user_id::text,jsonb_build_object('notes','Повторная проверка')))
+ on conflict(organization_key,course_slug) do update set participant_fields=excluded.participant_fields,version=document_batches.version+1;
  update public.certificates set revoked_at=statement_timestamp(),revoke_reason='notes regression' where id=c.id;
- c:=pg_temp.issuance_fixture('Плотник');
- if coalesce(c.document_snapshot#>>'{participantFields,notes}','X')<>'' then raise exception 'BIOT_STORED_NOTE_PRINTED: %',c.document_snapshot#>>'{participantFields,notes}'; end if;
+ insert into public.certificates select (jsonb_populate_record(null::public.certificates,to_jsonb(c)||jsonb_build_object('id',gen_random_uuid(),'certificate_number','SH-DEFAULTS-NOTE','document_snapshot',null,'revoked_at',null,'revoke_reason',null))).* returning * into c;
+ if c.document_snapshot#>>'{participantFields,notes}'<>'Повторная проверка' then raise exception 'BIOT_NOTE_LOST: %',c.document_snapshot#>>'{participantFields,notes}'; end if;
+ update public.certificates set revoked_at=statement_timestamp(),revoke_reason='notes regression' where id=c.id;
 
  -- «Причина обучения» of a fire-safety protocol, and its volume in hours.
  delete from public.document_profiles where course_slug='plotnik';

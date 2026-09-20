@@ -14,6 +14,7 @@ import {
   FileZip,
   FloppyDisk,
   IdentificationCard,
+  NotePencil,
   PencilSimple,
   Plus,
   Ruler,
@@ -28,6 +29,7 @@ import {
   DocumentImageTiles,
   type DocumentImageSlot,
 } from '@/components/admin/document-image-tiles';
+import { DocumentNoteField } from '@/components/admin/document-note-field';
 import { DocumentPdfPreview } from '@/components/admin/document-pdf-preview';
 import { DocumentSelect } from '@/components/admin/document-select';
 import { Badge } from '@/components/ui/badge';
@@ -99,7 +101,7 @@ export type CertificateSettingsView = {
 };
 type EditorData = Awaited<ReturnType<typeof readDocumentEditor>>;
 type DocumentTab = 'protocol' | 'certificate';
-const SECTION_IDS = ['profile', 'images', 'commission', 'texts', 'size'] as const;
+const SECTION_IDS = ['profile', 'note', 'images', 'commission', 'texts', 'size'] as const;
 type SectionId = (typeof SECTION_IDS)[number];
 const SECTIONS_KEY = 'document-editor-sections';
 /** Long enough to fold a burst of picks into one generation, short enough to read as instant. */
@@ -551,19 +553,19 @@ export function CertificateSettingsForm({
     !course && profiles.length
       ? { kind: 'message', text: CHOOSE_DOCUMENT }
       : buildPreviewJob({
-            tab,
-            loading,
-            person: selectedPerson,
-            metadata,
-            metadataMessage: metadataProblem,
-            sizeMessage: sizeProblem ? insertSizeMessage(sizeProblem) : null,
-            branding,
-            program,
-            organization,
-            sampleOrganization: fields.documentDefaults.companyName,
-            batch,
-            participants: data.participants,
-          });
+          tab,
+          loading,
+          person: selectedPerson,
+          metadata,
+          metadataMessage: metadataProblem,
+          sizeMessage: sizeProblem ? insertSizeMessage(sizeProblem) : null,
+          branding,
+          program,
+          organization,
+          sampleOrganization: fields.documentDefaults.companyName,
+          batch,
+          participants: data.participants,
+        });
   const key = jobKey(job);
   const fresh = shown?.key === key;
   const bytes = job.kind === 'message' ? null : (shown?.bytes ?? null);
@@ -1301,6 +1303,34 @@ export function CertificateSettingsForm({
                       current.map((p) => (p.id === profile.id ? profile : p)),
                     )
                   }
+                />
+              </Section>
+            ) : null}
+
+            {selectedPerson ? (
+              <Section
+                icon={<NotePencil aria-hidden="true" />}
+                title="Примечание в протоколе"
+                hint={selectedPerson.notes?.trim() || 'Пусто — так и печатается'}
+                open={sections.has('note')}
+                keepMounted
+                onToggle={() => toggle('note')}
+              >
+                <DocumentNoteField
+                  key={selectedPerson.userId + ':' + batch.id}
+                  person={selectedPerson}
+                  batch={batch}
+                  ensureBatch={async () => (await persist())?.batch ?? null}
+                  onSaved={(notes, version) => {
+                    setBatch((value) => ({ ...value, version }));
+                    setSavedBatch((value) => (value ? { ...value, version } : value));
+                    setData((value) => ({
+                      ...value,
+                      participants: value.participants.map((entry) =>
+                        entry.userId === selectedPerson.userId ? { ...entry, notes } : entry,
+                      ),
+                    }));
+                  }}
                 />
               </Section>
             ) : null}
