@@ -46,15 +46,17 @@ begin
  perform set_config('request.jwt.claims',jsonb_build_object('role','authenticated','sub',c.user_id)::text,true);
  perform set_config('request.jwt.claim.sub',c.user_id::text,true);
  perform set_config('request.jwt.claim.role','authenticated',true);
- -- Only the education refusal is caught. Existing unrelated requirements stay strict.
- update public.document_profiles set body=jsonb_set(body,'{family}','"ptm"') where course_slug=c.test_slug;
+ -- Only the education refusal is caught. Existing unrelated requirements stay
+ -- strict: a programme whose only profile names a category this learner is not
+ -- in still has no document to issue.
+ update public.document_profiles set audience='itr',body=jsonb_set(body,'{audience}','"itr"') where course_slug=c.test_slug;
  begin perform private.complete_test_attempt_unmetered(a.id,answers);
  exception when sqlstate '22023' then
-  if sqlerrm='DOCUMENT_REQUIRED_FIELDS:trainingReason' then blocked:=true; else raise; end if;
+  if sqlerrm='DOCUMENT_PROFILE_REQUIRED' then blocked:=true; else raise; end if;
  end;
  if not blocked then raise exception 'Non-education issuance error was silently swallowed'; end if;
  if (select status from public.test_attempts where id=a.id)<>'started' then raise exception 'Unrelated exception did not rollback completion'; end if;
- update public.document_profiles set body=jsonb_set(body,'{family}','"general"') where course_slug=c.test_slug;
+ update public.document_profiles set audience='all',body=jsonb_set(body,'{audience}','"all"') where course_slug=c.test_slug;
  update public.profiles set education='' where id=c.user_id;
  result:=private.complete_test_attempt_unmetered(a.id,answers);
  if result->>'status'<>'passed' or (result->>'score')::integer<>c.total then raise exception 'Improved attempt not completed: %',result; end if;

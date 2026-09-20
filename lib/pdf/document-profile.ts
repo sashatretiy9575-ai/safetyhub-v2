@@ -1,4 +1,5 @@
 import type { CertificateBranding } from './certificate-client-contract.ts';
+import { completeDocumentProfile } from './document-family-defaults.ts';
 
 export const DOCUMENT_FAMILIES = [
   'general',
@@ -41,8 +42,9 @@ export function registeredDocumentAssetUrl(id: string) {
 /** A profile contains explicit identity-to-image links; never infer a signature by row number. */
 export function applyDocumentProfile(
   branding: CertificateBranding,
-  profile: DocumentProfile,
+  stored: DocumentProfile,
 ): CertificateBranding {
+  const profile = completeDocumentProfile(stored);
   const [chairman, ...members] = profile.commission;
   const signature = (person: DocumentSigner | undefined) =>
     person?.assetId ? registeredDocumentAssetUrl(person.assetId) : null;

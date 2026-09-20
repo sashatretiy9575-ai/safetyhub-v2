@@ -1530,6 +1530,7 @@ export type Database = {
         Args: { p_force?: boolean }
         Returns: Json
       }
+      complete_document_profile: { Args: { p: Json }; Returns: Json }
       complete_test_attempt_unmetered: {
         Args: { p_answers: Json; p_attempt_id: string }
         Returns: Json
@@ -1630,6 +1631,14 @@ export type Database = {
           p_reason: string
           p_target_user_id: string
         }
+        Returns: Json
+      }
+      document_audience_for_position: {
+        Args: { p_position: string }
+        Returns: string
+      }
+      document_family_default: {
+        Args: { p_audience: string; p_family: string }
         Returns: Json
       }
       editor_course_question_variants: {
@@ -4726,6 +4735,7 @@ export type Database = {
           has_current_legal_acceptance: boolean
           profile_avatar_updated_at: string
           profile_created_at: string
+          profile_education: string
           profile_id: string
           profile_identity_state: string
           profile_job: string
@@ -5647,6 +5657,19 @@ export type Database = {
       }
       submit_profile_for_approval_from_trusted_server: {
         Args: {
+          p_job: string
+          p_name: string
+          p_organization: string
+          p_phone_country_iso2: string
+          p_phone_e164: string
+          p_surname: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      submit_profile_for_approval_from_trusted_server_with_education: {
+        Args: {
+          p_education: string
           p_job: string
           p_name: string
           p_organization: string

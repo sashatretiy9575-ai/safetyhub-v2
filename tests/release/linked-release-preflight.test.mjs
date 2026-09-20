@@ -117,18 +117,19 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const localMigrations = inventory;
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
-  // Everything reviewed is applied: the release of 20 September went out with
-  // the account deletion fixes, so the pending tail is empty.
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 0);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 98);
+  // Two migrations wait for the next release: education as a field every
+  // participant fills in, and the defaults that let a document be issued
+  // without retyping what the paper form already says.
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 2);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 100);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(receipt.matchedCount, 98);
-  assert.equal(receipt.pendingCount, 0);
+  assert.equal(receipt.pendingCount, 2);
   assert.equal(receipt.expectedBaseCount, 98);
-  assert.equal(receipt.expectedPendingCount, 0);
-  assert.equal(receipt.expectedTotalCount, 98);
+  assert.equal(receipt.expectedPendingCount, 2);
+  assert.equal(receipt.expectedTotalCount, 100);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

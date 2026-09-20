@@ -10,9 +10,14 @@ export const documentProfileSchema = z.object({
   id: z.string().regex(/^[a-z][a-z0-9-]{1,119}$/u), courseSlug: z.string().min(1).max(160),
   audience: z.enum(['all', 'worker', 'itr']), label: z.string().min(1).max(200),
   programName: z.string().min(1).max(240), family: z.enum(DOCUMENT_FAMILIES),
-  hours: z.number().int().positive().max(5000).nullable(), validityMonths: z.number().int().min(0).max(120),
-  protocolText: z.string().max(1000), decisionText: z.string().max(1000),
-  orderNumber: z.string().max(100), orderDate: z.union([z.iso.date(), z.literal('')]), verificationKind: z.string().max(120),
+  // A blank box means "the form does not state it", and the editor sends what a
+  // number input gives for an empty field. Refusing 0 turned that into an
+  // opaque «Проверьте реквизиты программы», and a row saved before these keys
+  // existed threw for the whole settings page.
+  hours: z.number().int().min(0).max(5000).nullable().default(null).transform((value) => value || null),
+  validityMonths: z.number().int().min(0).max(120).default(0),
+  protocolText: z.string().max(1000).default(''), decisionText: z.string().max(1000).default(''),
+  orderNumber: z.string().max(100).default(''), orderDate: z.union([z.iso.date(), z.literal('')]).default(''), verificationKind: z.string().max(120).default(''),
   commission: z.array(z.object({ signerId: z.string().min(1).max(80), name: z.string().min(1).max(200), position: z.string().max(200), assetId: z.string().uuid().nullable() }).strict()).min(1).max(6),
   stampAssetId: z.string().uuid().nullable(),
 }).strict();

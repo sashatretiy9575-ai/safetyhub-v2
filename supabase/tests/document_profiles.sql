@@ -52,17 +52,22 @@ begin
  update public.certificates set revoked_at=statement_timestamp(),revoke_reason='required field regression' where id=created.id;
  update public.document_batches set participant_fields=participant_fields-created.user_id::text where course_slug=created.test_slug;
  update public.document_profiles set body=jsonb_set(body,'{family}','"ptm"') where id='regression-all';
- changed:=false;
- begin
-   insert into public.certificates select (jsonb_populate_record(null::public.certificates,to_jsonb(created)||jsonb_build_object('id',gen_random_uuid(),'certificate_number','SH-DOCUMENT-REQUIRED-TEST','document_snapshot',null))).*;
- exception when others then if sqlerrm='DOCUMENT_REQUIRED_FIELDS:trainingReason' then changed:=true; else raise; end if; end;
- if not changed then raise exception 'PTM issuance accepted a missing training reason'; end if;
+ -- «Причина обучения» is the same word for the whole group, so it is the wording
+ -- of the form rather than a box the operator has to fill in for each person.
+ insert into public.certificates select (jsonb_populate_record(null::public.certificates,to_jsonb(created)||jsonb_build_object('id',gen_random_uuid(),'certificate_number','SH-DOCUMENT-REQUIRED-TEST','document_snapshot',null))).* returning * into created;
+ if created.document_snapshot#>>'{participantFields,trainingReason}'<>'Первичный' then raise exception 'PTM issuance did not carry the default training reason: %',created.document_snapshot#>>'{participantFields,trainingReason}'; end if;
+ update public.certificates set revoked_at=statement_timestamp(),revoke_reason='audience regression' where id=created.id;
+ -- A programme split by category binds by the position the person holds, and
+ -- still refuses when no profile covers that half of it.
  update public.document_profiles set audience='worker',body=jsonb_set(body,'{audience}','"worker"') where id='regression-all';
+ insert into public.certificates select (jsonb_populate_record(null::public.certificates,to_jsonb(created)||jsonb_build_object('id',gen_random_uuid(),'certificate_number','SH-DOCUMENT-AUDIENCE-TEST','document_snapshot',null,'revoked_at',null,'revoke_reason',null))).* returning * into created;
+ if created.document_snapshot#>>'{profile,audience}'<>'worker' then raise exception 'Worker position did not bind the worker profile'; end if;
+ update public.certificates set revoked_at=statement_timestamp(),revoke_reason='audience regression' where id=created.id;
  changed:=false;
  begin
-   insert into public.certificates select (jsonb_populate_record(null::public.certificates,to_jsonb(created)||jsonb_build_object('id',gen_random_uuid(),'certificate_number','SH-DOCUMENT-AUDIENCE-TEST','document_snapshot',null))).*;
+   insert into public.certificates select (jsonb_populate_record(null::public.certificates,to_jsonb(created)||jsonb_build_object('id',gen_random_uuid(),'certificate_number','SH-DOCUMENT-AUDIENCE-GAP-TEST','document_snapshot',null,'job','Начальник участка','revoked_at',null,'revoke_reason',null))).*;
  exception when others then if sqlerrm='DOCUMENT_PROFILE_REQUIRED' then changed:=true; else raise; end if; end;
- if not changed then raise exception 'Issuance guessed an audience without an explicit selection'; end if;
+ if not changed then raise exception 'Issuance invented a profile for an uncovered category'; end if;
  if has_table_privilege('authenticated','public.document_assets','select') or has_table_privilege('anon','public.certificate_settings_versions','select') then raise exception 'Private asset metadata exposed'; end if;
  if exists(select 1 from public.certificates where document_snapshot#>>'{settings,stampPng}' is not null) then raise exception 'Image bytes copied to certificates'; end if;
 end;

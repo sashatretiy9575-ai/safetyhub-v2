@@ -127,10 +127,7 @@ test('«Подписи и печать» is one section: the registry where prog
     read('app/(admin)/admin/settings/certificate/page.tsx'),
   ]);
   assert.match(form, /const governed = Boolean\(branding\.documentProfile\);/u);
-  assert.match(
-    form,
-    /const legacyMode = course \? !governed && !audienceRequired : profiles\.length === 0;/u,
-  );
+  assert.match(form, /const legacyMode = course \? !governed : profiles\.length === 0;/u);
   assert.equal(form.match(/title="Подписи и печать"/gu)?.length, 1);
   // Never both: one branch of one condition each.
   assert.match(
@@ -163,17 +160,20 @@ test('«Подписи и печать» is one section: the registry where prog
   // Where programs have profiles, no program means no document rather than a sample nobody issues.
   assert.match(
     form,
-    /!course && profiles\.length\n\s+\? \{ kind: 'message', text: CHOOSE_DOCUMENT \}\n\s+: audienceRequired\n\s+\? \{ kind: 'message', text: CHOOSE_AUDIENCE \}\n\s+: buildPreviewJob\(\{/u,
+    /!course && profiles\.length\n\s+\? \{ kind: 'message', text: CHOOSE_DOCUMENT \}\n\s+: buildPreviewJob\(\{/u,
   );
   assert.match(form, /const CHOOSE_DOCUMENT = 'Выберите компанию, программу и сотрудника';/u);
-  // A program split into workers and engineers binds nothing until the category is
-  // chosen. Drawing the settings' commission there produced a document with neither
-  // the stamp nor the signatures, while the database refuses to issue it at all.
+  // A program split into workers and engineers used to bind nothing until somebody
+  // picked a category by hand, and the database refused every issuance until they
+  // did. The position the person holds decides it now, here and in the database.
   assert.match(
     form,
-    /const audienceRequired =\n\s+Boolean\(course\) && !governed && profiles\.some\(\(p\) => p\.courseSlug === course\);/u,
+    /p\.courseSlug === batch\.courseSlug && p\.audience === documentAudienceForPosition\(position\)/u,
   );
-  assert.match(form, /const CHOOSE_AUDIENCE =\n\s+'Выберите категорию слушателей/u);
+  assert.doesNotMatch(form, /audienceRequired|CHOOSE_AUDIENCE/u);
+  // «Примечание», «Причина обучения» and «Решение комиссии» are the wording of the
+  // paper form, not a question for the operator: nothing is typed per listener.
+  assert.doesNotMatch(form, /DocumentParticipantFields/u);
 
   // The index follows the profiles it is read for; the other two reads wait for neither.
   assert.match(

@@ -99,12 +99,14 @@ function profileTemplates() {
           label: `${programName}${suffix}`,
           programName,
           family,
-          hours: ['ptm', 'industrial'].includes(family) ? (audience === 'itr' ? 40 : 10) : null,
+          // Blank on purpose: the volume, the term and both sentences come from
+          // the form the programme belongs to (lib/pdf/document-family-defaults.ts,
+          // mirrored by private.document_family_default). One generic sentence for
+          // every programme alike is what the administrator had to correct by hand.
+          hours: null,
           validityMonths: 0,
-          protocolText:
-            'Проверка знаний проведена в соответствии с утверждённой программой на тему: «{program}».',
-          decisionText:
-            'Результаты проверки знаний зафиксированы настоящим протоколом. Допуск к самостоятельной работе оформляет работодатель в установленном порядке.',
+          protocolText: '',
+          decisionText: '',
           orderNumber: '',
           orderDate: '',
           verificationKind: '',

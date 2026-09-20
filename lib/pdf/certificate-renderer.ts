@@ -257,7 +257,7 @@ async function renderCertificate(
   ]);
   measureSpan('doc:facsimiles', facsimilesStarted);
   drawFacsimile(page, stamp, photoX - 86, 272, 92, 92);
-  const signatureHeight = Math.min(42, lineHeight * 1.75);
+  const signatureHeight = Math.max(16, Math.min(42, lineHeight * 1.15));
   signatures.forEach((signature, i) => drawFacsimile(page, signature, right + commissionWidth - 124, 295 + (i + 1) * lineHeight + 7 - signatureHeight, 112, signatureHeight));
   if (metadata.verificationUrl) {
     const qr = (await import('qrcode')).default.create(metadata.verificationUrl, { errorCorrectionLevel: 'M' });

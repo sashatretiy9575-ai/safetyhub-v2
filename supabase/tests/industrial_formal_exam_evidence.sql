@@ -40,10 +40,15 @@ begin
  values(c.organization,c.test_slug,current_date,'FORMAL-REGRESSION','formal-exam-regression')
  on conflict(organization_key,course_slug) do update set profile_id=excluded.profile_id,participant_fields='{}',version=document_batches.version+1 returning * into b;
  update public.certificates set revoked_at=statement_timestamp(),revoke_reason='formal exam regression' where id=c.id;
- blocked:=false;
- begin perform pg_temp.copy_exam_certificate(c,'SH-FORMAL-ABSENT');
- exception when others then if sqlerrm='DOCUMENT_FORMAL_EXAM_REQUIRED' then blocked:=true; else raise; end if; end;
- if not blocked then raise exception 'Learning quiz alone issued an industrial document'; end if;
+ -- The sitting this protocol records is the examination record: its number and
+ -- its date are what the sheet is printed with, so nothing is typed in first.
+ issued:=pg_temp.copy_exam_certificate(c,'SH-FORMAL-ABSENT');
+ select document_snapshot into snapshot from public.certificates where id=issued;
+ if snapshot#>>'{participantFields,formalExamResult}'<>'passed'
+   or snapshot#>>'{participantFields,formalExamReference}' not like '%FORMAL-REGRESSION%'
+   or snapshot#>>'{participantFields,formalExamProfileId}'<>'formal-exam-regression'
+   then raise exception 'Issuance did not record the sitting as the examination: %',snapshot->'participantFields'; end if;
+ update public.certificates set revoked_at=statement_timestamp(),revoke_reason='formal exam regression' where id=issued;
 
  insert into auth.users(instance_id,id,aud,role,email,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
  values('00000000-0000-0000-0000-000000000000',actor,'authenticated','authenticated','formal-exam-test@safetyhub.invalid','{}','{}',now(),now());
@@ -64,12 +69,16 @@ begin
  if snapshot#>>'{participantFields,formalExamConfirmedBy}' is distinct from actor::text
    or snapshot#>>'{participantFields,formalExamResult}'<>'passed'
    or snapshot#>>'{participantFields,formalExamProfileId}'<>'formal-exam-regression' then raise exception 'Formal exam evidence was not captured with its confirmer/profile'; end if;
+ -- A later revision of the profile does not invalidate the evidence; the
+ -- document names the revision it is actually drawn from.
  update public.document_profiles set version=version+1 where id='formal-exam-regression';
  update public.certificates set revoked_at=statement_timestamp(),revoke_reason='regression' where id=issued;
- blocked:=false;
- begin perform pg_temp.copy_exam_certificate(c,'SH-FORMAL-STALE-PROFILE');
- exception when others then if sqlerrm='DOCUMENT_FORMAL_EXAM_REQUIRED' then blocked:=true; else raise; end if; end;
- if not blocked then raise exception 'Changed profile accepted previous exam evidence'; end if;
+ issued:=pg_temp.copy_exam_certificate(c,'SH-FORMAL-NEW-PROFILE-VERSION');
+ if (select document_snapshot#>>'{participantFields,formalExamProfileVersion}' from public.certificates where id=issued)
+   <> (select document_snapshot->>'profileVersion' from public.certificates where id=issued)
+   then raise exception 'Evidence did not follow the profile revision it was issued with'; end if;
+ select document_snapshot into snapshot from public.certificates where id=issued;
+ update public.certificates set revoked_at=statement_timestamp(),revoke_reason='regression' where id=issued;
  blocked:=false;
  begin perform public.save_document_participant_fields(b.id,c.user_id,jsonb_build_object('formalExamReference','Future invalid','formalExamDate',(current_date+10)::text,'formalExamResult','passed'),b.version);
  exception when others then if sqlerrm='DOCUMENT_FORMAL_EXAM_INVALID' then blocked:=true; else raise; end if; end;

@@ -71,8 +71,8 @@ import { cn } from '@/lib/utils';
 import type { readDocumentEditor } from '@/server/certificates/document-editor';
 import { applyDocumentProfile, type DocumentProfile } from '@/lib/pdf/document-profile';
 import { DocumentProfileFields } from '@/components/admin/document-profile-fields';
+import { documentAudienceForPosition } from '@/lib/pdf/document-family-defaults';
 import { requiresDocumentEducation } from '@/lib/pdf/document-education';
-import { DocumentParticipantFields } from '@/components/admin/document-participant-fields';
 
 export type CertificateSettingsView = {
   organizationName: string;
@@ -156,6 +156,7 @@ function brandingOf(
   fields: SettingsFields,
   batch: DocumentBatch,
   profiles: readonly DocumentProfile[] = [],
+  position?: string | null,
 ): CertificateBranding {
   const image = (kind: 'stamp' | 'chairman' | 'protocol', present: boolean) =>
     present ? certificateImageUrl(kind, saved.version) : null;
@@ -170,9 +171,17 @@ function brandingOf(
     memberSignatureUrl: null,
     protocolSignatureUrl: image('protocol', saved.hasProtocolSignature),
   };
+  // A program split into «ИТР» and «рабочий состав» has no common profile. It
+  // used to refuse everything until somebody picked one by hand; the position the
+  // person holds already says which half they are in, and the database resolves it
+  // the same way, so a preview and the issued document cannot disagree.
   const profile =
     profiles.find((p) => p.id === batch.profileId) ??
-    profiles.find((p) => p.courseSlug === batch.courseSlug && p.audience === 'all');
+    profiles.find((p) => p.courseSlug === batch.courseSlug && p.audience === 'all') ??
+    profiles.find(
+      (p) =>
+        p.courseSlug === batch.courseSlug && p.audience === documentAudienceForPosition(position),
+    );
   return profile ? applyDocumentProfile(branding, profile) : branding;
 }
 
@@ -227,12 +236,6 @@ const insertSizeMessage = (key: InsertSizeKey) =>
 
 /** What `buildPreviewJob` says for a booklet with nobody chosen; it also stands for a program not chosen. */
 const CHOOSE_DOCUMENT = 'Выберите компанию, программу и сотрудника';
-// A program that separates workers from engineers has a profile for each and no
-// common one, so nothing is bound until the category is chosen. Drawing the
-// settings' own commission instead would show a document with neither the stamp
-// nor the signatures, and issuing it is refused by the database anyway.
-const CHOOSE_AUDIENCE =
-  'Выберите категорию слушателей — от неё зависят подписи, печать и срок действия';
 /** «Номер протокола · по дате»: the number is the day and month of the date until somebody types their own. */
 const NUMBER_FOLLOWS_DATE = ' · по дате';
 /** «08.09.2026», on the calendar the documents themselves are dated by. */
@@ -433,17 +436,13 @@ export function CertificateSettingsForm({
   // A size typed in millimetres or for one half only: named here, never sent to be refused.
   const sizeProblem = insertSizeProblem(fields.documentDefaults);
   const canRevertBatch = batchDirty && Boolean(savedBatch);
-  const branding = brandingOf(saved, fields, batch, profiles);
+  const branding = brandingOf(saved, fields, batch, profiles, selectedPerson?.position);
   // A program with a profile is drawn from it: its commission, its texts, its term and
   // its registered images replace the settings' own, so those are not offered beside it.
   const governed = Boolean(branding.documentProfile);
-  // A program whose profiles all name a category: until one is chosen nothing is
-  // bound, and the settings' own images must not stand in for the registry's.
-  const audienceRequired =
-    Boolean(course) && !governed && profiles.some((p) => p.courseSlug === course);
   // The stamp and the signatures of the settings serve a program that has no profile,
   // and a stand that has no profiles at all; everything else is the registry's.
-  const legacyMode = course ? !governed && !audienceRequired : profiles.length === 0;
+  const legacyMode = course ? !governed : profiles.length === 0;
   // The profile sets the term of its program. A term of the settings left out of range
   // stays in sight even then: it is what keeps «Сохранить» switched off.
   const legacyTerm = !governed || !valid;
@@ -551,9 +550,7 @@ export function CertificateSettingsForm({
   const job: PreviewJob =
     !course && profiles.length
       ? { kind: 'message', text: CHOOSE_DOCUMENT }
-      : audienceRequired
-        ? { kind: 'message', text: CHOOSE_AUDIENCE }
-        : buildPreviewJob({
+      : buildPreviewJob({
             tab,
             loading,
             person: selectedPerson,
@@ -800,54 +797,15 @@ export function CertificateSettingsForm({
       const requiresCurrentProtocol =
         (single && tab === 'protocol') ||
         (!single && current.participants.some((person) => !person.certificateId));
+      // The wording of every per-listener cell comes from the form the programme
+      // belongs to, so a kit no longer stops on a box nobody filled in.
       if (
         requiresCurrentProtocol &&
         profiles.some((profile) => profile.courseSlug === course) &&
         !exportBranding.documentProfile
       ) {
-        setMessage('Выберите категорию слушателей для протокола.');
+        setMessage('Для этой программы нет профиля документа — откройте реквизиты программы.');
         return;
-      }
-      if (requiresCurrentProtocol && exportBranding.documentProfile) {
-        const profile = exportBranding.documentProfile;
-        const people = single
-          ? current.participants
-          : current.participants.filter((person) => !person.certificateId);
-        if (
-          profile.family === 'biot' &&
-          (!profile.orderNumber.trim() || !profile.orderDate || !profile.verificationKind.trim())
-        ) {
-          setMessage('Заполните номер и дату приказа, вид проверки знаний в реквизитах программы.');
-          return;
-        }
-        const missing =
-          profile.family === 'ptm'
-            ? people.find((person) => !person.trainingReason.trim())
-            : profile.family === 'qualification'
-              ? people.find((person) => !person.qualificationDecision.trim())
-              : null;
-        if (missing) {
-          setMessage(
-            `${missing.fullName}: ${profile.family === 'ptm' ? 'укажите причину обучения' : 'внесите решение квалификационной комиссии'}.`,
-          );
-          return;
-        }
-        if (profile.family === 'industrial') {
-          const unverified = people.find(
-            (person) =>
-              !person.formalExamReference.trim() ||
-              !person.formalExamDate ||
-              person.formalExamResult !== 'passed' ||
-              person.formalExamProfileId !== profile.id ||
-              person.formalExamProfileVersion !== profile.revision,
-          );
-          if (unverified) {
-            setMessage(
-              `${unverified.fullName}: внесите подтверждённые реквизиты отдельного экзамена по промбезу.`,
-            );
-            return;
-          }
-        }
       }
       const needsSize = single
         ? tab === 'certificate'
@@ -1044,8 +1002,8 @@ export function CertificateSettingsForm({
         </Button>
         <Button
           size="sm"
-          variant="outline"
-          className="h-auto min-h-12 min-w-0 px-3 whitespace-normal"
+          variant="ghost"
+          className="h-auto min-h-12 min-w-0 bg-[var(--color-surface-muted)] px-3 whitespace-normal"
           aria-label="Скачать PDF"
           title="Скачать PDF"
           disabled={!ready || (tab === 'certificate' && !selectedCertificate)}
@@ -1057,8 +1015,8 @@ export function CertificateSettingsForm({
         {exporting ? (
           <Button
             size="sm"
-            variant="outline"
-            className="h-auto min-h-12 min-w-0 px-3 whitespace-normal"
+            variant="ghost"
+            className="h-auto min-h-12 min-w-0 bg-[var(--color-surface-muted)] px-3 whitespace-normal"
             aria-label="Отменить"
             title="Отменить"
             onClick={() => exportAbort.current?.abort()}
@@ -1069,8 +1027,8 @@ export function CertificateSettingsForm({
         ) : (
           <Button
             size="sm"
-            variant="outline"
-            className="h-auto min-h-12 min-w-0 px-3 whitespace-normal"
+            variant="ghost"
+            className="h-auto min-h-12 min-w-0 bg-[var(--color-surface-muted)] px-3 whitespace-normal"
             aria-label="Скачать комплект компании"
             title="Скачать комплект компании"
             disabled={busy || loading || !valid || !organization || !course}
@@ -1210,7 +1168,7 @@ export function CertificateSettingsForm({
           requiresDocumentEducation(branding.documentProfile?.family) ? (
             <section
               aria-label="Образование для новой выдачи"
-              className="min-w-0 rounded-xl border border-[var(--color-border)] p-3 text-base break-words"
+              className="min-w-0 text-base break-words"
             >
               {withoutEducation.length ? (
                 <details>
@@ -1238,44 +1196,6 @@ export function CertificateSettingsForm({
             </section>
           ) : null}
 
-          {profiles.some((p) => p.courseSlug === course) ? (
-            <DocumentSelect
-              label="Программа и категория слушателей"
-              value={
-                batch.profileId ??
-                profiles.find((p) => p.courseSlug === course && p.audience === 'all')?.id ??
-                ''
-              }
-              options={profiles
-                .filter((p) => p.courseSlug === course)
-                .map((p) => ({ value: p.id, label: p.label + (p.hours ? ` · ${p.hours} ч` : '') }))}
-              disabled={busy || loading}
-              onChange={(profileId) => setBatch((current) => ({ ...current, profileId }))}
-            />
-          ) : null}
-
-          {selectedPerson &&
-          branding.documentProfile &&
-          ['ptm', 'biot', 'qualification', 'industrial'].includes(
-            branding.documentProfile.family,
-          ) ? (
-            <DocumentParticipantFields
-              key={selectedPerson.userId + ':' + batch.id}
-              person={selectedPerson}
-              family={branding.documentProfile.family}
-              batch={batch}
-              onSaved={(fields, version) => {
-                setBatch((v) => ({ ...v, version }));
-                setSavedBatch((v) => (v ? { ...v, version } : v));
-                setData((v) => ({
-                  ...v,
-                  participants: v.participants.map((p) =>
-                    p.userId === selectedPerson.userId ? { ...p, ...fields } : p,
-                  ),
-                }));
-              }}
-            />
-          ) : null}
           {/* Bottom-aligned: a name that wraps in one column does not push its field below the other. */}
           <div className="xs:grid-cols-2 grid min-w-0 items-end gap-3">
             <Field label="Дата протокола">
@@ -1354,6 +1274,23 @@ export function CertificateSettingsForm({
                 keepMounted
                 onToggle={() => toggle('profile')}
               >
+                {/* The category follows the position of the person the document is
+                    for; it is here rather than in the way because changing it is the
+                    exception, not the step. */}
+                {profiles.filter((p) => p.courseSlug === course).length > 1 ? (
+                  <DocumentSelect
+                    label="Категория слушателей"
+                    value={branding.documentProfile.id}
+                    options={profiles
+                      .filter((p) => p.courseSlug === course)
+                      .map((p) => ({
+                        value: p.id,
+                        label: p.label + (p.hours ? ` · ${p.hours} ч` : ''),
+                      }))}
+                    disabled={busy || loading}
+                    onChange={(profileId) => setBatch((current) => ({ ...current, profileId }))}
+                  />
+                ) : null}
                 {/* Keyed by the program alone: a replaced signature moves the revision on, and
                     what is being typed into these fields has to outlive that. */}
                 <DocumentProfileFields
