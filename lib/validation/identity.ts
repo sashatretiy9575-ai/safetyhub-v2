@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import { PROFILE_FIELD_LIMITS } from '@/lib/profile/fields';
-import { profileField } from '@/lib/validation/profile';
+import { optionalProfileField, personNameField, profileField } from '@/lib/validation/profile';
 
 /**
  * Administrative identity verification writes the same four columns a
@@ -12,11 +12,13 @@ import { profileField } from '@/lib/validation/profile';
  */
 export const verifyIdentitySchema = z.object({
   action: z.literal('verify'),
-  name: profileField(PROFILE_FIELD_LIMITS.name),
-  surname: profileField(PROFILE_FIELD_LIMITS.surname),
+  name: personNameField(PROFILE_FIELD_LIMITS.name),
+  surname: personNameField(PROFILE_FIELD_LIMITS.surname),
   job: profileField(PROFILE_FIELD_LIMITS.job),
   organization: profileField(PROFILE_FIELD_LIMITS.organization),
-  education: z.string().trim().max(200).regex(/^[^\u0000-\u001f\u007f]*$/u).optional(),
+  // Still optional: a card may be saved without touching the education. What is
+  // sent goes through the participant's own normalizer all the same.
+  education: optionalProfileField(PROFILE_FIELD_LIMITS.education),
   /**
    * The identity version the card was opened on. Optional, so callers that do
    * not edit from a form keep working; when present, a save made from a card

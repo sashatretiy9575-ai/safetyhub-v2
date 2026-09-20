@@ -1,6 +1,7 @@
 import * as z from 'zod';
 
 import {
+  isPersonName,
   normalizeProfileText,
   PROFILE_FIELD_LIMITS,
   type ProfileValues,
@@ -27,11 +28,32 @@ export const profileField = (maximum: number) =>
         .refine((value) => !CONTROL_CHARACTERS.test(value), 'Недопустимые служебные символы'),
     );
 
+/**
+ * The same normalizer without the required minimum: an administrator may save a
+ * person's card without touching their education.
+ */
+export const optionalProfileField = (maximum: number) =>
+  z
+    .string()
+    .transform(normalizeProfileText)
+    .pipe(
+      z
+        .string()
+        .max(maximum)
+        .refine((value) => !CONTROL_CHARACTERS.test(value), 'Недопустимые служебные символы'),
+    )
+    .optional();
+
+/** Latin or Cyrillic only: the value is printed on a certificate and in a protocol. */
+export const personNameField = (maximum: number) =>
+  profileField(maximum).refine(isPersonName, 'Имя и фамилию вводите латиницей или кириллицей');
+
 export const profileSchema = z.object({
-  name: profileField(PROFILE_FIELD_LIMITS.name),
-  surname: profileField(PROFILE_FIELD_LIMITS.surname),
+  name: personNameField(PROFILE_FIELD_LIMITS.name),
+  surname: personNameField(PROFILE_FIELD_LIMITS.surname),
   job: profileField(PROFILE_FIELD_LIMITS.job),
   organization: profileField(PROFILE_FIELD_LIMITS.organization),
+  education: profileField(PROFILE_FIELD_LIMITS.education),
 });
 type SchemaProfileValues = z.infer<typeof profileSchema>;
 const _profileTypeCheck: ProfileValues = {} as SchemaProfileValues;

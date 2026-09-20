@@ -1,12 +1,19 @@
 import { isPhoneCountryCode } from '@/lib/phone/country-codes';
 import type { PhoneInputValue } from '@/lib/phone/countries';
 
-export type ProfileValues = Readonly<{
+/** The four columns an administrator confirms on a person's card. */
+export type ProfileIdentityValues = Readonly<{
   name: string;
   surname: string;
   job: string;
   organization: string;
 }>;
+
+/**
+ * Education is printed in the certificate and in the protocol, so the person
+ * fills it in themselves, for every course, not only for the ones that need it.
+ */
+export type ProfileValues = ProfileIdentityValues & Readonly<{ education: string }>;
 
 export type ProfileField = keyof ProfileValues;
 
@@ -20,12 +27,13 @@ export type ProfileSubmissionField = ProfileField | 'phone';
 export type ProfileValidationError = Readonly<
   | { code: 'REQUIRED' }
   | { code: 'CONTROL_CHARACTERS' }
+  | { code: 'NAME_SCRIPT' }
   | { code: 'TOO_LONG'; maxLength: number }
   | { code: 'PHONE_COUNTRY_REQUIRED' }
   | { code: 'PHONE_INVALID' }
 >;
 
-export type ApprovedIdentity = ProfileValues &
+export type ApprovedIdentity = ProfileIdentityValues &
   Readonly<{
     version: number;
     verifiedAt: string;
@@ -39,9 +47,27 @@ export const PROFILE_FIELD_LIMITS = {
   surname: 80,
   job: 160,
   organization: 160,
+  education: 200,
 } as const satisfies Record<ProfileField, number>;
 
 const CONTROL_CHARACTERS = /[\p{Cc}\p{Cf}\p{Cs}]/u;
+
+/**
+ * A name reaches a printed certificate and a printed protocol, where the
+ * owner's own protocols spell Chinese participants in Latin letters — Chen
+ * Binbin, Li Haijian. Letters are therefore limited to Latin and Cyrillic;
+ * Cyrillic because Kazakh names carry ә, ғ, қ, ң, ө, ұ, ү, һ, і. Han, kana and
+ * emoji are refused. A job title and a company stay unrestricted: a real
+ * company name is written in Russian.
+ */
+export const PERSON_NAME_PATTERN =
+  /^[\p{Script=Latin}\p{Script=Cyrillic}\p{Mn}\p{Mc}0-9 '’.-]+$/u;
+const PERSON_NAME_LETTER = /[\p{Script=Latin}\p{Script=Cyrillic}]/u;
+const PERSON_NAME_FIELDS: readonly ProfileField[] = ['name', 'surname'];
+
+export function isPersonName(value: string) {
+  return PERSON_NAME_PATTERN.test(value) && PERSON_NAME_LETTER.test(value);
+}
 
 export function normalizeProfileText(value: string) {
   return value.normalize('NFC').trim().replace(/\s+/gu, ' ');
@@ -53,6 +79,9 @@ export function profileFieldError(field: ProfileField, value: string) {
   if (CONTROL_CHARACTERS.test(normalized)) return { code: 'CONTROL_CHARACTERS' } as const;
   if (normalized.length > PROFILE_FIELD_LIMITS[field]) {
     return { code: 'TOO_LONG', maxLength: PROFILE_FIELD_LIMITS[field] } as const;
+  }
+  if (PERSON_NAME_FIELDS.includes(field) && !isPersonName(normalized)) {
+    return { code: 'NAME_SCRIPT' } as const;
   }
   return null;
 }
@@ -72,6 +101,7 @@ export function normalizeProfileValues(values: ProfileValues): ProfileValues {
     surname: normalizeProfileText(values.surname),
     job: normalizeProfileText(values.job),
     organization: normalizeProfileText(values.organization),
+    education: normalizeProfileText(values.education),
   };
 }
 

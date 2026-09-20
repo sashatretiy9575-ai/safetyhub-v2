@@ -130,6 +130,14 @@ export const attestationFieldMaxLengths = {
   organization: 160,
 } as const satisfies Record<keyof typeof attestationFieldLabels, number>;
 
+/**
+ * A copy of `PERSON_NAME_PATTERN` from `lib/profile/fields`, duplicated for the
+ * same reason as the widths above. A name is printed on the certificate and in
+ * the protocol, so it carries Latin or Cyrillic letters only.
+ */
+const PERSON_NAME_PATTERN = /^[\p{Script=Latin}\p{Script=Cyrillic}\p{Mn}\p{Mc}0-9 '’.-]+$/u;
+const PERSON_NAME_LETTER = /[\p{Script=Latin}\p{Script=Cyrillic}]/u;
+
 export type AttestationIdentityFields = {
   name: string;
   surname: string;
@@ -456,7 +464,10 @@ export function AttestationBulkActionButtons({
   );
 }
 
-const EDUCATION_REQUIRED_MESSAGE = 'Заполните образование перед новой выдачей документа.';
+const EDUCATION_REQUIRED_MESSAGE =
+  'Заполните образование: оно печатается в удостоверении и протоколе.';
+const NAME_SCRIPT_MESSAGE =
+  'Имя и фамилию вводите латиницей или кириллицей — иероглифы в документ не попадают.';
 const IDENTITY_CHANGED_MESSAGE =
   'Данные сотрудника не сохранены: их уже изменил другой администратор.';
 
@@ -500,9 +511,6 @@ function AttestationIdentityForm({
 
   const [education, setEducation] = useState<string | null>(draft?.education ?? null);
   const [savedEducation, setSavedEducation] = useState('');
-  const [educationRequired, setEducationRequired] = useState<boolean | null>(
-    issue?.fields.includes('education') ? true : null,
-  );
   const educationInputRef = useRef<HTMLInputElement>(null);
   // The identity version this form was opened on; the save names it, so a card
   // that another administrator has changed meanwhile is refused, not overwritten.
@@ -515,7 +523,7 @@ function AttestationIdentityForm({
     // The field is disabled until its value loads, and a disabled field cannot
     // take focus, so this waits for the value as well as for the message.
     if (focusEducation && educationLoaded) educationInputRef.current?.focus();
-  }, [focusEducation, educationRequired, educationLoaded]);
+  }, [focusEducation, educationLoaded]);
   useEffect(() => {
     const controller = new AbortController();
     void (async () => {
@@ -529,7 +537,6 @@ function AttestationIdentityForm({
       if (controller.signal.aborted) return;
       const value = await readClientResponseJson<{
         education?: string | null;
-        educationRequired?: boolean | null;
         version?: number;
       }>(result.response);
       if (controller.signal.aborted) return;
@@ -541,15 +548,6 @@ function AttestationIdentityForm({
       // A draft typed on an earlier visit outlives the reload of the saved value.
       setEducation((current) => current ?? value.education ?? '');
       setSavedEducation(value.education ?? '');
-      // Once a refusal has named the education, the field stays whatever this
-      // answer says: it may have been sent before the refusal arrived.
-      setEducationRequired((current) =>
-        current === true
-          ? true
-          : typeof value.educationRequired === 'boolean'
-            ? value.educationRequired
-            : null,
-      );
     })();
     return () => controller.abort();
   }, [row.userId, row.testId]);
@@ -589,6 +587,18 @@ function AttestationIdentityForm({
       setError('Заполните все четыре поля — минимум по два символа.');
       return;
     }
+    if (
+      [normalized.name, normalized.surname].some(
+        (value) => !PERSON_NAME_PATTERN.test(value) || !PERSON_NAME_LETTER.test(value),
+      )
+    ) {
+      setError(NAME_SCRIPT_MESSAGE);
+      return;
+    }
+    if (!education.trim()) {
+      setError(EDUCATION_REQUIRED_MESSAGE);
+      return;
+    }
 
     setBusy(true);
     setError('');
@@ -613,7 +623,6 @@ function AttestationIdentityForm({
         const missingEducation =
           payload?.fields?.includes('education') ||
           payload?.error === 'DOCUMENT_REQUIRED_FIELDS:education';
-        if (missingEducation) setEducationRequired(true);
         // The API validates the same four fields the form shows and answers a
         // bare 400, so that case names them; "не удалось сохранить" sent the
         // operator into a second identical attempt.
@@ -622,9 +631,11 @@ function AttestationIdentityForm({
             ? EDUCATION_REQUIRED_MESSAGE
             : payload?.error === 'IDENTITY_CHANGED'
               ? IDENTITY_CHANGED_MESSAGE
-              : result.error.status === 400
-                ? 'Данные сотрудника не сохранены: сервер отклонил значения полей. Проверьте имя, фамилию, должность и компанию.'
-                : identitySaveFailure(result.error, payload?.error),
+              : payload?.error === 'PROFILE_NAME_SCRIPT'
+                ? NAME_SCRIPT_MESSAGE
+                : result.error.status === 400
+                  ? 'Данные сотрудника не сохранены: сервер отклонил значения полей. Проверьте имя, фамилию, должность и компанию.'
+                  : identitySaveFailure(result.error, payload?.error),
         );
         return;
       }
@@ -672,33 +683,30 @@ function AttestationIdentityForm({
           ),
         )}
       </div>
-      {educationRequired !== false ? (
-        <div className="space-y-1">
-          <Label htmlFor={`education-${row.userId}`}>
-            Образование{educationRequired ? ' · для новой выдачи' : ''}
-          </Label>
-          <Input
-            id={`education-${row.userId}`}
-            ref={educationInputRef}
-            aria-label="Образование"
-            aria-describedby={`education-hint-${row.userId}`}
-            value={education ?? ''}
-            invalid={issueFields.includes('education')}
-            disabled={busy || education === null}
-            maxLength={200}
-            onChange={(e) => {
-              setError('');
-              setEducation(e.target.value);
-              report(fields, e.target.value);
-            }}
-          />
-          <p id={`education-hint-${row.userId}`} className="text-sm text-[var(--color-text-muted)]">
-            {educationRequired
-              ? 'Заполните перед новой выдачей: образование печатается в этой форме.'
-              : 'Обязательность зависит от формы нового документа.'}
-          </p>
-        </div>
-      ) : null}
+      {/* Education belongs to every person, not only to the forms that print
+          it, so the field is always here and always filled in. */}
+      <div className="space-y-1">
+        <Label htmlFor={`education-${row.userId}`}>Образование</Label>
+        <Input
+          id={`education-${row.userId}`}
+          ref={educationInputRef}
+          aria-label="Образование"
+          aria-describedby={`education-hint-${row.userId}`}
+          placeholder="Образование"
+          value={education ?? ''}
+          invalid={issueFields.includes('education')}
+          disabled={busy || education === null}
+          maxLength={200}
+          onChange={(e) => {
+            setError('');
+            setEducation(e.target.value);
+            report(fields, e.target.value);
+          }}
+        />
+        <p id={`education-hint-${row.userId}`} className="text-sm text-[var(--color-text-muted)]">
+          Печатается в удостоверении и протоколе. Например: высшее техническое.
+        </p>
+      </div>
       {error ? (
         <p
           role="alert"

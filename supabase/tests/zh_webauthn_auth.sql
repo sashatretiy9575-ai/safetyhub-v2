@@ -88,7 +88,9 @@ begin
     );
   update public.user_roles set role = 'superadmin' where user_id = v_admin_id;
   update public.profiles
-  set name = '测试', surname = '用户', job = '工人', organization = '测试组织',
+  -- A Chinese account writes its name in Latin letters; the job title and the
+  -- company keep their own script.
+  set name = 'Ceshi', surname = 'Yonghu', job = '工人', organization = '测试组织',
       phone_country_iso2 = 'KZ', phone_e164 = '+77000000000',
       preferred_locale = 'zh', onboarding_completed_at = statement_timestamp()
   where id = v_user_id;

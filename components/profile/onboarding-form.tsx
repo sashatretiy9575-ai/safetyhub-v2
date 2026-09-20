@@ -59,6 +59,7 @@ export function OnboardingForm({
   const surnameRef = useRef<HTMLInputElement>(null);
   const jobRef = useRef<HTMLInputElement>(null);
   const organizationRef = useRef<HTMLInputElement>(null);
+  const educationRef = useRef<HTMLInputElement>(null);
   const phoneContainerRef = useRef<HTMLDivElement>(null);
   const avatarSectionRef = useRef<HTMLElement>(null);
 
@@ -74,6 +75,7 @@ export function OnboardingForm({
           surname: curr.surname || draft.surname || '',
           job: curr.job || draft.job || '',
           organization: curr.organization || draft.organization || '',
+          education: curr.education || draft.education || '',
           phone: curr.phone || draft.phone || '',
         }));
       }
@@ -127,11 +129,13 @@ export function OnboardingForm({
           ? jobRef.current
           : errors.organization
             ? organizationRef.current
-            : errors.phone
-              ? phoneContainerRef.current?.querySelector('input')
-              : errors.avatar
-                ? avatarSectionRef.current
-                : null;
+            : errors.education
+              ? educationRef.current
+              : errors.phone
+                ? phoneContainerRef.current?.querySelector('input')
+                : errors.avatar
+                  ? avatarSectionRef.current
+                  : null;
     requestAnimationFrame(() => {
       if (target) {
         target.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
@@ -170,6 +174,13 @@ export function OnboardingForm({
           setMessage(t('avatarMissing'));
           return;
         }
+        // The database refuses a name written in another script as a last
+        // resort; say so in words instead of leaving the code on screen.
+        if (payload?.error === 'PROFILE_NAME_SCRIPT') {
+          setFieldErrors((current) => ({ ...current, name: { code: 'NAME_SCRIPT' } }));
+          setMessage(t('validation.nameScript'));
+          return;
+        }
         setMessage(localizedClientRequestMessage(result.error, t('saveFailed'), tErrors));
         return;
       }
@@ -194,6 +205,7 @@ export function OnboardingForm({
     if (error.code === 'AVATAR_REQUIRED') return t('avatarRequired');
     if (error.code === 'REQUIRED') return t('validation.required');
     if (error.code === 'CONTROL_CHARACTERS') return t('validation.controlCharacters');
+    if (error.code === 'NAME_SCRIPT') return t('validation.nameScript');
     if (error.code === 'TOO_LONG') return t('validation.tooLong', { max: error.maxLength });
     if (error.code === 'PHONE_COUNTRY_REQUIRED') return t('validation.phoneCountry');
     return t('validation.phoneInvalid');
@@ -301,6 +313,34 @@ export function OnboardingForm({
               className="text-xs text-[var(--color-danger)]"
             >
               {validationMessage(fieldErrors.organization)}
+            </p>
+          ) : null}
+        </div>
+        <div className="space-y-2 sm:col-span-2">
+          <Label className="sr-only" htmlFor="onboarding-education">{t('education')}</Label>
+          <Input
+          placeholder={t('education')}
+            ref={educationRef}
+            id="onboarding-education"
+            maxLength={PROFILE_FIELD_LIMITS.education}
+            value={form.education}
+            onChange={update('education')}
+            invalid={Boolean(fieldErrors.education)}
+            aria-describedby={
+              fieldErrors.education ? 'onboarding-education-error' : 'onboarding-education-help'
+            }
+            required
+          />
+          <p id="onboarding-education-help" className="text-xs text-[var(--color-text-muted)]">
+            {t('educationHint')}
+          </p>
+          {fieldErrors.education ? (
+            <p
+              id="onboarding-education-error"
+              role="alert"
+              className="text-xs text-[var(--color-danger)]"
+            >
+              {validationMessage(fieldErrors.education)}
             </p>
           ) : null}
         </div>

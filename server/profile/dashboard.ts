@@ -9,7 +9,7 @@ import type { Json, LegalAcceptanceRow } from '@/lib/supabase/types';
 import type {
   ApprovedIdentity,
   ProfileIdentityState,
-  ProfileValues,
+  ProfileIdentityValues,
 } from '@/lib/profile/fields';
 import type { AppLocale } from '@/i18n/config';
 
@@ -35,7 +35,7 @@ export type ProfileAttestation = {
 export type LegalAcceptance = Omit<LegalAcceptanceRow, 'user_id'>;
 
 export type ProfileDashboard = {
-  profile: ProfileValues & {
+  profile: ProfileIdentityValues & {
     id: string;
     avatarUpdatedAt: string | null;
     onboardingCompletedAt: string | null;

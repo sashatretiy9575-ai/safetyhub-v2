@@ -62,6 +62,11 @@ test('profile editing includes organization and renders the account-approval sta
 
   assert.match(schema, /organization: profileField\(PROFILE_FIELD_LIMITS\.organization\)/);
   assert.match(fields, /organization: 160/);
+  // Education is the participant's own field now, required from everyone.
+  assert.match(schema, /education: profileField\(PROFILE_FIELD_LIMITS\.education\)/);
+  assert.match(fields, /education: 200/);
+  assert.match(form, /t\('education'\)/);
+  assert.match(form, /t\('educationHint'\)/);
   assert.match(form, /useTranslations\('Profile'\)/);
   assert.match(form, /t\('saved'\)/);
   assert.match(form, /t\('edit'\)/);
@@ -72,7 +77,11 @@ test('profile editing includes organization and renders the account-approval sta
   assert.doesNotMatch(form, /Сейчас в действующих сертификатах/);
   assert.doesNotMatch(profile, /Данные для сертификата/);
   assert.match(form, /api\/profile\/organizations/);
-  assert.match(route, /rpc\(\s*'submit_profile_for_approval_from_trusted_server'/);
+  assert.match(
+    route,
+    /rpc\(\s*'submit_profile_for_approval_from_trusted_server_with_education'/,
+  );
+  assert.match(route, /p_education: parsed\.data\.education/);
   assert.doesNotMatch(form, /supabase\/client|\/api\/identity/);
   assert.doesNotMatch(form, /появится автоматически/);
 });

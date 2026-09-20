@@ -218,7 +218,9 @@ begin
     raise exception 'ZH registration requested a review before the profile existed';
   end if;
 
-  -- The learner fills in the same form as everyone else, avatar included.
+  -- The learner fills in the same form as everyone else, avatar included. A
+  -- Chinese name goes in Latin letters, the way the printed protocols spell it;
+  -- the job title keeps its own script.
   v_avatar_token := gen_random_uuid();
   insert into private.profile_avatar_manifests (
     user_id, object_key, sha256, byte_length, operation_token
@@ -231,7 +233,7 @@ begin
   );
   update public.profiles set avatar_updated_at = statement_timestamp() where id = v_user_id;
   v_result := public.submit_profile_for_approval_from_trusted_server(
-    v_user_id, '伟', '张', '安全工程师', 'SafetyHub ZH fixture', 'CN', '+8613800138000'
+    v_user_id, 'Wei', 'Zhang', '安全工程师', 'SafetyHub ZH fixture', 'CN', '+8613800138000'
   );
   if v_result ->> 'approvalState' <> 'pending' then
     raise exception 'ZH profile submission did not request a review: %', v_result;
@@ -482,8 +484,8 @@ begin
   if v_queue_item is null
     or v_queue_item -> 'email' <> 'null'::jsonb
     or v_queue_item ->> 'username' <> 'zhminimal001'
-    or v_queue_item ->> 'name' <> '伟'
-    or v_queue_item ->> 'surname' <> '张'
+    or v_queue_item ->> 'name' <> 'Wei'
+    or v_queue_item ->> 'surname' <> 'Zhang'
     or v_queue_item ->> 'job' <> '安全工程师'
     or v_queue_item ->> 'organization' <> 'SafetyHub ZH fixture'
     or v_queue_item ->> 'phoneE164' <> '+8613800138000'
@@ -533,8 +535,8 @@ begin
     select 1
     from public.profiles profile
     where profile.id = v_user_id
-      and profile.name = '伟'
-      and profile.surname = '张'
+      and profile.name = 'Wei'
+      and profile.surname = 'Zhang'
       and profile.job = '安全工程师'
       and profile.organization = 'SafetyHub ZH fixture'
       and profile.phone_e164 = '+8613800138000'
@@ -640,7 +642,7 @@ begin
   set avatar_updated_at = statement_timestamp()
   where id = v_rejected_user_id;
   v_result := public.submit_profile_for_approval_from_trusted_server(
-    v_rejected_user_id, '娜', '李', '技术员', 'SafetyHub ZH rejected', 'CN', '+8613800138001'
+    v_rejected_user_id, 'Na', 'Li', '技术员', 'SafetyHub ZH rejected', 'CN', '+8613800138001'
   );
   if v_result ->> 'approvalState' <> 'pending' then
     raise exception 'ZH rejection fixture did not enter pending review: %', v_result;

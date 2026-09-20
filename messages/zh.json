@@ -295,10 +295,8 @@
     "metadataTitle": "联系方式：电话和 WhatsApp，阿拉木图",
     "metadataDescription": "SafetyHub 联系方式：关于职业安全与健康在线培训、考核以及带二维码验证的电子证书签发问题，可通过电话和 WhatsApp 咨询。",
     "title": "联系 SafetyHub",
-    "city": "城市",
-    "hours": "工作时间",
     "call": "拨打电话",
-    "chat": "在线咨询"
+    "chatAction": "通过 WhatsApp 联系"
   },
   "Faq": {
     "metadataTitle": "培训开始前的常见问题",
@@ -412,6 +410,8 @@
     "organization": "单位名称",
     "organizationShort": "单位",
     "organizationHint": "请选择匹配结果或自行输入名称。",
+    "education": "学历",
+    "educationHint": "例如：高等技术教育",
     "phone": "联系电话",
     "phoneCountry": "号码所属国家/地区",
     "phonePlaceholder": "请输入 {code} 后的号码",
@@ -427,6 +427,7 @@
     "validation": {
       "required": "请填写此项。",
       "controlCharacters": "请删除不支持的控制字符。",
+      "nameScript": "姓名请用拉丁字母（Latin）或西里尔字母填写，不要使用中文字符。",
       "tooLong": "请勿超过 {max} 个字符。",
       "phoneCountry": "请选择号码所属国家/地区。",
       "phoneInvalid": "请输入有效的电话号码。"

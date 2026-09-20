@@ -64,6 +64,7 @@ export default async function OnboardingPage() {
                   surname: profile.surname,
                   job: profile.job,
                   organization: profile.organization ?? '',
+                  education: context.profile.education,
                   phone: phoneInputValueFromE164(
                     context.profile.phone_country_iso2,
                     context.profile.phone_e164,

@@ -13,13 +13,14 @@ import { requestSecurityMetadata } from '@/server/security/request-metadata';
 
 type TrustedProfileSubmissionRpcClient = {
   rpc: (
-    name: 'submit_profile_for_approval_from_trusted_server',
+    name: 'submit_profile_for_approval_from_trusted_server_with_education',
     args: {
       p_user_id: string;
       p_name: string;
       p_surname: string;
       p_job: string;
       p_organization: string;
+      p_education: string;
       p_phone_country_iso2: string | null;
       p_phone_e164: string | null;
     },
@@ -56,12 +57,13 @@ export async function POST(request: Request) {
     ]);
     const response = await (
       createAdminClient() as unknown as TrustedProfileSubmissionRpcClient
-    ).rpc('submit_profile_for_approval_from_trusted_server', {
+    ).rpc('submit_profile_for_approval_from_trusted_server_with_education', {
       p_user_id: context.user.id,
       p_name: parsed.data.name,
       p_surname: parsed.data.surname,
       p_job: parsed.data.job,
       p_organization: parsed.data.organization,
+      p_education: parsed.data.education,
       p_phone_country_iso2: phone?.countryIso2 ?? null,
       p_phone_e164: phone?.phoneE164 ?? null,
     });

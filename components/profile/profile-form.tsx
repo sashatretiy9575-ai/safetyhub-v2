@@ -24,6 +24,7 @@ import type { PhoneCountryOption } from '@/lib/phone/countries';
 type OrganizationResponse = { organizations?: string[] };
 type UpdateResponse = {
   approvalState?: unknown;
+  error?: string;
 };
 
 export function ProfileForm({
@@ -95,6 +96,13 @@ export function ProfileForm({
       });
       const payload = await readClientResponseJson<UpdateResponse>(result.response);
       if (!result.ok) {
+        // The database refuses a name written in another script as a last
+        // resort; say so in words instead of leaving the code on screen.
+        if (payload?.error === 'PROFILE_NAME_SCRIPT') {
+          setErrors((current) => ({ ...current, name: { code: 'NAME_SCRIPT' } }));
+          setMessage(t('validation.nameScript'));
+          return;
+        }
         setMessage(localizedClientRequestMessage(result.error, t('saveFailed'), tErrors));
         return;
       }
@@ -121,6 +129,7 @@ export function ProfileForm({
     if (!error) return '';
     if (error.code === 'REQUIRED') return t('validation.required');
     if (error.code === 'CONTROL_CHARACTERS') return t('validation.controlCharacters');
+    if (error.code === 'NAME_SCRIPT') return t('validation.nameScript');
     if (error.code === 'TOO_LONG') return t('validation.tooLong', { max: error.maxLength });
     if (error.code === 'PHONE_COUNTRY_REQUIRED') return t('validation.phoneCountry');
     return t('validation.phoneInvalid');
@@ -212,6 +221,27 @@ export function ProfileForm({
             {errors.organization ? (
               <p className="text-xs text-[var(--color-danger)]">
                 {validationMessage(errors.organization)}
+              </p>
+            ) : null}
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="sr-only" htmlFor="profile-education">{t('education')}</Label>
+            <Input
+          placeholder={t('education')}
+              id="profile-education"
+              maxLength={PROFILE_FIELD_LIMITS.education}
+              value={form.education}
+              onChange={update('education')}
+              invalid={Boolean(errors.education)}
+              aria-describedby={errors.education ? undefined : 'profile-education-help'}
+              required
+            />
+            <p id="profile-education-help" className="text-xs text-[var(--color-text-muted)]">
+              {t('educationHint')}
+            </p>
+            {errors.education ? (
+              <p className="text-xs text-[var(--color-danger)]">
+                {validationMessage(errors.education)}
               </p>
             ) : null}
           </div>

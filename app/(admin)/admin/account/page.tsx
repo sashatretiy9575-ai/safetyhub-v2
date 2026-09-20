@@ -46,6 +46,7 @@ export default async function AdminAccountPage() {
                 surname: actor.profile.surname,
                 job: actor.profile.job,
                 organization: actor.profile.organization,
+                education: actor.profile.education,
                 phone: phoneInputValueFromE164(
                   actor.profile.phone_country_iso2,
                   actor.profile.phone_e164,

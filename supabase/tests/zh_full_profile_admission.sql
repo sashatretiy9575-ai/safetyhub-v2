@@ -88,8 +88,8 @@ begin
 
   -- With a profile but no photo the ordinary avatar gate must still apply.
   update public.profiles
-  set name = '伟',
-      surname = '张',
+  set name = 'Wei',
+      surname = 'Zhang',
       job = '安全工程师',
       organization = 'SafetyHub ZH admission',
       onboarding_completed_at = statement_timestamp()

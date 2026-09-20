@@ -861,7 +861,7 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
       );
       await page.getByRole('dialog').getByRole('button', { name: 'Отмена', exact: true }).click();
     });
-    test('server education requirement reveals a previously hidden field without losing edits', async ({
+    test('the card always asks for education and a refused save keeps what was typed', async ({
       page,
     }) => {
       test.setTimeout(120_000);
@@ -873,7 +873,7 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
           contentType: 'application/json',
           body: JSON.stringify(
             route.request().method() === 'GET'
-              ? { education: '', educationRequired: false }
+              ? { education: '' }
               : { error: 'DOCUMENT_REQUIRED_FIELDS', fields: ['education'] },
           ),
         });
@@ -892,9 +892,12 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
       await dialog.getByLabel('Имя', { exact: true }).fill('СохранитьРедактирование');
       await expect.poll(() => interceptedMethods.includes('GET')).toBe(true);
       await expect(dialog.getByRole('button', { name: 'Сохранить данные' })).toBeEnabled();
-      await expect(dialog.getByLabel('Образование', { exact: true })).toHaveCount(0);
-      await dialog.getByRole('button', { name: 'Сохранить данные' }).click();
+      // Education is asked of everyone, so the field is on the card from the
+      // start; a refusal only sends the cursor back to it.
       await expect(dialog.getByLabel('Образование', { exact: true })).toBeVisible();
+      await dialog.getByLabel('Образование', { exact: true }).fill('Высшее техническое');
+      await dialog.getByRole('button', { name: 'Сохранить данные' }).click();
+      await expect.poll(() => interceptedMethods.includes('PATCH')).toBe(true);
       await expect(dialog.getByLabel('Образование', { exact: true })).toBeFocused();
       await expect(dialog.getByLabel('Имя', { exact: true })).toHaveValue(
         'СохранитьРедактирование',
@@ -928,7 +931,7 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
           return route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify({ education: '', educationRequired: false, version: 3 }),
+            body: JSON.stringify({ education: 'Высшее техническое', version: 3 }),
           });
         saves.push(route.request().postDataJSON());
         return route.fulfill({

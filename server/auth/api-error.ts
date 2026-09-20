@@ -39,6 +39,11 @@ export function apiError(error: unknown) {
     );
   }
   if (error instanceof RpcMutationError) {
+    // The last line of defence for a name written in another script. It keeps
+    // its identity so the form can say what is wrong instead of showing a code.
+    if (['PROFILE_NAME_SCRIPT', 'PROFILE_CONTROL_CHARACTER'].includes(error.message)) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     if (['ACCOUNT_APPROVAL_NOT_PENDING', 'IDEMPOTENCY_KEY_REUSED'].includes(error.message)) {
       return NextResponse.json({ error: error.message }, { status: 409 });
     }

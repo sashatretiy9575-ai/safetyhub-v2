@@ -24,6 +24,7 @@ export type AuthProfile = Readonly<{
   surname: string;
   job: string;
   organization: string;
+  education: string;
   phone_country_iso2: string | null;
   phone_e164: string | null;
   preferred_locale: AppLocale;
@@ -62,6 +63,7 @@ const authContextRowSchema = z.object({
   profile_surname: z.string(),
   profile_job: z.string(),
   profile_organization: z.string(),
+  profile_education: z.string(),
   profile_phone_country_iso2: z.string().nullable(),
   profile_phone_e164: z.string().nullable(),
   profile_preferred_locale: z.enum(APP_LOCALES),
@@ -148,6 +150,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
       surname: row.profile_surname,
       job: row.profile_job,
       organization: row.profile_organization,
+      education: row.profile_education,
       phone_country_iso2: row.profile_phone_country_iso2,
       phone_e164: row.profile_phone_e164,
       preferred_locale: row.profile_preferred_locale,

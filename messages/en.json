@@ -295,10 +295,8 @@
     "metadataTitle": "Contacts: phone and WhatsApp, Almaty",
     "metadataDescription": "SafetyHub contacts: phone and WhatsApp for questions about online occupational safety and health training, testing and the issuing of electronic certificates with QR verification.",
     "title": "Contact SafetyHub",
-    "city": "City",
-    "hours": "Business hours",
     "call": "Call",
-    "chat": "Chat with us"
+    "chatAction": "Message on WhatsApp"
   },
   "Faq": {
     "metadataTitle": "Answers before you start training",
@@ -412,6 +410,8 @@
     "organization": "Company name",
     "organizationShort": "Company",
     "organizationHint": "Choose a matching result or enter the name yourself.",
+    "education": "Education",
+    "educationHint": "For example: higher technical education",
     "phone": "Phone number",
     "phoneCountry": "Phone country",
     "phonePlaceholder": "Number after {code}",
@@ -427,6 +427,7 @@
     "validation": {
       "required": "Complete this field.",
       "controlCharacters": "Remove unsupported control characters.",
+      "nameScript": "Enter the first and last name in Latin or Cyrillic letters.",
       "tooLong": "Use no more than {max} characters.",
       "phoneCountry": "Choose the phone country.",
       "phoneInvalid": "Enter a valid phone number."
