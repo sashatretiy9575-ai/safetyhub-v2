@@ -164,6 +164,38 @@ begin
   exception when integrity_constraint_violation then
     null;
   end;
+
+  -- An account that had ever published an article could not be deleted at all:
+  -- `article_revisions.published_by` is cleared by the foreign key when the user
+  -- goes, and the immutability trigger refused that update, so the whole purge
+  -- came back as ACCOUNT_PURGE_FAILED with nothing naming the row.
+  if exists (select 1 from public.article_revisions) then
+    alter table public.article_revisions disable trigger article_revisions_immutable;
+    update public.article_revisions
+    set published_by = v_second
+    where id = (select id from public.article_revisions order by id limit 1);
+    alter table public.article_revisions enable trigger article_revisions_immutable;
+
+    v_result := public.admin_purge_user_accounts(
+      gen_random_uuid(), array[v_second], 'Удаление автора опубликованной статьи'
+    );
+    if v_result -> 'items' -> 0 ->> 'status' <> 'completed' then
+      raise exception 'an article publisher could not be deleted: %', v_result;
+    end if;
+    if exists (select 1 from public.article_revisions where published_by = v_second) then
+      raise exception 'the deleted account is still named as a publisher';
+    end if;
+
+    -- Every other change to a published revision is still refused.
+    begin
+      update public.article_revisions
+      set content_hash = repeat('0', 64)
+      where id = (select id from public.article_revisions order by id limit 1);
+      raise exception 'a published article revision was editable';
+    exception when object_not_in_prerequisite_state then
+      null;
+    end;
+  end if;
 end;
 $test$;
 
