@@ -106,7 +106,12 @@ test('public course page offers presentation download before the test and preser
     actions.indexOf("t('downloadPresentation')") < actions.indexOf("t('startTest')"),
   );
   assert.match(actions, /download=\$\{encodeURIComponent/);
-  assert.match(actions, /download=\{filename\}/);
+  // The file is read by the page so the button can report progress; the browser
+  // still saves it under the course's own name once it is whole.
+  assert.match(actions, /link\.download = filename;/);
+  assert.match(actions, /aria-busy=\{downloading\}/);
+  assert.match(actions, /disabled=\{downloading\}/);
+  assert.match(actions, /t\('downloadProgress', \{ percent: download\.percent \}\)/);
   assert.match(actions, /localizePathname\(ROUTES\.test\(course\.slug\), locale\)/);
   assert.doesNotMatch(actions, /pdfjs-dist|canvas|iframe|PageUp|PageDown/);
   assert.match(topicSource, /course-presentations/);

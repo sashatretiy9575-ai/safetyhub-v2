@@ -194,7 +194,10 @@ test('course material is approval-gated, private, and stays out of precache', as
     'presentation download must render before the test action',
   );
   assert.match(actions, /download=\$\{encodeURIComponent/);
-  assert.match(actions, /download=\{filename\}/);
+  // The bytes are read by the page so the button can report progress, and the
+  // browser saves them under the course's own name once the file is whole.
+  assert.match(actions, /link\.download = filename;/);
+  assert.match(actions, /URL\.revokeObjectURL\(href\)/);
   assert.match(actions, /localizePathname\(ROUTES\.test\(course\.slug\), locale\)/);
   assert.doesNotMatch(actions, /pdfjs-dist|canvas|iframe|dangerouslySetInnerHTML/);
   assert.match(topicPage, /<CourseMaterialActions course=\{topic\}/);

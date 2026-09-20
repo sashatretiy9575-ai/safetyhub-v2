@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from '@phosphor-icons/react/dist/ssr/ArrowLeft';
+import { CircleNotch } from '@phosphor-icons/react/dist/ssr/CircleNotch';
 import { DownloadSimple } from '@phosphor-icons/react/dist/ssr/DownloadSimple';
 import { FilePdf } from '@phosphor-icons/react/dist/ssr/FilePdf';
 import { ListChecks } from '@phosphor-icons/react/dist/ssr/ListChecks';
@@ -29,12 +30,70 @@ function presentationDownloadUrl(url: string, slug: string) {
   return `${url}${separator}download=${encodeURIComponent(`${slug}.pdf`)}`;
 }
 
+/**
+ * A presentation is tens of megabytes and the route leases it before the first
+ * byte arrives, so a plain link sat there doing nothing visible for seconds and
+ * people pressed it again. The file is read here instead, so the button can say
+ * how far along it is; the browser still saves it the moment it is whole.
+ */
+function usePresentationDownload(url: string | undefined, filename: string) {
+  const [state, setState] = useState<'idle' | 'working' | 'failed' | 'done'>('idle');
+  const [percent, setPercent] = useState(0);
+  const abort = useRef<AbortController | null>(null);
+
+  useEffect(() => () => abort.current?.abort(), []);
+
+  const start = async () => {
+    if (!url || state === 'working') return;
+    abort.current?.abort();
+    const controller = new AbortController();
+    abort.current = controller;
+    setState('working');
+    setPercent(0);
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok || !response.body) throw new Error('PRESENTATION_DOWNLOAD_FAILED');
+      const total = Number(response.headers.get('content-length') ?? 0);
+      const reader = response.body.getReader();
+      const chunks: Uint8Array[] = [];
+      let received = 0;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.byteLength;
+        // Without a length the share is unknown; the button then counts megabytes.
+        if (total > 0) setPercent(Math.min(99, Math.round((received / total) * 100)));
+      }
+      const href = URL.createObjectURL(new Blob(chunks as BlobPart[], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = href;
+      link.download = filename;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(href), 30_000);
+      setPercent(100);
+      setState('done');
+    } catch (error) {
+      if (controller.signal.aborted) return;
+      console.error('PRESENTATION_DOWNLOAD_FAILED', error);
+      setState('failed');
+    }
+  };
+
+  return { state, percent, start };
+}
+
 type AccessCopy = Record<
   Exclude<CourseMaterialAccess, 'approved'>,
   { title: string; description: string; label: string }
 >;
 
-function accessCta(access: CourseMaterialAccess, slug: string, locale: ReturnType<typeof useLocale>, copy: AccessCopy) {
+function accessCta(
+  access: CourseMaterialAccess,
+  slug: string,
+  locale: ReturnType<typeof useLocale>,
+  copy: AccessCopy,
+) {
   if (access === 'approved') return null;
   if (access === 'anonymous') {
     const login = localizePathname('/auth/login', locale);
@@ -45,10 +104,10 @@ function accessCta(access: CourseMaterialAccess, slug: string, locale: ReturnTyp
   }
   const destination =
     access === 'legal_required'
-        ? '/auth/legal'
-        : access === 'profile_incomplete'
-          ? '/onboarding'
-          : '/profile';
+      ? '/auth/legal'
+      : access === 'profile_incomplete'
+        ? '/onboarding'
+        : '/profile';
   return {
     ...copy[access],
     href: localizePathname(destination, locale),
@@ -105,13 +164,42 @@ export function CourseMaterialActions({
   }, [access, course.slug]);
 
   const filename = `${course.slug}.pdf`;
+  const download = usePresentationDownload(
+    course.presentation ? presentationDownloadUrl(course.presentation.url, course.slug) : undefined,
+    filename,
+  );
+  const downloading = download.state === 'working';
   const cta = accessCta(currentAccess, course.slug, locale, {
-    anonymous: { title: t('access.anonymousTitle'), description: t('access.anonymousDescription'), label: t('access.anonymousLabel') },
-    legal_required: { title: t('access.legalTitle'), description: t('access.legalDescription'), label: t('access.legalLabel') },
-    profile_incomplete: { title: t('access.profileTitle'), description: t('access.profileDescription'), label: t('access.profileLabel') },
-    pending: { title: t('access.pendingTitle'), description: t('access.pendingDescription'), label: t('access.pendingLabel') },
-    rejected: { title: t('access.rejectedTitle'), description: t('access.rejectedDescription'), label: t('access.rejectedLabel') },
-    course_locked: { title: t('access.lockedTitle'), description: t('access.lockedDescription'), label: t('access.lockedLabel') },
+    anonymous: {
+      title: t('access.anonymousTitle'),
+      description: t('access.anonymousDescription'),
+      label: t('access.anonymousLabel'),
+    },
+    legal_required: {
+      title: t('access.legalTitle'),
+      description: t('access.legalDescription'),
+      label: t('access.legalLabel'),
+    },
+    profile_incomplete: {
+      title: t('access.profileTitle'),
+      description: t('access.profileDescription'),
+      label: t('access.profileLabel'),
+    },
+    pending: {
+      title: t('access.pendingTitle'),
+      description: t('access.pendingDescription'),
+      label: t('access.pendingLabel'),
+    },
+    rejected: {
+      title: t('access.rejectedTitle'),
+      description: t('access.rejectedDescription'),
+      label: t('access.rejectedLabel'),
+    },
+    course_locked: {
+      title: t('access.lockedTitle'),
+      description: t('access.lockedDescription'),
+      label: t('access.lockedLabel'),
+    },
   });
 
   return (
@@ -136,10 +224,13 @@ export function CourseMaterialActions({
                 <p className="text-xs font-bold tracking-widest text-[var(--color-primary)] uppercase">
                   {t('online')}
                 </p>
-                <h1 className="mt-2 text-h2 font-black">
+                <h1 className="text-h2 mt-2 font-black">
                   {t('pageHeading', { course: course.title })}
                 </h1>
-                <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--color-text-muted)] sm:text-base">
+                {/* A course summary is two or three lines; at `leading-7` on 14px
+                    text they stood twice their own height apart and the block read
+                    as a wall rather than a sentence. */}
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--color-text-muted)] sm:text-base">
                   {course.description}
                 </p>
 
@@ -172,7 +263,9 @@ export function CourseMaterialActions({
                 ) : cta ? (
                   <div className="space-y-3 rounded-xl border border-[var(--color-warning)] bg-[var(--color-surface-muted)] p-4 text-left">
                     <h2 className="font-sans text-base leading-6 font-bold">{cta.title}</h2>
-                    <p className="text-sm leading-6 text-[var(--color-text-muted)]">{cta.description}</p>
+                    <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                      {cta.description}
+                    </p>
                     <Button asChild size="lg" className="w-full">
                       <Link href={cta.href}>{cta.label}</Link>
                     </Button>
@@ -180,20 +273,61 @@ export function CourseMaterialActions({
                 ) : (
                   <>
                     {course.presentation ? (
-                  <Button asChild variant="secondary" size="xl" className="w-full">
-                    <a
-                      href={presentationDownloadUrl(course.presentation.url, course.slug)}
-                      download={filename}
-                    >
-                      <DownloadSimple size={20} weight="bold" aria-hidden="true" />
-                      {t('downloadPresentation')}
-                    </a>
-                  </Button>
-                ) : (
-                  <Button type="button" variant="secondary" size="xl" className="w-full" disabled>
-                    <DownloadSimple size={20} weight="bold" aria-hidden="true" />
-                    {t('presentationUnavailable')}
-                  </Button>
+                      <div className="grid gap-1.5">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="xl"
+                          className="w-full"
+                          aria-busy={downloading}
+                          disabled={downloading}
+                          onClick={download.start}
+                        >
+                          {downloading ? (
+                            <CircleNotch
+                              size={20}
+                              weight="bold"
+                              aria-hidden="true"
+                              className="motion-safe:animate-spin"
+                            />
+                          ) : (
+                            <DownloadSimple size={20} weight="bold" aria-hidden="true" />
+                          )}
+                          {downloading
+                            ? download.percent > 0
+                              ? t('downloadProgress', { percent: download.percent })
+                              : t('downloadPreparing')
+                            : t('downloadPresentation')}
+                        </Button>
+                        {/* The progress is spoken as well as drawn: the button's own
+                            label changes, and this line reports the end of it. */}
+                        <p
+                          aria-live="polite"
+                          className={
+                            'min-h-5 text-center text-xs font-semibold ' +
+                            (download.state === 'failed'
+                              ? 'text-[var(--color-danger)]'
+                              : 'text-[var(--color-text-muted)]')
+                          }
+                        >
+                          {download.state === 'failed'
+                            ? t('downloadFailed')
+                            : download.state === 'done'
+                              ? t('downloadDone')
+                              : ''}
+                        </p>
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="xl"
+                        className="w-full"
+                        disabled
+                      >
+                        <DownloadSimple size={20} weight="bold" aria-hidden="true" />
+                        {t('presentationUnavailable')}
+                      </Button>
                     )}
 
                     <Button asChild size="xl" className="w-full">

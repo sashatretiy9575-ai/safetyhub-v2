@@ -101,7 +101,7 @@ test('learner-facing course and profile UI block material until approval', async
   assert.doesNotMatch(topicPage, /auth\.approval\.state/);
   assert.match(topicPage, /<CourseMaterialActions course=\{topic\} access="anonymous"/);
   assert.match(topicPage, /export const revalidate = 300/);
-  assert.match(actions, /pending: \{ title: t\('access\.pendingTitle'\)/);
+  assert.match(actions, /pending: \{\s*title: t\('access\.pendingTitle'\)/u);
   assert.match(actions, /description: t\('access\.pendingDescription'\)/);
   assert.match(actions, /access === 'approved'/);
   assert.match(status, /window\.setTimeout\(syncAtMinuteBoundary/u);

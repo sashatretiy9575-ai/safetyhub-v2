@@ -217,7 +217,7 @@ test('a locked course is refused by name on every learner surface', async () => 
   assert.match(access, /access: 'course_locked'/u);
   assert.match(actions, /\/api\/auth\/access\?course=\$\{encodeURIComponent\(course\.slug\)\}/u);
   assert.match(actions, /new Map<string, CourseMaterialAccess>\(\)/u);
-  assert.match(actions, /course_locked: \{ title: t\('access\.lockedTitle'\)/u);
+  assert.match(actions, /course_locked: \{\s*title: t\('access\.lockedTitle'\)/u);
   assert.match(learning, /from\('course_access_grants'\)/u);
   const messages = JSON.parse(await read('messages/ru.json'));
   assert.ok(messages.Quiz.errors.courseAccessRequired);
