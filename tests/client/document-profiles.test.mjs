@@ -23,9 +23,13 @@ test('profile signatures follow explicit signer identities and mixed snapshots r
   assert.equal(branding.documentDefaults.commission[1].name,'Кудияров А.М.');
   const items=[{organization:'Компания',titleSnapshot:'Курс',branding},{organization:'Компания',titleSnapshot:'Курс',branding:{...branding,validityMonths:24}}];
   assert.equal(groupItemsForProtocols(items).length,2);
-  assert.equal(protocolColumns('ptm').length,7);
+  // «Примечание» closes every protocol, not only the «БиОТ» one.
+  assert.equal(protocolColumns('ptm').length,8);
   assert.equal(protocolColumns('biot').length,6);
-  assert.equal(protocolColumns('qualification').length,6);
+  assert.equal(protocolColumns('qualification').length,7);
+  for (const family of ['general','biot','ptm','industrial','qualification','first-aid'])
+    assert.equal(protocolColumns(family).at(-1),'Примечание',family);
+  assert.equal(protocolColumns('first-aid',2).at(-1),'Примечание');
 });
 
 test('cancelling one preview does not abort the shared immutable image of another document', async () => {

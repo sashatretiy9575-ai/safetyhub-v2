@@ -245,16 +245,20 @@ export async function generateProtocolInBrowser(
     paragraph('РЕЗУЛЬТАТЫ ПРОВЕРКИ', 12, 'center', true);
     y += 10 * scale;
     const family = profile?.family ?? 'general';
+    // Each row ends with «Примечание», so every width below is one column wider
+    // than the paper form's own; they still add up to the 501 pt table.
     const columns =
       family === 'ptm'
-        ? [26, 96, 72, 94, 73, 60, 80]
-        : family === 'biot' || family === 'qualification'
+        ? [22, 82, 62, 80, 62, 52, 66, 75]
+        : family === 'biot'
           ? [26, 110, 95, 80, 85, 105]
-          : [30, 133, 150, 98, 90];
+          : family === 'qualification'
+            ? [24, 95, 82, 70, 72, 88, 70]
+            : [28, 118, 128, 85, 72, 70];
     const left = (595.28 - 501) / 2;
     const header = protocolColumns(family, branding.protocolLayoutVersion);
     const row = (cells: string[], isHeader = false) => {
-      const size = (columns.length > 5 ? 9 : 10) * scale;
+      const size = (columns.length > 7 ? 8.5 : columns.length > 5 ? 9 : 10) * scale;
       const pitch = size * 1.3;
       const wrapped = cells.map((text, i) =>
         wrapDocumentText(fonts.pick(text), text, size, columns[i]! - 10),
@@ -331,10 +335,18 @@ export async function generateProtocolInBrowser(
           person.position,
           participantResult(person),
           filled.qualificationDecision,
+          filled.notes,
         ]);
       else if (family === 'first-aid' && branding.protocolLayoutVersion === 2)
-        row([...base, person.position, org, participantResult(person)]);
-      else row([...base, person.position, person.education ?? '', participantResult(person)]);
+        row([...base, person.position, org, participantResult(person), filled.notes]);
+      else
+        row([
+          ...base,
+          person.position,
+          person.education ?? '',
+          participantResult(person),
+          filled.notes,
+        ]);
     }
     if (!people.length) {
       y += 12;

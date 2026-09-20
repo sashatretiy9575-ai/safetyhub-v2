@@ -74,9 +74,22 @@ export function applyDocumentProfile(
   };
 }
 
+/**
+ * Every protocol ends with «Примечание». The column is empty on the sheets the
+ * training centre prints, and the owner asked for it on all of them and not only
+ * on the «БиОТ» form, so that a note can be written for one listener whatever
+ * programme the sitting was for.
+ */
 export function protocolColumns(family: DocumentFamily, layoutVersion?: 2) {
   if (family === 'first-aid' && layoutVersion === 2)
-    return ['№', 'Ф.И.О.', 'Занимаемая должность', 'Организация', 'Результат сдачи экзаменов'];
+    return [
+      '№',
+      'Ф.И.О.',
+      'Занимаемая должность',
+      'Организация',
+      'Результат сдачи экзаменов',
+      'Примечание',
+    ];
   if (family === 'ptm')
     return [
       '№',
@@ -86,6 +99,7 @@ export function protocolColumns(family: DocumentFamily, layoutVersion?: 2) {
       'Причина обучения',
       'Отметка',
       'Подпись',
+      'Примечание',
     ];
   if (family === 'biot')
     return [
@@ -104,6 +118,14 @@ export function protocolColumns(family: DocumentFamily, layoutVersion?: 2) {
       'Лауазымы / Должность',
       'Результат подготовки',
       'Решение квалификационной комиссии по специальности',
+      'Примечание',
     ];
-  return ['№', 'Ф.И.О.', 'Занимаемая должность', 'Образование', 'Результат сдачи экзаменов'];
+  return [
+    '№',
+    'Ф.И.О.',
+    'Занимаемая должность',
+    'Образование',
+    'Результат сдачи экзаменов',
+    'Примечание',
+  ];
 }
