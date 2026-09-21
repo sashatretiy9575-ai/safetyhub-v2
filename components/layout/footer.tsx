@@ -56,7 +56,8 @@ export async function Footer({
                 className="text-[var(--color-primary)]"
                 aria-hidden="true"
               />
-              {translations('whatsapp')}
+              <span className="sr-only">{translations('whatsapp')}</span>
+              <span aria-hidden="true">WhatsApp</span>
             </ContactLink>
           </div>
 
@@ -124,7 +125,10 @@ export async function Footer({
 
         <div className="mt-6 border-t border-white/10 pt-4 text-xs text-white/70 md:mt-8">
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-            <p>{translations('footer.copyright', { year })}</p>
+            <div className="grid gap-0.5">
+              <p>{translations('footer.copyright', { year })}</p>
+              <p className="font-semibold text-white/80">{translations('footer.project')}</p>
+            </div>
             <nav
               aria-label={translations('footer.legalNavigation')}
               className="flex flex-wrap gap-x-5 gap-y-1"

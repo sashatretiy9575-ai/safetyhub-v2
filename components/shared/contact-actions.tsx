@@ -26,10 +26,13 @@ export function ContactActions({
         size="xl"
         className="min-h-14 min-w-0 px-4 [&_svg]:size-5"
       >
+        {/* The icon already says «call» and «chat»: the buttons show the number and
+            the messenger alone, and only a screen reader hears the verb. */}
         <ContactLink kind="phone" contacts={contacts}>
           <PhoneCall weight="bold" aria-hidden="true" className="text-[var(--color-primary)]" />
-          <span className="min-w-0">
-            {t('call')} <span className="whitespace-nowrap">{contacts.phoneDisplay}</span>
+          <span className="min-w-0 whitespace-nowrap">
+            <span className="sr-only">{t('call')} </span>
+            {contacts.phoneDisplay}
           </span>
         </ContactLink>
       </Button>
@@ -37,7 +40,10 @@ export function ContactActions({
       <Button asChild variant="primary" size="xl" className="min-h-14 min-w-0 px-4 [&_svg]:size-5">
         <ContactLink kind="whatsapp" contacts={contacts}>
           <WhatsappLogo weight="fill" aria-hidden="true" />
-          <span className="min-w-0">{t('chatAction')}</span>
+          <span className="min-w-0">
+            <span className="sr-only">{t('chatAction')}</span>
+            <span aria-hidden="true">WhatsApp</span>
+          </span>
         </ContactLink>
       </Button>
     </div>
