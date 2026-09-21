@@ -76,8 +76,12 @@ import { cn } from '@/lib/utils';
 import type { readDocumentEditor } from '@/server/certificates/document-editor';
 import { applyDocumentProfile, type DocumentProfile } from '@/lib/pdf/document-profile';
 import { DocumentProfileFields } from '@/components/admin/document-profile-fields';
-import { documentAudienceForPosition } from '@/lib/pdf/document-family-defaults';
+import {
+  completeDocumentProfile,
+  documentAudienceForPosition,
+} from '@/lib/pdf/document-family-defaults';
 import { requiresDocumentEducation } from '@/lib/pdf/document-education';
+import { audienceLabel, protocolGroupsByAudience } from '@/lib/pdf/document-audience';
 
 export type CertificateSettingsView = {
   organizationName: string;
@@ -442,6 +446,16 @@ export function CertificateSettingsForm({
   const sizeProblem = insertSizeProblem(fields.documentDefaults);
   const canRevertBatch = batchDirty && Boolean(savedBatch);
   const branding = brandingOf(saved, fields, batch, profiles, selectedPerson?.position);
+  const courseProfiles = profiles.filter((p) => p.courseSlug === course);
+  // ИТР and workers are two protocols; the preview shows the one of the chosen person.
+  const audienceGroups = protocolGroupsByAudience(
+    data.participants,
+    courseProfiles,
+    batch.profileId,
+  );
+  const previewGroup =
+    audienceGroups.find((group) => group.profile?.id === branding.documentProfile?.id) ??
+    audienceGroups[0];
   // A program with a profile is drawn from it: its commission, its texts, its term and
   // its registered images replace the settings' own, so those are not offered beside it.
   const governed = Boolean(branding.documentProfile);
@@ -567,7 +581,7 @@ export function CertificateSettingsForm({
           organization,
           sampleOrganization: fields.documentDefaults.companyName,
           batch,
-          participants: data.participants,
+          participants: previewGroup?.people ?? data.participants,
         });
   const key = jobKey(job);
   const fresh = shown?.key === key;
@@ -832,7 +846,13 @@ export function CertificateSettingsForm({
         return;
       }
       const pendingPeople = current.participants.filter((person) => !person.certificateId);
-      const pendingProtocol = (people: readonly DocumentParticipant[], protocolNumber: string) =>
+      const exportProfiles = profiles.filter((p) => p.courseSlug === course);
+      const plainBranding = brandingOf(stored.settings, fields, stored.batch ?? batch);
+      const pendingProtocol = (
+        people: readonly DocumentParticipant[],
+        profile: DocumentProfile | null,
+        protocolNumber: string,
+      ) =>
         generateProtocolInBrowser(
           {
             organization,
@@ -841,33 +861,63 @@ export function CertificateSettingsForm({
             participants: people,
             date: exportBranding.protocolDate,
           },
-          { ...exportBranding, protocolNumber },
+          {
+            ...(profile ? applyDocumentProfile(plainBranding, profile) : exportBranding),
+            protocolNumber,
+          },
           protocolFontUrl(current.participants),
           controller.signal,
         );
+      const chosenProfileId = (stored.batch ?? batch).profileId;
       if (single) {
         setData(current);
+        const groups = protocolGroupsByAudience(
+          current.participants,
+          exportProfiles,
+          chosenProfileId,
+        );
+        const group =
+          groups.find((entry) => entry.profile?.id === branding.documentProfile?.id) ?? groups[0];
         download(
-          await pendingProtocol(current.participants, exportBranding.protocolNumber),
-          'Протокол.pdf',
+          await pendingProtocol(
+            group?.people ?? current.participants,
+            group?.profile ?? null,
+            exportBranding.protocolNumber,
+          ),
+          audienceLabel(group?.profile)
+            ? `Протокол-${audienceLabel(group?.profile)}.pdf`
+            : 'Протокол.pdf',
         );
         return;
       }
       const { zipSync } = await import('fflate');
       const { safeFilenameSegment } = await import('@/lib/pdf/certificate');
       const archive: Record<string, Uint8Array> = {};
-      // Fifty people to a protocol, numbered the way issuance will number them.
-      const parts = Math.ceil(pendingPeople.length / PROTOCOL_MAX_PARTICIPANTS);
-      for (let part = 1; part <= parts; part++) {
-        const number = protocolPartNumber(exportBranding.protocolNumber, part);
-        archive[parts > 1 ? `Протокол-невыданные-${part}.pdf` : 'Протокол-невыданные.pdf'] =
-          await pendingProtocol(
-            pendingPeople.slice(
-              (part - 1) * PROTOCOL_MAX_PARTICIPANTS,
-              part * PROTOCOL_MAX_PARTICIPANTS,
+      // One protocol per listener category and at most fifty people each,
+      // numbered one after another the way issuance numbers them.
+      let part = 0;
+      for (const group of protocolGroupsByAudience(
+        pendingPeople,
+        exportProfiles,
+        chosenProfileId,
+      )) {
+        const label = audienceLabel(group.profile);
+        const chunks = Math.ceil(group.people.length / PROTOCOL_MAX_PARTICIPANTS);
+        for (let chunk = 0; chunk < chunks; chunk++) {
+          part += 1;
+          const number = protocolPartNumber(exportBranding.protocolNumber, part);
+          const name = ['Протокол-невыданные', label, chunks > 1 ? String(chunk + 1) : '']
+            .filter(Boolean)
+            .join('-');
+          archive[name + '.pdf'] = await pendingProtocol(
+            group.people.slice(
+              chunk * PROTOCOL_MAX_PARTICIPANTS,
+              (chunk + 1) * PROTOCOL_MAX_PARTICIPANTS,
             ),
+            group.profile,
             number,
           );
+        }
       }
       const issuedItems: CertificateRenderMetadata[] = [];
       let count = 0;
@@ -1294,18 +1344,26 @@ export function CertificateSettingsForm({
                 {/* The category follows the position of the person the document is
                     for; it is here rather than in the way because changing it is the
                     exception, not the step. */}
-                {profiles.filter((p) => p.courseSlug === course).length > 1 ? (
+                {courseProfiles.length > 1 ? (
                   <DocumentSelect
                     label="Категория слушателей"
-                    value={branding.documentProfile.id}
-                    options={profiles
-                      .filter((p) => p.courseSlug === course)
-                      .map((p) => ({
+                    value={batch.profileId ?? ''}
+                    options={[
+                      { value: '', label: 'По должности: ИТР и рабочие — отдельные протоколы' },
+                      ...courseProfiles.map((p) => ({
                         value: p.id,
-                        label: p.label + (p.hours ? ` · ${p.hours} ч` : ''),
-                      }))}
+                        label:
+                          'Всех как: ' +
+                          p.label +
+                          (completeDocumentProfile(p).hours
+                            ? ` · ${completeDocumentProfile(p).hours} ч`
+                            : ''),
+                      })),
+                    ]}
                     disabled={busy || loading}
-                    onChange={(profileId) => setBatch((current) => ({ ...current, profileId }))}
+                    onChange={(profileId) =>
+                      setBatch((current) => ({ ...current, profileId: profileId || null }))
+                    }
                   />
                 ) : null}
                 {/* Keyed by the program alone: a replaced signature moves the revision on, and

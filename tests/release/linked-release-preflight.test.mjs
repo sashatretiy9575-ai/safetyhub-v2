@@ -121,14 +121,14 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   // One migration waits for the next release: the course a person asked for
   // reaches the administrator.
   assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 104);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 105);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 103);
+  assert.equal(receipt.matchedCount, 104);
   assert.equal(receipt.pendingCount, 1);
-  assert.equal(receipt.expectedBaseCount, 103);
+  assert.equal(receipt.expectedBaseCount, 104);
   assert.equal(receipt.expectedPendingCount, 1);
-  assert.equal(receipt.expectedTotalCount, 104);
+  assert.equal(receipt.expectedTotalCount, 105);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

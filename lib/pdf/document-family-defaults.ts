@@ -43,7 +43,8 @@ export const DOCUMENT_FAMILY_DEFAULTS: Record<DocumentFamily, DocumentFamilyDefa
     decisionText: PASSED_TO_WORK,
   },
   biot: {
-    hours: NO_HOURS,
+    // The law sets 40 hours for engineers and managers and 10 for workers.
+    hours: HOURS_BY_LEVEL,
     validityMonths: VALIDITY_BY_LEVEL,
     verificationKind: 'периодический',
     trainingReason: '',

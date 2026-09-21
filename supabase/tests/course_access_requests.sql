@@ -93,4 +93,45 @@ begin
 end;
 $test$;
 
+-- An administrator opens a presentation without an application of their own;
+-- a learner who has not been approved is still refused.
+do $test$
+declare
+  v_admin uuid := '76000000-0000-4000-8000-000000000010';
+  v_learner uuid := '76000000-0000-4000-8000-000000000011';
+  v_slug text;
+  v_message text;
+  v_actor uuid;
+begin
+  select slug into v_slug from public.tests where status = 'published' order by display_order, id limit 1;
+  if v_slug is null then return; end if;
+  insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+    raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+  values
+    ('00000000-0000-0000-0000-000000000000', v_admin, 'authenticated', 'authenticated',
+     'presentation-admin@safetyhub.invalid', '', now(), '{}', '{}', now(), now()),
+    ('00000000-0000-0000-0000-000000000000', v_learner, 'authenticated', 'authenticated',
+     'presentation-learner@safetyhub.invalid', '', now(), '{}', '{}', now(), now());
+  update public.user_roles set product_role = 'admin' where user_id = v_admin;
+  perform set_config('request.jwt.claim.role', 'authenticated', true);
+  foreach v_actor in array array[v_admin, v_learner] loop
+    perform set_config('request.jwt.claim.sub', v_actor::text, true);
+    perform set_config('request.jwt.claims',
+      jsonb_build_object('role', 'authenticated', 'sub', v_actor)::text, true);
+    v_message := 'ok';
+    begin
+      perform * from public.get_approved_course_presentation_locale(v_slug, 'presentation', 'ru');
+    exception when others then
+      v_message := sqlerrm;
+    end;
+    if v_actor = v_learner and v_message <> 'ACCOUNT_APPROVAL_REQUIRED' then
+      raise exception 'an unapproved learner reached a presentation: %', v_message;
+    end if;
+    if v_actor = v_admin and v_message not in ('ok', 'PRESENTATION_NOT_FOUND') then
+      raise exception 'an administrator was refused a presentation: %', v_message;
+    end if;
+  end loop;
+end;
+$test$;
+
 rollback;

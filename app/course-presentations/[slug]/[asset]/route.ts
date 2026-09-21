@@ -148,7 +148,10 @@ async function authorizeAsset(
   try {
     // This checks the cookie-backed session before the DB function repeats the
     // active-account and manual-approval checks in one protected SQL call.
-    const auth = await requireUser();
+    // An administrator reads the material without accepting the learner's
+    // documents; everyone else still has to.
+    const auth = await requireUser({ enforceLegal: false });
+    if (auth.role !== 'admin' && !auth.hasCurrentLegalAcceptance) return blockedResponse(403);
     const requestedLocale = new URL(request.url).searchParams.get('locale');
     const locale = isAppLocale(requestedLocale) ? requestedLocale : auth.profile.preferred_locale;
 

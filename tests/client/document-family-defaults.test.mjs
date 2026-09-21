@@ -47,6 +47,9 @@ test('a blank box carries the wording of the form, and a filled one is never ove
   assert.equal(completeDocumentProfile(profile({ family: 'general' })).hours, null);
   assert.equal(completeDocumentProfile(profile({ family: 'ptm', audience: 'itr' })).hours, 40);
   assert.equal(completeDocumentProfile(profile({ family: 'ptm', audience: 'worker' })).hours, 10);
+  // БиОТ: 40 hours for engineers and managers, 10 for workers, as the law sets.
+  assert.equal(completeDocumentProfile(profile({ family: 'biot', audience: 'itr' })).hours, 40);
+  assert.equal(completeDocumentProfile(profile({ family: 'biot', audience: 'worker' })).hours, 10);
   assert.equal(completeDocumentProfile(profile({ family: 'qualification' })).validityMonths, 0);
 });
 

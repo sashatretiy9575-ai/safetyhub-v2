@@ -202,7 +202,10 @@ test('course material is approval-gated, private, and stays out of precache', as
   assert.doesNotMatch(actions, /pdfjs-dist|canvas|iframe|dangerouslySetInnerHTML/);
   assert.match(topicPage, /<CourseMaterialActions course=\{topic\}/);
   assert.doesNotMatch(topicPage, /CoursePresentationViewer/);
-  assert.match(localAsset, /await requireUser\(\)/);
+  // An administrator reads the material without the learner's documents; the
+  // learner's legal acceptance is still demanded by the route itself.
+  assert.match(localAsset, /await requireUser\(\{ enforceLegal: false \}\)/);
+  assert.match(localAsset, /auth\.role !== 'admin' && !auth\.hasCurrentLegalAcceptance/);
   assert.match(localAsset, /get_approved_course_presentation/);
   assert.match(localAsset, /const admin = createAdminClient\(\)/);
   assert.match(localAsset, /admin\.storage/);

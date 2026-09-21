@@ -44,7 +44,10 @@ export function groupItemsForProtocols(
   return [...groups.values()].map((group, index) => ({ ...group, groupNumber: index + 1 }));
 }
 export function protocolFilename(group: ProtocolGroup, protocolNumber: string) {
-  return `protocols/Протокол-${safeFilenameSegment(protocolNumber || 'без-номера', 24)}-${safeFilenameSegment(group.organization ?? 'без-компании', 48)}-${safeFilenameSegment(group.courseTitle, 48)}${group.groupNumber ? '-' + group.groupNumber : ''}.pdf`;
+  // «ИТР» and «Рабочие» are separate protocols; the file says which one it is.
+  const audience = group.items[0]?.branding.documentProfile?.audience;
+  const label = audience === 'itr' ? 'ИТР-' : audience === 'worker' ? 'Рабочие-' : '';
+  return `protocols/Протокол-${safeFilenameSegment(protocolNumber || 'без-номера', 24)}-${label}${safeFilenameSegment(group.organization ?? 'без-компании', 48)}-${safeFilenameSegment(group.courseTitle, 48)}${group.groupNumber ? '-' + group.groupNumber : ''}.pdf`;
 }
 
 /**
