@@ -11,7 +11,7 @@ begin
  select revision.* into strict r from public.tests t join public.test_revisions revision on revision.id=t.current_revision_id where t.slug='plotnik' limit 1;
  insert into auth.users(instance_id,id,aud,role,email,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
  values('00000000-0000-0000-0000-000000000000',learner,'authenticated','authenticated',learner::text||'@document-defaults.invalid','{}','{}',now(),now());
- update public.profiles set name='Тестовый',surname='Слушатель',education='Высшее техническое',job=p_job,organization='Document defaults fixture' where id=learner;
+ update public.profiles set name='Тестовый',surname='Слушатель',education='Высшее',job=p_job,organization='Document defaults fixture' where id=learner;
  update public.verified_identities set status='verified',version=1,name='Тестовый',surname='Слушатель',job=p_job,organization='Document defaults fixture',verified_at=now() where user_id=learner;
  insert into public.test_attempts(user_id,revision_id,test_id,variant_id,duration_minutes,pass_score,attempts_per_day,reset_timezone,status,answers,score,started_at,expires_at,completed_at,locale)
  select learner,r.id,r.test_id,v.id,r.duration_minutes,r.pass_score,r.attempts_per_calendar_day,r.attempt_reset_timezone,

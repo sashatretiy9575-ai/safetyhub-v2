@@ -895,7 +895,7 @@ if (process.env.E2E_ADMIN_UX_SWEEP === '1') {
       // Education is asked of everyone, so the field is on the card from the
       // start; a refusal only sends the cursor back to it.
       await expect(dialog.getByLabel('Образование', { exact: true })).toBeVisible();
-      await dialog.getByLabel('Образование', { exact: true }).fill('Высшее техническое');
+      await dialog.getByLabel('Образование', { exact: true }).selectOption('Высшее');
       await dialog.getByRole('button', { name: 'Сохранить данные' }).click();
       await expect.poll(() => interceptedMethods.includes('PATCH')).toBe(true);
       await expect(dialog.getByLabel('Образование', { exact: true })).toBeFocused();

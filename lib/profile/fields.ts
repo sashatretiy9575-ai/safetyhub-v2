@@ -1,5 +1,14 @@
 import { isPhoneCountryCode } from '@/lib/phone/country-codes';
 import type { PhoneInputValue } from '@/lib/phone/countries';
+import { isEducationLevel } from '@/lib/profile/education';
+
+export {
+  EDUCATION_LEVEL_KEYS,
+  EDUCATION_LEVELS,
+  educationLevel,
+  isEducationLevel,
+  type EducationLevel,
+} from '@/lib/profile/education';
 
 /** The four columns an administrator confirms on a person's card. */
 export type ProfileIdentityValues = Readonly<{
@@ -80,6 +89,7 @@ export function profileFieldError(field: ProfileField, value: string) {
   if (normalized.length > PROFILE_FIELD_LIMITS[field]) {
     return { code: 'TOO_LONG', maxLength: PROFILE_FIELD_LIMITS[field] } as const;
   }
+  if (field === 'education' && !isEducationLevel(normalized)) return { code: 'REQUIRED' } as const;
   if (PERSON_NAME_FIELDS.includes(field) && !isPersonName(normalized)) {
     return { code: 'NAME_SCRIPT' } as const;
   }

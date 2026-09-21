@@ -411,7 +411,14 @@
     "organizationShort": "Компания",
     "organizationHint": "Выберите найденный вариант или введите название самостоятельно.",
     "education": "Образование",
-    "educationHint": "Например: высшее техническое",
+    "educationHint": "В протокол попадает уровень образования, а не название учебного заведения.",
+    "educationPlaceholder": "Выберите уровень образования",
+    "educationLevels": {
+      "higher": "Высшее",
+      "incompleteHigher": "Неоконченное высшее",
+      "vocational": "Среднее специальное",
+      "secondary": "Среднее"
+    },
     "phone": "Номер телефона",
     "phoneCountry": "Страна номера",
     "phonePlaceholder": "Номер после {code}",

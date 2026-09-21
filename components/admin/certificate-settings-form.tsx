@@ -54,8 +54,11 @@ import {
   insertSizeProblem,
   newDocumentBatch,
   numberFromDate,
+  PROTOCOL_MAX_PARTICIPANTS,
+  protocolPartNumber,
   type DocumentBatch,
   type DocumentDefaults,
+  type DocumentParticipant,
   type InsertSizeKey,
 } from '@/lib/pdf/document-editor';
 import {
@@ -829,31 +832,43 @@ export function CertificateSettingsForm({
         return;
       }
       const pendingPeople = current.participants.filter((person) => !person.certificateId);
-      const protocol =
-        single || pendingPeople.length
-          ? await generateProtocolInBrowser(
-              {
-                organization,
-                courseTitle: program,
-                items: [],
-                participants: single ? current.participants : pendingPeople,
-                date: exportBranding.protocolDate,
-              },
-              exportBranding,
-              protocolFontUrl(current.participants),
-              controller.signal,
-            )
-          : null;
-      if (single && protocol) {
+      const pendingProtocol = (people: readonly DocumentParticipant[], protocolNumber: string) =>
+        generateProtocolInBrowser(
+          {
+            organization,
+            courseTitle: program,
+            items: [],
+            participants: people,
+            date: exportBranding.protocolDate,
+          },
+          { ...exportBranding, protocolNumber },
+          protocolFontUrl(current.participants),
+          controller.signal,
+        );
+      if (single) {
         setData(current);
-        download(protocol, 'Протокол.pdf');
+        download(
+          await pendingProtocol(current.participants, exportBranding.protocolNumber),
+          'Протокол.pdf',
+        );
         return;
       }
       const { zipSync } = await import('fflate');
       const { safeFilenameSegment } = await import('@/lib/pdf/certificate');
-      const archive: Record<string, Uint8Array> = protocol
-        ? { 'Протокол-невыданные.pdf': protocol }
-        : {};
+      const archive: Record<string, Uint8Array> = {};
+      // Fifty people to a protocol, numbered the way issuance will number them.
+      const parts = Math.ceil(pendingPeople.length / PROTOCOL_MAX_PARTICIPANTS);
+      for (let part = 1; part <= parts; part++) {
+        const number = protocolPartNumber(exportBranding.protocolNumber, part);
+        archive[parts > 1 ? `Протокол-невыданные-${part}.pdf` : 'Протокол-невыданные.pdf'] =
+          await pendingProtocol(
+            pendingPeople.slice(
+              (part - 1) * PROTOCOL_MAX_PARTICIPANTS,
+              part * PROTOCOL_MAX_PARTICIPANTS,
+            ),
+            number,
+          );
+      }
       const issuedItems: CertificateRenderMetadata[] = [];
       let count = 0;
       for (const person of current.participants) {

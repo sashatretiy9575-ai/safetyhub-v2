@@ -9,7 +9,7 @@ begin
  select revision.* into strict r from public.tests t join public.test_revisions revision on revision.id=t.current_revision_id where t.slug in ('plotnik','armaturshchik') order by t.slug limit 1;
  insert into auth.users(instance_id,id,aud,role,email,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
  values('00000000-0000-0000-0000-000000000000',learner,'authenticated','authenticated',learner::text||'@document-regression.invalid','{}','{}',now(),now());
- update public.profiles set name='Тестовый',surname='Слушатель',education='Среднее профессиональное',job='Рабочий',organization='Document regression fixture' where id=learner;
+ update public.profiles set name='Тестовый',surname='Слушатель',education='Среднее специальное',job='Рабочий',organization='Document regression fixture' where id=learner;
  update public.verified_identities set status='verified',version=1,name='Тестовый',surname='Слушатель',job='Рабочий',organization='Document regression fixture',verified_at=now() where user_id=learner;
  insert into public.test_attempts(user_id,revision_id,test_id,variant_id,duration_minutes,pass_score,attempts_per_day,reset_timezone,status,answers,score,started_at,expires_at,completed_at,locale)
  select learner,r.id,r.test_id,v.id,r.duration_minutes,r.pass_score,r.attempts_per_calendar_day,r.attempt_reset_timezone,
@@ -54,12 +54,12 @@ begin
  perform set_config('request.jwt.claim.sub',actor::text,true);
  perform set_config('request.jwt.claim.role','authenticated',true);
  update public.profiles set avatar_updated_at=now() where id=c.user_id;
- result:=public.verify_user_identity_with_education(c.user_id,'Тестовый','Обновлённый','Рабочий',c.organization,'Новое образование');
+ result:=public.verify_user_identity_with_education(c.user_id,'Тестовый','Обновлённый','Рабочий',c.organization,'Неоконченное высшее');
  if result ? '__safetyhubRpcError' then raise exception 'Atomic verification failed: %',result; end if;
- if (select education from public.profiles where id=c.user_id)<>'Новое образование' then raise exception 'Education not saved'; end if;
- if not exists(select 1 from public.certificates where user_id=c.user_id and revoked_at is null and document_snapshot->>'education'='Новое образование') then raise exception 'Automatic issuance captured old education'; end if;
+ if (select education from public.profiles where id=c.user_id)<>'Неоконченное высшее' then raise exception 'Education not saved'; end if;
+ if not exists(select 1 from public.certificates where user_id=c.user_id and revoked_at is null and document_snapshot->>'education'='Неоконченное высшее') then raise exception 'Automatic issuance captured old education'; end if;
  result:=public.verify_user_identity_with_education(c.user_id,'Тестовый','Слушатель','Рабочий',c.organization,repeat('x',201));
  if not (result ? '__safetyhubRpcError') then raise exception 'Invalid education accepted'; end if;
- if (select education from public.profiles where id=c.user_id)<>'Новое образование' then raise exception 'Failed identity mutation changed education'; end if;
+ if (select education from public.profiles where id=c.user_id)<>'Неоконченное высшее' then raise exception 'Failed identity mutation changed education'; end if;
 end; $test$;
 rollback;

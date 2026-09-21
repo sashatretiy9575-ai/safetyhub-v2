@@ -1645,6 +1645,7 @@ export type Database = {
         Args: { p_variants: Json }
         Returns: Json
       }
+      education_level: { Args: { p_value: string }; Returns: string }
       emit_system_notification_alert_unmetered: {
         Args: {
           p_admin_path?: string

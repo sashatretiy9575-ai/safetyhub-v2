@@ -181,7 +181,7 @@ must(
       surname: user.surname,
       job: user.job,
       organization: user.organization,
-      education: 'Тестовое образование',
+      education: 'Высшее',
       onboarding_completed_at: '2026-08-01T08:00:00.000Z',
     })),
     { onConflict: 'id' },

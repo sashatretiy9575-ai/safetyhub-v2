@@ -27,6 +27,8 @@ import {
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { EDUCATION_LEVELS, educationLevel } from '@/lib/profile/education';
 import { Label } from '@/components/ui/label';
 import { CertificateDownloadButton } from '@/components/certificates/download-button';
 import {
@@ -465,7 +467,7 @@ export function AttestationBulkActionButtons({
 }
 
 const EDUCATION_REQUIRED_MESSAGE =
-  'Заполните образование: оно печатается в удостоверении и протоколе.';
+  'Выберите уровень образования: он печатается в протоколе.';
 const NAME_SCRIPT_MESSAGE =
   'Имя и фамилию вводите латиницей или кириллицей — иероглифы в документ не попадают.';
 const IDENTITY_CHANGED_MESSAGE =
@@ -511,7 +513,7 @@ function AttestationIdentityForm({
 
   const [education, setEducation] = useState<string | null>(draft?.education ?? null);
   const [savedEducation, setSavedEducation] = useState('');
-  const educationInputRef = useRef<HTMLInputElement>(null);
+  const educationInputRef = useRef<HTMLSelectElement>(null);
   // The identity version this form was opened on; the save names it, so a card
   // that another administrator has changed meanwhile is refused, not overwritten.
   const versionRef = useRef<number | undefined>(undefined);
@@ -595,7 +597,7 @@ function AttestationIdentityForm({
       setError(NAME_SCRIPT_MESSAGE);
       return;
     }
-    if (!education.trim()) {
+    if (!educationLevel(education)) {
       setError(EDUCATION_REQUIRED_MESSAGE);
       return;
     }
@@ -609,7 +611,8 @@ function AttestationIdentityForm({
         body: JSON.stringify({
           action: 'verify',
           ...normalized,
-          education,
+          // An older answer that names a level is saved as that level.
+          education: educationLevel(education),
           // Left out while the version is unknown; the server then skips the check.
           expectedVersion: versionRef.current,
         }),
@@ -687,24 +690,31 @@ function AttestationIdentityForm({
           it, so the field is always here and always filled in. */}
       <div className="space-y-1">
         <Label htmlFor={`education-${row.userId}`}>Образование</Label>
-        <Input
+        <Select
           id={`education-${row.userId}`}
           ref={educationInputRef}
           aria-label="Образование"
           aria-describedby={`education-hint-${row.userId}`}
-          placeholder="Образование"
-          value={education ?? ''}
+          value={education === null ? '' : (educationLevel(education) ?? '')}
           invalid={issueFields.includes('education')}
           disabled={busy || education === null}
-          maxLength={200}
           onChange={(e) => {
             setError('');
             setEducation(e.target.value);
             report(fields, e.target.value);
           }}
-        />
+        >
+          <option value="" disabled>
+            Выберите уровень образования
+          </option>
+          {EDUCATION_LEVELS.map((level) => (
+            <option key={level} value={level}>
+              {level}
+            </option>
+          ))}
+        </Select>
         <p id={`education-hint-${row.userId}`} className="text-sm text-[var(--color-text-muted)]">
-          Печатается в удостоверении и протоколе. Например: высшее техническое.
+          Печатается в протоколе: уровень образования, а не учебное заведение.
         </p>
       </div>
       {error ? (

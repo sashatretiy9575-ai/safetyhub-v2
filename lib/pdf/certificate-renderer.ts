@@ -248,17 +248,27 @@ async function renderCertificate(
     txt(m.position + ': ' + m.name, right, y, commissionWidth, lineHeight - 3, Math.min(10, lineHeight * .6));
     rule(page, right, y + lineHeight - 1, commissionWidth);
   });
-  // The stamp covers «М.П.» and the corner of the photograph, as on the paper
-  // form; the chairman signs across the first commission line.
+  // «М.П.» beside the photograph is left for the stamp of the company that sent
+  // the person to training. The training centre's own stamp goes over the
+  // commission's three signatures, as the centre stamps its paper booklets.
   const facsimilesStarted = spanStart();
   const [stamp, ...signatures] = await Promise.all([
     embedFacsimile(pdf, branding.stampUrl, metadata.verificationUrl, signal),
     ...(branding.commissionSignatureUrls ?? [branding.chairmanSignatureUrl]).map(url => embedFacsimile(pdf, url, metadata.verificationUrl, signal)),
   ]);
   measureSpan('doc:facsimiles', facsimilesStarted);
-  drawFacsimile(page, stamp, photoX - 86, 272, 92, 92);
   const signatureHeight = Math.max(16, Math.min(42, lineHeight * 1.15));
   signatures.forEach((signature, i) => drawFacsimile(page, signature, right + commissionWidth - 124, 295 + (i + 1) * lineHeight + 7 - signatureHeight, 112, signatureHeight));
+  // A real 40 mm stamp on a calibrated insert, never more than 40 % of its
+  // height; drawn after the signatures so its ink lies on top of them. Centred
+  // on where the signatures begin, it covers their first half and leaves the
+  // rest legible, as a hand-stamped booklet does; it stays inside the frame and
+  // clear of the QR code, which must still scan.
+  const stampSize = Math.min(150, d?.insertHeightCm ? 4 * 375 / d.insertHeightCm : 140);
+  const signaturesStart = right + commissionWidth - 124, commissionMiddle = 295 + members.length * lineHeight / 2;
+  const stampX = Math.min(signaturesStart - stampSize / 2, right + commissionWidth + 4 - stampSize);
+  const stampY = Math.min(Math.max(commissionMiddle - stampSize / 2, 200), 372 - stampSize);
+  drawFacsimile(page, stamp, stampX, stampY, stampSize, stampSize);
   if (metadata.verificationUrl) {
     const qr = (await import('qrcode')).default.create(metadata.verificationUrl, { errorCorrectionLevel: 'M' });
     const qrSize = 57, cell = qrSize / (qr.modules.size + 8), qrX = half * 2 - margin - qrSize;

@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
 import {
+  educationLevel,
   normalizeProfileSubmissionValues,
   PROFILE_FIELD_LIMITS,
   validateProfileSubmissionValues,
@@ -15,6 +16,7 @@ import {
   type ProfileSubmissionValues,
   type ProfileValidationError,
 } from '@/lib/profile/fields';
+import { EducationSelect } from '@/components/profile/education-select';
 import { PhoneInput } from '@/components/profile/phone-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,8 +41,13 @@ export function ProfileForm({
   const router = useRouter();
   const t = useTranslations('Profile');
   const tErrors = useTranslations('Common.errors');
-  const [form, setForm] = useState(initial);
-  const [savedProfile, setSavedProfile] = useState(initial);
+  // An older free-text answer is kept only when it names a level; a school's
+  // name leaves the picker empty, and the next save asks for a level.
+  const [savedProfile, setSavedProfile] = useState(() => ({
+    ...initial,
+    education: educationLevel(initial.education) ?? '',
+  }));
+  const [form, setForm] = useState(savedProfile);
   const [errors, setErrors] = useState<
     Partial<Record<ProfileSubmissionField, ProfileValidationError>>
   >({});
@@ -226,15 +233,15 @@ export function ProfileForm({
           </div>
           <div className="space-y-1 sm:col-span-2">
             <Label className="sr-only" htmlFor="profile-education">{t('education')}</Label>
-            <Input
-          placeholder={t('education')}
+            <EducationSelect
               id="profile-education"
-              maxLength={PROFILE_FIELD_LIMITS.education}
               value={form.education}
-              onChange={update('education')}
+              onChange={(education) => {
+                setForm((current) => ({ ...current, education }));
+                setErrors((current) => ({ ...current, education: undefined }));
+              }}
               invalid={Boolean(errors.education)}
               aria-describedby={errors.education ? undefined : 'profile-education-help'}
-              required
             />
             <p id="profile-education-help" className="text-xs text-[var(--color-text-muted)]">
               {t('educationHint')}

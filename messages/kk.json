@@ -411,7 +411,14 @@
     "organizationShort": "Компания",
     "organizationHint": "Табылған нұсқаны таңдаңыз немесе атауды өзіңіз енгізіңіз.",
     "education": "Білімі",
-    "educationHint": "Мысалы: жоғары техникалық",
+    "educationHint": "Хаттамаға оқу орнының атауы емес, білім деңгейі жазылады.",
+    "educationPlaceholder": "Білім деңгейін таңдаңыз",
+    "educationLevels": {
+      "higher": "Жоғары",
+      "incompleteHigher": "Аяқталмаған жоғары",
+      "vocational": "Орта арнаулы",
+      "secondary": "Орта"
+    },
     "phone": "Телефон нөмірі",
     "phoneCountry": "Нөмір елі",
     "phonePlaceholder": "{code} кейінгі нөмір",

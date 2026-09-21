@@ -5,6 +5,7 @@ import { ArrowRight, UserCircleCheck } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { AvatarUploader } from '@/components/profile/avatar-uploader';
+import { EducationSelect } from '@/components/profile/education-select';
 import { PhoneInput } from '@/components/profile/phone-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,7 @@ import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
 import { localizePathname, type AppLocale } from '@/i18n/config';
 import {
+  educationLevel,
   normalizeProfileSubmissionValues,
   PROFILE_FIELD_LIMITS,
   validateProfileSubmissionValues,
@@ -49,7 +51,11 @@ export function OnboardingForm({
   const locale = useLocale() as AppLocale;
   const t = useTranslations('Profile');
   const tErrors = useTranslations('Common.errors');
-  const [form, setForm] = useState(initial);
+  // An older free-text answer is kept only when it names a level.
+  const [form, setForm] = useState(() => ({
+    ...initial,
+    education: educationLevel(initial.education) ?? '',
+  }));
   const [avatarReady, setAvatarReady] = useState(Boolean(initialAvatarUrl));
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [organizations, setOrganizations] = useState<string[]>([]);
@@ -59,7 +65,7 @@ export function OnboardingForm({
   const surnameRef = useRef<HTMLInputElement>(null);
   const jobRef = useRef<HTMLInputElement>(null);
   const organizationRef = useRef<HTMLInputElement>(null);
-  const educationRef = useRef<HTMLInputElement>(null);
+  const educationRef = useRef<HTMLSelectElement>(null);
   const phoneContainerRef = useRef<HTMLDivElement>(null);
   const avatarSectionRef = useRef<HTMLElement>(null);
 
@@ -75,7 +81,7 @@ export function OnboardingForm({
           surname: curr.surname || draft.surname || '',
           job: curr.job || draft.job || '',
           organization: curr.organization || draft.organization || '',
-          education: curr.education || draft.education || '',
+          education: curr.education || educationLevel(draft.education) || '',
           phone: curr.phone || draft.phone || '',
         }));
       }
@@ -318,18 +324,18 @@ export function OnboardingForm({
         </div>
         <div className="space-y-2 sm:col-span-2">
           <Label className="sr-only" htmlFor="onboarding-education">{t('education')}</Label>
-          <Input
-          placeholder={t('education')}
+          <EducationSelect
             ref={educationRef}
             id="onboarding-education"
-            maxLength={PROFILE_FIELD_LIMITS.education}
             value={form.education}
-            onChange={update('education')}
+            onChange={(education) => {
+              setForm((current) => ({ ...current, education }));
+              setFieldErrors((current) => ({ ...current, education: undefined }));
+            }}
             invalid={Boolean(fieldErrors.education)}
             aria-describedby={
               fieldErrors.education ? 'onboarding-education-error' : 'onboarding-education-help'
             }
-            required
           />
           <p id="onboarding-education-help" className="text-xs text-[var(--color-text-muted)]">
             {t('educationHint')}

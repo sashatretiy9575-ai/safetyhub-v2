@@ -9,7 +9,7 @@ begin
  select revision.* into strict r from public.tests t join public.test_revisions revision on revision.id=t.current_revision_id where t.slug in ('plotnik','armaturshchik') order by t.slug limit 1;
  insert into auth.users(instance_id,id,aud,role,email,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
  values('00000000-0000-0000-0000-000000000000',learner,'authenticated','authenticated',learner::text||'@document-regression.invalid','{}','{}',now(),now());
- update public.profiles set name='Тестовый',surname='Слушатель',education='Среднее профессиональное',job='Рабочий',organization='Document regression fixture '||learner where id=learner;
+ update public.profiles set name='Тестовый',surname='Слушатель',education='Среднее специальное',job='Рабочий',organization='Document regression fixture '||learner where id=learner;
  update public.verified_identities set status='verified',version=1,name='Тестовый',surname='Слушатель',job='Рабочий',organization='Document regression fixture '||learner,verified_at=now() where user_id=learner;
  insert into public.test_attempts(user_id,revision_id,test_id,variant_id,duration_minutes,pass_score,attempts_per_day,reset_timezone,status,answers,score,started_at,expires_at,completed_at,locale)
  select learner,r.id,r.test_id,v.id,r.duration_minutes,r.pass_score,r.attempts_per_calendar_day,r.attempt_reset_timezone,
@@ -80,11 +80,11 @@ begin
  result:=public.execute_admin_attestation_action(gen_random_uuid(),recovery_action,array[c.attestation_id]);
  if result#>>'{items,0,reason}'<>'DOCUMENT_REQUIRED_FIELDS:education' or result#>>'{items,0,status}'<>'skipped' then raise exception 'Explicit issue must still enforce education: %',result; end if;
  if (select to_jsonb(cert) from public.certificates cert where id=c.id) is distinct from before_doc then raise exception 'Failed explicit issue changed old certificate'; end if;
- update public.profiles set education='Среднее профессиональное' where id=c.user_id;
+ update public.profiles set education='Среднее специальное' where id=c.user_id;
  result:=public.execute_admin_attestation_action(receipt,recovery_action,array[c.attestation_id]);
  if result#>>'{items,0,status}'<>'completed' then raise exception 'Explicit recovery failed: %',result; end if;
  select * into strict newer from public.certificates where user_id=c.user_id and revoked_at is null;
- if newer.score<>c.total or newer.attempt_id<>a.id or newer.supersedes_certificate_id<>c.id or newer.document_snapshot->>'education'<>'Среднее профессиональное' then raise exception 'Recovery lost score, predecessor or education'; end if;
+ if newer.score<>c.total or newer.attempt_id<>a.id or newer.supersedes_certificate_id<>c.id or newer.document_snapshot->>'education'<>'Среднее специальное' then raise exception 'Recovery lost score, predecessor or education'; end if;
  if (select document_snapshot from public.certificates where id=c.id) is distinct from c.document_snapshot then raise exception 'Recovery rewrote historical snapshot'; end if;
  result:=public.execute_admin_attestation_action(receipt,recovery_action,array[c.attestation_id]);
  if not (result->>'replayed')::boolean then raise exception 'Receipt retry was not replayed'; end if;

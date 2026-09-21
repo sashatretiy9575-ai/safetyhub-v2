@@ -63,7 +63,9 @@ test('profile editing includes organization and renders the account-approval sta
   assert.match(schema, /organization: profileField\(PROFILE_FIELD_LIMITS\.organization\)/);
   assert.match(fields, /organization: 160/);
   // Education is the participant's own field now, required from everyone.
-  assert.match(schema, /education: profileField\(PROFILE_FIELD_LIMITS\.education\)/);
+  // A level from the picker, not a school: the protocol prints «Высшее».
+  assert.match(schema, /education: educationField/);
+  assert.match(schema, /educationField = profileField\(PROFILE_FIELD_LIMITS\.education\)\.refine\(\s*isEducationLevel/);
   assert.match(fields, /education: 200/);
   assert.match(form, /t\('education'\)/);
   assert.match(form, /t\('educationHint'\)/);

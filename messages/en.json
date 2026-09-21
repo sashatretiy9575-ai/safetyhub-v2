@@ -411,7 +411,14 @@
     "organizationShort": "Company",
     "organizationHint": "Choose a matching result or enter the name yourself.",
     "education": "Education",
-    "educationHint": "For example: higher technical education",
+    "educationHint": "The protocol shows your level of education, not the name of your school.",
+    "educationPlaceholder": "Choose your level of education",
+    "educationLevels": {
+      "higher": "Higher",
+      "incompleteHigher": "Incomplete higher",
+      "vocational": "Vocational (secondary specialised)",
+      "secondary": "Secondary"
+    },
     "phone": "Phone number",
     "phoneCountry": "Phone country",
     "phonePlaceholder": "Number after {code}",

@@ -1,5 +1,5 @@
 import type { PDFDocument, PDFFont, PDFImage, PDFPage } from 'pdf-lib';
-import { rgb } from 'pdf-lib';
+import { BlendMode, rgb } from 'pdf-lib';
 import { loadCertificateFontBytes, loadCertificateImageBytes, resolveAssetUrl } from './certificate-renderer.ts';
 import { documentTextWidth, wrapDocumentText } from './protocol-renderer.ts';
 
@@ -25,11 +25,16 @@ export async function embedFacsimile(pdf: PDFDocument, url: string | null | unde
   if (!url) return null;
   return pdf.embedPng(await loadCertificateImageBytes(resolveAssetUrl(url, origin), signal));
 }
-/** Fits the image inside the box and centres it; drawn last, so the ink lies over the text like on paper. */
+/**
+ * Fits the image inside the box and centres it; drawn last, so the ink lies over
+ * the text like on paper. Multiplied, not painted: a stamp over the signatures
+ * darkens them instead of whiting them out, and any paper left in the scan
+ * disappears into the page.
+ */
 export function drawFacsimile(page: PDFPage, image: PDFImage | null, x: number, top: number, width: number, height: number) {
   if (!image) return;
   const fit = Math.min(width / image.width, height / image.height);
-  page.drawImage(image, { x: x + (width - image.width * fit) / 2, y: page.getHeight() - top - height + (height - image.height * fit) / 2, width: image.width * fit, height: image.height * fit });
+  page.drawImage(image, { x: x + (width - image.width * fit) / 2, y: page.getHeight() - top - height + (height - image.height * fit) / 2, width: image.width * fit, height: image.height * fit, blendMode: BlendMode.Multiply });
 }
 export function rule(page: PDFPage, x: number, top: number, width: number, thickness = .5) {
   page.drawLine({ start: { x, y: page.getHeight() - top }, end: { x: x + width, y: page.getHeight() - top }, thickness, color: ink });

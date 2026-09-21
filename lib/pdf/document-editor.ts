@@ -63,6 +63,16 @@ export function documentDate(now = new Date()) {
 export function numberFromDate(date: string) {
   return `${date.slice(8, 10)}.${date.slice(5, 7)}`;
 }
+/**
+ * One commission sitting takes at most fifty people, so a protocol lists no
+ * more: the fifty-first person of the same company, course and day opens
+ * «DD.MM-2». The number is fixed at issue by `private.capture_document_snapshot`,
+ * which keeps the same limit.
+ */
+export const PROTOCOL_MAX_PARTICIPANTS = 50;
+export function protocolPartNumber(base: string, part: number) {
+  return part > 1 ? `${base}-${part}` : base;
+}
 export function newDocumentBatch(organization: string, courseSlug: string): DocumentBatch {
   const date = documentDate();
   return { organization, courseSlug, date, number: numberFromDate(date), automatic: true, version: 0 };

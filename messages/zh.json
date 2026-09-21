@@ -411,7 +411,14 @@
     "organizationShort": "单位",
     "organizationHint": "请选择匹配结果或自行输入名称。",
     "education": "学历",
-    "educationHint": "例如：高等技术教育",
+    "educationHint": "协议中填写的是学历层次，而不是教育机构的名称。",
+    "educationPlaceholder": "请选择学历",
+    "educationLevels": {
+      "higher": "高等教育",
+      "incompleteHigher": "未完成的高等教育",
+      "vocational": "中等专业教育",
+      "secondary": "中等教育"
+    },
     "phone": "联系电话",
     "phoneCountry": "号码所属国家/地区",
     "phonePlaceholder": "请输入 {code} 后的号码",

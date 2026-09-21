@@ -26,12 +26,35 @@ begin
   -- Education takes the same NFC normalization and whitespace collapsing as the
   -- rest of the profile. It never did: the trigger did not fire on the column.
   update public.profiles
-  set education = '  Высшее   ' || U&'\0438\0306' || ' техническое  '
+  set education = '  Неоконченное   высшее  '
   where id = v_learner;
   if (select education from public.profiles where id = v_learner)
-    <> normalize('Высшее й техническое', NFC) then
+    <> 'Неоконченное высшее' then
     raise exception 'education was not normalized: %',
       (select education from public.profiles where id = v_learner);
+  end if;
+
+  -- The protocol prints a level, never a school: a new answer is one of four.
+  foreach v_value in array array['Высшее', 'Неоконченное высшее', 'Среднее специальное', 'Среднее'] loop
+    update public.profiles set education = v_value where id = v_learner;
+  end loop;
+  foreach v_value in array array['КазНУ им. Аль-Фараби', 'высшее техническое'] loop
+    v_blocked := false;
+    begin
+      update public.profiles set education = v_value where id = v_learner;
+    exception when check_violation then
+      if sqlerrm <> 'PROFILE_EDUCATION_LEVEL' then raise; end if;
+      v_blocked := true;
+    end;
+    if not v_blocked then
+      raise exception 'education that is not a level was accepted: %', v_value;
+    end if;
+  end loop;
+  if private.education_level('высшее техническое') <> 'Высшее'
+    or private.education_level('Среднее профессиональное') <> 'Среднее специальное'
+    or private.education_level('неполное высшее') <> 'Неоконченное высшее'
+    or private.education_level('КазНУ им. Аль-Фараби') is not null then
+    raise exception 'older answers are not read as the level they name';
   end if;
 
   -- Every alphabet a real participant writes their name in.
@@ -98,8 +121,8 @@ begin
   update public.profiles set name = '伟', surname = '张' where id = v_legacy;
   alter table public.profiles enable trigger profiles_normalize;
 
-  update public.profiles set education = 'Высшее техническое' where id = v_legacy;
-  if (select education from public.profiles where id = v_legacy) <> 'Высшее техническое' then
+  update public.profiles set education = 'Высшее' where id = v_legacy;
+  if (select education from public.profiles where id = v_legacy) <> 'Высшее' then
     raise exception 'a legacy row refused a write to another column';
   end if;
   if (select name from public.profiles where id = v_legacy) <> '伟' then
@@ -109,7 +132,7 @@ begin
   -- refused either: only a value the statement changes is judged.
   update public.profiles set name = '伟', job = 'Рабочий' where id = v_legacy;
 
-  update public.profiles set education = 'Среднее профессиональное' where id = v_legacy;
+  update public.profiles set education = 'Среднее специальное' where id = v_legacy;
   v_result := public.submit_profile_for_approval_from_trusted_server_with_education(
     v_legacy, 'Wei', 'Zhang', 'Рабочий', 'SafetyHub fixture', '   ', null, null
   );
@@ -125,7 +148,7 @@ begin
     raise exception 'the submission fixture failed for the wrong reason: %', v_result;
   end if;
   if (select education from public.profiles where id = v_legacy)
-    <> 'Среднее профессиональное' then
+    <> 'Среднее специальное' then
     raise exception 'a refused submission changed the education';
   end if;
 end; $test$;
