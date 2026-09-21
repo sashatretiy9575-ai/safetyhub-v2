@@ -18,6 +18,7 @@ const PHONE_COUNTRY_PATTERN = /^[A-Z]{2}$/u;
 const PHONE_E164_PATTERN = /^\+[1-9][0-9]{1,14}$/u;
 const ALLOWED_EVENT_TYPES = new Set([
   'account.approval_requested',
+  'course.access_requested',
   'course.completed',
   'system.alert',
 ]);
@@ -132,6 +133,25 @@ function requiredPhoneE164(value: unknown) {
 function parsePayload(eventType: unknown, value: unknown) {
   if (!isRecord(value)) fail('NOTIFICATION_PAYLOAD_INVALID');
   if (eventType === 'account.approval_requested') {
+    // The application that names the courses the newcomer clicked.
+    if (hasExactKeys(value, ['schemaVersion', 'locale', 'requestedAt', 'adminPath', 'courses'])) {
+      if (
+        value.schemaVersion !== 3 ||
+        !Array.isArray(value.courses) ||
+        value.courses.length < 1 ||
+        value.courses.length > 10
+      ) {
+        fail('NOTIFICATION_PAYLOAD_INVALID');
+      }
+      return {
+        approvalKind: 'generic_v2' as const,
+        schemaVersion: 3 as const,
+        locale: requiredLocale(value.locale),
+        requestedAt: requiredTimestamp(value.requestedAt),
+        adminPath: requiredAdminPath(value.adminPath),
+        courses: value.courses.map((course: unknown) => requiredText(course, 240)),
+      };
+    }
     if (hasExactKeys(value, ['schemaVersion', 'locale', 'requestedAt', 'adminPath'])) {
       if (value.schemaVersion !== 2) fail('NOTIFICATION_PAYLOAD_INVALID');
       return {
@@ -220,6 +240,24 @@ function parsePayload(eventType: unknown, value: unknown) {
       score,
       total,
       completedAt: requiredTimestamp(value.completedAt),
+      adminPath: requiredAdminPath(value.adminPath),
+    };
+  }
+  if (eventType === 'course.access_requested') {
+    exactKeys(
+      value,
+      ['userId', 'name', 'surname', 'locale', 'courseTitle', 'requestedAt', 'adminPath'],
+      'NOTIFICATION_PAYLOAD_INVALID',
+    );
+    // A Chinese account may have no printable name; the line then drops it.
+    const blankable = (text: unknown) => (text === '' ? '' : requiredText(text, 120));
+    return {
+      userId: requiredUuid(value.userId),
+      name: blankable(value.name),
+      surname: blankable(value.surname),
+      locale: requiredLocale(value.locale),
+      courseTitle: requiredText(value.courseTitle, 240),
+      requestedAt: requiredTimestamp(value.requestedAt),
       adminPath: requiredAdminPath(value.adminPath),
     };
   }
@@ -343,6 +381,7 @@ function eventMessage(claim: ReturnType<typeof parseDeliveryClaim>, siteOrigin: 
       return [
         '🔔 Новая заявка на обучение',
         '',
+        ...('courses' in payload && payload.courses ? [`📚 Курс: ${payload.courses.join(', ')}`] : []),
         `🌐 Язык: ${localeLabel(payload.locale)}`,
         `🕒 Время: ${messageTime(payload.requestedAt)}`,
         '',
@@ -363,6 +402,20 @@ function eventMessage(claim: ReturnType<typeof parseDeliveryClaim>, siteOrigin: 
   }
   if (!('adminPath' in payload)) fail('NOTIFICATION_PAYLOAD_INVALID');
   const deepLink = new URL(payload.adminPath, siteOrigin).toString();
+  if (claim.eventType === 'course.access_requested') {
+    const person = `${payload.surname} ${payload.name}`.trim();
+    return [
+      '🔁 Повторная заявка: ещё один курс',
+      'Клиент уже обучается у нас и просит открыть доступ.',
+      '',
+      ...(person ? [`👤 Клиент: ${person}`] : []),
+      `📚 Курс: ${payload.courseTitle}`,
+      `🕒 Время: ${messageTime(payload.requestedAt)}`,
+      '',
+      `🔗 Открыть в админ-панели:`,
+      deepLink,
+    ].join('\n');
+  }
   if (claim.eventType === 'course.completed') {
     return [
       payload.result === 'passed' ? '✅ Курс пройден' : '❌ Курс не пройден',

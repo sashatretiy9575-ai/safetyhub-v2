@@ -1,6 +1,7 @@
 import { NextResponse } from '@/lib/security/api-response';
 import { getAuthContext } from '@/server/auth/session';
 import { hasCourseAccess } from '@/server/learning/course-access';
+import { hasOpenCourseAccessRequest } from '@/server/learning/course-access-request';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +40,12 @@ export async function GET(request: Request) {
       // not exist, and the page then asked people to sign in again.
       const opened = await hasCourseAccess(context.user.id, slug).catch(() => true);
       if (!opened) {
-        return NextResponse.json({ access: 'course_locked', role: context.role });
+        // The page offers «Запросить доступ» once; after that it says the
+        // request is with the administrator.
+        const requested = await hasOpenCourseAccessRequest(context.user.id, slug).catch(
+          () => false,
+        );
+        return NextResponse.json({ access: 'course_locked', role: context.role, requested });
       }
     }
     return NextResponse.json({ access: 'approved', role: context.role });

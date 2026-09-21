@@ -230,8 +230,12 @@
       "rejectedDescription": "请查看管理员备注，修改后重新提交。",
       "rejectedLabel": "修改资料",
       "lockedTitle": "课程尚未开放",
-      "lockedDescription": "您的账户已获批准，但管理员尚未向您开放此课程。如需此课程，请联系我们。",
-      "lockedLabel": "打开个人中心"
+      "lockedDescription": "您的账户已获批准，但此课程尚未向您开放。请发送申请，管理员将为您开放。",
+      "lockedLabel": "申请开放",
+      "requestedTitle": "申请已发送",
+      "requestedDescription": "管理员已收到您的申请，将为您开放课程，通常在 24 小时内。",
+      "requestSending": "正在发送…",
+      "requestFailed": "申请未发送，请重试。"
     }
   },
   "Topics": {

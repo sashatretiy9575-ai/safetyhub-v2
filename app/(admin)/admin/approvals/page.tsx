@@ -3,6 +3,8 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { AccountApprovalQueue } from '@/components/admin/account-approval-queue';
 import { listAdminCourseOptions } from '@/server/admin/course-access';
+import { CourseAccessRequestList } from '@/components/admin/course-access-request-list';
+import { listOpenCourseAccessRequests } from '@/server/admin/course-access-requests';
 import { AdminEmptyState, AdminLoadFailure } from '@/components/admin/admin-data-state';
 import { AdminPagination } from '@/components/admin/admin-pagination';
 import { Button } from '@/components/ui/button';
@@ -42,9 +44,12 @@ export default async function AdminApprovalsPage({
   // Approval opens the ticked courses only, so the queue needs the catalogue.
   // A failed catalogue read leaves the queue readable but not approvable,
   // which the queue explains itself. Both reads travel to the database at once.
-  const [result, courses] = await Promise.all([
+  // The courses people asked for: a newcomer's are ticked in their
+  // application, an approved person's are the «повторные заявки» above it.
+  const [result, courses, requests] = await Promise.all([
     getPendingAccountApprovalPage(query),
     listAdminCourseOptions().catch(() => []),
+    listOpenCourseAccessRequests().catch(() => ({ byApplicant: {}, repeat: [] })),
   ]);
   const trail = parseAdminTrail(params[ADMIN_TRAIL_PARAM]);
   const currentToken =
@@ -69,6 +74,8 @@ export default async function AdminApprovalsPage({
         </Button>
       </div>
 
+      <CourseAccessRequestList items={requests.repeat} />
+
       {result.state === 'failed' ? (
         <AdminLoadFailure
           correlationId={result.correlationId}
@@ -78,7 +85,11 @@ export default async function AdminApprovalsPage({
         <AdminEmptyState>Новых заявок на проверку нет.</AdminEmptyState>
       ) : (
         <>
-          <AccountApprovalQueue items={result.data.items} courses={courses} />
+          <AccountApprovalQueue
+            items={result.data.items}
+            courses={courses}
+            requestedCourses={requests.byApplicant}
+          />
           <AdminPagination
             total={result.data.total}
             visible={result.data.items.length}

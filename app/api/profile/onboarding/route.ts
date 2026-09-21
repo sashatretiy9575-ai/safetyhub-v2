@@ -10,6 +10,15 @@ import { normalizeUserPhone } from '@/server/phone';
 import { phoneRequiredForLocale } from '@/lib/profile/fields';
 import { consumeBusinessQuota, consumeCoarseQuota } from '@/server/security/rate-limit';
 import { requestSecurityMetadata } from '@/server/security/request-metadata';
+import { requestCourseAccess } from '@/server/learning/course-access-request';
+
+/** The courses the newcomer clicked before signing up, remembered by the browser. */
+function requestedCourseSlugs(body: unknown): string[] {
+  if (!body || typeof body !== 'object' || !('courseSlugs' in body)) return [];
+  const value = (body as { courseSlugs?: unknown }).courseSlugs;
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.filter((slug): slug is string => typeof slug === 'string'))].slice(0, 5);
+}
 
 type TrustedProfileSubmissionRpcClient = {
   rpc: (
@@ -33,7 +42,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'FORBIDDEN' }, { status: 403 });
     }
     const context = await requireUser();
-    const parsed = onboardingProfileSchema.safeParse(await readJsonBody(request));
+    const body = await readJsonBody(request);
+    const parsed = onboardingProfileSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_PROFILE' }, { status: 400 });
     }
@@ -55,6 +65,12 @@ export async function POST(request: Request) {
       consumeBusinessQuota('profile.update', context.user.id),
       consumeCoarseQuota('profile.update', requestSecurityMetadata(request).ipHash),
     ]);
+    // Before the submission, so the application that reaches the administrator
+    // already names these courses. A course that cannot be recorded never
+    // costs the person their application.
+    for (const slug of requestedCourseSlugs(body)) {
+      await requestCourseAccess(context.user.id, slug).catch(() => undefined);
+    }
     const response = await (
       createAdminClient() as unknown as TrustedProfileSubmissionRpcClient
     ).rpc('submit_profile_for_approval_from_trusted_server_with_education', {

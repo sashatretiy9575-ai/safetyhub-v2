@@ -1,7 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowClockwise, Bell, Check, CheckCircle, Warning, XCircle } from '@phosphor-icons/react';
+import {
+  ArrowClockwise,
+  ArrowsClockwise,
+  Bell,
+  Check,
+  CheckCircle,
+  Warning,
+  XCircle,
+} from '@phosphor-icons/react';
 import {
   createContext,
   useCallback,
@@ -126,6 +134,7 @@ function parseEvent(value: unknown): AdminNotificationEvent | null {
 
   if (value.type === 'account.approval_requested') {
     const genericV2Keys = ['schemaVersion', 'locale', 'requestedAt', 'adminPath'];
+    const withCoursesKeys = [...genericV2Keys, 'courses'];
     const legacyGenericKeys = ['name', 'surname', 'locale', 'requestedAt', 'adminPath'];
     const applicationKeys = [
       'name',
@@ -137,8 +146,23 @@ function parseEvent(value: unknown): AdminNotificationEvent | null {
     ];
     const hasApplicationDetails = hasExactKeys(payload, applicationKeys);
     const hasGenericV2 = hasExactKeys(payload, genericV2Keys);
+    const hasCourses = hasExactKeys(payload, withCoursesKeys);
     const hasLegacyGeneric = hasExactKeys(payload, legacyGenericKeys);
-    if (!(hasGenericV2 || hasLegacyGeneric || hasApplicationDetails)) {
+    if (!(hasGenericV2 || hasCourses || hasLegacyGeneric || hasApplicationDetails)) {
+      return null;
+    }
+    if (
+      hasCourses &&
+      (payload.schemaVersion !== 3 ||
+        typeof payload.locale !== 'string' ||
+        !LOCALES.has(payload.locale) ||
+        !isTimestamp(payload.requestedAt) ||
+        !isAdminPath(payload.adminPath) ||
+        !Array.isArray(payload.courses) ||
+        payload.courses.length < 1 ||
+        payload.courses.length > 10 ||
+        !payload.courses.every((course) => isSingleLine(course)))
+    ) {
       return null;
     }
     if (
@@ -179,6 +203,28 @@ function parseEvent(value: unknown): AdminNotificationEvent | null {
       hasLegacyGeneric &&
       !isExactLegacyBlankZh &&
       (!isSingleLine(payload.name) || !isSingleLine(payload.surname))
+    ) {
+      return null;
+    }
+  } else if (value.type === 'course.access_requested') {
+    if (
+      !hasExactKeys(payload, [
+        'userId',
+        'name',
+        'surname',
+        'locale',
+        'courseTitle',
+        'requestedAt',
+        'adminPath',
+      ]) ||
+      !isUuid(payload.userId) ||
+      !(payload.name === '' || isSingleLine(payload.name)) ||
+      !(payload.surname === '' || isSingleLine(payload.surname)) ||
+      typeof payload.locale !== 'string' ||
+      !LOCALES.has(payload.locale) ||
+      !isSingleLine(payload.courseTitle) ||
+      !isTimestamp(payload.requestedAt) ||
+      !isAdminPath(payload.adminPath)
     ) {
       return null;
     }
@@ -553,10 +599,13 @@ function eventPresentation(event: AdminNotificationEvent) {
   switch (event.type) {
     case 'account.approval_requested': {
       if ('schemaVersion' in event.payload) {
+        const courses = 'courses' in event.payload ? event.payload.courses.join(', ') : '';
         return {
           icon: Bell,
           title: 'Новая заявка на обучение',
-          description: `Новая заявка · ${event.payload.locale.toUpperCase()}`,
+          description: courses
+            ? `Курс: ${courses} · ${event.payload.locale.toUpperCase()}`
+            : `Новая заявка · ${event.payload.locale.toUpperCase()}`,
         };
       }
       const applicationSummary =
@@ -574,6 +623,16 @@ function eventPresentation(event: AdminNotificationEvent) {
         icon: Bell,
         title: 'Новая заявка на обучение',
         description: `${event.payload.surname} ${event.payload.name}${applicationSummary}`,
+      };
+    }
+    case 'course.access_requested': {
+      const person =
+        `${event.payload.surname} ${event.payload.name}`.trim() ||
+        event.payload.locale.toUpperCase();
+      return {
+        icon: ArrowsClockwise,
+        title: 'Повторная заявка: ещё один курс',
+        description: `${person} уже у нас · просит «${event.payload.courseTitle}»`,
       };
     }
     case 'course.completed': {

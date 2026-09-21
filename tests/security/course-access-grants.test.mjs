@@ -76,10 +76,12 @@ test('the queue ticks courses per application and reaches the applicant on Whats
   assert.match(page, /listAdminCourseOptions\(\)/u);
   assert.match(
     page,
-    /<AccountApprovalQueue items=\{result\.data\.items\} courses=\{courses\} \/>/u,
+    /<AccountApprovalQueue\s+items=\{result\.data\.items\}\s+courses=\{courses\}\s+requestedCourses=\{requests\.byApplicant\}\s*\/>/u,
   );
-  // Nothing is pre-ticked: access is granted by hand, course by course.
+  // Only the course the person clicked before applying is ticked by default.
   assert.match(queue, /useState<Record<string, ReadonlySet<string>>>\(\s*\{\},?\s*\)/u);
+  assert.match(queue, /courseSelections\[itemId\] \?\? new Set\(requestedFor\(itemId\)\)/u);
+  assert.match(queue, /Выбрал курс:/u);
   assert.match(queue, /decision === 'approved' && courseIds\.length === 0/u);
   assert.match(queue, /\.\.\.\(decision === 'rejected' \? \{ reason \} : \{ courseIds \}\)/u);
   assert.match(queue, /disabled=\{busy \|\| selection\.size === 0\}/u);
@@ -217,7 +219,9 @@ test('a locked course is refused by name on every learner surface', async () => 
   assert.match(access, /access: 'course_locked'/u);
   assert.match(actions, /\/api\/auth\/access\?course=\$\{encodeURIComponent\(course\.slug\)\}/u);
   assert.match(actions, /new Map<string, CourseMaterialAccess>\(\)/u);
-  assert.match(actions, /course_locked: \{\s*title: t\('access\.lockedTitle'\)/u);
+  assert.match(actions, /title: t\('access\.lockedTitle'\)/u);
+  assert.match(actions, /course_locked: \{ \.\.\.lockedCopy, label: t\('access\.lockedLabel'\) \}/u);
+  assert.match(actions, /\/api\/profile\/course-access-request/u);
   assert.match(learning, /from\('course_access_grants'\)/u);
   const messages = JSON.parse(await read('messages/ru.json'));
   assert.ok(messages.Quiz.errors.courseAccessRequired);

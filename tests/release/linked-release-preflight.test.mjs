@@ -118,17 +118,17 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  // One migration waits for the next release: education as a level, and a
-  // protocol of at most fifty people.
+  // One migration waits for the next release: the course a person asked for
+  // reaches the administrator.
   assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 103);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 104);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 102);
+  assert.equal(receipt.matchedCount, 103);
   assert.equal(receipt.pendingCount, 1);
-  assert.equal(receipt.expectedBaseCount, 102);
+  assert.equal(receipt.expectedBaseCount, 103);
   assert.equal(receipt.expectedPendingCount, 1);
-  assert.equal(receipt.expectedTotalCount, 103);
+  assert.equal(receipt.expectedTotalCount, 104);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

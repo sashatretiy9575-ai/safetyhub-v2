@@ -2960,6 +2960,32 @@ export type Database = {
           },
         ]
       }
+      course_access_requests: {
+        Row: {
+          requested_at: string
+          test_id: string
+          user_id: string
+        }
+        Insert: {
+          requested_at?: string
+          test_id: string
+          user_id: string
+        }
+        Update: {
+          requested_at?: string
+          test_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_access_requests_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_catalog_batch_items: {
         Row: {
           batch_id: string
@@ -4572,6 +4598,10 @@ export type Database = {
         Args: { p_actor_id: string; p_asset_id: string }
         Returns: Json
       }
+      dismiss_course_access_request: {
+        Args: { p_test_id: string; p_user_id: string }
+        Returns: Json
+      }
       emit_system_notification_alert: {
         Args: {
           p_admin_path?: string
@@ -5262,6 +5292,10 @@ export type Database = {
           p_target_id: string
           p_user_agent?: string
         }
+        Returns: Json
+      }
+      request_course_access_from_trusted_server: {
+        Args: { p_slug: string; p_user_id: string }
         Returns: Json
       }
       reset_zh_credential: {

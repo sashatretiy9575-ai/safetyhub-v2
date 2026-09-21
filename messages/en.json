@@ -230,8 +230,12 @@
       "rejectedDescription": "Review the administrator’s comment and submit your details again.",
       "rejectedLabel": "Update details",
       "lockedTitle": "Course not opened yet",
-      "lockedDescription": "Your account is approved, but the administrator has not opened this course to you yet. Contact us if you need it.",
-      "lockedLabel": "Open account"
+      "lockedDescription": "Your account is approved, but this course is not open to you yet. Send a request and the administrator will open it.",
+      "lockedLabel": "Request access",
+      "requestedTitle": "Request sent",
+      "requestedDescription": "The administrator has your request and will open the course, usually within 24 hours.",
+      "requestSending": "Sending…",
+      "requestFailed": "The request was not sent. Please try again."
     }
   },
   "Topics": {

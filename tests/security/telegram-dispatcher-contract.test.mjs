@@ -44,12 +44,20 @@ test('Telegram dispatcher is bearer-protected, bounded, leased, and service-only
   assert.match(config, /\[functions\.telegram-dispatcher\]\s*\r?\nverify_jwt = false/u);
 });
 
-test('Telegram templates allow exactly three informational events with a generic v2 approval envelope and bounded legacy parsing', async () => {
+test('Telegram templates allow exactly four informational events with a generic approval envelope and bounded legacy parsing', async () => {
   const source = await read('supabase/functions/telegram-dispatcher/index.ts');
   const typeBlock =
     source.match(/const ALLOWED_EVENT_TYPES = new Set\(\[([\s\S]*?)\]\);/u)?.[1] ?? '';
   const types = [...typeBlock.matchAll(/'([^']+)'/gu)].map((match) => match[1]);
-  assert.deepEqual(types, ['account.approval_requested', 'course.completed', 'system.alert']);
+  assert.deepEqual(types, [
+    'account.approval_requested',
+    'course.access_requested',
+    'course.completed',
+    'system.alert',
+  ]);
+  // An approved person asking for one more course reads differently from a newcomer.
+  assert.match(source, /Повторная заявка: ещё один курс/u);
+  assert.match(source, /📚 Курс: \$\{payload\.courses\.join\(', '\)\}/u);
   assert.match(source, /Нов(?:ая|ую) заявк/u);
   assert.match(source, /Курс пройден/u);
   assert.match(source, /Курс не пройден/u);

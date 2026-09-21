@@ -3,6 +3,7 @@ import * as z from 'zod/mini';
 
 export const ADMIN_NOTIFICATION_EVENT_TYPES = [
   'account.approval_requested',
+  'course.access_requested',
   'course.completed',
   'system.alert',
 ] as const;
@@ -21,13 +22,11 @@ const localeSchema = z.enum(APP_LOCALES);
 const adminPathSchema = z
   .string()
   .check(z.minLength(1), z.maxLength(240), z.regex(/^\/admin(?:\/|$)/u));
-const singleLineTextSchema = z
-  .string()
-  .check(
-    z.minLength(1),
-    z.maxLength(240),
-    z.refine((value) => !/[\u0000-\u001f\u007f]/u.test(value)),
-  );
+const singleLineTextSchema = z.string().check(
+  z.minLength(1),
+  z.maxLength(240),
+  z.refine((value) => !/[\u0000-\u001f\u007f]/u.test(value)),
+);
 
 const deliverySchema = z.strictObject({
   status: z.enum(ADMIN_NOTIFICATION_DELIVERY_STATES),
@@ -51,6 +50,14 @@ const approvalRequestedPayloadSchema = z.union([
     locale: localeSchema,
     requestedAt: timestampSchema,
     adminPath: adminPathSchema,
+  }),
+  // The same application, naming the courses the newcomer clicked before applying.
+  z.strictObject({
+    schemaVersion: z.literal(3),
+    locale: localeSchema,
+    requestedAt: timestampSchema,
+    adminPath: adminPathSchema,
+    courses: z.array(singleLineTextSchema).check(z.minLength(1), z.maxLength(10)),
   }),
   z.strictObject({
     name: z.literal(''),
@@ -96,6 +103,17 @@ const courseCompletedPayloadSchema = z
   })
   .check(z.refine((payload) => payload.score <= payload.total));
 
+/** An approved person asks for one more course: the «повторная заявка». */
+const courseAccessRequestedPayloadSchema = z.strictObject({
+  userId: uuidSchema,
+  name: blankableLineSchema,
+  surname: blankableLineSchema,
+  locale: localeSchema,
+  courseTitle: singleLineTextSchema,
+  requestedAt: timestampSchema,
+  adminPath: adminPathSchema,
+});
+
 const systemAlertPayloadSchema = z.strictObject({
   machineCode: z.string().check(z.minLength(3), z.maxLength(80), z.regex(/^[A-Z][A-Z0-9_]+$/u)),
   correlationId: uuidSchema,
@@ -107,6 +125,10 @@ export const adminNotificationEventSchema = z
     z.extend(eventEnvelopeSchema, {
       type: z.literal('account.approval_requested'),
       payload: approvalRequestedPayloadSchema,
+    }),
+    z.extend(eventEnvelopeSchema, {
+      type: z.literal('course.access_requested'),
+      payload: courseAccessRequestedPayloadSchema,
     }),
     z.extend(eventEnvelopeSchema, {
       type: z.literal('course.completed'),

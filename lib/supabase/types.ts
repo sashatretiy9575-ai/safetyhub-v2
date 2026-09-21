@@ -390,6 +390,11 @@ export type Database = {
         granted_by: string | null;
         granted_at: string;
       }>;
+      course_access_requests: Table<{
+        user_id: string;
+        test_id: string;
+        requested_at: string;
+      }>;
       admin_capability_catalog: Table<{
         capability: string;
         category: string;

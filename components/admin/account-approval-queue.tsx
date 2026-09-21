@@ -99,7 +99,8 @@ const QUEUE_REFRESH_DEBOUNCE_MS = 1_500;
 
 function Avatar({ item, size }: { item: AdminAccountApprovalItem; size: 48 | 96 }) {
   const label = fullName(item);
-  const box = size === 48 ? 'size-12 rounded-xl text-lg' : 'size-24 rounded-[var(--radius-group)] text-3xl';
+  const box =
+    size === 48 ? 'size-12 rounded-xl text-lg' : 'size-24 rounded-[var(--radius-group)] text-3xl';
   return item.avatarUrl ? (
     // The signed URL arrives with the page, so the list makes no extra requests
     // — and with fixed dimensions it no longer reflows as photos land.
@@ -212,9 +213,12 @@ function CoursePicker({
 export function AccountApprovalQueue({
   items,
   courses,
+  requestedCourses = {},
 }: {
   items: AdminAccountApprovalItem[];
   courses: ApprovalCourseOption[];
+  /** The courses each newcomer clicked before applying, by person. */
+  requestedCourses?: Readonly<Record<string, readonly string[]>>;
 }) {
   const router = useRouter();
   const [reasons, setReasons] = useState<Record<string, string>>({});
@@ -226,8 +230,8 @@ export function AccountApprovalQueue({
   const [search, setSearch] = useState('');
   const [sortOrder, setSortOrder] = useState<'oldest' | 'newest'>('oldest');
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(() => new Set());
-  // Which courses each application opens. Nothing is pre-ticked: the owner's
-  // rule is that access is granted by hand, course by course.
+  // Which courses each application opens. The course the person clicked
+  // before applying is ticked by default; everything else is ticked by hand.
   const [courseSelections, setCourseSelections] = useState<Record<string, ReadonlySet<string>>>({});
   const [openId, setOpenId] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
@@ -276,7 +280,17 @@ export function AccountApprovalQueue({
     refreshQueueNow();
   };
 
-  const coursesFor = (itemId: string) => courseSelections[itemId] ?? new Set<string>();
+  const requestedFor = (itemId: string): readonly string[] =>
+    (requestedCourses[itemId] ?? []).filter((courseId) =>
+      courses.some((course) => course.id === courseId),
+    );
+  const requestedTitles = (itemId: string) =>
+    requestedFor(itemId)
+      .map((courseId) => courses.find((course) => course.id === courseId)?.title)
+      .filter(Boolean)
+      .join(', ');
+  const coursesFor = (itemId: string): ReadonlySet<string> =>
+    courseSelections[itemId] ?? new Set(requestedFor(itemId));
 
   const setCourse = (itemIds: readonly string[], courseId: string, checked: boolean) => {
     setMessage('');
@@ -284,7 +298,7 @@ export function AccountApprovalQueue({
     setCourseSelections((current) => {
       const next = { ...current };
       for (const itemId of itemIds) {
-        const selection = new Set(current[itemId] ?? []);
+        const selection = new Set(current[itemId] ?? requestedFor(itemId));
         if (checked) selection.add(courseId);
         else selection.delete(courseId);
         next[itemId] = selection;
@@ -590,6 +604,11 @@ export function AccountApprovalQueue({
                   <span className="block truncate text-sm text-[var(--color-text-muted)]">
                     {subtitle || 'Должность и компания не указаны'}
                   </span>
+                  {requestedTitles(item.id) ? (
+                    <span className="block truncate text-sm font-semibold text-[var(--color-primary)]">
+                      Выбрал курс: {requestedTitles(item.id)}
+                    </span>
+                  ) : null}
                   <span className="block truncate text-xs text-[var(--color-text-subtle)]">
                     {resolved
                       ? 'Решение сохранено. Обновляем очередь…'
@@ -672,6 +691,11 @@ export function AccountApprovalQueue({
                       <p className="mt-0.5 text-xs text-[var(--color-text-subtle)]">
                         Заявка от {dateTime(item.requestedAt)} · ответить до {dateTime(item.dueAt)}
                       </p>
+                      {requestedTitles(item.id) ? (
+                        <p className="mt-1 text-sm font-semibold break-words text-[var(--color-primary)]">
+                          Выбрал курс: {requestedTitles(item.id)} — отмечен ниже
+                        </p>
+                      ) : null}
                     </div>
                     <Button
                       type="button"

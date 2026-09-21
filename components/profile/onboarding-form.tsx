@@ -24,6 +24,7 @@ import {
   type ProfileValidationError,
 } from '@/lib/profile/fields';
 import type { PhoneCountryOption } from '@/lib/phone/countries';
+import { forgetRequestedCourses, readRequestedCourses } from '@/lib/profile/requested-courses';
 
 type FieldError = ProfileValidationError | Readonly<{ code: 'AVATAR_REQUIRED' }>;
 type FieldErrors = Partial<Record<ProfileSubmissionField | 'avatar', FieldError>>;
@@ -167,7 +168,10 @@ export function OnboardingForm({
       const result = await clientRequest('/api/profile/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(normalizeProfileSubmissionValues(form)),
+        body: JSON.stringify({
+          ...normalizeProfileSubmissionValues(form),
+          courseSlugs: readRequestedCourses(),
+        }),
       });
       if (!result.ok) {
         const payload = await readClientResponseJson<ErrorResponse>(result.response);
@@ -195,6 +199,7 @@ export function OnboardingForm({
       } catch {
         // Ignore storage errors
       }
+      forgetRequestedCourses();
       router.replace(localizePathname('/profile', locale));
       router.refresh();
     } catch (error) {
@@ -221,9 +226,11 @@ export function OnboardingForm({
     <form onSubmit={submit} className="space-y-6" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label className="sr-only" htmlFor="onboarding-name">{t('name')}</Label>
+          <Label className="sr-only" htmlFor="onboarding-name">
+            {t('name')}
+          </Label>
           <Input
-          placeholder={t('name')}
+            placeholder={t('name')}
             ref={nameRef}
             id="onboarding-name"
             autoComplete="given-name"
@@ -245,9 +252,11 @@ export function OnboardingForm({
           ) : null}
         </div>
         <div className="space-y-2">
-          <Label className="sr-only" htmlFor="onboarding-surname">{t('surname')}</Label>
+          <Label className="sr-only" htmlFor="onboarding-surname">
+            {t('surname')}
+          </Label>
           <Input
-          placeholder={t('surname')}
+            placeholder={t('surname')}
             ref={surnameRef}
             id="onboarding-surname"
             autoComplete="family-name"
@@ -269,9 +278,11 @@ export function OnboardingForm({
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label className="sr-only" htmlFor="onboarding-job">{t('job')}</Label>
+          <Label className="sr-only" htmlFor="onboarding-job">
+            {t('job')}
+          </Label>
           <Input
-          placeholder={t('job')}
+            placeholder={t('job')}
             ref={jobRef}
             id="onboarding-job"
             autoComplete="organization-title"
@@ -293,9 +304,11 @@ export function OnboardingForm({
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label className="sr-only" htmlFor="onboarding-organization">{t('organization')}</Label>
+          <Label className="sr-only" htmlFor="onboarding-organization">
+            {t('organization')}
+          </Label>
           <Input
-          placeholder={t('organization')}
+            placeholder={t('organization')}
             ref={organizationRef}
             id="onboarding-organization"
             list="onboarding-organization-options"
@@ -304,7 +317,9 @@ export function OnboardingForm({
             value={form.organization}
             onChange={update('organization')}
             invalid={Boolean(fieldErrors.organization)}
-            aria-describedby={fieldErrors.organization ? 'onboarding-organization-error' : undefined}
+            aria-describedby={
+              fieldErrors.organization ? 'onboarding-organization-error' : undefined
+            }
             required
           />
           <datalist id="onboarding-organization-options">
@@ -323,7 +338,9 @@ export function OnboardingForm({
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label className="sr-only" htmlFor="onboarding-education">{t('education')}</Label>
+          <Label className="sr-only" htmlFor="onboarding-education">
+            {t('education')}
+          </Label>
           <EducationSelect
             ref={educationRef}
             id="onboarding-education"

@@ -15,6 +15,7 @@ import type { Course } from '@/server/content/topics';
 import { ROUTES } from '@/lib/constants';
 import { useLocale, useTranslations } from 'next-intl';
 import { localizePathname } from '@/i18n/config';
+import { rememberRequestedCourse } from '@/lib/profile/requested-courses';
 
 export type CourseMaterialAccess =
   | 'anonymous'
@@ -117,6 +118,25 @@ function accessCta(
 // Keyed by course: since access is granted per course, one course's answer
 // says nothing about the next one the visitor opens.
 const cachedClientAccess = new Map<string, CourseMaterialAccess>();
+const cachedRequested = new Set<string>();
+
+/** Where a signed-in person without the course stands: they chose it, it goes to the administrator. */
+const RECORDED_STATES: ReadonlySet<CourseMaterialAccess> = new Set([
+  'legal_required',
+  'profile_incomplete',
+  'pending',
+]);
+
+async function sendCourseRequest(slug: string) {
+  const response = await fetch('/api/profile/course-access-request', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug }),
+  });
+  if (!response.ok) throw new Error('COURSE_ACCESS_REQUEST_FAILED');
+  const data = (await response.json()) as { status?: string };
+  return data.status;
+}
 
 export function CourseMaterialActions({
   course,
@@ -135,6 +155,9 @@ export function CourseMaterialActions({
   const [isResolving, setIsResolving] = useState(
     () => !cachedClientAccess.has(course.slug) && access === 'anonymous',
   );
+  const [request, setRequest] = useState<'idle' | 'sending' | 'sent' | 'failed'>(() =>
+    cachedRequested.has(course.slug) ? 'sent' : 'idle',
+  );
 
   useEffect(() => {
     let active = true;
@@ -145,6 +168,10 @@ export function CourseMaterialActions({
           if (active && data?.access) {
             cachedClientAccess.set(course.slug, data.access);
             setCurrentAccess(data.access);
+            if (data.requested === true) {
+              cachedRequested.add(course.slug);
+              setRequest('sent');
+            }
           }
         })
         .catch(() => undefined)
@@ -163,12 +190,40 @@ export function CourseMaterialActions({
     };
   }, [access, course.slug]);
 
+  // A newcomer who opened this course has chosen it: it is recorded quietly,
+  // so the approval queue ticks it for the administrator.
+  useEffect(() => {
+    if (!RECORDED_STATES.has(currentAccess)) return;
+    void sendCourseRequest(course.slug).catch(() => undefined);
+  }, [currentAccess, course.slug]);
+
+  const requestAccess = async () => {
+    if (request === 'sending' || request === 'sent') return;
+    setRequest('sending');
+    try {
+      const status = await sendCourseRequest(course.slug);
+      if (status === 'granted') {
+        cachedClientAccess.set(course.slug, 'approved');
+        setCurrentAccess('approved');
+        return;
+      }
+      cachedRequested.add(course.slug);
+      setRequest('sent');
+    } catch {
+      setRequest('failed');
+    }
+  };
+
   const filename = `${course.slug}.pdf`;
   const download = usePresentationDownload(
     course.presentation ? presentationDownloadUrl(course.presentation.url, course.slug) : undefined,
     filename,
   );
   const downloading = download.state === 'working';
+  const lockedCopy =
+    request === 'sent'
+      ? { title: t('access.requestedTitle'), description: t('access.requestedDescription') }
+      : { title: t('access.lockedTitle'), description: t('access.lockedDescription') };
   const cta = accessCta(currentAccess, course.slug, locale, {
     anonymous: {
       title: t('access.anonymousTitle'),
@@ -195,11 +250,7 @@ export function CourseMaterialActions({
       description: t('access.rejectedDescription'),
       label: t('access.rejectedLabel'),
     },
-    course_locked: {
-      title: t('access.lockedTitle'),
-      description: t('access.lockedDescription'),
-      label: t('access.lockedLabel'),
-    },
+    course_locked: { ...lockedCopy, label: t('access.lockedLabel') },
   });
 
   return (
@@ -266,9 +317,38 @@ export function CourseMaterialActions({
                     <p className="text-sm leading-6 text-[var(--color-text-muted)]">
                       {cta.description}
                     </p>
-                    <Button asChild size="lg" className="w-full">
-                      <Link href={cta.href}>{cta.label}</Link>
-                    </Button>
+                    {currentAccess === 'course_locked' ? (
+                      request === 'sent' ? null : (
+                        <Button
+                          type="button"
+                          size="lg"
+                          className="w-full"
+                          aria-busy={request === 'sending'}
+                          disabled={request === 'sending'}
+                          onClick={requestAccess}
+                        >
+                          {request === 'sending' ? t('access.requestSending') : cta.label}
+                        </Button>
+                      )
+                    ) : (
+                      <Button asChild size="lg" className="w-full">
+                        <Link
+                          href={cta.href}
+                          onClick={
+                            currentAccess === 'anonymous'
+                              ? () => rememberRequestedCourse(course.slug)
+                              : undefined
+                          }
+                        >
+                          {cta.label}
+                        </Link>
+                      </Button>
+                    )}
+                    {request === 'failed' ? (
+                      <p role="alert" className="text-sm text-[var(--color-danger)]">
+                        {t('access.requestFailed')}
+                      </p>
+                    ) : null}
                   </div>
                 ) : (
                   <>
