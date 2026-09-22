@@ -252,13 +252,19 @@ test('the admin dock is the site dock and survives a short window', async () => 
   assert.doesNotMatch(dockItem, /\buse[A-Z]\w*\(/u);
   assert.match(dockItem, /import Link from '@\/components\/shared\/navigation-link';/u);
 
-  // The phone branch hands everything to the shared item; the 3 + 2 wrap below
-  // 360 px is the only thing the admin adds.
+  // The phone branch hands everything to the shared item; the wrap is the only
+  // thing the admin adds: five items go 3 + 2 below 360 px, the last one
+  // taking the rest of the row; six («Документы») go 3 + 3 below 400 px.
   assert.match(
     navLink,
-    /if \(mobile\) \{\s*return \(\s*<DockItem\s+href=\{href\}\s+label=\{label\}\s+shortLabel=\{shortLabel\}\s+active=\{active\}\s+className="last:col-span-2 min-\[360px\]:last:col-span-1"/u,
+    /if \(mobile\) \{\s*return \(\s*<DockItem\s+href=\{href\}\s+label=\{label\}\s+shortLabel=\{shortLabel\}\s+active=\{active\}\s+className=\{spanLast \? 'last:col-span-2 min-\[360px\]:last:col-span-1' : undefined\}/u,
   );
-  assert.match(layout, /<div className="grid grid-cols-3 gap-0\.5 min-\[360px\]:grid-cols-5">/u);
+  assert.match(
+    layout,
+    /className=\{`grid grid-cols-3 gap-0\.5 \$\{sixItems \? 'xs:grid-cols-6' : 'min-\[360px\]:grid-cols-5'\}`\}/u,
+  );
+  assert.match(layout, /spanLast=\{!sixItems\}/u);
+  assert.match(layout, /href: '\/admin\/documents', icon: Certificate, label: 'Документы'/u);
   assert.match(layout, /label: 'Сотрудники', shortLabel: 'Люди'/u);
 
   // The pill takes the classes of the public dock, minus its fixed height.

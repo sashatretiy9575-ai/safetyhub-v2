@@ -17,7 +17,6 @@ import {
   type CertificateRenderMetadata,
 } from '@/lib/pdf/certificate-client-contract';
 import { certificateFilename } from '@/lib/pdf/certificate';
-import { findCertificateDocumentBatch } from '@/server/certificates/document-editor';
 import { numberFromDate, documentDate } from '@/lib/pdf/document-editor';
 import { certificateBranding, certificateSettingsSchema } from '@/server/certificates/settings';
 import { documentProfileSchema } from '@/server/certificates/document-profiles';
@@ -195,12 +194,9 @@ export async function createCertificateRenderMetadata(
         .eq('id', data.userId)
         .single();
   if (profile?.error) throw profile.error;
-  const batch =
-    !snapshot && data.organization
-      ? await findCertificateDocumentBatch(data.organization, data.testSlug)
-      : null;
-  const protocolDate =
-    snapshot?.protocolDate ?? batch?.date ?? documentDate(new Date(data.issuedAt));
+  // Every certificate carries a snapshot since 19 September 2026; one without
+  // it would be dated by the day it was issued.
+  const protocolDate = snapshot?.protocolDate ?? documentDate(new Date(data.issuedAt));
   let stableBranding = snapshot ? certificateBranding(snapshot.settings) : branding;
   if (snapshot?.profile) stableBranding = applyDocumentProfile(stableBranding, snapshot.profile);
   if (snapshot?.protocolLayoutVersion)
@@ -240,7 +236,7 @@ export async function createCertificateRenderMetadata(
     verificationUrl: certificateVerificationUrl(siteUrl, verificationToken),
     branding: {
       ...stableBranding,
-      protocolNumber: snapshot?.protocolNumber ?? batch?.number ?? numberFromDate(protocolDate),
+      protocolNumber: snapshot?.protocolNumber ?? numberFromDate(protocolDate),
       protocolDate,
     },
   };

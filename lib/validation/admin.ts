@@ -151,7 +151,9 @@ export const saveTestSchema = z
       .trim()
       .toLowerCase()
       .regex(TEST_EDITOR_SLUG_PATTERN)
-      .max(TEST_EDITOR_LIMITS.slugMax),
+      .max(TEST_EDITOR_LIMITS.slugMax)
+      // «Документы → Общее» lives at /admin/documents/common; a course cannot take its address.
+      .refine((slug) => slug !== 'common', 'Этот адрес занят, выберите другой.'),
     title: z.string().trim().min(TEST_EDITOR_LIMITS.titleMin).max(TEST_EDITOR_LIMITS.titleMax),
     description: z.string().trim().max(TEST_EDITOR_LIMITS.descriptionMax).default(''),
     icon: z

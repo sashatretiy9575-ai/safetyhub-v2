@@ -122,15 +122,17 @@ export function DestructiveDialog({
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
-          aria-describedby={descriptionId}
+          aria-describedby={description ? descriptionId : undefined}
           className="w-full max-w-md rounded-[var(--radius-group)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 shadow-2xl"
         >
           <h2 id={titleId} className="text-xl font-bold break-words">
             {title}
           </h2>
-          <p id={descriptionId} className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
-            {description}
-          </p>
+          {description ? (
+            <p id={descriptionId} className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
+              {description}
+            </p>
+          ) : null}
 
           {needsAcknowledgement ? (
             <label className="mt-5 flex min-h-12 cursor-pointer items-start gap-3 rounded-[var(--radius-control)] bg-[var(--color-danger-soft)] p-3 text-sm font-semibold">

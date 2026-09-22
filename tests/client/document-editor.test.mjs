@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import test from 'node:test';
 import { PDFDict, PDFDocument, PDFName } from 'pdf-lib';
-import { documentDate, numberFromDate, newDocumentBatch, changeDocumentDate, insertSizeProblem, DOCUMENT_DEFAULTS } from '../../lib/pdf/document-editor.ts';
+import { documentDate, numberFromDate, insertSizeProblem, DOCUMENT_DEFAULTS } from '../../lib/pdf/document-editor.ts';
 import { generateProtocolInBrowser } from '../../lib/pdf/protocol-renderer.ts';
 import { generateCertificateInBrowser } from '../../lib/pdf/certificate-renderer.ts';
 
@@ -16,13 +16,11 @@ async function renderPageForReview(page, filename) {
   await writeFile('test-results/document-editor-layout/' + filename, canvas.toBuffer('image/png'));
 }
 
-test('protocol date follows Oral midnight and manual numbers survive date changes', () => {
+test('protocol date follows Oral midnight and the number follows the date', () => {
   assert.equal(documentDate(new Date('2026-09-08T18:59:59Z')), '2026-09-08');
   assert.equal(documentDate(new Date('2026-09-08T19:00:00Z')), '2026-09-09');
   assert.equal(numberFromDate('2026-01-02'), '02.01');
-  const batch = newDocumentBatch('Компания', 'biot');
-  assert.equal(changeDocumentDate(batch, '2026-09-08').number, '08.09');
-  assert.equal(changeDocumentDate({ ...batch, number: 'CUSTOM/1', automatic: false }, '2026-09-08').number, 'CUSTOM/1');
+  assert.equal(numberFromDate('2026-09-08'), '08.09');
 });
 
 test('an insert size that cannot be printed is named by its side before it is sent', () => {

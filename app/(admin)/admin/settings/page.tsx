@@ -5,7 +5,6 @@ import { SiteContactsForm } from '@/components/admin/site-contacts-form';
 import {
   Buildings,
   CaretRight,
-  Certificate,
   ClockCounterClockwise,
   UsersThree,
 } from '@phosphor-icons/react/dist/ssr';
@@ -35,26 +34,6 @@ export default async function AdminSettingsPage() {
               <Buildings size={18} />
             </span>
             <span className="text-sm font-semibold">Компании</span>
-          </div>
-          <CaretRight
-            size={16}
-            className="text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
-          />
-        </Link>
-        <Link
-          href="/admin/settings/certificate"
-          className="group flex min-h-12 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-surface-muted)]"
-        >
-          <div className="flex items-center gap-3">
-            <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-              <Certificate size={18} />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-sm font-semibold">Документы</span>
-              <span className="block truncate text-xs text-[var(--color-text-muted)]">
-                Корочки клиентов и общие протоколы компаний
-              </span>
-            </span>
           </div>
           <CaretRight
             size={16}

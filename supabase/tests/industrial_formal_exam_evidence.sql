@@ -42,6 +42,8 @@ begin
  update public.certificates set revoked_at=statement_timestamp(),revoke_reason='formal exam regression' where id=c.id;
  -- The sitting this protocol records is the examination record: its number and
  -- its date are what the sheet is printed with, so nothing is typed in first.
+ -- The number is the one chosen in the issue dialog, as the RPC passes it on.
+ perform set_config('safetyhub.protocol_number','FORMAL-REGRESSION',true);
  issued:=pg_temp.copy_exam_certificate(c,'SH-FORMAL-ABSENT');
  select document_snapshot into snapshot from public.certificates where id=issued;
  if snapshot#>>'{participantFields,formalExamResult}'<>'passed'

@@ -16,7 +16,38 @@ export type DocumentSigner = {
   position: string;
   assetId: string | null;
 };
-export type DocumentProfile = {
+/**
+ * The commission and the stamp. One for every course: it is kept once, with
+ * the rest of «Общее», and written into a document's profile when the document
+ * is issued, so an issued document keeps the people it was signed by.
+ */
+export type DocumentCommission = {
+  /** The chairman first, then the members in the order they sign. */
+  signers: DocumentSigner[];
+  stampAssetId: string | null;
+};
+/** The training centre's own seal: the one stamp every document carries. */
+export const DOCUMENT_STAMP_OWNER = 'work-safety';
+/** A person added to the commission; their signatures are registered under this id. */
+export function newDocumentSignerId() {
+  const bytes = crypto.getRandomValues(new Uint8Array(4));
+  return `signer-${Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`;
+}
+export const BOOKLET_TEXT_KEYS = [
+  'examTextKk',
+  'examTextRu',
+  'knowledgeTextKk',
+  'knowledgeTextRu',
+] as const;
+export type BookletTexts = Record<(typeof BOOKLET_TEXT_KEYS)[number], string>;
+/**
+ * A course's own booklet. Absent, the course prints the booklet of «Общее».
+ * Every booklet is drawn on the standard layout today; the samples the
+ * training centre sends for other kinds of training become further layouts.
+ */
+export type DocumentBooklet = { layout: 'standard'; texts: BookletTexts };
+/** A course's documents for one listener category, as they are stored. */
+export type DocumentProfileSettings = {
   revision?: number;
   id: string;
   courseSlug: string;
@@ -26,14 +57,28 @@ export type DocumentProfile = {
   family: DocumentFamily;
   hours: number | null;
   validityMonths: number;
+  /** «Без срока» for a form that has a term by default; 0 months alone means "the form's term". */
+  noExpiry?: boolean;
   protocolText: string;
   decisionText: string;
   orderNumber: string;
   orderDate: string;
   verificationKind: string;
+  booklet?: DocumentBooklet;
+};
+/** The profile a document is drawn from: its settings and the commission of the day. */
+export type DocumentProfile = DocumentProfileSettings & {
   commission: DocumentSigner[];
   stampAssetId: string | null;
 };
+
+/** The settings of a course with the commission written in, as issuance writes it. */
+export function withDocumentCommission(
+  profile: DocumentProfileSettings,
+  commission: DocumentCommission,
+): DocumentProfile {
+  return { ...profile, commission: commission.signers, stampAssetId: commission.stampAssetId };
+}
 
 export function registeredDocumentAssetUrl(id: string) {
   return `/certificate-assets/registered?id=${id}`;
@@ -58,6 +103,7 @@ export function applyDocumentProfile(
     secondMemberName: members[1]?.name ?? '',
     secondMemberPosition: members[1]?.position ?? '',
     validityMonths: profile.validityMonths,
+    ...(profile.booklet ? profile.booklet.texts : {}),
     stampUrl: profile.stampAssetId ? registeredDocumentAssetUrl(profile.stampAssetId) : null,
     chairmanSignatureUrl: signature(chairman),
     protocolSignatureUrl: signature(chairman),

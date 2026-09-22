@@ -1,6 +1,6 @@
-import type { DocumentFamily, DocumentProfile } from './document-profile.ts';
+import type { DocumentFamily, DocumentProfileSettings } from './document-profile.ts';
 
-export type DocumentAudience = DocumentProfile['audience'];
+export type DocumentAudience = DocumentProfileSettings['audience'];
 
 /**
  * What the training centre's own protocols already say, for every programme and
@@ -103,14 +103,17 @@ export function documentFamilyDefaults(family: DocumentFamily | null | undefined
 /**
  * The profile as it is printed: every blank the administrator never filled in
  * carries the wording of the paper form. Stored values always win, so one
- * deliberate override is never overwritten by a default.
+ * deliberate override is never overwritten by a default. A term of 0 months is
+ * a blank too; «без срока» is said with `noExpiry`.
  */
-export function completeDocumentProfile(profile: DocumentProfile): DocumentProfile {
+export function completeDocumentProfile<T extends DocumentProfileSettings>(profile: T): T {
   const defaults = documentFamilyDefaults(profile.family);
   return {
     ...profile,
     hours: profile.hours ?? defaults.hours[profile.audience],
-    validityMonths: profile.validityMonths || defaults.validityMonths[profile.audience],
+    validityMonths: profile.noExpiry
+      ? 0
+      : profile.validityMonths || defaults.validityMonths[profile.audience],
     verificationKind: profile.verificationKind.trim() || defaults.verificationKind,
     protocolText: profile.protocolText.trim() || defaults.protocolText,
     decisionText: profile.decisionText.trim() || defaults.decisionText,

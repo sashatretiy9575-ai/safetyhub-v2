@@ -10,16 +10,6 @@ export type DocumentDefaults = {
   insertWidthCm?: number | null;
   insertHeightCm?: number | null;
 };
-export type DocumentBatch = {
-  id?: string;
-  organization: string;
-  courseSlug: string;
-  date: string;
-  number: string;
-  automatic: boolean;
-  version: number;
-  profileId?: string | null;
-};
 export type DocumentParticipant = {
   userId: string;
   fullName: string;
@@ -70,16 +60,6 @@ export function numberFromDate(date: string) {
  * which keeps the same limit.
  */
 export const PROTOCOL_MAX_PARTICIPANTS = 50;
-export function protocolPartNumber(base: string, part: number) {
-  return part > 1 ? `${base}-${part}` : base;
-}
-export function newDocumentBatch(organization: string, courseSlug: string): DocumentBatch {
-  const date = documentDate();
-  return { organization, courseSlug, date, number: numberFromDate(date), automatic: true, version: 0 };
-}
-export function changeDocumentDate(batch: DocumentBatch, date: string): DocumentBatch {
-  return { ...batch, date, number: batch.automatic ? numberFromDate(date) : batch.number };
-}
 export function documentCommission(branding: CertificateBranding): CommissionMember[] {
   return branding.documentDefaults?.commission ?? [
     { name: branding.memberName, position: branding.memberPosition },
@@ -91,10 +71,6 @@ export function documentStatement(text: string, branding: CertificateBranding, p
     .replaceAll('{program}', branding.documentProfile?.programName ?? program);
 }
 
-export function hasInsertSize(branding: CertificateBranding) {
-  const d = branding.documentDefaults;
-  return Boolean(d?.insertWidthCm && d?.insertHeightCm);
-}
 /** The open spread in centimetres: the smallest and the largest the layout is drawn for. */
 export const INSERT_SIZE_LIMITS = { insertWidthCm: [8, 60], insertHeightCm: [4, 30] } as const;
 export type InsertSizeKey = keyof typeof INSERT_SIZE_LIMITS;

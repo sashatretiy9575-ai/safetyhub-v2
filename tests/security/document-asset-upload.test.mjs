@@ -13,13 +13,12 @@ const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8
 const ROUTE = 'app/api/admin/documents/assets/route.ts';
 const SERVICE = 'server/certificates/document-assets.ts';
 const NORMALIZER = 'server/certificates/facsimile-normalize.ts';
-const REGISTRY = 'lib/pdf/document-asset-registry.ts';
 const NEW_FILES = [
   ROUTE,
   SERVICE,
   NORMALIZER,
-  REGISTRY,
-  'tests/client/document-asset-registry.test.mjs',
+  'components/admin/documents/facsimile-upload-tile.tsx',
+  'components/admin/documents/common-document-form.tsx',
   'tests/client/facsimile-browser.test.mjs',
   'tests/security/document-asset-upload.test.mjs',
 ];
@@ -53,14 +52,14 @@ test('nobody gets a body read, decoded or stored before origin, capability and b
       'targetOf(request)',
       "!== 'image/png'",
       'await readBoundedBytes(request, FACSIMILE_UPLOAD_MAX_BYTES)',
-      'await replaceDocumentAsset({ ...target, bytes })',
+      'await registerDocumentAsset({ ...target, bytes })',
     ],
     'the upload route',
   );
   // The service role writes here, so no RPC charges the actor: the route has to,
   // and the policy it names must be one the actor function knows.
   assert.match(rateLimit, /type BusinessQuotaAction =[^;]*\| 'site\.settings\.update';/u);
-  // One replacement is one unit, however many profiles it rebinds.
+  // One upload is one unit.
   assert.equal(route.match(/consumeBusinessQuota\(/gu)?.length, 1);
   assert.equal(route.match(/consumeAdminMutationQuota\(/gu)?.length, 1);
   assert.doesNotMatch(await read(SERVICE), /consume(?:Business|AdminMutation|Coarse)Quota/u);
@@ -80,29 +79,26 @@ test('nobody gets a body read, decoded or stored before origin, capability and b
     route,
     /error instanceof DocumentAssetError[\s\S]*?\{ error: error\.code \}, \{ status: 400 \}/u,
   );
-  assert.match(route, /\{ error: 'DOCUMENT_ASSET_PARTIAL', \.\.\.result \}, \{ status: 409 \}/u);
   assert.match(route, /return apiError\(error\);/u);
 });
 
-test('an image is stored under its digest, registered, and only then bound — by version', async () => {
+test('an image is stored under its digest and registered to its owner; saving «Общее» binds it', async () => {
   const service = await read(SERVICE);
   assert.match(service, /^import 'server-only';/u);
-  const replace = service.slice(service.indexOf('export async function replaceDocumentAsset'));
+  const register = service.slice(service.indexOf('export async function registerDocumentAsset'));
   assertOrder(
-    replace,
+    register,
     [
       "await requireCapability('site.settings.manage')",
-      'isDocumentAssetOwner(profiles, index, ownerId, kind)',
+      "(kind === 'stamp' && ownerId !== DOCUMENT_STAMP_OWNER)",
       "new DocumentAssetError('DOCUMENT_ASSET_OWNER_UNKNOWN')",
       'await normalizeFacsimile(bytes, { maxBytes: DOCUMENT_ASSET_MAX_BYTES })',
       "new DocumentAssetError('CERTIFICATE_IMAGE_INVALID')",
       "createHash('sha256').update(png).digest('hex')",
       'await storeFacsimile(client, `${sha256}.png`, png, sha256)',
-      'await registerAsset(client, ownerId, kind, sha256)',
-      'rebindProfile(client, profile, ownerId, kind, asset.id)',
-      'await readDocumentProfiles()',
+      'return registerAsset(client, ownerId, kind, sha256)',
     ],
-    'replaceDocumentAsset',
+    'registerDocumentAsset',
   );
   // Content-addressed and write-once: a taken name must already hold these bytes.
   assert.match(service, /upsert: false/u);
@@ -122,18 +118,9 @@ test('an image is stored under its digest, registered, and only then bound — b
     ],
     'registerAsset',
   );
-  // Compare-and-swap exactly like the profile editor, with a bounded re-read.
-  assert.match(service, /bindDocumentAsset\(current, ownerId, kind, assetId\)/u);
-  assert.match(
-    service,
-    /\.update\(\{ body, version: revision \+ 1, updated_at: new Date\(\)\.toISOString\(\) \}\)\s*\.eq\('id', body\.id\)\s*\.eq\('version', revision\)/u,
-  );
-  assert.match(service, /const REBIND_RETRIES = 2;/u);
-  assert.match(service, /if \(attempt >= REBIND_RETRIES\) return 'conflict';/u);
-  assert.match(service, /status: 'partial', asset, profiles: fresh, changed, conflicted/u);
-  // Issued certificates are not this module's business at all.
-  assert.doesNotMatch(service, /certificates'|document_snapshot|\.rpc\(/u);
-  assert.match(service, /\.in\('id', ids\)/u);
+  // Nothing is bound here: the commission names its images when «Общее» is
+  // saved, and issued certificates are not this module's business at all.
+  assert.doesNotMatch(service, /document_profiles|certificates'|document_snapshot|\.rpc\(/u);
 });
 
 test('nothing here can take an image away, and no image is committed with the code', async () => {
@@ -156,7 +143,6 @@ test('the normaliser is one pipeline with the budget of its destination', async 
   // A Node script imports the pipeline directly; it resolves neither of these.
   assert.doesNotMatch(normalizer, /import 'server-only'|from '@\//u);
   assert.match(legacy, /^import 'server-only';/u);
-  assert.match(legacy, /normalizeFacsimile\(bytes, \{ maxBytes: CERTIFICATE_IMAGE_MAX_BYTES \}\)/u);
   assert.match(
     legacy,
     /export \{[^}]*FACSIMILE_UPLOAD_MAX_BYTES[^}]*\} from '\.\/facsimile-normalize\.ts'/u,

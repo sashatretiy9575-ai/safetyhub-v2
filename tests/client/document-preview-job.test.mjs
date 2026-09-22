@@ -3,14 +3,13 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { PDFDict, PDFDocument, PDFName } from 'pdf-lib';
 import {
-  abortableDelay,
-  buildPreviewJob,
+  SAMPLE_ORGANIZATION,
   createBytesCache,
-  createSessionCache,
   isDiscreteChange,
   jobKey,
   protocolFontUrl,
   retryAfterSeconds,
+  samplePreviewJob,
 } from '../../lib/pdf/document-preview-job.ts';
 import {
   generateCertificateInBrowser,
@@ -50,24 +49,8 @@ const branding = {
   protocolSignatureUrl: '/certificate-assets/image?kind=protocol&v=7',
 };
 const CERTIFICATE_ID = '00000000-0000-4000-8000-0000000000a1';
-const draftPerson = {
-  userId: '00000000-0000-4000-8000-000000000001',
-  fullName: 'Участник Первый',
-  position: 'Инженер',
-  education: 'Высшее',
-  photoUrl: '/api/admin/documents/photo/00000000-0000-4000-8000-000000000001',
-  status: 'passed',
-  score: 9,
-  total: 10,
-  certificateId: null,
-};
-const issuedPerson = {
-  ...draftPerson,
-  userId: '00000000-0000-4000-8000-000000000002',
-  fullName: 'Участник Второй',
-  photoUrl: '/api/admin/documents/photo/00000000-0000-4000-8000-000000000002',
-  certificateId: CERTIFICATE_ID,
-};
+const engineer = { fullName: 'Иванов Иван', position: 'Инженер', education: 'Высшее' };
+const worker = { fullName: 'Петров Пётр', position: 'Слесарь', education: 'Среднее специальное' };
 const metadata = {
   schemaVersion: 1,
   certificateId: CERTIFICATE_ID,
@@ -90,225 +73,82 @@ const metadata = {
   verificationUrl: 'https://safetyhub.kz/verify/v1.test',
   branding: { ...branding, protocolNumber: '01.09', protocolDate: '2026-09-01' },
 };
-const state = (patch = {}) => ({
-  tab: 'certificate',
-  loading: false,
-  person: draftPerson,
-  metadata: null,
-  branding,
-  program: 'Работа на высоте',
-  organization: 'Компания',
-  sampleOrganization: 'Компания образца',
-  batch: { date: '2026-09-20' },
-  participants: [draftPerson, issuedPerson],
-  ...patch,
-});
+const job = (tab, patch = {}, person = engineer, program = 'Работа на высоте') =>
+  samplePreviewJob(tab, { ...branding, ...patch }, program, person);
 
-test('the job mirrors the editor: what is drawn, what is said instead, what is waited for', () => {
-  assert.deepEqual(buildPreviewJob(state({ loading: true })), { kind: 'wait' });
-  assert.deepEqual(buildPreviewJob(state({ loading: true, tab: 'protocol' })), { kind: 'wait' });
-  assert.deepEqual(buildPreviewJob(state({ person: undefined })), {
-    kind: 'message',
-    text: 'Выберите компанию, программу и сотрудника',
-  });
-  // The caller words the size it refuses; nobody is asked for a size before a person is chosen.
-  const sizeMessage = 'Общая ширина вкладыша: от 8 до 60 см';
-  assert.deepEqual(buildPreviewJob(state({ sizeMessage })), { kind: 'message', text: sizeMessage });
-  assert.equal(
-    buildPreviewJob(state({ sizeMessage, person: null })).text.startsWith('Выберите'),
-    true,
-  );
-  assert.equal(buildPreviewJob(state({ sizeMessage, tab: 'protocol' })).kind, 'protocol');
-
-  // An issued certificate waits for its own snapshot, not for the previous employee's.
-  assert.deepEqual(buildPreviewJob(state({ person: issuedPerson })), { kind: 'wait' });
-  const foreign = { ...metadata, certificateId: '00000000-0000-4000-8000-0000000000b2' };
-  assert.deepEqual(buildPreviewJob(state({ person: issuedPerson, metadata: foreign })), {
-    kind: 'wait',
-  });
+test('the preview is the document a course would print today for a sample person', () => {
+  const booklet = job('certificate');
+  assert.equal(booklet.kind, 'certificate');
+  assert.equal(booklet.input.fullName, 'Иванов Иван');
+  assert.equal(booklet.input.organization, SAMPLE_ORGANIZATION);
+  assert.equal(booklet.input.certificateNumber, 'ПРЕДПРОСМОТР');
+  assert.equal(booklet.input.photoUrl, null);
+  assert.equal(booklet.input.issuedAt, '2026-09-20T12:00:00+05:00');
+  assert.equal(booklet.input.branding.protocolNumber, '20.09');
+  const protocol = job('protocol', {}, worker);
+  assert.equal(protocol.kind, 'protocol');
+  assert.equal(protocol.input.organization, SAMPLE_ORGANIZATION);
+  assert.equal(protocol.input.date, '2026-09-20');
   assert.deepEqual(
-    buildPreviewJob(state({ person: issuedPerson, metadataMessage: 'Повторите через 40 с' })),
-    { kind: 'message', text: 'Повторите через 40 с' },
+    protocol.input.participants.map(({ fullName, position, education, status, score, total }) => ({
+      fullName,
+      position,
+      education,
+      status,
+      score,
+      total,
+    })),
+    [{ ...worker, status: 'passed', score: 10, total: 10 }],
   );
-  const issued = buildPreviewJob(state({ person: issuedPerson, metadata }));
-  assert.equal(issued.kind, 'certificate');
-  assert.equal(
-    issued.input,
-    metadata,
-    'the frozen snapshot itself, with nothing of the form in it',
-  );
-  // A snapshot left over from the previous employee never stands in for a draft.
-  assert.equal(buildPreviewJob(state({ metadata })).input.certificateNumber, 'ПРЕДПРОСМОТР');
-
-  const draft = buildPreviewJob(state());
-  assert.deepEqual(draft, {
-    kind: 'certificate',
-    input: {
-      schemaVersion: 1,
-      filename: 'Предпросмотр.pdf',
-      locale: 'ru',
-      templateVersion: 1,
-      templateUrl: '/certificate-assets/template',
-      fontUrl: '/certificate-assets/font?locale=ru&v=1',
-      fullName: 'Участник Первый',
-      position: 'Инженер',
-      organization: 'Компания',
-      titleSnapshot: 'Работа на высоте',
-      photoUrl: draftPerson.photoUrl,
-      score: 9,
-      total: 10,
-      passScore: 0,
-      certificateNumber: 'ПРЕДПРОСМОТР',
-      completedAt: '2026-09-20',
-      issuedAt: '2026-09-20T12:00:00+05:00',
-      branding,
-    },
-  });
-  assert.equal(
-    buildPreviewJob(state({ person: { ...draftPerson, score: null, total: null } })).input.total,
-    0,
-  );
-
-  const protocol = buildPreviewJob(state({ tab: 'protocol' }));
-  assert.deepEqual(protocol, {
-    kind: 'protocol',
-    input: {
-      organization: 'Компания',
-      courseTitle: 'Работа на высоте',
-      date: '2026-09-20',
-      items: [],
-      participants: [draftPerson, issuedPerson],
-    },
-    branding,
-    fontUrl: '/certificate-assets/font?locale=ru&v=1',
-  });
-  assert.equal(
-    buildPreviewJob(state({ tab: 'protocol', organization: '' })).input.organization,
-    'Компания образца',
-  );
-  assert.equal(
-    protocolFontUrl([{ fullName: '张伟' }]),
-    '/certificate-assets/font?locale=zh&v=Sans2.005',
-  );
+  assert.equal(protocol.fontUrl, '/certificate-assets/font?locale=ru&v=1');
+  assert.equal(protocolFontUrl([{ fullName: '王伟' }]), '/certificate-assets/font?locale=zh&v=Sans2.005');
 });
 
 test('a key is the arguments of the generator: nothing less and nothing else', () => {
-  const typed = { ...branding, chairmanName: 'Председатель Н.Н.', protocolNumber: 'НОВЫЙ/1' };
-  const issued = jobKey(buildPreviewJob(state({ person: issuedPerson, metadata })));
-  // F1: every keystroke used to regenerate the identical PDF of an issued certificate.
-  assert.equal(
-    jobKey(
-      buildPreviewJob(
-        state({
-          person: issuedPerson,
-          metadata,
-          branding: typed,
-          program: 'Другая программа',
-          organization: 'Другая компания',
-          batch: { date: '2027-01-01' },
-          participants: [],
-        }),
-      ),
-    ),
-    issued,
-  );
-  // A draft is drawn from the open fields, so each of them is in its key.
-  const draft = jobKey(buildPreviewJob(state()));
-  assert.notEqual(jobKey(buildPreviewJob(state({ branding: typed }))), draft);
-  assert.notEqual(jobKey(buildPreviewJob(state({ batch: { date: '2026-09-21' } }))), draft);
-  assert.notEqual(
-    jobKey(buildPreviewJob(state({ person: { ...draftPerson, position: 'Мастер' } }))),
-    draft,
-  );
-  // The protocol lists everybody: the chosen employee and a snapshot are not its business.
-  const protocol = jobKey(buildPreviewJob(state({ tab: 'protocol' })));
-  assert.equal(
-    jobKey(buildPreviewJob(state({ tab: 'protocol', person: issuedPerson, metadata }))),
-    protocol,
-  );
-  assert.equal(
-    jobKey(buildPreviewJob(state({ tab: 'protocol', person: null, sizeMessage: 'x' }))),
-    protocol,
-  );
-  assert.notEqual(jobKey(buildPreviewJob(state({ tab: 'protocol', branding: typed }))), protocol);
-  assert.notEqual(
-    jobKey(buildPreviewJob(state({ tab: 'protocol', participants: [draftPerson] }))),
-    protocol,
-  );
-  // The same state asked twice is the same PDF: a key is a cache address.
-  assert.equal(jobKey(buildPreviewJob(state())), draft);
+  const booklet = jobKey(job('certificate'));
+  assert.equal(jobKey(job('certificate')), booklet);
+  assert.notEqual(jobKey(job('certificate', { chairmanName: 'Председатель Н.Н.' })), booklet);
+  assert.notEqual(jobKey(job('certificate', { protocolDate: '2026-09-21' })), booklet);
+  assert.notEqual(jobKey(job('certificate', {}, worker)), booklet);
+  assert.notEqual(jobKey(job('certificate', {}, engineer, 'Другая программа')), booklet);
+  const protocol = jobKey(job('protocol'));
+  assert.notEqual(protocol, booklet);
+  assert.notEqual(jobKey(job('protocol', { protocolNumber: '15-П' })), protocol);
   assert.deepEqual(Object.keys(JSON.parse(protocol)), ['kind', 'input', 'branding', 'fontUrl']);
-  assert.deepEqual(Object.keys(JSON.parse(issued)), ['kind', 'input']);
+  assert.deepEqual(Object.keys(JSON.parse(booklet)), ['kind', 'input']);
 });
 
 test('a choice is drawn at once, typing waits for a pause', () => {
-  const draft = buildPreviewJob(state());
-  const protocol = buildPreviewJob(state({ tab: 'protocol' }));
-  const type = (patch) => ({ ...branding, ...patch });
-  // Typing: requisites, texts, the insert size, the date and the number, the sample names.
-  for (const next of [
-    state({ branding: type({ chairmanName: 'Председатель Н.' }) }),
-    state({ branding: type({ examTextRu: 'сдал экзамен' }) }),
-    state({
-      branding: type({ protocolNumber: '21.09', protocolDate: '2026-09-21' }),
-      batch: { date: '2026-09-21' },
-    }),
-    state({ branding: type({ validityMonths: 24 }) }),
-    state({
-      branding: type({
-        documentDefaults: { ...branding.documentDefaults, insertWidthCm: 30, commission: [] },
-      }),
-    }),
-    state({ program: 'Программа образца 2' }),
+  const booklet = job('certificate');
+  const protocol = job('protocol');
+  // Typing: requisites, texts, the insert size, the date and the number, the programme.
+  for (const [patch, program] of [
+    [{ chairmanName: 'Председатель Н.' }],
+    [{ examTextRu: 'сдал экзамен' }],
+    [{ protocolNumber: '21.09', protocolDate: '2026-09-21' }],
+    [{ validityMonths: 24 }],
+    [{ documentDefaults: { ...branding.documentDefaults, insertWidthCm: 30, commission: [] } }],
+    [{}, 'Программа образца 2'],
   ]) {
-    assert.equal(isDiscreteChange(draft, buildPreviewJob(next)), false);
-    assert.equal(
-      isDiscreteChange(protocol, buildPreviewJob({ ...next, tab: 'protocol', organization: '' })),
-      false,
-    );
+    assert.equal(isDiscreteChange(booklet, job('certificate', patch, engineer, program)), false);
+    assert.equal(isDiscreteChange(protocol, job('protocol', patch, engineer, program)), false);
   }
-  // Choices: the first job, a tab, an employee, a company's people, a picture, a profile.
-  assert.equal(isDiscreteChange(null, draft), true);
-  assert.equal(isDiscreteChange(draft, protocol), true);
-  assert.equal(isDiscreteChange(protocol, draft), true);
-  assert.equal(
-    isDiscreteChange(
-      draft,
-      buildPreviewJob(state({ person: { ...draftPerson, fullName: 'Участник Третий' } })),
-    ),
-    true,
-  );
-  assert.equal(
-    isDiscreteChange(draft, buildPreviewJob(state({ person: { ...draftPerson, photoUrl: null } }))),
-    true,
-  );
-  assert.equal(
-    isDiscreteChange(draft, buildPreviewJob(state({ person: issuedPerson, metadata }))),
-    true,
-  );
-  assert.equal(
-    isDiscreteChange(
-      protocol,
-      buildPreviewJob(state({ tab: 'protocol', participants: [issuedPerson] })),
-    ),
-    true,
-  );
-  const uploaded = type({ stampUrl: '/certificate-assets/image?kind=stamp&v=8' });
-  assert.equal(isDiscreteChange(draft, buildPreviewJob(state({ branding: uploaded }))), true);
-  assert.equal(
-    isDiscreteChange(protocol, buildPreviewJob(state({ tab: 'protocol', branding: uploaded }))),
-    true,
-  );
-  const profile = type({
-    documentProfile: { id: 'test-worker', revision: 2 },
-    chairmanName: 'Другой П.',
-  });
-  assert.equal(isDiscreteChange(draft, buildPreviewJob(state({ branding: profile }))), true);
+  // Choices: the first job, the other document, the other category, a picture, a profile.
+  assert.equal(isDiscreteChange(null, booklet), true);
+  assert.equal(isDiscreteChange(booklet, protocol), true);
+  assert.equal(isDiscreteChange(protocol, booklet), true);
+  assert.equal(isDiscreteChange(booklet, job('certificate', {}, worker)), true);
+  assert.equal(isDiscreteChange(protocol, job('protocol', {}, worker)), true);
+  const uploaded = { stampUrl: '/certificate-assets/registered?id=00000000-0000-4000-8000-000000000001' };
+  assert.equal(isDiscreteChange(booklet, job('certificate', uploaded)), true);
+  assert.equal(isDiscreteChange(protocol, job('protocol', uploaded)), true);
+  const profile = { documentProfile: { id: 'test-worker', revision: 2 }, chairmanName: 'Другой П.' };
+  assert.equal(isDiscreteChange(booklet, job('certificate', profile)), true);
   // «Повторить» asks for the same job again; a wait or a message is answered without a pause.
-  assert.equal(isDiscreteChange(draft, buildPreviewJob(state())), true);
-  assert.equal(isDiscreteChange({ kind: 'wait' }, draft), true);
+  assert.equal(isDiscreteChange(booklet, job('certificate')), true);
+  assert.equal(isDiscreteChange({ kind: 'wait' }, booklet), true);
   assert.equal(isDiscreteChange({ kind: 'message', text: 'x' }, protocol), true);
-  assert.equal(isDiscreteChange(draft, { kind: 'wait' }), true);
+  assert.equal(isDiscreteChange(booklet, { kind: 'wait' }), true);
 });
 
 test('the last four PDFs are kept, the one looked at longest ago goes first', () => {
@@ -334,71 +174,7 @@ test('the last four PDFs are kept, the one looked at longest ago goes first', ()
   assert.deepEqual(two.get('k3'), pdf(3));
 });
 
-test('a session downloads a photo once, never remembers a failure and survives a cancelled preview', async () => {
-  const cache = createSessionCache(2);
-  let loads = 0;
-  const load = (value) => async () => {
-    loads++;
-    return value;
-  };
-  assert.equal(await cache.get('a', load('A')), 'A');
-  assert.equal(await cache.get('a', load('never')), 'A');
-  assert.equal(loads, 1);
-
-  // A 403/503/429 is evicted: «Повторить» or the next preview asks again.
-  let fail = true;
-  const flaky = async () => {
-    loads++;
-    if (fail) throw new Error('CERTIFICATE_PHOTO_UNAVAILABLE');
-    return 'B';
-  };
-  await assert.rejects(cache.get('b', flaky), /CERTIFICATE_PHOTO_UNAVAILABLE/);
-  fail = false;
-  assert.equal(await cache.get('b', flaky), 'B');
-  assert.equal(loads, 3);
-  // A loader that throws before its first await is a failure like any other.
-  await assert.rejects(
-    cache.get('sync', () => {
-      throw new Error('SYNC');
-    }),
-    /SYNC/,
-  );
-  assert.equal(await cache.get('sync', load('S')), 'S');
-
-  // LRU: 'a' was evicted by 'b' and 'sync'; asking again downloads again.
-  const before = loads;
-  await cache.get('a', load('A2'));
-  assert.equal(loads, before + 1);
-
-  // One preview is cancelled while another waits for the same photo: the download goes on.
-  let release;
-  let shared = 0;
-  const slow = () => {
-    shared++;
-    return new Promise((resolve) => {
-      release = () => resolve('P');
-    });
-  };
-  const controller = new AbortController();
-  const first = cache.get('p', slow, controller.signal);
-  const second = cache.get('p', slow);
-  const cancelled = assert.rejects(first, { name: 'AbortError' });
-  controller.abort();
-  await cancelled;
-  release();
-  assert.equal(await second, 'P');
-  assert.equal(await cache.get('p', slow), 'P');
-  assert.equal(shared, 1);
-  await assert.rejects(cache.get('p', slow, controller.signal), { name: 'AbortError' });
-
-  assert.equal(cache.delete('p'), true);
-  const afterDelete = cache.get('p', load('P2'));
-  assert.equal(await afterDelete, 'P2');
-  cache.clear();
-  assert.equal(await cache.get('p', load('P3')), 'P3');
-});
-
-test('a quota answer becomes seconds to wait, and the wait can be cancelled', async () => {
+test('a quota answer becomes seconds to wait', () => {
   assert.equal(retryAfterSeconds('40'), 40);
   assert.equal(retryAfterSeconds(' 7 '), 7);
   assert.equal(retryAfterSeconds('0'), 1);
@@ -408,13 +184,6 @@ test('a quota answer becomes seconds to wait, and the wait can be cancelled', as
   const now = Date.parse('2026-09-20T10:00:00Z');
   assert.equal(retryAfterSeconds('Sun, 20 Sep 2026 10:00:30 GMT', 60, now), 30);
   assert.equal(retryAfterSeconds('Sun, 20 Sep 2026 09:00:00 GMT', 60, now), 1);
-
-  await abortableDelay(1);
-  const controller = new AbortController();
-  const waiting = assert.rejects(abortableDelay(60_000, controller.signal), { name: 'AbortError' });
-  controller.abort();
-  await waiting;
-  await assert.rejects(abortableDelay(60_000, controller.signal), { name: 'AbortError' });
 });
 
 test('a preview is drawn without the photo it could not get; a download never is', async () => {

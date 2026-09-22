@@ -30,7 +30,6 @@ test('the booklet and the protocol are drawn from one settings row that browsers
     /await requireCapability\('site\.settings\.manage'\);[\s\S]*?readJsonBody\(request, PATCH_BODY_LIMIT\)/u,
   );
   assert.match(route, /consumeAdminMutationQuota\(\s*'site\.settings\.update'/u);
-  assert.match(route, /CERTIFICATE_IMAGE_INVALID/u);
   assert.match(settings, /const PNG_MAGIC = \[0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a\]/u);
   assert.match(settings, /CERTIFICATE_IMAGE_MAX_BYTES = 400 \* 1024/u);
   // The stamp and signatures are served to signed-in sessions only, keyed by
@@ -48,29 +47,33 @@ test('the booklet and the protocol are drawn from one settings row that browsers
   assert.match(settings, /INSERT_SIZE_LIMITS\[key\]\[0\]\)\.max\(INSERT_SIZE_LIMITS\[key\]\[1\]\)/u);
 });
 
-test('the stamp and the signatures are pictures the administrator uploads, one save each', async () => {
-  const [migration, settings, route, normalizer, renderer] = await Promise.all([
+test('the stamp and the signatures are pictures the administrator uploads, drawn once «Общее» is saved', async () => {
+  const [migration, writes, settings, route, normalizer, renderer] = await Promise.all([
     read('supabase/migrations/20260917120000_document_facsimiles.sql'),
+    read('supabase/migrations/20260922110000_documents_admin_writes.sql'),
     read('server/certificates/settings.ts'),
-    read('app/api/admin/settings/certificate/image/route.ts'),
+    read('app/api/admin/documents/assets/route.ts'),
     read('server/certificates/facsimile-normalize.ts'),
     read('lib/pdf/certificate-renderer.ts'),
   ]);
-  // The editor migration switched images off; this one switches them back on
-  // and gives the protocol a signature of its own.
   assert.match(migration, /add column protocol_signature_png text/u);
   assert.doesNotMatch(migration, /DOCUMENT_IMAGES_DISABLED/u);
-  assert.match(migration, /message='CERTIFICATE_IMAGE_INVALID'/u);
   // This repository is public: a signature lives in the database, never in a migration.
-  assert.doesNotMatch(migration, /base64,[A-Za-z0-9+/]{32}/u);
-  // An image has its own route; the text save still cannot carry one.
-  assert.match(settings, /stampPng: z\.never\(\)\.optional\(\)/u);
+  for (const source of [migration, writes]) assert.doesNotMatch(source, /base64,[A-Za-z0-9+/]{32}/u);
+  // An image is stored on its own; the settings save names it by id and never carries its bytes.
+  const patch = settings.slice(settings.indexOf('export const certificateSettingsPatchSchema'));
+  assert.doesNotMatch(patch.slice(0, patch.indexOf('.strict();')), /Png:/u);
+  assert.match(settings, /documentCommission: documentCommissionSchema\.optional\(\)/u);
   assert.match(
     route,
-    /await authorize\(request\);[\s\S]*?readBoundedBytes\(request, FACSIMILE_UPLOAD_MAX_BYTES\)/u,
+    /await requireCapability\('site\.settings\.manage'\);[\s\S]*?readBoundedBytes\(request, FACSIMILE_UPLOAD_MAX_BYTES\)/u,
   );
   assert.match(route, /invalidOriginResponse\(request\)/u);
-  assert.match(route, /consumeAdminMutationQuota\('site\.settings\.update'/u);
+  assert.match(route, /consumeAdminMutationQuota\(\s*'site\.settings\.update'/u);
+  assert.doesNotMatch(route, /export async function DELETE/u);
+  // Every signature of the commission is the image registered to that very person.
+  assert.match(writes, /a\.owner_id=signer->>'signerId' and a\.kind='signature'/u);
+  assert.match(writes, /message='DOCUMENT_STAMP_INVALID'/u);
   // The whole PNG is decoded and re-encoded: pdf-lib parses it for every certificate.
   assert.match(normalizer, /failOn: 'warning'/u);
   assert.match(normalizer, /metadata\.format !== 'png'/u);
@@ -79,13 +82,12 @@ test('the stamp and the signatures are pictures the administrator uploads, one s
 });
 
 test('every certificate is a two-sided booklet drawn with its issuance snapshot', async () => {
-  const [contract, renderer, server, exportHelper, metadataRoute, sample] = await Promise.all([
+  const [contract, renderer, server, exportHelper, metadataRoute] = await Promise.all([
     read('lib/pdf/certificate-client-contract.ts'),
     read('lib/pdf/certificate-renderer.ts'),
     read('server/certificates/issuance.ts'),
     read('server/admin/certificate-export-archive.ts'),
     read('app/api/certificates/[certificateId]/metadata/route.ts'),
-    read('app/api/admin/settings/certificate/sample/route.ts'),
   ]);
   assert.match(contract, /export type CertificateBranding = Readonly<\{/u);
   assert.match(contract, /assertCertificateBranding\(item\.branding\)/u);
@@ -106,11 +108,6 @@ test('every certificate is a two-sided booklet drawn with its issuance snapshot'
   assert.match(server, /branding: CertificateBranding,/u);
   assert.match(exportHelper, /const branding = await loadCertificateBranding\(\);/u);
   assert.match(metadataRoute, /await loadCertificateBranding\(\)/u);
-  assert.match(sample, /requireCapability\('site\.settings\.manage'\)/u);
-  assert.match(
-    sample,
-    /createCertificateVerificationToken\('00000000-0000-4000-8000-000000000000'\)/u,
-  );
 });
 
 test('an export carries the workbook, one protocol per company and course, then the certificates', async () => {

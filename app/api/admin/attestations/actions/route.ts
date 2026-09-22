@@ -17,6 +17,13 @@ const ids = z
   .min(1)
   .max(ADMIN_ATTESTATION_BULK_LIMIT)
   .refine((values) => new Set(values).size === values.length, 'DUPLICATE_TARGET_IDS');
+// The sitting the issued documents record; the database refuses a date after today.
+const protocolDate = z.iso.date();
+const protocolNumber = z
+  .string()
+  .trim()
+  .max(40)
+  .regex(/^[^\p{Cc}]*$/u);
 const actionSchema = z.discriminatedUnion('action', [
   z
     .object({ action: z.literal('confirm'), userIds: ids, idempotencyKey: z.string().uuid() })
@@ -44,13 +51,21 @@ const actionSchema = z.discriminatedUnion('action', [
       }
     }),
   z
-    .object({ action: z.literal('issue'), attestationIds: ids, idempotencyKey: z.string().uuid() })
+    .object({
+      action: z.literal('issue'),
+      attestationIds: ids,
+      idempotencyKey: z.string().uuid(),
+      protocolDate: protocolDate.optional(),
+      protocolNumber: protocolNumber.optional(),
+    })
     .strict(),
   z
     .object({
       action: z.literal('confirm_and_issue'),
       attestationIds: ids,
       idempotencyKey: z.string().uuid(),
+      protocolDate: protocolDate.optional(),
+      protocolNumber: protocolNumber.optional(),
     })
     .strict(),
 ]);
@@ -91,9 +106,11 @@ export async function POST(request: Request) {
               field: action.field,
               value: action.value,
             }
-          : action.action === 'confirm_and_issue'
-            ? { action: 'confirm_and_issue', targetIds: action.attestationIds }
-            : { action: 'issue', targetIds: action.attestationIds },
+          : {
+              action: action.action,
+              targetIds: action.attestationIds,
+              protocol: { date: action.protocolDate, number: action.protocolNumber || null },
+            },
     );
     return NextResponse.json(operation);
   } catch (error) {

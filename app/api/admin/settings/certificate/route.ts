@@ -39,15 +39,9 @@ export async function PATCH(request: Request) {
       await readJsonBody(request, PATCH_BODY_LIMIT),
     );
     if (!parsed.success) {
-      const imageIssue = parsed.error.issues.find(
-        (issue) => issue.message === 'CERTIFICATE_IMAGE_INVALID',
-      );
-      // The editor names the refused field to the administrator instead of «повторите».
+      // The page names the refused field to the administrator instead of «повторите».
       const field = parsed.error.issues[0]?.path.map(String).join('.') ?? '';
-      return NextResponse.json(
-        { error: imageIssue ? 'CERTIFICATE_IMAGE_INVALID' : 'INVALID_REQUEST', field },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'INVALID_REQUEST', field }, { status: 400 });
     }
 
     const settings = await updateCertificateSettings(parsed.data);

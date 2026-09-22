@@ -3,7 +3,7 @@
 //
 //   node scripts/build-facsimile-png.mjs <scan> <left,top,width,height> <output.png> [--rotate=<degrees>] [--widen=<factor>]
 //
-// The result is uploaded in /admin/settings/certificate. It is the owner's
+// The result is uploaded in «Документы → Общее» (/admin/documents/common). It is the owner's
 // signature: keep it out of this repository, which is public.
 import path from 'node:path';
 import process from 'node:process';

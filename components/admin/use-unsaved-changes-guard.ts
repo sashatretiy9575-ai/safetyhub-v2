@@ -7,20 +7,28 @@ import { confirmDialog } from '@/components/admin/confirm-dialog';
 const LEAVE_WARNING =
   'Изменения сохранены только на этом устройстве. Покинуть редактор без сохранения на сервере?';
 
-function askToLeave() {
+/** What the question says; a page whose drafts live nowhere else asks without the device note. */
+export type LeaveQuestion = Readonly<{ title: string; description?: string }>;
+const EDITOR_QUESTION: LeaveQuestion = { title: 'Покинуть редактор?', description: LEAVE_WARNING };
+
+function askToLeave(question: LeaveQuestion) {
   return confirmDialog({
-    title: 'Покинуть редактор?',
-    description: LEAVE_WARNING,
+    title: question.title,
+    description: question.description ?? '',
     confirmLabel: 'Покинуть',
     busyLabel: 'Выходим…',
   });
 }
 
-export function useUnsavedChangesGuard(dirty: boolean) {
+export function useUnsavedChangesGuard(dirty: boolean, question: LeaveQuestion = EDITOR_QUESTION) {
   const router = useRouter();
   const navigationApprovedRef = useRef(false);
   const historyBounceRef = useRef(false);
   const askingRef = useRef(false);
+  const questionRef = useRef(question);
+  useEffect(() => {
+    questionRef.current = question;
+  });
 
   useEffect(() => {
     if (!dirty) return;
@@ -59,7 +67,7 @@ export function useUnsavedChangesGuard(dirty: boolean) {
       event.stopPropagation();
       if (askingRef.current) return;
       askingRef.current = true;
-      void askToLeave().then((confirmed) => {
+      void askToLeave(questionRef.current).then((confirmed) => {
         askingRef.current = false;
         if (!confirmed) return;
         navigationApprovedRef.current = true;
@@ -77,7 +85,7 @@ export function useUnsavedChangesGuard(dirty: boolean) {
       window.history.go(1);
       if (askingRef.current) return;
       askingRef.current = true;
-      void askToLeave().then((confirmed) => {
+      void askToLeave(questionRef.current).then((confirmed) => {
         askingRef.current = false;
         if (!confirmed) return;
         navigationApprovedRef.current = true;

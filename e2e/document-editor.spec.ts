@@ -3,16 +3,18 @@ import { resetLocalDocumentSettingsQuota } from './helpers/local-document-settin
 
 test.use({ storageState: process.env.E2E_ADMIN_STORAGE_STATE, channel: 'chrome' });
 
-// Each scenario/retry starts with its own synthetic actor budget. The product
-// limit remains intact during the scenario and is tested separately.
+// Each scenario/retry that saves settings starts with its own synthetic actor
+// budget. The product limit remains intact and is tested separately.
 test.beforeEach(async ({ page }, testInfo) => {
-  if (/company protocol|photographed stamp/.test(testInfo.title)) {
+  if (/set up once|«Общее»/.test(testInfo.title)) {
     await resetLocalDocumentSettingsQuota(page.request, String(testInfo.project.use.baseURL));
   }
 });
 
+const LOCAL = ['localhost', '127.0.0.1'];
+
 // A click that lands before React hydrates is lost, and on a CI runner that window is seconds wide.
-async function openEditor(page: Page, url?: string) {
+async function openPage(page: Page, url?: string) {
   if (url) await page.goto(url);
   else await page.reload();
   await expect(page.locator('.document-editor[data-hydrated]')).toBeVisible();
@@ -35,42 +37,46 @@ async function settledCanvases(page: Page) {
   }).toPass({ timeout: 30_000 });
 }
 
-test('protected photo route returns JPEG from a real private storage manifest', async ({
-  page,
-}, testInfo) => {
-  const base = String(testInfo.project.use.baseURL);
-  if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('LOCAL_ONLY');
-  const identity = await (await page.request.get('/api/identity')).json();
-  expect(identity.userId).toBeTruthy();
-  let photo = await page.request.get('/api/admin/documents/photo/' + identity.userId);
-  if (photo.status() === 404) {
-    const sharp = (await import('sharp')).default;
-    const fixture = await sharp({
-      create: { width: 360, height: 360, channels: 3, background: '#738491' },
-    })
-      .jpeg()
-      .toBuffer();
-    const upload = await page.request.post('/api/profile/avatar', {
-      headers: { origin: base },
-      multipart: { avatar: { name: 'local-fixture.jpg', mimeType: 'image/jpeg', buffer: fixture } },
-    });
-    expect(upload.ok(), await upload.text()).toBeTruthy();
-    photo = await page.request.get('/api/admin/documents/photo/' + identity.userId);
-  }
-  expect(photo.status()).toBe(200);
-  expect(photo.headers()['content-type']).toContain('image/jpeg');
-  expect(photo.headers()['cache-control']).toContain('no-store');
-  expect((await photo.body()).subarray(0, 2).toString('hex')).toBe('ffd8');
-});
+/** A labelled geometric fixture, never an actual person's signature or seal. */
+async function fixturePng(label: string, colour = '#1d3fa8') {
+  const sharp = (await import('sharp')).default;
+  return sharp(
+    Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="120"><circle cx="120" cy="60" r="50" fill="none" stroke="${colour}" stroke-width="6"/><text x="40" y="66" font-size="14" fill="${colour}">${label}</text></svg>`,
+    ),
+  )
+    .png()
+    .toBuffer();
+}
 
-test('company protocol, individual booklet, persistence and mobile preview', async ({
+async function saveCourse(page: Page) {
+  const saved = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/admin/documents/courses/') &&
+      response.request().method() === 'PUT',
+  );
+  await page.getByRole('button', { name: 'Сохранить', exact: true }).click();
+  const response = await saved;
+  expect(response.status(), await response.text()).toBe(200);
+  await expect(page.getByRole('status').filter({ hasText: 'Сохранено' }).first()).toBeVisible();
+}
+
+/** The seed's setup of a course: the general form, one category, the form's hours. */
+async function chooseGeneralForm(page: Page) {
+  await page.getByRole('button', { name: 'Форма протокола' }).click();
+  await page.getByRole('button', { name: 'Общий', exact: true }).click();
+  await page.getByRole('radio', { name: 'Одна', exact: true }).click();
+  const hours = page.getByRole('spinbutton', { name: 'Часы', exact: true });
+  if (await hours.inputValue()) await hours.fill('');
+}
+
+test('a course is set up once in «Документы»: its form, two categories, the preview', async ({
   page,
 }, testInfo) => {
   test.setTimeout(180_000);
   page.setDefaultTimeout(30_000);
-  const base = testInfo.project.use.baseURL;
-  if (!base || !['localhost', '127.0.0.1'].includes(new URL(base).hostname))
-    throw new Error('LOCAL_ONLY');
+  const base = String(testInfo.project.use.baseURL);
+  if (!LOCAL.includes(new URL(base).hostname)) throw new Error('LOCAL_ONLY');
   const errors: string[] = [];
   page.on('console', (message) => {
     if (
@@ -79,415 +85,210 @@ test('company protocol, individual booklet, persistence and mobile preview', asy
     )
       errors.push(message.text());
   });
-  page.on('response', async (response) => {
-    if (
-      response.request().method() === 'PATCH' &&
-      response.status() >= 400 &&
-      response.status() !== 409
-    ) {
-      console.error('Document mutation failed', response.status(), (await response.json()).error);
-    }
-  });
-  const manualNumber = 'EDITOR/' + Date.now();
-  // The actions are laid out twice, in the top row of a desktop and under the thumb on a phone; one is shown.
-  const saved = page.getByText('Сохранено', { exact: true }).filter({ visible: true });
-  page.on('pageerror', (error) => errors.push(error.message));
-  await openEditor(page, '/admin/settings/certificate');
+
+  await page.goto('/admin/documents');
   await expect(page.getByRole('heading', { name: 'Документы', exact: true })).toBeVisible();
-  const response = await page.request.get('/api/admin/documents');
-  expect(response.ok()).toBeTruthy();
-  const initial = await response.json();
-  let chosen: { organization: string; course: string; user: string; count: number } | null = null;
-  for (const organization of initial.organizations) {
-    for (const course of initial.courses) {
-      const r = await page.request.get('/api/admin/documents', {
-        params: { organization, course: course.slug },
-      });
-      const result = await r.json();
-      const participant = result.participants?.find(
-        (p: { certificateId: string | null }) => p.certificateId,
-      );
-      if (participant) {
-        chosen = {
-          organization,
-          course: course.slug,
-          user: participant.userId,
-          count: result.participants.length,
-        };
-        break;
-      }
-    }
-    if (chosen) break;
-  }
-  expect(chosen, 'seeded company must include an issued certificate').not.toBeNull();
-  const originalCompany = await (
-    await page.request.get('/api/admin/documents', { params: chosen! })
-  ).json();
-  const originalCertificateId = originalCompany.participants.find(
-    (p: { userId: string }) => p.userId === chosen!.user,
-  ).certificateId;
-  const originalMetadata = await (
-    await page.request.get(`/api/certificates/${originalCertificateId}/metadata`)
-  ).json();
-  expect(
-    originalMetadata.branding.documentDefaults?.insertWidthCm,
-    'seeded issuance must capture insert width before its immutable snapshot is created',
-  ).toBeGreaterThan(0);
-  expect(
-    originalMetadata.branding.documentDefaults?.insertHeightCm,
-    'seeded issuance must capture insert height before its immutable snapshot is created',
-  ).toBeGreaterThan(0);
-  await openEditor(
-    page,
-    '/admin/settings/certificate?' +
-      new URLSearchParams({
-        organization: chosen!.organization,
-        course: chosen!.course,
-        user: chosen!.user,
-      }),
-  );
-  await expect(page.getByRole('button', { name: 'Изменить', exact: true })).toBeVisible();
-  // Rare settings are one line each until opened; what was open survives a reload.
-  await page.getByRole('radio', { name: 'Удостоверение', exact: true }).click();
-  await page.getByRole('button', { name: /^Размер вкладыша/ }).click();
-  // A size typed in millimetres is named at its field and is never sent to be refused.
-  let refusedSaves = 0;
-  page.on('request', (request) => {
-    if (request.method() === 'PATCH' && request.url().endsWith('/api/admin/settings/certificate'))
-      refusedSaves++;
-  });
-  const spreadWidth = page.getByLabel('Общая ширина разворота, см', { exact: true });
-  await spreadWidth.fill('320');
-  await expect(page.getByRole('button', { name: /^Размер вкладыша/ })).toContainText(
-    'Общая ширина вкладыша: от 8 до 60 см',
-  );
-  await expect(spreadWidth).toHaveAttribute('aria-invalid', 'true');
-  await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(
-    page
-      .getByRole('status')
-      .filter({ hasText: 'Общая ширина вкладыша: от 8 до 60 см', visible: true })
-      .first(),
-  ).toBeVisible();
-  await expect(spreadWidth).toBeFocused();
-  expect(refusedSaves).toBe(0);
-  await spreadWidth.fill('32');
-  await page.getByLabel('Высота, см', { exact: true }).fill('10');
-  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 30_000 });
-  // The chip over the pages says which document they are: this one is issued and frozen.
-  await expect(
-    page.getByText(`· № ${originalMetadata.certificateNumber}`).filter({ visible: true }),
-  ).toHaveText(/^Выдано \d{2}\.\d{2}\.\d{4} · № /);
-  await page.getByRole('radio', { name: 'Протокол', exact: true }).click();
-  // «Организация» where the program has a profile, «Организация и комиссия» where it has none.
-  await page.getByRole('button', { name: /^Организация/ }).click();
-  // The name of the number says whether it follows the date; whichever it says, it is one field.
-  const protocolDate = page.getByLabel('Дата протокола', { exact: true });
-  const protocolNumber = page.getByLabel(/^Номер протокола/);
-  await protocolDate.fill('2026-09-08');
-  const numberByDate = page.getByRole('button', { name: 'Номер по дате', exact: true });
-  await expect(numberByDate).toHaveAttribute('title', 'Номер по дате: 08.09');
-  await numberByDate.click();
-  await expect(page.getByLabel('Номер протокола · по дате', { exact: true })).toHaveValue('08.09');
-  await protocolNumber.fill(manualNumber);
-  await expect(page.getByLabel('Номер протокола', { exact: true })).toHaveValue(manualNumber);
-  await protocolDate.fill('2026-09-09');
-  await expect(protocolNumber).toHaveValue(manualNumber);
-  await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(saved).toBeVisible();
-  await openEditor(page);
-  await expect(protocolNumber).toHaveValue(manualNumber);
-  await expect(protocolDate).toHaveValue('2026-09-09');
-  const originalReviewer = await page.getByLabel('Проверяющий', { exact: true }).inputValue();
-  const changedReviewer = 'Проверяющий теста ' + Date.now();
-  await page.getByLabel('Проверяющий', { exact: true }).fill(changedReviewer);
-  await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(saved).toBeVisible();
-  await openEditor(page);
-  await expect(page.getByLabel('Проверяющий', { exact: true })).toHaveValue(changedReviewer);
-  const company = await (
-    await page.request.get('/api/admin/documents', { params: chosen! })
-  ).json();
-  const certificateId = company.participants.find(
-    (p: { userId: string }) => p.userId === chosen!.user,
-  ).certificateId;
-  const refreshed = await (
-    await page.request.get(`/api/certificates/${certificateId}/metadata`)
-  ).json();
-  expect(refreshed.branding).toEqual(originalMetadata.branding);
-  expect(refreshed.branding.protocolNumber).not.toBe(manualNumber);
-  expect(refreshed.education).toEqual(originalMetadata.education);
-  expect(refreshed.photoUrl).toEqual(originalMetadata.photoUrl);
-  await page.getByLabel('Проверяющий', { exact: true }).fill(originalReviewer);
-  await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(saved).toBeVisible();
-  const settings = (await (await page.request.get('/api/admin/settings/certificate')).json())
-    .settings;
-  const concurrent = await page.request.patch('/api/admin/settings/certificate', {
-    headers: { origin: base },
-    data: {
-      expectedVersion: settings.version,
-      documentDefaults: { ...settings.documentDefaults, reviewerName: 'Другой администратор' },
-    },
-  });
-  const concurrentBody = await concurrent.text();
-  expect(
-    concurrent.ok(),
-    `Concurrent settings update returned ${concurrent.status()}: ${concurrentBody}`,
-  ).toBeTruthy();
-  await page.getByLabel('Проверяющий', { exact: true }).fill('Сохранённый черновик');
-  await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(
-    page.getByText(/Настройки изменил другой администратор/).filter({ visible: true }),
-  ).toBeVisible();
-  await expect(page.getByLabel('Проверяющий', { exact: true })).toHaveValue('Сохранённый черновик');
-  await page.getByLabel('Проверяющий', { exact: true }).fill(originalReviewer);
-  await page.getByRole('button', { name: 'Сохранить настройки', exact: true }).click();
-  await expect(saved).toBeVisible();
-  await page.getByRole('radio', { name: 'Удостоверение', exact: true }).click();
-  await expect(page.locator('canvas')).toHaveCount(1, { timeout: 30_000 });
-  await expect(page.getByRole('button', { name: 'Скачать PDF', exact: true })).toBeEnabled();
-  await page.setViewportSize({ width: 240, height: 812 });
-  await page.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
-  // Going to the fields and back draws nothing again: the very same canvas is still on the page.
+  await page.getByRole('link', { name: /^Пожарная безопасность/u }).click();
+  await expect(page).toHaveURL(/\/admin\/documents\/pozharnaya-bezopasnost$/u);
+  await expect(page.locator('.document-editor[data-hydrated]')).toBeVisible();
   await settledCanvases(page);
-  const keptCanvas = await page.locator('canvas').first().getAttribute('id');
-  for (let round = 0; round < 2; round++) {
-    await page.getByRole('radio', { name: 'Поля', exact: true }).click();
-    await expect(page.locator('canvas').first()).toBeHidden();
-    await page.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
-  }
-  await settledCanvases(page);
-  await expect(page.locator('canvas').first()).toHaveAttribute('id', keptCanvas!);
-  const halves = page.getByRole('radiogroup', { name: 'Половина разворота', exact: true });
-  await halves.getByRole('radio', { name: 'Правая половина', exact: true }).click();
-  expect(
-    await page.locator('.document-insert').evaluate((el) => getComputedStyle(el).transform),
-  ).not.toBe('none');
-  await halves.getByRole('radio', { name: 'Левая половина', exact: true }).click();
-  // The half slides into place; the check waits for it to arrive.
-  await expect
-    .poll(() => page.locator('.document-insert').evaluate((el) => getComputedStyle(el).transform))
-    .toBe('none');
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.screenshot({ path: testInfo.outputPath('booklet-desktop.png'), fullPage: true });
-  // A wider frame redraws the sheet at the new sharpness; the picture is taken of the settled canvas.
-  await expect(async () => {
-    await page
-      .locator('canvas')
-      .first()
-      .screenshot({ path: testInfo.outputPath('booklet-side-1.png'), timeout: 5_000 });
-  }).toPass();
-  const downloadEvent = page.waitForEvent('download', { timeout: 45_000 });
-  await page.getByRole('button', { name: 'Скачать PDF', exact: true }).click();
-  const bookletDownload = await downloadEvent;
-  expect(bookletDownload.suggestedFilename()).toMatch(/\.pdf$/);
-  await bookletDownload.saveAs(testInfo.outputPath('booklet.pdf'));
-  await page.getByRole('radio', { name: 'Протокол', exact: true }).click();
-  await expect(page.locator('canvas').first()).toBeVisible();
-  await page.screenshot({ path: testInfo.outputPath('protocol-desktop.png'), fullPage: true });
-  const zipEvent = page.waitForEvent('download', { timeout: 90_000 });
-  await page.getByRole('button', { name: 'Скачать комплект компании', exact: true }).click();
-  expect((await zipEvent).suggestedFilename()).toMatch(/\.zip$/);
-  const draftPerson = company.participants.find(
-    (p: { certificateId: string | null }) => !p.certificateId,
+  // A retry may find the course as an earlier attempt left it: start from the seed's.
+  await chooseGeneralForm(page);
+  if (await page.getByRole('button', { name: 'Сохранить', exact: true }).isEnabled())
+    await saveCourse(page);
+
+  await page.getByRole('button', { name: 'Форма протокола' }).click();
+  await page.getByRole('button', { name: 'ПТМ', exact: true }).click();
+  await page.getByRole('radio', { name: 'ИТР и рабочие', exact: true }).click();
+  await page.getByRole('spinbutton', { name: 'Часы, ИТР' }).fill('40');
+  await expect(page.getByRole('spinbutton', { name: 'Часы, Рабочие' })).toHaveAttribute(
+    'placeholder',
+    '10',
   );
-  if (draftPerson) {
-    await page.getByRole('radio', { name: 'Удостоверение', exact: true }).click();
-    await page.getByLabel('Сотрудник', { exact: true }).click();
-    await page.getByRole('button', { name: draftPerson.fullName, exact: true }).click();
-    await expect(page.getByText('Новая выдача', { exact: true })).toBeVisible();
-    await expect(page.locator('canvas')).toHaveCount(1);
-    await expect(page.getByRole('button', { name: 'Скачать PDF', exact: true })).toBeDisabled();
-    await page.getByRole('radio', { name: 'Протокол', exact: true }).click();
-  }
-  await page.setViewportSize({ width: 240, height: 740 });
-  await page.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
-  await expect(page.locator('canvas').first()).toBeVisible();
+  await saveCourse(page);
+
+  // It holds after a reload, and the list of courses says so.
+  await openPage(page);
+  await expect(page.getByRole('radio', { name: 'ИТР и рабочие', exact: true })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await expect(page.getByRole('spinbutton', { name: 'Часы, ИТР' })).toHaveValue('40');
+  await expect(page.getByRole('button', { name: 'Форма протокола' })).toContainText('ПТМ');
+  await page.goto('/admin/documents');
+  await expect(page.getByRole('link', { name: /^Пожарная безопасность/u })).toContainText(
+    'ПТМ · ИТР 40 ч, рабочие 10 ч · корочка общая',
+  );
+
+  // A phone: nothing wider than the screen, the booklet shows half at a time.
+  await page.setViewportSize({ width: 320, height: 800 });
+  await openPage(page, '/admin/documents/pozharnaya-bezopasnost?preview=booklet');
+  await expect(page.getByRole('radio', { name: 'Корочка', exact: true })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await expect(page.getByRole('radiogroup', { name: 'Половина разворота' })).toBeVisible();
+  await settledCanvases(page);
   expect(
-    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-  ).toBeTruthy();
-  await page.screenshot({ path: testInfo.outputPath('editor-mobile.png'), fullPage: true });
-  for (const width of [240, 320, 375, 390, 768, 1440]) {
-    await page.setViewportSize({ width, height: 812 });
-    await page.evaluate(() => window.scrollTo(0, 0));
-    expect(
-      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-      `overflow at ${width}`,
-    ).toBeTruthy();
-    await page.screenshot({ path: testInfo.outputPath(`editor-${width}.png`), fullPage: true });
-    if (width < 1024) {
-      await page.getByRole('radio', { name: 'Поля', exact: true }).click();
-      await page.evaluate(() => window.scrollTo(0, 0));
-      expect(
-        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-      ).toBeTruthy();
-      expect(
-        await page
-          .locator('.document-editor button')
-          .evaluateAll((buttons) =>
-            buttons
-              .filter((b) => b.getBoundingClientRect().height > 0)
-              .every((b) => b.scrollHeight <= b.clientHeight + 1),
-          ),
-      ).toBeTruthy();
-      await page.screenshot({ path: testInfo.outputPath(`fields-${width}.png`), fullPage: true });
-      if (width === 240) {
-        await page.setViewportSize({ width, height: 390 });
-        await protocolNumber.focus();
-        expect(
-          await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-        ).toBeTruthy();
-        await page.setViewportSize({ width, height: 812 });
-      }
-      await page.getByRole('radio', { name: 'Предпросмотр', exact: true }).click();
-    }
-  }
-  expect(
-    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-  ).toBeTruthy();
+    await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    ),
+  ).toBeLessThanOrEqual(0);
+  await page.screenshot({ path: testInfo.outputPath('course-320.png'), fullPage: true });
+
+  // Back as it was: the general form, one category.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await openPage(page, '/admin/documents/pozharnaya-bezopasnost');
+  await chooseGeneralForm(page);
+  await saveCourse(page);
   expect(errors).toEqual([]);
 });
 
-test('a photographed stamp becomes a transparent picture, stays until replaced and can be taken off', async ({
+test('«Общее»: the stamp is uploaded, drawn once saved, and nobody else can read it', async ({
+  page,
+  browser,
+}, testInfo) => {
+  test.setTimeout(180_000);
+  page.setDefaultTimeout(30_000);
+  const base = String(testInfo.project.use.baseURL);
+  if (!LOCAL.includes(new URL(base).hostname)) throw new Error('LOCAL_ONLY');
+  await openPage(page, '/admin/documents/common');
+
+  const uploaded = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/admin/documents/assets') &&
+      response.request().method() === 'PUT',
+  );
+  const chooser = page.waitForEvent('filechooser');
+  await page.getByRole('button', { name: /^Печать: (?:загрузить|заменить)$/u }).click();
+  await (await chooser).setFiles({
+    name: 'stamp.png',
+    mimeType: 'image/png',
+    buffer: await fixturePng('TEST ' + Date.now()),
+  });
+  const answer = await uploaded;
+  expect(answer.status(), await answer.text()).toBe(200);
+  const stampId = ((await answer.json()) as { asset: { id: string } }).asset.id;
+  const address = '/certificate-assets/registered?id=' + stampId;
+  await expect(page.locator(`img[src="${address}"]`)).toBeVisible();
+
+  // The picture is drawn once «Общее» is saved: leaving now asks first.
+  await page.getByRole('link', { name: 'К документам' }).click();
+  await expect(page.getByRole('dialog', { name: 'Уйти без сохранения?' })).toBeVisible();
+  await page.getByRole('button', { name: 'Отмена', exact: true }).click();
+  await expect(page).toHaveURL(/\/admin\/documents\/common$/u);
+
+  const saved = page.waitForResponse(
+    (response) =>
+      response.url().endsWith('/api/admin/settings/certificate') &&
+      response.request().method() === 'PATCH',
+  );
+  await page.getByRole('button', { name: 'Сохранить', exact: true }).click();
+  const response = await saved;
+  expect(response.status(), await response.text()).toBe(200);
+  expect(
+    ((await response.json()) as { settings: { documentCommission: { stampAssetId: string } } })
+      .settings.documentCommission.stampAssetId,
+  ).toBe(stampId);
+  await page.goto('/admin/documents');
+  await expect(page.getByRole('link', { name: /^Общее/u })).not.toContainText('нет печати');
+
+  const allowed = await page.request.get(address);
+  expect(allowed.status()).toBe(200);
+  expect(allowed.headers()['content-type']).toBe('image/png');
+  const contextOptions = {
+    baseURL: base,
+    ignoreHTTPSErrors: Boolean(testInfo.project.use.ignoreHTTPSErrors),
+  };
+  const anonymous = await browser.newContext({
+    ...contextOptions,
+    storageState: { cookies: [], origins: [] },
+  });
+  expect([401, 403]).toContain((await anonymous.request.get(address)).status());
+  await anonymous.close();
+  // No issued document of the participant draws this fixture.
+  const participant = await browser.newContext({
+    ...contextOptions,
+    storageState: process.env.E2E_PARTICIPANT_STORAGE_STATE,
+  });
+  expect([401, 403, 404]).toContain((await participant.request.get(address)).status());
+  await participant.close();
+});
+
+test('the address of the old editor lands on «Документы»', async ({ page }) => {
+  await page.goto('/admin/settings/certificate?course=biot&tab=certificate');
+  await expect(page).toHaveURL(/\/admin\/documents\/biot\?preview=booklet$/u);
+  await expect(page.locator('.document-editor[data-hydrated]')).toBeVisible();
+  await expect(page.getByRole('radio', { name: 'Корочка', exact: true })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await page.goto('/admin/settings/certificate');
+  await expect(page).toHaveURL(/\/admin\/documents$/u);
+  await expect(page.getByRole('heading', { name: 'Документы', exact: true })).toBeVisible();
+});
+
+test('issuance prints the sitting chosen for it, and the archive carries it', async ({
   page,
 }, testInfo) => {
+  test.setTimeout(120_000);
   const base = String(testInfo.project.use.baseURL);
-  if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname)) throw new Error('LOCAL_ONLY');
-  const sharp = (await import('sharp')).default;
-  const settings = async () =>
-    (await (await page.request.get('/api/admin/settings/certificate')).json()).settings;
-  const stored = (version: number) =>
-    page.request.get(`/certificate-assets/image?kind=stamp&v=${version}`);
-  const before = await settings();
-  const original = before.hasStamp ? await (await stored(before.version)).body() : null;
-  // A sheet photographed under a lamp: a blue ring on unevenly lit paper, no transparency at all.
-  const sheet = await sharp(
-    Buffer.from(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="420" height="320"><defs><linearGradient id="l"><stop offset="0" stop-color="#f4f1ea"/><stop offset="1" stop-color="#c9c6c0"/></linearGradient></defs><rect width="420" height="320" fill="url(#l)"/><circle cx="210" cy="160" r="96" fill="none" stroke="#2f4fb4" stroke-width="9"/></svg>',
-    ),
-  )
-    .jpeg({ quality: 90 })
-    .toBuffer();
-  // The persisted RPC quota must return its retry contract, not a generic 500.
-  // Only the disposable local actor's bucket is set; product limits are unchanged.
-  await resetLocalDocumentSettingsQuota(page.request, base, 10);
+  const databaseUrl =
+    process.env.SAFETYHUB_LOCAL_DATABASE_URL ??
+    'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+  if (!LOCAL.includes(new URL(base).hostname)) throw new Error('LOCAL_ONLY');
+  expect(databaseUrl).toBe('postgresql://postgres:postgres@127.0.0.1:54322/postgres');
+  const { createRequire } = await import('node:module');
+  const pg = createRequire(import.meta.url)('pg');
+  const db = new pg.Client({ connectionString: databaseUrl });
+  await db.connect();
+  let attestationId: string;
   try {
-    const limited = await page.request.put('/api/admin/settings/certificate/image?kind=stamp', {
-      headers: { origin: base, 'content-type': 'image/png' },
-      data: await sharp(sheet).png().toBuffer(),
-    });
-    expect(limited.status()).toBe(429);
-    const quota = await limited.json();
-    expect(quota.error).toBe('RATE_LIMITED');
-    expect(quota.retryAfter).toBeGreaterThan(0);
-    expect(limited.headers()['retry-after']).toBe(String(quota.retryAfter));
-    expect((await settings()).version).toBe(before.version);
+    const ready = await db.query(
+      "select attestation_id from private.admin_attestation_rows where certificate_state='ready' order by attestation_id limit 1",
+    );
+    expect(ready.rows.length, 'the seeded workspace has a result ready to issue').toBe(1);
+    attestationId = ready.rows[0].attestation_id;
   } finally {
-    await resetLocalDocumentSettingsQuota(page.request, base);
+    await db.end();
   }
-  try {
-    await openEditor(page, '/admin/settings/certificate?tab=certificate');
-    await page.getByRole('button', { name: /^Подписи и печать/ }).click();
-    // The settings' own stamp has a tile only where no program has a profile. Where
-    // profiles exist the section is the registry of their images (its own spec), and
-    // the stamp of the settings is reached through its route alone.
-    const stampTile = page.getByRole('button', { name: /^Печать: (?:загрузить|заменить)$/ });
-    const registryTile = page.getByRole('button', { name: /^(?:Загрузить|Заменить)$/ });
-    await expect(stampTile.or(registryTile).first()).toBeVisible();
-    const legacy = (await stampTile.count()) > 0;
-    if (legacy) {
-      const chooser = page.waitForEvent('filechooser');
-      await stampTile.click();
-      const upload = page.waitForResponse(
-        (response) =>
-          response.url().includes('/api/admin/settings/certificate/image') &&
-          response.request().method() === 'PUT',
-      );
-      await (await chooser).setFiles({ name: 'sheet.jpg', mimeType: 'image/jpeg', buffer: sheet });
-      expect((await upload).status()).toBe(200);
-    } else {
-      // Taking the paper off a photograph is the browser's work; the route takes the cut-out it makes.
-      const cutOut = await sharp(
-        Buffer.from(
-          '<svg xmlns="http://www.w3.org/2000/svg" width="420" height="320"><circle cx="210" cy="160" r="96" fill="none" stroke="#2f4fb4" stroke-width="9"/></svg>',
-        ),
-      )
-        .png()
-        .toBuffer();
-      const upload = await page.request.put('/api/admin/settings/certificate/image?kind=stamp', {
-        headers: { origin: base, 'content-type': 'image/png' },
-        data: cutOut,
-      });
-      expect(upload.status(), await upload.text()).toBe(200);
-    }
-    const uploaded = await settings();
-    expect(uploaded.hasStamp).toBe(true);
-    expect(uploaded.version).toBeGreaterThan(before.version);
-    const image = await stored(uploaded.version);
-    expect(image.status()).toBe(200);
-    expect(image.headers()['content-type']).toBe('image/png');
-    const { data, info } = await sharp(await image.body())
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-    expect(info.channels).toBe(4);
-    // The paper is gone, the ring is ink: a clear centre and an opaque stroke.
-    const alpha = (x: number, y: number) => data[(y * info.width + x) * 4 + 3] ?? 0;
-    expect(alpha(Math.floor(info.width / 2), Math.floor(info.height / 2))).toBe(0);
-    expect(
-      Math.max(
-        ...Array.from({ length: info.width }, (_, x) => alpha(x, Math.floor(info.height / 2))),
-      ),
-    ).toBeGreaterThan(200);
-    // A historical URL keeps its own exact bytes (or its original absence).
-    // It must never resolve to a signature uploaded after issuance.
-    const outdated = await stored(before.version);
-    if (original) {
-      expect(outdated.status()).toBe(200);
-      expect(outdated.headers()['cache-control']).toContain('private');
-      expect(Buffer.compare(await outdated.body(), original)).toBe(0);
-    } else expect(outdated.status()).toBe(404);
-    if (legacy) {
-      await openEditor(page);
-      await expect(
-        page.getByRole('button', { name: 'Печать: заменить', exact: true }),
-      ).toBeVisible();
-      const removal = page.waitForResponse(
-        (response) =>
-          response.url().includes('/api/admin/settings/certificate/image') &&
-          response.request().method() === 'DELETE',
-      );
-      await page.getByRole('button', { name: 'Печать: убрать', exact: true }).click();
-      // Every document issued from now on changes, so the editor asks first.
-      await page.getByRole('button', { name: 'Убрать', exact: true }).click();
-      expect((await removal).status()).toBe(200);
-      await expect(
-        page.getByRole('button', { name: 'Печать: загрузить', exact: true }),
-      ).toBeVisible();
-    } else {
-      const removal = await page.request.delete(
-        '/api/admin/settings/certificate/image?kind=stamp',
-        { headers: { origin: base } },
-      );
-      expect(removal.status(), await removal.text()).toBe(200);
-    }
-    expect((await settings()).hasStamp).toBe(false);
-    const retained = await stored(uploaded.version);
-    expect(retained.status()).toBe(200);
-    expect(retained.headers()['cache-control']).toContain('private');
-    expect(Buffer.compare(await retained.body(), await image.body())).toBe(0);
-    const refused = await page.request.put('/api/admin/settings/certificate/image?kind=stamp', {
-      headers: { origin: base, 'content-type': 'image/png' },
-      data: Buffer.from('not a picture at all'),
-    });
-    expect(refused.status()).toBe(400);
-  } finally {
-    if (original)
-      await page.request.put('/api/admin/settings/certificate/image?kind=stamp', {
-        headers: { origin: base, 'content-type': 'image/png' },
-        data: original,
-      });
-  }
+  const yesterday = new Date(Date.now() - 86_400_000)
+    .toLocaleDateString('en-CA', { timeZone: 'Asia/Oral' })
+    .slice(0, 10);
+  const issued = await page.request.post('/api/admin/attestations/actions', {
+    headers: { origin: base },
+    data: {
+      action: 'issue',
+      attestationIds: [attestationId],
+      idempotencyKey: crypto.randomUUID(),
+      protocolDate: yesterday,
+      protocolNumber: 'E2E-7',
+    },
+  });
+  expect(issued.status(), await issued.text()).toBe(200);
+  const item = ((await issued.json()) as { items: { status: string; reason: string | null }[] })
+    .items[0];
+  expect(item, JSON.stringify(item)).toMatchObject({ status: 'completed' });
+
+  const archived = await page.request.post('/api/admin/attestations/export', {
+    headers: { origin: base },
+    data: { attestationIds: [attestationId] },
+  });
+  expect(archived.status(), await archived.text()).toBe(200);
+  const metadata = (await archived.json()) as {
+    items: { certificateId: string; branding: { protocolNumber: string; protocolDate: string } }[];
+  };
+  expect(metadata.items[0]?.branding).toMatchObject({
+    protocolNumber: 'E2E-7',
+    protocolDate: yesterday,
+  });
+  const single = await page.request.get(
+    `/api/certificates/${metadata.items[0]!.certificateId}/metadata`,
+  );
+  expect(single.status()).toBe(200);
+  expect(((await single.json()) as { branding: unknown }).branding).toEqual(
+    metadata.items[0]!.branding,
+  );
 });
 
 test('a slow navigation dims the viewport with a centred loader and clears on completion', async ({
@@ -548,35 +349,54 @@ test('a slow navigation dims the viewport with a centred loader and clears on co
   await expect(page.getByRole('status', { name: 'Loading', exact: true })).toHaveCount(0);
 });
 
-test('anonymous and participant cannot read company documents', async ({ browser }, testInfo) => {
+test('anonymous and participant can neither read nor change documents', async ({
+  browser,
+}, testInfo) => {
+  const base = String(testInfo.project.use.baseURL);
   const contextOptions = {
-    baseURL: String(testInfo.project.use.baseURL),
+    baseURL: base,
     ignoreHTTPSErrors: Boolean(testInfo.project.use.ignoreHTTPSErrors),
   };
-  const context = await browser.newContext({
+  const someone = '00000000-0000-4000-8000-000000000001';
+  const participant = await browser.newContext({
     ...contextOptions,
     storageState: process.env.E2E_PARTICIPANT_STORAGE_STATE,
   });
-  const result = await context.request.get('/api/admin/documents');
-  expect([401, 403]).toContain(result.status());
-  const foreignCertificate = await context.request.get(
+  const read = await participant.request.get(
+    `/api/admin/documents/person/${someone}?course=${someone}`,
+  );
+  expect([401, 403]).toContain(read.status());
+  const write = await participant.request.put(`/api/admin/documents/courses/${someone}`, {
+    headers: { origin: base },
+    data: {},
+  });
+  expect([401, 403]).toContain(write.status());
+  const note = await participant.request.put('/api/admin/documents/notes', {
+    headers: { origin: base },
+    data: { userId: someone, courseSlug: 'biot', notes: 'x' },
+  });
+  expect([401, 403]).toContain(note.status());
+  const foreignCertificate = await participant.request.get(
     '/api/certificates/20000000-0000-4000-8000-000000000062/metadata',
   );
   expect([403, 404]).toContain(foreignCertificate.status());
-  const foreignPhoto = await context.request.get(
+  const foreignPhoto = await participant.request.get(
     '/api/certificates/20000000-0000-4000-8000-000000000062/photo',
   );
   expect([403, 404]).toContain(foreignPhoto.status());
-  await context.close();
+  await participant.close();
   const anonymous = await browser.newContext({
     ...contextOptions,
     storageState: { cookies: [], origins: [] },
   });
-  const denied = await anonymous.request.get('/api/admin/documents', {
-    maxRedirects: 0,
-  });
+  const denied = await anonymous.request.get(
+    `/api/admin/documents/person/${someone}?course=${someone}`,
+    { maxRedirects: 0 },
+  );
   expect([401, 403, 307]).toContain(denied.status());
   if (denied.status() === 307) expect(denied.headers().location).toContain('/auth/login');
+  const page = await anonymous.request.get('/admin/documents', { maxRedirects: 0 });
+  expect([302, 303, 307, 401, 403]).toContain(page.status());
   await anonymous.close();
 });
 
@@ -589,24 +409,16 @@ test('registered signatures require document ownership or document administratio
   const databaseUrl =
     process.env.SAFETYHUB_LOCAL_DATABASE_URL ??
     'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
-  expect(['localhost', '127.0.0.1']).toContain(new URL(base).hostname);
-  expect(['localhost', '127.0.0.1']).toContain(new URL(url).hostname);
+  expect(LOCAL).toContain(new URL(base).hostname);
+  expect(LOCAL).toContain(new URL(url).hostname);
   expect(databaseUrl).toBe('postgresql://postgres:postgres@127.0.0.1:54322/postgres');
   const { randomUUID, createHash } = await import('node:crypto');
   const { createClient } = await import('@supabase/supabase-js');
   const { createRequire } = await import('node:module');
   const pg = createRequire(import.meta.url)('pg');
-  const sharp = (await import('sharp')).default;
   const assetId = randomUUID();
   const owner = 'e2e-' + randomUUID();
-  // A labelled geometric fixture, never an actual person's signature or a private source file.
-  const bytes = await sharp(
-    Buffer.from(
-      `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="60"><rect x="5" y="5" width="230" height="50" fill="none" stroke="blue"/><text x="10" y="35" font-size="12">TEST ${assetId}</text></svg>`,
-    ),
-  )
-    .png()
-    .toBuffer();
+  const bytes = await fixturePng('TEST ' + assetId.slice(0, 8));
   const sha256 = createHash('sha256').update(bytes).digest('hex');
   const objectKey = sha256 + '.png';
   const client = createClient(url, process.env.SUPABASE_SECRET_KEY!, {
@@ -614,36 +426,6 @@ test('registered signatures require document ownership or document administratio
   });
   const db = new pg.Client({ connectionString: databaseUrl });
   await db.connect();
-  const profileId = 'armaturshchik-all';
-  const original = (
-    await db.query('select * from public.document_profiles where course_slug=$1 and audience=$2', [
-      'armaturshchik',
-      'all',
-    ])
-  ).rows[0];
-  const activeProfileId = original?.id ?? profileId;
-  const body = {
-    ...(original?.body ?? {
-      id: profileId,
-      courseSlug: 'armaturshchik',
-      audience: 'all',
-      label: 'Арматурщик — тест',
-      programName: 'Арматурщик',
-      family: 'general',
-      hours: null,
-      validityMonths: 0,
-      protocolText: 'Тестовая программа {program}.',
-      decisionText: 'Тестовый профиль.',
-      orderNumber: '',
-      orderDate: '',
-      verificationKind: '',
-      stampAssetId: null,
-    }),
-    commission: [
-      { signerId: owner, name: 'Тестовый подписант', position: 'Тестовая комиссия', assetId },
-    ],
-  };
-  let profileInstalled = false;
   const contexts = [];
   try {
     const upload = await client.storage
@@ -654,22 +436,7 @@ test('registered signatures require document ownership or document administratio
       'insert into public.document_assets(id,owner_id,kind,sha256,object_key) values($1,$2,$3,$4,$5)',
       [assetId, owner, 'signature', sha256, objectKey],
     );
-    if (original)
-      await db.query('update public.document_profiles set body=$1 where id=$2', [
-        body,
-        activeProfileId,
-      ]);
-    else
-      await db.query(
-        'insert into public.document_profiles(id,course_slug,audience,body) values($1,$2,$3,$4)',
-        [activeProfileId, 'armaturshchik', 'all', body],
-      );
-    profileInstalled = true;
-    await openEditor(page, '/admin/settings/certificate?course=armaturshchik');
     const asset = '/certificate-assets/registered?id=' + assetId;
-    // The signer's picture is a tile of «Подписи и печать», not a link among the profile's fields.
-    await page.getByRole('button', { name: /^Подписи и печать/ }).click();
-    await expect(page.locator(`img[src*="${asset}"]`).filter({ visible: true })).toHaveCount(1);
     const allowed = await page.request.get(asset);
     expect(allowed.status()).toBe(200);
     expect(allowed.headers()['content-type']).toBe('image/png');
@@ -680,31 +447,16 @@ test('registered signatures require document ownership or document administratio
       storageState: { cookies: [], origins: [] },
     });
     contexts.push(anonymous);
-    const denied = await anonymous.request.get(base + asset);
-    expect([401, 403]).toContain(denied.status());
+    expect([401, 403]).toContain((await anonymous.request.get(base + asset)).status());
     // No issued snapshot references this unique fixture, including on a reused local DB.
     const participant = await browser.newContext({
       storageState: process.env.E2E_PARTICIPANT_STORAGE_STATE,
     });
     contexts.push(participant);
-    const foreign = await participant.request.get(base + asset);
-    expect([401, 403, 404]).toContain(foreign.status());
+    expect([401, 403, 404]).toContain((await participant.request.get(base + asset)).status());
   } finally {
     await Promise.all(contexts.map((context) => context.close()));
     try {
-      if (profileInstalled) {
-        const cleaned = original
-          ? await db.query('update public.document_profiles set body=$1 where id=$2 and body=$3', [
-              original.body,
-              activeProfileId,
-              body,
-            ])
-          : await db.query('delete from public.document_profiles where id=$1 and body=$2', [
-              activeProfileId,
-              body,
-            ]);
-        expect(cleaned.rowCount, 'only the unchanged fixture may be restored/removed').toBe(1);
-      }
       await db.query(
         'delete from public.document_assets where id=$1 and owner_id=$2 and sha256=$3',
         [assetId, owner, sha256],

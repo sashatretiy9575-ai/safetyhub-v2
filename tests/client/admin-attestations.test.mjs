@@ -224,8 +224,13 @@ test('attestation list keeps personal details compact and loads the avatar only 
   // for good when the answer never came.
   assert.match(
     panels,
-    /export const preloadAttestationCard = \(\) =>\s*void import\('@\/components\/admin\/course-access-control'\)/u,
+    /export const preloadAttestationCard = \(\) => \{\s*void import\('@\/components\/admin\/course-access-control'\);\s*void import\('@\/components\/admin\/person-document-fields'\);\s*\};/u,
   );
+  // The card edits what the protocol prints about the person — the category and
+  // the note — in place; it no longer sends anybody to a separate editor.
+  assert.match(panels, /<PersonDocumentFields[\s\S]{0,160}userId=\{row\.userId\}[\s\S]{0,80}courseId=\{row\.testId\}/u);
+  assert.doesNotMatch(`${panels}
+${manager}`, /\/admin\/settings\/certificate/u);
   assert.match(manager, /window\.requestIdleCallback\(preloadAttestationCard\)/u);
   assert.match(manager, /window\.setTimeout\(preloadAttestationCard, /u);
   assert.doesNotMatch(panels, /(?:void|await)\s+fetch\s*\(/u);

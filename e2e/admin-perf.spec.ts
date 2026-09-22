@@ -179,13 +179,7 @@ type EmployeeTarget = {
   pinnedByQuery: boolean;
 };
 
-type DocumentSelection = {
-  organization: string;
-  course: string;
-  user: string | null;
-  participants: number;
-  withCertificate: number;
-};
+type DocumentSelection = { course: string };
 
 // ---------------------------------------------------------------------------------------------
 // In-page kit. Serialized into every document by addInitScript: it must stay self-contained and
@@ -287,7 +281,7 @@ function installPerfKit(): void {
     lastMutationAt: null as number | null,
     unavailableSeenAt: null as number | null,
   };
-  if (location.pathname.includes('/admin/settings/certificate')) {
+  if (location.pathname.startsWith('/admin/documents/')) {
     const started = performance.now();
     const track = () => {
       const now = performance.now();
@@ -648,7 +642,6 @@ const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/giu;
 const COURSE_ACCESS_PATH = /^\/api\/admin\/users\/([0-9a-f-]{36})\/course-access$/iu;
 const CARD_USER_PATH =
   /^\/api\/admin\/(?:attestations\/(?:contact|avatar|history)|users)\/([0-9a-f-]{36})(?:\/|$)/iu;
-const PREFERRED_ORGANIZATIONS = ['ТОО Арман Строй', 'Каспий-Пром АО', 'ТОО Восток Энерго'];
 
 const PROFILES: Record<Profile['name'], Profile> = {
   local: {
@@ -1170,53 +1163,11 @@ async function discoverEmployee(page: Page, waitMs: number): Promise<EmployeeTar
   return { ...first, hasPhoto: false, scanned, pinnedByQuery: false };
 }
 
+/** The course page of «Документы»: E2E_PERF_COURSE, or БиОТ, which prints two categories. */
 async function discoverDocumentSelection(page: Page): Promise<DocumentSelection | null> {
-  type EditorPayload = {
-    organizations?: string[];
-    courses?: { slug: string }[];
-    participants?: { userId: string; certificateId: string | null }[];
-  };
-  const response = await page.request.get('/api/admin/documents');
-  if (!response.ok()) throw new Error(`GET /api/admin/documents returned ${response.status()}`);
-  const initial = (await response.json()) as EditorPayload;
-  const all = initial.organizations ?? [];
-  const pinnedOrganization = process.env.E2E_PERF_ORGANIZATION?.trim();
-  const pinnedCourse = process.env.E2E_PERF_COURSE?.trim();
-  const organizations = pinnedOrganization
-    ? [pinnedOrganization]
-    : [
-        ...PREFERRED_ORGANIZATIONS.filter((name) => all.includes(name)),
-        ...all.filter((name) => !PREFERRED_ORGANIZATIONS.includes(name)),
-      ];
-  const courses = pinnedCourse
-    ? [pinnedCourse]
-    : (initial.courses ?? []).map((course) => course.slug);
-  let best: DocumentSelection | null = null;
-  let probes = 0;
-  for (const organization of organizations) {
-    for (const course of courses) {
-      if (probes >= 80) return best;
-      probes += 1;
-      const result = await page.request.get('/api/admin/documents', {
-        params: { organization, course },
-      });
-      if (!result.ok()) continue;
-      const people = ((await result.json()) as EditorPayload).participants ?? [];
-      const issued = people.filter((person) => person.certificateId);
-      if (!people.length || (!issued.length && !pinnedOrganization)) continue;
-      const candidate: DocumentSelection = {
-        organization,
-        course,
-        user: issued[0]?.userId ?? null,
-        participants: people.length,
-        withCertificate: issued.length,
-      };
-      // Six people make the employee switch meaningful; short of that, the largest group wins.
-      if (candidate.participants >= 6) return candidate;
-      if (!best || candidate.participants > best.participants) best = candidate;
-    }
-  }
-  return best;
+  const course = process.env.E2E_PERF_COURSE?.trim() || 'biot';
+  const response = await page.request.get('/admin/documents/' + encodeURIComponent(course));
+  return response.ok() ? { course } : null;
 }
 
 async function radioInGroup(group: Locator, pattern: RegExp, fallbackIndex: number) {
@@ -1227,24 +1178,20 @@ async function radioInGroup(group: Locator, pattern: RegExp, fallbackIndex: numb
 }
 
 async function documentKindRadio(page: Page, kind: 'certificate' | 'protocol') {
-  // «Вид документа» before the rename, «Документ» after: both builds are measured.
-  const named = page.getByRole('radiogroup', { name: /^Документ$|Вид документа/u });
-  const group = (await named.count())
-    ? named.first()
-    : page.locator('[data-document-toolbar]').getByRole('radiogroup').first();
+  const group = page.getByRole('radiogroup', { name: /^Документ$/u }).first();
   return kind === 'certificate'
-    ? radioInGroup(group, /Удостоверение/u, 0)
-    : radioInGroup(group, /Протокол/u, 1);
+    ? radioInGroup(group, /Корочка/u, 1)
+    : radioInGroup(group, /Протокол/u, 0);
 }
 
-async function numberField(page: Page): Promise<Locator | null> {
-  const editor = page.locator('.document-editor').filter({ visible: true }).first();
-  const textInput = page.locator('input:not([type="hidden"]):not([type="date"]), textarea');
-  for (const pattern of [/^Номер(?: протокола)?$/u, /Номер протокола/u, /Номер/u]) {
-    const candidate = editor.getByLabel(pattern).and(textInput).filter({ visible: true });
-    if (await candidate.count()) return candidate.first();
-  }
-  return null;
+async function programmeField(page: Page): Promise<Locator | null> {
+  const field = page
+    .locator('.document-editor')
+    .filter({ visible: true })
+    .first()
+    .getByRole('textbox', { name: 'Название программы' })
+    .filter({ visible: true });
+  return (await field.count()) ? field.first() : null;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1384,14 +1331,8 @@ if (process.env.E2E_ADMIN_PERF === '1') {
       try {
         selection = await discoverDocumentSelection(page);
         discovery.documents = selection
-          ? {
-              organization: selection.organization,
-              course: selection.course,
-              participants: selection.participants,
-              withCertificate: selection.withCertificate,
-              userPinned: Boolean(selection.user),
-            }
-          : { error: 'no company/programme with participants was found' };
+          ? { course: selection.course }
+          : { error: 'the course page of «Документы» did not open' };
       } catch (error) {
         discovery.documents = { error: errorMessage(error) };
       }
@@ -1675,15 +1616,13 @@ if (process.env.E2E_ADMIN_PERF === '1') {
       });
     };
 
-    // -- C: document editor ----------------------------------------------------------------------
+    // -- C: the documents of a course --------------------------------------------------------------
     const runDocumentEditor = async (run: number) => {
       const names = [
         'C1_editorColdOpen',
         'C2_documentKindSwitch',
-        'C3_numberEdit',
-        'C4_mobileModeToggle',
-        'C5_mobileHalfSwitch',
-        'C6_employeeSwitch',
+        'C3_programmeEdit',
+        'C4_mobileHalfSwitch',
       ] as const;
       if (!selection) {
         for (const name of names) record(name, { run, error: 'document discovery failed' });
@@ -1731,18 +1670,12 @@ if (process.env.E2E_ADMIN_PERF === '1') {
           await redraw(['click'], () => radio.click({ timeout: waitMs }));
         };
 
-        // C1 — cold open with the selection in the address.
+        // C1 — cold open of the course page.
         let editorReady = false;
         await guarded(names[0], async () => {
-          const params = new URLSearchParams({
-            organization: chosen.organization,
-            course: chosen.course,
-            tab: 'protocol',
-          });
-          if (chosen.user) params.set('user', chosen.user);
           const before = await readCpu(harness.cdp);
           const wallStart = Date.now();
-          await editorPage.goto('/admin/settings/certificate?' + params, {
+          await editorPage.goto('/admin/documents/' + encodeURIComponent(chosen.course), {
             timeout: 120_000,
             waitUntil: 'commit',
           });
@@ -1806,7 +1739,7 @@ if (process.env.E2E_ADMIN_PERF === '1') {
           .waitFor({ state: 'visible', timeout: waitMs })
           .catch(() => undefined);
 
-        // C2 — Протокол → Удостоверение → Протокол → Удостоверение.
+        // C2 — Протокол → Корочка → Протокол → Корочка.
         await guarded(names[1], async () => {
           const switches: RunRecord[] = [];
           for (const kind of ['certificate', 'protocol', 'certificate'] as const) {
@@ -1824,13 +1757,13 @@ if (process.env.E2E_ADMIN_PERF === '1') {
           return { switches };
         });
 
-        // C3 — one character in the protocol number, then back.
+        // C3 — one character in the programme's name, then back.
         await guarded(names[2], async () => {
           await showKind('protocol');
-          const field = await numberField(editorPage);
-          if (!field) return { skipped: 'no number field' };
+          const field = await programmeField(editorPage);
+          if (!field) return { skipped: 'no programme field' };
           const original = await field.inputValue();
-          const limit = Number(await field.getAttribute('maxlength')) || 64;
+          const limit = Number(await field.getAttribute('maxlength')) || 240;
           const changed =
             original.length >= limit
               ? original.slice(0, -1) + (original.endsWith('7') ? '8' : '7')
@@ -1840,78 +1773,13 @@ if (process.env.E2E_ADMIN_PERF === '1') {
           return { tab: 'protocol', edit, restore };
         });
 
-        // C4 — a phone: Изменить/Поля ↔ Предпросмотр, twice.
         let onPhone = false;
+        // C4 — a phone: the other half of the booklet and back.
         await guarded(names[3], async () => {
           await showKind('certificate');
-          await quiet();
-          await editorPage.setViewportSize({ width: 390, height: 844 });
-          onPhone = true;
-          await quiet();
-          const group = editorPage
-            .getByRole('radiogroup')
-            .filter({ has: editorPage.getByRole('radio', { name: /Предпросмотр/u }) })
-            .first();
-          const radios = group.getByRole('radio');
-          const labels = await radios.evaluateAll((nodes) =>
-            nodes.map((node) => (node.textContent ?? '').trim()),
-          );
-          const previewIndex = labels.findIndex((text) => /Предпросмотр/u.test(text));
-          const fieldsIndex = labels.findIndex((_, index) => index !== previewIndex);
-          if (previewIndex < 0 || fieldsIndex < 0) return { skipped: 'no «Режим» radios' };
-          const toggles: RunRecord[] = [];
-          for (const to of ['preview', 'fields', 'preview', 'fields'] as const) {
-            try {
-              const radio = radios.nth(to === 'preview' ? previewIndex : fieldsIndex);
-              const taggedBefore = to === 'preview' ? await tagCanvases(editorPage) : 0;
-              const marks: WatchMark[] =
-                to === 'preview'
-                  ? [
-                      { name: 'canvasVisible', kind: 'canvasVisible' },
-                      { name: 'newCanvas', kind: 'newCanvas', settleMs: recreateWindowMs },
-                    ]
-                  : [{ name: 'previewHidden', kind: 'previewHidden' }];
-              const { value, metrics } = await measureStep(harness, () =>
-                watch(
-                  editorPage,
-                  // Leaving the preview has nothing to wait for beyond the layout change itself.
-                  { triggers: ['click'], timeoutMs: to === 'preview' ? waitMs : 5_000, marks },
-                  () => radio.click({ timeout: waitMs }),
-                ),
-              );
-              toggles.push({
-                to,
-                ...(to === 'preview'
-                  ? {
-                      taggedBefore,
-                      // Without canvases to compare against, "re-created" has no meaning.
-                      recreated: taggedBefore > 0 ? value.marks.newCanvas != null : null,
-                    }
-                  : {}),
-                marks: marksOf(
-                  value,
-                  marks.map((mark) => mark.name),
-                ),
-                t0Source: value.t0Source,
-                ...metrics,
-                notes: value.notes,
-              });
-              if (to === 'preview') await quiet();
-            } catch (error) {
-              toggles.push({ to, error: errorMessage(error) });
-            }
-          }
-          return { viewport: '390x844', tab: 'certificate', toggles };
-        });
-
-        // C5 — a phone: the other half of the booklet and back.
-        await guarded(names[4], async () => {
           if (!onPhone) await editorPage.setViewportSize({ width: 390, height: 844 });
           onPhone = true;
-          const previewRadio = editorPage.getByRole('radio', { name: /Предпросмотр/u }).first();
-          if ((await previewRadio.getAttribute('aria-checked')) !== 'true') {
-            await previewRadio.click({ timeout: waitMs });
-          }
+          await editorPage.locator('[data-document-preview]').first().scrollIntoViewIfNeeded();
           await quiet();
           const halves = editorPage.getByRole('radiogroup', { name: /Сторона|Половина/u }).first();
           if (!(await halves.count())) return { skipped: 'no half radiogroup' };
@@ -1953,93 +1821,6 @@ if (process.env.E2E_ADMIN_PERF === '1') {
           return { viewport: '390x844', switches };
         });
 
-        // C6 — several employees in quick succession.
-        await guarded(names[5], async () => {
-          if (onPhone) await editorPage.setViewportSize(desktop);
-          await showKind('certificate');
-          await quiet();
-          const editor = editorPage.locator('.document-editor').filter({ visible: true }).first();
-          const trigger = editor
-            .getByRole('button', { name: /^Сотрудник/u })
-            .or(editor.getByRole('combobox', { name: /Сотрудник/u }))
-            .filter({ visible: true })
-            .first();
-          if (!(await trigger.count())) return { skipped: 'no «Сотрудник» select' };
-          const native = (await trigger.evaluate((node) => node.tagName)) === 'SELECT';
-          let options: Locator | null = null;
-          let total = 0;
-          let current = -1;
-          if (native) {
-            total = await trigger.locator('option').count();
-            current = await trigger.evaluate((node) => (node as HTMLSelectElement).selectedIndex);
-          } else {
-            await trigger.click({ timeout: waitMs });
-            const listId = await trigger.getAttribute('aria-controls');
-            options = listId
-              ? editorPage.locator(`[id="${listId}"]`).locator('button, [role="option"]')
-              : editorPage.getByRole('option');
-            total = await options.count();
-            current = await options.evaluateAll((nodes) =>
-              nodes.findIndex(
-                (node) =>
-                  node.getAttribute('aria-current') === 'true' ||
-                  node.getAttribute('aria-selected') === 'true',
-              ),
-            );
-            await editorPage.keyboard.press('Escape');
-          }
-          const picks = Array.from({ length: total }, (_, index) => index)
-            .filter((index) => index !== current)
-            .slice(0, 6);
-          if (!picks.length) return { participants: total, skipped: 'nobody else to select' };
-
-          await tagCanvases(editorPage);
-          const { value, metrics, snapshot } = await measureStep(harness, async () => {
-            const id = await armWatch(editorPage, {
-              triggers: ['click', 'change'],
-              timeoutMs: waitMs,
-              marks: [{ name: 'started', kind: 'trigger' }],
-            });
-            const wallStart = Date.now();
-            for (const index of picks) {
-              if (native) await trigger.selectOption({ index }, { timeout: waitMs });
-              else {
-                await trigger.click({ timeout: waitMs });
-                await options!.nth(index).click({ timeout: waitMs });
-              }
-            }
-            const picksWallMs = Date.now() - wallStart;
-            const started = await watchResult(editorPage, id);
-            const settled = await previewQuiet(editorPage, quietMs, waitMs);
-            return { started, settled, picksWallMs };
-          });
-          cooldownSeconds = Math.max(cooldownSeconds, snapshot.maxRetryAfter);
-          const { started, settled, picksWallMs } = value;
-          const t0 = started.t0;
-          const since = (at: number | null) => (t0 !== null && at !== null && at >= t0 ? at - t0 : null);
-          return {
-            participants: total,
-            picks: picks.length,
-            marks: {
-              picksWallMs,
-              lastPreviewChangeMs: roundOrNull(since(settled.lastMutationAt)),
-            },
-            finalCanvasCount: settled.canvasCount,
-            finalFreshCanvasCount: settled.freshCanvasCount,
-            previewSettled: settled.quiet,
-            unavailableSeen: since(settled.unavailableSeenAt) !== null,
-            unavailableAtEnd: settled.message.includes('Удостоверение недоступно'),
-            t0Source: started.t0Source,
-            ...metrics,
-            raw: {
-              ...(metrics.raw as RunRecord),
-              status429Paths: snapshot.errors
-                .filter((entry) => entry.status === 429)
-                .map((entry) => entry.path),
-              finalMessage: settled.message,
-            },
-          };
-        });
         return cooldownSeconds;
       });
     };

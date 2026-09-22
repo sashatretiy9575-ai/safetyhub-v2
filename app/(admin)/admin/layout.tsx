@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Article } from '@phosphor-icons/react/dist/ssr/Article';
+import { Certificate } from '@phosphor-icons/react/dist/ssr/Certificate';
 import { CheckSquareOffset } from '@phosphor-icons/react/dist/ssr/CheckSquareOffset';
 import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
 import { UserCircleCheck } from '@phosphor-icons/react/dist/ssr/UserCircleCheck';
@@ -40,8 +41,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: '/admin/approvals', icon: UserCircleCheck, label: 'Заявки' },
     { href: employeeHref, icon: Users, label: 'Сотрудники', shortLabel: 'Люди' },
     { href: '/admin/courses', icon: ClipboardText, label: 'Курсы' },
+    ...(actor.capabilities.includes('site.settings.manage')
+      ? [{ href: '/admin/documents', icon: Certificate, label: 'Документы' }]
+      : []),
     { href: '/admin/articles', icon: Article, label: 'Материалы' },
   ];
+  // Six items do not fit one row of a narrow phone: the dock wraps to 3 + 3
+  // below 400 px, five wrap to 3 + 2 below 360 px.
+  const sixItems = items.length > 5;
 
   const fullName = `${actor.profile.name ?? ''} ${actor.profile.surname ?? ''}`.trim() || undefined;
   // The header picture is served from its own address instead of a signed URL
@@ -150,7 +157,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             // jumps to sits under the sticky header.
             tabIndex={-1}
             // The reserve follows the dock: two rows of it below 360 px, one above.
-            className="min-w-0 scroll-mt-[calc(3.5rem+var(--safe-area-top))] pb-[calc(var(--mobile-fixed-bottom-space)+5rem)] outline-none min-[360px]:pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)] lg:scroll-mt-0 lg:pb-0"
+            className={`min-w-0 scroll-mt-[calc(3.5rem+var(--safe-area-top))] pb-[calc(var(--mobile-fixed-bottom-space)+5rem)] outline-none lg:scroll-mt-0 lg:pb-0 ${
+              sixItems
+                ? 'xs:pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)]'
+                : 'min-[360px]:pb-[calc(var(--mobile-fixed-bottom-space)+1.5rem)]'
+            }`}
           >
             <Container
               size="admin"
@@ -171,9 +182,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             aria-label="Мобильная навигация админ-панели"
             className="glass-strong fixed right-[max(.625rem,var(--safe-area-right))] bottom-[var(--safe-area-bottom)] left-[max(.625rem,var(--safe-area-left))] z-50 mx-auto mt-2 max-w-[32.5rem] rounded-[var(--radius-dock)] p-0.5 lg:hidden"
           >
-            <div className="grid grid-cols-3 gap-0.5 min-[360px]:grid-cols-5">
+            <div
+              className={`grid grid-cols-3 gap-0.5 ${sixItems ? 'xs:grid-cols-6' : 'min-[360px]:grid-cols-5'}`}
+            >
               {items.map(({ href, icon: Icon, label, shortLabel }) => (
-                <AdminNavLink key={href} href={href} label={label} shortLabel={shortLabel} mobile>
+                <AdminNavLink
+                  key={href}
+                  href={href}
+                  label={label}
+                  shortLabel={shortLabel}
+                  mobile
+                  spanLast={!sixItems}
+                >
                   <Icon size={21} weight="regular" />
                 </AdminNavLink>
               ))}

@@ -1486,6 +1486,10 @@ export type Database = {
         Returns: Json
       }
       capabilities_for_user: { Args: { p_user_id: string }; Returns: string[] }
+      certificate_course_slug: {
+        Args: { p_fallback: string; p_revision_id: string }
+        Returns: string
+      }
       certificate_download_payload: {
         Args: { p_certificate_id: string }
         Returns: Json
@@ -1530,7 +1534,9 @@ export type Database = {
         Args: { p_force?: boolean }
         Returns: Json
       }
-      complete_document_profile: { Args: { p: Json }; Returns: Json }
+      complete_document_profile:
+        | { Args: { p: Json }; Returns: Json }
+        | { Args: { c: Json; p: Json }; Returns: Json }
       complete_test_attempt_unmetered: {
         Args: { p_answers: Json; p_attempt_id: string }
         Returns: Json
@@ -1624,6 +1630,10 @@ export type Database = {
         Args: { p_variants: Json }
         Returns: boolean
       }
+      default_document_profile_body: {
+        Args: { p_slug: string; p_title: string }
+        Returns: Json
+      }
       delete_admin_learning_history_unmetered: {
         Args: {
           p_actor_id: string
@@ -1637,9 +1647,18 @@ export type Database = {
         Args: { p_position: string }
         Returns: string
       }
+      document_course_body: {
+        Args: { p: Json; p_audience: string; p_slug: string }
+        Returns: Json
+      }
+      document_course_payload: { Args: { p_test_id: string }; Returns: Json }
       document_family_default: {
         Args: { p_audience: string; p_family: string }
         Returns: Json
+      }
+      document_profile_id: {
+        Args: { p_audience: string; p_slug: string }
+        Returns: string
       }
       editor_course_question_variants: {
         Args: { p_variants: Json }
@@ -1851,6 +1870,10 @@ export type Database = {
           p_user_agent?: string
         }
         Returns: Json
+      }
+      protocol_part: {
+        Args: { p_base: string; p_number: string }
+        Returns: number
       }
       public_questions_from_draft: {
         Args: { p_questions: Json }
@@ -2104,6 +2127,8 @@ export type Database = {
         }
         Returns: Json
       }
+      valid_document_commission: { Args: { v: Json }; Returns: boolean }
+      valid_document_course: { Args: { p: Json }; Returns: boolean }
       valid_document_defaults: { Args: { v: Json }; Returns: boolean }
       valid_document_defaults_v1: { Args: { v: Json }; Returns: boolean }
       verify_user_identity_unmetered: {
@@ -2646,6 +2671,7 @@ export type Database = {
           chairman_name: string
           chairman_position: string
           chairman_signature_png: string | null
+          document_commission: Json
           document_defaults: Json
           exam_text_kk: string
           exam_text_ru: string
@@ -2671,6 +2697,7 @@ export type Database = {
           chairman_name?: string
           chairman_position?: string
           chairman_signature_png?: string | null
+          document_commission: Json
           document_defaults?: Json
           exam_text_kk?: string
           exam_text_ru?: string
@@ -2696,6 +2723,7 @@ export type Database = {
           chairman_name?: string
           chairman_position?: string
           chairman_signature_png?: string | null
+          document_commission?: Json
           document_defaults?: Json
           exam_text_kk?: string
           exam_text_ru?: string
@@ -3374,13 +3402,13 @@ export type Database = {
         Row: {
           automatic: boolean
           course_slug: string
-          document_date: string
+          document_date: string | null
           id: string
           organization: string
           organization_key: string | null
           participant_fields: Json
           profile_id: string | null
-          protocol_number: string
+          protocol_number: string | null
           updated_at: string
           updated_by: string | null
           version: number
@@ -3388,13 +3416,13 @@ export type Database = {
         Insert: {
           automatic?: boolean
           course_slug: string
-          document_date: string
+          document_date?: string | null
           id?: string
           organization: string
           organization_key?: string | null
           participant_fields?: Json
           profile_id?: string | null
-          protocol_number: string
+          protocol_number?: string | null
           updated_at?: string
           updated_by?: string | null
           version?: number
@@ -3402,13 +3430,13 @@ export type Database = {
         Update: {
           automatic?: boolean
           course_slug?: string
-          document_date?: string
+          document_date?: string | null
           id?: string
           organization?: string
           organization_key?: string | null
           participant_fields?: Json
           profile_id?: string | null
-          protocol_number?: string
+          protocol_number?: string | null
           updated_at?: string
           updated_by?: string | null
           version?: number
@@ -3455,7 +3483,15 @@ export type Database = {
           updated_at?: string
           version?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "document_profiles_course_slug_fkey"
+            columns: ["course_slug"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       legal_acceptances: {
         Row: {
@@ -3629,6 +3665,7 @@ export type Database = {
         Row: {
           avatar_updated_at: string | null
           created_at: string
+          document_audience: string | null
           education: string
           id: string
           job: string
@@ -3645,6 +3682,7 @@ export type Database = {
         Insert: {
           avatar_updated_at?: string | null
           created_at?: string
+          document_audience?: string | null
           education?: string
           id: string
           job?: string
@@ -3661,6 +3699,7 @@ export type Database = {
         Update: {
           avatar_updated_at?: string | null
           created_at?: string
+          document_audience?: string | null
           education?: string
           id?: string
           job?: string
@@ -4624,8 +4663,10 @@ export type Database = {
       execute_admin_attestation_action: {
         Args: {
           p_action: string
+          p_document_date?: string
           p_field?: string
           p_idempotency_key: string
+          p_protocol_number?: string
           p_reason?: string
           p_target_ids: string[]
           p_value?: string
@@ -5552,6 +5593,14 @@ export type Database = {
             }
             Returns: Json
           }
+      save_document_course: {
+        Args: { p_course: Json; p_expected: Json; p_test_id: string }
+        Returns: Json
+      }
+      save_document_note: {
+        Args: { p_course_slug: string; p_notes: string; p_user_id: string }
+        Returns: Json
+      }
       save_document_participant_fields: {
         Args: {
           p_batch_id: string
@@ -5612,6 +5661,10 @@ export type Database = {
       }
       set_course_catalog_maintenance: {
         Args: { p_actor_id: string; p_enabled: boolean }
+        Returns: Json
+      }
+      set_document_audience: {
+        Args: { p_audience: string; p_user_id: string }
         Returns: Json
       }
       set_preferred_locale: {

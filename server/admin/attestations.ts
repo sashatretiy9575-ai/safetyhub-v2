@@ -487,8 +487,14 @@ export type AdminAttestationAction =
       field: 'name' | 'surname' | 'job' | 'organization';
       value: string;
     }
-  | { action: 'issue'; targetIds: string[] }
-  | { action: 'confirm_and_issue'; targetIds: string[] };
+  | { action: 'issue' | 'confirm_and_issue'; targetIds: string[]; protocol?: IssueProtocol };
+
+/**
+ * The sitting the documents record, chosen in the issue dialog: its date and,
+ * when the centre numbers it itself, its number. Without them issuance dates
+ * the protocol by the day of issue and numbers it DD.MM.
+ */
+export type IssueProtocol = { date?: string | null; number?: string | null };
 
 export async function executeAdminAttestationAction(
   idempotencyKey: string,
@@ -501,6 +507,14 @@ export async function executeAdminAttestationAction(
     p_field: action.action === 'update' ? action.field : null,
     p_value: action.action === 'update' ? action.value : null,
     p_reason: null,
+    // Sent only when chosen: the function without them is the one every
+    // deployment before this one calls.
+    ...(action.action !== 'confirm' && action.action !== 'update' && action.protocol?.date
+      ? { p_document_date: action.protocol.date }
+      : {}),
+    ...(action.action !== 'confirm' && action.action !== 'update' && action.protocol?.number
+      ? { p_protocol_number: action.protocol.number }
+      : {}),
   });
   const envelope = record(raw);
   invalidateAdminAttestationReads();

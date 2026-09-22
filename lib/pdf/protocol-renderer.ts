@@ -23,6 +23,13 @@ export type ProtocolGroup = Readonly<{
   groupNumber?: number;
 }>;
 
+/**
+ * One file per protocol the commission signed: the company, the course, the
+ * number and the date issuance gave it. Settings saved between two issuances
+ * of the same sitting — a corrected text, another signature — do not split one
+ * protocol into two files under one number; the heading is drawn from the
+ * first document of the list.
+ */
 export function groupItemsForProtocols(
   items: readonly CertificateRenderMetadata[],
 ): ProtocolGroup[] {
@@ -34,8 +41,9 @@ export function groupItemsForProtocols(
     const organization = item.organization ? normalizePdfText(item.organization) : null;
     const key = JSON.stringify([
       organization?.toLocaleLowerCase('ru-RU'),
-      item.titleSnapshot,
-      item.branding,
+      item.branding.documentProfile?.courseSlug ?? item.titleSnapshot,
+      item.branding.protocolNumber,
+      item.branding.protocolDate ?? null,
     ]);
     const group = groups.get(key) ?? { organization, courseTitle: item.titleSnapshot, items: [] };
     group.items.push(item);
@@ -220,9 +228,13 @@ export async function generateProtocolInBrowser(
       );
     const profile = branding.documentProfile;
     if (profile?.hours) paragraph('Объём программы: ' + profile.hours + ' часов.', 11);
+    // The field is «Номер приказа»: a «№» typed into it is not printed twice,
+    // and the date reads the way the rest of the sheet is dated.
     if (profile?.orderNumber)
       paragraph(
-        'Приказ № ' + profile.orderNumber + (profile.orderDate ? ' от ' + profile.orderDate : ''),
+        'Приказ № ' +
+          profile.orderNumber.replace(/^\s*№\s*/u, '') +
+          (profile.orderDate ? ' от ' + profile.orderDate.split('-').reverse().join('.') : ''),
         11,
       );
     if (profile?.verificationKind)
@@ -322,7 +334,15 @@ export async function generateProtocolInBrowser(
         person,
       );
       if (family === 'ptm')
-        row([...base, person.position, org, filled.trainingReason, participantResult(person), '']);
+        row([
+          ...base,
+          person.position,
+          org,
+          filled.trainingReason,
+          participantResult(person),
+          '',
+          filled.notes,
+        ]);
       else if (family === 'biot')
         row([
           ...base,

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { EDUCATION_LEVELS, educationLevel } from '../../lib/profile/education.ts';
-import { PROTOCOL_MAX_PARTICIPANTS, protocolPartNumber } from '../../lib/pdf/document-editor.ts';
+import { PROTOCOL_MAX_PARTICIPANTS } from '../../lib/pdf/document-editor.ts';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 const MIGRATION = 'supabase/migrations/20260921100000_education_levels_and_protocol_parts.sql';
@@ -34,9 +34,11 @@ test('the database accepts exactly the levels the picker offers', async () => {
 
 test('a protocol takes fifty people, the fifty-first opens the next part', async () => {
   assert.equal(PROTOCOL_MAX_PARTICIPANTS, 50);
-  assert.equal(protocolPartNumber('21.09', 1), '21.09');
-  assert.equal(protocolPartNumber('21.09', 2), '21.09-2');
   const sql = await read(MIGRATION);
   assert.match(sql, new RegExp(`c_max_participants constant integer := ${PROTOCOL_MAX_PARTICIPANTS};`, 'u'));
   assert.match(sql, /v_base\|\|'-'\|\|\(v_people\/c_max_participants\+1\)::text/u);
+  // The capture that issues today keeps the same limit, a category to a protocol.
+  const current = await read('supabase/migrations/20260922100000_documents_issuance_model.sql');
+  assert.match(current, new RegExp(`c_max_participants constant integer := ${PROTOCOL_MAX_PARTICIPANTS};`, 'u'));
+  assert.match(current, /profile_id is not distinct from p\.id and people<c_max_participants/u);
 });

@@ -46,6 +46,8 @@ export type ProfileRow = {
   onboarding_completed_at: string | null;
   created_at: string;
   updated_at: string;
+  /** ИТР or рабочий chosen by an administrator; null lets the position decide. */
+  document_audience?: 'itr' | 'worker' | null;
 };
 
 export type AuthContextRpcRow = {

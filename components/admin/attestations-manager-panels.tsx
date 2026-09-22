@@ -50,15 +50,34 @@ const CourseAccessControl = dynamic(
   { loading: () => <p role="status">Загружаем допуски…</p> },
 );
 
+const PersonDocumentFields = dynamic(
+  () =>
+    import('@/components/admin/person-document-fields').then(
+      (module) => module.PersonDocumentFields,
+    ),
+  {
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="h-24 animate-pulse rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] motion-reduce:animate-none"
+      />
+    ),
+  },
+);
+
 /**
- * Fetches the card's lazy chunk ahead of the first click. The list asks for it
- * once the browser is idle, so opening a person no longer starts with a
- * download; the same specifier as above resolves to the same chunk.
+ * Fetches the card's lazy chunks ahead of the first click. The list asks for
+ * them once the browser is idle, so opening a person no longer starts with a
+ * download; the same specifiers as above resolve to the same chunks.
  */
-export const preloadAttestationCard = () => void import('@/components/admin/course-access-control');
+export const preloadAttestationCard = () => {
+  void import('@/components/admin/course-access-control');
+  void import('@/components/admin/person-document-fields');
+};
 
 export type AttestationPermissions = {
-  canManageDocuments?: boolean;
+  /** The phone dock carries «Документы» too and wraps to two rows sooner. */
+  canManageSettings?: boolean;
   canReadUser: boolean;
   canReadIdentity: boolean;
   canReadCertificate: boolean;
@@ -1157,31 +1176,12 @@ function AttestationDetailContent({
               ) : null}
             </section>
 
-            {permissions.canManageDocuments && row.organization && !courseDeleted ? (
-              <div className="grid gap-2 sm:grid-cols-2">
-                {(['certificate', 'protocol'] as const).map((tab) => (
-                  <Button
-                    key={tab}
-                    asChild
-                    variant="outline"
-                    className="h-auto min-h-11 max-w-full min-w-0 px-3 text-center [overflow-wrap:anywhere] whitespace-normal"
-                  >
-                    <a
-                      href={
-                        '/admin/settings/certificate?' +
-                        new URLSearchParams({
-                          organization: row.organization!,
-                          course: row.testId ?? '',
-                          user: row.userId,
-                          tab,
-                        })
-                      }
-                    >
-                      {tab === 'certificate' ? 'Редактировать удостоверение' : 'Протокол компании'}
-                    </a>
-                  </Button>
-                ))}
-              </div>
+            {permissions.canIssue && row.testId && !courseDeleted ? (
+              <PersonDocumentFields
+                key={`documents:${row.userId}:${row.testId}`}
+                userId={row.userId}
+                courseId={row.testId}
+              />
             ) : null}
             {canReadCertificate && !courseDeleted ? (
               <details className="group rounded-[var(--radius-group)] border border-[var(--color-border)]">

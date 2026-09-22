@@ -12,6 +12,7 @@ export function AdminNavLink({
   shortLabel,
   children,
   mobile = false,
+  spanLast = true,
 }: {
   href: string;
   label: string;
@@ -19,6 +20,8 @@ export function AdminNavLink({
   shortLabel?: string;
   children: ReactNode;
   mobile?: boolean;
+  /** Five items: the last one takes the rest of the second row below 360 px. */
+  spanLast?: boolean;
 }) {
   const pathname = usePathname();
   const active =
@@ -26,7 +29,7 @@ export function AdminNavLink({
 
   // The phone dock is the public site's dock, item for item. Below 360 px five
   // captions do not fit one row, so the grid wraps to 3 + 2 and the last item
-  // takes the rest of the second row.
+  // takes the rest of the second row; six wrap to 3 + 3 and need no filler.
   if (mobile) {
     return (
       <DockItem
@@ -34,7 +37,7 @@ export function AdminNavLink({
         label={label}
         shortLabel={shortLabel}
         active={active}
-        className="last:col-span-2 min-[360px]:last:col-span-1"
+        className={spanLast ? 'last:col-span-2 min-[360px]:last:col-span-1' : undefined}
       >
         {children}
       </DockItem>

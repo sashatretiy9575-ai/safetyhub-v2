@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { FRAME_INPUT, FrameWord, WordFrame } from '@/components/admin/word-frame';
+import { documentDate, numberFromDate } from '@/lib/pdf/document-editor';
 
 export type AttestationDialogConfig = {
   title: string;
@@ -21,6 +23,15 @@ export type AttestationDialogConfig = {
   };
   reason?: { label: string; minLength: number; placeholder?: string };
   confirmationPhrase?: string;
+  /** Issuance: the date of the protocol and, if the centre numbers it itself, its number. */
+  protocol?: boolean;
+};
+
+export type AttestationDialogValues = {
+  value: string;
+  reason: string;
+  protocolDate?: string;
+  protocolNumber?: string;
 };
 
 export function AttestationsActionDialog({
@@ -34,7 +45,7 @@ export function AttestationsActionDialog({
   busy: boolean;
   error: string;
   onCancel: () => void;
-  onConfirm: (values: { value: string; reason: string }) => void | Promise<void>;
+  onConfirm: (values: AttestationDialogValues) => void | Promise<void>;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -42,6 +53,8 @@ export function AttestationsActionDialog({
   const [value, setValue] = useState('');
   const [reason, setReason] = useState('');
   const [confirmation, setConfirmation] = useState('');
+  const [protocolDate, setProtocolDate] = useState('');
+  const [protocolNumber, setProtocolNumber] = useState('');
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -49,6 +62,8 @@ export function AttestationsActionDialog({
       setValue(config.input?.initialValue ?? '');
       setReason('');
       setConfirmation('');
+      setProtocolDate(documentDate());
+      setProtocolNumber('');
       dialog.showModal();
     }
     if (!config && dialog?.open) dialog.close();
@@ -83,7 +98,13 @@ export function AttestationsActionDialog({
           className="max-h-[92dvh] overflow-y-auto"
           onSubmit={(event) => {
             event.preventDefault();
-            void onConfirm({ value: value.trim(), reason: reason.trim() });
+            void onConfirm({
+              value: value.trim(),
+              reason: reason.trim(),
+              ...(config.protocol
+                ? { protocolDate, protocolNumber: protocolNumber.trim() }
+                : {}),
+            });
           }}
         >
           <div className="space-y-2 border-b border-[var(--color-border)] p-3 sm:p-5">
@@ -107,6 +128,29 @@ export function AttestationsActionDialog({
                   maxLength={config.input.maxLength ?? 160}
                   required
                   autoFocus
+                />
+              </div>
+            ) : null}
+            {config.protocol ? (
+              <div className="xs:grid-cols-2 grid min-w-0 gap-3">
+                <WordFrame>
+                  <FrameWord>протокол от</FrameWord>
+                  <input
+                    type="date"
+                    aria-label="Дата протокола"
+                    required
+                    max={documentDate()}
+                    className={FRAME_INPUT}
+                    value={protocolDate}
+                    onChange={(event) => setProtocolDate(event.target.value)}
+                  />
+                </WordFrame>
+                <Input
+                  aria-label="Номер протокола"
+                  placeholder={protocolDate ? `№ ${numberFromDate(protocolDate)}` : '№'}
+                  maxLength={40}
+                  value={protocolNumber}
+                  onChange={(event) => setProtocolNumber(event.target.value)}
                 />
               </div>
             ) : null}
