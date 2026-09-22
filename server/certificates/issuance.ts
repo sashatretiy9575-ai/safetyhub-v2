@@ -87,6 +87,8 @@ export const certificateDownloadPayloadSchema = z
           .object({
             trainingReason: z.string().max(500).optional(),
             notes: z.string().max(500).optional(),
+            electricalGroup: z.string().max(8).optional(),
+            electricalVoltage: z.string().max(32).optional(),
             qualificationDecision: z.string().max(500).optional(),
             formalExamReference: z.string().max(500).optional(),
             formalExamDate: z.string().optional(),
@@ -219,6 +221,8 @@ export async function createCertificateRenderMetadata(
       ? {
           trainingReason: snapshot.participantFields.trainingReason,
           notes: snapshot.participantFields.notes,
+          electricalGroup: snapshot.participantFields.electricalGroup,
+          electricalVoltage: snapshot.participantFields.electricalVoltage,
           qualificationDecision: snapshot.participantFields.qualificationDecision,
           formalExamReference: snapshot.participantFields.formalExamReference,
           formalExamDate: snapshot.participantFields.formalExamDate,

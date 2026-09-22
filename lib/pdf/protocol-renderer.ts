@@ -55,7 +55,39 @@ export function protocolFilename(group: ProtocolGroup, protocolNumber: string) {
   // «ИТР» and «Рабочие» are separate protocols; the file says which one it is.
   const audience = group.items[0]?.branding.documentProfile?.audience;
   const label = audience === 'itr' ? 'ИТР-' : audience === 'worker' ? 'Рабочие-' : '';
+  // A qualification check of electrical safety is one protocol per person, so
+  // the file is named after the person rather than after the company.
+  if (group.items[0]?.branding.documentProfile?.family === 'electrical')
+    return `protocols/Протокол-${safeFilenameSegment(protocolNumber || 'без-номера', 24)}-${safeFilenameSegment(group.items[0]?.fullName ?? group.participants?.[0]?.fullName ?? 'без-имени', 64)}.pdf`;
   return `protocols/Протокол-${safeFilenameSegment(protocolNumber || 'без-номера', 24)}-${label}${safeFilenameSegment(group.organization ?? 'без-компании', 48)}-${safeFilenameSegment(group.courseTitle, 48)}${group.groupNumber ? '-' + group.groupNumber : ''}.pdf`;
+}
+
+/** The day of the sitting: the group's own, the branding's, else the day of issue. */
+export function protocolDate(group: ProtocolGroup, branding: CertificateBranding) {
+  return new Date(
+    (group.date ??
+      branding.protocolDate ??
+      group.items[0]?.issuedAt?.slice(0, 10) ??
+      new Date().toISOString().slice(0, 10)) + 'T12:00:00+05:00',
+  );
+}
+
+/** Who the protocol lists: the people given to it, or the documents it draws. */
+export function protocolParticipants(group: ProtocolGroup): DocumentParticipant[] {
+  return (
+    group.participants?.slice() ??
+    group.items.map((item): DocumentParticipant => ({
+      userId: item.certificateId,
+      fullName: item.fullName,
+      position: item.position ?? '',
+      education: item.education ?? '',
+      status: item.score >= item.passScore ? 'passed' : 'failed',
+      score: item.score,
+      total: item.total,
+      certificateId: item.certificateId,
+      ...item.documentDetails,
+    }))
+  );
 }
 
 /**
@@ -145,6 +177,37 @@ export async function generateProtocolInBrowser(
     import('./document-layout.ts'),
   ]);
 
+  // The qualification check of electrical safety is a sheet per person, not a
+  // table of a sitting: another form altogether.
+  if (branding.documentProfile?.family === 'electrical') {
+    const [{ drawElectricalProtocols }, pdf] = await Promise.all([
+      import('./electrical-protocol.ts'),
+      PDFDocument.create(),
+    ]);
+    pdf.registerFontkit(fontkitModule.default);
+    const fonts = await loadDocumentFonts(pdf, fontUrl, group.items[0]?.verificationUrl, signal);
+    const [stamp, ...signatures] = await Promise.all([
+      embedFacsimile(pdf, branding.stampUrl, group.items[0]?.verificationUrl, signal),
+      ...(branding.commissionSignatureUrls ?? [branding.protocolSignatureUrl ?? null]).map((url) =>
+        embedFacsimile(pdf, url, group.items[0]?.verificationUrl, signal),
+      ),
+    ]);
+    drawElectricalProtocols(pdf, fonts, protocolParticipants(group), {
+      branding,
+      organization: group.organization ?? '',
+      date: protocolDate(group, branding),
+      number: branding.protocolNumber,
+      stamp,
+      signatures,
+    });
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+    pdf.setTitle('Протокол № ' + branding.protocolNumber + ' — ' + group.courseTitle);
+    pdf.setAuthor(branding.organizationName);
+    const electricalBytes = await pdf.save({ useObjectStreams: true });
+    measureSpan('doc:job', jobStarted);
+    return electricalBytes;
+  }
+
   const draw = async (scale: number) => {
     const pdf = await PDFDocument.create();
     pdf.registerFontkit(fontkitModule.default);
@@ -181,12 +244,7 @@ export async function generateProtocolInBrowser(
         y += 12 * scale;
       }
     };
-    const date = new Date(
-      (group.date ??
-        branding.protocolDate ??
-        group.items[0]?.issuedAt?.slice(0, 10) ??
-        new Date().toISOString().slice(0, 10)) + 'T12:00:00+05:00',
-    );
+    const date = protocolDate(group, branding);
     pdf.setTitle('Протокол № ' + branding.protocolNumber + ' — ' + group.courseTitle);
     pdf.setAuthor(branding.organizationName);
     paragraph(
@@ -311,19 +369,7 @@ export async function generateProtocolInBrowser(
       y += height;
     };
     row(header, true);
-    const people =
-      group.participants ??
-      group.items.map((item): DocumentParticipant => ({
-        userId: item.certificateId,
-        fullName: item.fullName,
-        position: item.position ?? '',
-        education: item.education ?? '',
-        status: item.score >= item.passScore ? 'passed' : 'failed',
-        score: item.score,
-        total: item.total,
-        certificateId: item.certificateId,
-        ...item.documentDetails,
-      }));
+    const people = protocolParticipants(group);
     for (const [i, person] of people.entries()) {
       if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
       const base = [String(i + 1) + '.', person.fullName || 'ФИО не указано'];

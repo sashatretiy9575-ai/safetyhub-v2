@@ -1957,7 +1957,15 @@ export type Database = {
         Args: { p_test_slug: string; p_user_id: string }
         Returns: undefined
       }
+      resolve_certificate_export_job_without_snapshots: {
+        Args: { p_job_id: string }
+        Returns: Json
+      }
       resolve_certificate_export_unmetered: {
+        Args: { p_attestation_ids: string[] }
+        Returns: Json
+      }
+      resolve_certificate_export_unmetered_without_snapshots: {
         Args: { p_attestation_ids: string[] }
         Returns: Json
       }
@@ -2131,6 +2139,7 @@ export type Database = {
       valid_document_course: { Args: { p: Json }; Returns: boolean }
       valid_document_defaults: { Args: { v: Json }; Returns: boolean }
       valid_document_defaults_v1: { Args: { v: Json }; Returns: boolean }
+      valid_electrical_admission: { Args: { v: Json }; Returns: boolean }
       verify_user_identity_unmetered: {
         Args: {
           p_job: string
@@ -2141,6 +2150,7 @@ export type Database = {
         }
         Returns: Json
       }
+      with_document_snapshots: { Args: { p: Json }; Returns: Json }
       zh_session_epoch_is_current: {
         Args: { p_user_id: string }
         Returns: boolean
@@ -5595,6 +5605,15 @@ export type Database = {
           }
       save_document_course: {
         Args: { p_course: Json; p_expected: Json; p_test_id: string }
+        Returns: Json
+      }
+      save_document_electrical: {
+        Args: {
+          p_course_slug: string
+          p_group: string
+          p_user_id: string
+          p_voltage: string
+        }
         Returns: Json
       }
       save_document_note: {

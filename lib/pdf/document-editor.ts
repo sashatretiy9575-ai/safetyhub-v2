@@ -24,6 +24,9 @@ export type DocumentParticipant = {
   verificationKind?: string;
   trainingReason?: string;
   notes?: string;
+  /** The group and the voltage this person was admitted to, on an electrical course. */
+  electricalGroup?: string;
+  electricalVoltage?: string;
   qualificationDecision?: string;
   organization?: string;
   formalExamReference?: string;

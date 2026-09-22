@@ -1,5 +1,6 @@
 import type { CertificateBranding } from './certificate-client-contract.ts';
 import { completeDocumentProfile } from './document-family-defaults.ts';
+import type { ElectricalAdmission } from './electrical.ts';
 
 export const DOCUMENT_FAMILIES = [
   'general',
@@ -8,6 +9,7 @@ export const DOCUMENT_FAMILIES = [
   'industrial',
   'qualification',
   'first-aid',
+  'electrical',
 ] as const;
 export type DocumentFamily = (typeof DOCUMENT_FAMILIES)[number];
 export type DocumentSigner = {
@@ -65,6 +67,8 @@ export type DocumentProfileSettings = {
   orderDate: string;
   verificationKind: string;
   booklet?: DocumentBooklet;
+  /** The usual admission of an electrical course; one person may be given another. */
+  electrical?: ElectricalAdmission;
 };
 /** The profile a document is drawn from: its settings and the commission of the day. */
 export type DocumentProfile = DocumentProfileSettings & {

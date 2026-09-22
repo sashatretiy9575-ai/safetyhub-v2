@@ -173,7 +173,11 @@ begin
       and has_function_privilege('service_role', routine.oid, 'EXECUTE')
       and routine.oid not in (
         'private.normalize_profile_text(text)'::regprocedure::oid,
-        'private.normalized_lookup_key(text)'::regprocedure::oid
+        'private.normalized_lookup_key(text)'::regprocedure::oid,
+        -- Read by the guard on course presentations while the server publishes
+        -- one with its own key; it reads a transaction setting and compares two
+        -- json documents, and decides nothing on its own.
+        'private.purge_clears_user_column(jsonb,jsonb,text)'::regprocedure::oid
       )
   ) then
     raise exception 'service role has unexpected private function execute';

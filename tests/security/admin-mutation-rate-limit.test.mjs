@@ -26,6 +26,7 @@ const guardedRoutes = new Map([
   ['app/api/admin/documents/courses/[courseId]/route.ts', 'site.settings.update'],
   ['app/api/admin/documents/notes/route.ts', 'admin.attestation.mutate'],
   ['app/api/admin/documents/audience/route.ts', 'admin.attestation.mutate'],
+  ['app/api/admin/documents/electrical/route.ts', 'admin.attestation.mutate'],
 ]);
 
 test('every live privileged mutation applies same-origin and shared actor/IP quotas', async () => {

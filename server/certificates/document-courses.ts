@@ -4,7 +4,10 @@ import { z } from 'zod';
 import type { CourseDocumentSetup, courseDocumentPayload } from '@/lib/pdf/document-course';
 import { DOCUMENT_FAMILIES } from '@/lib/pdf/document-profile';
 import { requireCapability } from '@/server/auth/session';
-import { parseDocumentProfileRow } from '@/server/certificates/document-profiles';
+import {
+  electricalAdmissionSchema,
+  parseDocumentProfileRow,
+} from '@/server/certificates/document-profiles';
 import { createAdminClient } from '@/server/supabase/admin';
 import { createClient } from '@/server/supabase/server';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
@@ -87,6 +90,7 @@ export const courseDocumentSaveSchema = z
         orderDate: z.union([z.iso.date(), z.literal('')]),
         verificationKind: z.string().max(120),
         booklet: z.object({ layout: z.literal('standard'), texts: bookletTexts }).strict().nullable(),
+        electrical: electricalAdmissionSchema.nullable(),
         categories: z
           .object({
             all: categorySchema.optional(),

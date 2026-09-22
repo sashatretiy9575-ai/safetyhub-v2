@@ -1,0 +1,994 @@
+{
+  "schemaVersion": 1,
+  "slug": "elektrobezopasnost-i-raboty-na-vysote",
+  "locale": "en",
+  "status": "draft-awaiting-independent-review",
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "variants": [
+    {
+      "id": "12b4ece4-dfce-5ffc-aaa9-eb30fff289d6",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "e4bcea94-621a-5b9e-a934-5d10fc09c7e2",
+          "text": "What 50 Hz alternating current is called the non-let-go current, at which a person cannot release their grip unaided?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "def1d9b2-399b-58f7-982c-3aa6695aa757",
+              "text": "0.6–1.5 mA",
+              "displayOrder": 1
+            },
+            {
+              "id": "35c105ef-de0d-5fbf-9e63-67175e64c6c5",
+              "text": "10–15 mA",
+              "displayOrder": 2
+            },
+            {
+              "id": "b7d7d3a7-a868-5480-a69c-792a322dc74f",
+              "text": "50–100 mA",
+              "displayOrder": 3
+            },
+            {
+              "id": "66320bd2-3c73-57b1-9b1b-888e7a1cf07f",
+              "text": "More than 5 A",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "35c105ef-de0d-5fbf-9e63-67175e64c6c5",
+          "explanation": "A current of 10–15 mA causes irresistible muscle spasms: it is impossible to unclench the hand and break free unaided.",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "423e81b5-d6ff-520a-add5-942953cea559",
+          "text": "What share of the current does the “hand — hand” loop pass through the heart?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "1f9c3faf-638b-5b0d-ad15-537b2333022a",
+              "text": "About 0.4%",
+              "displayOrder": 1
+            },
+            {
+              "id": "acbdb4c0-4469-5f69-8829-1b9f6ea74a03",
+              "text": "About 3.3%",
+              "displayOrder": 2
+            },
+            {
+              "id": "36e22184-95a1-5394-9a33-05b31bfea27b",
+              "text": "About 12%",
+              "displayOrder": 3
+            },
+            {
+              "id": "2da357a3-304e-56c8-b7df-75c070d1239b",
+              "text": "About 25%",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "acbdb4c0-4469-5f69-8829-1b9f6ea74a03",
+          "explanation": "The “hand — hand” loop passes about 3.3% of the current through the heart and remains the most common workplace case.",
+          "slideRefs": [
+            "slide-09"
+          ]
+        },
+        {
+          "id": "4b56e79c-4b04-516a-a97c-512f01566689",
+          "text": "How do you correctly leave a step voltage zone?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "c9cf6fb1-649f-51b3-9946-0d79085bedfa",
+              "text": "At a run, to leave the danger zone faster",
+              "displayOrder": 1
+            },
+            {
+              "id": "67e99b64-e14f-5f31-8bec-2731b4aeb8b7",
+              "text": "By hopping on one foot",
+              "displayOrder": 2
+            },
+            {
+              "id": "b270c079-92b6-5afb-adae-d5faf7f63340",
+              "text": "With a “shuffle”, feet never off the ground",
+              "displayOrder": 3
+            },
+            {
+              "id": "02e9c2bf-7c7a-59a8-bc82-2a5764dcd7b7",
+              "text": "With long strides along the shortest route",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b270c079-92b6-5afb-adae-d5faf7f63340",
+          "explanation": "Leave the current spreading zone slowly with a “shuffle”, each step no longer than your foot; running and jumping are forbidden — a fall is fatal.",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "d5cbc30b-672c-52b4-8f38-c99ce9cb22d5",
+          "text": "What is protective earthing for?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "abc4c541-ee6b-5e27-a03a-a16a67791fb4",
+              "text": "It disconnects the faulty section in 0.4 seconds",
+              "displayOrder": 1
+            },
+            {
+              "id": "2e999f3b-0916-50f9-860c-00f123d366b9",
+              "text": "It limits the leakage current to 30 mA",
+              "displayOrder": 2
+            },
+            {
+              "id": "a84034fd-ec28-59e8-a28b-a20e554a090d",
+              "text": "It equalises potentials under step voltage",
+              "displayOrder": 3
+            },
+            {
+              "id": "3759930c-99d5-5c66-ba4c-54956f1bd7f9",
+              "text": "It reduces touch voltage on a fault to the enclosure",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "3759930c-99d5-5c66-ba4c-54956f1bd7f9",
+          "explanation": "Earthing connects non-live metal parts to an earth electrode: the fault current flows into the ground. Disconnection in 0.4 s is the TN neutral connection, and 30 mA is the RCD threshold.",
+          "slideRefs": [
+            "slide-16"
+          ]
+        },
+        {
+          "id": "11783fe3-ab47-50b6-896d-127f571d50dc",
+          "text": "Which RCD is used to protect people against direct contact with live parts?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "a6129e61-37b5-53cd-9027-fd16597493a3",
+              "text": "With a leakage current of no more than 100 mA",
+              "displayOrder": 1
+            },
+            {
+              "id": "472c3162-4537-56be-b4bd-bbe5aaf08b9e",
+              "text": "With a leakage current of no more than 30 mA",
+              "displayOrder": 2
+            },
+            {
+              "id": "ec95abfc-fc2b-5e50-b102-826d9c48d1b7",
+              "text": "With a leakage current of no more than 300 mA",
+              "displayOrder": 3
+            },
+            {
+              "id": "0c1300bc-585c-569b-94bc-0bb814722147",
+              "text": "With a leakage current of no more than 1 A",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "472c3162-4537-56be-b4bd-bbe5aaf08b9e",
+          "explanation": "People are protected by an RCD with IΔn of no more than 30 mA; it disconnects the circuit in 0.02–0.04 s.",
+          "slideRefs": [
+            "slide-19"
+          ]
+        },
+        {
+          "id": "49c01109-75f5-558d-82ca-b0803156fe01",
+          "text": "In what order is a portable protective earth applied?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "a345c1e3-5063-5ab7-87dd-3e439238ed5e",
+              "text": "First to the earth electrode, then to the live parts",
+              "displayOrder": 1
+            },
+            {
+              "id": "9e3e61d3-8a25-5805-8606-f38a2faa2b08",
+              "text": "First to the live parts, then to the earth electrode",
+              "displayOrder": 2
+            },
+            {
+              "id": "7609271b-2551-5c41-98fb-9f3852d28321",
+              "text": "To the earth electrode and the live parts at once",
+              "displayOrder": 3
+            },
+            {
+              "id": "3062a03a-21be-5f99-a43b-fbdd9e85a5b9",
+              "text": "In any order, if the work is done in gloves",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "a345c1e3-5063-5ab7-87dd-3e439238ed5e",
+          "explanation": "Earthing is applied “first to Earth, then to Phase” and removed in the reverse order. Breaking this order is fatal.",
+          "slideRefs": [
+            "slide-24"
+          ]
+        },
+        {
+          "id": "d4f9e174-3d6f-5db5-8af3-8aa556a0d360",
+          "text": "What is the maximum validity period of a work permit?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "ae2c02bf-78b6-5b98-ad01-57321a4fad85",
+              "text": "One work shift",
+              "displayOrder": 1
+            },
+            {
+              "id": "b956065b-403e-53d9-8b01-9071d72d0ab2",
+              "text": "No more than 30 calendar days",
+              "displayOrder": 2
+            },
+            {
+              "id": "af7354c8-c85f-52c6-968c-4141568abedd",
+              "text": "One year",
+              "displayOrder": 3
+            },
+            {
+              "id": "37dc83bf-5314-532b-92b6-1905165325d3",
+              "text": "No more than 15 calendar days",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "37dc83bf-5314-532b-92b6-1905165325d3",
+          "explanation": "A work permit is valid for no more than 15 calendar days; a work order — within one shift.",
+          "slideRefs": [
+            "slide-28"
+          ]
+        },
+        {
+          "id": "313fbddc-48ae-5997-812e-655fdb8c3f1b",
+          "text": "Which work counts as high-level (steeplejack) work?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "9d76bd9e-1fe9-52c3-a0e9-addcb2bef59c",
+              "text": "At more than 1.3 m above machines and mechanisms",
+              "displayOrder": 1
+            },
+            {
+              "id": "229c08e3-dc97-532d-9c12-f388a1a48425",
+              "text": "At more than 1.8 m from a leaning ladder",
+              "displayOrder": 2
+            },
+            {
+              "id": "f7010a45-c7e9-520a-b2e1-f1f915dcdd70",
+              "text": "At more than 5 m above ground or a floor slab",
+              "displayOrder": 3
+            },
+            {
+              "id": "ff38746d-c0aa-5b5a-a7ca-1612453a9834",
+              "text": "At any height from an aerial work platform",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f7010a45-c7e9-520a-b2e1-f1f915dcdd70",
+          "explanation": "High-level (steeplejack) work is work more than 5 m above the ground or a floor slab, done from erection fixtures or directly from structures.",
+          "slideRefs": [
+            "slide-40"
+          ]
+        },
+        {
+          "id": "bf0d3f94-2549-543d-ab19-62ff3c52767d",
+          "text": "May a waist installation belt without shoulder and thigh straps be used as a fall arrest system?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "f5ec783b-897a-54fe-8f6a-ff24c48e28d6",
+              "text": "Yes, at heights up to 5 m",
+              "displayOrder": 1
+            },
+            {
+              "id": "a8da883a-1669-5635-a2af-ec9a23371ec1",
+              "text": "No, this is prohibited",
+              "displayOrder": 2
+            },
+            {
+              "id": "35650115-6396-5446-98c5-8e6eb3979849",
+              "text": "Yes, if an energy absorber is attached to the belt",
+              "displayOrder": 3
+            },
+            {
+              "id": "5f5e78ac-92b1-5a44-8a24-8679d3e3de62",
+              "text": "Yes, if there is a reliable anchor",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "a8da883a-1669-5635-a2af-ec9a23371ec1",
+          "explanation": "A waist belt without straps is prohibited as a fall arrest system: only a full body harness can stop a fall.",
+          "slideRefs": [
+            "slide-43"
+          ]
+        },
+        {
+          "id": "01b43686-ce34-557a-b68d-051034f79d75",
+          "text": "How is a conscious casualty positioned after being lowered from suspension in a harness?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "85d47078-e7e9-5816-b6c1-1590a4f8cd25",
+              "text": "Semi-sitting, not laid on their back",
+              "displayOrder": 1
+            },
+            {
+              "id": "6f559b2d-273f-5dce-8469-c70c7b78ed43",
+              "text": "Horizontally on the back with the legs raised",
+              "displayOrder": 2
+            },
+            {
+              "id": "7f530f05-4f5d-558d-a16a-6e93124711ab",
+              "text": "Face down, head turned to the side",
+              "displayOrder": 3
+            },
+            {
+              "id": "05f5bb08-64b1-5c24-97fc-ad2e7262ea18",
+              "text": "Standing, supported by the rescuer",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "85d47078-e7e9-5816-b6c1-1590a4f8cd25",
+          "explanation": "A conscious casualty is placed semi-sitting: laying them flat on their back risks “reflow syndrome”. If there is no consciousness or breathing, they are laid flat and CPR is started.",
+          "slideRefs": [
+            "slide-55"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3cae53a1-4ed5-51c1-84bb-590f60692bad",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "06a53113-9153-5e02-8d33-779201515483",
+          "text": "At what alternating current does cardiac fibrillation occur?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "4533fbf6-a7c9-56d4-9c31-cfa58bac7fa4",
+              "text": "0.6–1.5 mA",
+              "displayOrder": 1
+            },
+            {
+              "id": "e3092ca3-b267-56c2-84b8-5a1371ae4c95",
+              "text": "10–15 mA",
+              "displayOrder": 2
+            },
+            {
+              "id": "c0d3db18-feb7-5485-a9fd-6eae5f9f73ba",
+              "text": "50–100 mA",
+              "displayOrder": 3
+            },
+            {
+              "id": "d1abe76a-6568-53ec-ada3-d818cb739cd4",
+              "text": "Up to 0.5 mA",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c0d3db18-feb7-5485-a9fd-6eae5f9f73ba",
+          "explanation": "A current of 50–100 mA causes chaotic contractions of the heart (fibrillation) and circulatory arrest.",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "fe718ad9-bcec-54a6-8b27-39020169a0f2",
+          "text": "What category does the outdoor switchgear area belong to?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "ff91c1d8-c70b-504d-8856-672b9ae8492c",
+              "text": "Especially hazardous premises",
+              "displayOrder": 1
+            },
+            {
+              "id": "133241f7-b96c-5bc3-8715-233efc89c8a4",
+              "text": "Premises without increased hazard",
+              "displayOrder": 2
+            },
+            {
+              "id": "c0a0b4d4-fb02-54d8-832a-e58f7f3194bf",
+              "text": "Premises with increased hazard",
+              "displayOrder": 3
+            },
+            {
+              "id": "7b38e7ed-cfa4-539b-afe5-ea8758e677dd",
+              "text": "Not classified by hazard",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ff91c1d8-c70b-504d-8856-672b9ae8492c",
+          "explanation": "An outdoor switchgear area is always equated to especially hazardous premises; any outdoor work is work in especially hazardous conditions.",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "5e472e12-25e2-5a77-9680-1b60d91f5cdf",
+          "text": "Which earthing system is prohibited for new and reconstructed electrical installations?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "4d874767-46be-5bc5-8458-810e2217baf3",
+              "text": "TN-S",
+              "displayOrder": 1
+            },
+            {
+              "id": "d750aa0a-a822-5d7f-8220-927b414bc6b2",
+              "text": "TN-C-S",
+              "displayOrder": 2
+            },
+            {
+              "id": "3c4412bb-de81-568e-addc-a2861563be65",
+              "text": "IT",
+              "displayOrder": 3
+            },
+            {
+              "id": "f0bcfa22-aa94-5697-ada9-8646e53cb1e0",
+              "text": "TN-C",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f0bcfa22-aa94-5697-ada9-8646e53cb1e0",
+          "explanation": "TN-C, with a combined PEN conductor throughout the network, is outdated and prohibited for new and reconstructed electrical installations.",
+          "slideRefs": [
+            "slide-17"
+          ]
+        },
+        {
+          "id": "c88d970b-adf7-52a8-8ab2-56cafd255041",
+          "text": "With protective neutral connection, how quickly must a faulty section of a 220/380 V network be disconnected?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "a10a8b89-7257-5353-9025-78bca861bb25",
+              "text": "In no more than 2 s",
+              "displayOrder": 1
+            },
+            {
+              "id": "4adaca07-15f4-5b1b-9a5b-4defbceb4ff7",
+              "text": "In no more than 0.4 s",
+              "displayOrder": 2
+            },
+            {
+              "id": "53f90043-7c7d-57da-b259-42d2854dd7df",
+              "text": "In no more than 5 s",
+              "displayOrder": 3
+            },
+            {
+              "id": "287273ea-c419-5475-8e2e-a90eb3035f16",
+              "text": "In no more than 10 s",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "4adaca07-15f4-5b1b-9a5b-4defbceb4ff7",
+          "explanation": "Under the PUE (Electrical Installation Code), the disconnection time of a faulty section in a 220/380 V network must not exceed 0.4 s.",
+          "slideRefs": [
+            "slide-18"
+          ]
+        },
+        {
+          "id": "57918d2d-6cab-53d4-adb5-0dcf56e3944a",
+          "text": "What voltage must lamps have inside metal tanks, boilers and wells?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "99b06ca9-1c1f-5787-bbe6-338084110596",
+              "text": "No higher than 12 V",
+              "displayOrder": 1
+            },
+            {
+              "id": "ecf51aac-15ab-56a7-9408-4261d133d3bb",
+              "text": "No higher than 42 V",
+              "displayOrder": 2
+            },
+            {
+              "id": "cf671a3e-2e75-5ad5-a23a-a459659360b0",
+              "text": "No higher than 127 V",
+              "displayOrder": 3
+            },
+            {
+              "id": "ac8ef91f-4457-5254-9123-00d47715d008",
+              "text": "No higher than 220 V",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "99b06ca9-1c1f-5787-bbe6-338084110596",
+          "explanation": "In especially hazardous conditions — inside boilers, tanks and wells — a voltage of no higher than 12 V is permitted.",
+          "slideRefs": [
+            "slide-20"
+          ]
+        },
+        {
+          "id": "8dd59d26-bb9a-5f32-91e7-78b0ed05f9ab",
+          "text": "What are dielectric gloves in electrical installations above 1000 V?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "0cb2a512-91f1-5c5d-8887-de6155a45d44",
+              "text": "Basic electrical protective equipment",
+              "displayOrder": 1
+            },
+            {
+              "id": "0802553e-89be-5001-ab16-ccfbb6dd4101",
+              "text": "Equipment that is not used there",
+              "displayOrder": 2
+            },
+            {
+              "id": "2647db89-dd7a-5221-ac71-bda8c0d70d3b",
+              "text": "Additional electrical protective equipment",
+              "displayOrder": 3
+            },
+            {
+              "id": "527aea03-7295-55d9-8463-091c6d9918ee",
+              "text": "Equipment for measurements only",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "2647db89-dd7a-5221-ac71-bda8c0d70d3b",
+          "explanation": "Above 1 kV, dielectric gloves are only additional equipment and are used together with basic equipment (insulating rods, tongs, voltage detectors).",
+          "slideRefs": [
+            "slide-21"
+          ]
+        },
+        {
+          "id": "c40c053c-15e3-53d8-8421-09f06acbd99a",
+          "text": "Which electrical safety group entitles a person to inspect alone and perform work in electrical installations up to 1 kV?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "5c179742-920d-5800-8df0-1276ccb20e6c",
+              "text": "Group I",
+              "displayOrder": 1
+            },
+            {
+              "id": "bdc24579-5dec-5dc8-b8d3-cb712520c4db",
+              "text": "Group III",
+              "displayOrder": 2
+            },
+            {
+              "id": "d06f3917-2577-5e77-a689-a1c0b857c590",
+              "text": "Group II",
+              "displayOrder": 3
+            },
+            {
+              "id": "32f3c55d-1fcc-53da-b6e7-6b83bfbca7eb",
+              "text": "No group is required for this",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "bdc24579-5dec-5dc8-b8d3-cb712520c4db",
+          "explanation": "Group III is electrical personnel entitled to inspect alone and perform work up to 1 kV.",
+          "slideRefs": [
+            "slide-29"
+          ]
+        },
+        {
+          "id": "a1155690-7842-5566-b506-dcba2b709b48",
+          "text": "What does preparing a workplace in an electrical installation start with?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "4e9f6c2e-1a4e-5ba3-82e7-9cb03df60c14",
+              "text": "Applying portable protective earths",
+              "displayOrder": 1
+            },
+            {
+              "id": "9e260edf-cd8f-5316-9a60-d15ce7aa1bcb",
+              "text": "Hanging up the “EARTHED” signs",
+              "displayOrder": 2
+            },
+            {
+              "id": "b689b28c-06a3-50b9-8bf3-9072cb121137",
+              "text": "Fencing off the workplace with screens",
+              "displayOrder": 3
+            },
+            {
+              "id": "e2fb8b49-4fe3-5392-b2b2-50e0ce27c3de",
+              "text": "Switching off to create a visible circuit break",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "e2fb8b49-4fe3-5392-b2b2-50e0ce27c3de",
+          "explanation": "The first step is the necessary switching off with a visible break; then locking, checking for absence of voltage, earthing, signs and fencing.",
+          "slideRefs": [
+            "slide-31"
+          ]
+        },
+        {
+          "id": "2bf1d691-536b-51f9-88d3-724894d5b168",
+          "text": "What strength must the anchor device of a fall arrest system have?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "c6d7b7ee-4cf1-5dba-ae47-7dd32f8a19fd",
+              "text": "At least 22 kN",
+              "displayOrder": 1
+            },
+            {
+              "id": "64511fb6-ce26-58b8-b5e8-289e32e8aab7",
+              "text": "At least 6 kN",
+              "displayOrder": 2
+            },
+            {
+              "id": "406e6816-af29-5a43-8695-1a8e0ad6330d",
+              "text": "At least 10 kN",
+              "displayOrder": 3
+            },
+            {
+              "id": "960d5325-1488-512d-bded-808b392a8096",
+              "text": "At least 2.2 kN",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c6d7b7ee-4cf1-5dba-ae47-7dd32f8a19fd",
+          "explanation": "Under the ABC rule, the anchor point must withstand at least 22 kN, i.e. 2.2 tonnes.",
+          "slideRefs": [
+            "slide-44"
+          ]
+        },
+        {
+          "id": "d9f5a174-d6ae-55c0-a640-bd3048dc4f30",
+          "text": "At what angle to the horizontal is a leaning ladder set up?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "56038aac-c906-549c-88dc-f1d0cc59be92",
+              "text": "45–50 degrees",
+              "displayOrder": 1
+            },
+            {
+              "id": "127e390e-f209-512d-abd5-38af1b684b45",
+              "text": "55–60 degrees",
+              "displayOrder": 2
+            },
+            {
+              "id": "f55395eb-2551-5f1d-9ba6-4b713ebdb563",
+              "text": "70–75 degrees",
+              "displayOrder": 3
+            },
+            {
+              "id": "cbfb4c3e-c76d-5597-a2cd-3b2b17b8d830",
+              "text": "85–90 degrees",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f55395eb-2551-5f1d-9ba6-4b713ebdb563",
+          "explanation": "A leaning ladder is set at an angle of 70–75° (height to base about 4 to 1) and extends 1 m above the landing.",
+          "slideRefs": [
+            "slide-47"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "09e84580-b605-53bb-ba74-442e3bae5846",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "42e06dd7-2941-5b14-a665-97fef6249fa7",
+          "text": "At what wind speed is ordinary work at height stopped?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "b7ad28ac-c348-5e6b-acd6-1aae659eebb0",
+              "text": "More than 5 m/s",
+              "displayOrder": 1
+            },
+            {
+              "id": "e94c4c6d-2661-5d65-bfa8-c03646b321ec",
+              "text": "More than 15 m/s",
+              "displayOrder": 2
+            },
+            {
+              "id": "deb914bb-b7de-5592-9747-2ec0c2befc88",
+              "text": "More than 8 m/s",
+              "displayOrder": 3
+            },
+            {
+              "id": "99d979ba-db0c-5196-b4d0-5186dcfadfae",
+              "text": "More than 25 m/s",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "e94c4c6d-2661-5d65-bfa8-c03646b321ec",
+          "explanation": "Work at height is stopped when the wind exceeds 15 m/s, and when installing solid structures and panels — already at 10–12 m/s.",
+          "slideRefs": [
+            "slide-50"
+          ]
+        },
+        {
+          "id": "eb3c3612-4ed0-574d-8418-5f7f15f69a81",
+          "text": "What is the radius of the dangerous current spreading zone around an overhead line wire that has fallen to the ground?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "22b18880-0ee5-5744-88e8-abdbf624b077",
+              "text": "1 m",
+              "displayOrder": 1
+            },
+            {
+              "id": "9b4164be-0c2b-55f3-aad1-8f07ad48909a",
+              "text": "3 m",
+              "displayOrder": 2
+            },
+            {
+              "id": "aee790ff-4141-5361-9687-1987bfa89673",
+              "text": "20 m",
+              "displayOrder": 3
+            },
+            {
+              "id": "758cbc3a-a7b7-57ba-9793-9de0fb6fe845",
+              "text": "8 m",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "758cbc3a-a7b7-57ba-9793-9de0fb6fe845",
+          "explanation": "The danger radius around a fallen wire is 8 m (4–5 m indoors); do not approach a wire lying on the ground.",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "f4bdf066-903d-521b-b5b3-50cb19689830",
+          "text": "May electrical protective equipment with an expired test stamp be used?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "aae9b4c7-fe8f-5131-97a0-7a2636ffc99f",
+              "text": "No, this is strictly prohibited",
+              "displayOrder": 1
+            },
+            {
+              "id": "d56c8174-8882-5b9e-8670-5240df8b543a",
+              "text": "Yes, if there are no visible cracks",
+              "displayOrder": 2
+            },
+            {
+              "id": "e78d58c1-475d-5dca-bc6f-a1700a2e01b1",
+              "text": "Yes, in electrical installations up to 1000 V",
+              "displayOrder": 3
+            },
+            {
+              "id": "818d8c7a-395d-586d-8542-35835b566f6e",
+              "text": "Yes, if the equipment has passed a twist test",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "aae9b4c7-fe8f-5131-97a0-7a2636ffc99f",
+          "explanation": "First check the test date on the stamp: using expired equipment is prohibited.",
+          "slideRefs": [
+            "slide-22"
+          ]
+        },
+        {
+          "id": "7d6a9578-7a20-5470-a4ac-bbf155e0a135",
+          "text": "How is the absence of voltage checked?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "a2e424e7-7340-51b2-b630-3e51a0d304f0",
+              "text": "With a voltage detector, without protective equipment",
+              "displayOrder": 1
+            },
+            {
+              "id": "11e57a8d-c2bf-5a48-88bd-ef813b13d48e",
+              "text": "By touching with the back of the hand",
+              "displayOrder": 2
+            },
+            {
+              "id": "ff55eee7-a375-5a9e-bfa4-4efce28509bc",
+              "text": "With a voltage detector, wearing dielectric gloves",
+              "displayOrder": 3
+            },
+            {
+              "id": "3df6cda4-0b67-5b6c-a873-f7f6a66fa6da",
+              "text": "By the indicator lamps on the panel",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ff55eee7-a375-5a9e-bfa4-4efce28509bc",
+          "explanation": "The detector is first checked on parts known to be live, then all phases are tested — only while wearing dielectric gloves.",
+          "slideRefs": [
+            "slide-23"
+          ]
+        },
+        {
+          "id": "71334f00-7afa-50d5-912d-dcec36589858",
+          "text": "Who has the right to remove the “DO NOT SWITCH ON! PEOPLE AT WORK” sign?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "4181aa6b-92c6-57ea-ba01-fe2826d40844",
+              "text": "Any crew member",
+              "displayOrder": 1
+            },
+            {
+              "id": "ece689df-b1dc-5ec3-92e4-f725a9def6f5",
+              "text": "Only the person who put it up",
+              "displayOrder": 2
+            },
+            {
+              "id": "86843720-1603-568b-a109-f1c5e2b6342c",
+              "text": "Any worker with Group III",
+              "displayOrder": 3
+            },
+            {
+              "id": "ef84bc3c-7839-52a0-afc6-bc1727778e36",
+              "text": "The duty officer upon a verbal phone call",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ece689df-b1dc-5ec3-92e4-f725a9def6f5",
+          "explanation": "The “DO NOT SWITCH ON” sign has the force of an order, and only the person who put it up may remove it.",
+          "slideRefs": [
+            "slide-25"
+          ]
+        },
+        {
+          "id": "317a5630-2240-5839-a604-fb63ce795b40",
+          "text": "What principle is the LOTO lockout system based on?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "c57b9e94-4b78-5d67-8602-5b9684ca692d",
+              "text": "One lock per crew, the key kept by the foreman",
+              "displayOrder": 1
+            },
+            {
+              "id": "ba303564-89c0-568a-949a-2397de37ac34",
+              "text": "Lock keys are kept by the permitting officer",
+              "displayOrder": 2
+            },
+            {
+              "id": "996ace2c-fb34-5315-9177-b349f67f0eb6",
+              "text": "The duty officer removes the lock at end of shift",
+              "displayOrder": 3
+            },
+            {
+              "id": "75beafcf-fa5a-5ed5-bd56-30e1c573e082",
+              "text": "One worker — one lock — one key",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "75beafcf-fa5a-5ed5-bd56-30e1c573e082",
+          "explanation": "Each crew member attaches a personal lock and keeps their own key: power cannot be applied until the last worker removes their lock.",
+          "slideRefs": [
+            "slide-32"
+          ]
+        },
+        {
+          "id": "52a4e1c6-747e-5910-908b-d8a39548ab18",
+          "text": "What is done if the work supervisor has to leave for a while?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "9fad3e6d-9729-544c-98f6-8251e00550fc",
+              "text": "The crew is fully withdrawn from the installation",
+              "displayOrder": 1
+            },
+            {
+              "id": "05df228b-d533-5c5a-b645-65a5adc21eb9",
+              "text": "Supervision is handed to a crew member with Group III",
+              "displayOrder": 2
+            },
+            {
+              "id": "f17e06c8-5dd4-5778-a78b-c6e9dc2e3832",
+              "text": "The switchgear doors are locked and work continues",
+              "displayOrder": 3
+            },
+            {
+              "id": "4a6233d2-77f2-5906-b585-93b6ef9e0b51",
+              "text": "The absence is noted in the site operational log",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "9fad3e6d-9729-544c-98f6-8251e00550fc",
+          "explanation": "Without the work supervisor's supervision, the crew may not stay in the switchgear or at height — it is withdrawn from the electrical installation.",
+          "slideRefs": [
+            "slide-34"
+          ]
+        },
+        {
+          "id": "5a763929-9324-5d2c-8c52-4d2ca58b1ce6",
+          "text": "Which fall protection measure comes first in the hierarchy?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "1312402b-6cd0-5652-b9ad-09cf51225b4e",
+              "text": "Install collective guards",
+              "displayOrder": 1
+            },
+            {
+              "id": "663887fa-4270-5669-9dd1-653bc4c7a7b4",
+              "text": "Use a restraint system",
+              "displayOrder": 2
+            },
+            {
+              "id": "c5b1a490-68e3-5d00-8093-88f4636b1510",
+              "text": "Eliminate work at height",
+              "displayOrder": 3
+            },
+            {
+              "id": "46693388-94b3-5bdb-bc17-1294a85227cd",
+              "text": "Put on a full body harness",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c5b1a490-68e3-5d00-8093-88f4636b1510",
+          "explanation": "First work at height is eliminated, then collective protection and restraint are applied, and only then fall arrest. PPE is the last resort.",
+          "slideRefs": [
+            "slide-41"
+          ]
+        },
+        {
+          "id": "1ccf896e-fb3c-5bfa-bb0d-ca7000f26ec8",
+          "text": "At what anchor position is the fall factor equal to 2?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "ba031117-4f2f-5a77-ada3-05ca15e58484",
+              "text": "Anchor above the head",
+              "displayOrder": 1
+            },
+            {
+              "id": "a1bd3c51-6fd2-544e-907c-5aa9a8b08ad0",
+              "text": "Anchor at foot level",
+              "displayOrder": 2
+            },
+            {
+              "id": "2daef2d4-25d0-5779-abbc-1718947c78a9",
+              "text": "Anchor at chest or shoulder level",
+              "displayOrder": 3
+            },
+            {
+              "id": "4273addd-2954-5ae5-aa40-37c5b7ce2e5a",
+              "text": "Anchor at a neighbouring worker's waist level",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "a1bd3c51-6fd2-544e-907c-5aa9a8b08ad0",
+          "explanation": "Fall factor 2 means the anchor is at foot level: the free fall equals twice the lanyard length. Attach the lanyard as high above the head as possible.",
+          "slideRefs": [
+            "slide-45"
+          ]
+        },
+        {
+          "id": "39a5a253-bf36-5ae4-be44-7ba22f210b71",
+          "text": "What is the ratio of chest compressions to breaths in cardiopulmonary resuscitation?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "b737ae0b-8001-5e8b-a0af-fc3389bc1842",
+              "text": "15 to 1",
+              "displayOrder": 1
+            },
+            {
+              "id": "dd7fe5ad-bc05-55c3-b16e-4d0e2f389489",
+              "text": "5 to 1",
+              "displayOrder": 2
+            },
+            {
+              "id": "70bd4099-31fe-5cba-9236-3075b1e4b08b",
+              "text": "10 to 2",
+              "displayOrder": 3
+            },
+            {
+              "id": "d5502be4-4687-504f-b051-01c71c1022a7",
+              "text": "30 to 2",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "d5502be4-4687-504f-b051-01c71c1022a7",
+          "explanation": "CPR: 30 compressions on the middle of the breastbone, 5–6 cm deep, at 100–120 per minute, then 2 breaths.",
+          "slideRefs": [
+            "slide-57"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -85,32 +85,37 @@ begin
  insert into public.document_assets(owner_id,kind,sha256,object_key) values('fixture','signature',repeat('b',64),repeat('b',64)||'.png') returning id into new_signature;
  insert into public.document_assets(owner_id,kind,sha256,object_key) values('fixture-organization','stamp',repeat('c',64),repeat('c',64)||'.png') returning id into old_stamp;
  insert into public.document_assets(owner_id,kind,sha256,object_key) values('fixture-organization','stamp',repeat('d',64),repeat('d',64)||'.png') returning id into new_stamp;
+ -- The commission and the stamp are one for every course and live on the
+ -- settings row; a profile no longer carries a copy of them.
  update public.document_profiles set audience='all',version=version+1,
-   body=body||jsonb_build_object('audience','all','family','general','stampAssetId',old_stamp,
-     'commission',jsonb_build_array(jsonb_build_object('signerId','fixture','name','Проверяющий','position','Комиссия','assetId',old_signature)))
+   body=body||jsonb_build_object('audience','all','family','general')
  where id='regression-all';
+ update public.certificate_settings set version=version+1,
+   document_commission=jsonb_build_object('stampAssetId',old_stamp,
+     'signers',jsonb_build_array(jsonb_build_object('signerId','fixture','name','Проверяющий','position','Комиссия','assetId',old_signature)))
+ where singleton;
  insert into public.certificates(certificate_number,user_id,revision_id,attestation_id,attempt_id,identity_version,full_name,job,organization,test_slug,test_title,localized_test_title,locale,score,total,pass_score,best_completed_at,issue_source)
  values('SH-DOCUMENT-REBIND-TEST',prior.user_id,prior.revision_id,prior.attestation_id,prior.attempt_id,prior.identity_version,prior.full_name,prior.job,prior.organization,prior.test_slug,prior.test_title,prior.localized_test_title,prior.locale,prior.score,prior.total,prior.pass_score,prior.best_completed_at,'manual') returning * into issued;
- if issued.document_snapshot#>>'{profile,commission,0,assetId}'<>old_signature::text or issued.document_snapshot#>>'{profile,stampAssetId}'<>old_stamp::text then raise exception 'Issuance did not capture the bound assets'; end if;
+ if issued.document_snapshot#>>'{profile,commission,0,assetId}' is distinct from old_signature::text or issued.document_snapshot#>>'{profile,stampAssetId}' is distinct from old_stamp::text then raise exception 'Issuance did not capture the bound assets: %',issued.document_snapshot->'profile'->'commission'; end if;
  select jsonb_object_agg(id::text,document_snapshot) into snapshots from public.certificates;
 
  -- The statement the server runs: compare-and-swap on the version it read.
- select version into strict v from public.document_profiles where id='regression-all';
- update public.document_profiles set version=v+1,updated_at=now(),
-   body=jsonb_set(jsonb_set(body,'{commission,0,assetId}',to_jsonb(new_signature::text)),'{stampAssetId}',to_jsonb(new_stamp::text))
- where id='regression-all' and version=v;
+ select version into strict v from public.certificate_settings where singleton;
+ update public.certificate_settings set version=v+1,updated_at=statement_timestamp(),
+   document_commission=jsonb_set(jsonb_set(document_commission,'{signers,0,assetId}',to_jsonb(new_signature::text)),'{stampAssetId}',to_jsonb(new_stamp::text))
+ where singleton and version=v;
  get diagnostics n=row_count;
  if n<>1 then raise exception 'Rebinding the current version wrote % rows',n; end if;
- update public.document_profiles set version=v+1,body=jsonb_set(body,'{stampAssetId}','null') where id='regression-all' and version=v;
+ update public.certificate_settings set version=v+1,document_commission=jsonb_set(document_commission,'{stampAssetId}','null') where singleton and version=v;
  get diagnostics n=row_count;
- if n<>0 then raise exception 'A stale version overwrote a rebound profile'; end if;
+ if n<>0 then raise exception 'A stale version overwrote a rebound commission'; end if;
 
- if (select jsonb_object_agg(id::text,document_snapshot) from public.certificates) is distinct from snapshots then raise exception 'Rebinding a profile rewrote an issued snapshot'; end if;
+ if (select jsonb_object_agg(id::text,document_snapshot) from public.certificates) is distinct from snapshots then raise exception 'Rebinding the commission rewrote an issued snapshot'; end if;
  if private.certificate_download_payload(issued.id)#>>'{documentSnapshot,profile,commission,0,assetId}'<>old_signature::text then raise exception 'An issued document lost the signature it was issued with'; end if;
  update public.certificates set revoked_at=statement_timestamp(),revoke_reason='rebind regression successor' where id=issued.id;
  insert into public.certificates(certificate_number,user_id,revision_id,attestation_id,attempt_id,identity_version,full_name,job,organization,test_slug,test_title,localized_test_title,locale,score,total,pass_score,best_completed_at,issue_source)
  values('SH-DOCUMENT-REBOUND-TEST',prior.user_id,prior.revision_id,prior.attestation_id,prior.attempt_id,prior.identity_version,prior.full_name,prior.job,prior.organization,prior.test_slug,prior.test_title,prior.localized_test_title,prior.locale,prior.score,prior.total,prior.pass_score,prior.best_completed_at,'manual') returning * into successor;
- if successor.document_snapshot#>>'{profile,commission,0,assetId}'<>new_signature::text or successor.document_snapshot#>>'{profile,stampAssetId}'<>new_stamp::text then raise exception 'A new issuance did not draw the replaced images'; end if;
+ if successor.document_snapshot#>>'{profile,commission,0,assetId}' is distinct from new_signature::text or successor.document_snapshot#>>'{profile,stampAssetId}' is distinct from new_stamp::text then raise exception 'A new issuance did not draw the replaced images'; end if;
  if (select document_snapshot from public.certificates where id=issued.id) is distinct from issued.document_snapshot then raise exception 'Revocation or reissue rewrote the earlier snapshot'; end if;
  -- The registry is written by the server alone; a browser role reaches neither table.
  if exists(select 1 from unnest(array['anon','authenticated']) r, unnest(array['select','insert','update','delete']) p

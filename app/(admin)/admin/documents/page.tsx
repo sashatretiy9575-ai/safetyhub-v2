@@ -31,7 +31,11 @@ function courseSummary(course: CourseDocumentSetup) {
   return [
     DOCUMENT_FAMILY_LABELS[lead.family],
     hours.length ? hours.join(', ') : split ? 'ИТР и рабочие' : null,
-    lead.booklet ? 'корочка своя' : 'корочка общая',
+    lead.family === 'electrical'
+      ? 'удостоверение ЭБ'
+      : lead.booklet
+        ? 'корочка своя'
+        : 'корочка общая',
   ]
     .filter(Boolean)
     .join(' · ');

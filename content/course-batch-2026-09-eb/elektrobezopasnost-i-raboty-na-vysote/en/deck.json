@@ -1,0 +1,710 @@
+{
+  "schemaVersion": 1,
+  "slug": "elektrobezopasnost-i-raboty-na-vysote",
+  "locale": "en",
+  "title": "Electrical Safety and Work at Height",
+  "description": "Course on electrical safety and work at height: effects of current, protective measures, electrical safety groups, work permits, fall protection systems, rescue and first aid.",
+  "status": "draft-awaiting-independent-review",
+  "sources": [
+    {
+      "id": "labour-code",
+      "url": "https://old.adilet.zan.kz/rus/docs/K1500000414",
+      "title": "Labour Code of the Republic of Kazakhstan"
+    },
+    {
+      "id": "civil-protection",
+      "url": "https://old.adilet.zan.kz/rus/docs/Z1400000188",
+      "title": "Law of the RK “On Civil Protection”"
+    },
+    {
+      "id": "installation-code",
+      "url": "https://old.adilet.zan.kz/rus/docs/V1500010851",
+      "title": "Electrical Installation Code, Order No. 230"
+    },
+    {
+      "id": "safety-rules",
+      "url": "https://old.adilet.zan.kz/rus/docs/V1500010889",
+      "title": "Safety Rules for the Operation of Consumers' Electrical Installations, Order No. 222"
+    },
+    {
+      "id": "personnel-rules",
+      "url": "https://old.adilet.zan.kz/rus/docs/V1500010830",
+      "title": "Rules for Work with Personnel in Energy Organisations of the RK, Order No. 234"
+    },
+    {
+      "id": "height-rules",
+      "url": "https://old.adilet.zan.kz/rus/docs/V2200027349",
+      "title": "Rules on Occupational Safety and Health for Work at Height, Order No. 109"
+    }
+  ],
+  "slides": [
+    {
+      "id": "slide-01",
+      "title": "Electrical Safety and Work at Height",
+      "body": [
+        "TRAINING",
+        "Practical basics of safely operating electrical installations, work permits and high-level (steeplejack) work",
+        "Training course for electrical personnel, steeplejacks and line supervisors"
+      ],
+      "callout": ""
+    },
+    {
+      "id": "slide-02",
+      "title": "After the course you can",
+      "body": [
+        "01. Recognise electrical and height hazards, assess risks and set safe work boundaries.",
+        "02. Correctly use fall protection PPE, dielectric equipment and portable protective earths.",
+        "03. Flawlessly perform technical and organisational measures to prepare the worksite and admit crews.",
+        "04. Act instantly in incidents: free victims from current, rescue a suspended worker and give first aid."
+      ],
+      "callout": "The course's main goal — zero injuries, no contact with current and prevention of falls from height."
+    },
+    {
+      "id": "slide-03",
+      "title": "Five course parts",
+      "body": [
+        "01. Electrical safety basics and effects of electric current.",
+        "02. Technical safeguards and electrical protective gear.",
+        "03. Safe work organisation, electrical safety groups and permits.",
+        "04. Safety at height and in high-level (steeplejack) work.",
+        "05. Combined work, suspension rescue and first aid."
+      ],
+      "callout": "practical modules of comprehensive safety"
+    },
+    {
+      "id": "slide-04",
+      "title": "Electrical safety basics",
+      "body": [
+        "Electric current is invisible, odourless and acts instantly. The only protection is knowing the laws and strictly following the rules."
+      ],
+      "callout": ""
+    },
+    {
+      "id": "slide-05",
+      "title": "Electrical safety at work",
+      "body": [
+        "Work environment: electrical installations up to and above 1000 V, switchboard rooms, cable routes and switchgear.",
+        "Nature of the hazard: electric current shows no outward signs of danger (no colour, smell or sound in normal operation).",
+        "Human factor: loss of vigilance, getting used to danger and ignoring the rules cause over 80% of severe electrical injuries.",
+        "Main rule: every electrical installation is considered live until proven otherwise and until earthing is in place."
+      ],
+      "callout": "Electric current forgives no mistakes: the lack of visible danger dulls your vigilance!"
+    },
+    {
+      "id": "slide-06",
+      "title": "Effects of electric current on the human body",
+      "body": [
+        "Thermal — Severe tissue burns, vessel heating, boiling blood and lymph — Insulation, protective shields, arc-rated PPE",
+        "Electrolytic — Decomposition of body fluids, blood breakdown, chemical changes — De-energising, dielectric gloves and insulated tools",
+        "Mechanical (dynamic) — Torn muscles, tendons and blood vessels, fractures, dislocations — Automatic disconnection (RCD, fast-acting relays)",
+        "Biological — Muscle spasms, cardiac fibrillation, respiratory arrest — Equipotential bonding, TN neutral connection, earthing"
+      ],
+      "callout": "Severity depends on the size of the current, the exposure time and its path through the body."
+    },
+    {
+      "id": "slide-07",
+      "title": "4 thresholds of alternating current (50 Hz)",
+      "body": [
+        "0.6 — 1.5 mA — Perceptible current: slight tingling, faint itch in the fingers.",
+        "10 — 15 mA — Non-let-go current: irresistible muscle spasms, the hand cannot unclench.",
+        "50 — 100 mA — Fibrillation current: chaotic heart contractions, circulatory arrest.",
+        "> 5 A — Lethal current: instant heart paralysis, the most severe thermal burns."
+      ],
+      "callout": "A current of just 0.1 A (100 mA) for 1–2 seconds is fatal!"
+    },
+    {
+      "id": "slide-08",
+      "title": "Local electrical injuries and effects",
+      "body": [
+        "Electrical burns: contact current burns (current passing through tissue) and arc burns (arc temperature reaches 4000–6000 °C).",
+        "Electrical marks: firm grey or yellowish spots of dead skin with sharp edges at the current entry and exit points.",
+        "Skin metallisation: tiny splashes of molten metal driven into the epidermis by an electric arc.",
+        "Electro-ophthalmia: inflammation of the cornea and conjunctiva from intense arc UV radiation (goggles or a face shield required)."
+      ],
+      "callout": "Electric arc temperature reaches 6000 °C — working without a face shield and arc suit is deadly!"
+    },
+    {
+      "id": "slide-09",
+      "title": "Current paths through the body (current loops)",
+      "body": [
+        "Danger of a current loop: set by the share of total current passing through vital organs — the heart, lungs and brain.",
+        "“Hand — hand” loop: ~3.3% of the current passes through the heart. The most common workplace case when touching two phases.",
+        "“Left hand — feet” loop: up to 4.0% of the current reaches the heart — the most critical, dangerous path!",
+        "“Foot — foot” loop: step voltage current; ~0.4% passes through the heart, but falling to the ground turns it into “hands — feet”."
+      ],
+      "callout": "A fall in the current zone instantly turns the loop from “foot-foot” to the deadly “hands-feet”!"
+    },
+    {
+      "id": "slide-10",
+      "title": "CRITICAL BAN: Dangerous approach distances",
+      "body": [
+        "Do not approach unguarded live parts closer than the set minimum distances (up to 1 kV — 0.6 m; 1–35 kV — 0.6 m; 110 kV — 1.0 m; 220 kV — 2.0 m).",
+        "Do not work alone in electrical installations where the work permit requires a second person to be present.",
+        "Do not touch live insulators and structures without basic electrical protective equipment.",
+        "Do not continue work if there are signs of arcing, an unusual transformer hum or a smell of burning."
+      ],
+      "callout": "A person or tool coming closer than permitted causes flashover across the air gap!"
+    },
+    {
+      "id": "slide-11",
+      "title": "Premises classified by electrical hazard",
+      "body": [
+        "Premises without increased danger: dry, normal temperature, insulating wooden floors, no conductive dust.",
+        "Premises with increased danger: damp (humidity >75%), conductive dust, conductive floors (metal, concrete), temperature >35 °C.",
+        "Especially dangerous premises: extreme damp (humidity near 100%), chemically aggressive environment or two signs of increased danger at once.",
+        "Outdoor switchgear areas: always equated to the category of especially dangerous premises!"
+      ],
+      "callout": "Any work outdoors or in the open air is automatically treated as work in especially dangerous conditions!"
+    },
+    {
+      "id": "slide-12",
+      "title": "Touch voltage and step voltage",
+      "body": [
+        "Step voltage: the potential difference between two points on the ground one human step apart (0.8 m).",
+        "Current spreading zone: occurs when an OHL wire falls to the ground or on an earth fault. Danger zone radius — 8 metres (indoors 4–5 m).",
+        "Potential distribution: falls hyperbolically from the fault point outwards; the largest difference is near the fallen wire.",
+        "No hopping on one foot: losing balance and falling onto your hands is deadly, as it creates a “hands — feet” current loop."
+      ],
+      "callout": "The danger radius around a fallen wire is 8 metres! Never approach a wire on the ground!"
+    },
+    {
+      "id": "slide-13",
+      "title": "4 rules for leaving a step voltage zone",
+      "body": [
+        "Feet together — Immediately bring your feet together so there is no potential difference.",
+        "“Shuffle” — Move slowly, with the heel of one foot against the toe of the other, never lifting.",
+        "Step ≤ 10 cm — Step length must not exceed the foot's width; no wide steps!",
+        "Get 8 m away — Keep moving until fully out of the 8-metre danger radius around the fallen wire."
+      ],
+      "callout": "Never run or jump — losing your balance will be fatal!"
+    },
+    {
+      "id": "slide-14",
+      "title": "Section I summary: 5 electrical safety barriers",
+      "body": [
+        "1. Hazard awareness: remember that current is invisible and never be careless in any operation on electrical installations.",
+        "2. Distance barrier: strictly keep the minimum permissible distances to live parts.",
+        "3. Environmental control: account for humidity, conductive floors and open structures, which cut body resistance tenfold.",
+        "4. Behavioural rules: no working alone where the rules require a crew or supervision.",
+        "5. Incident readiness: solid knowledge of step voltage and the first aid algorithm for a victim."
+      ],
+      "callout": "Electrical safety is not a set of tips but the law of survival on an industrial site!"
+    },
+    {
+      "id": "slide-15",
+      "title": "Technical safeguards",
+      "body": [
+        "Reliable earthing, insulation, extra-low voltage and electrical protective equipment form an impassable technical barrier."
+      ],
+      "callout": ""
+    },
+    {
+      "id": "slide-16",
+      "title": "Protective earthing: how it works",
+      "body": [
+        "Definition: a deliberate electrical connection of the non-current-carrying metal parts of an installation to an earthing device.",
+        "Purpose: to reduce touch voltage to a safe level when phase conductor insulation breaks down to a metal enclosure.",
+        "Physical principle: the earth electrode resistance (Re <= 4 Ohm) and the human body (Rb ~ 1000 Ohm) in parallel.",
+        "Result: most of the fault current flows to earth through the low-resistance earthing loop, protecting the person."
+      ],
+      "callout": "Current takes the path of least resistance: good earthing takes the hit!"
+    },
+    {
+      "id": "slide-17",
+      "title": "Earthing systems of power networks",
+      "body": [
+        "TN-S system: the neutral (N) and protective (PE) conductors are separate throughout the network — the safest system.",
+        "TN-C-S system: N and PE functions are combined in one PEN conductor in the upstream part and split at the building entry.",
+        "TN-C system: an outdated system with a combined PEN throughout; prohibited for new and reconstructed installations!",
+        "TT and IT systems: TT — independent earthing of the installation; IT — isolated neutral with insulation monitoring (mines, mobile units)."
+      ],
+      "callout": "Separating PE and N conductors is the key to correct RCD operation and electrical safety!"
+    },
+    {
+      "id": "slide-18",
+      "title": "Protective neutral (TN): purpose and tripping",
+      "body": [
+        "TN connection: a deliberate electrical connection of exposed conductive parts to the solidly earthed neutral of the supply via the PE conductor.",
+        "Protection principle: turns a phase-to-enclosure fault into a short circuit (SC) between the phase and the protective conductor.",
+        "Protection tripping: the short-circuit overcurrent instantly trips the circuit breaker or blows the fuse link.",
+        "Standard time: the faulty section of a 220/380 V network must be disconnected within 0.4 seconds (per the PUE)."
+      ],
+      "callout": "TN connection turns a fault into a short circuit and cuts the faulty section in a split second!"
+    },
+    {
+      "id": "slide-19",
+      "title": "Residual current devices (RCD)",
+      "body": [
+        "Differential transformer: continuously compares the vector sum of currents entering the load via phase and returning via neutral.",
+        "Leakage current: when a person touches a live part, a residual current (earth leakage) arises and induces an EMF in the secondary winding.",
+        "Tripping threshold: to protect people against direct contact, RCDs with a rated residual current IΔn <= 30 mA are used.",
+        "Response speed: a quality RCD disconnects the faulty circuit in 0.02–0.04 seconds, before heart fibrillation sets in."
+      ],
+      "callout": "A 30 mA RCD is the only protection that can save a life in direct contact with a bare wire!"
+    },
+    {
+      "id": "slide-20",
+      "title": "Extra-low voltage (ELV / SELV)",
+      "body": [
+        "Definition: rated voltage not exceeding 50 V AC or 120 V DC between conductors or to earth.",
+        "Application: supply of portable hand-held power tools and portable lamps in conditions of increased danger.",
+        "Voltage levels: 42 V (or 36 V) — in premises with increased danger; 12 V — in especially dangerous conditions (inside boilers, tanks, wells).",
+        "Power source: only via isolating step-down transformers with separate windings (autotransformers are prohibited!)."
+      ],
+      "callout": "Inside metal tanks and wells, only lamps rated at no more than 12 volts may be used!"
+    },
+    {
+      "id": "slide-21",
+      "title": "Electrical protective equipment types",
+      "body": [
+        "Basic up to 1000 V: dielectric gloves, tools with insulated handles, voltage indicators, clamp meters.",
+        "Additional up to 1000 V: dielectric overshoes, dielectric mats, insulating stands and covers, protective barriers.",
+        "Basic above 1000 V: insulating rods of all types, insulating tongs, voltage indicators above 1000 V.",
+        "Additional above 1000 V: dielectric boots, dielectric gloves (above 1 kV they are only additional!), mats."
+      ],
+      "callout": "Basic PPE withstands the operating voltage; additional PPE is used only together with basic PPE!"
+    },
+    {
+      "id": "slide-22",
+      "title": "Electrical protective equipment: 4 checks",
+      "body": [
+        "Test stamp — Check the next test date on the stamp. Expired PPE is prohibited!",
+        "Visual check — Make sure there are no cracks, punctures, tears, chips or mechanical defects.",
+        "Roll test — Roll the glove towards the fingers to check for punctures under air pressure.",
+        "Clean and dry — Before work, wipe off dust, dirt, oil and moisture with a clean, dry cloth."
+      ],
+      "callout": "Using electrical protective equipment with an expired test stamp is strictly prohibited!"
+    },
+    {
+      "id": "slide-23",
+      "title": "4 steps to verify absence of voltage",
+      "body": [
+        "Self-check — Check that the indicator works on parts known to be live or with a test device.",
+        "Phase by phase — Verify there is no voltage between each phase and earth, then between all phases.",
+        "Induced voltage — Make sure there is no dangerous induced voltage from adjacent energised lines and phases.",
+        "Re-test — Re-check the indicator on a known live source to rule out a sudden failure."
+      ],
+      "callout": "Always wear dielectric gloves when verifying absence of voltage!"
+    },
+    {
+      "id": "slide-24",
+      "title": "Portable protective earthing",
+      "body": [
+        "Purpose: protect workers from voltage applied in error by switching devices and from induced voltage.",
+        "Fitting order: FIRST connect the earth clamp to the earthing device (loop), and only THEN to the live parts.",
+        "Removal order: strictly in reverse: FIRST take the clamps off the live parts, and only THEN detach the clamp from the earth electrode.",
+        "Earthing conductor cross-section: flexible copper wires of at least 16 mm² (up to 1000 V) and at least 25 mm² (above 1000 V) for thermal withstand."
+      ],
+      "callout": "Fitting earths: first to Earth, then to Phase! Removing: first from Phase, then Earth! Wrong order is deadly!"
+    },
+    {
+      "id": "slide-25",
+      "title": "Electrical safety signs and posters",
+      "body": [
+        "Prohibition: “DO NOT SWITCH ON! PEOPLE AT WORK”, “DO NOT OPEN! PEOPLE AT WORK” — hung on the drives of switching devices.",
+        "Warning: “STOP! HIGH VOLTAGE”, “DO NOT CLIMB! DANGER OF DEATH”, “CAUTION! ELECTRICAL HAZARD” — mark off the danger zone.",
+        "Mandatory: “WORK HERE”, “CLIMB HERE” — clearly mark the prepared and verified safe workplace.",
+        "Indicative: “EARTHED” — hung on device keys and control handles and on earthed sections of the installation."
+      ],
+      "callout": "The “DO NOT SWITCH ON” sign has the legal force of an order! Only the person who hung it may remove it!"
+    },
+    {
+      "id": "slide-26",
+      "title": "CRITICAL BAN: Breaching technical measures",
+      "body": [
+        "Do not start work in an electrical installation without completing all 5 mandatory technical measures to prepare the site.",
+        "Do not switch on disconnected devices or remove prohibition signs and mechanical locks without authorisation.",
+        "Do not use random wires of non-standard cross-section or twisted wires as portable protective earths.",
+        "Do not touch live parts without verifying absence of voltage with a working indicator while wearing dielectric gloves."
+      ],
+      "callout": "De-energising without earthing does not guarantee safety — induced voltage kills just like operating voltage!"
+    },
+    {
+      "id": "slide-27",
+      "title": "Work organisation and permits",
+      "body": [
+        "Clearly divided responsibility, strict admission rules and the work permit rule out the human factor and errors."
+      ],
+      "callout": ""
+    },
+    {
+      "id": "slide-28",
+      "title": "Two ways to authorise electrical work",
+      "body": [
+        "WORK PERMIT: • A written order on a prescribed form.",
+        "WORK PERMIT: • Sets the exact place and the start and end times of work.",
+        "WORK PERMIT: • Records the crew, responsible persons and safety measures.",
+        "WORK PERMIT: • Required for de-energised work and work near live parts.",
+        "WORK PERMIT: • Maximum validity — no more than 15 calendar days.",
+        "WORK ORDER: • A verbal task for a one-off simple job.",
+        "WORK ORDER: • Valid for one work shift of the crew.",
+        "WORK ORDER: • Must be recorded in the site operational log.",
+        "WORK ORDER: • Done by a small team (1–2 people) with a clear scope.",
+        "WORK ORDER: • Used for unplanned urgent minor work up to 1 kV."
+      ],
+      "callout": "Routine operational work follows a pre-approved list, without a work permit or work order."
+    },
+    {
+      "id": "slide-29",
+      "title": "Electrical safety qualification groups",
+      "body": [
+        "Group I: non-electrical staff (office, warehouses, PC operators); briefing once a year, recorded in the log.",
+        "Group II: electrotechnological staff (welders, crane operators, machine operators); 72+ hours of training, knows installations up to 1 kV.",
+        "Group III: electrical staff; 1–3 months' experience in Group II, may inspect alone and work up to 1 kV.",
+        "Group IV: may work in installations above 1 kV and act as work supervisor, permit issuer or person in charge of electrical facilities up to 1 kV.",
+        "Group V: highest level (engineers, energy managers, persons in charge of installations above 1 kV); knows all circuits and rules."
+      ],
+      "callout": "A safety group is a personal measure of responsibility and the right to independent access to hazardous work!"
+    },
+    {
+      "id": "slide-30",
+      "title": "Persons responsible for safe work",
+      "body": [
+        "Permit issuer (work order giver): decides if work is needed, its safe scope and the qualifications of the crew's responsible persons.",
+        "Responsible work manager (RWM): ensures the planned safety measures are complete and sufficient and coordinates the crews.",
+        "Permitting officer: responsible for correct workplace preparation, checking absence of voltage, fitting earths and signs.",
+        "Work supervisor (WS): responsible for a clear on-site crew briefing, correct use of PPE and continuous supervision.",
+        "Observer and crew members: the observer supervises non-electrical staff; crew members strictly follow the WS's instructions."
+      ],
+      "callout": "Each responsible person answers for their part of preparation — combining roles is strictly regulated by the SR!"
+    },
+    {
+      "id": "slide-31",
+      "title": "6 steps to prepare the workplace",
+      "body": [
+        "1. Disconnection: make the required disconnections with a visible break in the circuit.",
+        "2. Locks and signs: lock the drives with LOTO locks and hang prohibition signs.",
+        "3. Voltage check: verify absence of voltage on all phases with a working indicator.",
+        "4. Earthing: close the fixed earthing switches or apply portable earths.",
+        "5. Indicative signs: hang “EARTHED” signs on device keys and handles.",
+        "6. Fencing: fence off the workplace with portable screens and hang safety signs."
+      ],
+      "callout": "Strict order of the 6 preparation steps: disconnect → lock → sign → test → earth → fence!"
+    },
+    {
+      "id": "slide-32",
+      "title": "LOTO protective lockout in power networks",
+      "body": [
+        "LOTO concept (Lockout / Tagout): mechanical isolation of hazardous energy sources with personal padlocks and warning tags.",
+        "Personal lock: each crew member puts their own lock on the breaker or switch lockout device and keeps the only key.",
+        "Group lockout: with several crews, a group lock box is used: equipment keys go inside, and every team puts its lock on the box.",
+        "Error-proofing: no breaker can be switched on remotely or manually until the last worker removes their personal lock."
+      ],
+      "callout": "One worker — one lock — one key! No one can energise the line while you are working on it!"
+    },
+    {
+      "id": "slide-33",
+      "title": "4 steps to admit a crew under a work permit",
+      "body": [
+        "Staff check — Check the crew by names, ID certificates and electrical safety groups.",
+        "Show on site — Prove absence of voltage, show the earths, boundaries and adjacent equipment.",
+        "Task briefing — Explain the work method, danger zones, escape routes and safe work practices.",
+        "Sign the permit — Permitting officer, work supervisor and crew sign the permit in person."
+      ],
+      "callout": "No work may start without the permitting officer's and work supervisor's signatures on the permit!"
+    },
+    {
+      "id": "slide-34",
+      "title": "Continuous supervision during work",
+      "body": [
+        "Duty of the work supervisor (observer): continuously supervise all crew members throughout the task.",
+        "No leaving: the work supervisor must not combine supervision with any other work or leave the workplace.",
+        "Supervisor's temporary absence: if the work supervisor has to leave, the entire crew must be withdrawn from the installation.",
+        "Crew members: may not stay in the switchgear or at height without the work supervisor; switchgear doors are locked during breaks."
+      ],
+      "callout": "The work supervisor is the crew's “safety eyes”: doing their own work means losing control over people!"
+    },
+    {
+      "id": "slide-35",
+      "title": "Breaks and completion of work",
+      "body": [
+        "Lunch break: the crew leaves the work zone; the permit stays with the work supervisor; signs, earths and barriers stay in place.",
+        "Re-admission after a break: the work supervisor personally checks that the workplace is unchanged and admits the crew without the permitting officer.",
+        "Daily end of work: the workplace is tidied up and the permit is handed to the duty operating staff, marked as end of shift.",
+        "Final completion: temporary fixtures are dismantled, crew earths removed, and the permit is closed with WS and permitting officer signatures."
+      ],
+      "callout": "After the shift, switching on the installation before the work permit is formally closed is strictly prohibited!"
+    },
+    {
+      "id": "slide-36",
+      "title": "4 work supervisor actions during a break",
+      "body": [
+        "Withdraw crew — Stop the tasks, collect all tools and lead people out of the electrical installation.",
+        "Lock access — Lock the switchroom doors, barriers and gates of the work zone.",
+        "Keep the setup — Leave all signs, LOTO locks and portable protective earths in place.",
+        "Check before re-entry — Before resuming, personally confirm the setup is safe and the earths are intact."
+      ],
+      "callout": "Crew members must not enter the work zone before the work supervisor returns!"
+    },
+    {
+      "id": "slide-37",
+      "title": "Admission of seconded staff and contractors",
+      "body": [
+        "Secondment letter: the employer sends an official letter listing the workers, their safety groups and the rights of responsible persons.",
+        "Knowledge check: seconded staff receive induction and initial briefings on the client's electrical installation layout.",
+        "Admission certificate: issued when a separate fenced work zone is allocated to the contractor on an operating site.",
+        "Assigning the permitting officer: initial admission of seconded crews is always done only by the client's own operating staff."
+      ],
+      "callout": "A contractor on site calls for extra attention: initial admission is done only by the owner company's own staff!"
+    },
+    {
+      "id": "slide-38",
+      "title": "Section III summary: Organisational control chain",
+      "body": [
+        "Unbroken chain: safety is guaranteed only when every link works — permit, briefing, LOTO and supervision.",
+        "Personal responsibility: each worker signs the work permit for their own and their colleagues' safety.",
+        "Documenting changes: any change in the crew or work conditions requires the admission to be reissued at once.",
+        "Life comes first: organisational rules are based on the analysis of hundreds of real incidents and are mandatory."
+      ],
+      "callout": "A work permit is not a formality but a legal document that protects your life and freedom!"
+    },
+    {
+      "id": "slide-39",
+      "title": "Work at height and steeplejack work",
+      "body": [
+        "Falls from height are the leading cause of fatal workplace injuries. The right choice of fall protection saves lives."
+      ],
+      "callout": ""
+    },
+    {
+      "id": "slide-40",
+      "title": "Work at height defined: regulatory criteria",
+      "body": [
+        "Basic height criterion: work with a risk of falling from 1.3 m (under construction codes) or 1.8 m or more above the surface.",
+        "Guarding: work on platforms within 2 m of unguarded drops over 1.3 m, or where guardrails are lower than 1.1 m.",
+        "Hazards below: work less than 1.3 m above machines, mechanisms, protruding objects, water or molten metal.",
+        "High-level (steeplejack) work: work more than 5 m above the ground or a floor slab, done from erection fixtures or directly from structures."
+      ],
+      "callout": "Even an unprotected fall from just 1.8 metres in 85% of cases leads to disability or death!"
+    },
+    {
+      "id": "slide-41",
+      "title": "Fall protection hierarchy: 4 levels",
+      "body": [
+        "Avoidance — Assemble units on the ground before lifting them by crane into position.",
+        "Collective guards — Install guardrails, handrails, scaffolds, platforms and safety catch nets.",
+        "Restraint — Use a restraint system that physically prevents reaching the edge of a drop.",
+        "Fall arrest — A fall arrest system with a harness and energy absorber to safely arrest a fall."
+      ],
+      "callout": "Fall protection PPE is the last line of defence! Collective guards always come first!"
+    },
+    {
+      "id": "slide-42",
+      "title": "Safety groups for work at height",
+      "body": [
+        "No group: work from scaffolds, platforms and towers with guardrails of 1.1 m or more, and from leaning ladders up to 5 m.",
+        "Group 1: workers admitted to work as part of a crew or under the direct control of an appointed supervisor.",
+        "Group 2: foremen, crew leaders, responsible performers and safety specialists who carry out periodic PPE inspections.",
+        "Group 3: responsible work managers under permits, persons approving the WEP for work at height, certification board members, rescuers."
+      ],
+      "callout": "A Group 1 worker may not work alone — only under the direct control of a Group 2 or 3 specialist!"
+    },
+    {
+      "id": "slide-43",
+      "title": "Two protection systems: Restraint vs Fall arrest",
+      "body": [
+        "RESTRAINT SYSTEM: • Goal: physically PREVENT access to the edge of a drop.",
+        "RESTRAINT SYSTEM: • Components: a work belt or harness + a fixed-length lanyard.",
+        "RESTRAINT SYSTEM: • No fall: the fall factor is zero (no dynamic shock load).",
+        "RESTRAINT SYSTEM: • Load: no energy absorber needed, as a fall is impossible.",
+        "RESTRAINT SYSTEM: • Limitation: never use where a fall into a void is possible!",
+        "FALL ARREST SYSTEM: • Goal: SAFELY ARREST a fall that has already begun.",
+        "FALL ARREST SYSTEM: • Components: full body harness + energy absorber + anchor line.",
+        "FALL ARREST SYSTEM: • Shock absorption: the absorber cuts the arrest force to <= 6 kN.",
+        "FALL ARREST SYSTEM: • Load distribution: the load is transferred to the thighs, pelvis and chest.",
+        "FALL ARREST SYSTEM: • Prerequisite: calculate the clearance below the worker."
+      ],
+      "callout": "A work positioning belt (without shoulder and thigh straps) is PROHIBITED as a fall arrest system!"
+    },
+    {
+      "id": "slide-44",
+      "title": "Fall arrest system components: The ABC rule",
+      "body": [
+        "A (Anchor): a reliable anchor device (sling, clamp, beam clamp) with a strength of at least 22 kN (2.2 tonnes).",
+        "B (Body wear): a full body harness with shoulder and thigh straps and a dorsal fall arrest D-ring.",
+        "C (Connector): a lanyard with an energy absorber, a self-retracting lifeline (SRL) or a rope grab on a flexible line.",
+        "100% tie-off rule: when moving along structures, use a twin-leg (Y-shaped) lanyard — one leg is always clipped in!"
+      ],
+      "callout": "Fall protection PPE works only with correct anchorage and a calculated clearance!"
+    },
+    {
+      "id": "slide-45",
+      "title": "Fall factor and clearance",
+      "body": [
+        "Fall factor = Fall height / Lanyard length. It determines how hard the dynamic shock on the worker's body is in a fall.",
+        "Factor 0 (anchor above head): the best option, minimal fall distance, gentle absorber deployment.",
+        "Factor 1 (anchor at chest/shoulder level): a standard fall of the slack lanyard length; acceptable with an energy absorber.",
+        "Factor 2 (anchor at foot level): CRITICAL risk! Free fall equals twice the lanyard length (up to 4 m); risk of hitting structures.",
+        "Clearance: the calculated distance below the workplace (lanyard length + absorber extension 1.2 m + height 1.8 m + margin 1.0 m = 5.7–6.0 m)."
+      ],
+      "callout": "Clip the lanyard AS HIGH ABOVE YOUR HEAD AS POSSIBLE! Factor 2 — extreme load on the anchor and spine!"
+    },
+    {
+      "id": "slide-46",
+      "title": "Anchor devices and rigid / flexible lines",
+      "body": [
+        "Class A: fixed structural anchor points on concrete and steel load-bearing building structures.",
+        "Class B: portable temporary anchor devices (textile slings, tripods, I-beam clamps).",
+        "Class C: flexible horizontal cable anchor lines for free, continuous movement of the worker along the structure.",
+        "Class D: rigid horizontal rail anchor lines with a sliding trolley for heavy-duty use.",
+        "Never anchor to unreliable supports: process pipelines, cable trays, radiators and window frames!"
+      ],
+      "callout": "Never attach the lanyard to process pipes or cable trays — only to verified load-bearing structures!"
+    },
+    {
+      "id": "slide-47",
+      "title": "Ladders, stepladders and access platforms",
+      "body": [
+        "Three points of contact rule: when climbing up or down a ladder, always keep two hands and one foot (or two feet and one hand) on it.",
+        "Leaning ladder angle: strictly 70–75 degrees to the horizontal (height-to-base ratio 4:1).",
+        "Top end: a leaning ladder must extend at least 1.0 metre above the landing.",
+        "Work ban: do not work from the top two steps of stepladders without handrails and guarded platforms.",
+        "No heavy work: heavy erection and power electrical installation work must not be done from leaning ladders."
+      ],
+      "callout": "A leaning ladder is a means of access, not a workplace! Heavy work is done only from scaffolds and platforms!"
+    },
+    {
+      "id": "slide-48",
+      "title": "4 steps of a pre-use harness check",
+      "body": [
+        "Webbing — Check the webbing for cuts, burns, abrasion and intact contrast stitching.",
+        "Metal hardware — Inspect D-rings and buckles for deformation, cracks, corrosion and secure latches.",
+        "Fall indicator — Make sure the fabric fall indicator is intact (the harness has not arrested a fall).",
+        "Body fit — Adjust the thigh and shoulder straps: a flat hand should fit snugly under the thigh strap."
+      ],
+      "callout": "A harness that has arrested a fall is immediately withdrawn from use and destroyed!"
+    },
+    {
+      "id": "slide-49",
+      "title": "Risk matrix for erection work at height",
+      "body": [
+        "Person falling from height — Severe multiple trauma, spinal fractures, death — 100% tie-off, Y-lanyard, horizontal anchor line",
+        "Falling objects and tools — Injury to personnel at ground level — Helmets, protective canopies, tool lanyards, 15 cm toe boards",
+        "Scaffold/platform instability — Collapse of the structure with people and materials — Anchoring to the facade, diagonal bracing, formal acceptance",
+        "Weather (wind, thunderstorm, ice) — Blown off by a gust, loss of balance, slipping, lightning strike — Monitor forecasts, stop work at once if wind >10–12 m/s"
+      ],
+      "callout": "The danger zone below work at height must be fenced off with warning tape and signs!"
+    },
+    {
+      "id": "slide-50",
+      "title": "CRITICAL BAN: Violations during work at height",
+      "body": [
+        "Being at height without a correctly worn and adjusted full body harness and a locked carabiner.",
+        "Wind speed above 10–12 m/s (when erecting solid structures and panels) or 15 m/s for ordinary work.",
+        "Onset of a thunderstorm, squall, fog (visibility under 50 m) or icing of structures and ladders.",
+        "No approved work execution plan for work at height (WEP) or rescue and evacuation plan (REP).",
+        "Using homemade, uncertified or damaged platforms, barrels or stands instead of scaffolding."
+      ],
+      "callout": "An unprotected fall gives no second chance — safety at height is absolute!"
+    },
+    {
+      "id": "slide-51",
+      "title": "Combined work, rescue and first aid",
+      "body": [
+        "Specifics of electrical work at height, preventing suspension trauma, emergency evacuation and first aid for victims."
+      ],
+      "callout": ""
+    },
+    {
+      "id": "slide-52",
+      "title": "4 safety steps for work on OHL poles",
+      "body": [
+        "Pole check — Check for wood rot or cracks in reinforced concrete, pole stability and guy wires.",
+        "100% tie-off — Use a flexible anchor line or a pole strap throughout the climb.",
+        "Safety zone — Keep safe clearances to adjacent lines that are live or carry induced voltage.",
+        "Earth the line — Fit portable earths on both sides of the worksite on all phase conductors."
+      ],
+      "callout": "Climbing angle poles from the inside of the conductor angle is strictly prohibited!"
+    },
+    {
+      "id": "slide-53",
+      "title": "Aerial work platforms (AWP) near OHL",
+      "body": [
+        "Work permit: work within 30 metres of the outermost OHL conductor is done only under a work permit and a manager's supervision.",
+        "Chassis earthing: the AWP vehicle body must be earthed with a flexible copper conductor to a fixed earth electrode or the substation earth.",
+        "100% tie-off: an electrician in the basket must be clipped by the harness lanyard to the basket's dedicated certified anchor point.",
+        "No travel: moving the AWP with people in the basket or with the boom raised is strictly prohibited!"
+      ],
+      "callout": "Earthing the AWP body and clipping into the basket are mandatory before switching on the boom hydraulics!"
+    },
+    {
+      "id": "slide-54",
+      "title": "4 stages of the rescue plan (REP)",
+      "body": [
+        "Alarm and timer — Alert the supervisor at once and start timing. Rescue time — up to 10 minutes!",
+        "Rig rescue kit — Attach the rescue device to a secure anchor above the victim or on an adjacent structure.",
+        "Hook and lower — Clip the rescue line to the suspended worker's harness, cut their lanyard, lower gently.",
+        "Shock control — Place them in the right position (sitting or semi-sitting!), call an ambulance."
+      ],
+      "callout": "The rescue and evacuation plan (REP) and rescue kit must be on site before work starts!"
+    },
+    {
+      "id": "slide-55",
+      "title": "Suspension trauma in a harness",
+      "body": [
+        "Injury mechanism: thigh straps compress the femoral veins and blood pools in the legs, causing acute venous congestion.",
+        "Reduced blood return: after 5–10 minutes of motionless hanging, brain hypoxia, loss of consciousness and cardiac arrest follow.",
+        "Self-help while suspended: if conscious, actively move the legs (“pedal a bicycle”) and stand in the foot-loop stirrups.",
+        "GOLDEN RULE: after lowering, NEVER lay the victim flat on their back! (risk of “reflow syndrome” and cardiac arrest)."
+      ],
+      "callout": "After lowering the victim, NEVER, EVER LAY THEM ON THEIR BACK! Keep them semi-sitting for 30+ minutes to spare the heart from toxic shock!"
+    },
+    {
+      "id": "slide-56",
+      "title": "Releasing a victim from current at height",
+      "body": [
+        "Step 1. De-energise the installation: switch off the nearest isolator, breaker or switch with the emergency stop.",
+        "Step 2. Prevent a fall: remember that once the current is off, the victim will go limp and fall unless secured by fall protection!",
+        "Step 3. Insulate the rescuer: if power cannot be cut quickly, use dielectric gloves, an insulating rod or an axe with a dry handle.",
+        "Step 4. Separate the victim: pull the victim by dry clothing only, with one hand, without touching bare skin or metal."
+      ],
+      "callout": "When cutting the current to a victim at height, secure them from falling: the fall after a shock is deadlier than the current!"
+    },
+    {
+      "id": "slide-57",
+      "title": "First aid: cardiopulmonary resuscitation (CPR)",
+      "body": [
+        "Assessment: check consciousness (call out, shake the shoulders) and breathing (the “listen — look — feel” rule for 10 seconds).",
+        "Chest compressions: 30 presses on the centre of the breastbone, 5–6 cm deep, at 100–120 per minute with the heel of the hand.",
+        "Rescue breaths: 2 mouth-to-mouth breaths through a barrier face shield after tilting the head back and pinching the nose.",
+        "Using an AED (defibrillator): apply the automated defibrillator pads and follow the device's voice prompts.",
+        "Fractures and bleeding: apply a pressure bandage to bleeding, splint fractures, do not reset bone fragments!"
+      ],
+      "callout": "Start CPR immediately! Every minute of delay cuts the brain's chance of survival by 10%! Ratio: 30 to 2!"
+    },
+    {
+      "id": "slide-58",
+      "title": "CRITICAL STOP: 6 grounds for an absolute stop",
+      "body": [
+        "1. Sudden appearance of voltage on disconnected live parts or sparking at the worksite.",
+        "2. Worsening weather: onset of a thunderstorm, squall wind (>12 m/s), snowstorm or dense fog.",
+        "3. Detection of a defect or tear in the harness, lanyard, carabiner or anchor line during work.",
+        "4. Sudden illness of any crew member (dizziness, nausea, weakness, chest pain).",
+        "5. Forced departure of the work supervisor or the person providing continuous supervision.",
+        "6. An emergency, or tools or structures falling near people."
+      ],
+      "callout": "The right to stop work (“STOP CARD”) is every worker's sacred right, with no risk of punishment!"
+    },
+    {
+      "id": "slide-59",
+      "title": "Final admission checklist: 6 safety conditions",
+      "body": [
+        "Work permit issued — Permit signed by all parties, still valid, task briefing given.",
+        "De-energised and earthed — Switching devices off, absence of voltage verified, earths applied.",
+        "LOTO lockout in place — Personal mechanical locks on the drives, keys held by crew members.",
+        "Electrical PPE checked — Dielectric gloves, tools and indicators tested, stamps valid.",
+        "Full body harness fitted — 100% continuous tie-off, anchor point reliable (>=22 kN), twin-leg lanyard connected.",
+        "Rescue plan ready — Evacuation kit on site, communications working, danger zone below fenced off."
+      ],
+      "callout": ""
+    }
+  ],
+  "seo": {
+    "title": "Electrical Safety and Work at Height | SafetyHub",
+    "description": "Course on electrical safety and work at height: effects of current, protective measures, electrical safety groups, work permits, fall protection systems, rescue and first aid.",
+    "ogTitle": "Electrical Safety and Work at Height",
+    "ogDescription": "Course on electrical safety and work at height: effects of current, protective measures, electrical safety groups, work permits, fall protection systems, rescue and first aid.",
+    "ogImage": "/images/course-batch/elektrobezopasnost-i-raboty-na-vysote-en.webp",
+    "indexable": true
+  }
+}

@@ -14,6 +14,13 @@ import {
 export const COURSE_BATCH_SLUGS = ['svarshchik', 'promyshlennaya-bezopasnost'];
 export const COURSE_BATCH_LOCALES = ['ru', 'kk', 'en', 'zh'];
 const ROOT = path.resolve('content/course-batch-2026-09');
+// What the September batch was published with, and what a later batch states
+// for itself in `batch.json` beside its courses.
+const SEPTEMBER_BATCH = {
+  slugs: COURSE_BATCH_SLUGS,
+  icons: { svarshchik: 'goggles', 'promyshlennaya-bezopasnost': 'factory' },
+  pages: { svarshchik: [40, 45], 'promyshlennaya-bezopasnost': [50, 59] },
+};
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 function assert(ok, message) {
@@ -98,13 +105,24 @@ export function assessmentProjection(variants, includeAnswers = false) {
 }
 
 export async function loadCourseBatch(root = ROOT) {
+  const manifest = await json(path.join(root, 'batch.json')).catch((error) => {
+    if (error.code !== 'ENOENT') throw error;
+    return SEPTEMBER_BATCH;
+  });
+  assert(
+    Array.isArray(manifest.slugs) &&
+      manifest.slugs.length > 0 &&
+      manifest.slugs.every((slug) => /^[a-z][a-z0-9-]{1,80}$/u.test(slug)) &&
+      manifest.slugs.every((slug) => manifest.icons?.[slug] && manifest.pages?.[slug]?.length === 2),
+    'BATCH_MANIFEST_INVALID',
+  );
   const review = await json(path.join(root, 'release-review.json'));
   assert(
     review.status === 'passed' && review.independentReviewer && review.reviewedAt,
     'INDEPENDENT_REVIEW_REQUIRED',
   );
   const entries = [];
-  for (const slug of COURSE_BATCH_SLUGS) {
+  for (const slug of manifest.slugs) {
     let sourceVariants;
     for (const locale of COURSE_BATCH_LOCALES) {
       const dir = path.join(root, slug, locale);
@@ -130,8 +148,7 @@ export async function loadCourseBatch(root = ROOT) {
         'DECK_IDENTITY_INVALID',
       );
       assert(
-        pageCount >= (slug === 'svarshchik' ? 40 : 50) &&
-          pageCount <= (slug === 'svarshchik' ? 45 : 59),
+        pageCount >= manifest.pages[slug][0] && pageCount <= manifest.pages[slug][1],
         'DECK_LENGTH_INVALID',
       );
       assert(pdf.length <= 25 * 1024 * 1024, 'PRESENTATION_TOO_LARGE');
@@ -153,7 +170,7 @@ export async function loadCourseBatch(root = ROOT) {
       });
     }
   }
-  return { entries, review, batchHash: hash(JSON.stringify(review)) };
+  return { entries, review, manifest, batchHash: hash(JSON.stringify(review)) };
 }
 
 async function rpc(client, name, args) {
@@ -250,7 +267,8 @@ export async function publishCourseBatch({ batch, target, receiptPath, confirmHa
     .from('tests')
     .select('id,slug,display_order,current_revision_id,content_version');
   if (catalog.error) throw new Error('CATALOG_READ_FAILED');
-  const oldCourses = catalog.data.filter((c) => !COURSE_BATCH_SLUGS.includes(c.slug));
+  const slugs = batch.manifest.slugs;
+  const oldCourses = catalog.data.filter((c) => !slugs.includes(c.slug));
   const qa = {
     status: 'passed',
     mode: 'automated-only',
@@ -258,7 +276,7 @@ export async function publishCourseBatch({ batch, target, receiptPath, confirmHa
     independentSemanticReviewSha256: hash(JSON.stringify(batch.review)),
     humanApproval: false,
   };
-  for (const [index, slug] of COURSE_BATCH_SLUGS.entries()) {
+  for (const [index, slug] of slugs.entries()) {
     const items = batch.entries.filter((e) => e.slug === slug);
     const ru = items[0];
     let entry = receipt.courses[slug];
@@ -279,7 +297,7 @@ export async function publishCourseBatch({ batch, target, receiptPath, confirmHa
       p_slug: slug,
       p_title: ru.deck.title,
       p_description: ru.deck.description,
-      p_icon: slug === 'svarshchik' ? 'goggles' : 'factory',
+      p_icon: batch.manifest.icons[slug],
       p_display_order: displayOrder,
       p_presentation_id: presentationId,
       p_duration_minutes: 15,
@@ -419,18 +437,18 @@ if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === imp
     const value = (n) => argv.find((a) => a.startsWith(n + '='))?.slice(n.length + 1);
     assert(
       argv.every(
-        (a) => a === '--plan' || a === '--apply' || /^--(target|receipt|confirm-hash)=/.test(a),
+        (a) => a === '--plan' || a === '--apply' || /^--(target|receipt|confirm-hash|batch)=/.test(a),
       ),
       'UNKNOWN_ARGUMENT',
     );
     assert(argv.includes('--plan') !== argv.includes('--apply'), 'CHOOSE_PLAN_OR_APPLY');
-    const batch = await loadCourseBatch();
+    const batch = await loadCourseBatch(path.resolve(value('--batch') ?? ROOT));
     if (argv.includes('--plan'))
       console.log(
         JSON.stringify({
           ok: true,
           batchHash: batch.batchHash,
-          courses: COURSE_BATCH_SLUGS,
+          courses: batch.manifest.slugs,
           presentations: batch.entries.length,
           pages: batch.entries.reduce((a, e) => a + e.presentation.pageCount, 0),
         }),

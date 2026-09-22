@@ -1,0 +1,16 @@
+-- Publishing a course presentation has been failing since 20 September.
+--
+-- `private.protect_course_presentation_object` — the guard that keeps a ready
+-- presentation from being edited — asks `private.purge_clears_user_column`
+-- whether a change is the purge clearing the name of a deleted account. That
+-- helper was revoked from every role but the owner on 20 September
+-- (20260920150000), and the guard is an ordinary trigger function, so it runs
+-- as whoever writes the row. The server writes presentations with its own key,
+-- so every publication died on «permission denied for function
+-- purge_clears_user_column» the moment a staged presentation was moved to
+-- validating — the state after the bytes are uploaded and before they are
+-- checked. Nothing had been published since, so nobody saw it.
+--
+-- The helper reads one transaction setting and compares two json documents; it
+-- decides nothing on its own. The server's role may ask it.
+grant execute on function private.purge_clears_user_column(jsonb, jsonb, text) to service_role;

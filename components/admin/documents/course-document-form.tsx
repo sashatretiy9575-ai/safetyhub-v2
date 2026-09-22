@@ -33,6 +33,16 @@ import {
   type SamplePerson,
 } from '@/lib/pdf/document-preview-job';
 import { DOCUMENT_FAMILIES, type BookletTexts } from '@/lib/pdf/document-profile';
+import {
+  ELECTRICAL_GROUPS,
+  ELECTRICAL_ROLES,
+  ELECTRICAL_ROLE_TEXT,
+  ELECTRICAL_VOLTAGES,
+  ELECTRICAL_VOLTAGE_TEXT,
+  type ElectricalGroup,
+  type ElectricalRole,
+  type ElectricalVoltage,
+} from '@/lib/pdf/electrical';
 import { DocumentPreviewPane } from './document-preview-pane';
 import type { DocumentPreviewTab } from './use-document-preview';
 
@@ -47,6 +57,8 @@ const BOOKLET_FIELDS: readonly { key: keyof BookletTexts; label: string }[] = [
   { key: 'examTextRu', label: 'Левая сторона, русский' },
   { key: 'knowledgeTextRu', label: 'Правая сторона, русский' },
 ];
+/** The kinds of check the qualification protocol of the energy rules names. */
+const VERIFICATION_KINDS = ['первичная', 'очередная', 'внеочередная'] as const;
 const FIELD_INPUT = 'min-h-12 min-w-0 w-full text-base';
 const FIELD_TEXTAREA = 'min-w-0 w-full text-base';
 
@@ -107,6 +119,7 @@ export function CourseDocumentForm({
   useUnsavedChangesGuard(dirty, { title: 'Уйти без сохранения?' });
   const problem = draftProblem(draft);
   const defaults = documentFamilyDefaults(draft.family);
+  const electrical = draft.family === 'electrical';
   const audiences = draftAudiences(draft);
   const shownAudience: DocumentAudienceKey = draft.split
     ? focused === 'worker'
@@ -191,10 +204,7 @@ export function CourseDocumentForm({
   };
 
   return (
-    <div
-      className="document-editor min-w-0 space-y-4"
-      data-hydrated={hydrated ? '' : undefined}
-    >
+    <div className="document-editor min-w-0 space-y-4" data-hydrated={hydrated ? '' : undefined}>
       <div
         data-editor-action-bar
         className="sticky top-[calc(3.5rem+var(--safe-area-top))] z-[var(--z-sticky)] border-y border-[var(--color-border-strong)] bg-[var(--color-surface)]/96 px-3 py-2 shadow-[var(--shadow-card)] backdrop-blur-xl md:rounded-[var(--radius-lg)] md:border-x lg:top-4"
@@ -208,7 +218,10 @@ export function CourseDocumentForm({
           <h1 className="min-w-0 flex-1 truncate text-lg font-bold tracking-tight">
             {setup.title}
           </h1>
-          <p role="status" className="hidden min-w-0 truncate text-sm text-[var(--color-text-muted)] sm:block">
+          <p
+            role="status"
+            className="hidden min-w-0 truncate text-sm text-[var(--color-text-muted)] sm:block"
+          >
             {status}
           </p>
           <Button
@@ -221,7 +234,10 @@ export function CourseDocumentForm({
             <span className="hidden sm:inline">Сохранить</span>
           </Button>
         </div>
-        <p role="status" className="min-h-5 truncate pt-1 text-sm text-[var(--color-text-muted)] sm:hidden">
+        <p
+          role="status"
+          className="min-h-5 truncate pt-1 text-sm text-[var(--color-text-muted)] sm:hidden"
+        >
           {status}
         </p>
       </div>
@@ -237,15 +253,63 @@ export function CourseDocumentForm({
             }))}
             onChange={(family) => update({ family: family as CourseDocumentDraft['family'] })}
           />
-          <SegmentedControl
-            label="Категории слушателей"
-            value={draft.split ? 'split' : 'one'}
-            onChange={(value) => update({ split: value === 'split' })}
-            options={[
-              { value: 'one', label: 'Одна' },
-              { value: 'split', label: 'ИТР и рабочие' },
-            ]}
-          />
+          {electrical ? null : (
+            <SegmentedControl
+              label="Категории слушателей"
+              value={draft.split ? 'split' : 'one'}
+              onChange={(value) => update({ split: value === 'split' })}
+              options={[
+                { value: 'one', label: 'Одна' },
+                { value: 'split', label: 'ИТР и рабочие' },
+              ]}
+            />
+          )}
+          {electrical ? (
+            <div className="grid min-w-0 gap-3">
+              <SegmentedControl
+                label="Группа по электробезопасности"
+                value={draft.electrical.group}
+                onChange={(group) =>
+                  update({ electrical: { ...draft.electrical, group: group as ElectricalGroup } })
+                }
+                options={ELECTRICAL_GROUPS.map((group) => ({ value: group, label: group }))}
+              />
+              <SegmentedControl
+                label="Напряжение электроустановок"
+                value={draft.electrical.voltage}
+                onChange={(voltage) =>
+                  update({
+                    electrical: { ...draft.electrical, voltage: voltage as ElectricalVoltage },
+                  })
+                }
+                options={ELECTRICAL_VOLTAGES.map((voltage) => ({
+                  value: voltage,
+                  label: ELECTRICAL_VOLTAGE_TEXT[voltage].label,
+                }))}
+              />
+            </div>
+          ) : null}
+          {electrical ? (
+            <DocumentSelect
+              label="В качестве"
+              value={draft.electrical.role}
+              options={ELECTRICAL_ROLES.map((role) => ({
+                value: role,
+                label: ELECTRICAL_ROLE_TEXT[role].label,
+              }))}
+              onChange={(role) =>
+                update({ electrical: { ...draft.electrical, role: role as ElectricalRole } })
+              }
+            />
+          ) : null}
+          {electrical ? (
+            <DocumentSelect
+              label="Вид проверки знаний"
+              value={draft.verificationKind.trim() || defaults.verificationKind}
+              options={VERIFICATION_KINDS.map((kind) => ({ value: kind, label: kind }))}
+              onChange={(kind) => update({ verificationKind: kind })}
+            />
+          ) : null}
           {audiences.map((audience) => {
             const category = draft.categories[audience];
             const hoursDefault = defaults.hours[audience];
@@ -257,23 +321,25 @@ export function CourseDocumentForm({
                 className="xs:grid-cols-2 grid min-w-0 gap-3"
                 onFocus={() => setFocused(audience)}
               >
-                <WordFrame>
-                  {word ? <FrameWord>{word}</FrameWord> : null}
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min={1}
-                    max={5000}
-                    aria-label={word ? `Часы, ${word}` : 'Часы'}
-                    placeholder={hoursDefault ? String(hoursDefault) : '—'}
-                    className={FRAME_INPUT}
-                    value={category?.hours ?? ''}
-                    onChange={(event) =>
-                      updateCategory(audience, { hours: numberOrNull(event.target.value) })
-                    }
-                  />
-                  <FrameWord>ч</FrameWord>
-                </WordFrame>
+                {electrical ? null : (
+                  <WordFrame>
+                    {word ? <FrameWord>{word}</FrameWord> : null}
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min={1}
+                      max={5000}
+                      aria-label={word ? `Часы, ${word}` : 'Часы'}
+                      placeholder={hoursDefault ? String(hoursDefault) : '—'}
+                      className={FRAME_INPUT}
+                      value={category?.hours ?? ''}
+                      onChange={(event) =>
+                        updateCategory(audience, { hours: numberOrNull(event.target.value) })
+                      }
+                    />
+                    <FrameWord>ч</FrameWord>
+                  </WordFrame>
+                )}
                 <WordFrame>
                   {word ? <FrameWord>{word}</FrameWord> : null}
                   <input
@@ -304,24 +370,29 @@ export function CourseDocumentForm({
             value={draft.programName}
             onChange={(event) => update({ programName: event.target.value })}
           />
-          <Textarea
-            aria-label="Основание проверки"
-            placeholder={defaults.protocolText}
-            maxLength={1000}
-            rows={3}
-            className={FIELD_TEXTAREA}
-            value={draft.protocolText}
-            onChange={(event) => update({ protocolText: event.target.value })}
-          />
-          <Textarea
-            aria-label="Решение комиссии"
-            placeholder={defaults.decisionText}
-            maxLength={1000}
-            rows={3}
-            className={FIELD_TEXTAREA}
-            value={draft.decisionText}
-            onChange={(event) => update({ decisionText: event.target.value })}
-          />
+          {/* The qualification form of the energy rules carries its own wording. */}
+          {electrical ? null : (
+            <Textarea
+              aria-label="Основание проверки"
+              placeholder={defaults.protocolText}
+              maxLength={1000}
+              rows={3}
+              className={FIELD_TEXTAREA}
+              value={draft.protocolText}
+              onChange={(event) => update({ protocolText: event.target.value })}
+            />
+          )}
+          {electrical ? null : (
+            <Textarea
+              aria-label="Решение комиссии"
+              placeholder={defaults.decisionText}
+              maxLength={1000}
+              rows={3}
+              className={FIELD_TEXTAREA}
+              value={draft.decisionText}
+              onChange={(event) => update({ decisionText: event.target.value })}
+            />
+          )}
           {draft.family === 'biot' ? (
             <div className="xs:grid-cols-2 grid min-w-0 gap-3">
               <Input
@@ -354,19 +425,21 @@ export function CourseDocumentForm({
               onChange={(event) => update({ verificationKind: event.target.value })}
             />
           ) : null}
-          <SegmentedControl
-            label="Корочка"
-            value={bookletMode}
-            onChange={(value) => {
-              update({ booklet: value === 'own' ? (draft.booklet ?? commonBooklet) : null });
-              setTab('certificate');
-            }}
-            options={[
-              { value: 'common', label: 'Общая корочка' },
-              { value: 'own', label: 'Своя корочка' },
-            ]}
-          />
-          {draft.booklet ? (
+          {electrical ? null : (
+            <SegmentedControl
+              label="Корочка"
+              value={bookletMode}
+              onChange={(value) => {
+                update({ booklet: value === 'own' ? (draft.booklet ?? commonBooklet) : null });
+                setTab('certificate');
+              }}
+              options={[
+                { value: 'common', label: 'Общая корочка' },
+                { value: 'own', label: 'Своя корочка' },
+              ]}
+            />
+          )}
+          {draft.booklet && !electrical ? (
             <div className="grid min-w-0 gap-3 xl:grid-cols-2">
               {BOOKLET_FIELDS.map(({ key, label }) => (
                 <Textarea
@@ -389,12 +462,7 @@ export function CourseDocumentForm({
           ) : null}
         </fieldset>
 
-        <DocumentPreviewPane
-          tab={tab}
-          onTab={setTab}
-          job={job}
-          className="lg:sticky lg:top-24"
-        />
+        <DocumentPreviewPane tab={tab} onTab={setTab} job={job} className="lg:sticky lg:top-24" />
       </div>
     </div>
   );

@@ -85,6 +85,19 @@ export const DOCUMENT_FAMILY_DEFAULTS: Record<DocumentFamily, DocumentFamilyDefa
     decisionText:
       'Квалификационная комиссия приняла решение о выдаче свидетельства по специальности.',
   },
+  // The qualification check of the rules for personnel of energy organizations:
+  // one protocol per person, a group of admission, a check a year later. The
+  // sheet prints neither hours nor a wording of its own.
+  electrical: {
+    hours: NO_HOURS,
+    validityMonths: { all: 12, itr: 12, worker: 12 },
+    verificationKind: 'очередная',
+    trainingReason: '',
+    protocolText:
+      'Квалификационная проверка знаний по электробезопасности проведена по программе «{program}».',
+    decisionText:
+      'Комиссия присвоила группу допуска по электробезопасности и допустила к работе в электроустановках.',
+  },
   'first-aid': {
     hours: { all: 8, itr: 8, worker: 8 },
     validityMonths: { all: 12, itr: 12, worker: 12 },

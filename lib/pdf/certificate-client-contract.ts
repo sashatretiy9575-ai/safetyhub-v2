@@ -55,6 +55,9 @@ export type CertificateRenderMetadata = Readonly<{
   documentDetails?: {
     trainingReason?: string;
     notes?: string;
+    /** What one person of an electrical course was admitted to, if not the course's own. */
+    electricalGroup?: string;
+    electricalVoltage?: string;
     qualificationDecision?: string;
     formalExamReference?: string;
     formalExamDate?: string;

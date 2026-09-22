@@ -1,6 +1,12 @@
 import 'server-only';
 
 import { documentAudienceForPosition } from '@/lib/pdf/document-family-defaults';
+import {
+  courseAdmission,
+  personAdmission,
+  type ElectricalGroup,
+  type ElectricalVoltage,
+} from '@/lib/pdf/electrical';
 import { requireCapability } from '@/server/auth/session';
 import { createAdminClient } from '@/server/supabase/admin';
 import { createClient } from '@/server/supabase/server';
@@ -17,6 +23,13 @@ export type PersonCourseDocuments = {
   /** The category the position alone would give. */
   positionAudience: PersonAudience;
   note: string;
+  /** Present for a course of electrical safety: what this person is admitted to. */
+  electrical: {
+    group: ElectricalGroup;
+    voltage: ElectricalVoltage;
+    courseGroup: ElectricalGroup;
+    courseVoltage: ElectricalVoltage;
+  } | null;
 };
 
 export async function readPersonCourseDocuments(
@@ -26,14 +39,18 @@ export async function readPersonCourseDocuments(
   await requireCapability('certificate.issue');
   const client = createAdminClient();
   const [person, course] = await Promise.all([
-    client.from('profiles').select('job,organization,document_audience').eq('id', userId).maybeSingle(),
+    client
+      .from('profiles')
+      .select('job,organization,document_audience')
+      .eq('id', userId)
+      .maybeSingle(),
     client.from('tests').select('slug').eq('id', courseId).maybeSingle(),
   ]);
   if (person.error) throw person.error;
   if (course.error) throw course.error;
   if (!person.data || !course.data) return null;
   const [profiles, batches] = await Promise.all([
-    client.from('document_profiles').select('audience').eq('course_slug', course.data.slug),
+    client.from('document_profiles').select('audience,body').eq('course_slug', course.data.slug),
     client
       .from('document_batches')
       .select('organization_key,participant_fields,updated_at')
@@ -46,12 +63,42 @@ export async function readPersonCourseDocuments(
   const organizationKey = person.data.organization.trim().toLocaleLowerCase('ru-RU');
   // The same order the issuance trigger reads it in: the present company first.
   const records = [...(batches.data ?? [])].sort(
-    (a, b) => Number(b.organization_key === organizationKey) - Number(a.organization_key === organizationKey),
+    (a, b) =>
+      Number(b.organization_key === organizationKey) -
+      Number(a.organization_key === organizationKey),
   );
   const fields = records
-    .map((record) => (record.participant_fields as Record<string, { notes?: unknown }> | null)?.[userId])
+    .map(
+      (record) =>
+        (
+          record.participant_fields as Record<
+            string,
+            { notes?: unknown; electricalGroup?: unknown; electricalVoltage?: unknown }
+          > | null
+        )?.[userId],
+    )
     .find(Boolean);
   const stored = person.data.document_audience;
+  const body = (profiles.data ?? []).map((profile) => profile.body).find(Boolean) as
+    { family?: string; electrical?: Record<string, string> } | undefined;
+  const courseElectrical = courseAdmission(
+    body?.electrical as Parameters<typeof courseAdmission>[0],
+  );
+  const personElectrical = personAdmission(courseElectrical, {
+    electricalGroup:
+      typeof fields?.electricalGroup === 'string' ? fields.electricalGroup : undefined,
+    electricalVoltage:
+      typeof fields?.electricalVoltage === 'string' ? fields.electricalVoltage : undefined,
+  });
+  const admission =
+    body?.family === 'electrical'
+      ? {
+          group: personElectrical.group,
+          voltage: personElectrical.voltage,
+          courseGroup: courseElectrical.group,
+          courseVoltage: courseElectrical.voltage,
+        }
+      : null;
   return {
     courseSlug: course.data.slug,
     split:
@@ -60,6 +107,7 @@ export async function readPersonCourseDocuments(
     audience: stored === 'itr' || stored === 'worker' ? stored : positionAudience,
     positionAudience,
     note: typeof fields?.notes === 'string' ? fields.notes : '',
+    electrical: admission,
   };
 }
 
@@ -76,6 +124,25 @@ export async function savePersonAudience(userId: string, audience: PersonAudienc
   const client = (await createClient()) as unknown as RpcClient;
   unwrapRpcMutationResponse(
     await client.rpc('set_document_audience', { p_user_id: userId, p_audience: audience }),
+  );
+}
+
+/** One person's own group of admission; null gives the course's back. */
+export async function savePersonElectrical(
+  userId: string,
+  courseSlug: string,
+  group: ElectricalGroup | null,
+  voltage: ElectricalVoltage | null,
+) {
+  await requireCapability('certificate.issue');
+  const client = (await createClient()) as unknown as RpcClient;
+  unwrapRpcMutationResponse(
+    await client.rpc('save_document_electrical', {
+      p_user_id: userId,
+      p_course_slug: courseSlug,
+      p_group: group,
+      p_voltage: voltage,
+    }),
   );
 }
 

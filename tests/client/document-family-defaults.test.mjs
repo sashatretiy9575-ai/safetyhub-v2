@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
   DOCUMENT_FAMILY_DEFAULTS,
@@ -76,7 +76,15 @@ test('the listener category follows the position the person holds', () => {
 });
 
 test('the database fills the same blanks with the same words', async () => {
-  const sql = await read('supabase/migrations/20260920170000_document_defaults_one_click.sql');
+  // Whichever migration states the defaults last is the one the database runs.
+  const directory = new URL('../../supabase/migrations/', import.meta.url);
+  const files = (await readdir(directory)).filter((file) => file.endsWith('.sql')).sort();
+  const sources = await Promise.all(
+    files.map(async (file) => [file, await readFile(new URL(file, directory), 'utf8')]),
+  );
+  const latest = (name) => sources.filter(([, source]) => source.includes(name)).at(-1)?.[1];
+  const sql = latest('function private.document_family_default');
+  assert.ok(sql, 'a migration states the defaults');
   for (const [family, defaults] of Object.entries(DOCUMENT_FAMILY_DEFAULTS)) {
     assert.ok(sql.includes(defaults.protocolText), `${family}: protocolText`);
     assert.ok(sql.includes(defaults.decisionText), `${family}: decisionText`);
@@ -88,5 +96,5 @@ test('the database fills the same blanks with the same words', async () => {
   const source = await read('lib/pdf/document-family-defaults.ts');
   const words = /\(([а-яa-z|]+)\)/iu.exec(source.split('SUPERVISORY_POSITION')[1] ?? '')?.[1];
   assert.ok(words && words.includes('руковод'));
-  assert.ok(sql.includes(words));
+  assert.ok(latest('function private.document_audience_for_position')?.includes(words));
 });

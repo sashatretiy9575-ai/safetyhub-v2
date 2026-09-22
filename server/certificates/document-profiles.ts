@@ -2,6 +2,11 @@ import 'server-only';
 import { z } from 'zod';
 import { createAdminClient } from '@/server/supabase/admin';
 import { requireCapability } from '@/server/auth/session';
+import {
+  ELECTRICAL_GROUPS,
+  ELECTRICAL_ROLES,
+  ELECTRICAL_VOLTAGES,
+} from '@/lib/pdf/electrical';
 import { DOCUMENT_FAMILIES, type DocumentProfileSettings } from '@/lib/pdf/document-profile';
 
 export const documentSignerSchema = z
@@ -33,6 +38,15 @@ const bookletTextsSchema = z
   })
   .strict();
 
+/** The admission an electrical course gives; the database checks the same lists. */
+export const electricalAdmissionSchema = z
+  .object({
+    group: z.enum(ELECTRICAL_GROUPS),
+    voltage: z.enum(ELECTRICAL_VOLTAGES),
+    role: z.enum(ELECTRICAL_ROLES),
+  })
+  .strict();
+
 const profileFields = {
   revision: z.number().int().positive().optional(),
   id: z.string().regex(/^[a-z][a-z0-9-]{1,119}$/u),
@@ -58,6 +72,7 @@ const profileFields = {
   orderDate: z.union([z.iso.date(), z.literal('')]).default(''),
   verificationKind: z.string().max(120).default(''),
   booklet: z.object({ layout: z.literal('standard'), texts: bookletTextsSchema }).strict().optional(),
+  electrical: electricalAdmissionSchema.optional(),
 };
 
 /** A course's documents for one category, as `document_profiles.body` stores them. */

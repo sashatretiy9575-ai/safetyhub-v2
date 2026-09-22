@@ -1,5 +1,6 @@
 import type { CertificateBranding } from './certificate-client-contract.ts';
 import type { DocumentDefaults } from './document-editor.ts';
+import { courseAdmission, type ElectricalAdmission } from './electrical.ts';
 import {
   applyDocumentProfile,
   withDocumentCommission,
@@ -32,8 +33,10 @@ export type CourseDocumentDraft = {
   orderNumber: string;
   orderDate: string;
   verificationKind: string;
-  /** Null prints the booklet of «Общее». */
+  /** Null prints the booklet of «Общее»; an electrical course prints its own. */
   booklet: BookletTexts | null;
+  /** The admission an electrical course gives; other forms ignore it. */
+  electrical: ElectricalAdmission;
   categories: Partial<Record<DocumentAudienceKey, CourseDocumentCategory>>;
 };
 /** One course and the profiles it is stored as, each with its version. */
@@ -53,6 +56,7 @@ export const DOCUMENT_FAMILY_LABELS: Readonly<Record<DocumentFamily, string>> = 
   industrial: 'Промбез',
   qualification: 'Квалификационный',
   'first-aid': 'Первая помощь',
+  electrical: 'Электробезопасность',
 };
 export const AUDIENCE_LABELS: Readonly<Record<DocumentAudienceKey, string>> = {
   all: '',
@@ -82,11 +86,16 @@ export function courseDocumentDraft(setup: CourseDocumentSetup): CourseDocumentD
     (a, b) => order.indexOf(a.audience) - order.indexOf(b.audience),
   );
   const lead = profiles[0];
-  const split = !profiles.some((profile) => profile.audience === 'all') && profiles.length > 1;
+  const family = lead?.family ?? 'general';
+  // One protocol per person: an electrical course is never split in two.
+  const split =
+    family !== 'electrical' &&
+    !profiles.some((profile) => profile.audience === 'all') &&
+    profiles.length > 1;
   const categories: CourseDocumentDraft['categories'] = {};
   for (const profile of profiles) categories[profile.audience] = categoryOf(profile);
   return {
-    family: lead?.family ?? 'general',
+    family,
     split,
     programName: lead?.programName || setup.title,
     protocolText: lead?.protocolText ?? '',
@@ -95,14 +104,16 @@ export function courseDocumentDraft(setup: CourseDocumentSetup): CourseDocumentD
     orderDate: lead?.orderDate ?? '',
     verificationKind: lead?.verificationKind ?? '',
     booklet: lead?.booklet?.texts ?? null,
+    electrical: courseAdmission(lead?.electrical),
     categories,
   };
 }
 
 /** What the database is sent: only the categories the course keeps. */
 export function courseDocumentPayload(draft: CourseDocumentDraft) {
+  const electrical = draft.family === 'electrical';
   const categories: Partial<Record<DocumentAudienceKey, CourseDocumentCategory>> = {};
-  for (const audience of draftAudiences(draft)) {
+  for (const audience of draftAudiences({ ...draft, split: !electrical && draft.split })) {
     const category = draft.categories[audience];
     categories[audience] = {
       hours: category?.hours ?? null,
@@ -111,14 +122,15 @@ export function courseDocumentPayload(draft: CourseDocumentDraft) {
   }
   return {
     family: draft.family,
-    split: draft.split,
+    split: !electrical && draft.split,
     programName: draft.programName.trim(),
     protocolText: draft.protocolText.trim(),
     decisionText: draft.decisionText.trim(),
     orderNumber: draft.family === 'biot' ? draft.orderNumber.trim() : '',
     orderDate: draft.family === 'biot' ? draft.orderDate : '',
     verificationKind: draft.verificationKind.trim(),
-    booklet: draft.booklet ? { layout: 'standard' as const, texts: draft.booklet } : null,
+    booklet: !electrical && draft.booklet ? { layout: 'standard' as const, texts: draft.booklet } : null,
+    electrical: electrical ? draft.electrical : null,
     categories,
   };
 }
@@ -154,6 +166,7 @@ export function draftProfile(
     orderDate: payload.orderDate,
     verificationKind: payload.verificationKind,
     ...(payload.booklet ? { booklet: payload.booklet } : {}),
+    ...(payload.electrical ? { electrical: payload.electrical } : {}),
   };
 }
 

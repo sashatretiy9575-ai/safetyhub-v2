@@ -194,6 +194,30 @@ async function renderCertificate(
   const until = certificateValidUntil(date, branding.validityMonths);
   const statement = (text: string) => documentStatement(text, branding, metadata.titleSnapshot);
   const margin = 35, usable = half - margin * 2;
+  // A course of electrical safety prints the booklet of the energy rules: an
+  // admission to installations instead of the statements, a table of checks
+  // instead of the commission's lines.
+  if (branding.documentProfile?.family === 'electrical') {
+    const { drawElectricalBooklet } = await import('./electrical-booklet.ts');
+    await drawElectricalBooklet(pdf, page, fonts, metadata, {
+      half,
+      date,
+      until,
+      loadPhoto,
+      onPhotoError,
+      signal,
+    });
+    page.scale(scale, scale);
+    pdf.setTitle('Удостоверение ' + metadata.certificateNumber);
+    pdf.setAuthor(branding.organizationName);
+    pdf.setCreationDate(date);
+    if (signal?.aborted) throw abortError();
+    const electricalSaveStarted = spanStart();
+    const electricalBytes = await pdf.save({ useObjectStreams: true });
+    measureSpan('doc:save', electricalSaveStarted);
+    measureSpan('doc:job', jobStarted);
+    return electricalBytes;
+  }
   const txt = (text: string, x: number, y: number, w: number, h: number, size = 12, bold = false, align: 'left' | 'center' | 'right' = 'left') =>
     block(page, text, fonts.pick(text, bold), x, y, w, h, size, align);
   for (const x of [8, half]) page.drawRectangle({ x, y: 8, width: half - 8, height: 359, borderColor: ink, borderWidth: .45 });
