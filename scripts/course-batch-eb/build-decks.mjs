@@ -2,9 +2,9 @@
 // per language beside the presentation it describes, the thumbnail of its first
 // page and the catalogue cover.
 //
-// The Russian deck is the owner's file, untouched. The other three are built by
-// `scripts/course-batch-eb/deck/build_locale.py` from the same generator with
-// the translated slide data, and exported to PDF through PowerPoint.
+// All four are built by `scripts/course-batch-eb/deck/build_locale.py` from the
+// owner's own generator — Russian from his own slide data, the other three from
+// its translation — and exported to PDF through PowerPoint.
 //
 //   node scripts/course-batch-eb/build-decks.mjs
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -21,7 +21,7 @@ const SOURCE_DIR = path.resolve('content/course-batch-2026-09-eb/deck-source');
 const BUILD_DIR = path.resolve(process.env.EB_DECK_BUILD ?? 'artifacts/eb-2026-09/deck');
 const CONTENT = path.resolve('content/course-batch-2026-09-eb', SLUG);
 const PDFS = {
-  ru: '../src/presentation.pdf',
+  ru: 'deck-ru.pdf',
   kk: 'deck-kk.pdf',
   en: 'deck-en.pdf',
   zh: 'deck-zh.pdf',

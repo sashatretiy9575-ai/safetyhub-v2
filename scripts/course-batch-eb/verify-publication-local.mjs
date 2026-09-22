@@ -94,10 +94,21 @@ for (const locale of LOCALES) {
     );
 }
 
+// A course that has been published twice holds the presentation of each
+// publication, so the file a reader is served is the one this revision names,
+// not merely one that is ready.
+const mapping = await service
+  .from('test_revision_presentations')
+  .select('locale,presentation_id')
+  .eq('revision_id', revision.data.id);
+if (mapping.error) throw mapping.error;
 const presentations = await service
   .from('course_presentations')
-  .select('locale,status,sha256,page_count,byte_size,storage_bucket,storage_path')
-  .eq('course_id', course.data.id);
+  .select('id,locale,status,sha256,page_count,byte_size,storage_bucket,storage_path')
+  .in(
+    'id',
+    mapping.data.map((entry) => entry.presentation_id),
+  );
 if (presentations.error) throw presentations.error;
 for (const locale of LOCALES) {
   const row = presentations.data.find(

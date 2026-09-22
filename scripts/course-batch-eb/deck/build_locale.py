@@ -124,7 +124,7 @@ def _rewrap(value, source):
 
 # Chinese is broken by the translator at its own measure: it has no spaces to
 # re-break at, and a line may not part a number from its unit.
-if LOCALE not in ("rx", "zh"):
+if LOCALE not in ("ru", "zh"):
     russian = json.load(open(os.path.join(SOURCE, "slides-ru.json"), encoding="utf-8"))
     slides = [_rewrap(slide, russian[index]) for index, slide in enumerate(slides)]
 

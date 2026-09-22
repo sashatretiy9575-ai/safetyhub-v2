@@ -129,7 +129,7 @@
       "body": [
         "Danger of a current loop: set by the share of total current passing through vital organs — the heart, lungs and brain.",
         "“Hand — hand” loop: ~3.3% of the current passes through the heart. The most common workplace case when touching two phases.",
-        "“Left hand — feet” loop: up to 4.0% of the current reaches the heart — the most critical, dangerous path!",
+        "“Hand — feet” loop: more current reaches the heart than in the “hand — hand” loop: ~3.7% from the left hand and ~6.7% from the right.",
         "“Foot — foot” loop: step voltage current; ~0.4% passes through the heart, but falling to the ground turns it into “hands — feet”."
       ],
       "callout": "A fall in the current zone instantly turns the loop from “foot-foot” to the deadly “hands-feet”!"
@@ -312,7 +312,7 @@
       "id": "slide-26",
       "title": "CRITICAL BAN: Breaching technical measures",
       "body": [
-        "Do not start work in an electrical installation without completing all 5 mandatory technical measures to prepare the site.",
+        "Do not start work in an electrical installation without completing all the mandatory technical measures to prepare the site.",
         "Do not switch on disconnected devices or remove prohibition signs and mechanical locks without authorisation.",
         "Do not use random wires of non-standard cross-section or twisted wires as portable protective earths.",
         "Do not touch live parts without verifying absence of voltage with a working indicator while wearing dielectric gloves."
@@ -475,7 +475,7 @@
         "Hazards below: work less than 1.3 m above machines, mechanisms, protruding objects, water or molten metal.",
         "High-level (steeplejack) work: work more than 5 m above the ground or a floor slab, done from erection fixtures or directly from structures."
       ],
-      "callout": "Even an unprotected fall from just 1.8 metres in 85% of cases leads to disability or death!"
+      "callout": "Even an unprotected fall from just 1.8 metres often ends in severe injury or death!"
     },
     {
       "id": "slide-41",
@@ -581,7 +581,7 @@
         "Person falling from height — Severe multiple trauma, spinal fractures, death — 100% tie-off, Y-lanyard, horizontal anchor line",
         "Falling objects and tools — Injury to personnel at ground level — Helmets, protective canopies, tool lanyards, 15 cm toe boards",
         "Scaffold/platform instability — Collapse of the structure with people and materials — Anchoring to the facade, diagonal bracing, formal acceptance",
-        "Weather (wind, thunderstorm, ice) — Blown off by a gust, loss of balance, slipping, lightning strike — Monitor forecasts, stop work at once if wind >10–12 m/s"
+        "Weather (wind, thunderstorm, ice) — Blown off by a gust, loss of balance, slipping, lightning strike — Monitor forecasts, stop work at wind of 15 m/s or more (10 m/s for solid structures and panels)"
       ],
       "callout": "The danger zone below work at height must be fenced off with warning tape and signs!"
     },
@@ -590,7 +590,7 @@
       "title": "CRITICAL BAN: Violations during work at height",
       "body": [
         "Being at height without a correctly worn and adjusted full body harness and a locked carabiner.",
-        "Wind speed above 10–12 m/s (when erecting solid structures and panels) or 15 m/s for ordinary work.",
+        "Wind speed of 15 m/s or more, or 10 m/s or more when erecting solid structures and panels.",
         "Onset of a thunderstorm, squall, fog (visibility under 50 m) or icing of structures and ladders.",
         "No approved work execution plan for work at height (WEP) or rescue and evacuation plan (REP).",
         "Using homemade, uncertified or damaged platforms, barrels or stands instead of scaffolding."
@@ -645,9 +645,9 @@
         "Injury mechanism: thigh straps compress the femoral veins and blood pools in the legs, causing acute venous congestion.",
         "Reduced blood return: after 5–10 minutes of motionless hanging, brain hypoxia, loss of consciousness and cardiac arrest follow.",
         "Self-help while suspended: if conscious, actively move the legs (“pedal a bicycle”) and stand in the foot-loop stirrups.",
-        "GOLDEN RULE: after lowering, NEVER lay the victim flat on their back! (risk of “reflow syndrome” and cardiac arrest)."
+        "GOLDEN RULE: if conscious, do not lay the victim flat — keep them semi-sitting; if unconscious, lay them down and start CPR once breathing stops."
       ],
-      "callout": "After lowering the victim, NEVER, EVER LAY THEM ON THEIR BACK! Keep them semi-sitting for 30+ minutes to spare the heart from toxic shock!"
+      "callout": "If conscious — semi-sitting, never flat on the back, and watched for at least 30 minutes. If unconscious — lay down and start resuscitation!"
     },
     {
       "id": "slide-56",
@@ -677,7 +677,7 @@
       "title": "CRITICAL STOP: 6 grounds for an absolute stop",
       "body": [
         "1. Sudden appearance of voltage on disconnected live parts or sparking at the worksite.",
-        "2. Worsening weather: onset of a thunderstorm, squall wind (>12 m/s), snowstorm or dense fog.",
+        "2. Worsening weather: onset of a thunderstorm, wind of 15 m/s or more (10 m/s for solid structures), snowstorm or dense fog.",
         "3. Detection of a defect or tear in the harness, lanyard, carabiner or anchor line during work.",
         "4. Sudden illness of any crew member (dizziness, nausea, weakness, chest pain).",
         "5. Forced departure of the work supervisor or the person providing continuous supervision.",

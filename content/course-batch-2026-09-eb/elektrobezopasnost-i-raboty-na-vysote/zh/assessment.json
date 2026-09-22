@@ -695,7 +695,7 @@
             }
           ],
           "correctOptionId": "e94c4c6d-2661-5d65-bfa8-c03646b321ec",
-          "explanation": "风速大于15 m/s时应停止高处作业；而安装实体构件和墙板时，风速达到10–12 m/s即应停止。",
+          "explanation": "风速达15 m/s及以上时应停止高处作业；而安装封闭构件和墙板时，风速达到10 m/s即应停止。",
           "slideRefs": [
             "slide-50"
           ]

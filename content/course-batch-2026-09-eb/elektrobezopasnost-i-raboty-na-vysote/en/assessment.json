@@ -695,7 +695,7 @@
             }
           ],
           "correctOptionId": "e94c4c6d-2661-5d65-bfa8-c03646b321ec",
-          "explanation": "Work at height is stopped when the wind exceeds 15 m/s, and when installing solid structures and panels — already at 10–12 m/s.",
+          "explanation": "Work at height is stopped at a wind of 15 m/s or more, and when installing solid structures and panels — already at 10 m/s.",
           "slideRefs": [
             "slide-50"
           ]
