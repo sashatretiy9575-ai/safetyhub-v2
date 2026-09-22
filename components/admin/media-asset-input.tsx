@@ -137,7 +137,9 @@ export function MediaAssetInput({
   };
 
   return (
-    <div className="space-y-2">
+    // A path is one long word: nothing here may make the field wider than the
+    // column it sits in, or the whole editor scrolls sideways on a phone.
+    <div className="min-w-0 space-y-2">
       <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
         <Input
           id={id}
@@ -158,7 +160,7 @@ export function MediaAssetInput({
       </div>
 
       {value ? (
-        <div className="flex items-start gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-2">
+        <div className="flex min-w-0 items-start gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-2">
           <span className="relative block aspect-video w-32 shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface)]">
             {previewFailed ? (
               <span className="text-micro grid size-full place-items-center px-1 text-center leading-tight text-[var(--color-text-muted)]">
@@ -180,7 +182,7 @@ export function MediaAssetInput({
             )}
           </span>
           <div className="min-w-0 flex-1 space-y-1">
-            <p className="truncate text-xs font-bold" title={value}>
+            <p className="min-w-0 text-xs font-bold break-all" title={value}>
               {selectedAssetName(value, assets)}
             </p>
             {previewFailed ? (
