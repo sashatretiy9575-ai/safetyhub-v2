@@ -28,6 +28,9 @@ export function ArticleCard({
   return (
     <Link
       href={localizePathname(`/blog/${slug}`, locale)}
+      // A grid of cards in view prefetched every article whole — about 20 KB
+      // each, right after load, on a phone. Hovering or tapping still loads it.
+      prefetch={false}
       className={cn(
         'group flex h-full min-w-0 flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_16px_40px_-30px_rgba(15,23,18,0.34)] transition duration-300 hover:border-[var(--color-primary)]/45 hover:shadow-[var(--shadow-card)] focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)] motion-safe:hover:-translate-y-1',
         featured &&

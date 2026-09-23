@@ -113,11 +113,23 @@ const nextConfig: NextConfig = {
   // Sharp discovers its platform binding and libvips payload dynamically.
   // Next's file tracer can otherwise keep the binding while dropping the
   // shared library from this route's Vercel function.
-    outputFileTracingIncludes: {
-      '/api/certificates/*/photo': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
-      '/api/admin/documents/photo/*': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
-      '/api/admin/settings/certificate/image': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
-      '/api/admin/documents/assets': ['./node_modules/@img/sharp-linux-x64/**/*', './node_modules/@img/sharp-libvips-linux-x64/**/*'],
+  outputFileTracingIncludes: {
+    '/api/certificates/*/photo': [
+      './node_modules/@img/sharp-linux-x64/**/*',
+      './node_modules/@img/sharp-libvips-linux-x64/**/*',
+    ],
+    '/api/admin/documents/photo/*': [
+      './node_modules/@img/sharp-linux-x64/**/*',
+      './node_modules/@img/sharp-libvips-linux-x64/**/*',
+    ],
+    '/api/admin/settings/certificate/image': [
+      './node_modules/@img/sharp-linux-x64/**/*',
+      './node_modules/@img/sharp-libvips-linux-x64/**/*',
+    ],
+    '/api/admin/documents/assets': [
+      './node_modules/@img/sharp-linux-x64/**/*',
+      './node_modules/@img/sharp-libvips-linux-x64/**/*',
+    ],
     '/api/profile/avatar': [
       './node_modules/@img/sharp-linux-x64/**/*',
       './node_modules/@img/sharp-libvips-linux-x64/**/*',
@@ -132,10 +144,10 @@ const nextConfig: NextConfig = {
       './node_modules/@img/sharp-linux-x64/**/*',
       './node_modules/@img/sharp-libvips-linux-x64/**/*',
     ],
-      '/certificate-assets/font': [
-        './lib/pdf/assets/NotoSerif-Regular.ttf',
-        './lib/pdf/assets/NotoSerif-Bold.ttf',
-        './lib/pdf/assets/NotoSans-Bold.ttf',
+    '/certificate-assets/font': [
+      './lib/pdf/assets/NotoSerif-Regular.ttf',
+      './lib/pdf/assets/NotoSerif-Bold.ttf',
+      './lib/pdf/assets/NotoSans-Bold.ttf',
       './lib/pdf/assets/noto-sans-latin-cyrillic.ttf',
       './lib/pdf/assets/NotoSansCJKsc-Regular-b2e9d66e.otf',
     ],
@@ -180,6 +192,20 @@ const nextConfig: NextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Pictures under /public carried `max-age=0, must-revalidate`, and the
+        // optimiser copies the larger of its own and the source's lifetime into
+        // /_next/image: every repeat view asked the server about each of the
+        // ~15 pictures on the home page. A day fresh and a week stale-while-
+        // revalidate: a replaced cover (same name) still shows within a day.
+        source: '/:dir(images|icons)/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
           },
         ],
       },

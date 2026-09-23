@@ -123,12 +123,24 @@ export function CommonDocumentForm({
     setStatus('');
     setFields((current) => ({ ...current, ...patch }));
   };
-  const updateCommission = (patch: Partial<DocumentCommission>) =>
-    update({ commission: { ...fields.commission, ...patch } });
-  const updateSigner = (index: number, patch: Partial<DocumentCommission['signers'][number]>) =>
-    updateCommission({
-      signers: signers.map((signer, at) => (at === index ? { ...signer, ...patch } : signer)),
-    });
+  // Each change is applied to the form as it is at that moment: an upload
+  // finishes seconds after it started, and applying it to the state it began
+  // with undid whatever was typed meanwhile, or the other signature.
+  const updateCommission = (
+    change: (commission: DocumentCommission) => Partial<DocumentCommission>,
+  ) => {
+    setStatus('');
+    setFields((current) => ({
+      ...current,
+      commission: { ...current.commission, ...change(current.commission) },
+    }));
+  };
+  const updateSigner = (signerId: string, patch: Partial<DocumentCommission['signers'][number]>) =>
+    updateCommission((commission) => ({
+      signers: commission.signers.map((signer) =>
+        signer.signerId === signerId ? { ...signer, ...patch } : signer,
+      ),
+    }));
 
   async function save() {
     const problem = fieldsProblem(fields);
@@ -238,7 +250,7 @@ export function CommonDocumentForm({
             assetId={fields.commission.stampAssetId}
             disabled={busy}
             className="w-40"
-            onUploaded={(assetId) => updateCommission({ stampAssetId: assetId })}
+            onUploaded={(assetId) => updateCommission(() => ({ stampAssetId: assetId }))}
           />
         </div>
 
@@ -258,7 +270,7 @@ export function CommonDocumentForm({
                 placeholder="Подпись"
                 assetId={signer.assetId}
                 disabled={busy}
-                onUploaded={(assetId) => updateSigner(index, { assetId })}
+                onUploaded={(assetId) => updateSigner(signer.signerId, { assetId })}
               />
               <div className="flex min-w-0 items-start gap-1">
                 <div className="grid min-w-0 flex-1 gap-3">
@@ -268,7 +280,9 @@ export function CommonDocumentForm({
                     maxLength={200}
                     className={FIELD_INPUT}
                     value={signer.name}
-                    onChange={(event) => updateSigner(index, { name: event.target.value })}
+                    onChange={(event) =>
+                      updateSigner(signer.signerId, { name: event.target.value })
+                    }
                   />
                   <Input
                     aria-label={
@@ -278,7 +292,9 @@ export function CommonDocumentForm({
                     maxLength={200}
                     className={FIELD_INPUT}
                     value={signer.position}
-                    onChange={(event) => updateSigner(index, { position: event.target.value })}
+                    onChange={(event) =>
+                      updateSigner(signer.signerId, { position: event.target.value })
+                    }
                   />
                 </div>
                 <Button
@@ -289,7 +305,11 @@ export function CommonDocumentForm({
                   title="Убрать"
                   disabled={signers.length <= 1}
                   onClick={() =>
-                    updateCommission({ signers: signers.filter((_, at) => at !== index) })
+                    updateCommission((commission) => ({
+                      signers: commission.signers.filter(
+                        (member) => member.signerId !== signer.signerId,
+                      ),
+                    }))
                   }
                 >
                   <Trash aria-hidden="true" />
@@ -304,12 +324,12 @@ export function CommonDocumentForm({
             title="Добавить"
             disabled={signers.length >= MAX_SIGNERS}
             onClick={() =>
-              updateCommission({
+              updateCommission((commission) => ({
                 signers: [
-                  ...signers,
+                  ...commission.signers,
                   { signerId: newDocumentSignerId(), name: '', position: '', assetId: null },
                 ],
-              })
+              }))
             }
           >
             <Plus aria-hidden="true" />

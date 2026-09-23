@@ -22,7 +22,12 @@ import type { AdminRequestMetadata } from '@/server/security/request-metadata';
 import { consumeAdminMutationQuota, consumeCoarseQuota } from '@/server/security/rate-limit';
 import { removeAvatarPrefix } from '@/server/supabase/avatar-prefix-cleanup';
 import { safeErrorDiagnosticCode } from '@/lib/security/error-diagnostics';
-import { CONTENT_CACHE_TAG, TOPICS_CACHE_TAG } from '@/lib/content/cache-policy';
+import {
+  CONTENT_CACHE_TAG,
+  CONTENT_REVALIDATE_PATHS,
+  TOPICS_CACHE_TAG,
+  localizedContentPaths,
+} from '@/lib/content/cache-policy';
 import { invalidateCertificateVerificationCache } from '@/server/certificates/issuance';
 import { invalidateAdminAttestationReads } from '@/server/admin/attestations';
 
@@ -150,8 +155,10 @@ function metadataArgs(metadata: AdminRequestMetadata) {
 function invalidateTestContent(slug?: string | null) {
   revalidateTag(CONTENT_CACHE_TAG, { expire: 0 });
   revalidateTag(TOPICS_CACHE_TAG, { expire: 0 });
-  for (const path of ['/', '/topics', '/sitemap.xml', '/admin']) revalidatePath(path);
-  if (slug) revalidatePath(`/topics/${slug}`);
+  // Every language of the site, not only Russian: a course published or hidden
+  // here is listed on /kk, /en and /zh as well.
+  for (const path of CONTENT_REVALIDATE_PATHS) revalidatePath(path);
+  if (slug) for (const path of localizedContentPaths(`/topics/${slug}`)) revalidatePath(path);
 }
 
 export async function setUserSuspended(
@@ -243,11 +250,7 @@ type PurgeItem = { id: string; status: 'completed' | 'skipped'; reason: string |
  * database purge and then clears the account's Storage prefix, which is the one
  * part the transaction cannot cover.
  */
-export async function purgeUserAccounts(
-  userIds: string[],
-  reason: string,
-  idempotencyKey: string,
-) {
+export async function purgeUserAccounts(userIds: string[], reason: string, idempotencyKey: string) {
   const actor = await requireCapability('user.delete');
   if (userIds.includes(actor.user.id)) throw new Error('CANNOT_DELETE_SELF');
   // The coarse budget is spent once per HTTP request, in the route handler.
@@ -521,7 +524,6 @@ export async function saveTest(values: SaveTestValues) {
     if (current.error) throw current.error;
     if (!current.data) throw new Error('TEST_NOT_FOUND');
     if (current.data.current_revision_id) previousPublishedSlug = current.data.slug;
-
   }
   const mutationArgs = {
     p_actor_id: actor.user.id,

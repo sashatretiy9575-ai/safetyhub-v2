@@ -104,14 +104,18 @@ export function buildMetadata({
   // The suffix is worth having until it pushes the title past what a result
   // page shows. Open Graph and Twitter keep the branded form either way —
   // there the sixty-character budget does not apply.
-  const brandedTitle = title ? `${title} — ${BRAND.domain}` : `${BRAND.domain}`;
-  const fullTitle = title && brandedTitle.length > TITLE_BUDGET ? title : brandedTitle;
+  // A stored SEO title often already ends in «| SafetyHub»; branding it again
+  // read «Сварщик | SafetyHub — SafetyHub.kz».
+  const bareTitle = title?.replace(/\s*[|—–-]\s*SafetyHub(?:\.kz)?\s*$/iu, '').trim() || title;
+  const brandedTitle = bareTitle ? `${bareTitle} — ${BRAND.domain}` : `${BRAND.domain}`;
+  const fullTitle = bareTitle && brandedTitle.length > TITLE_BUDGET ? bareTitle : brandedTitle;
   const normalizedPath = path || '';
   const localizedPath = localizePathname(normalizedPath || '/', locale);
   const url = absoluteUrl(localizedPath);
-  const resolvedOgImage = ogImage.startsWith('http://') || ogImage.startsWith('https://')
-    ? ogImage
-    : absoluteUrl(ogImage);
+  const resolvedOgImage =
+    ogImage.startsWith('http://') || ogImage.startsWith('https://')
+      ? ogImage
+      : absoluteUrl(ogImage);
   const preview = isPreviewDeployment();
   const preventIndexing = noindex || preview;
   const localeRoutesEnabled = rolloutFeatureEnabled('localeRoutes');
@@ -345,13 +349,12 @@ export function articleJsonLd(input: {
     image: [input.image.startsWith('http') ? input.image : absoluteUrl(input.image)],
     datePublished: input.datePublished,
     dateModified: input.dateModified ?? input.datePublished,
-    // The name is the editorial team, not a person: no article in the
-    // repository or in the database carries an author field.
-    author: { '@type': 'Organization', name: input.author, '@id': organizationId() },
+    // The organisation itself, by reference: the same @id under a second name
+    // («editorial team») made one entity with two names.
+    author: { '@id': organizationId() },
     publisher: { '@id': organizationId() },
     mainEntityOfPage: { '@type': 'WebPage', '@id': input.url },
     isPartOf: { '@id': absoluteUrl('/#website') },
     inLanguage: htmlLanguage(input.locale ?? DEFAULT_LOCALE),
   };
 }
-

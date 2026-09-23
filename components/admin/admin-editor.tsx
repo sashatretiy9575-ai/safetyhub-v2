@@ -454,7 +454,7 @@ export function AdminEditor({
           setError(
             result.publicationError === 'ARTICLE_LOCALIZATIONS_INCOMPLETE'
               ? 'Для публикации нужны все 4 языка (RU, KK, EN, ZH). Черновик сохранён.'
-              : 'Локализации не опубликованы. Черновик сохранён.',
+              : `Локализации не опубликованы${result.publicationCode ? ` (${result.publicationCode})` : ''}. Черновик сохранён.`,
           );
           approveNavigation();
           router.replace(
@@ -596,7 +596,9 @@ export function AdminEditor({
               <CardContent className="xs:p-5 min-w-0 space-y-4 p-4 md:p-6">
                 <h2 className="font-semibold">Метаданные</h2>
                 <div className="min-w-0 space-y-2">
-                  <Label className="sr-only" htmlFor="article-slug">Slug (URL)</Label>
+                  <Label className="sr-only" htmlFor="article-slug">
+                    Slug (URL)
+                  </Label>
                   <Input
                     id="article-slug"
                     value={slug}
@@ -605,7 +607,9 @@ export function AdminEditor({
                   />
                 </div>
                 <div className="min-w-0 space-y-2">
-                  <Label className="sr-only" htmlFor="article-cover">Обложка</Label>
+                  <Label className="sr-only" htmlFor="article-cover">
+                    Обложка
+                  </Label>
                   <MediaAssetInput
                     id="article-cover"
                     value={coverImage}
@@ -646,20 +650,27 @@ export function AdminEditor({
                   </summary>
                   <div className="mt-4 space-y-4">
                     <div className="space-y-2">
-                      <Label className="sr-only" htmlFor="article-jurisdiction">Юрисдикция</Label>
+                      <Label className="sr-only" htmlFor="article-jurisdiction">
+                        Юрисдикция
+                      </Label>
                       <Input
-          placeholder="Юрисдикция"
+                        placeholder="Юрисдикция"
                         id="article-jurisdiction"
                         value={jurisdiction}
                         maxLength={CONTENT_METADATA_LIMITS.jurisdictionMax}
                         onChange={(event) => setJurisdiction(event.target.value)}
                       />
                     </div>
-                    <div className={`flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)] ${fieldFrameFocus}`}>
+                    <div
+                      className={`flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 shadow-[var(--shadow-soft)] ${fieldFrameFocus}`}
+                    >
                       <Label className="sr-only" htmlFor="article-effective-date">
                         Дата актуальности
                       </Label>
-                      <span aria-hidden className="text-caption shrink-0 text-[var(--color-text-subtle)]">
+                      <span
+                        aria-hidden
+                        className="text-caption shrink-0 text-[var(--color-text-subtle)]"
+                      >
                         актуально на
                       </span>
                       <input
@@ -752,7 +763,9 @@ export function AdminEditor({
             <Card>
               <CardContent className="space-y-4 p-4 md:p-5">
                 <div className="space-y-2">
-                  <Label className="sr-only" htmlFor="article-title">Название статьи</Label>
+                  <Label className="sr-only" htmlFor="article-title">
+                    Название статьи
+                  </Label>
                   <Input
                     id="article-title"
                     value={title}
@@ -762,7 +775,9 @@ export function AdminEditor({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="sr-only" htmlFor="article-description">Краткое описание</Label>
+                  <Label className="sr-only" htmlFor="article-description">
+                    Краткое описание
+                  </Label>
                   <Textarea
                     id="article-description"
                     value={description}

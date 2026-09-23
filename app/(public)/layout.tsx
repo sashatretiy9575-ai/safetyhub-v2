@@ -6,7 +6,7 @@ import { RootDocument } from '@/components/layout/root-document';
 import { JsonLd } from '@/components/shared/json-ld';
 import { DeferredPwaInstall } from '@/components/shared/deferred-pwa-install';
 import { PublicAccountControl } from '@/components/shared/public-account-control';
-import { pickClientNamespaces } from '@/i18n/client-namespaces';
+import { PUBLIC_CLIENT_NAMESPACES, pickClientNamespaces } from '@/i18n/client-namespaces';
 import { DEFAULT_LOCALE } from '@/i18n/config';
 import { buildMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import { getSiteContacts } from '@/server/site-contacts';
@@ -54,7 +54,10 @@ export default async function PublicLayout({ children }: { children: ReactNode }
     getTranslations('Shell.footer'),
   ]);
   return (
-    <RootDocument locale={DEFAULT_LOCALE} messages={pickClientNamespaces(messages)}>
+    <RootDocument
+      locale={DEFAULT_LOCALE}
+      messages={pickClientNamespaces(messages, PUBLIC_CLIENT_NAMESPACES)}
+    >
       <JsonLd
         data={[
           organizationJsonLd(contacts, DEFAULT_LOCALE, {

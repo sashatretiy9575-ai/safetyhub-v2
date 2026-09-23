@@ -46,6 +46,12 @@ export type CourseDocumentSetup = {
   title: string;
   published: boolean;
   profiles: DocumentProfileSettings[];
+  /**
+   * The version of every stored row of the course, including one that did not
+   * parse: the database compares the whole set, so a row left out of it made
+   * every save a conflict that a reload could not clear.
+   */
+  versions?: Readonly<Record<string, number>>;
 };
 
 export const SPLIT_AUDIENCES = ['itr', 'worker'] as const;
@@ -129,7 +135,8 @@ export function courseDocumentPayload(draft: CourseDocumentDraft) {
     orderNumber: draft.family === 'biot' ? draft.orderNumber.trim() : '',
     orderDate: draft.family === 'biot' ? draft.orderDate : '',
     verificationKind: draft.verificationKind.trim(),
-    booklet: !electrical && draft.booklet ? { layout: 'standard' as const, texts: draft.booklet } : null,
+    booklet:
+      !electrical && draft.booklet ? { layout: 'standard' as const, texts: draft.booklet } : null,
     electrical: electrical ? draft.electrical : null,
     categories,
   };
@@ -137,7 +144,10 @@ export function courseDocumentPayload(draft: CourseDocumentDraft) {
 
 /** The versions the draft was read at: a save made elsewhere in between is refused. */
 export function courseDocumentVersions(setup: CourseDocumentSetup) {
-  return Object.fromEntries(setup.profiles.map((profile) => [profile.id, profile.revision ?? 1]));
+  return (
+    setup.versions ??
+    Object.fromEntries(setup.profiles.map((profile) => [profile.id, profile.revision ?? 1]))
+  );
 }
 
 /** The profile of one category as the draft would store it, for the preview. */

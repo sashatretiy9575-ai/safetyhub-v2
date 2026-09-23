@@ -27,8 +27,17 @@ function collapse(value: string) {
   return value.trim().replace(/\s+/gu, ' ');
 }
 
+/**
+ * Cut at the last whole word that fits, without «…»: a search result already
+ * shortens a long title itself, and «…unauthorized D…» read as a broken page.
+ * Text without spaces (Chinese) is cut at the limit.
+ */
 function clamp(value: string, max: number) {
-  return value.length <= max ? value : `${value.slice(0, max - 1).trimEnd()}…`;
+  if (value.length <= max) return value;
+  const cut = value.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  const words = lastSpace >= max * 0.6 ? cut.slice(0, lastSpace) : cut;
+  return words.replace(/[\s,;:—–-]+$/u, '');
 }
 
 /**

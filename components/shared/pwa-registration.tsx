@@ -12,7 +12,9 @@ export function PWARegistration() {
           scope: '/',
           updateViaCache: 'none',
         })
-        .then((registration) => registration.update())
+        // No explicit update(): with `updateViaCache: 'none'` the browser
+        // already checks sw.js on navigation, and the extra call fetched it a
+        // second time on every page load.
         .catch(() => {
           // The site remains fully usable when service workers are unavailable.
         });

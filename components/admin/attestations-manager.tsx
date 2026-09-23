@@ -97,8 +97,6 @@ const SKIP_REASON_LABELS: Record<string, string> = {
   DOCUMENT_FORMAL_EXAM_REQUIRED: 'тест промбеза не сдан на проходной балл',
   DOCUMENT_SIGNER_ASSET_MISMATCH:
     'подпись не принадлежит члену комиссии — замените её в «Документы → Общее»',
-  DOCUMENT_DATE_INVALID: 'дата протокола не может быть позже сегодняшней',
-  PROTOCOL_NUMBER_INVALID: 'номер протокола: не больше 40 символов',
 };
 
 function skipReasonLabel(code: string | null | undefined) {

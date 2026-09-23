@@ -145,6 +145,10 @@ export function CourseDocumentForm({
     });
   };
   const setJournalStart = (value: number | null) => {
+    if (value !== null && !isJournalStart(value)) {
+      setStatus('Номер журнала — целое число от 1 до 999 999 999');
+      return;
+    }
     const { group, voltage, role } = draft.electrical;
     update({
       electrical:
@@ -160,7 +164,11 @@ export function CourseDocumentForm({
     const profile = draftProfile(setup, draft, audience);
     const branding = previewBranding(common, profile, {
       date: today,
-      number: numberFromDate(today),
+      // An electrical course numbers its sheets from its journal.
+      number:
+        electrical && draft.electrical.journalStart
+          ? String(draft.electrical.journalStart)
+          : numberFromDate(today),
     });
     const job = samplePreviewJob(tab, branding, profile.programName, SAMPLE[audience]);
     if (job.kind === 'message') {

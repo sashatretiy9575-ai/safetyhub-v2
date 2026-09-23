@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
-const loadingSource = await readFile('app/loading.tsx', 'utf8');
+const loadingSource = await readFile('app/(account)/loading.tsx', 'utf8');
 const errorSource = await readFile('app/error.tsx', 'utf8');
 const globalErrorSource = await readFile('app/global-error.tsx', 'utf8');
 const sharedStateSource = await readFile('components/shared/app-state.tsx', 'utf8');

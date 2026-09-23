@@ -13,18 +13,24 @@ import { createClient } from '@/server/supabase/server';
 import { unwrapRpcMutationResponse } from '@/server/supabase/rpc-mutation-result';
 import { normalizeRateLimitError } from '@/server/security/rate-limit';
 
-type ProfileRow = { id: string; course_slug: string; audience: string; body: unknown; version: number };
+type ProfileRow = {
+  id: string;
+  course_slug: string;
+  audience: string;
+  body: unknown;
+  version: number;
+};
 type CourseRow = { id: string; slug: string; title: string; status: string };
 
 function setupOf(course: CourseRow, rows: readonly ProfileRow[]): CourseDocumentSetup {
+  const own = rows.filter((row) => row.course_slug === course.slug);
   return {
     courseId: course.id,
     slug: course.slug,
     title: course.title,
     published: course.status === 'published',
-    profiles: rows
-      .filter((row) => row.course_slug === course.slug)
-      .flatMap((row) => parseDocumentProfileRow(row) ?? []),
+    profiles: own.flatMap((row) => parseDocumentProfileRow(row) ?? []),
+    versions: Object.fromEntries(own.map((row) => [row.id, row.version])),
   };
 }
 
@@ -89,7 +95,10 @@ export const courseDocumentSaveSchema = z
         orderNumber: z.string().max(100),
         orderDate: z.union([z.iso.date(), z.literal('')]),
         verificationKind: z.string().max(120),
-        booklet: z.object({ layout: z.literal('standard'), texts: bookletTexts }).strict().nullable(),
+        booklet: z
+          .object({ layout: z.literal('standard'), texts: bookletTexts })
+          .strict()
+          .nullable(),
         electrical: electricalAdmissionSchema.nullable(),
         categories: z
           .object({
@@ -115,7 +124,12 @@ const payloadSchema = z.object({
   slug: z.string(),
   title: z.string(),
   profiles: z.array(
-    z.object({ id: z.string(), audience: z.string(), version: z.number().int(), body: z.unknown() }),
+    z.object({
+      id: z.string(),
+      audience: z.string(),
+      version: z.number().int(),
+      body: z.unknown(),
+    }),
   ),
 });
 
@@ -149,7 +163,11 @@ export async function saveDocumentCourse(
     normalizeRateLimitError(error);
   }
   const saved = payloadSchema.parse(data);
-  const status = await createAdminClient().from('tests').select('status').eq('id', courseId).single();
+  const status = await createAdminClient()
+    .from('tests')
+    .select('status')
+    .eq('id', courseId)
+    .single();
   if (status.error) throw status.error;
   return setupOf(
     { id: saved.courseId, slug: saved.slug, title: saved.title, status: status.data.status },

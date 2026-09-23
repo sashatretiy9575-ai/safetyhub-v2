@@ -4,9 +4,6 @@ import test from 'node:test';
 import { PDFDict, PDFDocument, PDFName } from 'pdf-lib';
 import {
   SAMPLE_ORGANIZATION,
-  createBytesCache,
-  isDiscreteChange,
-  jobKey,
   protocolFontUrl,
   retryAfterSeconds,
   samplePreviewJob,
@@ -101,77 +98,10 @@ test('the preview is the document a course would print today for a sample person
     [{ ...worker, status: 'passed', score: 10, total: 10 }],
   );
   assert.equal(protocol.fontUrl, '/certificate-assets/font?locale=ru&v=1');
-  assert.equal(protocolFontUrl([{ fullName: '王伟' }]), '/certificate-assets/font?locale=zh&v=Sans2.005');
-});
-
-test('a key is the arguments of the generator: nothing less and nothing else', () => {
-  const booklet = jobKey(job('certificate'));
-  assert.equal(jobKey(job('certificate')), booklet);
-  assert.notEqual(jobKey(job('certificate', { chairmanName: 'Председатель Н.Н.' })), booklet);
-  assert.notEqual(jobKey(job('certificate', { protocolDate: '2026-09-21' })), booklet);
-  assert.notEqual(jobKey(job('certificate', {}, worker)), booklet);
-  assert.notEqual(jobKey(job('certificate', {}, engineer, 'Другая программа')), booklet);
-  const protocol = jobKey(job('protocol'));
-  assert.notEqual(protocol, booklet);
-  assert.notEqual(jobKey(job('protocol', { protocolNumber: '15-П' })), protocol);
-  assert.deepEqual(Object.keys(JSON.parse(protocol)), ['kind', 'input', 'branding', 'fontUrl']);
-  assert.deepEqual(Object.keys(JSON.parse(booklet)), ['kind', 'input']);
-});
-
-test('a choice is drawn at once, typing waits for a pause', () => {
-  const booklet = job('certificate');
-  const protocol = job('protocol');
-  // Typing: requisites, texts, the insert size, the date and the number, the programme.
-  for (const [patch, program] of [
-    [{ chairmanName: 'Председатель Н.' }],
-    [{ examTextRu: 'сдал экзамен' }],
-    [{ protocolNumber: '21.09', protocolDate: '2026-09-21' }],
-    [{ validityMonths: 24 }],
-    [{ documentDefaults: { ...branding.documentDefaults, insertWidthCm: 30, commission: [] } }],
-    [{}, 'Программа образца 2'],
-  ]) {
-    assert.equal(isDiscreteChange(booklet, job('certificate', patch, engineer, program)), false);
-    assert.equal(isDiscreteChange(protocol, job('protocol', patch, engineer, program)), false);
-  }
-  // Choices: the first job, the other document, the other category, a picture, a profile.
-  assert.equal(isDiscreteChange(null, booklet), true);
-  assert.equal(isDiscreteChange(booklet, protocol), true);
-  assert.equal(isDiscreteChange(protocol, booklet), true);
-  assert.equal(isDiscreteChange(booklet, job('certificate', {}, worker)), true);
-  assert.equal(isDiscreteChange(protocol, job('protocol', {}, worker)), true);
-  const uploaded = { stampUrl: '/certificate-assets/registered?id=00000000-0000-4000-8000-000000000001' };
-  assert.equal(isDiscreteChange(booklet, job('certificate', uploaded)), true);
-  assert.equal(isDiscreteChange(protocol, job('protocol', uploaded)), true);
-  const profile = { documentProfile: { id: 'test-worker', revision: 2 }, chairmanName: 'Другой П.' };
-  assert.equal(isDiscreteChange(booklet, job('certificate', profile)), true);
-  // «Повторить» asks for the same job again; a wait or a message is answered without a pause.
-  assert.equal(isDiscreteChange(booklet, job('certificate')), true);
-  assert.equal(isDiscreteChange({ kind: 'wait' }, booklet), true);
-  assert.equal(isDiscreteChange({ kind: 'message', text: 'x' }, protocol), true);
-  assert.equal(isDiscreteChange(booklet, { kind: 'wait' }), true);
-});
-
-test('the last four PDFs are kept, the one looked at longest ago goes first', () => {
-  const cache = createBytesCache();
-  const pdf = (n) => new Uint8Array([n]);
-  for (const n of [1, 2, 3, 4]) cache.set('k' + n, pdf(n));
-  assert.deepEqual(cache.get('k1'), pdf(1), 'reading makes it the most recent');
-  cache.set('k5', pdf(5));
-  assert.equal(cache.get('k2'), undefined, 'the least recently used is evicted');
-  for (const n of [1, 3, 4, 5]) assert.deepEqual(cache.get('k' + n), pdf(n));
-  const again = pdf(9);
-  cache.set('k1', again);
-  assert.equal(cache.get('k1'), again, 'a key keeps one PDF');
-  cache.set('k6', pdf(6));
-  assert.equal(cache.get('k3'), undefined);
-  assert.equal(cache.delete('k1'), true);
-  assert.equal(cache.get('k1'), undefined);
-  cache.clear();
-  assert.equal(cache.get('k6'), undefined);
-  const two = createBytesCache(2);
-  for (const n of [1, 2, 3]) two.set('k' + n, pdf(n));
-  assert.equal(two.get('k1'), undefined);
-  assert.deepEqual(two.get('k3'), pdf(3));
+  assert.equal(
+    protocolFontUrl([{ fullName: '王伟' }]),
+    '/certificate-assets/font?locale=zh&v=Sans2.005',
+  );
 });
 
 test('a quota answer becomes seconds to wait', () => {

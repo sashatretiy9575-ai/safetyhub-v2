@@ -253,7 +253,9 @@
     "catalogAria": "Course catalogue",
     "seoKeyword": "safety knowledge testing",
     "breadcrumbHome": "Home",
-    "breadcrumbCourses": "Courses"
+    "breadcrumbCourses": "Courses",
+    "relatedCourses": "Other courses",
+    "relatedArticles": "Safety articles"
   },
   "Blog": {
     "metadataTitle": "Workplace and industrial safety articles in Kazakhstan",

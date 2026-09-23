@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { JsonLd } from '@/components/shared/json-ld';
 import { getTopics } from '@/server/content/topics';
 import { getCourseCoverImage } from '@/lib/content/course-cover-images';
-import { breadcrumbsJsonLd, buildMetadata } from '@/lib/seo';
+import { breadcrumbsJsonLd, buildMetadata, courseJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { localizePathname } from '@/i18n/config';
 
@@ -21,7 +21,11 @@ export async function generateMetadata() {
 }
 
 export default async function TopicsPage() {
-  const [locale, t] = await Promise.all([getLocale(), getTranslations('Topics')]);
+  const [locale, t, courseT] = await Promise.all([
+    getLocale(),
+    getTranslations('Topics'),
+    getTranslations('Course'),
+  ]);
   const topics = await getTopics(locale);
 
   return (
@@ -31,6 +35,27 @@ export default async function TopicsPage() {
           { name: t('breadcrumbHome'), url: absoluteUrl(localizePathname('/', locale)) },
           { name: t('breadcrumbCourses'), url: absoluteUrl(localizePathname('/topics', locale)) },
         ])}
+      />
+      {/* The catalogue is the page that is about the list of courses, so it
+          states the list too, not only the home page. */}
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          itemListElement: topics.map((topic, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: courseJsonLd({
+              name: topic.title,
+              description: topic.description,
+              url: absoluteUrl(localizePathname(`/topics/${topic.slug}`, locale)),
+              locale,
+              credentialName: courseT('credentialAwarded'),
+              durationMinutes: topic.durationMinutes,
+              image: getCourseCoverImage(topic.slug, locale, topic.seo.ogImage),
+            }),
+          })),
+        }}
       />
       <PageHeader title={t('title')} description={t('description')} variant="compact" />
 

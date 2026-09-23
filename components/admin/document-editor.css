@@ -3,26 +3,3 @@
   min-width: 0;
   max-width: 100%;
 }
-.document-pages {
-  display: grid;
-  gap: 0.75rem;
-}
-/* Paper stays white in the dark theme: it is the sheet that will be printed. */
-.document-page {
-  display: block;
-  width: 100%;
-  height: auto;
-  background: #fff;
-  border-radius: 2px;
-  box-shadow: var(--shadow-card);
-}
-.document-insert {
-  transition: transform 0.2s ease;
-}
-@media (prefers-reduced-motion: reduce) {
-  .document-insert { transition: none; }
-}
-@media (width < 64rem) {
-  .document-insert { width: 200%; }
-  .document-insert-right { transform: translateX(-50%); }
-}

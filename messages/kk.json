@@ -253,7 +253,9 @@
     "catalogAria": "Курстар каталогы",
     "seoKeyword": "қауіпсіздік білімін тексеру",
     "breadcrumbHome": "Басты бет",
-    "breadcrumbCourses": "Курстар"
+    "breadcrumbCourses": "Курстар",
+    "relatedCourses": "Басқа курстар",
+    "relatedArticles": "Қауіпсіздік туралы мақалалар"
   },
   "Blog": {
     "metadataTitle": "Қазақстандағы еңбекті қорғау және қауіпсіздік мақалалары",

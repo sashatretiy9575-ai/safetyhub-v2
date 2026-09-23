@@ -2,13 +2,16 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { RootDocument } from '@/components/layout/root-document';
-import { pickClientNamespaces } from '@/i18n/client-namespaces';
+import { PUBLIC_CLIENT_NAMESPACES, pickClientNamespaces } from '@/i18n/client-namespaces';
 import { LOCALE_PREFIXES, isAppLocale, type AppLocale } from '@/i18n/config';
 import { buildMetadata } from '@/lib/seo';
 import '../globals.css';
 
 export const revalidate = 300;
-export const dynamicParams = false;
+// No `dynamicParams = false` here: set on the layout it holds for every page
+// below, whatever the page says, so a course or article published after the
+// build answered a cached 404 on /kk, /en and /zh until the next deploy. An
+// unknown locale is still refused by `localeFromParams`.
 
 export const viewport: Viewport = {
   themeColor: '#f7f8fa',
@@ -67,7 +70,10 @@ export default async function LocalizedRootLayout({
   const messages = await getMessages();
 
   return (
-    <RootDocument locale={locale} messages={pickClientNamespaces(messages)}>
+    <RootDocument
+      locale={locale}
+      messages={pickClientNamespaces(messages, PUBLIC_CLIENT_NAMESPACES)}
+    >
       {children}
     </RootDocument>
   );

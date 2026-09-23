@@ -246,7 +246,13 @@ async function serveAsset(
     // A HEAD request performs the same authorization and database work as a GET
     // and then returns before either download budget is charged, so the relay
     // could be probed without limit.
-    await consumeCoarseQuota('presentation.probe', requestSecurityMetadata(request).ipHash);
+    try {
+      await consumeCoarseQuota('presentation.probe', requestSecurityMetadata(request).ipHash);
+    } catch (error) {
+      // The limit answered 500 here: the GET branch's handler never saw it.
+      if (error instanceof RateLimitError) return blockedResponse(429, error.retryAfter);
+      throw error;
+    }
     return new Response(null, {
       status: 200,
       headers: assetHeaders(

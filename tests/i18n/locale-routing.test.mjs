@@ -167,19 +167,18 @@ test('proxy composes locale routing ahead of the existing Supabase/CSP gate', as
     privateLocale,
     accountLayout,
     loginPage,
-  ] =
-    await Promise.all([
-      read('proxy.ts'),
-      read('components/layout/language-switcher.tsx'),
-      read('i18n/request.ts'),
-      read('app/(public)/layout.tsx'),
-      read('app/[locale]/layout.tsx'),
-      read('components/layout/root-document.tsx'),
-      read('lib/seo.ts'),
-      read('i18n/private-request-locale.ts'),
-      read('app/(account)/layout.tsx'),
-      read('app/(account)/auth/login/page.tsx'),
-    ]);
+  ] = await Promise.all([
+    read('proxy.ts'),
+    read('components/layout/language-switcher.tsx'),
+    read('i18n/request.ts'),
+    read('app/(public)/layout.tsx'),
+    read('app/[locale]/layout.tsx'),
+    read('components/layout/root-document.tsx'),
+    read('lib/seo.ts'),
+    read('i18n/private-request-locale.ts'),
+    read('app/(account)/layout.tsx'),
+    read('app/(account)/auth/login/page.tsx'),
+  ]);
   const publicFastPath = proxy.indexOf('if (!isProtected && !isAuthEntry)');
   const refresh = proxy.indexOf('await updateSession');
   assert.ok(publicFastPath > 0 && refresh > publicFastPath);
@@ -207,7 +206,10 @@ test('proxy composes locale routing ahead of the existing Supabase/CSP gate', as
   // navigation; only the signed-out realm transition may reload the document,
   // because the server has just replaced the auth cookies.
   assert.match(switcher, /openLocale\(navigationTarget\(pathname, nextLocale\)\)/u);
-  assert.match(switcher, /const openLocale = \(target: string\) => \{[\s\S]*router\.replace\(target\)/u);
+  assert.match(
+    switcher,
+    /const openLocale = \(target: string\) => \{[\s\S]*router\.replace\(target\)/u,
+  );
   assert.match(switcher, /window\.location\.assign\(payload\.redirectTo\)/u);
   assert.doesNotMatch(
     switcher,
@@ -229,11 +231,15 @@ test('proxy composes locale routing ahead of the existing Supabase/CSP gate', as
   assert.match(loginPage, /locale === 'zh' \? <ZhUsernamePasswordFlow/u);
   assert.match(publicLayout, /export const revalidate = 300/u);
   assert.match(publicLayout, /setRequestLocale\(DEFAULT_LOCALE\)/u);
-  assert.match(localizedLayout, /export const dynamicParams = false/u);
+  // Set on the layout it would bind every page below it: content published
+  // after the build must render on /kk, /en and /zh, not answer a cached 404.
+  assert.doesNotMatch(localizedLayout, /export const dynamicParams = false/u);
+  assert.match(localizedLayout, /if \(!isAppLocale\(value\) \|\| value === 'ru'\) notFound\(\)/u);
   assert.match(localizedLayout, /generateStaticParams/u);
   assert.match(localizedLayout, /setRequestLocale\(locale\)/u);
   assert.match(rootDocument, /translate="no"/u);
   assert.match(rootDocument, /className="notranslate"/u);
   assert.match(seo, /google:\s*'notranslate'/u);
-  assert.match(rootDocument, /noto-sans-sc-ui\.b5829052\.woff2/u);
+  assert.doesNotMatch(rootDocument, /preload\('\/fonts\/noto-sans-sc/u);
+  assert.match(rootDocument, /if \(locale !== 'zh'\)/u);
 });

@@ -253,7 +253,9 @@
     "catalogAria": "Каталог курсов",
     "seoKeyword": "тестирование по безопасности",
     "breadcrumbHome": "Главная",
-    "breadcrumbCourses": "Курсы"
+    "breadcrumbCourses": "Курсы",
+    "relatedCourses": "Другие курсы",
+    "relatedArticles": "Статьи по безопасности"
   },
   "Blog": {
     "metadataTitle": "Статьи по охране труда и безопасности в Казахстане",

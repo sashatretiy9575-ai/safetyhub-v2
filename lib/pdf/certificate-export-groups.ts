@@ -105,3 +105,45 @@ export function groupCertificateExportByOrganization(
     };
   });
 }
+
+/**
+ * The parts one export is cut into when the browser cannot stream it: whole
+ * protocols, never more than `max` certificates a part unless one protocol is
+ * larger than that on its own. A cut by position alone split protocol «23.09»
+ * across two archives, each printing only part of its people.
+ */
+export function archivePartsByProtocol<
+  T extends {
+    organization?: string | null;
+    titleSnapshot: string;
+    branding: {
+      protocolNumber?: string | null;
+      protocolDate?: string | null;
+      documentProfile?: { courseSlug?: string | null } | null;
+    };
+  },
+>(items: readonly T[], max: number): T[][] {
+  const protocols = new Map<string, T[]>();
+  for (const item of items) {
+    const key = JSON.stringify([
+      organizationArchiveKey(item.organization),
+      item.branding.documentProfile?.courseSlug ?? item.titleSnapshot,
+      item.branding.protocolNumber ?? null,
+      item.branding.protocolDate ?? null,
+    ]);
+    const protocol = protocols.get(key) ?? [];
+    protocol.push(item);
+    protocols.set(key, protocol);
+  }
+  const parts: T[][] = [];
+  let current: T[] = [];
+  for (const protocol of protocols.values()) {
+    if (current.length && current.length + protocol.length > max) {
+      parts.push(current);
+      current = [];
+    }
+    current.push(...protocol);
+  }
+  if (current.length || !parts.length) parts.push(current);
+  return parts;
+}

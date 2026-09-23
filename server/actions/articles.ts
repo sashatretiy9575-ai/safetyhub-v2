@@ -31,6 +31,8 @@ export type ArticleMutationResult = {
   contentHash: string;
   previousSlug?: string | null;
   publicationError?: 'ARTICLE_LOCALIZATIONS_INCOMPLETE' | 'ARTICLE_LOCALIZATION_PUBLISH_FAILED';
+  /** Why publication failed, when the database named it (a code, never a message). */
+  publicationCode?: string;
 };
 
 type ArticleRpcClient = {
@@ -152,7 +154,17 @@ export async function publishArticleAction(input: unknown): Promise<ArticleMutat
     if (error instanceof Error && error.message === 'ARTICLE_LOCALIZATIONS_INCOMPLETE') {
       return { ...saved, publicationError: 'ARTICLE_LOCALIZATIONS_INCOMPLETE' };
     }
-    return { ...saved, publicationError: 'ARTICLE_LOCALIZATION_PUBLISH_FAILED' };
+    // The draft is saved either way; the reason used to be dropped, so a
+    // missing permission, a rate limit and a conflict all read the same.
+    const code =
+      error instanceof Error && /^[A-Z][A-Z0-9_:]{2,80}$/u.test(error.message)
+        ? error.message
+        : undefined;
+    return {
+      ...saved,
+      publicationError: 'ARTICLE_LOCALIZATION_PUBLISH_FAILED',
+      ...(code ? { publicationCode: code } : {}),
+    };
   }
   revalidateArticlePaths(result.slug, result.previousSlug);
   await getArticleBySlug(result.slug);

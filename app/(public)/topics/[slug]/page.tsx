@@ -1,6 +1,14 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { getTopicLocales, getTopicBySlug, getTopicRedirectBySlug, getTopicSlugs } from '@/server/content/topics';
+import {
+  getTopicLocales,
+  getTopicBySlug,
+  getTopicRedirectBySlug,
+  getTopicSlugs,
+  getTopics,
+} from '@/server/content/topics';
+import { getArticles } from '@/server/content/articles';
+import { TopicRelatedLinks } from '@/components/topics/topic-related-links';
 import { CourseMaterialActions } from '@/components/topics/course-material-actions';
 import { JsonLd } from '@/components/shared/json-ld';
 import { breadcrumbsJsonLd, buildMetadata, courseJsonLd } from '@/lib/seo';
@@ -40,7 +48,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: topic.seo.description,
     ogTitle: usesRawTitle ? seoTitle : topic.seo.ogTitle,
     ogDescription: topic.seo.ogDescription,
-    ogImage: topic.seo.ogImage || '/opengraph-image',
+    // The course's own title slide, in the page's language, before the one
+    // generic site card that every course used to share.
+    ogImage: topic.seo.ogImage || getCourseCoverImage(slug, locale) || '/opengraph-image',
     noindex: !topic.seo.indexable,
     path: `/topics/${slug}`,
     // A course page is a catalogue entry, not a publication: `article` asks for
@@ -77,6 +87,17 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
 
   const courseIcon = resolveCourseIcon(topic.icon);
   const CourseIcon = courseIcon.component;
+  // The next three courses of the catalogue (wrapping round) and the three
+  // latest articles, in the page's language.
+  const [catalogue, articles] = await Promise.all([getTopics(locale), getArticles(locale)]);
+  const at = catalogue.findIndex((course) => course.slug === topic.slug);
+  const relatedCourses = [...catalogue.slice(at + 1), ...catalogue.slice(0, Math.max(at, 0))]
+    .filter((course) => course.slug !== topic.slug)
+    .slice(0, 3)
+    .map(({ slug: courseSlug, title }) => ({ slug: courseSlug, title }));
+  const relatedArticles = articles
+    .slice(0, 3)
+    .map(({ slug: articleSlug, title }) => ({ slug: articleSlug, title }));
 
   return (
     <>
@@ -109,6 +130,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
        */}
       <CourseMaterialActions course={topic} access="anonymous" iconSlot={<CourseIcon size={30} weight="duotone" aria-hidden="true" />} />
       <TopicSourcesCard topic={topic} />
+      <TopicRelatedLinks locale={locale} courses={relatedCourses} articles={relatedArticles} />
     </>
   );
 }

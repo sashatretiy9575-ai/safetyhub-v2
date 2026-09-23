@@ -58,6 +58,11 @@ export function certificateReportRows(
 ): CertificateReportRow[] {
   return items.map((item) => {
     const issuedAt = new Date(item.issuedAt);
+    // The booklet and the protocol count the term from the protocol's sitting;
+    // the report says the same date, not the moment the file was issued.
+    const sitting = item.branding.protocolDate
+      ? new Date(`${item.branding.protocolDate}T12:00:00+05:00`)
+      : issuedAt;
     return {
       fullName: item.fullName,
       position: item.position,
@@ -67,7 +72,7 @@ export function certificateReportRows(
       total: item.total,
       completedAt: new Date(item.completedAt),
       issuedAt,
-      validUntil: certificateValidUntil(issuedAt, item.branding.validityMonths),
+      validUntil: certificateValidUntil(sitting, item.branding.validityMonths),
       certificateNumber: item.certificateNumber,
     };
   });

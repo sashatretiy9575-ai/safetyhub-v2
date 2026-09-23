@@ -118,17 +118,18 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  // One migration waits for the next release: the electrical journal number,
-  // stated once on the course now that issuance no longer asks for a number.
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 110);
+  // Two migrations wait for the next release: a refused reissue no longer
+  // loses a learner's better result, and the electrical journal counts on from
+  // the highest sheet it has printed.
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 2);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 112);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 109);
-  assert.equal(receipt.pendingCount, 1);
-  assert.equal(receipt.expectedBaseCount, 109);
-  assert.equal(receipt.expectedPendingCount, 1);
-  assert.equal(receipt.expectedTotalCount, 110);
+  assert.equal(receipt.matchedCount, 110);
+  assert.equal(receipt.pendingCount, 2);
+  assert.equal(receipt.expectedBaseCount, 110);
+  assert.equal(receipt.expectedPendingCount, 2);
+  assert.equal(receipt.expectedTotalCount, 112);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),

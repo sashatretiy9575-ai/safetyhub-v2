@@ -253,7 +253,9 @@
     "catalogAria": "课程目录",
     "seoKeyword": "安全知识测试",
     "breadcrumbHome": "首页",
-    "breadcrumbCourses": "课程"
+    "breadcrumbCourses": "课程",
+    "relatedCourses": "其他课程",
+    "relatedArticles": "安全文章"
   },
   "Blog": {
     "metadataTitle": "哈萨克斯坦职业与工业安全文章",

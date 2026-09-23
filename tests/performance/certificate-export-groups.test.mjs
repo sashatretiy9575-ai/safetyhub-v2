@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  archivePartsByProtocol,
   groupCertificateExportByOrganization,
   organizationArchiveFilename,
   organizationArchiveKey,
@@ -137,4 +138,44 @@ test('colliding names are numbered case-insensitively', () => {
     groups.map((group) => group.metadata.filename),
     ['AB.zip', 'AB-2.zip'],
   );
+});
+
+test('a buffered export is cut between protocols, never inside one', () => {
+  const person = (number, index) => ({
+    organization: 'ТОО «Пример»',
+    titleSnapshot: 'БиОТ',
+    branding: { protocolNumber: number, protocolDate: '2026-09-23', documentProfile: null },
+    index,
+  });
+  // 50 + 50 + 20 people on three protocols of one day.
+  const items = [
+    ...Array.from({ length: 50 }, (_, i) => person('23.09', i)),
+    ...Array.from({ length: 50 }, (_, i) => person('23.09-2', 50 + i)),
+    ...Array.from({ length: 20 }, (_, i) => person('23.09-3', 100 + i)),
+  ];
+  const parts = archivePartsByProtocol(items, 100);
+  assert.deepEqual(
+    parts.map((part) => part.length),
+    [100, 20],
+  );
+  for (const part of parts) {
+    const numbers = new Set(part.map((item) => item.branding.protocolNumber));
+    for (const number of numbers) {
+      assert.equal(
+        part.filter((item) => item.branding.protocolNumber === number).length,
+        items.filter((item) => item.branding.protocolNumber === number).length,
+        number,
+      );
+    }
+  }
+  // A protocol of 70 after one of 50 opens a new part rather than splitting.
+  const uneven = [
+    ...Array.from({ length: 50 }, (_, i) => person('24.09', i)),
+    ...Array.from({ length: 70 }, (_, i) => person('24.09-2', 50 + i)),
+  ];
+  assert.deepEqual(
+    archivePartsByProtocol(uneven, 100).map((part) => part.length),
+    [50, 70],
+  );
+  assert.deepEqual(archivePartsByProtocol([], 100), [[]]);
 });

@@ -273,8 +273,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
               <figure className="relative aspect-[16/9] min-h-0 overflow-hidden rounded-[22px] bg-[var(--color-surface-soft)] lg:aspect-[4/3] lg:max-h-[27rem]">
                 <Image
                   src={article.coverImage}
-                  alt=""
-                  aria-hidden="true"
+                  alt={article.title}
                   fill
                   priority
                   sizes="(max-width: 1023px) 92vw, 420px"

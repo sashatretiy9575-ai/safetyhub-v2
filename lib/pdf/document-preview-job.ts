@@ -18,8 +18,6 @@ export type PreviewJob =
   | Readonly<{ kind: 'message'; text: string }>
   | Readonly<{ kind: 'wait' }>;
 
-type RenderJob = Extract<PreviewJob, { kind: 'certificate' | 'protocol' }>;
-
 /** A Chinese name needs the CJK face; every other protocol is set in the Cyrillic one. */
 export function protocolFontUrl(people: readonly Pick<DocumentParticipant, 'fullName'>[]) {
   return (
@@ -91,86 +89,6 @@ export function samplePreviewJob(
     },
     branding,
     fontUrl: protocolFontUrl([person]),
-  };
-}
-
-/** Two jobs with one key are one PDF: the key is the generator's arguments, all of them. */
-export function jobKey(job: PreviewJob): string {
-  return JSON.stringify(job);
-}
-
-// What a keyboard cannot change: who the document is about and which pictures it
-// carries. Everything else in a job is text, a number or a date somebody is typing.
-const BRANDING_IDENTITY = [
-  'stampUrl',
-  'chairmanSignatureUrl',
-  'memberSignatureUrl',
-  'protocolSignatureUrl',
-  'commissionSignatureUrls',
-  'documentProfile',
-  'protocolLayoutVersion',
-] as const;
-const PERSON_IDENTITY = [
-  'certificateId',
-  'certificateNumber',
-  'fullName',
-  'position',
-  'photoUrl',
-  'score',
-  'total',
-  'fontUrl',
-] as const;
-
-const isRenderJob = (job: PreviewJob): job is RenderJob =>
-  job.kind === 'certificate' || job.kind === 'protocol';
-
-function identity(job: RenderJob): string {
-  const branding = job.kind === 'certificate' ? job.input.branding : job.branding;
-  const input: Partial<Record<(typeof PERSON_IDENTITY)[number], unknown>> =
-    job.kind === 'certificate' ? job.input : {};
-  return JSON.stringify([
-    job.kind,
-    BRANDING_IDENTITY.map((field) => branding[field] ?? null),
-    job.kind === 'certificate'
-      ? PERSON_IDENTITY.map((field) => input[field] ?? null)
-      : [job.fontUrl, job.input.participants ?? null],
-  ]);
-}
-
-/**
- * A choice is drawn at once, typing waits for a pause. A tab, an employee, a
- * company, a program or a profile changes who or what the document is; the same
- * job asked for again is «Повторить»; a job that follows a message or a wait is
- * the answer to it. Only a text that differs is somebody still typing.
- */
-export function isDiscreteChange(previous: PreviewJob | null | undefined, next: PreviewJob) {
-  if (!previous || !isRenderJob(previous) || !isRenderJob(next)) return true;
-  return jobKey(previous) === jobKey(next) || identity(previous) !== identity(next);
-}
-
-/** The last few PDFs by job key: going back to a document already drawn costs nothing. */
-export function createBytesCache(limit = 4) {
-  const entries = new Map<string, Uint8Array>();
-  return {
-    get(key: string): Uint8Array | undefined {
-      const bytes = entries.get(key);
-      if (bytes) {
-        entries.delete(key);
-        entries.set(key, bytes);
-      }
-      return bytes;
-    },
-    set(key: string, bytes: Uint8Array) {
-      entries.delete(key);
-      entries.set(key, bytes);
-      while (entries.size > limit) entries.delete(entries.keys().next().value!);
-    },
-    delete(key: string) {
-      return entries.delete(key);
-    },
-    clear() {
-      entries.clear();
-    },
   };
 }
 

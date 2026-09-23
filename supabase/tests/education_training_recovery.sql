@@ -46,16 +46,13 @@ begin
  perform set_config('request.jwt.claims',jsonb_build_object('role','authenticated','sub',c.user_id)::text,true);
  perform set_config('request.jwt.claim.sub',c.user_id::text,true);
  perform set_config('request.jwt.claim.role','authenticated',true);
- -- Only the education refusal is caught. Existing unrelated requirements stay
- -- strict: a programme whose only profile names a category this learner is not
- -- in still has no document to issue.
+ -- Any refusal to issue the better document keeps the earlier certificate and
+ -- still records the result: here a programme whose only profile names a
+ -- category this learner is not in. It used to roll the submission back.
  update public.document_profiles set audience='itr',body=jsonb_set(body,'{audience}','"itr"') where course_slug=c.test_slug;
- begin perform private.complete_test_attempt_unmetered(a.id,answers);
- exception when sqlstate '22023' then
-  if sqlerrm='DOCUMENT_PROFILE_REQUIRED' then blocked:=true; else raise; end if;
- end;
- if not blocked then raise exception 'Non-education issuance error was silently swallowed'; end if;
- if (select status from public.test_attempts where id=a.id)<>'started' then raise exception 'Unrelated exception did not rollback completion'; end if;
+ result:=private.complete_test_attempt_unmetered(a.id,answers);
+ if result->>'status'<>'passed' or (result->>'score')::integer<>c.total then raise exception 'An unrelated refusal lost the result: %',result; end if;
+ if (select to_jsonb(cert) from public.certificates cert where id=c.id) is distinct from before_doc then raise exception 'An unrelated refusal changed the earlier certificate'; end if;
  update public.document_profiles set audience='all',body=jsonb_set(body,'{audience}','"all"') where course_slug=c.test_slug;
  update public.profiles set education='' where id=c.user_id;
  result:=private.complete_test_attempt_unmetered(a.id,answers);

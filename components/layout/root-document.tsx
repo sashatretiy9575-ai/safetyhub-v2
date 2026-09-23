@@ -25,13 +25,12 @@ export function RootDocument({
   // fetched and parsed the CSS bundle and found a node that needs them — the
   // third leg of the critical path — so the first paint of every page was
   // system-font text that then reflowed into Manrope.
-  if (locale === 'zh') {
-    preload('/fonts/noto-sans-sc-ui.b5829052.woff2', {
-      as: 'font',
-      type: 'font/woff2',
-      crossOrigin: 'anonymous',
-    });
-  } else {
+  //
+  // Chinese is not preloaded: its subset is 335 KB, fourteen times the Latin
+  // file, and at the top of the queue it held back the hero image of every zh
+  // page. It still loads from the stylesheet and swaps in (`font-display:
+  // swap`); until then the system's own Chinese face draws the text.
+  if (locale !== 'zh') {
     // Latin carries the brand, the numerals and every e-mail address, so it is
     // needed on any page; Cyrillic carries the body text of ru and kk. The
     // extended subsets are deliberately left out: they are rarely reached and a

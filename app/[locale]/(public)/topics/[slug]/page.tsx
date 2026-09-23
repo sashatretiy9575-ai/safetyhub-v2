@@ -7,9 +7,7 @@ import { setPhysicalLocale } from '../../../locale-context';
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
-// Overrides `dynamicParams = false` from app/[locale]/layout.tsx. That setting
-// is right for the fixed set of locales; applied to content slugs it meant
-// anything published after the last build could never be reached.
+// Content published after the build is rendered on its first request.
 export const dynamicParams = true;
 
 export async function generateStaticParams({ params }: { params: { locale: string } }) {

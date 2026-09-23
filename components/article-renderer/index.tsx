@@ -8,7 +8,19 @@ import type { ArticleBlock } from '@/server/content/articles';
 import type { SiteContactSettings } from '@/lib/site-contacts';
 import { ARTICLE_WHATSAPP_ACTION_URL, articleBlocksSchema } from '@/lib/validation/article';
 import { cn } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { isAppLocale, localizePathname, type AppLocale } from '@/i18n/config';
+
+/**
+ * An internal link in the body is stored as the Russian path («/topics/biot»);
+ * on a kk, en or zh article it has to lead to the same language.
+ */
+function localizedHref(url: string, locale: AppLocale) {
+  if (!url.startsWith('/') || url.startsWith('//')) return url;
+  const cut = url.search(/[?#]/u);
+  const path = cut === -1 ? url : url.slice(0, cut);
+  return localizePathname(path, locale) + (cut === -1 ? '' : url.slice(cut));
+}
 
 interface ArticleRendererProps {
   blocks: unknown;
@@ -113,6 +125,8 @@ const calloutStyles = {
 
 export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: ArticleRendererProps) {
   const t = useTranslations('Blog');
+  const requested = useLocale();
+  const locale: AppLocale = isAppLocale(requested) ? requested : 'ru';
   const result = articleBlocksSchema.safeParse(blocks);
   if (!result.success) {
     return (
@@ -201,7 +215,7 @@ export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: Article
                       <ArrowRight size={18} weight="bold" aria-hidden="true" />
                     </ContactLink>
                   ) : (
-                    <Link href={block.url} data-article-cta>
+                    <Link href={localizedHref(block.url, locale)} data-article-cta>
                       {block.text}
                       <ArrowRight size={18} weight="bold" aria-hidden="true" />
                     </Link>

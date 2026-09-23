@@ -85,8 +85,10 @@ test('locale-aware PWA resources are precached and Chinese font loading is route
   assert.match(worker, /offlineUrlForPathname/u);
   assert.match(worker, /Object\.keys\(OFFLINE_URLS\).*`\/manifest\/\$\{locale\}`/su);
   assert.match(worker, /CACHE_PREFIX\}v9/u);
-  assert.match(rootDocument, /locale === 'zh'/u);
-  assert.match(rootDocument, /\/fonts\/noto-sans-sc-ui\.b5829052\.woff2/u);
+  // The Chinese face comes from the stylesheet, not a preload: at 335 KB a
+  // preload held back the hero image of every zh page.
+  assert.match(rootDocument, /locale !== 'zh'/u);
+  assert.match(styles, /\/fonts\/noto-sans-sc-ui\.b5829052\.woff2/u);
   // The Chinese branch used to be the only one with a preload, so ru and kk
   // discovered their own font a full round trip late and repainted into it.
   assert.match(rootDocument, /\/fonts\/manrope-latin\.[0-9a-f]+\.woff2/u);

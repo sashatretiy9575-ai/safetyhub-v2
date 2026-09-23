@@ -9,7 +9,10 @@ import {
   type CertificateRenderMetadata,
   type CertificateWorkerProgress,
 } from './certificate-client-contract.ts';
-import { groupCertificateExportByOrganization } from './certificate-export-groups.ts';
+import {
+  archivePartsByProtocol,
+  groupCertificateExportByOrganization,
+} from './certificate-export-groups.ts';
 import type {
   CertificateWorkerRequest,
   CertificateWorkerResponse,
@@ -424,17 +427,16 @@ async function renderBufferedArchiveParts(
   options: WorkerOptions,
   pool: RenderPool,
 ): Promise<number> {
-  const partCount = Math.max(
-    1,
-    Math.ceil(metadata.items.length / CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS),
-  );
+  // Whole protocols per part: a protocol is never printed in two archives.
+  const parts = archivePartsByProtocol(metadata.items, CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS);
+  const partCount = parts.length;
+  let done = 0;
   for (let partIndex = 0; partIndex < partCount; partIndex += 1) {
     if (options.signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
     if (partIndex > 0) await pauseBetweenDownloads(options.signal);
-    const items = metadata.items.slice(
-      partIndex * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS,
-      (partIndex + 1) * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS,
-    );
+    const items = parts[partIndex]!;
+    const before = done;
+    done += items.length;
     const partMetadata: CertificateExportMetadata = {
       ...metadata,
       filename: archivePartFilename(metadata.filename, partIndex + 1, partCount),
@@ -447,7 +449,7 @@ async function renderBufferedArchiveParts(
     const taskId = crypto.randomUUID();
     const onProgress = (progress: CertificateWorkerProgress) =>
       options.onProgress?.({
-        completed: partIndex * CERTIFICATE_BUFFERED_ARCHIVE_MAX_ITEMS + progress.completed,
+        completed: before + progress.completed,
         total: metadata.items.length,
       });
     let archiveBytes: Uint8Array | null = null;
