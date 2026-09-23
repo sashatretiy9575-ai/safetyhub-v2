@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/shared/navigation-link';
 import { useTranslations } from 'next-intl';
 import { Container } from '@/components/ui/container';
 import { localizePathname, type AppLocale } from '@/i18n/config';
@@ -30,7 +30,6 @@ export function TopicRelatedLinks({
             <li key={item.slug}>
               <Link
                 href={localizePathname(`${base}/${item.slug}`, locale)}
-                prefetch={false}
                 className="font-medium [overflow-wrap:anywhere] text-[var(--color-primary)] underline-offset-4 hover:underline"
               >
                 {item.title}
