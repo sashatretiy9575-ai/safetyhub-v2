@@ -27,7 +27,14 @@ export type ElectricalAdmission = {
   group: ElectricalGroup;
   voltage: ElectricalVoltage;
   role: ElectricalRole;
+  /** The number the centre's journal runs on from; each sheet takes the next free one. */
+  journalStart?: number;
 };
+
+/** A journal number the database accepts: 1 to 999 999 999. */
+export function isJournalStart(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 999_999_999;
+}
 
 /** What the sample protocol of the training centre states: II group up to 1000 V. */
 export const ELECTRICAL_DEFAULT: ElectricalAdmission = {
@@ -95,6 +102,7 @@ export function courseAdmission(
     group: isGroup(stored?.group) ? stored.group : ELECTRICAL_DEFAULT.group,
     voltage: isVoltage(stored?.voltage) ? stored.voltage : ELECTRICAL_DEFAULT.voltage,
     role: isRole(stored?.role) ? stored.role : ELECTRICAL_DEFAULT.role,
+    ...(isJournalStart(stored?.journalStart) ? { journalStart: stored.journalStart } : {}),
   };
 }
 

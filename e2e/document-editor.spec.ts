@@ -20,23 +20,6 @@ async function openPage(page: Page, url?: string) {
   await expect(page.locator('.document-editor[data-hydrated]')).toBeVisible();
 }
 
-/** Two looks a second apart find the very same canvases: whatever was being drawn has landed. */
-async function settledCanvases(page: Page) {
-  const look = () =>
-    page.locator('canvas').evaluateAll((nodes) =>
-      nodes.map((node) => {
-        node.id ||= 'e2e-canvas-' + Math.random().toString(36).slice(2);
-        return node.id;
-      }),
-    );
-  await expect(async () => {
-    const seen = await look();
-    expect(seen.length).toBeGreaterThan(0);
-    await page.waitForTimeout(1_000);
-    expect(await look()).toEqual(seen);
-  }).toPass({ timeout: 30_000 });
-}
-
 /** A labelled geometric fixture, never an actual person's signature or seal. */
 async function fixturePng(label: string, colour = '#1d3fa8') {
   const sharp = (await import('sharp')).default;
@@ -61,16 +44,13 @@ async function saveCourse(page: Page) {
   await expect(page.getByRole('status').filter({ hasText: 'Сохранено' }).first()).toBeVisible();
 }
 
-/** The seed's setup of a course: the general form, one category, the form's hours. */
-async function chooseGeneralForm(page: Page) {
-  await page.getByRole('button', { name: 'Форма протокола' }).click();
-  await page.getByRole('button', { name: 'Общий', exact: true }).click();
-  await page.getByRole('radio', { name: 'Одна', exact: true }).click();
-  const hours = page.getByRole('spinbutton', { name: 'Часы', exact: true });
-  if (await hours.inputValue()) await hours.fill('');
+/** The kind of protocol, chosen from the one list the course page shows. */
+async function chooseForm(page: Page, form: string) {
+  await page.getByRole('button', { name: 'Вид протокола' }).click();
+  await page.getByRole('button', { name: form, exact: true }).click();
 }
 
-test('a course is set up once in «Документы»: its form, two categories, the preview', async ({
+test('a course is set up by its kind of protocol; the rest is folded away', async ({
   page,
 }, testInfo) => {
   test.setTimeout(180_000);
@@ -91,55 +71,66 @@ test('a course is set up once in «Документы»: its form, two categorie
   await page.getByRole('link', { name: /^Пожарная безопасность/u }).click();
   await expect(page).toHaveURL(/\/admin\/documents\/pozharnaya-bezopasnost$/u);
   await expect(page.locator('.document-editor[data-hydrated]')).toBeVisible();
-  await settledCanvases(page);
   // A retry may find the course as an earlier attempt left it: start from the seed's.
-  await chooseGeneralForm(page);
+  await chooseForm(page, 'Общий');
   if (await page.getByRole('button', { name: 'Сохранить', exact: true }).isEnabled())
     await saveCourse(page);
 
-  await page.getByRole('button', { name: 'Форма протокола' }).click();
-  await page.getByRole('button', { name: 'ПТМ', exact: true }).click();
-  await page.getByRole('radio', { name: 'ИТР и рабочие', exact: true }).click();
-  await page.getByRole('spinbutton', { name: 'Часы, ИТР' }).fill('40');
+  // One choice on the screen: hours, terms and wording stay folded.
+  await expect(page.getByRole('button', { name: 'Вид протокола' })).toBeVisible();
+  await expect(page.getByRole('spinbutton', { name: /^Часы/u })).toHaveCount(0);
+  await expect(page.getByRole('radiogroup', { name: 'Категории слушателей' })).toHaveCount(0);
+
+  // ПТМ prints «ИТР» and «рабочие» apart: the form decides it, not the admin.
+  await chooseForm(page, 'ПТМ');
+  await saveCourse(page);
+  await openPage(page);
+  await expect(page.getByRole('button', { name: 'Вид протокола' })).toContainText('ПТМ');
+  await page.getByText('Дополнительно', { exact: true }).click();
+  await expect(page.getByRole('spinbutton', { name: 'Часы, ИТР' })).toHaveAttribute(
+    'placeholder',
+    '40',
+  );
   await expect(page.getByRole('spinbutton', { name: 'Часы, Рабочие' })).toHaveAttribute(
     'placeholder',
     '10',
   );
-  await saveCourse(page);
 
-  // It holds after a reload, and the list of courses says so.
-  await openPage(page);
-  await expect(page.getByRole('radio', { name: 'ИТР и рабочие', exact: true })).toHaveAttribute(
-    'aria-checked',
-    'true',
-  );
-  await expect(page.getByRole('spinbutton', { name: 'Часы, ИТР' })).toHaveValue('40');
-  await expect(page.getByRole('button', { name: 'Форма протокола' })).toContainText('ПТМ');
+  // The sample opens as a PDF of its own.
+  const popup = page.waitForEvent('popup');
+  await page.getByRole('button', { name: 'Образец протокола' }).click();
+  const tab = await popup;
+  await expect.poll(() => tab.url(), { timeout: 30_000 }).toMatch(/^blob:/u);
+  await tab.close();
+
   await page.goto('/admin/documents');
   await expect(page.getByRole('link', { name: /^Пожарная безопасность/u })).toContainText(
     'ПТМ · ИТР 40 ч, рабочие 10 ч · корочка общая',
   );
 
-  // A phone: nothing wider than the screen, the booklet shows half at a time.
-  await page.setViewportSize({ width: 320, height: 800 });
-  await openPage(page, '/admin/documents/pozharnaya-bezopasnost?preview=booklet');
-  await expect(page.getByRole('radio', { name: 'Корочка', exact: true })).toHaveAttribute(
-    'aria-checked',
-    'true',
-  );
-  await expect(page.getByRole('radiogroup', { name: 'Половина разворота' })).toBeVisible();
-  await settledCanvases(page);
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    ),
-  ).toBeLessThanOrEqual(0);
-  await page.screenshot({ path: testInfo.outputPath('course-320.png'), fullPage: true });
+  // A phone: the courses two a row, nothing wider than the screen.
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.reload();
+  const tiles = page.getByRole('navigation', { name: 'Документы курсов' }).getByRole('link');
+  const [first, second] = await Promise.all([
+    tiles.nth(1).boundingBox(),
+    tiles.nth(2).boundingBox(),
+  ]);
+  expect(first && second && Math.abs(first.y - second.y)).toBeLessThanOrEqual(1);
+  for (const address of ['/admin/documents', '/admin/documents/pozharnaya-bezopasnost']) {
+    if (address !== '/admin/documents') await openPage(page, address);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(0);
+  }
+  await page.screenshot({ path: testInfo.outputPath('course-390.png'), fullPage: true });
 
-  // Back as it was: the general form, one category.
+  // Back as it was: the general form.
   await page.setViewportSize({ width: 1280, height: 900 });
   await openPage(page, '/admin/documents/pozharnaya-bezopasnost');
-  await chooseGeneralForm(page);
+  await chooseForm(page, 'Общий');
   await saveCourse(page);
   expect(errors).toEqual([]);
 });
@@ -161,7 +152,9 @@ test('«Общее»: the stamp is uploaded, drawn once saved, and nobody else c
   );
   const chooser = page.waitForEvent('filechooser');
   await page.getByRole('button', { name: /^Печать: (?:загрузить|заменить)$/u }).click();
-  await (await chooser).setFiles({
+  await (
+    await chooser
+  ).setFiles({
     name: 'stamp.png',
     mimeType: 'image/png',
     buffer: await fixturePng('TEST ' + Date.now()),
@@ -217,12 +210,9 @@ test('«Общее»: the stamp is uploaded, drawn once saved, and nobody else c
 
 test('the address of the old editor lands on «Документы»', async ({ page }) => {
   await page.goto('/admin/settings/certificate?course=biot&tab=certificate');
-  await expect(page).toHaveURL(/\/admin\/documents\/biot\?preview=booklet$/u);
+  await expect(page).toHaveURL(/\/admin\/documents\/biot$/u);
   await expect(page.locator('.document-editor[data-hydrated]')).toBeVisible();
-  await expect(page.getByRole('radio', { name: 'Корочка', exact: true })).toHaveAttribute(
-    'aria-checked',
-    'true',
-  );
+  await expect(page.getByRole('button', { name: 'Вид протокола' })).toBeVisible();
   await page.goto('/admin/settings/certificate');
   await expect(page).toHaveURL(/\/admin\/documents$/u);
   await expect(page.getByRole('heading', { name: 'Документы', exact: true })).toBeVisible();

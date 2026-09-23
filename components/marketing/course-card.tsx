@@ -42,10 +42,9 @@ export function CourseCard({
     >
       <div
         data-course-card-cover
-        // A phone gets a fixed 170px cover so five cards stay scannable; a
-        // `aspect-video` cover grew past 200px on a 390px screen and made the
-        // catalog one long scroll. Wider layouts keep the 16:9 proportion.
-        className="relative h-[170px] shrink-0 overflow-hidden bg-[var(--color-surface-muted)] sm:aspect-video sm:h-auto"
+        // Two cards a row on a phone: the 16:9 cover of a half-width card is
+        // about 95px tall, so a screen shows four courses, not one.
+        className="relative aspect-video shrink-0 overflow-hidden bg-[var(--color-surface-muted)]"
       >
         {coverImage ? (
           <Image
@@ -54,7 +53,7 @@ export function CourseCard({
             fill
             // The grid is capped at 1280 px, so above that the slot stops growing with
             // the viewport and a vw hint overstates it.
-            sizes="(min-width: 1280px) 416px, (min-width: 1200px) 33vw, (min-width: 640px) 50vw, 100vw"
+            sizes="(min-width: 1280px) 312px, (min-width: 768px) 33vw, (min-width: 360px) 50vw, 100vw"
             priority={priority}
             loading={priority ? undefined : 'lazy'}
             placeholder="blur"
@@ -74,7 +73,7 @@ export function CourseCard({
           className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/30 to-transparent"
         />
         <span
-          className="absolute top-3 right-3 grid size-9 place-items-center rounded-xl border border-white/55 bg-white/85 text-slate-700 shadow-sm backdrop-blur-md"
+          className="absolute top-2 right-2 grid size-8 place-items-center rounded-xl border border-white/55 bg-white/85 text-slate-700 shadow-sm backdrop-blur-md sm:top-3 sm:right-3 sm:size-9"
           title={title}
         >
           <CourseIcon size={20} weight="duotone" aria-hidden="true" />
@@ -82,21 +81,23 @@ export function CourseCard({
         </span>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
-        <h3 className="text-title line-clamp-2 font-bold">{title}</h3>
+      <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-5">
+        <h3 className="sm:text-title line-clamp-2 text-sm leading-snug font-bold [overflow-wrap:anywhere]">
+          {title}
+        </h3>
         {description ? (
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[var(--color-text-muted)]">
+          <p className="mt-1.5 line-clamp-2 text-sm leading-snug text-[var(--color-text-muted)] max-sm:text-xs sm:mt-2 sm:leading-relaxed">
             {description}
           </p>
         ) : null}
 
         <div
           data-course-card-actions
-          className="mt-auto grid grid-cols-2 gap-2 pt-4 text-xs font-semibold text-[var(--color-text-muted)]"
+          className="mt-auto grid grid-cols-2 gap-2 pt-3 text-xs font-semibold text-[var(--color-text-muted)] sm:pt-4"
         >
           <span
             aria-label={t('questions', { count: questionCount })}
-            className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5"
+            className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5 max-sm:hidden"
           >
             <ListChecks
               size={16}
@@ -113,7 +114,7 @@ export function CourseCard({
           </span>
           <span
             aria-label={`${t('minutes', { count: durationMinutes })}${pageCount ? `, ${t('pages', { count: pageCount })}` : ''}`}
-            className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5"
+            className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5 max-sm:hidden"
           >
             <Clock
               size={16}
@@ -130,7 +131,7 @@ export function CourseCard({
             data-course-card-cta
             aria-label={t('open')}
             // 44px is the minimum comfortable tap target; this was 40px.
-            className="col-span-2 mt-1 inline-flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-[14px] bg-[var(--color-primary)] px-4 text-xs font-bold whitespace-nowrap text-[var(--color-primary-foreground)] shadow-[0_10px_24px_-16px_var(--color-primary)] transition-colors group-hover:bg-[var(--color-primary-hover)] sm:text-sm"
+            className="col-span-2 inline-flex min-h-11 min-w-0 items-center justify-between gap-2 rounded-[14px] bg-[var(--color-primary)] px-3 text-xs font-bold whitespace-nowrap text-[var(--color-primary-foreground)] shadow-[0_10px_24px_-16px_var(--color-primary)] transition-colors group-hover:bg-[var(--color-primary-hover)] sm:mt-1 sm:gap-3 sm:px-4 sm:text-sm"
           >
             <span aria-hidden="true">{t('open')}</span>
             <ArrowUpRight

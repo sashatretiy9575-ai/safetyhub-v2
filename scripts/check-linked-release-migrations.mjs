@@ -19,24 +19,8 @@ const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 // issuance and selection recovery form the exact hash-pinned pending tail. Adding
 // a migration means adding it here too, with its hash; an open-ended local tail
 // would defeat this preflight.
-export const REVIEWED_BASE_MIGRATION_COUNT = 105;
+export const REVIEWED_BASE_MIGRATION_COUNT = 109;
 export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
-  Object.freeze({
-    filename: '20260909120000_audit_product_role_changes.sql',
-    sha256: '454cba0c0338e19c7d5255cfd6516e533160eb9b9d19161047b080e2c19a0191',
-  }),
-  Object.freeze({
-    filename: '20260912100000_immediate_self_account_purge.sql',
-    sha256: 'c591faa13edc838492c12605781c4daa07a82b888c77891c94fa90ba50f0d91b',
-  }),
-  Object.freeze({
-    filename: '20260912130000_course_access_grants.sql',
-    sha256: 'ff2f5a3ae020414be1d2b4e0df4a334772785e6710e788361aeabc14a32bf71a',
-  }),
-  Object.freeze({
-    filename: '20260912170000_certificate_settings_and_purge_receipts.sql',
-    sha256: 'dde05d00b28521c7c857be471a65cdaa12daf39844bfe36fa408e9149212a866',
-  }),
   Object.freeze({
     filename: '20260912180000_admin_reads_and_schedules.sql',
     sha256: 'd4ef996f9e1218864267a9ab2b1c801fd3cbad778aa43d4f97e2f45e67349824',
@@ -129,8 +113,6 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
     filename: '20260921140000_protocols_by_listener_category.sql',
     sha256: 'e2071c4aeba017c8a84746e40f2525ce4e383aaf46153309c31abef824920e64',
   }),
-]);
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260922100000_documents_issuance_model.sql',
     sha256: 'cdde0c2dcfd2682dcf9ae69ac937cfb2632bde89a6bad59a564345dee7bf00ed',
@@ -146,6 +128,12 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260922130000_presentation_publish_guard.sql',
     sha256: '418ccca5a44ada665f5e1bf669435af625c81ec0f9ef99488247bb3ea1790fed',
+  }),
+]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+  Object.freeze({
+    filename: '20260923100000_electrical_journal_start.sql',
+    sha256: '0c4c3d034a9498b0950a60a5d104272408f1c4aab4ded60183201fe2a8225b5f',
   }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =

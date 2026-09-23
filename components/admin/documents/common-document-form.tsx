@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, FloppyDisk, Plus, Trash } from '@phosphor-icons/react';
+import { ArrowLeft, CaretDown, FloppyDisk, Plus, Trash } from '@phosphor-icons/react';
 import { useUnsavedChangesGuard } from '@/components/admin/use-unsaved-changes-guard';
 import { FRAME_INPUT, FrameWord, WordFrame } from '@/components/admin/word-frame';
 import { Button } from '@/components/ui/button';
@@ -60,7 +60,8 @@ function fieldsOf(settings: CertificateSettings): Fields {
 /** Why «Общее» cannot be sent, or null. */
 function fieldsProblem(fields: Fields) {
   if (!fields.commission.signers.length) return 'Добавьте председателя комиссии';
-  if (fields.commission.signers.some((signer) => !signer.name.trim())) return 'Укажите ФИО в комиссии';
+  if (fields.commission.signers.some((signer) => !signer.name.trim()))
+    return 'Укажите ФИО в комиссии';
   const size = insertSizeProblem(fields);
   if (size) {
     const [min, max] = INSERT_SIZE_LIMITS[size];
@@ -102,7 +103,11 @@ type Answer = { settings?: CertificateSettings; error?: string; retryAfter?: num
  * commission with the signatures of its members, and the booklet every course
  * prints unless it has its own. One «Сохранить» for all of it.
  */
-export function CommonDocumentForm({ settings: initialSettings }: { settings: CertificateSettings }) {
+export function CommonDocumentForm({
+  settings: initialSettings,
+}: {
+  settings: CertificateSettings;
+}) {
   const [settings, setSettings] = useState(initialSettings);
   const [fields, setFields] = useState(() => fieldsOf(initialSettings));
   const [busy, setBusy] = useState(false);
@@ -167,7 +172,7 @@ export function CommonDocumentForm({ settings: initialSettings }: { settings: Ce
 
   return (
     <div
-      className="document-editor mx-auto min-w-0 max-w-4xl space-y-4"
+      className="document-editor mx-auto max-w-4xl min-w-0 space-y-4"
       data-hydrated={hydrated ? '' : undefined}
     >
       <div
@@ -181,15 +186,26 @@ export function CommonDocumentForm({ settings: initialSettings }: { settings: Ce
             </Link>
           </Button>
           <h1 className="min-w-0 flex-1 truncate text-lg font-bold tracking-tight">Общее</h1>
-          <p role="status" className="hidden min-w-0 truncate text-sm text-[var(--color-text-muted)] sm:block">
+          <p
+            role="status"
+            className="hidden min-w-0 truncate text-sm text-[var(--color-text-muted)] sm:block"
+          >
             {status}
           </p>
-          <Button size="sm" aria-label="Сохранить" disabled={busy || !dirty} onClick={() => void save()}>
+          <Button
+            size="sm"
+            aria-label="Сохранить"
+            disabled={busy || !dirty}
+            onClick={() => void save()}
+          >
             <FloppyDisk aria-hidden="true" />
             <span className="hidden sm:inline">Сохранить</span>
           </Button>
         </div>
-        <p role="status" className="min-h-5 truncate pt-1 text-sm text-[var(--color-text-muted)] sm:hidden">
+        <p
+          role="status"
+          className="min-h-5 truncate pt-1 text-sm text-[var(--color-text-muted)] sm:hidden"
+        >
           {status}
         </p>
       </div>
@@ -205,24 +221,14 @@ export function CommonDocumentForm({ settings: initialSettings }: { settings: Ce
               value={fields.organizationName}
               onChange={(event) => update({ organizationName: event.target.value })}
             />
-            <div className="xs:grid-cols-2 grid min-w-0 gap-3">
-              <Input
-                aria-label="БИН"
-                placeholder="БИН"
-                maxLength={32}
-                className={FIELD_INPUT}
-                value={fields.bin}
-                onChange={(event) => update({ bin: event.target.value })}
-              />
-              <Input
-                aria-label="Проверяющий"
-                placeholder="Проверяющий"
-                maxLength={200}
-                className={FIELD_INPUT}
-                value={fields.reviewerName}
-                onChange={(event) => update({ reviewerName: event.target.value })}
-              />
-            </div>
+            <Input
+              aria-label="БИН"
+              placeholder="БИН"
+              maxLength={32}
+              className={FIELD_INPUT}
+              value={fields.bin}
+              onChange={(event) => update({ bin: event.target.value })}
+            />
           </div>
           <FacsimileUploadTile
             ownerId={DOCUMENT_STAMP_OWNER}
@@ -265,7 +271,9 @@ export function CommonDocumentForm({ settings: initialSettings }: { settings: Ce
                     onChange={(event) => updateSigner(index, { name: event.target.value })}
                   />
                   <Input
-                    aria-label={index ? `Должность члена комиссии ${index}` : 'Должность председателя'}
+                    aria-label={
+                      index ? `Должность члена комиссии ${index}` : 'Должность председателя'
+                    }
                     placeholder="Должность"
                     maxLength={200}
                     className={FIELD_INPUT}
@@ -308,48 +316,64 @@ export function CommonDocumentForm({ settings: initialSettings }: { settings: Ce
           </Button>
         </section>
 
-        <section aria-labelledby="documents-booklet" className="min-w-0 space-y-3">
-          <h2 id="documents-booklet" className="text-lg font-bold">
-            Корочка
-          </h2>
-          <div className="grid min-w-0 gap-3 md:grid-cols-2">
-            {BOOKLET_FIELDS.map(({ key, label }) => (
-              <Textarea
-                key={key}
-                aria-label={label}
-                placeholder={label}
-                maxLength={1000}
-                rows={4}
-                className={FIELD_TEXTAREA}
-                value={fields.booklet[key]}
-                onChange={(event) =>
-                  update({ booklet: { ...fields.booklet, [key]: event.target.value } })
-                }
-              />
-            ))}
-          </div>
-          <div className="xs:grid-cols-2 grid min-w-0 gap-3">
-            {(['insertWidthCm', 'insertHeightCm'] as const).map((key) => (
-              <WordFrame key={key}>
-                <FrameWord>{key === 'insertWidthCm' ? 'ширина' : 'высота'}</FrameWord>
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  step="0.1"
-                  min={INSERT_SIZE_LIMITS[key][0]}
-                  max={INSERT_SIZE_LIMITS[key][1]}
-                  aria-label={key === 'insertWidthCm' ? 'Ширина разворота, см' : 'Высота, см'}
-                  className={FRAME_INPUT}
-                  value={fields[key] ?? ''}
+        <details className="group min-w-0 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)]">
+          <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm font-semibold [&::-webkit-details-marker]:hidden">
+            Дополнительно
+            <CaretDown
+              aria-hidden="true"
+              className="shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+            />
+          </summary>
+          <div className="min-w-0 space-y-3 border-t border-[var(--color-border)] p-3">
+            <Input
+              aria-label="Проверяющий"
+              placeholder="Проверяющий"
+              maxLength={200}
+              className={FIELD_INPUT}
+              value={fields.reviewerName}
+              onChange={(event) => update({ reviewerName: event.target.value })}
+            />
+            <div className="grid min-w-0 gap-3 md:grid-cols-2">
+              {BOOKLET_FIELDS.map(({ key, label }) => (
+                <Textarea
+                  key={key}
+                  aria-label={label}
+                  placeholder={label}
+                  maxLength={1000}
+                  rows={4}
+                  className={FIELD_TEXTAREA}
+                  value={fields.booklet[key]}
                   onChange={(event) =>
-                    update({ [key]: event.target.value === '' ? null : Number(event.target.value) })
+                    update({ booklet: { ...fields.booklet, [key]: event.target.value } })
                   }
                 />
-                <FrameWord>см</FrameWord>
-              </WordFrame>
-            ))}
+              ))}
+            </div>
+            <div className="xs:grid-cols-2 grid min-w-0 gap-3">
+              {(['insertWidthCm', 'insertHeightCm'] as const).map((key) => (
+                <WordFrame key={key}>
+                  <FrameWord>{key === 'insertWidthCm' ? 'ширина' : 'высота'}</FrameWord>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    step="0.1"
+                    min={INSERT_SIZE_LIMITS[key][0]}
+                    max={INSERT_SIZE_LIMITS[key][1]}
+                    aria-label={key === 'insertWidthCm' ? 'Ширина разворота, см' : 'Высота, см'}
+                    className={FRAME_INPUT}
+                    value={fields[key] ?? ''}
+                    onChange={(event) =>
+                      update({
+                        [key]: event.target.value === '' ? null : Number(event.target.value),
+                      })
+                    }
+                  />
+                  <FrameWord>см</FrameWord>
+                </WordFrame>
+              ))}
+            </div>
           </div>
-        </section>
+        </details>
       </fieldset>
     </div>
   );

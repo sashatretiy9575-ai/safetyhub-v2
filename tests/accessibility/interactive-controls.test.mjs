@@ -55,7 +55,6 @@ test('testimonials and article galleries keep the original accessible carousel p
 
 test('marketing collections use the native scroll-snap slider below 1200px', async () => {
   const sliderPaths = [
-    'components/marketing/course-grid.tsx',
     'components/marketing/partners-strip.tsx',
     'components/marketing/resources.tsx',
     'components/marketing/process-timeline.tsx',
@@ -83,14 +82,19 @@ test('marketing collections use the native scroll-snap slider below 1200px', asy
 });
 
 test('complete catalogs expose every item in an ordinary responsive grid', async () => {
-  const catalogs = await Promise.all([
+  const [topics, blog, home] = await Promise.all([
     read('app/(public)/topics/page.tsx'),
     read('app/(public)/blog/page.tsx'),
+    read('components/marketing/course-grid.tsx'),
   ]);
 
-  for (const source of catalogs) {
-    assert.match(source, /grid items-stretch gap-[45][^"\n]*sm:grid-cols-2/);
-    assert.match(source, /wide:grid-cols-3/);
-    assert.doesNotMatch(source, /<MarketingSlider/);
+  assert.match(blog, /grid items-stretch gap-[45][^"\n]*sm:grid-cols-2/);
+  assert.match(blog, /wide:grid-cols-3/);
+  // Courses, on the home page and in the catalogue: two a row on a phone, no
+  // slider — there are many and more are coming (the owner, September 2026).
+  for (const source of [topics, home]) {
+    assert.match(source, /grid grid-cols-1 items-stretch gap-3 min-\[360px\]:grid-cols-2/);
+    assert.match(source, /md:grid-cols-3/);
   }
+  for (const source of [topics, blog, home]) assert.doesNotMatch(source, /<MarketingSlider/);
 });

@@ -2,11 +2,7 @@ import 'server-only';
 import { z } from 'zod';
 import { createAdminClient } from '@/server/supabase/admin';
 import { requireCapability } from '@/server/auth/session';
-import {
-  ELECTRICAL_GROUPS,
-  ELECTRICAL_ROLES,
-  ELECTRICAL_VOLTAGES,
-} from '@/lib/pdf/electrical';
+import { ELECTRICAL_GROUPS, ELECTRICAL_ROLES, ELECTRICAL_VOLTAGES } from '@/lib/pdf/electrical';
 import { DOCUMENT_FAMILIES, type DocumentProfileSettings } from '@/lib/pdf/document-profile';
 
 export const documentSignerSchema = z
@@ -25,7 +21,8 @@ export const documentCommissionSchema = z
   })
   .strict()
   .refine(
-    (value) => new Set(value.signers.map((signer) => signer.signerId)).size === value.signers.length,
+    (value) =>
+      new Set(value.signers.map((signer) => signer.signerId)).size === value.signers.length,
     { message: 'DOCUMENT_COMMISSION_INVALID' },
   );
 
@@ -44,6 +41,7 @@ export const electricalAdmissionSchema = z
     group: z.enum(ELECTRICAL_GROUPS),
     voltage: z.enum(ELECTRICAL_VOLTAGES),
     role: z.enum(ELECTRICAL_ROLES),
+    journalStart: z.number().int().min(1).max(999_999_999).optional(),
   })
   .strict();
 
@@ -71,7 +69,10 @@ const profileFields = {
   orderNumber: z.string().max(100).default(''),
   orderDate: z.union([z.iso.date(), z.literal('')]).default(''),
   verificationKind: z.string().max(120).default(''),
-  booklet: z.object({ layout: z.literal('standard'), texts: bookletTextsSchema }).strict().optional(),
+  booklet: z
+    .object({ layout: z.literal('standard'), texts: bookletTextsSchema })
+    .strict()
+    .optional(),
   electrical: electricalAdmissionSchema.optional(),
 };
 
@@ -90,7 +91,13 @@ export const documentProfileSchema = z
   })
   .strict();
 
-type ProfileRow = { id: string; course_slug: string; audience: string; body: unknown; version: number };
+type ProfileRow = {
+  id: string;
+  course_slug: string;
+  audience: string;
+  body: unknown;
+  version: number;
+};
 
 /** The row's own id, course and category win over the copies inside its body. */
 export function parseDocumentProfileRow(row: ProfileRow): DocumentProfileSettings | null {
@@ -131,7 +138,11 @@ export async function readArchivedDocumentSettings(version: number) {
 
 export async function readRegisteredDocumentAsset(id: string) {
   const client = createAdminClient();
-  const result = await client.from('document_assets').select('object_key').eq('id', id).maybeSingle();
+  const result = await client
+    .from('document_assets')
+    .select('object_key')
+    .eq('id', id)
+    .maybeSingle();
   if (result.error) throw result.error;
   if (!result.data) return null;
   const image = await client.storage.from('document-facsimiles').download(result.data.object_key);

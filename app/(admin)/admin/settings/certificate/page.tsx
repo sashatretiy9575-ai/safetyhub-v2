@@ -13,7 +13,5 @@ export default async function LegacyDocumentEditorPage({
   const values = await searchParams;
   const course = typeof values.course === 'string' ? values.course.trim() : '';
   if (!course) redirect('/admin/documents');
-  redirect(
-    `/admin/documents/${encodeURIComponent(course)}${values.tab === 'certificate' ? '?preview=booklet' : ''}`,
-  );
+  redirect(`/admin/documents/${encodeURIComponent(course)}`);
 }

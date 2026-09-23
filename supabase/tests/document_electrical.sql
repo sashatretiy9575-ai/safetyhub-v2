@@ -125,6 +125,37 @@ begin
  if snapshot->>'protocolNumber' is distinct from sheet then
    raise exception 'a corrected sheet took a new number: % instead of %',snapshot->>'protocolNumber',sheet;
  end if;
+
+ -- The journal is stated once on the course; issuance asks for no number.
+ select coalesce(jsonb_object_agg(id,version),'{}'::jsonb) into expected from public.document_profiles where course_slug='plotnik';
+ setup:=public.save_document_course(course,jsonb_build_object(
+   'family','electrical','split',false,'programName','Электробезопасность и работы на высоте',
+   'protocolText','','decisionText','','orderNumber','','orderDate','','verificationKind','очередная',
+   'booklet',null,'electrical',jsonb_build_object('group','II','voltage','up-to-1000','role','electrotechnical','journalStart',500),
+   'categories',jsonb_build_object('all',jsonb_build_object('hours',null,'validityMonths',12))),expected);
+ if setup#>>'{profiles,0,body,electrical,journalStart}' is distinct from '500' then
+   raise exception 'the course did not keep its journal: %',setup;
+ end if;
+ perform public.execute_admin_attestation_action(gen_random_uuid(),'issue',array[pg_temp.attestation('Electrical fixture E')]);
+ perform public.execute_admin_attestation_action(gen_random_uuid(),'issue',array[pg_temp.attestation('Electrical fixture F')]);
+ if (select array_agg(number order by number) from (
+       select document_snapshot->>'protocolNumber' as number from public.certificates
+       where test_slug='plotnik' and organization in ('Electrical fixture E','Electrical fixture F')
+         and revoked_at is null) issued) is distinct from array['500','501'] then
+   raise exception 'the journal of the course did not number the sheets: %',
+     (select jsonb_agg(document_snapshot->>'protocolNumber') from public.certificates
+      where test_slug='plotnik' and organization in ('Electrical fixture E','Electrical fixture F'));
+ end if;
+ -- Only a whole number from 1 is a journal.
+ select coalesce(jsonb_object_agg(id,version),'{}'::jsonb) into expected from public.document_profiles where course_slug='plotnik';
+ setup:=public.save_document_course(course,jsonb_build_object(
+   'family','electrical','split',false,'programName','Электробезопасность и работы на высоте',
+   'protocolText','','decisionText','','orderNumber','','orderDate','','verificationKind','очередная',
+   'booklet',null,'electrical',jsonb_build_object('group','II','voltage','up-to-1000','role','electrotechnical','journalStart','500'),
+   'categories',jsonb_build_object('all',jsonb_build_object('hours',null,'validityMonths',12))),expected);
+ if setup#>>'{__safetyhubRpcError,message}' is distinct from 'DOCUMENT_COURSE_INVALID' then
+   raise exception 'a journal written as text was accepted: %',setup;
+ end if;
 end; $test$;
 
 rollback;

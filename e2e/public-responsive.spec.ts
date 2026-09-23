@@ -61,9 +61,7 @@ for (const viewport of viewports) {
   });
 }
 
-test('marketing cards peek below 1200px and become an equal three-column grid at 1200px', async ({
-  page,
-}) => {
+test('courses are a grid, two a row on a phone, and never a slider', async ({ page }) => {
   await blockRemoteIntegrations(page);
   await page.goto('/topics', { waitUntil: 'domcontentloaded' });
   const catalogCards = page.locator('[data-course-card]');
@@ -71,42 +69,46 @@ test('marketing cards peek below 1200px and become an equal three-column grid at
   const publishedLinks = await catalogCards.evaluateAll((cards) =>
     cards.map((card) => card.getAttribute('href')).sort(),
   );
-  // Geometry needs three cards; the published catalog may grow beyond the seed.
-  expect(publishedLinks.length).toBeGreaterThanOrEqual(3);
+  // Geometry needs five cards; the published catalog may grow beyond the seed.
+  expect(publishedLinks.length).toBeGreaterThanOrEqual(5);
   expect(new Set(publishedLinks).size).toBe(publishedLinks.length);
-  for (const width of [390, 768, 1200] as const) {
+
+  // Cards a row: one below 360px, two on a phone, three from 768px, four from 1280px.
+  for (const [width, perRow] of [
+    [320, 1],
+    [390, 2],
+    [768, 3],
+    [1280, 4],
+  ] as const) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-
-    const slider = page.getByRole('region', { name: 'Программы обучения' });
-    await expect(slider).toBeVisible();
-    const slides = slider.getByRole('listitem');
-    await expect(slides).toHaveCount(publishedLinks.length);
-    expect(
-      await slider
-        .locator('[data-course-card]')
-        .evaluateAll((cards) => cards.map((card) => card.getAttribute('href')).sort()),
-    ).toEqual(publishedLinks);
-
-    const geometry = await Promise.all([
-      slider.boundingBox(),
-      slides.nth(0).boundingBox(),
-      slides.nth(1).boundingBox(),
-      slides.nth(2).boundingBox(),
-    ]);
-    const [frame, first, second, third] = geometry;
-    expect(frame && first && second && third).toBeTruthy();
-    if (!frame || !first || !second || !third) continue;
-
-    if (width < 1200) {
-      expect(first.width).toBeLessThan(frame.width);
-      expect(width === 390 ? second.x : third.x).toBeLessThan(frame.x + frame.width);
-      await expect(slider.getByRole('button', { name: /Следующая/ })).toBeVisible();
-    } else {
-      expect(Math.abs(first.width - second.width)).toBeLessThanOrEqual(1);
-      expect(Math.abs(second.width - third.width)).toBeLessThanOrEqual(1);
-      expect(Math.abs(first.height - third.height)).toBeLessThanOrEqual(1);
-      await expect(slider.getByRole('button', { name: /Следующая/ })).toBeHidden();
+    for (const address of ['/', '/topics']) {
+      await page.goto(address, { waitUntil: 'domcontentloaded' });
+      const cards = page.locator(
+        address === '/' ? '#courses [data-course-card]' : '[data-course-card]',
+      );
+      expect(
+        await cards.evaluateAll((nodes) => nodes.map((card) => card.getAttribute('href')).sort()),
+      ).toEqual(publishedLinks);
+      const boxes = await cards.evaluateAll((nodes) =>
+        nodes.map((card) => {
+          const box = card.getBoundingClientRect();
+          return { x: box.x, y: box.y, width: box.width };
+        }),
+      );
+      const firstRow = boxes.filter((box) => Math.abs(box.y - boxes[0]!.y) <= 1);
+      expect(firstRow.length, `${address} at ${width}px`).toBe(perRow);
+      const widths = firstRow.map((box) => box.width);
+      expect(Math.max(...widths) - Math.min(...widths)).toBeLessThanOrEqual(1);
+      await expect(
+        page
+          .locator(address === '/' ? '#courses' : 'main')
+          .getByRole('button', { name: /Следующая/ }),
+      ).toHaveCount(0);
+      const geometry = await page.evaluate(() => ({
+        clientWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+      }));
+      expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth);
     }
   }
 });
@@ -199,9 +201,9 @@ test('article hero, table of contents and body share the 1120px desktop rail', a
   }
 });
 
-test('mobile course card has a 170px cover', async ({ page }) => {
+test('a course card keeps its 16:9 cover at every width', async ({ page }) => {
   await blockRemoteIntegrations(page);
-  for (const width of [320, 390] as const) {
+  for (const width of [320, 390, 1280] as const) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/topics', { waitUntil: 'domcontentloaded' });
 
@@ -209,7 +211,7 @@ test('mobile course card has a 170px cover', async ({ page }) => {
     await expect(card).toBeVisible();
     const cover = await card.locator('[data-course-card-cover]').boundingBox();
     expect(cover).toBeTruthy();
-    expect(Math.abs((cover?.height ?? 0) - 170)).toBeLessThanOrEqual(2);
+    expect(Math.abs((cover?.width ?? 0) * (9 / 16) - (cover?.height ?? 0))).toBeLessThanOrEqual(2);
   }
 });
 
@@ -229,10 +231,16 @@ test('course CTA uses a full second row without clipping across the viewport mat
 
   for (const width of [240, 280, 320, 360, 390, 600, 768, 1200] as const) {
     await page.setViewportSize({ width, height: 900 });
-    const boxes = await Promise.all([0, 1, 2].map((index) => controls.nth(index).boundingBox()));
-    expect(boxes.every(Boolean)).toBe(true);
-    expect(Math.abs((boxes[0]?.y ?? 0) - (boxes[1]?.y ?? 0))).toBeLessThanOrEqual(1);
-    expect(boxes[2]?.y ?? 0).toBeGreaterThan((boxes[0]?.y ?? 0) + 1);
+    // A phone card is half the screen: the two chips give way to the action.
+    if (width >= 640) {
+      const boxes = await Promise.all([0, 1, 2].map((index) => controls.nth(index).boundingBox()));
+      expect(boxes.every(Boolean)).toBe(true);
+      expect(Math.abs((boxes[0]?.y ?? 0) - (boxes[1]?.y ?? 0))).toBeLessThanOrEqual(1);
+      expect(boxes[2]?.y ?? 0).toBeGreaterThan((boxes[0]?.y ?? 0) + 1);
+    } else {
+      await expect(controls.nth(0)).toBeHidden();
+      await expect(controls.nth(1)).toBeHidden();
+    }
 
     const cta = card.locator('[data-course-card-cta]');
     await expect(cta).toContainText('Открыть курс');

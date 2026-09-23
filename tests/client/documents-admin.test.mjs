@@ -178,11 +178,20 @@ test('the owner’s rules: names inside the fields, no sentences, one save, no l
     assert.match(source, /aria-label="Сохранить"/u);
     assert.match(source, /'Сохранено в другом окне — обновите страницу'/u);
   }
-  // The course page: the form, one or two categories, the booklet, the preview.
-  for (const text of ['Форма протокола', 'Одна', 'ИТР и рабочие', 'Общая корочка', 'Своя корочка']) {
+  // The course page is one choice, the kind of protocol. The form decides one
+  // or two categories; everything it states is folded under «Дополнительно»;
+  // the sample opens as a PDF of its own, not beside the fields.
+  for (const text of ['Вид протокола', 'Общая корочка', 'Своя корочка']) {
     assert.ok(courseForm.includes(`'${text}'`) || courseForm.includes(`"${text}"`), text);
   }
-  assert.match(courseForm, /<DocumentPreviewPane/u);
+  assert.match(courseForm, /<details\b[\s\S]*Дополнительно[\s\S]*<\/details>/u);
+  assert.match(courseForm, /split: SPLIT_FAMILIES\.has\(family as DocumentFamily\)/u);
+  assert.match(courseForm, /new Set\(\['biot', 'ptm', 'industrial'\]\)/u);
+  assert.doesNotMatch(courseForm, /DocumentPreviewPane|'Категории слушателей'/u);
+  assert.match(courseForm, /openSamplePdf\(/u);
+  // The protocol's date and number are the server's: issuance asks for neither.
+  const dialog = await read('components/admin/attestations-action-dialog.tsx');
+  assert.doesNotMatch(dialog, /протокол от|Номер протокола|protocolDate|protocolNumber/u);
   assert.match(
     courseForm,
     /\/api\/admin\/documents\/courses\/\$\{encodeURIComponent\(setup\.courseId\)\}/u,

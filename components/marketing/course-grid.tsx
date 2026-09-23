@@ -1,7 +1,6 @@
 import { CourseCard } from '@/components/marketing/course-card';
 import { SectionHeading } from '@/components/marketing/shared/section-heading';
 import { Container } from '@/components/ui/container';
-import { MarketingSlider } from '@/components/ui/marketing-slider';
 import { JsonLd } from '@/components/shared/json-ld';
 import { ROUTES } from '@/lib/constants';
 import { getTopics } from '@/server/content/topics';
@@ -50,13 +49,17 @@ export async function CourseGrid() {
         className="scroll-mt-24 py-10 sm:py-14 lg:py-16"
       >
         <Container size="wide">
-          {/* The slider below already shows every published course, so the
+          {/* The grid below already shows every published course, so the
               "all courses" link and the filler sentence under the heading
-              only repeated it. */}
+              only repeated it. Two a row on a phone, not a slider: there are
+              many courses and more to come, and a slider hides all but one. */}
           <SectionHeading id="courses-heading" eyebrow={t('eyebrow')} title={t('title')} />
 
           {topics.length > 0 ? (
-            <MarketingSlider label={t('slider')} itemLabel={t('item')} className="mt-7 sm:mt-10">
+            <div
+              aria-label={t('slider')}
+              className="mt-7 grid grid-cols-1 items-stretch gap-3 min-[360px]:grid-cols-2 sm:mt-10 sm:gap-4 md:grid-cols-3 lg:gap-5 xl:grid-cols-4"
+            >
               {topics.map((topic) => (
                 <CourseCard
                   key={topic.slug}
@@ -73,7 +76,7 @@ export async function CourseGrid() {
                   priority={false}
                 />
               ))}
-            </MarketingSlider>
+            </div>
           ) : (
             <p className="mt-6 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 p-6 text-sm text-[var(--color-text-muted)] backdrop-blur-xl">
               {t('empty')}

@@ -95,7 +95,8 @@ const SKIP_REASON_LABELS: Record<string, string> = {
   'DOCUMENT_REQUIRED_FIELDS:organization,position': 'заполните организацию и должность сотрудника',
   DOCUMENT_PROFILE_REQUIRED: 'у курса нет настроек документов',
   DOCUMENT_FORMAL_EXAM_REQUIRED: 'тест промбеза не сдан на проходной балл',
-  DOCUMENT_SIGNER_ASSET_MISMATCH: 'подпись не принадлежит члену комиссии — замените её в «Документы → Общее»',
+  DOCUMENT_SIGNER_ASSET_MISMATCH:
+    'подпись не принадлежит члену комиссии — замените её в «Документы → Общее»',
   DOCUMENT_DATE_INVALID: 'дата протокола не может быть позже сегодняшней',
   PROTOCOL_NUMBER_INVALID: 'номер протокола: не больше 40 символов',
 };
@@ -300,7 +301,6 @@ export function AttestationsManager({
   const [detailIssue, setDetailIssue] = useState<AttestationCardIssue | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const idempotencyKeyRef = useRef('');
-  const idempotencySignatureRef = useRef('');
   const purgeKeysRef = useRef<string[]>([]);
   const purgeSignatureRef = useRef('');
   const exportAbortRef = useRef<AbortController | null>(null);
@@ -788,7 +788,6 @@ export function AttestationsManager({
         title: 'Подтвердить и выдать',
         description: `Данные будут подтверждены, сертификаты выданы: ${actionSummary.total}.`,
         confirmLabel: `Подтвердить и выдать ${actionSummary.total}`,
-        protocol: true,
       };
     }
     if (pending.kind === 'bulk-update') {
@@ -812,7 +811,6 @@ export function AttestationsManager({
         title: 'Выдать сертификаты',
         description: `Выдача: ${actionSummary.readyToIssue} из ${actionSummary.total} выбранных.${warningText}`,
         confirmLabel: `Выдать ${actionSummary.readyToIssue}`,
-        protocol: true,
       };
     }
     if (pending.kind === 'bulk-delete') {
@@ -1048,12 +1046,7 @@ export function AttestationsManager({
     }
   };
 
-  const confirmAction = async ({
-    value,
-    reason,
-    protocolDate,
-    protocolNumber,
-  }: AttestationDialogValues) => {
+  const confirmAction = async ({ value, reason }: AttestationDialogValues) => {
     if (!pending) return;
     if (pending.kind === 'export') {
       setPending(null);
@@ -1064,12 +1057,8 @@ export function AttestationsManager({
       await purgeSelectedUsers(reason);
       return;
     }
-    // The key belongs to one request: pressing again after a timeout replays it,
-    // while another date or number is another request and gets a key of its own.
-    const protocol = { protocolDate, protocolNumber: protocolNumber || undefined };
-    const signature = JSON.stringify(protocol);
-    if (idempotencySignatureRef.current !== signature) idempotencyKeyRef.current = '';
-    idempotencySignatureRef.current = signature;
+    // The key belongs to one request: pressing again after a timeout replays it.
+    // The protocol's date and number are the server's: today and «DD.MM».
     const idempotencyKey = idempotencyKeyRef.current || crypto.randomUUID();
     idempotencyKeyRef.current = idempotencyKey;
     const targetUserIds = singleTarget ? [singleTarget.userId] : userIds;
@@ -1086,7 +1075,6 @@ export function AttestationsManager({
               action: 'confirm_and_issue',
               attestationIds: targetAttestationIds,
               idempotencyKey,
-              ...protocol,
             }
           : pending.kind === 'bulk-update'
             ? {
@@ -1096,7 +1084,7 @@ export function AttestationsManager({
                 value,
                 idempotencyKey,
               }
-            : { action: 'issue', attestationIds: targetAttestationIds, idempotencyKey, ...protocol };
+            : { action: 'issue', attestationIds: targetAttestationIds, idempotencyKey };
     await runAttestationAction(
       body,
       pending.kind,
