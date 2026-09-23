@@ -89,15 +89,19 @@ test('courses are a grid, two a row on a phone, and never a slider', async ({ pa
       expect(
         await cards.evaluateAll((nodes) => nodes.map((card) => card.getAttribute('href')).sort()),
       ).toEqual(publishedLinks);
-      const boxes = await cards.evaluateAll((nodes) =>
-        nodes.map((card) => {
-          const box = card.getBoundingClientRect();
-          return { x: box.x, y: box.y, width: box.width };
-        }),
-      );
-      const firstRow = boxes.filter((box) => Math.abs(box.y - boxes[0]!.y) <= 1);
-      expect(firstRow.length, `${address} at ${width}px`).toBe(perRow);
-      const widths = firstRow.map((box) => box.width);
+      await cards.first().scrollIntoViewIfNeeded();
+      // Measured once the grid has settled: right after a resize and a load
+      // the first look can land before the stylesheet has laid the grid out.
+      const firstRowWidths = () =>
+        cards.evaluateAll((nodes) => {
+          const boxes = nodes.map((card) => card.getBoundingClientRect());
+          const top = boxes[0]?.top ?? 0;
+          return boxes.filter((box) => Math.abs(box.top - top) <= 1).map((box) => box.width);
+        });
+      await expect
+        .poll(async () => (await firstRowWidths()).length, { message: `${address} at ${width}px` })
+        .toBe(perRow);
+      const widths = await firstRowWidths();
       expect(Math.max(...widths) - Math.min(...widths)).toBeLessThanOrEqual(1);
       await expect(
         page
