@@ -6,7 +6,7 @@ import {
   assessmentProjection,
   COURSE_BATCH_SLUGS,
   COURSE_BATCH_LOCALES,
-} from '../../scripts/publish-course-batch.mjs';
+} from '../../scripts/content/publish-course-batch.mjs';
 
 function bank() {
   return Array.from({ length: 3 }, (_, v) => ({

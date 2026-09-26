@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const source = await readFile(
-  new URL('../../scripts/run-supabase-sql-tests.mjs', import.meta.url),
+  new URL('../../scripts/db/run-supabase-sql-tests.mjs', import.meta.url),
   'utf8',
 );
 

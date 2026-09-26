@@ -7,14 +7,14 @@ import test from 'node:test';
 import {
   executeStage6Publication,
   parseCliArguments,
-} from '../../scripts/publish-stage6-localizations.mjs';
+} from '../../scripts/content/publish-stage6-localizations.mjs';
 import {
   assertNoAnswerKeys,
   loadStage6PublicationBatch,
   sha256,
   Stage6PublicationContractError,
-} from '../../scripts/content-localization/stage6-publication-contract.mjs';
-import { CURRENT_PRODUCTION_PROJECT_REF } from '../../scripts/production-operator-safety.mjs';
+} from '../../scripts/content/localization/stage6-publication-contract.mjs';
+import { CURRENT_PRODUCTION_PROJECT_REF } from '../../scripts/ops/production-operator-safety.mjs';
 
 const ACTOR_ID = '11111111-1111-4111-8111-111111111111';
 const REVISION_ID = '22222222-2222-4222-8222-222222222222';
@@ -426,7 +426,7 @@ test('Stage 6 plan is reviewed, bounded and answer-key free', async () => {
 
 test('Stage 6 runtime invokes only the paired legal publisher', async () => {
   const source = await readFile(
-    path.join(process.cwd(), 'scripts', 'publish-stage6-localizations.mjs'),
+    path.join(process.cwd(), 'scripts', 'content', 'publish-stage6-localizations.mjs'),
     'utf8',
   );
   assert.match(source, /publishLegalBundle\(args\)/u);

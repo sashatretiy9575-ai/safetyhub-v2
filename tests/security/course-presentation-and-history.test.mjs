@@ -182,10 +182,10 @@ test('course material is approval-gated, private, and stays out of precache', as
     read('app/(public)/topics/[slug]/page.tsx'),
     read('app/course-presentations/[slug]/[asset]/route.ts'),
     read('server/content/topics.ts'),
-    read('scripts/ensure-course-presentation-buckets.mjs'),
+    read('scripts/storage/ensure-course-presentation-buckets.mjs'),
     read('supabase/migrations/20260831104000_approved_course_presentation_access.sql'),
     read('components/admin/course-presentation-input.tsx'),
-    read('scripts/content-sync-linked.mjs'),
+    read('scripts/content/content-sync-linked.mjs'),
     read('public/sw.js'),
     read('lib/security/content-security-policy.ts'),
   ]);

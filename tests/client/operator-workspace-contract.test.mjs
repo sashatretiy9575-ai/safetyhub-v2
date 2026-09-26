@@ -113,7 +113,7 @@ test('materials and course editors keep primary content central and protect draf
 
 test('workspace seed provides at least one hundred participants and authenticated E2E matrix', async () => {
   const [seed, e2e, packageJson] = await Promise.all([
-    read('scripts/seed-operator-workspace.mjs'),
+    read('scripts/db/seed-operator-workspace.mjs'),
     read('e2e/authenticated-workspaces.spec.ts'),
     read('package.json'),
   ]);

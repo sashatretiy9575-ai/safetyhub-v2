@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 
 test('the staged KK/EN/ZH content batch preserves topology and security boundaries', () => {
-  const script = path.resolve('scripts/content-localization/validate-stage6-localizations.mjs');
+  const script = path.resolve('scripts/content/localization/validate-stage6-localizations.mjs');
   const result = spawnSync(process.execPath, [script], {
     cwd: process.cwd(),
     encoding: 'utf8',

@@ -8,19 +8,19 @@ import {
   DISPOSABLE_PROJECT_MARKER,
   PRODUCTION_PROJECT_REF,
   PROTECTED_PROJECT_REFS,
-} from '../../scripts/load-test-safety.mjs';
+} from '../../scripts/release/load-test-safety.mjs';
 import {
   inspectDisposableStorageTarget,
   main as rehearseStorageRestore,
   materializeVerifiedStorageBackup,
   parseArguments,
-} from '../../scripts/rehearse-linked-storage-restore.mjs';
-import { OperatorToolError } from '../../scripts/storage-operator-tools.mjs';
+} from '../../scripts/storage/rehearse-linked-storage-restore.mjs';
+import { OperatorToolError } from '../../scripts/storage/storage-operator-tools.mjs';
 import {
   SAFETYHUB_STORAGE_BUCKET_ALLOWLIST,
   readVerifiedStorageByteBackupForRestore,
   runStorageByteBackup,
-} from '../../scripts/storage-byte-backup-tools.mjs';
+} from '../../scripts/storage/storage-byte-backup-tools.mjs';
 
 const BUCKETS = [...SAFETYHUB_STORAGE_BUCKET_ALLOWLIST];
 const TARGET_REF = 'aaaaaaaaaaaaaaaaaaaa';

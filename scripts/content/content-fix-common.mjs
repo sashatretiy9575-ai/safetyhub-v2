@@ -4,12 +4,12 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
-import { operatorSession } from '../publish-course-batch.mjs';
-import { createSupabaseRepository } from '../publish-stage6-localizations.mjs';
+import { operatorSession } from './publish-course-batch.mjs';
+import { createSupabaseRepository } from './publish-stage6-localizations.mjs';
 import {
   CURRENT_PRODUCTION_PROJECT_REF,
   assertLinkedProductionProjectRef,
-} from '../production-operator-safety.mjs';
+} from '../ops/production-operator-safety.mjs';
 
 export const LOCALES = ['ru', 'kk', 'en', 'zh'];
 export const TRANSLATED = ['kk', 'en', 'zh'];

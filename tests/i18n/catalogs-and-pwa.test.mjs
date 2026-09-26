@@ -75,7 +75,7 @@ test('locale-aware PWA resources are precached and Chinese font loading is route
       read('app/globals.css'),
       read('app/manifest/[locale]/route.ts'),
       read('app/offline/[locale]/route.ts'),
-      read('scripts/subset-cjk-ui-font.py'),
+      read('scripts/fonts/subset-cjk-ui-font.py'),
     ]);
   const font = await stat(
     new URL('../../public/fonts/noto-sans-sc-ui.b5829052.woff2', import.meta.url),

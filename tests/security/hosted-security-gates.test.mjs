@@ -14,11 +14,11 @@ import {
   runHostedStorageGates,
   runOfficialAccountPurge,
   runPostgrestAclGates,
-} from '../../scripts/hosted-security-gates.mjs';
+} from '../../scripts/release/hosted-security-gates.mjs';
 import {
   DISPOSABLE_PROJECT_MARKER,
   PRODUCTION_PROJECT_REF,
-} from '../../scripts/load-test-safety.mjs';
+} from '../../scripts/release/load-test-safety.mjs';
 
 const DISPOSABLE_REF = 'abcdefghijklmnopqrst';
 const DISPOSABLE_URL = `https://${DISPOSABLE_REF}.supabase.co`;
@@ -485,7 +485,7 @@ test('ambiguous authorized upload preserves its write lease and still reaches of
   // The source-level cleanup contract must keep ambiguous writes away from
   // finish_profile_avatar_storage_write, which would clear the 30-minute lease.
   const source = await readFile(
-    new URL('../../scripts/hosted-security-gates.mjs', import.meta.url),
+    new URL('../../scripts/release/hosted-security-gates.mjs', import.meta.url),
     'utf8',
   );
   assert.match(
@@ -545,7 +545,7 @@ test('every foreign negative probe key is tracked for exact privileged cleanup',
   assert.deepEqual(tracked, [foreignKey]);
 
   const source = await readFile(
-    new URL('../../scripts/hosted-security-gates.mjs', import.meta.url),
+    new URL('../../scripts/release/hosted-security-gates.mjs', import.meta.url),
     'utf8',
   );
   assert.match(source, /onProbeKey\(objectKey\);[\s\S]*client\.storage/u);
@@ -1087,7 +1087,7 @@ test('an unexpectedly accepted foreign-prefix probe is removed and verified befo
 
 test('hosted harness orders all fail-closed preflights before its first write and logs only redacted report fields', async () => {
   const source = await readFile(
-    new URL('../../scripts/hosted-security-gates.mjs', import.meta.url),
+    new URL('../../scripts/release/hosted-security-gates.mjs', import.meta.url),
     'utf8',
   );
 

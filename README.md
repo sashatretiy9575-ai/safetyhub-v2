@@ -37,7 +37,9 @@ lib/         общие помощники для сервера и браузе
 i18n/ messages/   локали ru/kk/en/zh и каталоги строк
 supabase/    миграции, SQL-тесты, edge-функции, config.toml, seed.sql
 content/     снапшоты курсов, статей, правовых документов и локализаций
-scripts/ tests/ e2e/   инструменты, node-тесты, Playwright
+scripts/     инструменты по назначению: db/, storage/, auth/, ops/, release/, fonts/, icons/, dev/
+             и content/ (+ localization/, snapshot/, decks/, batches/)
+tests/ e2e/  node-тесты, Playwright
 ```
 
 ## Команды

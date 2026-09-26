@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const source = await readFile(
-  new URL('../../scripts/bootstrap-passwordless-admin.mjs', import.meta.url),
+  new URL('../../scripts/auth/bootstrap-passwordless-admin.mjs', import.meta.url),
   'utf8',
 );
 const [migration, sqlContract, appTypes] = await Promise.all([

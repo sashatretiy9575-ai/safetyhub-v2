@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { normalizeGeneratedTypes } from '../../scripts/generate-supabase-types.mjs';
+import { normalizeGeneratedTypes } from '../../scripts/db/generate-supabase-types.mjs';
 
 test('only the preserved operator backup is excluded from application type comparison', () => {
   const backup = '      document_editor_release_backup_20260915: {\n        Row: { saved_at: string }\n      }\n';

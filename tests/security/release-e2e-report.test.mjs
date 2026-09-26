@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildReleaseE2eSummary } from '../../scripts/release-e2e-report.mjs';
+import { buildReleaseE2eSummary } from '../../scripts/release/release-e2e-report.mjs';
 
 test('release E2E evidence excludes environment and redacts temporary credentials', () => {
   const secret = 'temporary-local-password';

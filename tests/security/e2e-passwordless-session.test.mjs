@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import {
   prepareReleaseE2eAuth,
   sanitizePasswordlessBrowserState,
-} from '../../scripts/e2e-passwordless-session.mjs';
+} from '../../scripts/release/e2e-passwordless-session.mjs';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 
@@ -158,9 +158,9 @@ test('remote release requires HTTPS before reading any supplied test state', asy
 test('authenticated workspace and release runner retain no legacy password login assumption', async () => {
   const [workspace, runner, sessionHarness, capture] = await Promise.all([
     readFile(new URL('../../e2e/authenticated-workspaces.spec.ts', import.meta.url), 'utf8'),
-    readFile(new URL('../../scripts/run-e2e-release.mjs', import.meta.url), 'utf8'),
-    readFile(new URL('../../scripts/e2e-passwordless-session.mjs', import.meta.url), 'utf8'),
-    readFile(new URL('../../scripts/capture-e2e-otp-session.mjs', import.meta.url), 'utf8'),
+    readFile(new URL('../../scripts/release/run-e2e-release.mjs', import.meta.url), 'utf8'),
+    readFile(new URL('../../scripts/release/e2e-passwordless-session.mjs', import.meta.url), 'utf8'),
+    readFile(new URL('../../scripts/release/capture-e2e-otp-session.mjs', import.meta.url), 'utf8'),
   ]);
 
   assert.match(workspace, /E2E_ADMIN_STORAGE_STATE/u);

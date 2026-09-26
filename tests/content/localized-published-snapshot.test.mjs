@@ -10,13 +10,13 @@ import {
   buildLocalizedPublishedSnapshot,
   LocalizedSnapshotError,
   validateLocalizedPublishedSnapshot,
-} from '../../scripts/content-localization/localized-published-snapshot.mjs';
+} from '../../scripts/content/localization/localized-published-snapshot.mjs';
 import {
   canonicalHash,
   loadStage6PublicationBatch,
   sha256,
   STAGE6_ALL_LOCALES,
-} from '../../scripts/content-localization/stage6-publication-contract.mjs';
+} from '../../scripts/content/localization/stage6-publication-contract.mjs';
 
 function uuid(value) {
   const bytes = createHash('sha256').update(value).digest().subarray(0, 16);
@@ -476,7 +476,7 @@ test('content seed deterministically includes the complete published localizatio
       const generated = spawnSync(
         process.execPath,
         [
-          'scripts/generate-content-seed.mjs',
+          'scripts/content/generate-content-seed.mjs',
           '--localizations-root',
           snapshotRoot,
           '--output',

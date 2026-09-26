@@ -8,7 +8,7 @@ import manifest from './course-cover-manifest.json' with { type: 'json' };
  * nothing to do with the material a learner then opened, while the two courses
  * of September already showed their own title slide. Every cover is now
  * exported from the presentation it belongs to, in the language it is read in
- * — `scripts/export-course-covers.mjs` writes both the files and the manifest
+ * — `scripts/content/export-course-covers.mjs` writes both the files and the manifest
  * below, so a course with no exported cover falls back to its Russian one and
  * then to the picture an editor uploaded, instead of pointing at nothing.
  */

@@ -7,7 +7,7 @@ import {
   LEGACY_RU_CONTENT_TOTALS,
   assertLegacyRuContentContract,
   classifyLocalizedSchema,
-} from '../../scripts/content-localization/linked-preflight-contract.mjs';
+} from '../../scripts/content/localization/linked-preflight-contract.mjs';
 import {
   REVIEWED_APPLIED_RELEASE_MIGRATIONS,
   REVIEWED_BASE_MIGRATION_COUNT,
@@ -17,7 +17,7 @@ import {
   assertReviewedLocalMigrationInventory,
   loadLocalMigrationInventory,
   parseLinkedMigrationList,
-} from '../../scripts/check-linked-release-migrations.mjs';
+} from '../../scripts/db/check-linked-release-migrations.mjs';
 
 function localizedSchemaState(value) {
   return {
@@ -220,8 +220,8 @@ test('migration-list parser rejects malformed and unbounded CLI output', () => {
 
 test('release scripts keep legacy fallback read-only and post-migration exact type gate separate', async () => {
   const [contentSync, migrationGate, packageJson] = await Promise.all([
-    readFile('scripts/content-sync-linked.mjs', 'utf8'),
-    readFile('scripts/check-linked-release-migrations.mjs', 'utf8'),
+    readFile('scripts/content/content-sync-linked.mjs', 'utf8'),
+    readFile('scripts/db/check-linked-release-migrations.mjs', 'utf8'),
     readFile('package.json', 'utf8').then(JSON.parse),
   ]);
   assert.match(contentSync, /LEGACY_RU_CONTENT_PULL_REQUIRES_CHECK_ONLY/u);
@@ -232,10 +232,10 @@ test('release scripts keep legacy fallback read-only and post-migration exact ty
   assert.doesNotMatch(migrationGate, /db push|migration repair|writeFile|unlink|rename|rm\(/u);
   assert.equal(
     packageJson.scripts['db:migrations:check-preflight'],
-    'node scripts/check-linked-release-migrations.mjs',
+    'node scripts/db/check-linked-release-migrations.mjs',
   );
   assert.equal(
     packageJson.scripts['db:types:check'],
-    'node scripts/generate-supabase-types.mjs --linked --check',
+    'node scripts/db/generate-supabase-types.mjs --linked --check',
   );
 });

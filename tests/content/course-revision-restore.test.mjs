@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateTarget, digest } from '../../scripts/restore-course-revision-local.mjs';
+import { validateTarget, digest } from '../../scripts/content/restore-course-revision-local.mjs';
 const uuid = '11111111-1111-4111-8111-111111111111';
 const options = { target: 'local', course: uuid, revision: uuid, expectedCurrent: uuid };
 const api = 'http://127.0.0.1:54321';

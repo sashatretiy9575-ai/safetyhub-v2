@@ -5,7 +5,7 @@ import {
   ALLOWED_CREDENTIAL_LITERALS,
   scanForCredentials,
   TEXTUAL_EXTENSIONS,
-} from '../../scripts/credential-scan.mjs';
+} from '../../scripts/release/credential-scan.mjs';
 
 const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8');
 
@@ -17,7 +17,7 @@ const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8
 const compose = (...parts) => parts.join('');
 
 test('repository security gate recognizes GitHub, Telegram, Supabase, and private-key credentials', async () => {
-  const source = await read('scripts/credential-scan.mjs');
+  const source = await read('scripts/release/credential-scan.mjs');
   assert.match(source, /gh\[pousr\]_/u);
   assert.match(source, /github_pat_/u);
   assert.match(source, /sb_secret_/u);

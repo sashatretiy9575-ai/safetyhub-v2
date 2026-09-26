@@ -9,8 +9,8 @@ import {
   main as configureDrainVault,
   parseArguments,
   VAULT_NAMES,
-} from '../../scripts/configure-auth-email-drain-vault.mjs';
-import { CURRENT_PRODUCTION_PROJECT_REF } from '../../scripts/production-operator-safety.mjs';
+} from '../../scripts/auth/configure-auth-email-drain-vault.mjs';
+import { CURRENT_PRODUCTION_PROJECT_REF } from '../../scripts/ops/production-operator-safety.mjs';
 
 const SERVICE_KEY = `sb_secret_${'s'.repeat(48)}`;
 const DRAIN_SECRET = `drain-${'d'.repeat(40)}`;

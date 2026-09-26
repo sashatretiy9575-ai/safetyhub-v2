@@ -11,7 +11,7 @@ import {
   coursePublicationBlockers,
   looksRussian,
 } from '../../lib/admin/course-readiness.ts';
-import { assessmentProjection } from '../../scripts/publish-course-batch.mjs';
+import { assessmentProjection } from '../../scripts/content/publish-course-batch.mjs';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const BATCH = 'content/course-batch-2026-09';

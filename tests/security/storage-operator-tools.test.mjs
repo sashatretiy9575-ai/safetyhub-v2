@@ -16,7 +16,7 @@ import {
   runVisibleInventory,
   validateOperatorConfig,
   writeInventoryReport,
-} from '../../scripts/storage-operator-tools.mjs';
+} from '../../scripts/storage/storage-operator-tools.mjs';
 
 const USER_ONE = '11111111-1111-4111-8111-111111111111';
 const USER_TWO = '22222222-2222-4222-8222-222222222222';
@@ -790,7 +790,7 @@ test('backup rejects repository output and visible blockers before any download'
 
 test('operator tooling contains no Storage mutation or physical-backend claim path', async () => {
   const source = await readFile(
-    new URL('../../scripts/storage-operator-tools.mjs', import.meta.url),
+    new URL('../../scripts/storage/storage-operator-tools.mjs', import.meta.url),
     'utf8',
   );
   assert.doesNotMatch(source, /\b(?:storage|bucket)\.(?:remove|upload|update|move|copy)\s*\(/u);

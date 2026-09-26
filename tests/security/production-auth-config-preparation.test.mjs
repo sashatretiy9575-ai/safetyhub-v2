@@ -17,7 +17,7 @@ import {
   repositoryRoot,
   safeConfigPushCommand,
   templateSha256,
-} from '../../scripts/prepare-production-auth-config.mjs';
+} from '../../scripts/auth/prepare-production-auth-config.mjs';
 
 async function listRelativeFiles(root, current = root) {
   const entries = await readdir(current, { withFileTypes: true });

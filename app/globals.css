@@ -82,7 +82,7 @@
  * cap heights up to within a thousandth of an em — and each weight is served by
  * the Inter weight whose stems measure the same as Manrope's, which runs about
  * a step and a half lighter than the nominal value. See
- * scripts/subset-kazakh-companion-font.py.
+ * scripts/fonts/subset-kazakh-companion-font.py.
  */
 @font-face {
   font-family: 'SafetyHub Kazakh';

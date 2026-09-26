@@ -6,7 +6,7 @@ import {
   main as pruneDeployments,
   parseArguments,
   planDeploymentPrune,
-} from '../../scripts/prune-vercel-deployments.mjs';
+} from '../../scripts/ops/prune-vercel-deployments.mjs';
 
 const TOKEN = `vercel-test-token-${'t'.repeat(24)}`;
 const ENV = {
@@ -232,6 +232,6 @@ test('the workflow prunes after every successful deployment and on demand, from 
   assert.ok(workflow.includes('VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.NAME }}'));
   assert.ok(workflow.includes('ref: main'));
   assert.ok(workflow.includes('contents: read'));
-  assert.ok(workflow.includes('node scripts/prune-vercel-deployments.mjs --keep=3'));
+  assert.ok(workflow.includes('node scripts/ops/prune-vercel-deployments.mjs --keep=3'));
   assert.equal(workflow.includes('pull_request'), false);
 });

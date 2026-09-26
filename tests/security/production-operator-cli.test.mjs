@@ -5,12 +5,12 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import test from 'node:test';
 
-import { main as configureVault } from '../../scripts/configure-notification-dispatch-vault.mjs';
-import { CURRENT_PRODUCTION_PROJECT_REF } from '../../scripts/production-operator-safety.mjs';
+import { main as configureVault } from '../../scripts/ops/configure-notification-dispatch-vault.mjs';
+import { CURRENT_PRODUCTION_PROJECT_REF } from '../../scripts/ops/production-operator-safety.mjs';
 import {
   main as setRuntimeFlag,
   parseArguments as parseRuntimeFlagArguments,
-} from '../../scripts/set-runtime-feature-flag.mjs';
+} from '../../scripts/ops/set-runtime-feature-flag.mjs';
 
 const SERVICE_KEY = `sb_secret_${'s'.repeat(48)}`;
 const DISPATCHER_SECRET = `dispatcher-${'d'.repeat(40)}`;

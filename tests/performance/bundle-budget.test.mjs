@@ -7,7 +7,7 @@ import {
   budgetViolations,
   parseClientReferenceManifest,
   resolveRouteAssets,
-} from '../../scripts/check-bundle-budgets.mjs';
+} from '../../scripts/release/check-bundle-budgets.mjs';
 
 test('bundle accounting deduplicates shared chunks and isolates the leaf route entry', () => {
   const payload = {
@@ -84,7 +84,7 @@ test('package verification and CI run contact and bundle guards in the required 
     readFile(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),
   ]);
   const scripts = JSON.parse(packageSource).scripts;
-  assert.equal(scripts['check:bundles'], 'node scripts/check-bundle-budgets.mjs');
+  assert.equal(scripts['check:bundles'], 'node scripts/release/check-bundle-budgets.mjs');
   assert.ok(scripts.verify.indexOf('npm run check:contacts') >= 0);
   assert.ok(
     scripts.verify.indexOf('npm run build') < scripts.verify.indexOf('npm run check:bundles'),

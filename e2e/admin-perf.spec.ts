@@ -10,7 +10,7 @@
  *
  * Output: artifacts/admin-fix-2026-09/perf-<label>-<timestamp>.json (rewritten after every run, so
  * a killed process still leaves the completed runs). Compare two files with
- * scripts/summarize-admin-perf.mjs.
+ * scripts/dev/summarize-admin-perf.mjs.
  *
  * The harness never saves settings, never uploads or removes images. The only data it changes is
  * course access in scenario B, which it restores and then verifies through the API.

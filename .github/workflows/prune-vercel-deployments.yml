@@ -48,4 +48,4 @@ jobs:
 
       - name: Delete all but the three newest successful deployments
         if: env.VERCEL_TOKEN != ''
-        run: node scripts/prune-vercel-deployments.mjs --keep=3
+        run: node scripts/ops/prune-vercel-deployments.mjs --keep=3

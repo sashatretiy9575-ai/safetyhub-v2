@@ -6,16 +6,16 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import test from 'node:test';
 
-import { parseArguments as parseStorageBackupArguments } from '../../scripts/backup-linked-storage.mjs';
-import { readRawSecretFromStdin } from '../../scripts/production-operator-safety.mjs';
-import { OperatorToolError } from '../../scripts/storage-operator-tools.mjs';
+import { parseArguments as parseStorageBackupArguments } from '../../scripts/storage/backup-linked-storage.mjs';
+import { readRawSecretFromStdin } from '../../scripts/ops/production-operator-safety.mjs';
+import { OperatorToolError } from '../../scripts/storage/storage-operator-tools.mjs';
 import {
   SAFETYHUB_STORAGE_BUCKET_ALLOWLIST,
   assertRecoveryKeyOutsideOutput,
   runStorageByteBackup,
   validateStorageBackupRequest,
   verifyStorageByteBackup,
-} from '../../scripts/storage-byte-backup-tools.mjs';
+} from '../../scripts/storage/storage-byte-backup-tools.mjs';
 
 const PROJECT_REF = 'vezgxdooijznpjqrpvcv';
 const FIXED_NOW = new Date('2026-08-31T01:00:00.000Z');
@@ -421,9 +421,9 @@ test('generic Storage backup rejects a mismatched stream and removes every incom
 test('generic Storage backup source has no cloud mutation, identity, or database access path', async () => {
   const sources = await Promise.all(
     [
-      '../../scripts/storage-byte-backup-tools.mjs',
-      '../../scripts/backup-linked-storage.mjs',
-      '../../scripts/verify-linked-storage-backup.mjs',
+      '../../scripts/storage/storage-byte-backup-tools.mjs',
+      '../../scripts/storage/backup-linked-storage.mjs',
+      '../../scripts/storage/verify-linked-storage-backup.mjs',
     ].map((relative) => readFile(new URL(relative, import.meta.url), 'utf8')),
   );
   const source = sources.join('\n');

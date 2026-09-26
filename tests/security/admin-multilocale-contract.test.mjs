@@ -238,7 +238,7 @@ test('offline assessment importer accepts only strict public wording and emits a
       }),
       'utf8',
     );
-    const script = path.join(repositoryRoot, 'scripts/import-course-assessment-localization.mjs');
+    const script = path.join(repositoryRoot, 'scripts/content/import-course-assessment-localization.mjs');
     const checked = await run(process.execPath, [script, '--check', '--file', validPath], {
       cwd: repositoryRoot,
       maxBuffer: 1024 * 1024,

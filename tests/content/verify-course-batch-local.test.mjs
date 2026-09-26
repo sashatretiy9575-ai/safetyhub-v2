@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { COURSE_BATCH_LOCALES, COURSE_BATCH_SLUGS } from '../../scripts/publish-course-batch.mjs';
+import { COURSE_BATCH_LOCALES, COURSE_BATCH_SLUGS } from '../../scripts/content/publish-course-batch.mjs';
 import {
   VERIFIED_LOCALES,
   VERIFIED_SLUGS,
@@ -15,7 +15,7 @@ import {
   cyrillicShare,
   findAnswerKeyPaths,
   russianLeftovers,
-} from '../../scripts/verify-course-batch-local.mjs';
+} from '../../scripts/content/verify-course-batch-local.mjs';
 
 const HASH = 'a'.repeat(64);
 

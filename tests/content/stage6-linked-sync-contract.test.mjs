@@ -2,12 +2,12 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
-import { loadStage6PublicationBatch } from '../../scripts/content-localization/stage6-publication-contract.mjs';
+import { loadStage6PublicationBatch } from '../../scripts/content/localization/stage6-publication-contract.mjs';
 
 const root = process.cwd();
 
 test('linked pull includes the complete four-locale published content contract', async () => {
-  const source = await readFile(`${root}/scripts/content-sync-linked.mjs`, 'utf8');
+  const source = await readFile(`${root}/scripts/content/content-sync-linked.mjs`, 'utf8');
   const queryStart = source.indexOf('courseLocalizationRows =');
   const queryEnd = source.indexOf("await client.query('commit')", queryStart);
   assert.ok(queryStart > 0 && queryEnd > queryStart, 'localized repeatable-read query block missing');
@@ -39,7 +39,7 @@ test('package commands expose plan/apply and snapshot validation separately', as
   const packageJson = JSON.parse(await readFile(`${root}/package.json`, 'utf8'));
   assert.equal(
     packageJson.scripts['content:localizations:publish:plan'],
-    'node scripts/publish-stage6-localizations.mjs --plan',
+    'node scripts/content/publish-stage6-localizations.mjs --plan',
   );
   assert.match(
     packageJson.scripts['content:localizations:publish'],
@@ -52,7 +52,7 @@ test('package commands expose plan/apply and snapshot validation separately', as
 });
 
 test('localized seed projection is fail-closed and contains no private answer mapping', async () => {
-  const source = await readFile(`${root}/scripts/generate-content-seed.mjs`, 'utf8');
+  const source = await readFile(`${root}/scripts/content/generate-content-seed.mjs`, 'utf8');
   const start = source.indexOf('const localizedSeedPayload =');
   const end = source.indexOf('const sql =', start);
   assert.ok(start > 0 && end > start, 'localized seed block missing');
@@ -70,7 +70,7 @@ test('localized seed projection is fail-closed and contains no private answer ma
 
 test('localized course seed hashes use raw staged variants and isolate variant receipts', async () => {
   const [source, seed, snapshot] = await Promise.all([
-    readFile(`${root}/scripts/generate-content-seed.mjs`, 'utf8'),
+    readFile(`${root}/scripts/content/generate-content-seed.mjs`, 'utf8'),
     readFile(`${root}/supabase/seed.sql`, 'utf8'),
     readFile(`${root}/content/snapshots/localizations/manifest.json`, 'utf8'),
   ]);

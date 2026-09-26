@@ -16,7 +16,7 @@ import {
   assertLocalCiLoadTestTarget,
   assertLoadTestTarget,
   projectRefFromSupabaseUrl,
-} from '../../scripts/load-test-safety.mjs';
+} from '../../scripts/release/load-test-safety.mjs';
 
 const DISPOSABLE_REF = 'abcdefghijklmnopqrst';
 const DISPOSABLE_URL = `https://${DISPOSABLE_REF}.supabase.co`;
@@ -367,8 +367,8 @@ test('Auth and data baseline errors, unknown counts, and nonzero rows all fail c
 
 test('load harness completes every safety preflight before its first seed write', async () => {
   const [harness, safety, workflow] = await Promise.all([
-    readFile(new URL('../../scripts/load-test-supabase.mjs', import.meta.url), 'utf8'),
-    readFile(new URL('../../scripts/load-test-safety.mjs', import.meta.url), 'utf8'),
+    readFile(new URL('../../scripts/release/load-test-supabase.mjs', import.meta.url), 'utf8'),
+    readFile(new URL('../../scripts/release/load-test-safety.mjs', import.meta.url), 'utf8'),
     readFile(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),
   ]);
 

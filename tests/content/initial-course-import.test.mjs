@@ -8,7 +8,7 @@ import {
   executeInitialImport,
   linkedEnvironment,
   parseCliArguments,
-} from '../../scripts/initial-course-import.mjs';
+} from '../../scripts/content/initial-course-import.mjs';
 
 const catalogHash = '11b5486025cbb94c02ea0ed021ce8a8afc3f1e4c997c9cccbf5497e8fb42c026';
 const projectRef = 'abcdefghijklmnopqrst';
@@ -73,7 +73,7 @@ test('linked environment fails closed when URL project ref differs', () => {
 test('database workflow is service-only, phased, idempotent and receipt-bounded', async () => {
   const [migration, script] = await Promise.all([
     read('supabase/migrations/20260831122000_initial_course_import_workflow.sql'),
-    read('scripts/initial-course-import.mjs'),
+    read('scripts/content/initial-course-import.mjs'),
   ]);
   for (const routine of [
     'begin_initial_course_import',

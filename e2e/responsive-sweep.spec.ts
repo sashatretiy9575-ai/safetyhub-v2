@@ -6,7 +6,7 @@ import { expect, test, type Page } from '@playwright/test';
 //   E2E_SWEEP=1 npx playwright test e2e/responsive-sweep.spec.ts
 // The account and admin routes need the release runner's sessions
 // (E2E_ADMIN_STORAGE_STATE / E2E_PARTICIPANT_STORAGE_STATE) and are swept by
-// scripts/run-e2e-release.mjs.
+// scripts/release/run-e2e-release.mjs.
 const enabled = process.env.E2E_SWEEP === '1';
 
 const VIEWPORTS = [

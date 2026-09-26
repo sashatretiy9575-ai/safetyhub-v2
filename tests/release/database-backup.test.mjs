@@ -13,11 +13,11 @@ import {
   loadPostgresSslRootCertificate,
   parseLinkedPostgresConnection,
   validateDatabaseBackupReceipt,
-} from '../../scripts/database-backup-security.mjs';
+} from '../../scripts/db/database-backup-security.mjs';
 import {
   CURRENT_PRODUCTION_PROJECT_REF,
   assertLinkedProductionProjectRef,
-} from '../../scripts/production-operator-safety.mjs';
+} from '../../scripts/ops/production-operator-safety.mjs';
 
 const ARTIFACT_OVERHEAD = Buffer.byteLength('SAFETYHUB-DB-BACKUP-V1\0') + 12 + 16;
 
@@ -78,7 +78,7 @@ test('database backup encrypts, verifies, and restores exact dump bytes', async 
     const created = spawnSync(
       process.execPath,
       [
-        'scripts/create-database-backup.mjs',
+        'scripts/db/create-database-backup.mjs',
         '--schema',
         schema,
         '--data',
@@ -96,7 +96,7 @@ test('database backup encrypts, verifies, and restores exact dump bytes', async 
 
     const recovered = spawnSync(
       process.execPath,
-      ['scripts/restore-database-backup.mjs', '--backup', backup, '--output', restoredWithDpapi],
+      ['scripts/db/restore-database-backup.mjs', '--backup', backup, '--output', restoredWithDpapi],
       { cwd: process.cwd(), encoding: 'utf8', windowsHide: true },
     );
     assert.equal(recovered.status, 0, recovered.stderr);
@@ -109,7 +109,7 @@ test('database backup encrypts, verifies, and restores exact dump bytes', async 
     const recoveredPortably = spawnSync(
       process.execPath,
       [
-        'scripts/restore-database-backup.mjs',
+        'scripts/db/restore-database-backup.mjs',
         '--backup',
         backup,
         '--output',
@@ -138,15 +138,15 @@ test('database backup encrypts, verifies, and restores exact dump bytes', async 
 
 test('linked backup uses a read-only snapshot and never persists temporary credentials', async () => {
   const [source, contentSync, securityHelper] = await Promise.all([
-    readFile('scripts/backup-linked-database.mjs', 'utf8'),
-    readFile('scripts/content-sync-linked.mjs', 'utf8'),
-    readFile('scripts/database-backup-security.mjs', 'utf8'),
+    readFile('scripts/db/backup-linked-database.mjs', 'utf8'),
+    readFile('scripts/content/content-sync-linked.mjs', 'utf8'),
+    readFile('scripts/db/database-backup-security.mjs', 'utf8'),
   ]);
   assert.match(source, /repeatable read read only deferrable/u);
   assert.match(source, /pg_export_snapshot/u);
   assert.match(source, /--format=custom/u);
   assert.match(source, /rehearseDockerRestore/u);
-  const rehearsal = await readFile('scripts/rehearse-database-backup-docker.mjs', 'utf8');
+  const rehearsal = await readFile('scripts/db/rehearse-database-backup-docker.mjs', 'utf8');
   assert.match(rehearsal, /--disable-triggers/u);
   assert.match(rehearsal, /'--network','none'/u);
   assert.match(rehearsal, /create extension pgcrypto/u);
@@ -439,7 +439,7 @@ test('restore rejects an unsafe receipt before creating output and does not echo
     await writeFile(path.join(backup, 'receipt.json'), JSON.stringify(receipt));
     const restored = spawnSync(
       process.execPath,
-      ['scripts/restore-database-backup.mjs', '--backup', backup, '--output', output],
+      ['scripts/db/restore-database-backup.mjs', '--backup', backup, '--output', output],
       { cwd: process.cwd(), encoding: 'utf8', windowsHide: true },
     );
     assert.notEqual(restored.status, 0);
@@ -461,7 +461,7 @@ test('restore bounds receipt input and keeps plaintext output outside the encryp
     const oversizedResult = spawnSync(
       process.execPath,
       [
-        'scripts/restore-database-backup.mjs',
+        'scripts/db/restore-database-backup.mjs',
         '--backup',
         oversizedBackup,
         '--output',
@@ -479,7 +479,7 @@ test('restore bounds receipt input and keeps plaintext output outside the encryp
     await writeFile(path.join(nestedBackup, 'receipt.json'), JSON.stringify(backupReceipt()));
     const nestedResult = spawnSync(
       process.execPath,
-      ['scripts/restore-database-backup.mjs', '--backup', nestedBackup, '--output', nestedOutput],
+      ['scripts/db/restore-database-backup.mjs', '--backup', nestedBackup, '--output', nestedOutput],
       { cwd: process.cwd(), encoding: 'utf8', windowsHide: true },
     );
     assert.notEqual(nestedResult.status, 0);
@@ -558,7 +558,7 @@ test('backup creation rejects a Windows case-alias recovery path before output c
     const created = spawnSync(
       process.execPath,
       [
-        'scripts/create-database-backup.mjs',
+        'scripts/db/create-database-backup.mjs',
         '--schema',
         schema,
         '--data',
@@ -626,9 +626,9 @@ test('physical path guard resolves a junction before containment checks when ava
 
 test('generic Storage byte backup requires the full allowlist and a portable recovery verification path', async () => {
   const [runner, verifier, core] = await Promise.all([
-    readFile('scripts/backup-linked-storage.mjs', 'utf8'),
-    readFile('scripts/verify-linked-storage-backup.mjs', 'utf8'),
-    readFile('scripts/storage-byte-backup-tools.mjs', 'utf8'),
+    readFile('scripts/storage/backup-linked-storage.mjs', 'utf8'),
+    readFile('scripts/storage/verify-linked-storage-backup.mjs', 'utf8'),
+    readFile('scripts/storage/storage-byte-backup-tools.mjs', 'utf8'),
   ]);
   assert.match(runner, /--expected-project-ref/u);
   assert.match(runner, /--allow-bucket/u);

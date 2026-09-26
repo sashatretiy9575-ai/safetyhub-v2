@@ -76,9 +76,9 @@ test('local Auth configuration activates the email-OTP access-token hook after m
 
 test('only the isolated ZH load harness uses the post-cutover password credential path', async () => {
   const [operatorSeed, hostedGate, loadHarness] = await Promise.all([
-    read('scripts/seed-operator-workspace.mjs'),
-    read('scripts/hosted-security-gates.mjs'),
-    read('scripts/load-test-supabase.mjs'),
+    read('scripts/db/seed-operator-workspace.mjs'),
+    read('scripts/release/hosted-security-gates.mjs'),
+    read('scripts/release/load-test-supabase.mjs'),
   ]);
 
   assert.doesNotMatch(operatorSeed, /SAFETYHUB_SEED_PASSWORD|password\s*:/u);

@@ -9,8 +9,8 @@ import {
   main,
   parseArguments,
   validateResult,
-} from '../../scripts/recover-legacy-zh-approval-deliveries.mjs';
-import { CURRENT_PRODUCTION_PROJECT_REF } from '../../scripts/production-operator-safety.mjs';
+} from '../../scripts/ops/recover-legacy-zh-approval-deliveries.mjs';
+import { CURRENT_PRODUCTION_PROJECT_REF } from '../../scripts/ops/production-operator-safety.mjs';
 
 const IDEMPOTENCY_KEY = '11111111-1111-4111-8111-111111111111';
 const SERVICE_KEY = `sb_secret_${'a'.repeat(48)}`;
@@ -132,14 +132,14 @@ test('legacy-ZH recovery rejects malformed or over-bounded RPC results before wr
 
 test('recovery package command preserves the service-only safety boundary', async () => {
   const [source, packageSource] = await Promise.all([
-    readFile('scripts/recover-legacy-zh-approval-deliveries.mjs', 'utf8'),
+    readFile('scripts/ops/recover-legacy-zh-approval-deliveries.mjs', 'utf8'),
     readFile('package.json', 'utf8'),
   ]);
   const packageJson = JSON.parse(packageSource);
 
   assert.equal(
     packageJson.scripts['notifications:legacy-zh:recover'],
-    'node scripts/recover-legacy-zh-approval-deliveries.mjs',
+    'node scripts/ops/recover-legacy-zh-approval-deliveries.mjs',
   );
   assert.match(source, /assertProductionMutationConfirmation/u);
   assert.match(source, /assertReason/u);

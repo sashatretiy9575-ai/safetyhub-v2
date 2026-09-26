@@ -111,7 +111,7 @@ test('optional content metadata participates in draft identity', async () => {
   const [additive, contract, seedGenerator] = await Promise.all([
     read('supabase/migrations/20260820000000_content_lifecycle_additive.sql'),
     read('supabase/migrations/20260820010000_content_lifecycle_contract.sql'),
-    read('scripts/generate-content-seed.mjs'),
+    read('scripts/content/generate-content-seed.mjs'),
   ]);
 
   for (const source of [additive, contract]) {

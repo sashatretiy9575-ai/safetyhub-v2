@@ -23,7 +23,7 @@ const CJK_FONT_PATH = path.join(
 // The full Noto Sans CJK SC is 16.4 MB, and this file travels to the
 // browser: generateCertificateInBrowser fetches it before it can draw a
 // single glyph. It is now the subset built by
-// scripts/subset-cjk-certificate-font.py — GB/T 2312 plus everything the
+// scripts/fonts/subset-cjk-certificate-font.py — GB/T 2312 plus everything the
 // Chinese content uses, plus Latin and Cyrillic for names.
 const CJK_FONT_BYTES = 3_553_936;
 const CJK_FONT_ETAG = '"b2e9d66e497b1e69e5066b8bec9433d5026aa593918d4625a03555817047f993"';

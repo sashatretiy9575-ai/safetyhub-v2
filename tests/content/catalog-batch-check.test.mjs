@@ -11,10 +11,10 @@ import {
   checkCatalogBatch,
   parseCliArguments,
   runCli,
-} from '../../scripts/check-course-catalog-batch.mjs';
+} from '../../scripts/content/check-course-catalog-batch.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const SCRIPT_PATH = path.join(ROOT, 'scripts', 'check-course-catalog-batch.mjs');
+const SCRIPT_PATH = path.join(ROOT, 'scripts', 'content', 'check-course-catalog-batch.mjs');
 const PACKAGE_PATH = path.join(ROOT, 'package.json');
 const COURSE_FIXTURES = [
   ['plotnik', 1, 25],
@@ -383,6 +383,6 @@ test('script and package expose a SELECT/download-only linked command', async ()
   );
   assert.equal(
     packageJson.scripts['content:catalog-batch:check'],
-    'node --env-file-if-exists=.env.local scripts/check-course-catalog-batch.mjs',
+    'node --env-file-if-exists=.env.local scripts/content/check-course-catalog-batch.mjs',
   );
 });

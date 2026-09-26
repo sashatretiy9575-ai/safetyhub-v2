@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { validateAndRenderPresentation } from '../../scripts/course-content/presentation-pdf-qa.mjs';
+import { validateAndRenderPresentation } from '../../scripts/content/snapshot/presentation-pdf-qa.mjs';
 
 const root = process.cwd();
 
@@ -27,7 +27,7 @@ function canonicalHash(value) {
 test('canonical five-course snapshot passes the material and hash validator', () => {
   const output = execFileSync(
     process.execPath,
-    [path.join(root, 'scripts/course-content/validate-snapshot.mjs'), '--initial-import'],
+    [path.join(root, 'scripts/content/snapshot/validate-snapshot.mjs'), '--initial-import'],
     { cwd: root, encoding: 'utf8', windowsHide: true },
   );
   const result = JSON.parse(output);
@@ -44,7 +44,7 @@ test('canonical five-course snapshot passes the material and hash validator', ()
 });
 
 test('linked content export is explicitly scoped away from operational personal data', async () => {
-  const source = await readFile(path.join(root, 'scripts/content-sync-linked.mjs'), 'utf8');
+  const source = await readFile(path.join(root, 'scripts/content/content-sync-linked.mjs'), 'utf8');
   for (const forbidden of [
     'auth.users',
     'public.profiles',
@@ -64,7 +64,7 @@ test('linked content export is explicitly scoped away from operational personal 
 });
 
 test('linked content export preserves PostgreSQL calendar dates east of UTC', async () => {
-  const source = await readFile(path.join(root, 'scripts/content-sync-linked.mjs'), 'utf8');
+  const source = await readFile(path.join(root, 'scripts/content/content-sync-linked.mjs'), 'utf8');
   const definition = source.match(/function asDate\(value\) \{[\s\S]*?\n\}/u)?.[0];
   assert.ok(definition, 'asDate helper is missing');
 
@@ -223,7 +223,7 @@ test('presentation QA accepts a Node Buffer at the pdfjs boundary', async () => 
 });
 
 test('linked pull previews a staged transaction before canonical replacement', async () => {
-  const source = await readFile(path.join(root, 'scripts/content-sync-linked.mjs'), 'utf8');
+  const source = await readFile(path.join(root, 'scripts/content/content-sync-linked.mjs'), 'utf8');
   const previewIndex = source.indexOf("mode: 'preview'");
   const replacementIndex = source.lastIndexOf('await applyWithExclusiveLock()');
   assert.ok(previewIndex >= 0, 'pull must emit a preview');
@@ -236,7 +236,7 @@ test('linked pull previews a staged transaction before canonical replacement', a
 
 test('PDF renderer discovers presentations from manifests instead of the initial slug matrix', async () => {
   const source = await readFile(
-    path.join(root, 'scripts/course-content/render-and-verify-pdfs.mjs'),
+    path.join(root, 'scripts/content/snapshot/render-and-verify-pdfs.mjs'),
     'utf8',
   );
   assert.match(source, /catalog[.]courses/u);
@@ -252,7 +252,7 @@ test('seed generator supports isolated staged roots and output', async () => {
     execFileSync(
       process.execPath,
       [
-        path.join(root, 'scripts/generate-content-seed.mjs'),
+        path.join(root, 'scripts/content/generate-content-seed.mjs'),
         '--articles-root',
         path.join(root, 'content', 'articles'),
         '--courses-root',

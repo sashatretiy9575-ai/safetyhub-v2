@@ -7,7 +7,7 @@ const read = (file) => readFile(new URL(`../../${file}`, import.meta.url), 'utf8
 test('the release run leaves the opt-in responsive sweep out instead of reporting it as skipped', async () => {
   const [config, runner, sweep] = await Promise.all([
     read('playwright.config.ts'),
-    read('scripts/run-e2e-release.mjs'),
+    read('scripts/release/run-e2e-release.mjs'),
     read('e2e/responsive-sweep.spec.ts'),
   ]);
   assert.ok(
@@ -21,7 +21,7 @@ test('the release run leaves the opt-in responsive sweep out instead of reportin
 });
 
 test('the capacity profile grants its learners the courses before reading presentations', async () => {
-  const harness = await read('scripts/load-test-supabase.mjs');
+  const harness = await read('scripts/release/load-test-supabase.mjs');
   const grant = harness.indexOf("'course_access_grants'");
   assert.ok(grant > 0);
   assert.ok(grant < harness.indexOf("'get_approved_course_presentation_locale'"));
