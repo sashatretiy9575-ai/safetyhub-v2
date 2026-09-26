@@ -38,14 +38,12 @@ const privateNoStoreHeaders = [
   { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
 ];
 
-// Features this product never uses. The FLoC token that used to head this list
-// was withdrawn with the API itself and is no longer parsed by any engine,
-// while the browsing and attribution APIs that replaced it were left at their
-// permissive defaults.
+// Features this product never uses. Only names browsers still parse belong
+// here: FLoC's token, the ambient light sensor and Attribution Reporting are
+// not recognised any more, and each unknown name printed a console error on
+// every page view.
 const DENIED_BROWSER_FEATURES = [
   'accelerometer',
-  'ambient-light-sensor',
-  'attribution-reporting',
   'autoplay',
   'bluetooth',
   'browsing-topics',
@@ -169,6 +167,14 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // The old registration address. Its page redirects too, but the private
+      // group streams, so from there the answer was a 200 with a meta refresh.
+      { source: '/auth/register', destination: '/auth/login', permanent: true },
+      {
+        source: localizedPrivateSource('/auth/register'),
+        destination: '/:locale/auth/login',
+        permanent: true,
+      },
       ...legacyTopicRedirects.map((redirect) => ({ ...redirect, permanent: true })),
       ...LOCALE_PREFIXES.flatMap((locale) =>
         legacyTopicRedirects.map((redirect) => ({

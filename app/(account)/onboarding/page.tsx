@@ -12,6 +12,12 @@ import { Container } from '@/components/ui/container';
 import { localizePathname, type AppLocale } from '@/i18n/config';
 import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 
+export async function generateMetadata() {
+  const locale = (await getPrivateRequestLocale()) as AppLocale;
+  const t = await getTranslations({ locale, namespace: 'Profile' });
+  return { title: t('onboardingTitle') };
+}
+
 export default async function OnboardingPage() {
   const locale = (await getPrivateRequestLocale()) as AppLocale;
   const t = await getTranslations({ locale, namespace: 'Profile' });

@@ -3,6 +3,8 @@ export const dynamic = 'force-dynamic';
 import { LegalLocalizationsEditor } from '@/components/admin/legal-localizations-editor';
 import { listLegalLocalizationVersions } from '@/server/admin/localizations';
 
+export const metadata = { title: 'Юридические документы' };
+
 export default async function AdminLegalLocalizationsPage() {
   const versions = await listLegalLocalizationVersions();
   return (

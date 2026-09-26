@@ -12,6 +12,7 @@ import {
 } from '@/components/article-renderer';
 import { ArticleCard } from '@/components/marketing/article-card';
 import { JsonLd } from '@/components/shared/json-ld';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 import { Container } from '@/components/ui/container';
 import {
   getArticleBySlug,
@@ -24,7 +25,8 @@ import {
 import { articleJsonLd, breadcrumbsJsonLd, buildMetadata } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/utils';
 import { getSiteContacts } from '@/server/site-contacts';
-import { htmlLanguage, localizePathname, type AppLocale } from '@/i18n/config';
+import { BUSINESS_TIME_ZONE, localizePathname, type AppLocale } from '@/i18n/config';
+import { intlLocale } from '@/i18n/intl-locale';
 
 export async function generateStaticParams() {
   return (await getArticleSlugs()).map((slug) => ({ slug }));
@@ -34,11 +36,13 @@ function formatDate(value: string | undefined, locale: AppLocale) {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(htmlLanguage(locale), {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-    timeZone: 'UTC',
+    // The editorial calendar is Kazakhstan's: in UTC an article saved after
+    // midnight in Almaty showed the day before.
+    timeZone: BUSINESS_TIME_ZONE,
   }).format(date);
 }
 
@@ -49,7 +53,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const locale = await getLocale();
-  const article = await getArticleBySlug(slug, locale);
+  const [article, availableLocales] = await Promise.all([
+    getArticleBySlug(slug, locale),
+    getArticleLocales(slug),
+  ]);
   if (!article)
     // Without this the layout's canonical is inherited and a missing article
     // declares itself to be the home page.
@@ -68,7 +75,7 @@ export async function generateMetadata({
     locale,
     // Only the locales this document was actually published in. Announcing all
     // four pointed hreflang at URLs that do not exist.
-    availableLocales: await getArticleLocales(slug),
+    availableLocales,
   });
 }
 
@@ -126,6 +133,7 @@ function ArticleSources({
                   className="font-semibold text-[var(--color-primary-hover)] underline underline-offset-4"
                 >
                   {source.title}
+                  <NewTabHint />
                 </a>
               </li>
             ))}

@@ -9,9 +9,14 @@ import { getPrivateRequestLocale } from '@/i18n/private-request-locale';
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const locale = await getPrivateRequestLocale();
-  const t = await getTranslations({ locale, namespace: 'Quiz' });
+  const [t, topic] = await Promise.all([
+    getTranslations({ locale, namespace: 'Quiz' }),
+    getTopicBySlug(slug, locale),
+  ]);
   return buildMetadata({
-    title: t('metadataTitle'),
+    // Every test tab used to carry the same title; with several courses open
+    // the tabs could not be told apart.
+    title: topic ? `${t('metadataTitle')}: ${topic.title}` : t('metadataTitle'),
     description: t('metadataDescription'),
     // Without a path this canonicalised to «/» and inherited the home page's
     // hreflang cluster, on a screen that is noindex to begin with.

@@ -4,19 +4,13 @@ import { isPreviewDeployment } from '@/lib/site-url';
 import { LOCALE_PREFIXES } from '@/i18n/config';
 
 /**
- * The private screens, listed once.
- *
- * The prefixed and unprefixed lists were written out separately and had already
- * drifted: `/onboarding` was disallowed under `/kk`, `/en` and `/zh` and left
- * open on the route that actually exists today.
+ * Only what crawlers must not even request. The sign-in, profile, onboarding
+ * and test screens are left crawlable on purpose: they answer with noindex, and
+ * a robots.txt block hid that answer — every public page links to the sign-in
+ * screen, so it could be listed as a bare URL that Google was never allowed to
+ * open and see was not meant to be indexed.
  */
-const PRIVATE_PATHS = [
-  '/profile',
-  '/onboarding',
-  '/auth/*',
-  '/callback',
-  '/topics/*/test',
-] as const;
+const PRIVATE_PATHS = ['/callback'] as const;
 
 export default function robots(): MetadataRoute.Robots {
   if (isPreviewDeployment()) {

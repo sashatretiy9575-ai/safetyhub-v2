@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { CaretDown } from '@phosphor-icons/react';
+import { useEffect, useRef, useState } from 'react';
+import { CaretDown } from '@phosphor-icons/react/dist/csr/CaretDown';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -12,12 +12,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LocaleFlag } from '@/components/layout/locale-flag';
+import { LANGUAGE_TRIGGER_CLASS } from '@/components/layout/language-switcher-trigger';
 import { clearSafetyHubDeviceData } from '@/lib/pwa/device-data';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import {
   LOCALE_COOKIE_MAX_AGE,
   LOCALE_COOKIE_NAME,
   LOCALE_SHORT_LABEL_BY_LOCALE,
+  htmlLanguage,
   isAppLocale,
   localizePathname,
   type AppLocale,
@@ -67,13 +69,30 @@ function isTransitionResult(value: unknown): value is LocaleTransitionResult {
  * of a client Supabase read. Guests only navigate. Authenticated transitions
  * are resolved by the server, which owns the realm boundary and cookie cleanup.
  */
-export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] }) {
+export function LanguageSwitcher({
+  locales,
+  defaultOpen = false,
+  autoFocusTrigger = false,
+}: {
+  locales: readonly AppLocale[];
+  /** Open at once: the visitor clicked the placeholder before this chunk loaded. */
+  defaultOpen?: boolean;
+  /** Keep keyboard focus: the placeholder had it when it was swapped out. */
+  autoFocusTrigger?: boolean;
+}) {
   const locale = useLocale() as AppLocale;
   const router = useRouter();
   const pathname = usePathname();
   const translations = useTranslations('Shell.language');
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState('');
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (autoFocusTrigger) triggerRef.current?.focus();
+    // Only on the swap from the placeholder.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const quizLocked = ACTIVE_QUIZ_ROUTE.test(pathname);
 
   /**
@@ -147,14 +166,15 @@ export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] })
 
   return (
     <div className="relative shrink-0">
-      <DropdownMenu>
+      <DropdownMenu defaultOpen={defaultOpen}>
         <DropdownMenuTrigger asChild>
           <button
+            ref={triggerRef}
             type="button"
             aria-label={`${translations('label')}: ${translations(locale)}`}
             aria-describedby={status ? 'language-switcher-status' : undefined}
             disabled={pending}
-            className="inline-flex h-11 items-center gap-1 rounded-[var(--radius-control)] px-1.5 text-sm font-semibold text-[var(--color-text)] transition-colors hover:bg-[var(--color-surface-muted)] focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] disabled:cursor-wait disabled:opacity-60"
+            className={LANGUAGE_TRIGGER_CLASS}
           >
             <LocaleFlag locale={locale} />
             {/* The flag plus the short code is the whole visible control; the
@@ -184,7 +204,10 @@ export function LanguageSwitcher({ locales }: { locales: readonly AppLocale[] })
                 disabled={pending || quizLocked}
                 // The owner wants one label per language: the flag and the short
                 // code, as in the trigger. The full name stays the accessible name.
-                aria-label={translations(candidate)}
+                // Spoken in its own language, and the name contains the visible
+                // code so voice control can reach it by what it shows.
+                lang={htmlLanguage(candidate)}
+                aria-label={`${translations(candidate)} (${LOCALE_SHORT_LABEL_BY_LOCALE[candidate]})`}
                 className="min-h-11 gap-2.5 py-2.5 pr-4 text-[var(--color-text)] data-[state=checked]:bg-[var(--color-primary-soft)] data-[state=checked]:font-semibold"
               >
                 <LocaleFlag locale={candidate} />

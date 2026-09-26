@@ -7,6 +7,8 @@ import { AdminLoadFailure } from '@/components/admin/admin-data-state';
 import { Button } from '@/components/ui/button';
 import { getOrganizationCleanupClusters } from '@/server/admin/organizations';
 
+export const metadata = { title: 'Очистка компаний' };
+
 export default async function OrganizationCleanupPage() {
   const result = await getOrganizationCleanupClusters();
   return (
@@ -14,7 +16,7 @@ export default async function OrganizationCleanupPage() {
       <div>
         <Button asChild size="sm" variant="ghost" className="mb-2">
           <Link href="/admin/employees">
-            <ArrowLeft /> Сотрудники
+            <ArrowLeft aria-hidden="true" /> Сотрудники
           </Link>
         </Button>
         <h1 className="font-display text-h3 font-bold">Очистка компаний</h1>

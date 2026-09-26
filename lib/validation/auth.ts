@@ -1,10 +1,11 @@
 import * as z from 'zod/mini';
+import { EMAIL_MAX_LENGTH, EMAIL_PATTERN, OTP_CODE_PATTERN } from './email-shape.ts';
 
-// zod/mini on purpose: this schema runs in the browser on the login page, and
-// the classic API ships every locale plus the JSON-Schema compiler with it.
+// Server-side request schemas. The sign-in page checks the same shapes with
+// lib/validation/email-shape.ts and no zod at all; both use one pattern.
 const normalizedEmailSchema = z
   .string()
-  .check(z.trim(), z.toLowerCase(), z.regex(z.regexes.email), z.maxLength(254));
+  .check(z.trim(), z.toLowerCase(), z.regex(EMAIL_PATTERN), z.maxLength(EMAIL_MAX_LENGTH));
 const captchaTokenSchema = z.optional(z.string().check(z.minLength(1), z.maxLength(4096)));
 const emailOtpLocaleSchema = z.optional(z.enum(['ru', 'kk', 'en']));
 
@@ -32,7 +33,7 @@ export type EmailOtpStartValues = z.infer<typeof emailOtpStartSchema>;
 // inferred from an old UI mode.
 export const emailOtpVerifySchema = z.object({
   email: normalizedEmailSchema,
-  code: z.string().check(z.regex(/^\d{6}$/)),
+  code: z.string().check(z.regex(OTP_CODE_PATTERN)),
   locale: emailOtpLocaleSchema,
   legalAccepted: z.literal(true),
 });

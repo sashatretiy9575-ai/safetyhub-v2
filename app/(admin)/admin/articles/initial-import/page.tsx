@@ -7,6 +7,8 @@ import {
   INITIAL_ARTICLE_SNAPSHOT_HASH,
 } from '@/server/content/initial-article-import';
 
+export const metadata = { title: 'Первичная публикация материалов' };
+
 export default async function InitialArticleImportPage() {
   await requireCapability('content.manage');
   return (

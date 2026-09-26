@@ -6,7 +6,7 @@ const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8
 
 test('small and icon actions keep a 44px target and destructive editor actions confirm', async () => {
   const [button, userMenu, signOutAction, editor, contentEditor] = await Promise.all([
-    read('components/ui/button.tsx'),
+    read('components/ui/button-classes.ts'),
     read('components/shared/user-menu.tsx'),
     read('components/shared/sign-out-action.tsx'),
     read('components/admin/admin-editor.tsx'),

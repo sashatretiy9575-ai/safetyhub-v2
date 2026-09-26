@@ -40,13 +40,14 @@ test('homepage topics and resources use the shared published content APIs', asyn
   assert.match(resources, /coverImage=\{post\.coverImage\}/);
 });
 
-test('homepage streams its useful choices first and removes duplicate promise sections', async () => {
+test('homepage renders its useful choices first, in document order, without duplicate promise sections', async () => {
   const page = await read('app/(public)/page.tsx');
 
   const coursePosition = page.indexOf('<CourseGrid />');
   const trustPosition = page.indexOf('<PartnersStrip />');
   assert.ok(coursePosition > 0 && coursePosition < trustPosition);
-  assert.match(page, /Suspense fallback=\{<HomeSectionFallback label=\{t\('loadingCourses'\)\}/);
+  // Prerendered page: no Suspense boundary to push sections after the footer.
+  assert.doesNotMatch(page, /<Suspense/);
   assert.doesNotMatch(page, /<ResultsNumbers \/>/);
   assert.doesNotMatch(page, /<BenefitGrid \/>/);
 });

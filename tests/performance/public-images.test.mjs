@@ -32,7 +32,12 @@ test('hero uses optimized mobile and desktop art direction', async () => {
   assert.match(source, /hero-safetyhub-mobile-v2\.webp/);
   assert.match(source, /<picture>/);
   assert.match(source, /media="\(min-width: 1024px\)"/);
-  assert.match(source, /priority: true/);
+  // No deprecated `priority` and no react-dom preload() hint: a hint from a
+  // Server Component rides in every Home-link prefetch, so other pages
+  // downloaded the hero. The preload links belong to this page's tree.
+  assert.match(source, /loading: 'eager',\s*fetchPriority: 'high'/);
+  assert.doesNotMatch(source, /priority: true|from 'react-dom'/);
+  assert.match(source, /<link\s+rel="preload"\s+as="image"/);
   assert.match(source, /fetchPriority="high"/);
   assert.doesNotMatch(source, /setInterval|mountedSlides|useState/);
   assert.doesNotMatch(resources, /priority=/);

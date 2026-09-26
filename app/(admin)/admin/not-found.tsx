@@ -11,7 +11,7 @@ export default function AdminNotFound() {
     <div className="grid min-h-[60vh] place-items-center px-6 py-16 text-center">
       <div className="space-y-4">
         <div className="grid place-items-center text-[var(--color-text-muted)]">
-          <MagnifyingGlass className="size-10" />
+          <MagnifyingGlass aria-hidden="true" className="size-10" />
         </div>
         <h1 className="font-display text-h3 font-semibold">Раздел не найден</h1>
         <p className="max-w-md text-sm text-[var(--color-text-muted)]">

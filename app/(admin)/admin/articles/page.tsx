@@ -71,6 +71,8 @@ async function readDraftVersions(admin: AdminClient, articleIds: string[]) {
   return versions;
 }
 
+export const metadata = { title: 'Материалы' };
+
 export default async function AdminArticlesPage({
   searchParams,
 }: {
@@ -100,7 +102,7 @@ export default async function AdminArticlesPage({
         action={
           <Button asChild size="sm">
             <Link href={`${BASE_PATH}/new`}>
-              <Plus /> Новая статья
+              <Plus aria-hidden="true" /> Новая статья
             </Link>
           </Button>
         }

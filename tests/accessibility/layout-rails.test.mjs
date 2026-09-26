@@ -6,7 +6,7 @@ const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8
 
 test('header, page headers, catalogs, and marketing share the 1280px rail', async () => {
   const [container, header, pageHeader, blog, topics, sectionShell] = await Promise.all([
-    read('components/ui/container.tsx'),
+    read('components/ui/container-classes.ts'),
     read('components/layout/header.tsx'),
     read('components/ui/page-header.tsx'),
     read('app/(public)/blog/page.tsx'),

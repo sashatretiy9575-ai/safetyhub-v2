@@ -1,0 +1,37 @@
+/**
+ * Button class strings, kept apart from the `Button` component so screens that
+ * must stay tiny — the error and 404 boundaries, which load on every route —
+ * can draw the same buttons without pulling in cva, Radix Slot and
+ * tailwind-merge.
+ */
+export const BUTTON_BASE =
+  'inline-flex items-center justify-center gap-2 text-center break-words font-semibold transition-[color,background-color,border-color,box-shadow,transform] duration-150 focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[var(--color-focus)] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0';
+
+export const BUTTON_VARIANTS = {
+  primary:
+    'bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-[var(--shadow-soft)] hover:bg-[var(--color-primary-hover)] active:translate-y-px',
+  secondary:
+    'border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-text)] shadow-[var(--shadow-soft)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-muted)]',
+  outline:
+    'border border-[var(--color-border-strong)] bg-transparent text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
+  ghost: 'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
+  danger: 'bg-[var(--color-danger)] text-[var(--color-danger-foreground)] hover:brightness-90',
+  // The way into a destructive dialog: red, but quiet until it is pointed at.
+  dangerGhost: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
+} as const;
+
+export const BUTTON_SIZES = {
+  sm: 'h-11 min-h-11 rounded-[var(--radius-control)] px-4 text-sm',
+  md: 'h-11 min-h-11 rounded-[var(--radius-control)] px-6 text-sm',
+  lg: 'h-12 min-h-12 rounded-[var(--radius-control)] px-7 text-base',
+  xl: 'h-14 min-h-14 rounded-[var(--radius-control)] px-9 text-base',
+  icon: 'size-11 rounded-[var(--radius-control)] shrink-0 [&_svg]:size-5',
+} as const;
+
+/** The class list `buttonVariants({ variant, size })` produces, without cva. */
+export function buttonClassName(
+  variant: keyof typeof BUTTON_VARIANTS = 'primary',
+  size: keyof typeof BUTTON_SIZES = 'md',
+) {
+  return `${BUTTON_BASE} ${BUTTON_VARIANTS[variant]} ${BUTTON_SIZES[size]}`;
+}

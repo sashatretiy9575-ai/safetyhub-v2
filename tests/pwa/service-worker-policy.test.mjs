@@ -23,7 +23,7 @@ test('navigation preload and a bounded network race provide a deterministic offl
   const worker = await read('public/sw.js');
 
   assert.match(worker, /navigationPreload\?\.enable\(\)/);
-  assert.match(worker, /NAVIGATION_TIMEOUT_MS = 6000/);
+  assert.match(worker, /NAVIGATION_TIMEOUT_MS = 12000/);
   assert.match(worker, /Promise\.race\(\[network, timeout\]\)/);
   assert.match(worker, /event\.preloadResponse/);
   assert.match(worker, /caches\.match\(OFFLINE_URL\)/);
@@ -42,21 +42,17 @@ test('authenticated navigations and generated downloads bypass the service worke
   assert.ok(privateBypass >= 0 && privateBypass < navigationHandler);
   assert.match(worker, /\(\?:api\|auth\|admin\|profile\|account\|onboarding\|callback\)/u);
   assert.match(worker, /topics\\\/\[\^\/\]\+\\\/test/u);
-  assert.match(worker, /CACHE_PREFIX\}v9/u);
+  assert.match(worker, /CACHE_PREFIX\}v10/u);
   assert.match(worker, /PRIVATE_DOWNLOAD_PATH = \/\^\\\/course-presentations/u);
 });
 
 test('retired legacy auth links still bypass the service worker without exchanging state', async () => {
-  const [worker, register, recovery, callback, authCallback] = await Promise.all([
+  const [worker, callback, authCallback] = await Promise.all([
     read('public/sw.js'),
-    read('app/api/auth/register/route.ts'),
-    read('app/api/auth/password/recovery/route.ts'),
     read('app/(account)/callback/route.ts'),
     read('app/(account)/auth/callback/route.ts'),
   ]);
 
-  assert.match(register, /passwordAuthRetiredResponse\(\)/u);
-  assert.match(recovery, /passwordAuthRetiredResponse\(\)/u);
   assert.match(callback, /redirectFromRetiredPasswordLink\(\)/u);
   assert.doesNotMatch(callback, /exchangeCodeForSession|verifyOtp|setSession/u);
   assert.match(authCallback, /export \{ GET \} from '\.\.\/\.\.\/callback\/route'/u);

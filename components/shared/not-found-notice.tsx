@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Container } from '@/components/ui/container';
-import { Button } from '@/components/ui/button';
+import { buttonClassName } from '@/components/ui/button-classes';
+import { EMERGENCY_CONTAINER } from '@/components/ui/container-classes';
 import { htmlLanguage, localizePathname, type AppLocale } from '@/i18n/config';
 import { emergencyLocale } from '@/i18n/emergency-locale';
 import ruMessages from '@/messages/global-error/ru.json';
@@ -23,11 +23,10 @@ const MESSAGE_CATALOGS = {
  * It sits outside every locale layout, so there is no request locale and no
  * provider — the same situation `global-error` is in, and it uses the same
  * four-key emergency catalogs rather than pulling a 50 KB dictionary into a
- * client chunk. The copy used to be English on every locale.
- *
- * The document element belongs to the wrapper Next generates for the root
- * `not-found`, so the language is set on it rather than rendered; without that
- * the page announced itself as having no language at all.
+ * client chunk. This chunk loads with every route, so it draws its button from
+ * plain class strings instead of the `Button`/`Container` components: through
+ * them it carried its own copies of cva, Radix Slot, tailwind-merge and
+ * next/link into every page.
  */
 export function NotFoundNotice() {
   const [locale, setLocale] = useState<AppLocale>('ru');
@@ -40,17 +39,17 @@ export function NotFoundNotice() {
   }, []);
 
   return (
-    <Container size="narrow" className="grid min-h-[60vh] place-items-center py-16 text-center">
+    <div className={`${EMERGENCY_CONTAINER} grid min-h-[60vh] place-items-center py-16 text-center`}>
       <div className="space-y-4">
         <p className="font-mono text-sm tracking-widest text-[var(--color-text-muted)] uppercase">
           404
         </p>
         <h1 className="font-display text-h2 font-semibold">{messages.AppState.notFoundTitle}</h1>
         <p className="text-[var(--color-text-muted)]">{messages.AppState.notFoundDescription}</p>
-        <Button asChild>
-          <a href={localizePathname('/', locale)}>{messages.Common.home}</a>
-        </Button>
+        <a href={localizePathname('/', locale)} className={buttonClassName()}>
+          {messages.Common.home}
+        </a>
       </div>
-    </Container>
+    </div>
   );
 }

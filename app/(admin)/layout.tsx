@@ -16,8 +16,8 @@ export const viewport: Viewport = APP_VIEWPORT;
 
 export const metadata: Metadata = {
   metadataBase: new URL(resolveSiteOrigin()),
-  // The (admin) group is its own root layout and none of its twenty-two pages
-  // exports metadata, so without this the browser tab had no name at all.
+  // The (admin) group is its own root layout. Each page names itself and the
+  // template adds the section, so several open admin tabs can be told apart.
   title: { default: 'Админка SafetyHub', template: '%s — Админка SafetyHub' },
   robots: { index: false, follow: false },
   ...pwaIdentity(),

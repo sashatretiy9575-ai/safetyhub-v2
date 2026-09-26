@@ -8,6 +8,8 @@ import { articleBlocksSchema, type ArticleLifecycleStatus } from '@/lib/validati
 import { contentSeoSchema, defaultContentSeo } from '@/lib/validation/content-seo';
 import { getArticleEditorLocalizations } from '@/server/admin/localizations';
 
+export const metadata = { title: 'Редактирование статьи' };
+
 export default async function EditArticlePage({
   params,
   searchParams,

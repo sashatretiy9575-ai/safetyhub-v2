@@ -5,7 +5,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { AppShell } from '@/components/layout/app-shell';
 import { RootDocument } from '@/components/layout/root-document';
 import { PWAProvider } from '@/components/shared/pwa-provider';
-import { UserMenu } from '@/components/shared/user-menu';
+import { LazyUserMenu } from '@/components/shared/lazy-user-menu';
 import { CspNonceProvider } from '@/components/auth/csp-nonce';
 import { getAuthContext } from '@/server/auth/session';
 import { pickClientNamespaces } from '@/i18n/client-namespaces';
@@ -26,7 +26,8 @@ export const viewport: Viewport = APP_VIEWPORT;
 
 export const metadata: Metadata = {
   metadataBase: new URL(resolveSiteOrigin()),
-  title: 'SafetyHub',
+  // Each private page names itself; the brand follows, as on the public site.
+  title: { default: 'SafetyHub.kz', template: '%s — SafetyHub.kz' },
   robots: { index: false, follow: false },
   ...pwaIdentity(),
 };
@@ -61,7 +62,7 @@ export default async function AccountLayout({ children }: { children: ReactNode 
             locale={locale}
             accountMenu={
               auth ? (
-                <UserMenu
+                <LazyUserMenu
                   email={auth.user.email ?? ''}
                   fullName={fullName}
                   isAdmin={auth.role === 'admin'}

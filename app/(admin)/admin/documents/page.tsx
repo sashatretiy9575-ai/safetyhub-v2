@@ -42,6 +42,8 @@ function courseSummary(course: CourseDocumentSetup) {
     .join(' · ');
 }
 
+export const metadata = { title: 'Документы' };
+
 export default async function AdminDocumentsPage() {
   await requireCapability('site.settings.manage');
   const [settings, courses] = await Promise.all([readCertificateSettings(), readDocumentCourses()]);
@@ -67,6 +69,7 @@ export default async function AdminDocumentsPage() {
           <span className="flex min-w-0 items-center justify-between gap-2">
             <span className="text-sm font-semibold">Общее</span>
             <CaretRight
+              aria-hidden="true"
               size={16}
               className="shrink-0 text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
             />

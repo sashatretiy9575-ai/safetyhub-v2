@@ -84,7 +84,7 @@ test('locale-aware PWA resources are precached and Chinese font loading is route
   assert.match(worker, /OFFLINE_URLS/u);
   assert.match(worker, /offlineUrlForPathname/u);
   assert.match(worker, /Object\.keys\(OFFLINE_URLS\).*`\/manifest\/\$\{locale\}`/su);
-  assert.match(worker, /CACHE_PREFIX\}v9/u);
+  assert.match(worker, /CACHE_PREFIX\}v10/u);
   // The Chinese face comes from the stylesheet, not a preload: at 335 KB a
   // preload held back the hero image of every zh page.
   assert.match(rootDocument, /locale !== 'zh'/u);

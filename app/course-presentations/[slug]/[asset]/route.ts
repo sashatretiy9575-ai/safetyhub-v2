@@ -267,11 +267,19 @@ async function serveAsset(
   let releaseBeforeReturn: (() => Promise<void>) | null = null;
   try {
     const admin = createAdminClient();
-    const { data: record, error: recordError } = await admin
-      .from('course_presentations')
-      .select('storage_bucket,storage_path,thumbnail_path,status')
-      .eq('id', authorized.presentation.presentation_id)
-      .maybeSingle();
+    const ipHash = requestSecurityMetadata(request).ipHash;
+    // The storage record and both download meters are independent round trips
+    // to the database; made one after another they held back the first byte of
+    // every download. A refused meter still wins: its error is thrown below.
+    const [{ data: record, error: recordError }] = await Promise.all([
+      admin
+        .from('course_presentations')
+        .select('storage_bucket,storage_path,thumbnail_path,status')
+        .eq('id', authorized.presentation.presentation_id)
+        .maybeSingle(),
+      consumeCoarseQuota('presentation.download', ipHash),
+      consumeBusinessQuota('presentation.download', authorized.actorId),
+    ]);
     if (
       recordError ||
       !record ||
@@ -283,12 +291,6 @@ async function serveAsset(
     const objectPath =
       authorized.asset === 'presentation' ? record.storage_path : record.thumbnail_path;
     if (!isSafeStoragePath(objectPath)) return blockedResponse(503);
-
-    const ipHash = requestSecurityMetadata(request).ipHash;
-    await Promise.all([
-      consumeCoarseQuota('presentation.download', ipHash),
-      consumeBusinessQuota('presentation.download', authorized.actorId),
-    ]);
 
     const serviceRpc = admin as unknown as ServiceRpcClient;
     const leaseId = await claimPresentationLease(serviceRpc, authorized.actorId);

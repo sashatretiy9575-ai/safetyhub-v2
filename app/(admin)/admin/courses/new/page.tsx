@@ -1,6 +1,8 @@
 import { requireCapability } from '@/server/auth/session';
 import { TestEditor } from '@/components/admin/test-editor';
 
+export const metadata = { title: 'Новый курс' };
+
 export default async function NewCoursePage() {
   await requireCapability('test.manage');
   return (

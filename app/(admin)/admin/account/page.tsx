@@ -10,6 +10,8 @@ import { SignOutAction } from '@/components/shared/sign-out-action';
 import { Card, CardContent } from '@/components/ui/card';
 import { phoneCountryOptions, phoneInputValueFromE164 } from '@/lib/phone/countries';
 
+export const metadata = { title: 'Мой аккаунт' };
+
 export default async function AdminAccountPage() {
   const actor = await requireRole(['admin']);
   const avatarUrl = actor.profile.avatar_updated_at

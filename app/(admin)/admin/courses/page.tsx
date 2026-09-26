@@ -18,6 +18,8 @@ import { readListFilters } from '@/lib/admin/list-return';
 const BASE_PATH = '/admin/courses';
 const STATUS_LABELS = { draft: 'Черновик', published: 'Опубликован' } as const;
 
+export const metadata = { title: 'Курсы' };
+
 export default async function AdminCoursesPage({
   searchParams,
 }: {
@@ -40,7 +42,7 @@ export default async function AdminCoursesPage({
         action={
           <Button asChild size="sm">
             <Link href={`${BASE_PATH}/new`}>
-              <Plus /> Новый курс
+              <Plus aria-hidden="true" /> Новый курс
             </Link>
           </Button>
         }

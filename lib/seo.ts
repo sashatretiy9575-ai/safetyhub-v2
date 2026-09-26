@@ -135,7 +135,9 @@ export function buildMetadata({
   const keywordList = [...(locale === 'ru' ? BASE_KEYWORDS : []), ...keywords];
   return {
     metadataBase: new URL(absoluteUrl('/')),
-    title: fullTitle,
+    // Absolute: the title is already branded, and the private roots carry a
+    // template that would otherwise brand it twice.
+    title: { absolute: fullTitle },
     description,
     // An empty string is worse than no tag: it was emitted on every kk, en and
     // zh page, which have no Russian base list to fall back on.

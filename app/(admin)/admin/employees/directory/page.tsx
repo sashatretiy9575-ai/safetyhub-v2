@@ -40,6 +40,8 @@ function directoryHref(
   return value ? `/admin/employees/directory?${value}` : '/admin/employees/directory';
 }
 
+export const metadata = { title: 'Все аккаунты сотрудников' };
+
 export default async function EmployeeDirectoryPage({
   searchParams,
 }: {
@@ -98,7 +100,7 @@ export default async function EmployeeDirectoryPage({
             {result.data.items.map((user) => (
               <li
                 key={user.id}
-                className="flex flex-col gap-3 rounded-xl border bg-[var(--color-surface)] p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex min-w-0 flex-col gap-3 rounded-xl border bg-[var(--color-surface)] p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
                   <p className="truncate font-bold">{user.label}</p>

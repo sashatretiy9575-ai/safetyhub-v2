@@ -11,6 +11,8 @@ import {
 import { requireCapability } from '@/server/auth/session';
 import { readSiteContactsUncached } from '@/server/site-contacts';
 
+export const metadata = { title: 'Настройки' };
+
 export default async function AdminSettingsPage() {
   await requireCapability('site.settings.manage');
   const settings = await readSiteContactsUncached();
@@ -31,11 +33,12 @@ export default async function AdminSettingsPage() {
         >
           <div className="flex items-center gap-3">
             <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-              <Buildings size={18} />
+              <Buildings aria-hidden="true" size={18} />
             </span>
             <span className="text-sm font-semibold">Компании</span>
           </div>
           <CaretRight
+            aria-hidden="true"
             size={16}
             className="text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
           />
@@ -46,11 +49,12 @@ export default async function AdminSettingsPage() {
         >
           <div className="flex items-center gap-3">
             <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-              <UsersThree size={18} />
+              <UsersThree aria-hidden="true" size={18} />
             </span>
             <span className="text-sm font-semibold">Администраторы</span>
           </div>
           <CaretRight
+            aria-hidden="true"
             size={16}
             className="text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
           />
@@ -61,11 +65,12 @@ export default async function AdminSettingsPage() {
         >
           <div className="flex items-center gap-3">
             <span className="grid size-8 place-items-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-              <ClockCounterClockwise size={18} />
+              <ClockCounterClockwise aria-hidden="true" size={18} />
             </span>
             <span className="text-sm font-semibold">История действий</span>
           </div>
           <CaretRight
+            aria-hidden="true"
             size={16}
             className="text-[var(--color-text-subtle)] transition-transform group-hover:translate-x-0.5"
           />

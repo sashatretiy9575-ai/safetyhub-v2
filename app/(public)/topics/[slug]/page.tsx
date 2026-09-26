@@ -28,10 +28,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
 
   const locale = await getLocale();
-  const [topic, t, courseT] = await Promise.all([
+  const [topic, t, courseT, availableLocales] = await Promise.all([
     getTopicBySlug(slug, locale),
     getTranslations('Topics'),
     getTranslations('Course'),
+    getTopicLocales(slug),
   ]);
   if (!topic)
     // Without this the layout's canonical is inherited and a missing course
@@ -61,7 +62,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     locale,
     // Only the locales this document was actually published in. Announcing all
     // four pointed hreflang at URLs that do not exist.
-    availableLocales: await getTopicLocales(slug),
+    availableLocales,
   });
 }
 
@@ -73,7 +74,14 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
     getTranslations('Course'),
   ]);
 
-  const topic = await getTopicBySlug(slug, locale);
+  // The catalogue and the articles feed the related links below; they are
+  // cached reads, so asking for them alongside the course costs nothing when
+  // the course turns out to be missing.
+  const [topic, catalogue, articles] = await Promise.all([
+    getTopicBySlug(slug, locale),
+    getTopics(locale),
+    getArticles(locale),
+  ]);
   if (!topic) {
     const destination = await getTopicRedirectBySlug(slug);
     if (destination) permanentRedirect(localizePathname(`/topics/${destination}`, locale));
@@ -89,7 +97,6 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
   const CourseIcon = courseIcon.component;
   // The next three courses of the catalogue (wrapping round) and the three
   // latest articles, in the page's language.
-  const [catalogue, articles] = await Promise.all([getTopics(locale), getArticles(locale)]);
   const at = catalogue.findIndex((course) => course.slug === topic.slug);
   const relatedCourses = [...catalogue.slice(at + 1), ...catalogue.slice(0, Math.max(at, 0))]
     .filter((course) => course.slug !== topic.slug)

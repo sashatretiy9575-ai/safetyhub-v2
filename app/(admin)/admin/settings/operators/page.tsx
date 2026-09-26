@@ -43,6 +43,8 @@ function operatorsHref(
   return value ? `/admin/settings/operators?${value}` : '/admin/settings/operators';
 }
 
+export const metadata = { title: 'Администраторы' };
+
 export default async function AdminOperatorsPage({
   searchParams,
 }: {
@@ -124,7 +126,7 @@ export default async function AdminOperatorsPage({
             {result.data.items.map((operator) => (
               <li
                 key={operator.id}
-                className="flex flex-col gap-3 rounded-xl border bg-[var(--color-surface)] p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex min-w-0 flex-col gap-3 rounded-xl border bg-[var(--color-surface)] p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
                   <p className="truncate font-bold">

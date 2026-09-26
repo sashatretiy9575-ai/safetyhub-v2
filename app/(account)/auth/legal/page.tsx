@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { Container } from '@/components/ui/container';
 import { LegalAcceptanceGate } from '@/components/auth/legal-acceptance-gate';
 import { AuthenticationError, requireUser } from '@/server/auth/session';
@@ -13,6 +14,12 @@ function authenticatedLanding(context: Awaited<ReturnType<typeof requireUser>>) 
   return context.profile.onboarding_completed_at === null
     ? ('/onboarding' as const)
     : ('/profile' as const);
+}
+
+export async function generateMetadata() {
+  const locale = (await getPrivateRequestLocale()) as AppLocale;
+  const t = await getTranslations({ locale, namespace: 'LegalFlow' });
+  return { title: t('documentsEyebrow') };
 }
 
 export default async function LegalAcceptancePage() {

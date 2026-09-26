@@ -15,6 +15,8 @@ import { getAdminWorkQueue } from '@/server/admin/attestations';
 import { getPendingAccountApprovalPage } from '@/server/admin/data';
 import { requireCapability } from '@/server/auth/session';
 
+export const metadata = { title: 'В работе' };
+
 export default async function AdminWorkPage() {
   const actor = await requireCapability('results.read');
   const canManageIdentity = actor.capabilities.includes('identity.manage');
@@ -85,7 +87,7 @@ export default async function AdminWorkPage() {
               className="group grid min-h-16 min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_auto_auto] items-center gap-3 border-b px-4 py-3 transition-colors last:border-b-0 hover:bg-[var(--color-surface-muted)] sm:[&:nth-child(odd)]:border-r sm:[&:nth-last-child(-n+2)]:border-b-0"
             >
               <span className="grid size-11 place-items-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                <Icon size={22} />
+                <Icon aria-hidden="true" size={22} />
               </span>
               <span className="min-w-0 text-base font-bold break-words">{label}</span>
               <strong className="text-2xl font-black tabular-nums">{count}</strong>
@@ -106,12 +108,12 @@ export default async function AdminWorkPage() {
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm">
             <Link href="/admin/courses/new">
-              <Plus /> Новый курс
+              <Plus aria-hidden="true" /> Новый курс
             </Link>
           </Button>
           <Button asChild size="sm" variant="outline">
             <Link href="/admin/articles/new">
-              <Plus /> Новый материал
+              <Plus aria-hidden="true" /> Новый материал
             </Link>
           </Button>
         </div>

@@ -115,7 +115,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               href="/"
               className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]"
             >
-              <House size={19} />
+              <House size={19} aria-hidden="true" />
               На сайт
             </Link>
           </div>
@@ -136,7 +136,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 aria-label="На сайт"
                 className="grid size-11 place-items-center rounded-full text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]"
               >
-                <House size={20} />
+                <House size={20} aria-hidden="true" />
               </Link>
               <UserMenu
                 email={actor.user.email ?? ''}

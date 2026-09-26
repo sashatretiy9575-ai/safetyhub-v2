@@ -120,7 +120,9 @@ function NextStep({
       </Card>
     );
   }
-  const failed = current.find((item) => item.resultState === 'failed');
+  // A course that is not open to the learner is never offered as the next
+  // step: its test would only answer «not open to you».
+  const failed = current.find((item) => item.resultState === 'failed' && item.accessible);
   if (failed) {
     return (
       <Card>
@@ -143,7 +145,9 @@ function NextStep({
       </Card>
     );
   }
-  const nextCourse = current.find((item) => item.resultState === 'not_started') ?? current[0];
+  const nextCourse =
+    current.find((item) => item.resultState === 'not_started' && item.accessible) ??
+    current.find((item) => item.accessible);
   return (
     <Card>
       <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
@@ -239,12 +243,21 @@ function CourseRow({
           <CertificateDownloadButton certificateId={item.certificateId!} className="w-full">
             {t('download')}
           </CertificateDownloadButton>
-        ) : (
+        ) : item.accessible ? (
           <Button asChild size="sm" variant="outline" className="w-full">
             <Link href={localizePathname(`/topics/${item.testSlug}`, locale)}>
               {item.resultState === 'not_started' ? t('start') : t('details')}
             </Link>
           </Button>
+        ) : (
+          // Not open to the learner: no action to take here, only the state.
+          <Badge
+            variant="outline"
+            className="w-full justify-center text-[var(--color-text-muted)]"
+            data-course-access="none"
+          >
+            {t('noAccess')}
+          </Badge>
         )}
       </div>
     </div>
@@ -332,6 +345,12 @@ function LearningDashboard({
   );
 }
 
+export async function generateMetadata() {
+  const locale = (await getPrivateRequestLocale()) as AppLocale;
+  const t = await getTranslations({ locale, namespace: 'Profile' });
+  return { title: t('dashboardTitle') };
+}
+
 export default async function ProfilePage() {
   const locale = (await getPrivateRequestLocale()) as AppLocale;
   const t = await getTranslations({ locale, namespace: 'Profile' });
@@ -391,7 +410,7 @@ export default async function ProfilePage() {
           {canAccessLearning ? null : (
             <Button asChild>
               <Link href="#my-data">
-                {t('myData')} <ArrowRight />
+                {t('myData')} <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
           )}
@@ -462,7 +481,7 @@ export default async function ProfilePage() {
                   <Badge variant={approval.variant} className="xs:inline-flex hidden">
                     {approval.label}
                   </Badge>
-                  <CaretDown className="transition-transform group-open:rotate-180" />
+                  <CaretDown aria-hidden="true" className="transition-transform group-open:rotate-180" />
                 </span>
               </summary>
               <div className="grid gap-5 border-t p-4 sm:grid-cols-[auto_minmax(0,1fr)] md:p-6">
@@ -479,7 +498,7 @@ export default async function ProfilePage() {
                       {profile.job || t('jobMissing')}
                     </p>
                     <p className="mt-1 flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
-                      <Buildings />
+                      <Buildings aria-hidden="true" />
                       <span className="break-words">
                         {profile.organization || t('companyMissingCapital')}
                       </span>
@@ -520,7 +539,7 @@ export default async function ProfilePage() {
             <details className="group">
               <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden md:px-6">
                 <h2 className="font-display text-lg font-bold">{t('settings')}</h2>
-                <CaretDown className="transition-transform group-open:rotate-180" />
+                <CaretDown aria-hidden="true" className="transition-transform group-open:rotate-180" />
               </summary>
               <div className="space-y-4 border-t p-4 md:p-6">
                 <PwaManualInstall />

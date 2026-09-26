@@ -22,24 +22,24 @@ const OFFLINE_FALLBACK: Record<
   ru: {
     title: 'Нет подключения',
     description:
-      'Проверьте интернет и повторите попытку. Открытые тесты не сохраняются в офлайн-режиме.',
+      'Проверьте интернет и повторите попытку. Без связи тест нельзя начать или отправить.',
     home: 'На главную',
   },
   kk: {
     title: 'Интернет байланысы жоқ',
     description:
-      'Интернетті тексеріп, әрекетті қайталаңыз. Ашық тесттер офлайн режимінде сақталмайды.',
+      'Интернетті тексеріп, қайталап көріңіз. Байланыссыз тестті бастау не жіберу мүмкін емес.',
     home: 'Басты бетке',
   },
   en: {
     title: 'You’re offline',
     description:
-      'Check your internet connection and try again. Open tests are not saved while offline.',
-    home: 'Go to home',
+      'Check your connection and try again. A test can’t be started or submitted offline.',
+    home: 'Back to home',
   },
   zh: {
     title: '网络连接已断开',
-    description: '请检查网络连接后重试。离线时不会保存正在进行的测试。',
+    description: '请检查网络连接后重试。离线时无法开始或提交测试。',
     home: '返回首页',
   },
 };
@@ -84,18 +84,18 @@ export async function GET(_request: Request, context: { params: Promise<{ locale
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#1f9f4a" />
+    <meta name="theme-color" content="#176b43" />
     <title>${title} — SafetyHub</title>
     <style>
       :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       * { box-sizing: border-box; }
       body { min-height: 100dvh; margin: 0; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); background: #f4faf6; color: #0e0e0e; }
       main { width: min(100%, 420px); border: 1px solid #d4dad7; border-radius: 24px; background: #fff; padding: 28px; text-align: center; box-shadow: 0 16px 48px -16px rgb(15 23 42 / 0.18); }
-      .mark { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 20px; border-radius: 18px; background: #1f9f4a; color: #fff; font-size: 34px; font-weight: 900; }
+      .mark { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 20px; border-radius: 18px; background: #176b43; color: #fff; font-size: 34px; font-weight: 900; }
       h1 { margin: 0; font-size: clamp(24px, 8vw, 34px); line-height: 1.1; }
       p { margin: 12px 0 22px; color: #5f6b66; line-height: 1.55; }
-      a { min-height: 48px; width: 100%; display: grid; place-items: center; border-radius: 999px; background: #1f9f4a; color: #fff; padding: 12px 18px; font: inherit; font-weight: 800; text-decoration: none; }
-      a:focus-visible { outline: 3px solid rgb(31 159 74 / 0.35); outline-offset: 3px; }
+      a { min-height: 48px; width: 100%; display: grid; place-items: center; border-radius: 999px; background: #176b43; color: #fff; padding: 12px 18px; font: inherit; font-weight: 800; text-decoration: none; }
+      a:focus-visible { outline: 3px solid rgb(23 107 67 / 0.4); outline-offset: 3px; }
       @media (prefers-color-scheme: dark) { body { background: #0b0d0c; color: #f5f7f6; } main { border-color: #3a423e; background: #131715; } p { color: #b3bcb6; } }
     </style>
   </head>

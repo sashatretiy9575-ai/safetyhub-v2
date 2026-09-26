@@ -14,8 +14,8 @@ import {
 import { Turnstile, type TurnstileHandle } from '@/components/auth/turnstile';
 import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { safeReturnPath } from '@/lib/security/redirect';
-import { flattenError } from 'zod/mini';
-import { emailOtpStartSchema, emailOtpVerifySchema } from '@/lib/validation/auth';
+import { isOtpCode, normalizeEmail } from '@/lib/validation/email-shape';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -50,9 +50,9 @@ function readStoredAttempt(): StoredAttempt | null {
     const value = JSON.parse(sessionStorage.getItem(ATTEMPT_STORAGE_KEY) ?? 'null') as unknown;
     if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
     const candidate = value as Partial<StoredAttempt>;
-    const parsedEmail = emailOtpStartSchema.safeParse({ email: candidate.email });
+    const email = normalizeEmail(candidate.email);
     if (
-      !parsedEmail.success ||
+      !email ||
       typeof candidate.sentAt !== 'number' ||
       candidate.sentAt > Date.now() ||
       Date.now() - candidate.sentAt > ATTEMPT_TTL_MS
@@ -60,10 +60,7 @@ function readStoredAttempt(): StoredAttempt | null {
       sessionStorage.removeItem(ATTEMPT_STORAGE_KEY);
       return null;
     }
-    return {
-      email: parsedEmail.data.email,
-      sentAt: candidate.sentAt,
-    };
+    return { email, sentAt: candidate.sentAt };
   } catch {
     return null;
   }
@@ -98,9 +95,9 @@ function readStoredSendCooldown(): StoredCooldown | null {
     ) as unknown;
     if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
     const candidate = value as Partial<StoredCooldown>;
-    const parsedEmail = emailOtpStartSchema.safeParse({ email: candidate.email });
+    const email = normalizeEmail(candidate.email);
     if (
-      !parsedEmail.success ||
+      !email ||
       typeof candidate.retryAt !== 'number' ||
       candidate.retryAt <= Date.now() ||
       candidate.retryAt - Date.now() > ATTEMPT_TTL_MS
@@ -108,7 +105,7 @@ function readStoredSendCooldown(): StoredCooldown | null {
       sessionStorage.removeItem(SEND_COOLDOWN_STORAGE_KEY);
       return null;
     }
-    return { email: parsedEmail.data.email, retryAt: candidate.retryAt };
+    return { email, retryAt: candidate.retryAt };
   } catch {
     return null;
   }
@@ -334,14 +331,9 @@ export function EmailOtpFlow() {
       sendRetrySeconds > 0
     )
       return;
-    const parsed = emailOtpStartSchema.safeParse({
-      email,
-    });
-    if (!parsed.success) {
-      const nextErrors: FieldErrors = {};
-      const flattened = flattenError(parsed.error).fieldErrors;
-      if (flattened.email?.length) nextErrors.email = t('emailInvalid');
-      setFieldErrors(nextErrors);
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail) {
+      setFieldErrors({ email: t('emailInvalid') });
       setError('');
       requestAnimationFrame(() => emailRef.current?.focus());
       return;
@@ -349,35 +341,30 @@ export function EmailOtpFlow() {
 
     if (captchaRequired) {
       setBusy('send');
-      pendingCaptchaSubmitRef.current = (token) => void sendCode(parsed.data.email, token);
+      pendingCaptchaSubmitRef.current = (token) => void sendCode(normalizedEmail, token);
       setError('');
       setFieldErrors({});
       turnstileRef.current?.execute();
       return;
     }
-    void sendCode(parsed.data.email);
+    void sendCode(normalizedEmail);
   };
 
   const verifyCode = async (event: React.FormEvent) => {
     event.preventDefault();
     if (busy || inFlightActionRef.current || verifyRetrySeconds > 0) return;
-    const parsed = emailOtpVerifySchema.safeParse({
-      email,
-      code,
-      locale,
-      legalAccepted,
-    });
-    if (!parsed.success) {
-      const nextErrors: FieldErrors = {};
-      const flattened = flattenError(parsed.error).fieldErrors;
-      if (flattened.email?.length) nextErrors.email = t('emailInvalid');
-      if (flattened.code?.length) nextErrors.code = t('codeInvalid');
-      if (flattened.legalAccepted?.length) nextErrors.legal = t('legalRequired');
+    const normalizedEmail = normalizeEmail(email);
+    const nextErrors: FieldErrors = {};
+    if (!normalizedEmail) nextErrors.email = t('emailInvalid');
+    if (!isOtpCode(code)) nextErrors.code = t('codeInvalid');
+    if (legalAccepted !== true) nextErrors.legal = t('legalRequired');
+    if (!normalizedEmail || nextErrors.code || nextErrors.legal) {
       setFieldErrors(nextErrors);
       setError('');
       requestAnimationFrame(() => (nextErrors.email ? emailRef.current : codeRef.current)?.focus());
       return;
     }
+    const body = { email: normalizedEmail, code, locale, legalAccepted: true as const };
 
     inFlightActionRef.current = 'verify';
     setBusy('verify');
@@ -387,7 +374,7 @@ export function EmailOtpFlow() {
       const result = await clientRequest('/api/auth/email-otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(parsed.data),
+        body: JSON.stringify(body),
       });
       const payload = await readClientResponseJson<{
         verified?: unknown;
@@ -591,8 +578,8 @@ export function EmailOtpFlow() {
               onChange={(event) => {
                 const nextEmail = event.target.value;
                 setEmail(nextEmail);
-                const parsed = emailOtpStartSchema.safeParse({ email: nextEmail });
-                if (sentAt > 0 && parsed.success) storeAttempt(parsed.data.email, sentAt);
+                const storedEmail = normalizeEmail(nextEmail);
+                if (sentAt > 0 && storedEmail) storeAttempt(storedEmail, sentAt);
                 setFieldErrors((value) => ({ ...value, email: undefined }));
               }}
               invalid={Boolean(fieldErrors.email)}
@@ -650,6 +637,7 @@ export function EmailOtpFlow() {
                   rel="noreferrer"
                 >
                   {legalT('terms')}
+                  <NewTabHint />
                 </a>{' '}
                 {t('legalAnd')}{' '}
                 <a
@@ -659,6 +647,7 @@ export function EmailOtpFlow() {
                   rel="noreferrer"
                 >
                   {legalT('privacy')}
+                  <NewTabHint />
                 </a>
                 .
               </span>

@@ -143,8 +143,8 @@ test('all responses receive baseline browser hardening headers', async () => {
   assert.match(config, /camera=\(\)/u);
   // FLoC was withdrawn; the token is dead weight, while the APIs that replaced
   // it were left at their permissive defaults.
-  assert.doesNotMatch(config, /interest-cohort/u);
-  for (const feature of ['browsing-topics', 'attribution-reporting', 'display-capture', 'serial', 'bluetooth', 'hid']) {
+  assert.doesNotMatch(config, /interest-cohort|ambient-light-sensor|attribution-reporting/u);
+  for (const feature of ['browsing-topics', 'display-capture', 'serial', 'bluetooth', 'hid']) {
     assert.ok(config.includes(`'${feature}'`), `${feature} is not denied`);
   }
   assert.match(config, /autoplay=\(self\)/u);

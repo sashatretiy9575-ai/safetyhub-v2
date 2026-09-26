@@ -48,6 +48,8 @@ function employeeHref(query: AdminAttestationQuery, cursorToken: string, trail: 
   return search ? `/admin/employees?${search}` : '/admin/employees';
 }
 
+export const metadata = { title: 'Сотрудники' };
+
 export default async function AdminEmployeesPage({
   searchParams,
 }: {

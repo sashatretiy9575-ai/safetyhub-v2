@@ -1,9 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Container } from '@/components/ui/container';
+import { buttonClassName } from '@/components/ui/button-classes';
+import { EMERGENCY_CONTAINER } from '@/components/ui/container-classes';
 import { localizePathname, type AppLocale } from '@/i18n/config';
 import { emergencyLocale } from '@/i18n/emergency-locale';
 import { reportAppError } from '@/lib/observability';
@@ -27,18 +26,24 @@ const MESSAGE_CATALOGS = {
  * catalogs and a locale read off the URL. Reaching for the request locale here
  * would make the error screen depend on the thing that just failed, and
  * importing the full dictionary would put 50 KB into a client chunk that only
- * ever renders when something is broken. The copy used to be English on every
- * locale.
+ * ever renders when something is broken.
+ *
+ * The chunk loads with every route, so it uses plain markup and class strings:
+ * through `Button`, `Container` and `next/link` it carried its own copies of
+ * cva, Radix Slot, tailwind-merge and the router link into every page. A hard
+ * navigation home is also the right recovery after a crash.
  */
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
-  const diagnostic = reportAppError(error, { source: 'route-error' });
+  // Reported once per boundary mount; reporting during render sent a second
+  // report as soon as the locale effect re-rendered the screen.
+  const [diagnostic] = useState(() => reportAppError(error, { source: 'route-error' }));
   const [locale, setLocale] = useState<AppLocale>('ru');
   const messages = MESSAGE_CATALOGS[locale];
 
   useEffect(() => setLocale(emergencyLocale()), []);
 
   return (
-    <Container size="narrow" className="grid min-h-[60vh] place-items-center py-16 text-center">
+    <div className={`${EMERGENCY_CONTAINER} grid min-h-[60vh] place-items-center py-16 text-center`}>
       <div
         className="mx-auto w-full max-w-xl space-y-5 rounded-3xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] p-6 shadow-[var(--shadow-soft)]"
         role="alert"
@@ -53,14 +58,14 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-3">
-          <Button type="button" onClick={reset}>
+          <button type="button" onClick={reset} className={buttonClassName()}>
             {messages.Common.retry}
-          </Button>
-          <Button asChild variant="outline">
-            <Link href={localizePathname('/', locale)}>{messages.Common.home}</Link>
-          </Button>
+          </button>
+          <a href={localizePathname('/', locale)} className={buttonClassName('outline')}>
+            {messages.Common.home}
+          </a>
         </div>
       </div>
-    </Container>
+    </div>
   );
 }

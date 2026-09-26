@@ -5,6 +5,8 @@ import { courseLocaleBlockers } from '@/lib/admin/course-readiness';
 import { TestEditor } from '@/components/admin/test-editor';
 import { CourseLocalizationsEditor } from '@/components/admin/course-localizations-editor';
 
+export const metadata = { title: 'Редактирование курса' };
+
 export default async function EditCoursePage({
   params,
   searchParams,

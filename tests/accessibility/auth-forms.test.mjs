@@ -32,7 +32,10 @@ test('canonical access uses neutral email-code while ZH exposes one accessible u
   assert.match(register, /redirect\(localizePathname\('\/auth\/login', locale\)\)/u);
   assert.doesNotMatch(register, /<EmailOtpFlow|<ZhUsernamePasswordFlow|intent=/u);
   assert.doesNotMatch(register, /firstName|lastName|profile-job|PasswordInput/u);
-  assert.match(flow, /emailOtpStartSchema\.safeParse/u);
+  // The sign-in page checks the address without zod (its core was 20 KB of
+  // the page every new learner opens); the server keeps the zod schema.
+  assert.match(flow, /normalizeEmail\(email\)/u);
+  assert.doesNotMatch(flow, /from 'zod/u);
   assert.match(flow, /clientRequest\('\/api\/auth\/email-otp\/request'/u);
   assert.match(requestRoute, /createEphemeralAuthClient\(\)\.auth\.signInWithOtp/u);
   assert.match(requestRoute, /shouldCreateUser: true/u);

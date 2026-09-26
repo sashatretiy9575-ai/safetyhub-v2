@@ -2,6 +2,7 @@ import AuditPage from '../../audit/page';
 import type { RawAdminSearchParams } from '@/server/admin/data';
 
 export const dynamic = 'force-dynamic';
+export const metadata = { title: 'История действий' };
 
 /**
  * The historical URL of the administrator log. It renders the same page, but

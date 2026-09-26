@@ -34,6 +34,8 @@ function approvalHref(cursorToken: string, trail: readonly string[]) {
   return search ? `/admin/approvals?${search}` : '/admin/approvals';
 }
 
+export const metadata = { title: 'Заявки на обучение' };
+
 export default async function AdminApprovalsPage({
   searchParams,
 }: {

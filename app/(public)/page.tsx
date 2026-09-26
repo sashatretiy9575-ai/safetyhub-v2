@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Hero } from '@/components/marketing/hero';
 import { PartnersStrip } from '@/components/marketing/partners-strip';
@@ -10,26 +9,6 @@ import { FaqAccordion } from '@/components/marketing/faq-accordion';
 import { ContactCta } from '@/components/marketing/contact-cta';
 import { QUIZ_POLICY } from '@/lib/constants';
 import { buildMetadata } from '@/lib/seo';
-
-function HomeSectionFallback({ label }: { label: string }) {
-  return (
-    <section
-      aria-label={label}
-      className="mx-auto w-full max-w-[1280px] px-4 py-10 sm:py-14 md:px-6 lg:py-16 xl:px-8"
-    >
-      <div className="h-6 w-56 animate-pulse rounded bg-[var(--color-surface-muted)] sm:h-8" />
-      <div className="wide:grid wide:grid-cols-3 wide:gap-5 wide:pr-0 mt-7 flex gap-3 overflow-hidden pr-[14%] sm:mt-10 sm:gap-4 sm:pr-[12%]">
-        {Array.from({ length: 3 }, (_, index) => (
-          <div
-            key={index}
-            className="wide:min-w-0 h-[25rem] min-w-[min(82vw,19.5rem)] animate-pulse rounded-[24px] bg-[var(--color-surface-soft)] sm:min-w-[calc((100%_-_1rem)/2.15)]"
-            aria-hidden="true"
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
 
 export async function generateMetadata() {
   const t = await getTranslations('Home');
@@ -44,21 +23,23 @@ export async function generateMetadata() {
   });
 }
 
-export default async function HomePage() {
-  const t = await getTranslations('Home');
+/**
+ * The page is prerendered, so the course grid and the articles are ready
+ * before the first byte. Suspense boundaries around them bought nothing: React
+ * printed skeletons in their place and moved the real sections after the
+ * footer, revealing them at least 300 ms apart and leaving them hidden from
+ * anything that reads the HTML without running JavaScript.
+ */
+export default function HomePage() {
   return (
     <>
       {/* The FAQPage graph belongs to /faq. Emitting the identical one here as
           well described the same questions at two URLs from one source. */}
       <Hero />
-      <Suspense fallback={<HomeSectionFallback label={t('loadingCourses')} />}>
-        <CourseGrid />
-      </Suspense>
+      <CourseGrid />
       <PartnersStrip />
       <ProcessTimeline />
-      <Suspense fallback={<HomeSectionFallback label={t('loadingResources')} />}>
-        <Resources />
-      </Suspense>
+      <Resources />
       <Testimonials />
       <FaqAccordion withContact={false} />
       <ContactCta />

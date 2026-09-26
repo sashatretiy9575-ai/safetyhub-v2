@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'safetyhub-static-';
-const CACHE_VERSION = `${CACHE_PREFIX}v9`;
+const CACHE_VERSION = `${CACHE_PREFIX}v10`;
 const OFFLINE_URL = '/offline.html';
 const OFFLINE_URLS = {
   ru: '/offline/ru',
@@ -7,7 +7,10 @@ const OFFLINE_URLS = {
   en: '/offline/en',
   zh: '/offline/zh',
 };
-const NAVIGATION_TIMEOUT_MS = 6000;
+// Long enough for a real page on a slow 3G link: a shorter race swapped a
+// working, merely slow connection for the offline screen. A connection that
+// is really gone fails fast anyway and falls back at once.
+const NAVIGATION_TIMEOUT_MS = 12000;
 const RUNTIME_MAX_ENTRIES = 48;
 const RUNTIME_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
 const CACHED_AT_HEADER = 'x-safetyhub-cached-at';

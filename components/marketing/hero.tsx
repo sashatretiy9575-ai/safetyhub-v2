@@ -1,6 +1,5 @@
 import { getImageProps } from 'next/image';
 import Link from 'next/link';
-import { preload } from 'react-dom';
 import { ArrowRight, ChatCircleDots, MapPin } from '@phosphor-icons/react/dist/ssr';
 import { Container } from '@/components/ui/container';
 import { ROUTES } from '@/lib/constants';
@@ -16,16 +15,23 @@ const HERO_IMAGES = {
 // Each branch of the <picture> gets the sizes that actually apply to it. The
 // combined media query was correct on the <img> and absent from the <source>,
 // so at desktop widths the browser had a srcSet with no sizes, assumed 100vw,
-// picked the 1920w candidate — and then the preload, which did carry sizes,
-// asked for a different one. The LCP image was fetched twice.
-const MOBILE_SIZES = 'calc(100vw - 2rem)';
+// picked the 1920w candidate — and the preload asked for a different one. The
+// LCP image was fetched twice. `calc(100vw - 2rem)` is not understood by
+// next/image, which then listed all sixteen widths in the mobile srcSet.
+const MOBILE_SIZES = '100vw';
 const DESKTOP_SIZES = '56vw';
 
 function HeroPicture({ alt }: { alt: string }) {
+  // No `priority` (deprecated in Next 16) and no `preload()`: a preload
+  // called from a Server Component becomes a hint in the route tree that every
+  // Home link prefetches, so every other page downloaded the hero at high
+  // priority. The preload links below belong to this page's own tree instead,
+  // and the <img> carries the high fetch priority itself.
   const common = {
     alt,
     fill: true,
-    priority: true,
+    loading: 'eager',
+    fetchPriority: 'high',
     quality: 82,
   } as const;
   const { props: mobileImageProps } = getImageProps({
@@ -39,32 +45,37 @@ function HeroPicture({ alt }: { alt: string }) {
     src: HERO_IMAGES.desktop,
   });
 
-  preload(mobileImageProps.src, {
-    as: 'image',
-    fetchPriority: 'high',
-    imageSrcSet: mobileImageProps.srcSet,
-    imageSizes: MOBILE_SIZES,
-    media: '(max-width: 1023px)',
-  });
-  preload(desktopImageProps.src, {
-    as: 'image',
-    fetchPriority: 'high',
-    imageSrcSet: desktopImageProps.srcSet,
-    imageSizes: DESKTOP_SIZES,
-    media: '(min-width: 1024px)',
-  });
-
   return (
-    <picture>
-      <source media="(min-width: 1024px)" srcSet={desktopImageProps.srcSet} sizes={DESKTOP_SIZES} />
-      <img
-        {...mobileImageProps}
-        alt={alt}
-        sizes={MOBILE_SIZES}
+    <>
+      <link
+        rel="preload"
+        as="image"
+        href={mobileImageProps.src}
+        imageSrcSet={mobileImageProps.srcSet}
+        imageSizes={MOBILE_SIZES}
+        media="(max-width: 1023px)"
         fetchPriority="high"
-        className="object-cover object-center"
       />
-    </picture>
+      <link
+        rel="preload"
+        as="image"
+        href={desktopImageProps.src}
+        imageSrcSet={desktopImageProps.srcSet}
+        imageSizes={DESKTOP_SIZES}
+        media="(min-width: 1024px)"
+        fetchPriority="high"
+      />
+      <picture>
+        <source media="(min-width: 1024px)" srcSet={desktopImageProps.srcSet} sizes={DESKTOP_SIZES} />
+        <img
+          {...mobileImageProps}
+          alt={alt}
+          sizes={MOBILE_SIZES}
+          fetchPriority="high"
+          className="object-cover object-center"
+        />
+      </picture>
+    </>
   );
 }
 

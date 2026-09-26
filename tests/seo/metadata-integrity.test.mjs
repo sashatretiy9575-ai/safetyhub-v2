@@ -63,13 +63,12 @@ test('sitemap uses every published source row and stable content timestamps', as
   assert.match(policy, /'\/sitemap\.xml'/);
 });
 
-test('deployment URLs fail closed, previews cannot be indexed, and retired registration is inert', async () => {
-  const [siteUrl, config, seo, robots, registerRoute] = await Promise.all([
+test('deployment URLs fail closed and previews cannot be indexed', async () => {
+  const [siteUrl, config, seo, robots] = await Promise.all([
     read('lib/site-url.ts'),
     read('next.config.ts'),
     read('lib/seo.ts'),
     read('app/robots.ts'),
-    read('app/api/auth/register/route.ts'),
   ]);
 
   assert.match(siteUrl, /VERCEL_ENV === 'production'/);
@@ -81,6 +80,4 @@ test('deployment URLs fail closed, previews cannot be indexed, and retired regis
   assert.match(config, /assertDeploymentSiteUrl\(\)/);
   assert.match(seo, /noindex \|\| preview/);
   assert.match(robots, /disallow: '\/'/);
-  assert.match(registerRoute, /passwordAuthRetiredResponse\(\)/u);
-  assert.doesNotMatch(registerRoute, /auth\.signUp|new URL\(request\.url\)\.origin|window\./u);
 });

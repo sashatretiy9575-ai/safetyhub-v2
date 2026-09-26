@@ -6,6 +6,8 @@ import { requireCapability } from '@/server/auth/session';
 import { readDocumentCourse } from '@/server/certificates/document-courses';
 import { commonDocumentSettings, readCertificateSettings } from '@/server/certificates/settings';
 
+export const metadata = { title: 'Документы курса' };
+
 export default async function AdminCourseDocumentsPage({
   params,
 }: {

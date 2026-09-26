@@ -8,6 +8,8 @@ import { getAdminLearningHistory } from '@/server/admin/management';
 
 const paramsSchema = z.object({ userId: z.string().uuid() });
 
+export const metadata = { title: 'Учебная история' };
+
 export default async function EmployeeLearningHistoryPage({
   params,
 }: {

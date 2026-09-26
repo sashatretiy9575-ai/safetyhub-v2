@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { DeferredBottomTabBar } from '@/components/layout/deferred-bottom-tab-bar';
+import { BottomTabBar } from '@/components/layout/bottom-tab-bar';
 import { getSiteContacts } from '@/server/site-contacts';
 import type { AppLocale } from '@/i18n/config';
 
@@ -65,7 +65,7 @@ export async function AppShell({
       <div className="bg-[var(--color-footer)] pb-[calc(var(--mobile-fixed-bottom-space)+var(--pwa-banner-space,0px))] lg:pb-[var(--pwa-banner-space,0px)]">
         <Footer contacts={contacts} locale={locale} />
       </div>
-      <DeferredBottomTabBar accountMode={accountMode} />
+      <BottomTabBar accountMode={accountMode} />
     </div>
   );
 }
