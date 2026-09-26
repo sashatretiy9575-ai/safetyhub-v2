@@ -1,3 +1,4 @@
+import { requireCapability } from '@/server/auth/session';
 import { NextResponse } from '@/lib/security/api-response';
 import { apiError } from '@/server/auth/api-error';
 import { invalidOriginResponse } from '@/server/http/request-origin';
@@ -18,6 +19,9 @@ export async function POST(request: Request) {
     if (invalidOrigin) return invalidOrigin;
     // The resolver runs an arbitrary filter across the whole register, so it is
     // metered like any other expensive administrative read.
+    // Authorize first: the meter is keyed by network, so an anonymous caller
+    // charging it could lock out an administrator behind the same address.
+    await requireCapability('results.read');
     await consumeCoarseQuota('admin.read.query', requestSecurityMetadata(request).ipHash);
     const body = await readJsonBody(request);
     if (body && typeof body === 'object' && 'recordIds' in body) {

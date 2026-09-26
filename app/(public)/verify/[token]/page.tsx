@@ -2,12 +2,27 @@ export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import { CheckCircle, XCircle } from '@phosphor-icons/react/dist/ssr';
-import { getPublicCertificateVerification } from '@/server/certificates/issuance';
+import {
+  getPublicCertificateVerification,
+  type PublicCertificateVerification,
+} from '@/server/certificates/issuance';
 import { Container } from '@/components/ui/container';
 import { Card, CardContent } from '@/components/ui/card';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { htmlLanguage } from '@/i18n/config';
+import { BUSINESS_TIME_ZONE, htmlLanguage } from '@/i18n/config';
 import { absoluteUrl } from '@/lib/utils';
+
+/**
+ * The date printed on the document — its sitting, a day in Oral — rather than
+ * the moment of issue in the server's zone, which ran a day behind for anything
+ * issued after 19:00 UTC. Noon +05:00 keeps the day whatever zone formats it.
+ */
+function printedDate(certificate: PublicCertificateVerification, language: string) {
+  const instant = certificate.documentDate
+    ? new Date(`${certificate.documentDate}T12:00:00+05:00`)
+    : new Date(certificate.issuedAt);
+  return instant.toLocaleDateString(language, { timeZone: BUSINESS_TIME_ZONE });
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Certificate');
@@ -69,22 +84,34 @@ export default async function VerifyCertificatePage({
     );
   }
 
+  // Withdrawn without a replacement, or its holder's identity was revoked or
+  // account suspended: the record is shown, but never as a valid document.
+  const revoked = certificate.status === 'revoked';
+
   return (
     <section className="py-12 md:py-20">
       <Container size="narrow">
-        <Card className="border-2">
+        <Card className={revoked ? 'border-2 border-[var(--color-danger)]' : 'border-2'}>
           <CardContent className="space-y-6 p-5 md:p-8">
-            <div className="flex items-start gap-4">
-              <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                <CheckCircle size={32} weight="fill" />
+            <div className="flex items-start gap-4" data-certificate-status={certificate.status}>
+              <span
+                className={`grid size-14 shrink-0 place-items-center rounded-full ${revoked ? 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]' : 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]'}`}
+              >
+                {revoked ? (
+                  <XCircle size={32} weight="fill" aria-hidden="true" />
+                ) : (
+                  <CheckCircle size={32} weight="fill" aria-hidden="true" />
+                )}
               </span>
               <div>
                 <p className="text-xs font-bold tracking-wider text-[var(--color-text-muted)] uppercase">
                   {t('verification')}
                 </p>
-                <h1 className="font-display text-h2 font-bold">{t('valid')}</h1>
+                <h1 className="font-display text-h2 font-bold">
+                  {t(revoked ? 'revoked' : 'valid')}
+                </h1>
                 <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                  {t('validDescription')}
+                  {t(revoked ? 'revokedDescription' : 'validDescription')}
                 </p>
               </div>
             </div>
@@ -107,7 +134,7 @@ export default async function VerifyCertificatePage({
               <div>
                 <dt className="text-xs text-[var(--color-text-muted)]">{t('issuedAt')}</dt>
                 <dd className="mt-1 font-semibold">
-                  {new Date(certificate.issuedAt).toLocaleDateString(htmlLanguage(locale))}
+                  {printedDate(certificate, htmlLanguage(locale))}
                 </dd>
               </div>
               <div className="sm:col-span-2">

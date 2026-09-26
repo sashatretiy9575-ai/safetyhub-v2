@@ -8,6 +8,8 @@ const long = (name) => `${name}-${'x'.repeat(40)}`;
 const complete = {
   RATE_LIMIT_HMAC_SECRET: long('rate-limit'),
   CERTIFICATE_VERIFICATION_SECRET: long('certificate'),
+  SUPABASE_SECRET_KEY: long('sb_secret'),
+  SUPABASE_SEND_EMAIL_HOOK_SECRETS: long('v1,whsec_'),
 };
 
 test('local builds and CI are left alone', () => {
@@ -50,6 +52,33 @@ test('a deployment missing the certificate signing secret is refused', () => {
         RATE_LIMIT_HMAC_SECRET: complete.RATE_LIMIT_HMAC_SECRET,
       }),
     /CERTIFICATE_VERIFICATION_SECRET/,
+  );
+});
+
+test('a deployment missing the service-role key or the email hook secret is refused', () => {
+  for (const [VERCEL_ENV, names] of [
+    ['production', ['SUPABASE_SECRET_KEY', 'SUPABASE_SEND_EMAIL_HOOK_SECRETS']],
+    ['preview', ['SUPABASE_SECRET_KEY']],
+  ]) {
+    for (const name of names) {
+      const environment = { VERCEL_ENV, ...complete };
+      delete environment[name];
+      assert.throws(
+        () => assertDeploymentRuntimeSecrets(environment),
+        new RegExp(`missing: ${name}`),
+      );
+    }
+  }
+  // Preview never receives the Auth email hook, so it builds without its secret.
+  const preview = { VERCEL_ENV: 'preview', ...complete };
+  delete preview.SUPABASE_SEND_EMAIL_HOOK_SECRETS;
+  assert.doesNotThrow(() => assertDeploymentRuntimeSecrets(preview));
+  // CI's application job builds with VERCEL_ENV unset and neither value set.
+  assert.doesNotThrow(() =>
+    assertDeploymentRuntimeSecrets({
+      RATE_LIMIT_HMAC_SECRET: complete.RATE_LIMIT_HMAC_SECRET,
+      CERTIFICATE_VERIFICATION_SECRET: complete.CERTIFICATE_VERIFICATION_SECRET,
+    }),
   );
 });
 

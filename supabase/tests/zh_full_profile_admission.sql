@@ -55,6 +55,10 @@ begin
     statement_timestamp()
   );
   update public.profiles set preferred_locale = 'zh' where id = v_user_id;
+  -- The token below names this GoTrue session; since 20260926110000 a token
+  -- whose session no longer exists (signed out) is refused before any gate.
+  insert into auth.sessions (id, user_id, created_at, updated_at, aal)
+  values (v_session_id, v_user_id, statement_timestamp(), statement_timestamp(), 'aal1');
   -- The auto-approved shape (no review window), which the constraint allows.
   update public.account_controls
   set approval_state = 'approved'

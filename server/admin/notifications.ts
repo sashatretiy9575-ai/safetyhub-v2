@@ -27,7 +27,7 @@ async function authenticatedRpc(name: string, args: Record<string, unknown>) {
   return rpcClient(await createClient()).rpc(name, args);
 }
 
-const INBOX_CAPABILITIES = ['notifications.read', 'audit.read'] as const;
+export const INBOX_CAPABILITIES = ['notifications.read', 'audit.read'] as const;
 
 // The envelope stays strict, but each item is validated on its own: one
 // malformed payload (for example, a legacy schema left in the table) must not

@@ -2,6 +2,7 @@ import { NextResponse } from '@/lib/security/api-response';
 import * as z from 'zod';
 import { apiError } from '@/server/auth/api-error';
 import { requireCapability } from '@/server/auth/session';
+import { consumeBusinessQuota } from '@/server/security/rate-limit';
 import { createAdminClient } from '@/server/supabase/admin';
 
 const paramsSchema = z.object({ userId: z.string().uuid() });
@@ -21,7 +22,10 @@ type SafeEmailRpcClient = {
  */
 export async function GET(_request: Request, context: { params: Promise<{ userId: string }> }) {
   try {
-    await requireCapability('user.read');
+    const actor = await requireCapability('user.read');
+    // Each card opening reads one person's address and phone through the
+    // service role; the per-operator budget stops a script walking the register.
+    await consumeBusinessQuota('admin.pii.read', actor.user.id);
     const parsed = paramsSchema.safeParse(await context.params);
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });

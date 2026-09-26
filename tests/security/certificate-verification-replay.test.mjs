@@ -8,7 +8,8 @@ test('valid QR replays share one short-lived database projection', async () => {
   const source = await read('server/certificates/issuance.ts');
 
   assert.match(source, /unstable_cache/u);
-  assert.match(source, /public-certificate-verification-v1/u);
+  // v2 since the payload carries the printed date and a revoked status.
+  assert.match(source, /public-certificate-verification-v2/u);
   assert.match(source, /revalidate:\s*15/u);
   assert.match(source, /CERTIFICATE_VERIFICATION_CACHE_TAG/u);
   assert.match(source, /return getCachedPublicCertificate\(certificateId\)/u);

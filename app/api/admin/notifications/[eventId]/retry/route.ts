@@ -1,5 +1,6 @@
+import { requireAnyCapability } from '@/server/auth/session';
 import * as z from 'zod';
-import { retryAdminNotificationDelivery } from '@/server/admin/notifications';
+import { INBOX_CAPABILITIES, retryAdminNotificationDelivery } from '@/server/admin/notifications';
 import { apiError } from '@/server/auth/api-error';
 import { invalidOriginResponse } from '@/server/http/request-origin';
 import { NextResponse } from '@/lib/security/api-response';
@@ -20,6 +21,7 @@ export async function POST(request: Request, context: { params: Promise<{ eventI
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
+    await requireAnyCapability(INBOX_CAPABILITIES);
     await consumeAdminMutationQuota('admin.access.mutate', requestSecurityMetadata(request).ipHash);
     return NextResponse.json(await retryAdminNotificationDelivery(parsed.data.eventId));
   } catch (error) {

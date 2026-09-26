@@ -1,3 +1,4 @@
+import { requireCapability } from '@/server/auth/session';
 import { NextResponse } from '@/lib/security/api-response';
 import { invalidOriginResponse } from '@/server/http/request-origin';
 import { zhUsernamePasswordApiError } from '@/server/auth/zh-username-password-api';
@@ -20,6 +21,7 @@ export async function POST(request: Request, context: { params: Promise<{ userId
     if (!parsedUserId.success || !parsedBody.success) {
       return NextResponse.json({ error: 'ZH_RECOVERY_FAILED' }, { status: 403 });
     }
+    await requireCapability('identity.manage');
     await consumeCoarseQuota('admin.zh_credential.reset', requestSecurityMetadata(request).ipHash);
     return NextResponse.json(await provisionZhUsernamePassword(parsedUserId.data, parsedBody.data));
   } catch (error) {

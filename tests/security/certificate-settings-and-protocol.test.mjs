@@ -36,10 +36,15 @@ test('the booklet and the protocol are drawn from one settings row that browsers
   // the settings version so a replaced image is never reused from cache.
   assert.match(image, /requireUser\(\{ enforceLegal: false \}\)/u);
   assert.match(image, /status: 401/u);
+  // Sign-up is open, so a session alone is not enough: a learner reads only
+  // the version printed on a certificate of their own.
+  assert.match(image, /'site\.settings\.manage', 'certificate\.read', 'certificate\.issue'/u);
+  assert.match(image, /\.eq\('user_id', userId\)\s*\.contains\('document_snapshot', \{ settings: \{ version \} \}\)/u);
+  assert.match(image, /if \(!privileged && !\(await ownsCertificateWithVersion\(/u);
   // Old versions resolve archived bytes; a missing archive is refused, never
   // replaced by today's signature. Behaviour is also covered by the SQL test.
   assert.match(image, /readArchivedDocumentSettings\(Number\(version\)\)/u);
-  assert.match(image, /if \(!parsed\.success\).*status: 404/u);
+  assert.match(image, /if \(!parsed\.success\) return notFound\(\);/u);
   assert.match(image, /'Cache-Control': 'private, max-age=31536000, immutable'/u);
   // A refused save names its field, and the editor names the insert's limits
   // before anything is sent: «повторите» never helped with a size in millimetres.

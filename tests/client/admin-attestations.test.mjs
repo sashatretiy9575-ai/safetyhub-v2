@@ -291,6 +291,14 @@ ${manager}`, /\/admin\/settings\/certificate/u);
   assert.match(contactRoute, /select\('phone_e164, phone_country_iso2'\)/);
   assert.match(contactRoute, /@\/lib\/security\/api-response/);
   assert.match(historyRoute, /requireCapability\('user\.read'\)/);
+  // Both service-role reads of one person spend the operator's budget, after
+  // the capability check and before any database read.
+  for (const route of [contactRoute, historyRoute]) {
+    assert.match(
+      route,
+      /const actor = await requireCapability\('user\.read'\);[\s\S]*?await consumeBusinessQuota\('admin\.pii\.read', actor\.user\.id\);[\s\S]*createAdminClient\(\)/u,
+    );
+  }
   // The card reads the address from the contact endpoint above, so the history
   // payload carries certificates only: no address lookup of any kind is left.
   assert.doesNotMatch(historyRoute, /get_safe_user_email|\bemail\b/);

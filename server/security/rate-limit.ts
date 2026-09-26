@@ -50,6 +50,10 @@ type BusinessQuotaAction =
   | 'certificate.pdf'
   | 'presentation.download'
   | 'profile.update'
+  // The employee card's service-role reads of one person (contact details and
+  // certificate history): 120 per 600 s per operator, so the register cannot
+  // be harvested card by card.
+  | 'admin.pii.read'
   // A registered signature or stamp is written through the service role, so no
   // RPC charges the administrator for it the way the settings RPCs do.
   | 'site.settings.update';

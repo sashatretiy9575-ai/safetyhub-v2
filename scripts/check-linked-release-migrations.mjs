@@ -19,16 +19,8 @@ const MAX_CLI_OUTPUT_BYTES = 4 * 1024 * 1024;
 // issuance and selection recovery form the exact hash-pinned pending tail. Adding
 // a migration means adding it here too, with its hash; an open-ended local tail
 // would defeat this preflight.
-export const REVIEWED_BASE_MIGRATION_COUNT = 110;
+export const REVIEWED_BASE_MIGRATION_COUNT = 112;
 export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
-  Object.freeze({
-    filename: '20260912182000_auth_email_outbox_and_otp_gateway.sql',
-    sha256: '91893b9e12ea5926bbde47096f52464ae9e1c2c680f98cbd3d4c1c9aa4219520',
-  }),
-  Object.freeze({
-    filename: '20260915120000_document_editor.sql',
-    sha256: 'c529f831c4cfd4f7723cc621909eedc8b38136bf28817452c9d307f03105d6be',
-  }),
   Object.freeze({
     filename: '20260915180000_document_insert_and_education.sql',
     sha256: '171eb16acbc064119b2fd8905e41d6a1e424b457738e91c7670338f7edc08315',
@@ -129,8 +121,6 @@ export const REVIEWED_APPLIED_RELEASE_MIGRATIONS = Object.freeze([
     filename: '20260923100000_electrical_journal_start.sql',
     sha256: '0c4c3d034a9498b0950a60a5d104272408f1c4aab4ded60183201fe2a8225b5f',
   }),
-]);
-export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260924100000_keep_result_when_reissue_refused.sql',
     sha256: '498057ac521a0ea18dd74a2b19c33b368947a787b129b5ce49d04a55e6c74d9e',
@@ -138,6 +128,16 @@ export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
   Object.freeze({
     filename: '20260924110000_electrical_journal_next_number.sql',
     sha256: '295e0ed1a0547fc43a2b09417b4603eaf9bc4decda5e835ebc557e2866df66ee',
+  }),
+]);
+export const REVIEWED_PENDING_MIGRATIONS = Object.freeze([
+  Object.freeze({
+    filename: '20260926100000_certificate_logic_fixes.sql',
+    sha256: 'ac1bd8a898eb60a21be3b968d55d387223381040f713e48281e3f910285f7e2d',
+  }),
+  Object.freeze({
+    filename: '20260926110000_security_hardening_sept26.sql',
+    sha256: '329ca6ee108c8ff1523c7a14c18920ddca9f30b3094c871b7361917189ce4f29',
   }),
 ]);
 export const REVIEWED_TOTAL_MIGRATION_COUNT =

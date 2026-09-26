@@ -27,7 +27,8 @@ begin
   end if;
 
   v_payload := public.get_public_certificate(v_certificate.id);
-  if v_payload is null or v_payload ? 'revokedAt' or v_payload ? 'revokeReason' then
+  if v_payload is null or v_payload ? 'revokedAt' or v_payload ? 'revokeReason'
+    or v_payload ->> 'status' is distinct from 'valid' then
     raise exception 'active certificate payload is wrong: %', v_payload;
   end if;
 
@@ -35,10 +36,12 @@ begin
   set revoked_at = statement_timestamp(), revoked_by = null, revoke_reason = 'замена документа'
   where id = v_certificate.id;
 
-  -- With no replacement the old number simply stops resolving; it never renders
-  -- as a revoked document.
-  if public.get_public_certificate(v_certificate.id) is not null then
-    raise exception 'a superseded certificate without a successor still verifies';
+  -- With no replacement the old number answers as revoked (20260926100000),
+  -- still without the internal revocation fields.
+  v_payload := public.get_public_certificate(v_certificate.id);
+  if v_payload is null or v_payload ->> 'status' is distinct from 'revoked'
+    or v_payload ? 'revokedAt' or v_payload ? 'revokeReason' then
+    raise exception 'a certificate withdrawn without a successor still verifies: %', v_payload;
   end if;
 
   update public.profiles set education = 'Среднее специальное' where id = v_certificate.user_id;

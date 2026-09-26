@@ -39,6 +39,7 @@ const actionLabels: Record<string, string> = {
   'test.passed': 'Тест пройден',
   'certificate.issued': 'Документ выдан',
   'certificate.revoked': 'Документ отозван',
+  'certificate.reissue_refused': 'Документ не переоформлен',
   'certificate.exported': 'Документы экспортированы',
   'certificate.export_job.created': 'Подготовлен экспорт документов',
   'certificate.export_job.downloaded': 'Архив документов скачан',
@@ -283,6 +284,8 @@ function quickFilterHref(
   const encoded = params.toString();
   return encoded ? `${basePath}?${encoded}` : basePath;
 }
+
+export const metadata = { title: 'История действий' };
 
 export default async function AuditPage({
   searchParams,

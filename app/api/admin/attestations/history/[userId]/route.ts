@@ -2,6 +2,7 @@ import { NextResponse } from '@/lib/security/api-response';
 import * as z from 'zod';
 import { apiError } from '@/server/auth/api-error';
 import { requireCapability } from '@/server/auth/session';
+import { consumeBusinessQuota } from '@/server/security/rate-limit';
 import { createAdminClient } from '@/server/supabase/admin';
 
 const paramsSchema = z.object({
@@ -16,7 +17,9 @@ export async function GET(
 ) {
   try {
     await requireCapability('certificate.read');
-    await requireCapability('user.read');
+    const actor = await requireCapability('user.read');
+    // Same per-operator budget as the contact read the card makes beside it.
+    await consumeBusinessQuota('admin.pii.read', actor.user.id);
     const url = new URL(request.url);
     const parsed = paramsSchema.safeParse({
       userId: (await context.params).userId,

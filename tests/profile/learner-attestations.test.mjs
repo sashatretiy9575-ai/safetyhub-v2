@@ -87,3 +87,24 @@ test('profile editing includes organization and renders the account-approval sta
   assert.doesNotMatch(form, /supabase\/client|\/api\/identity/);
   assert.doesNotMatch(form, /появится автоматически/);
 });
+
+test('organization suggestions start at three characters and stay quiet when the budget runs out', async () => {
+  const [route, profileForm, onboardingForm, migration] = await Promise.all([
+    read('app/api/profile/organizations/route.ts'),
+    read('components/profile/profile-form.tsx'),
+    read('components/profile/onboarding-form.tsx'),
+    read('supabase/migrations/20260926110000_security_hardening_sept26.sql'),
+  ]);
+
+  assert.match(route, /query\.length < 3 \|\| query\.length > 180/);
+  assert.match(route, /error\.message\.includes\('RATE_LIMITED'\)[\s\S]*?organizations: \[\]/);
+  assert.match(profileForm, /form\.organization\.trim\(\)\.length < 3\) return;/);
+  assert.match(onboardingForm, /query\.length < 3\) return;/);
+  assert.doesNotMatch(`${profileForm}\n${onboardingForm}`, /\.length < 2\) return;/);
+
+  assert.match(migration, /char_length\(pg_catalog\.btrim\(v_query\)\) < 3/);
+  assert.match(migration, /perform private\.enforce_actor_quota\('profile\.organization\.search'\)/);
+  assert.match(migration, /least\(greatest\(coalesce\(p_limit, 8\), 1\), 8\)/);
+  // A substring, not a prefix: «Арман» still finds «ТОО Арман Строй».
+  assert.match(migration, /normalized_key like '%' \|\| v_pattern \|\| '%'/);
+});

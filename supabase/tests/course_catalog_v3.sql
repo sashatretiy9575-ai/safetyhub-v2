@@ -872,6 +872,12 @@ begin
     v_admin_id, statement_timestamp()
   );
 
+  -- Course access is manual, and a submission is refused on a course that is
+  -- not open to the learner.
+  insert into public.course_access_grants (user_id, test_id)
+  values (v_participant_a, v_behavior_test_id)
+  on conflict do nothing;
+
   perform set_config('request.jwt.claim.sub', v_participant_a::text, true);
   perform set_config('request.jwt.claim.role', 'authenticated', true);
   v_result := private.start_test_attempt_unmetered('db-v3-behavior-fixture');

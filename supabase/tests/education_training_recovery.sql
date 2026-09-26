@@ -16,6 +16,8 @@ begin
  'passed',array_fill(1::smallint,array[v.question_count]),r.pass_score,now()-interval '2 minutes',now()-interval '2 minutes'+make_interval(mins=>r.duration_minutes),now(),'ru'
  from public.test_revision_variants v where v.revision_id=r.id order by v.id limit 1 returning * into strict a;
  insert into public.attestations(user_id,revision_id,best_attempt_id,best_score,best_completed_at) values(learner,r.id,a.id,a.score,a.completed_at) returning id into att;
+ -- The course is open to the learner: a submission on a closed course is refused.
+ insert into public.course_access_grants(user_id,test_id) values(learner,r.test_id) on conflict do nothing;
  select l.title into strict title from public.test_revision_localizations l where l.revision_id=r.id and l.locale='ru';
  update public.document_batches set profile_id=null where course_slug=r.slug;
  delete from public.document_profiles where course_slug=r.slug;

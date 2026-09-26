@@ -32,6 +32,11 @@ const publicCertificateSchema = z.object({
   score: z.number().int(),
   total: z.number().int().positive(),
   issuedAt: z.string(),
+  // The date printed on the document (its sitting), already a day in Oral.
+  documentDate: z.iso.date().nullable().default(null),
+  // `revoked`: withdrawn without a replacement, or its holder's identity was
+  // revoked or account suspended.
+  status: z.enum(['valid', 'revoked']).default('valid'),
 });
 
 const boundedText = (maximum: number) => z.string().trim().min(1).max(maximum);
@@ -150,7 +155,8 @@ const getCachedPublicCertificate = unstable_cache(
       learningAssessment: record.test_slug === 'promyshlennaya-bezopasnost',
     };
   },
-  ['public-certificate-verification-v1'],
+  // v2: the payload carries the printed date and a revoked status.
+  ['public-certificate-verification-v2'],
   { revalidate: 15, tags: [CERTIFICATE_VERIFICATION_CACHE_TAG] },
 );
 

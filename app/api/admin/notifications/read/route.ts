@@ -1,5 +1,7 @@
+import { requireAnyCapability } from '@/server/auth/session';
 import * as z from 'zod';
 import {
+  INBOX_CAPABILITIES,
   markAdminNotificationsRead,
   markAllAdminNotificationsRead,
 } from '@/server/admin/notifications';
@@ -32,6 +34,7 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: 'INVALID_REQUEST' }, { status: 400 });
     }
+    await requireAnyCapability(INBOX_CAPABILITIES);
     await consumeAdminMutationQuota('admin.access.mutate', requestSecurityMetadata(request).ipHash);
     return NextResponse.json(
       'all' in parsed.data

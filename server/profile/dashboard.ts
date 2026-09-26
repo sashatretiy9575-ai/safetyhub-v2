@@ -30,6 +30,8 @@ export type ProfileAttestation = {
   certificateNumber: string | null;
   certificateScore: number | null;
   issuedAt: string | null;
+  /** The course is open to the learner; without it the test answers «not open to you». */
+  accessible: boolean;
 };
 
 export type LegalAcceptance = Omit<LegalAcceptanceRow, 'user_id'>;
@@ -100,6 +102,8 @@ const profileAttestationSchema = z.object({
   certificateNumber: z.string().nullable(),
   certificateScore: z.number().int().nonnegative().nullable(),
   issuedAt: z.string().nullable(),
+  // Sent since 20260926100000; a database without it keeps every row open.
+  accessible: z.boolean().default(true),
 });
 
 const dashboardSchema = z.object({

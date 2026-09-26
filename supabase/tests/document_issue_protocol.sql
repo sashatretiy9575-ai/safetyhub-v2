@@ -13,7 +13,8 @@ begin
  update public.verified_identities set status='verified',version=1,name='Тестовый',surname='Слушатель',job='Плотник',organization=p_organization,verified_at=now() where user_id=learner;
  insert into public.test_attempts(user_id,revision_id,test_id,variant_id,duration_minutes,pass_score,attempts_per_day,reset_timezone,status,answers,score,started_at,expires_at,completed_at,locale)
  select learner,r.id,r.test_id,v.id,r.duration_minutes,r.pass_score,r.attempts_per_calendar_day,r.attempt_reset_timezone,
- 'passed',array_fill(1::smallint,array[v.question_count]),r.question_count,now()-interval '2 minutes',now()-interval '2 minutes'+make_interval(mins=>r.duration_minutes),now(),'ru'
+ -- Sat three days ago: a sitting dated yesterday may not precede the exam.
+ 'passed',array_fill(1::smallint,array[v.question_count]),r.question_count,now()-interval '3 days',now()-interval '3 days'+make_interval(mins=>r.duration_minutes),now()-interval '3 days'+interval '1 minute','ru'
  from public.test_revision_variants v where v.revision_id=r.id order by v.id limit 1 returning * into strict a;
  insert into public.attestations(user_id,revision_id,best_attempt_id,best_score,best_completed_at) values(learner,r.id,a.id,a.score,a.completed_at) returning id into att;
  return att;

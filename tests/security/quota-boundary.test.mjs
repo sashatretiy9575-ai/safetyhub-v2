@@ -60,6 +60,7 @@ test('actor quota is consumed exactly once at the trusted mutation boundary', as
     'certificate.pdf',
     'presentation.download',
     'profile.update',
+    'admin.pii.read',
   ]) {
     assert.match(rateLimit, new RegExp(`\\| '${action.replace('.', '\\.')}'`, 'u'));
   }
