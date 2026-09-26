@@ -23,7 +23,11 @@ const securityHeaders = [
   { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
   { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
   { key: 'Origin-Agent-Cluster', value: '?1' },
-  ...(process.env.NODE_ENV === 'production'
+  // Only the production deployment answers over HTTPS on a real domain. A
+  // local `next start` is a production build too, and sending HSTS from
+  // http://localhost made the browser upgrade every later request to an
+  // https://localhost that does not exist (vercel.app hosts are preloaded).
+  ...(process.env.VERCEL_ENV === 'production'
     ? [{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' }]
     : []),
 ];

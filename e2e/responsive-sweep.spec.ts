@@ -9,6 +9,12 @@ import { expect, test, type Page } from '@playwright/test';
 // scripts/release/run-e2e-release.mjs.
 const enabled = process.env.E2E_SWEEP === '1';
 
+// The sweep injects a stylesheet that fakes a notched phone's safe areas. On
+// a production build the sign-in and verify pages carry a nonce-only style
+// policy that refuses it, so the sweep measures layout with CSP bypassed; the
+// security specs check the policy itself.
+test.use({ bypassCSP: true });
+
 const VIEWPORTS = [
   { width: 320, height: 568 },
   { width: 375, height: 812 },
