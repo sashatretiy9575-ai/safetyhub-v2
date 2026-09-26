@@ -78,6 +78,9 @@ test('current legal copies accurately disclose the minimal ZH username-password 
     footer,
     legalContacts,
     ruMessages,
+    privacyV11Renderer,
+    termsV21Renderer,
+    staticLegalDocument,
   ] = await Promise.all([
     read('app/(public)/privacy/page.tsx'),
     read('app/(public)/terms/page.tsx'),
@@ -88,6 +91,9 @@ test('current legal copies accurately disclose the minimal ZH username-password 
     read('components/layout/footer.tsx'),
     read('components/legal/legal-contacts.tsx'),
     read('messages/ru.json'),
+    read('components/legal/privacy-policy-v1-1.tsx'),
+    read('components/legal/terms-policy-v2-1.tsx'),
+    read('components/legal/static-legal-document.tsx'),
   ]);
 
   for (const page of [privacyPage, termsPage]) {
@@ -102,8 +108,18 @@ test('current legal copies accurately disclose the minimal ZH username-password 
     assert.doesNotMatch(page, /LEGAL_REVIEW_NOTICE/);
   }
 
-  assert.match(privacyPage, /export function PrivacyPolicyV11/);
-  assert.match(termsPage, /export function TermsPolicyV21/);
+  assert.match(privacyV11Renderer, /export function PrivacyPolicyV11/);
+  assert.match(termsV21Renderer, /export function TermsPolicyV21/);
+  assert.doesNotMatch(privacyPage, /PrivacyPolicyV11/);
+  assert.doesNotMatch(termsPage, /TermsPolicyV21/);
+  assert.match(
+    staticLegalDocument,
+    /import \{ PrivacyPolicyV11 \} from '@\/components\/legal\/privacy-policy-v1-1'/u,
+  );
+  assert.match(
+    staticLegalDocument,
+    /import \{ TermsPolicyV21 \} from '@\/components\/legal\/terms-policy-v2-1'/u,
+  );
 
   const privacyDocument = JSON.parse(privacySource);
   const termsDocument = JSON.parse(termsSource);

@@ -4,28 +4,6 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('retired Chinese WebAuthn and recovery endpoints are server-side 410 tombstones', async () => {
-  const [helper, ...routes] = await Promise.all([
-    read('server/auth/zh-passkey-retired.ts'),
-    read('app/api/auth/zh/registration/options/route.ts'),
-    read('app/api/auth/zh/registration/verify/route.ts'),
-    read('app/api/auth/zh/authentication/options/route.ts'),
-    read('app/api/auth/zh/authentication/verify/route.ts'),
-    read('app/api/auth/zh/recovery/verify/route.ts'),
-    read('app/api/admin/users/[userId]/zh-credential/reset/route.ts'),
-  ]);
-
-  assert.match(helper, /ZH_AUTH_METHOD_RETIRED/u);
-  assert.match(helper, /status: 410/u);
-  for (const route of routes) {
-    assert.match(route, /zhPasskeyRetiredResponse/u);
-    assert.doesNotMatch(
-      route,
-      /zh-webauthn|simplewebauthn|readJsonBody|createEphemeralAuthClient|console\.(?:log|error)/iu,
-    );
-  }
-});
-
 test('Chinese username/password routes are same-origin, bounded, rate-limited, and generic', async () => {
   const [login, register, reset, provision, server] = await Promise.all([
     read('app/api/auth/zh/login/route.ts'),

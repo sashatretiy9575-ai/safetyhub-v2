@@ -17,33 +17,23 @@ const legacyPasswordApiRoutes = [
   'app/api/admin/users/invite/route.ts',
 ];
 
-test('legacy password APIs fail closed with an explicit no-store 410 response', async () => {
-  const sources = await Promise.all(legacyPasswordApiRoutes.map(read));
+const legacyPasswordPages = [
+  'app/(account)/auth/change-password/page.tsx',
+  'app/(account)/auth/update-password/page.tsx',
+  'app/(account)/auth/invite/page.tsx',
+];
 
-  for (const source of sources) {
-    assert.match(source, /passwordAuthRetiredResponse\(\)/u);
-    assert.doesNotMatch(
-      source,
-      /signInWithPassword|auth\.signUp|updateUser|resetPasswordForEmail|verifyOtp|inviteUser|createClient|readJsonBody/u,
-    );
+test('legacy password APIs and pages are removed, so a request is an ordinary 404', async () => {
+  for (const route of [...legacyPasswordApiRoutes, ...legacyPasswordPages]) {
+    await assert.rejects(read(route), { code: 'ENOENT' }, route);
   }
 
   const helper = await read('server/auth/password-auth-retired.ts');
-  assert.match(helper, /PASSWORD_AUTH_RETIRED/u);
-  assert.match(helper, /status:\s*410/u);
-  assert.match(helper, /'Cache-Control': 'no-store'/u);
-  assert.match(helper, /'X-Robots-Tag': 'noindex'/u);
+  assert.doesNotMatch(helper, /passwordAuthRetiredResponse|PASSWORD_AUTH_RETIRED/u);
 });
 
-test('legacy password pages cannot parse a token, render password inputs, or mutate Auth', async () => {
-  const sources = await Promise.all(
-    [
-      'app/(account)/auth/change-password/page.tsx',
-      'app/(account)/auth/reset-password/page.tsx',
-      'app/(account)/auth/update-password/page.tsx',
-      'app/(account)/auth/invite/page.tsx',
-    ].map(read),
-  );
+test('the legacy reset-password page cannot parse a token, render password inputs, or mutate Auth', async () => {
+  const sources = await Promise.all(['app/(account)/auth/reset-password/page.tsx'].map(read));
 
   for (const source of sources) {
     assert.match(source, /PasswordAuthRetiredPage/u);

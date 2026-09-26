@@ -11,11 +11,6 @@ export type AppLocale = (typeof APP_LOCALES)[number];
  */
 export type AuthRealm = 'email_otp' | 'zh_username_password';
 
-export const EMAIL_OTP_LOCALES = ['ru', 'kk', 'en'] as const satisfies readonly Exclude<
-  AppLocale,
-  'zh'
->[];
-
 export function authRealmForLocale(locale: AppLocale): AuthRealm {
   return locale === 'zh' ? 'zh_username_password' : 'email_otp';
 }

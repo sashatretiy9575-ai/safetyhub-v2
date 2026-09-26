@@ -9,8 +9,8 @@ const SCAN_ROOTS = ['app', 'components'];
 const CANONICAL_RU_CONTENT_SOURCES = new Set([
   // Published Russian legal revisions are immutable content, not UI copy. Other
   // locales are loaded fail-closed from legal_document_localizations.
-  'app/(public)/privacy/page.tsx',
-  'app/(public)/terms/page.tsx',
+  'components/legal/privacy-policy-v1-1.tsx',
+  'components/legal/terms-policy-v2-1.tsx',
   'components/legal/privacy-policy-v1-2.tsx',
   'components/legal/terms-policy-v2-2.tsx',
 ]);

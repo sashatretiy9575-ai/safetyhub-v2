@@ -123,10 +123,6 @@ export function personAdmission(
 export function electricalGroupText(admission: ElectricalAdmission) {
   return `${admission.group} группа ${ELECTRICAL_VOLTAGE_TEXT[admission.voltage].ru}`;
 }
-/** «II топ, 1000 В дейін» — the Kazakh half of the booklet. */
-export function electricalGroupTextKk(admission: ElectricalAdmission) {
-  return `${admission.group} топ, ${ELECTRICAL_VOLTAGE_TEXT[admission.voltage].kk}`;
-}
 /** «Допущен к работе в электроустановках до 1000 В, в качестве электротехнического персонала». */
 export function electricalAdmissionText(admission: ElectricalAdmission) {
   return (

@@ -7,20 +7,9 @@ import { fileURLToPath } from 'node:url';
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
 
-test('legacy password registration and login cannot create, confirm, or recover an account', async () => {
-  const [login, register, callback] = await Promise.all([
-    read('app/api/auth/login/route.ts'),
-    read('app/api/auth/register/route.ts'),
-    read('app/(account)/callback/route.ts'),
-  ]);
+test('legacy password callback links cannot create, confirm, or recover an account', async () => {
+  const callback = await read('app/(account)/callback/route.ts');
 
-  for (const source of [login, register]) {
-    assert.match(source, /passwordAuthRetiredResponse\(\)/u);
-    assert.doesNotMatch(
-      source,
-      /signInWithPassword|auth\.signUp|prepareSignupLegalOperation|finalizeSignupLegalOperation|createClient|readJsonBody/u,
-    );
-  }
   assert.doesNotMatch(
     callback,
     /exchangeCodeForSession|signupLegalCorrelationFromUserMetadata|finalizeSignupLegalOperation/u,

@@ -99,10 +99,7 @@ test('each protocol family renders its source columns and all three transparent 
 });
 
 
-test('education follows new form applicability and first-aid historical layout remains stable', async () => {
-  const { requiresDocumentEducation } = await import('../../lib/pdf/document-education.ts');
-  for (const family of ['general', 'industrial', undefined, null]) assert.equal(requiresDocumentEducation(family), true);
-  for (const family of ['ptm', 'biot', 'qualification', 'first-aid']) assert.equal(requiresDocumentEducation(family), false);
+test('protocol education columns follow the layout version and first-aid history stays stable', async () => {
   assert.ok(protocolColumns('first-aid').includes('Образование'));
   assert.ok(!protocolColumns('first-aid', 2).includes('Образование'));
   assert.ok(protocolColumns('general', 2).includes('Образование'));

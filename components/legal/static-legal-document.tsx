@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
-import { PrivacyPolicyV11 } from '@/app/(public)/privacy/page';
-import { TermsPolicyV21 } from '@/app/(public)/terms/page';
+import { PrivacyPolicyV11 } from '@/components/legal/privacy-policy-v1-1';
+import { TermsPolicyV21 } from '@/components/legal/terms-policy-v2-1';
 import { TermsPolicyV22 } from '@/components/legal/terms-policy-v2-2';
 import { PrivacyPolicyV12 } from '@/components/legal/privacy-policy-v1-2';
 import { LocalizedLegalDocumentView } from '@/components/legal/localized-legal-document';

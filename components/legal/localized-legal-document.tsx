@@ -2,6 +2,7 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
 import { LegalContacts } from '@/components/legal/legal-contacts';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 import type { LocalizedLegalDocument } from '@/server/content/legal-documents';
 import { LEGAL_EFFECTIVE_TIME_ZONE } from '@/lib/legal';
 
@@ -83,6 +84,7 @@ export async function LocalizedLegalDocumentView({
                           rel={link.url.startsWith('https://') ? 'noreferrer' : undefined}
                         >
                           {link.label}
+                          {link.url.startsWith('https://') ? <NewTabHint /> : null}
                         </a>
                       </li>
                     ))}

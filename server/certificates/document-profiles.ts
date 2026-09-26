@@ -1,7 +1,6 @@
 import 'server-only';
 import { z } from 'zod';
 import { createAdminClient } from '@/server/supabase/admin';
-import { requireCapability } from '@/server/auth/session';
 import { ELECTRICAL_GROUPS, ELECTRICAL_ROLES, ELECTRICAL_VOLTAGES } from '@/lib/pdf/electrical';
 import { DOCUMENT_FAMILIES, type DocumentProfileSettings } from '@/lib/pdf/document-profile';
 
@@ -109,21 +108,6 @@ export function parseDocumentProfileRow(row: ProfileRow): DocumentProfileSetting
     audience: row.audience,
   });
   return parsed.success ? { ...parsed.data, revision: row.version } : null;
-}
-
-/**
- * Every stored profile. A row that does not read is left out rather than
- * taking the whole documents section down with it; the course it belongs to
- * shows as not set up and is saved again from its page.
- */
-export async function readDocumentProfiles(): Promise<DocumentProfileSettings[]> {
-  await requireCapability('site.settings.manage');
-  const { data, error } = await createAdminClient()
-    .from('document_profiles')
-    .select('id,course_slug,audience,body,version')
-    .order('id');
-  if (error) throw error;
-  return (data ?? []).flatMap((row) => parseDocumentProfileRow(row) ?? []);
 }
 
 export async function readArchivedDocumentSettings(version: number) {

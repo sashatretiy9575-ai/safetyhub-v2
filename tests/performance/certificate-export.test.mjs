@@ -3,7 +3,6 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { unzipSync } from 'fflate';
 import {
-  attachmentContentDisposition,
   certificateFilename,
   normalizePdfText,
 } from '../../lib/pdf/certificate.ts';
@@ -195,18 +194,13 @@ test('certificate payload and filenames preserve multilingual participant data s
   assert.match(renderer, /Сведения о проверке знаний/);
   // Every face is subset now: a Cyrillic booklet no longer carries the whole font.
   assert.match(await read('lib/pdf/document-layout.ts'), /subset: true/);
-  assert.match(certificate, /filename\*=UTF-8''/);
   assert.match(certificate, /certificateFilename/);
 });
 
-test('multilingual attachment names are NFC-normalized and header-safe', () => {
+test('multilingual attachment names are NFC-normalized and path-safe', () => {
   assert.equal(normalizePdfText('Әділ  Құсаи\u0306ынұлы'), 'Әділ Құсайынұлы');
   const filename = certificateFilename('SH-2026/..', 'Әділ\r\n Құсайынұлы');
   assert.equal(filename, 'SH-2026-Әділ-Құсайынұлы.pdf');
-  const disposition = attachmentContentDisposition(filename);
-  assert.match(disposition, /^attachment; filename="[\x20-\x7e]+";/);
-  assert.match(disposition, /filename\*=UTF-8''SH-2026-/);
-  assert.doesNotMatch(disposition, /[\r\n]/);
 });
 
 test('streaming ZIP builder preserves Unicode names and rejects traversal', async () => {

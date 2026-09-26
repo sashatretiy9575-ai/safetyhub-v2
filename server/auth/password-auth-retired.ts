@@ -3,23 +3,6 @@ import 'server-only';
 import { NextResponse } from '@/lib/security/api-response';
 import { getSiteUrl } from '@/server/auth/session';
 
-export const PASSWORD_AUTH_RETIRED_ERROR = 'PASSWORD_AUTH_RETIRED';
-
-export function passwordAuthRetiredResponse() {
-  return NextResponse.json(
-    {
-      error: PASSWORD_AUTH_RETIRED_ERROR,
-    },
-    {
-      status: 410,
-      headers: {
-        'Cache-Control': 'no-store',
-        'X-Robots-Tag': 'noindex',
-      },
-    },
-  );
-}
-
 /**
  * Old confirmation, recovery, and invite links must never exchange a code or
  * create a session after password authentication is retired. The destination

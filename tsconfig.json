@@ -43,6 +43,11 @@
   "exclude": [
     "node_modules",
     ".next",
-    "out"
+    "out",
+    "artifacts",
+    "tmp",
+    "test-results",
+    "playwright-report",
+    "coverage"
   ]
 }

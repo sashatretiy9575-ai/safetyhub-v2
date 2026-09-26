@@ -246,13 +246,3 @@ export async function openSmtpSession(transport: SmtpTransport): Promise<SmtpSes
     },
   };
 }
-
-/** One message on a fresh connection. */
-export async function sendSmtpMail(transport: SmtpTransport, message: SmtpMessage) {
-  const session = await openSmtpSession(transport);
-  try {
-    return await session.send(message);
-  } finally {
-    session.quit();
-  }
-}

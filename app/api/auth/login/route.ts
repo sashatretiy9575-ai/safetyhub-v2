@@ -1,7 +1,0 @@
-import { passwordAuthRetiredResponse } from '@/server/auth/password-auth-retired';
-import { enforceApiNoStore } from '@/lib/security/api-response';
-
-/** @deprecated Password sign-in is permanently replaced by email OTP. */
-export function POST() {
-  return enforceApiNoStore(passwordAuthRetiredResponse());
-}

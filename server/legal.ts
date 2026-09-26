@@ -73,12 +73,3 @@ export async function getCurrentLegalPolicies(): Promise<CurrentLegalPolicies> {
     ),
   };
 }
-
-export async function resolveActivatedLegalPolicy(
-  type: LegalDocumentType,
-  requestedVersion?: string,
-) {
-  if (requestedVersion) return resolveLegalDocumentVersion(type, requestedVersion);
-  const current = await getCurrentLegalPolicies();
-  return current[type];
-}

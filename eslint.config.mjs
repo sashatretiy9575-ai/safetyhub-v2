@@ -21,6 +21,8 @@ const eslintConfig = defineConfig([
     // Working notes and one-off scripts, git-ignored by design: they never ship,
     // and lint errors in them hid the state of the code that does.
     'artifacts/**',
+    'tmp/**',
+    'blob-report/**',
     // Deno edge functions are checked by the Supabase toolchain.
     'supabase/**',
   ]),

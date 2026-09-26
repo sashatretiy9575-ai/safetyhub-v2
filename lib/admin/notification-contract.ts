@@ -1,13 +1,6 @@
 import { APP_LOCALES } from '@/i18n/config';
 import * as z from 'zod/mini';
 
-export const ADMIN_NOTIFICATION_EVENT_TYPES = [
-  'account.approval_requested',
-  'course.access_requested',
-  'course.completed',
-  'system.alert',
-] as const;
-
 export const ADMIN_NOTIFICATION_DELIVERY_STATES = [
   'pending',
   'leased',
