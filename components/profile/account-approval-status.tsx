@@ -10,10 +10,10 @@ import { HourglassMedium } from '@phosphor-icons/react/dist/csr/HourglassMedium'
 import type { SiteContactSettings } from '@/lib/site-contacts';
 import {
   BUSINESS_TIME_ZONE,
-  HTML_LANGUAGE_BY_LOCALE,
   localizePathname,
   type AppLocale,
 } from '@/i18n/config';
+import { intlLocale } from '@/i18n/intl-locale';
 
 type ApprovalState = 'profile_incomplete' | 'pending' | 'approved' | 'rejected';
 
@@ -23,7 +23,7 @@ function formatRemaining(milliseconds: number) {
 }
 
 function formatDueAt(value: string, locale: AppLocale) {
-  return new Intl.DateTimeFormat(HTML_LANGUAGE_BY_LOCALE[locale], {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     day: 'numeric',
     month: 'long',
     hour: '2-digit',

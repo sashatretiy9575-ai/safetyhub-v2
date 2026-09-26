@@ -300,7 +300,7 @@ test('theme switch synchronizes metadata, color scheme and document backgrounds'
     bodyBackground: 'rgb(247, 248, 250)',
     themeColor: '#f7f8fa',
   });
-  await page.getByRole('switch', { name: /переключить на тёмную/iu }).click();
+  await page.getByRole('switch', { name: 'Тёмная тема', checked: false }).click();
   await expect.poll(themeState).toEqual({
     dark: true,
     colorScheme: 'dark',

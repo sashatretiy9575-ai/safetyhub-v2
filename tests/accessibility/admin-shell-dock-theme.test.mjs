@@ -163,12 +163,15 @@ test('inside a menu the theme is a checkbox item styled like its neighbours', as
   assert.match(menuItem, /onCheckedChange=\{toggleTheme\}/u);
   // The menu stays open: the change is visible behind it.
   assert.match(menuItem, /onSelect=\{\(event\) => event\.preventDefault\(\)\}/u);
-  assert.match(menuItem, /aria-label=\{isDark \? t\('switchToLight'\) : t\('switchToDark'\)\}/u);
+  // A fixed name: the state is `aria-checked`. A name that changed with the
+  // state announced it twice and contradicted the checkbox.
+  assert.match(menuItem, /aria-label=\{t\('darkMode'\)\}/u);
+  assert.doesNotMatch(menuItem, /switchToLight|switchToDark/u);
   assert.match(menuItem, /\{isDark \? t\('dark'\) : t\('light'\)\}/u);
   assert.match(menuItem, /useTranslations\('Shell\.theme'\)/u);
   assert.deepEqual(
     [...new Set([...menuItem.matchAll(/\bt\('([A-Za-z]+)'\)/gu)].map((match) => match[1]))].sort(),
-    ['dark', 'light', 'switchToDark', 'switchToLight'],
+    ['dark', 'darkMode', 'light'],
   );
   assert.doesNotMatch(menuItem, /[Ѐ-ӿ]/u);
 

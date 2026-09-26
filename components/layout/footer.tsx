@@ -7,6 +7,7 @@ import { Container } from '@/components/ui/container';
 import { ROUTES } from '@/lib/constants';
 import { localizePathname, type AppLocale } from '@/i18n/config';
 import type { SiteContactSettings } from '@/lib/site-contacts';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 
 const NAV_LINKS = [
   { href: ROUTES.topics, messageKey: 'nav.topics' },
@@ -154,6 +155,7 @@ export async function Footer({
               className="text-title inline-flex min-h-11 items-center font-extrabold text-[#ff8a24] transition-colors duration-150 hover:text-[#ffad66]"
             >
               rc-web.kz
+              <NewTabHint />
             </a>
           </p>
         </div>

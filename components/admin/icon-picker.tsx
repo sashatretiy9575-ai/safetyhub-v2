@@ -28,6 +28,16 @@ export function IconPicker({
   const selected = resolveCourseIcon(value);
   const items = useMemo(() => searchCourseIcons(query, category), [category, query]);
   const SelectedIcon = selected.component;
+  // One tab stop for the whole gallery, as a listbox has: Tab used to walk
+  // every icon — more than a hundred stops — before reaching the next field.
+  // The stop is the icon last moved to, else the chosen one, else the first;
+  // the arrow keys move between icons.
+  const [activeId, setActiveId] = useState<IconId | null>(null);
+  const tabStopId = items.some((item) => item.id === activeId)
+    ? activeId
+    : items.some((item) => item.id === selected.id)
+      ? selected.id
+      : items[0]?.id;
 
   const navigate = (event: KeyboardEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -51,6 +61,8 @@ export function IconPicker({
     if (nextIndex === null) return;
     event.preventDefault();
     const bounded = Math.max(0, Math.min(items.length - 1, nextIndex));
+    const next = items[bounded];
+    if (next) setActiveId(next.id);
     event.currentTarget.querySelector<HTMLElement>(`[data-icon-index="${bounded}"]`)?.focus();
   };
 
@@ -103,9 +115,14 @@ export function IconPicker({
         </div>
       </div>
 
+      <p role="status" className="sr-only">
+        {items.length > 0 ? `Найдено иконок: ${items.length}` : 'Иконки не найдены.'}
+      </p>
+      {/* Without icons it is no listbox: a listbox holds options only, and the
+          empty-state line is plain text. */}
       <div
-        role="listbox"
-        aria-label="Иконки курса"
+        role={items.length > 0 ? 'listbox' : undefined}
+        aria-label={items.length > 0 ? 'Иконки курса' : undefined}
         onKeyDown={navigate}
         className="mt-3 grid max-h-64 grid-cols-6 gap-1.5 overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] p-2 sm:grid-cols-8"
       >
@@ -121,6 +138,8 @@ export function IconPicker({
               aria-label={`${item.label}, ${item.category}`}
               title={item.label}
               data-icon-index={index}
+              tabIndex={item.id === tabStopId ? 0 : -1}
+              onFocus={() => setActiveId(item.id)}
               className={cn(
                 'grid aspect-square min-h-11 place-items-center rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-focus)]',
                 active

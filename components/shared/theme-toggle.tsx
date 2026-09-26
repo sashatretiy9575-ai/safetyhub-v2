@@ -9,12 +9,16 @@ export function ThemeToggle() {
   const isDark = useIsDarkTheme();
   const translations = useTranslations('Shell.theme');
 
+  // A switch is named after what it turns on and reports its state through
+  // `aria-checked`. The label used to describe the state and the action as
+  // well ("Dark theme. Switch to light"), so a screen reader heard the state
+  // twice and an action that contradicted "on".
   return (
     <button
       type="button"
       role="switch"
       aria-checked={isDark}
-      aria-label={isDark ? translations('switchToLight') : translations('switchToDark')}
+      aria-label={translations('darkMode')}
       onClick={toggleTheme}
       className="group inline-flex size-11 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-transparent px-0 whitespace-nowrap text-[var(--color-text)] transition-[color,background-color] duration-150 hover:bg-[var(--color-surface-muted)] lg:h-11 lg:w-[7.25rem] lg:px-2.5"
     >

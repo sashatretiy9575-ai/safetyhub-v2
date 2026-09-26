@@ -287,11 +287,17 @@ export function CourseMaterialActions({
 
                 <div className="mt-6 flex flex-wrap gap-2 text-xs font-semibold text-[var(--color-text-muted)] sm:text-sm">
                   <span className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[var(--color-surface-muted)] px-3.5">
-                    <FilePdf size={18} weight="duotone" className="text-[var(--color-primary)]" />
+                    <FilePdf
+                      aria-hidden="true"
+                      size={18}
+                      weight="duotone"
+                      className="text-[var(--color-primary)]"
+                    />
                     {t('pages', { count: course.presentation?.pageCount ?? 0 })}
                   </span>
                   <span className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[var(--color-surface-muted)] px-3.5">
                     <ListChecks
+                      aria-hidden="true"
                       size={18}
                       weight="duotone"
                       className="text-[var(--color-primary)]"
@@ -299,7 +305,12 @@ export function CourseMaterialActions({
                     {t('questions', { count: course.questionCount })}
                   </span>
                   <span className="inline-flex min-h-10 items-center gap-2 rounded-full bg-[var(--color-surface-muted)] px-3.5">
-                    <Timer size={18} weight="duotone" className="text-[var(--color-primary)]" />
+                    <Timer
+                      aria-hidden="true"
+                      size={18}
+                      weight="duotone"
+                      className="text-[var(--color-primary)]"
+                    />
                     {t('minutes', { count: course.durationMinutes })}
                   </span>
                 </div>

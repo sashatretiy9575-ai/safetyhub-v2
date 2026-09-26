@@ -10,6 +10,7 @@ import { ARTICLE_WHATSAPP_ACTION_URL, articleBlocksSchema } from '@/lib/validati
 import { cn } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
 import { isAppLocale, localizePathname, type AppLocale } from '@/i18n/config';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 
 /**
  * An internal link in the body is stored as the Russian path («/topics/biot»);
@@ -200,7 +201,7 @@ export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: Article
             const buttonClass =
               block.style === 'outline'
                 ? 'min-h-13 w-full justify-between rounded-[var(--radius-md)] px-5 text-base font-bold shadow-sm sm:w-auto sm:min-w-72 dark:border-white/50 dark:bg-white/5 dark:text-white dark:hover:bg-white/15'
-                : 'min-h-13 w-full justify-between rounded-[var(--radius-md)] px-5 text-base font-bold !text-white no-underline shadow-[var(--color-primary)]/20 shadow-lg hover:no-underline sm:w-auto sm:min-w-72';
+                : 'min-h-13 w-full justify-between rounded-[var(--radius-md)] px-5 text-base font-bold !text-[var(--color-primary-foreground)] no-underline shadow-[var(--color-primary)]/20 shadow-lg hover:no-underline sm:w-auto sm:min-w-72';
             return (
               <div key={index} className="my-10 flex justify-start">
                 <Button
@@ -391,6 +392,7 @@ export function ArticleRenderer({ blocks, contacts, headingOffset = 0 }: Article
                   className="font-semibold"
                 >
                   {block.title}
+                  <NewTabHint />
                 </a>
                 {block.note ? <p className="mb-0 text-sm">{block.note}</p> : null}
               </aside>

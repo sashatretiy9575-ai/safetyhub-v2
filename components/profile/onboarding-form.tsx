@@ -101,7 +101,8 @@ export function OnboardingForm({
 
   useEffect(() => {
     const query = form.organization.trim();
-    if (query.length < 2) return;
+    // The directory answers from three characters (search_profile_organizations).
+    if (query.length < 3) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
       void (async () => {
@@ -224,6 +225,9 @@ export function OnboardingForm({
 
   return (
     <form onSubmit={submit} className="space-y-6" noValidate>
+      <p role="status" className="sr-only">
+        {message}
+      </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label className="sr-only" htmlFor="onboarding-name">
@@ -242,11 +246,7 @@ export function OnboardingForm({
             required
           />
           {fieldErrors.name ? (
-            <p
-              id="onboarding-name-error"
-              role="alert"
-              className="text-xs text-[var(--color-danger)]"
-            >
+            <p id="onboarding-name-error" className="text-xs text-[var(--color-danger)]">
               {validationMessage(fieldErrors.name)}
             </p>
           ) : null}
@@ -268,11 +268,7 @@ export function OnboardingForm({
             required
           />
           {fieldErrors.surname ? (
-            <p
-              id="onboarding-surname-error"
-              role="alert"
-              className="text-xs text-[var(--color-danger)]"
-            >
+            <p id="onboarding-surname-error" className="text-xs text-[var(--color-danger)]">
               {validationMessage(fieldErrors.surname)}
             </p>
           ) : null}
@@ -294,11 +290,7 @@ export function OnboardingForm({
             required
           />
           {fieldErrors.job ? (
-            <p
-              id="onboarding-job-error"
-              role="alert"
-              className="text-xs text-[var(--color-danger)]"
-            >
+            <p id="onboarding-job-error" className="text-xs text-[var(--color-danger)]">
               {validationMessage(fieldErrors.job)}
             </p>
           ) : null}
@@ -328,11 +320,7 @@ export function OnboardingForm({
             ))}
           </datalist>
           {fieldErrors.organization ? (
-            <p
-              id="onboarding-organization-error"
-              role="alert"
-              className="text-xs text-[var(--color-danger)]"
-            >
+            <p id="onboarding-organization-error" className="text-xs text-[var(--color-danger)]">
               {validationMessage(fieldErrors.organization)}
             </p>
           ) : null}
@@ -351,18 +339,16 @@ export function OnboardingForm({
             }}
             invalid={Boolean(fieldErrors.education)}
             aria-describedby={
-              fieldErrors.education ? 'onboarding-education-error' : 'onboarding-education-help'
+              fieldErrors.education
+                ? 'onboarding-education-error onboarding-education-help'
+                : 'onboarding-education-help'
             }
           />
           <p id="onboarding-education-help" className="text-xs text-[var(--color-text-muted)]">
             {t('educationHint')}
           </p>
           {fieldErrors.education ? (
-            <p
-              id="onboarding-education-error"
-              role="alert"
-              className="text-xs text-[var(--color-danger)]"
-            >
+            <p id="onboarding-education-error" className="text-xs text-[var(--color-danger)]">
               {validationMessage(fieldErrors.education)}
             </p>
           ) : null}
@@ -381,18 +367,18 @@ export function OnboardingForm({
               setFieldErrors((current) => ({ ...current, phone: undefined }));
             }}
             invalid={Boolean(fieldErrors.phone)}
-            describedBy={fieldErrors.phone ? 'onboarding-phone-error' : 'onboarding-phone-help'}
+            describedBy={
+              fieldErrors.phone
+                ? 'onboarding-phone-error onboarding-phone-help'
+                : 'onboarding-phone-help'
+            }
             disabled={busy}
           />
           <p id="onboarding-phone-help" className="text-xs text-[var(--color-text-muted)]">
             {t('phoneHint')}
           </p>
           {fieldErrors.phone ? (
-            <p
-              id="onboarding-phone-error"
-              role="alert"
-              className="text-xs text-[var(--color-danger)]"
-            >
+            <p id="onboarding-phone-error" className="text-xs text-[var(--color-danger)]">
               {validationMessage(fieldErrors.phone)}
             </p>
           ) : null}
@@ -403,6 +389,7 @@ export function OnboardingForm({
         ref={avatarSectionRef}
         tabIndex={-1}
         aria-labelledby="onboarding-photo-title"
+        aria-describedby={fieldErrors.avatar ? 'onboarding-avatar-error' : undefined}
         className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-muted)]/45 p-4 outline-none sm:p-6"
       >
         <div className="text-center">
@@ -421,7 +408,10 @@ export function OnboardingForm({
           }}
         />
         {fieldErrors.avatar ? (
-          <p role="alert" className="text-center text-xs text-[var(--color-danger)]">
+          <p
+            id="onboarding-avatar-error"
+            className="text-center text-xs text-[var(--color-danger)]"
+          >
             {validationMessage(fieldErrors.avatar)}
           </p>
         ) : null}
@@ -434,11 +424,7 @@ export function OnboardingForm({
           {!busy ? <ArrowRight size={18} /> : null}
         </Button>
         {message ? (
-          <p
-            role="status"
-            aria-live="polite"
-            className="text-center text-sm text-[var(--color-text-muted)]"
-          >
+          <p aria-hidden="true" className="text-center text-sm text-[var(--color-text-muted)]">
             {message}
           </p>
         ) : null}

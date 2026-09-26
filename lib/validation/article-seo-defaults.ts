@@ -13,14 +13,14 @@ const FALLBACK_TITLE: Record<AppLocale, string> = {
   ru: 'Материал SafetyHub',
   kk: 'SafetyHub материалы',
   en: 'SafetyHub article',
-  zh: 'SafetyHub 材料',
+  zh: 'SafetyHub 资料',
 };
 
 const DESCRIPTION_TAIL: Record<AppLocale, string> = {
   ru: 'Практический материал SafetyHub по безопасности труда и промышленной безопасности.',
   kk: 'Еңбек қауіпсіздігі және өнеркәсіптік қауіпсіздік бойынша SafetyHub практикалық материалы.',
   en: 'A practical SafetyHub guide to occupational and industrial safety.',
-  zh: 'SafetyHub 关于职业安全与工业安全的实用材料。',
+  zh: 'SafetyHub 关于职业安全与工业安全的实用资料。',
 };
 
 function collapse(value: string) {

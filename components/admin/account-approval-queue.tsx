@@ -16,6 +16,7 @@ import { requestAdminNotificationRefresh } from '@/components/admin/admin-notifi
 import type { AdminAccountApprovalItem } from '@/lib/admin/types';
 import { clientRequest, clientRequestMessage, readClientResponseJson } from '@/lib/client-request';
 import { formatPhoneDisplay, phoneHref, whatsappChatHref } from '@/lib/site-contacts';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 
 type Decision = 'approved' | 'rejected';
 
@@ -464,6 +465,7 @@ export function AccountApprovalQueue({
       <div className="flex flex-col gap-3 rounded-[var(--radius-group)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1">
           <MagnifyingGlass
+            aria-hidden="true"
             className="absolute top-1/2 left-3.5 -translate-y-1/2 text-[var(--color-text-subtle)]"
             size={18}
           />
@@ -625,7 +627,7 @@ export function AccountApprovalQueue({
                     href={whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`Написать в WhatsApp: ${label}`}
+                    aria-label={`Написать в WhatsApp: ${label} (откроется в новой вкладке)`}
                     title="Написать в WhatsApp"
                   >
                     <WhatsappLogo size={20} aria-hidden="true" />
@@ -743,6 +745,7 @@ export function AccountApprovalQueue({
                       <a href={whatsapp} target="_blank" rel="noopener noreferrer">
                         <WhatsappLogo size={18} aria-hidden="true" />
                         Написать в WhatsApp
+                        <NewTabHint />
                       </a>
                     </Button>
                   ) : null}

@@ -24,6 +24,16 @@ import { Label } from '@/components/ui/label';
 import type { PhoneCountryOption } from '@/lib/phone/countries';
 
 type OrganizationResponse = { organizations?: string[] };
+
+/** The fields in the order they sit on screen; each input's id is `profile-<field>`. */
+const PROFILE_FIELD_ORDER = [
+  'name',
+  'surname',
+  'job',
+  'organization',
+  'education',
+  'phone',
+] as const satisfies readonly ProfileSubmissionField[];
 type UpdateResponse = {
   approvalState?: unknown;
   error?: string;
@@ -57,7 +67,8 @@ export function ProfileForm({
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!editing || form.organization.trim().length < 2) return;
+    // The directory answers from three characters (search_profile_organizations).
+    if (!editing || form.organization.trim().length < 3) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
       void (async () => {
@@ -89,6 +100,10 @@ export function ProfileForm({
     if (Object.keys(validation).length > 0) {
       setErrors(validation);
       setMessage(t('required'));
+      // The first field to fix takes focus, so its message — linked through
+      // aria-describedby — is read with it, as the onboarding form does.
+      const first = PROFILE_FIELD_ORDER.find((field) => validation[field]);
+      if (first) requestAnimationFrame(() => document.getElementById(`profile-${first}`)?.focus());
       return;
     }
 
@@ -144,13 +159,20 @@ export function ProfileForm({
 
   return (
     <div className="space-y-3">
+      {/* One live region that outlives the switch between reading and editing:
+          a status paragraph mounted together with its text is often not
+          announced, and saving unmounts the form that held it. The visible
+          copies below are for the eye only. */}
+      <p role="status" className="sr-only">
+        {message}
+      </p>
       {!editing ? (
         <div className="flex flex-wrap items-center gap-3">
           <Button type="button" size="sm" variant="outline" onClick={() => setEditing(true)}>
             <PencilSimple size={17} /> {t('edit')}
           </Button>
           {message ? (
-            <p role="status" className="text-sm text-[var(--color-text-muted)]">
+            <p aria-hidden="true" className="text-sm text-[var(--color-text-muted)]">
               {message}
             </p>
           ) : null}
@@ -167,10 +189,13 @@ export function ProfileForm({
               value={form.name}
               onChange={update('name')}
               invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? 'profile-name-error' : undefined}
               required
             />
             {errors.name ? (
-              <p className="text-xs text-[var(--color-danger)]">{validationMessage(errors.name)}</p>
+              <p id="profile-name-error" className="text-xs text-[var(--color-danger)]">
+                {validationMessage(errors.name)}
+              </p>
             ) : null}
           </div>
           <div className="space-y-1">
@@ -183,10 +208,11 @@ export function ProfileForm({
               value={form.surname}
               onChange={update('surname')}
               invalid={Boolean(errors.surname)}
+              aria-describedby={errors.surname ? 'profile-surname-error' : undefined}
               required
             />
             {errors.surname ? (
-              <p className="text-xs text-[var(--color-danger)]">
+              <p id="profile-surname-error" className="text-xs text-[var(--color-danger)]">
                 {validationMessage(errors.surname)}
               </p>
             ) : null}
@@ -201,10 +227,13 @@ export function ProfileForm({
               value={form.job}
               onChange={update('job')}
               invalid={Boolean(errors.job)}
+              aria-describedby={errors.job ? 'profile-job-error' : undefined}
               required
             />
             {errors.job ? (
-              <p className="text-xs text-[var(--color-danger)]">{validationMessage(errors.job)}</p>
+              <p id="profile-job-error" className="text-xs text-[var(--color-danger)]">
+                {validationMessage(errors.job)}
+              </p>
             ) : null}
           </div>
           <div className="space-y-1 sm:col-span-2">
@@ -218,6 +247,7 @@ export function ProfileForm({
               value={form.organization}
               onChange={update('organization')}
               invalid={Boolean(errors.organization)}
+              aria-describedby={errors.organization ? 'profile-organization-error' : undefined}
               required
             />
             <datalist id="profile-organizations">
@@ -226,7 +256,7 @@ export function ProfileForm({
               ))}
             </datalist>
             {errors.organization ? (
-              <p className="text-xs text-[var(--color-danger)]">
+              <p id="profile-organization-error" className="text-xs text-[var(--color-danger)]">
                 {validationMessage(errors.organization)}
               </p>
             ) : null}
@@ -241,13 +271,17 @@ export function ProfileForm({
                 setErrors((current) => ({ ...current, education: undefined }));
               }}
               invalid={Boolean(errors.education)}
-              aria-describedby={errors.education ? undefined : 'profile-education-help'}
+              aria-describedby={
+                errors.education
+                  ? 'profile-education-error profile-education-help'
+                  : 'profile-education-help'
+              }
             />
             <p id="profile-education-help" className="text-xs text-[var(--color-text-muted)]">
               {t('educationHint')}
             </p>
             {errors.education ? (
-              <p className="text-xs text-[var(--color-danger)]">
+              <p id="profile-education-error" className="text-xs text-[var(--color-danger)]">
                 {validationMessage(errors.education)}
               </p>
             ) : null}
@@ -266,7 +300,9 @@ export function ProfileForm({
                 setErrors((current) => ({ ...current, phone: undefined }));
               }}
               invalid={Boolean(errors.phone)}
-              describedBy={errors.phone ? 'profile-phone-error' : 'profile-phone-help'}
+              describedBy={
+                errors.phone ? 'profile-phone-error profile-phone-help' : 'profile-phone-help'
+              }
               disabled={busy}
             />
             <p id="profile-phone-help" className="text-xs text-[var(--color-text-muted)]">
@@ -287,7 +323,7 @@ export function ProfileForm({
             </Button>
           </div>
           {message ? (
-            <p role="status" className="text-sm text-[var(--color-text-muted)] sm:col-span-2">
+            <p aria-hidden="true" className="text-sm text-[var(--color-text-muted)] sm:col-span-2">
               {message}
             </p>
           ) : null}

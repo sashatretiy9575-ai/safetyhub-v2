@@ -1,6 +1,7 @@
 import { Container } from '@/components/ui/container';
 import type { Topic } from '@/server/content/topics';
 import { useTranslations } from 'next-intl';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 
 export function TopicSourcesCard({ topic }: { topic: Pick<Topic, 'sources'> }) {
   const t = useTranslations('Course');
@@ -35,6 +36,7 @@ export function TopicSourcesCard({ topic }: { topic: Pick<Topic, 'sources'> }) {
                       className="font-medium text-[var(--color-primary)] underline underline-offset-4"
                     >
                       {source.title}
+                      <NewTabHint />
                     </a>
                   </li>
                 ))}

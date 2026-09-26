@@ -158,7 +158,11 @@ test('public article composition is wide, single-column, readable, and related',
   assert.match(page, /<ArticleRenderer blocks=\{article\.blocks\} contacts=\{contacts\} \/>/);
   assert.match(renderer, /\{block\.text\}/);
   assert.match(renderer, /<ArrowRight size=\{18\}/);
-  assert.match(renderer, /!text-white no-underline/);
+  // The primary button's own foreground token: white on the light theme's green,
+  // near-black on the dark theme's lighter green. A fixed white failed contrast
+  // in dark mode.
+  assert.match(renderer, /!text-\[var\(--color-primary-foreground\)\] no-underline/);
+  assert.doesNotMatch(renderer, /!text-white/);
 });
 
 test('article cards keep copy visible and expose a clear reading action', async () => {

@@ -22,7 +22,11 @@ test('avatar is square, privately staged, and published only through its manifes
   assert.match(uploader, /\/api\/profile\/avatar/);
   assert.match(uploader, /avatar\.type === 'image\/jpeg'/);
   assert.match(uploader, /scrollIntoView/);
-  assert.match(uploader, /feedback\.kind === 'error' \? 'alert' : 'status'/);
+  // Errors interrupt, progress waits its turn — through live regions that are
+  // in the page before their text, since one mounted with its message is
+  // often not announced.
+  assert.match(uploader, /<p role="alert" className="sr-only">\s*\{feedback\?\.kind === 'error'/);
+  assert.match(uploader, /<p role="status" className="sr-only">\s*\{feedback\?\.kind === 'status'/);
   assert.doesNotMatch(uploader, /createClient|storage\.from|router\.refresh/);
   assert.match(route, /createAdminClient/);
   assert.match(route, /avatar\.type !== 'image\/webp' && avatar\.type !== 'image\/jpeg'/);

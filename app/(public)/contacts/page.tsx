@@ -5,6 +5,7 @@ import { Container } from '@/components/ui/container';
 import { PageHeader } from '@/components/ui/page-header';
 import { getSiteContacts } from '@/server/site-contacts';
 import { buildMetadata } from '@/lib/seo';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 
 export async function generateMetadata() {
   const t = await getTranslations('Contacts');
@@ -45,6 +46,7 @@ export default async function ContactsPage() {
                 className="underline underline-offset-4 transition-colors hover:text-[var(--color-primary)]"
               >
                 {shellT('city')}
+                <NewTabHint />
               </a>
               <span aria-hidden="true">·</span>
               <Clock aria-hidden="true" className="size-4 shrink-0" />

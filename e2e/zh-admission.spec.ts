@@ -24,7 +24,7 @@ test.describe('Chinese admission', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-Hans');
 
     // Switching to registration must not ask for an email anywhere.
-    const registerTab = page.getByRole('button', { name: '创建访问账号' }).first();
+    const registerTab = page.getByRole('button', { name: '注册账号' }).first();
     await expect(registerTab).toBeVisible();
     // The tab is server-rendered before its handler is attached, so a click can
     // land on an unhydrated button and do nothing at all. Retry until the panel
@@ -35,7 +35,7 @@ test.describe('Chinese admission', () => {
     }).toPass({ timeout: 15_000 });
 
     await expect(page.locator('input[type="email"]')).toHaveCount(0);
-    await expect(page.getByLabel('拉丁用户名')).toBeVisible();
+    await expect(page.getByLabel('用户名（英文字母）')).toBeVisible();
 
     // Consent is pre-ticked here as well.
     await expect(page.locator('#zh-register-legal')).toBeChecked();

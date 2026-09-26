@@ -37,6 +37,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 const LearningHistoryControl = dynamic(
   () =>
     import('@/components/admin/learning-history-control').then(
@@ -291,6 +292,7 @@ function ProfileAvatar({
       className="shrink-0 rounded-[var(--radius-group)]"
     >
       {avatar}
+      <NewTabHint />
     </a>
   ) : (
     avatar
@@ -1090,7 +1092,11 @@ function AttestationDetailContent({
                         href={whatsappChatHref(contact.phoneE164)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={'Написать в WhatsApp: ' + formatPhoneDisplay(contact.phoneE164)}
+                        aria-label={
+                          'Написать в WhatsApp: ' +
+                          formatPhoneDisplay(contact.phoneE164) +
+                          ' (откроется в новой вкладке)'
+                        }
                         title="WhatsApp"
                       >
                         <WhatsappLogo aria-hidden />

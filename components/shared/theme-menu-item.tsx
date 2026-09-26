@@ -23,7 +23,9 @@ export function ThemeMenuItem() {
       checked={isDark}
       onCheckedChange={toggleTheme}
       onSelect={(event) => event.preventDefault()}
-      aria-label={isDark ? t('switchToLight') : t('switchToDark')}
+      // Named after what "checked" means, as the header switch is; the state
+      // comes from `aria-checked`, not from words that change with it.
+      aria-label={t('darkMode')}
       className="min-h-11 cursor-pointer rounded-[var(--radius-control)] py-2 focus:bg-[var(--color-surface-muted)]"
     >
       <div className="flex min-w-0 items-center gap-3">

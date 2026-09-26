@@ -67,11 +67,13 @@ export function DocumentSelect({
         trigger.current?.focus();
       }}
     >
+      {/* Named by its own two lines, the field's name and the chosen value. An
+          aria-label of the name alone hid the value: a screen reader heard
+          «Компания», never which one. The popup is a plain list of buttons,
+          not a menu, so it is a disclosure without aria-haspopup. */}
       <button
         ref={trigger}
         type="button"
-        aria-label={label}
-        aria-haspopup="true"
         aria-expanded={open}
         aria-controls={open ? listId : undefined}
         disabled={disabled}
@@ -113,6 +115,11 @@ export function DocumentSelect({
                 className="h-11 w-full rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] pr-3 pl-9 text-base text-[var(--color-text)] placeholder:text-[var(--color-text-subtle)]"
               />
             </label>
+          ) : null}
+          {options.length >= SEARCH_FROM ? (
+            <p role="status" className="sr-only">
+              {query.trim() ? `Найдено: ${visible.length}` : ''}
+            </p>
           ) : null}
           <ul id={listId} className="max-h-64 overflow-y-auto overscroll-contain">
             {visible.map((option) => (

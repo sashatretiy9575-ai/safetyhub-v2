@@ -56,7 +56,25 @@ test('the page keeps one stable heading across all four states', () => {
     'the three non-result views name the course',
   );
   assert.doesNotMatch(client, /<h1[^>]*>\{currentQuestion\.text\}/u);
-  assert.match(client, /<h2 className="font-display text-xl leading-tight font-bold">\{currentQuestion\.text\}<\/h2>/u);
+  assert.match(
+    client,
+    /<h2\s+id="quiz-question-title"\s+ref=\{questionHeadingRef\}\s+tabIndex=\{-1\}\s+className="font-display text-xl leading-tight font-bold outline-none"\s*>\s*\{currentQuestion\.text\}\s*<\/h2>/u,
+  );
+});
+
+test('the question names its answers and is announced when it changes', () => {
+  // The radio group was named «Выберите ответ» on every question; the question
+  // itself is the name, the instruction its description.
+  assert.match(
+    client,
+    /<fieldset\s+aria-labelledby="quiz-question-title"\s+aria-describedby="quiz-question-hint"/u,
+  );
+  assert.match(client, /<legend id="quiz-question-hint" className="sr-only">/u);
+  // Back, Next and the review list move focus to the new question; the
+  // numbered strip keeps focus and announces it through a live region.
+  assert.match(client, /questionHeadingRef\.current\?\.focus\(\)/u);
+  assert.match(client, /navigateToQuestion\(index, \{ moveFocus: false \}\)/u);
+  assert.match(client, /<p role="status" className="sr-only">\s*\{questionAnnouncement\}/u);
 });
 
 test('leaving mid-attempt with answers is warned about', () => {

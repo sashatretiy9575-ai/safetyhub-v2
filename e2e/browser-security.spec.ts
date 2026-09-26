@@ -82,15 +82,14 @@ test('the selected theme survives navigation into nonce-protected auth pages', a
 
   await page.goto('/');
   const themeSwitch = page.getByRole('switch');
-  const currentAction = await themeSwitch.getAttribute('aria-label');
-  if (currentAction?.includes('тёмную')) await themeSwitch.click();
+  if ((await themeSwitch.getAttribute('aria-checked')) !== 'true') await themeSwitch.click();
 
   await expect(page.locator('html')).toHaveClass(/dark/u);
   await page.goto('/auth/login');
   await expect(page.locator('html')).toHaveClass(/dark/u);
-  await expect(page.getByRole('switch')).toHaveAttribute(
-    'aria-label',
-    'Тёмная тема. Переключить на светлую',
+  await expect(page.getByRole('switch', { name: 'Тёмная тема' })).toHaveAttribute(
+    'aria-checked',
+    'true',
   );
   expect(cspErrors).toEqual([]);
 });

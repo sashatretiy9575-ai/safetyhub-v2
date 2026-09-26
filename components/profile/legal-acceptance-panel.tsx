@@ -9,6 +9,7 @@ import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { legalDocumentHref, type LegalDocumentVersion, type LegalDocumentType } from '@/lib/legal';
 import type { Json, LegalAcceptanceRow } from '@/lib/supabase/types';
 import { localizePathname, type AppLocale } from '@/i18n/config';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 
 type Acceptance = Omit<LegalAcceptanceRow, 'user_id'>;
 
@@ -166,6 +167,7 @@ export function LegalAcceptancePanel({
               className="font-medium text-[var(--color-primary)] underline underline-offset-2"
             >
               {t(document.type)}
+              <NewTabHint />
             </Link>
             <span className="text-xs">{document.version}</span>
           </span>
@@ -251,6 +253,7 @@ export function LegalAcceptancePanel({
                   className="inline-flex min-h-11 shrink-0 items-center font-medium text-[var(--color-primary)] underline underline-offset-2"
                 >
                   {t('openAccepted')}
+                  <NewTabHint />
                 </Link>
               </li>
             ))}

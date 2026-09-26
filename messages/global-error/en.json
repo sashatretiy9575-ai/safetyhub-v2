@@ -10,7 +10,7 @@
   },
   "Common": {
     "retry": "Try again",
-    "home": "Go to home",
+    "home": "Back to home",
     "correlationIdPlain": "Reference code"
   }
 }

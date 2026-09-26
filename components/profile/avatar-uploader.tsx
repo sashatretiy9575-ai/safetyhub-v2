@@ -134,6 +134,7 @@ function CropPreview({
       width={AVATAR_WIDTH}
       height={AVATAR_HEIGHT}
       className="aspect-square h-auto w-full touch-none rounded-2xl bg-[var(--color-surface-muted)] object-cover"
+      role="img"
       aria-label={previewLabel}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
@@ -479,6 +480,12 @@ export function AvatarUploader({
 
   return (
     <div className={compact ? 'space-y-2 text-center' : 'space-y-4 text-center'}>
+      <p role="alert" className="sr-only">
+        {feedback?.kind === 'error' ? feedback.message : ''}
+      </p>
+      <p role="status" className="sr-only">
+        {feedback?.kind === 'status' ? feedback.message : ''}
+      </p>
       <Avatar
         className={`${compact ? 'size-24' : 'size-32'} mx-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] shadow-sm`}
       >
@@ -567,6 +574,7 @@ export function AvatarUploader({
           data-avatar-crop-panel
           ref={cropPanelRef}
           tabIndex={-1}
+          role="group"
           aria-labelledby={cropTitleId}
           className="mx-auto max-w-sm space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 text-left"
         >
@@ -665,8 +673,7 @@ export function AvatarUploader({
       ) : null}
       {feedback ? (
         <p
-          role={feedback.kind === 'error' ? 'alert' : 'status'}
-          aria-live="polite"
+          aria-hidden="true"
           className={`text-xs ${feedback.kind === 'error' ? 'text-[var(--color-danger)]' : 'text-[var(--color-text-muted)]'}`}
         >
           {feedback.message}

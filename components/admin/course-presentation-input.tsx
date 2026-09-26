@@ -8,6 +8,7 @@ import { clientRequest, readClientResponseJson } from '@/lib/client-request';
 import { TEST_EDITOR_LIMITS } from '@/lib/admin/course-test-editor';
 import type { AppLocale } from '@/lib/supabase/types';
 import { confirmDialog } from '@/components/admin/confirm-dialog';
+import { NewTabHint } from '@/components/shared/new-tab-hint';
 
 type UploadGrant = {
   presentationId: string;
@@ -413,6 +414,7 @@ export function CoursePresentationInput({
                   className="inline-flex min-h-11 items-center text-sm font-bold text-[var(--color-primary)] underline"
                 >
                   Открыть PDF
+                  <NewTabHint />
                 </a>
                 <a
                   href={adminPresentationUrl(courseId, value.id, 'presentation', true)}

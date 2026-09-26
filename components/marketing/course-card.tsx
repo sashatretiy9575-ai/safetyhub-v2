@@ -72,12 +72,14 @@ export function CourseCard({
           aria-hidden="true"
           className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/30 to-transparent"
         />
+        {/* The badge is decoration: the heading below names the course. A hidden
+            copy of the title here made the link read the title twice. */}
         <span
+          aria-hidden="true"
           className="absolute top-2 right-2 grid size-8 place-items-center rounded-xl border border-white/55 bg-white/85 text-slate-700 shadow-sm backdrop-blur-md sm:top-3 sm:right-3 sm:size-9"
           title={title}
         >
           <CourseIcon size={20} weight="duotone" aria-hidden="true" />
-          <span className="sr-only">{title}</span>
         </span>
       </div>
 
@@ -95,10 +97,11 @@ export function CourseCard({
           data-course-card-actions
           className="mt-auto grid grid-cols-2 gap-2 pt-3 text-xs font-semibold text-[var(--color-text-muted)] sm:pt-4"
         >
-          <span
-            aria-label={t('questions', { count: questionCount })}
-            className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5 max-sm:hidden"
-          >
+          {/* The chips are part of the link's name, so they speak in words.
+              An aria-label on a plain span is not allowed and most screen
+              readers drop it — which left the hidden text below as the only
+              copy, and on a phone nothing at all. */}
+          <span className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5 max-sm:hidden">
             <ListChecks
               size={16}
               weight="duotone"
@@ -108,14 +111,11 @@ export function CourseCard({
             <span className="min-[280px]:hidden" aria-hidden="true">
               {questionCount}
             </span>
-            <span className="hidden min-[280px]:inline" aria-hidden="true">
+            <span className="hidden min-[280px]:inline">
               {t('questions', { count: questionCount })}
             </span>
           </span>
-          <span
-            aria-label={`${t('minutes', { count: durationMinutes })}${pageCount ? `, ${t('pages', { count: pageCount })}` : ''}`}
-            className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5 max-sm:hidden"
-          >
+          <span className="inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[12px] bg-[var(--color-surface-muted)] px-2.5 max-sm:hidden">
             <Clock
               size={16}
               weight="duotone"
@@ -126,14 +126,19 @@ export function CourseCard({
               {t('minutesShort', { count: durationMinutes })}
               {pageCount ? ` · ${t('pagesShort', { count: pageCount })}` : ''}
             </span>
+            <span className="sr-only">
+              {`${t('minutes', { count: durationMinutes })}${pageCount ? `, ${t('pages', { count: pageCount })}` : ''}`}
+            </span>
           </span>
+          {/* The whole card is the link and the heading names it; the same
+              "open course" words on every card only lengthened each name. */}
           <span
             data-course-card-cta
-            aria-label={t('open')}
+            aria-hidden="true"
             // 44px is the minimum comfortable tap target; this was 40px.
             className="col-span-2 inline-flex min-h-11 min-w-0 items-center justify-between gap-2 rounded-[14px] bg-[var(--color-primary)] px-3 text-xs font-bold whitespace-nowrap text-[var(--color-primary-foreground)] shadow-[0_10px_24px_-16px_var(--color-primary)] transition-colors group-hover:bg-[var(--color-primary-hover)] sm:mt-1 sm:gap-3 sm:px-4 sm:text-sm"
           >
-            <span aria-hidden="true">{t('open')}</span>
+            <span>{t('open')}</span>
             <ArrowUpRight
               size={16}
               weight="bold"

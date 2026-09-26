@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "description": "Online training in industrial safety, occupational safety and health, and fire safety.",
-    "manifestName": "SafetyHub.kz — workplace safety",
+    "manifestName": "SafetyHub.kz — occupational safety",
     "manifestDescription": "Training and knowledge checks for workplace and industrial safety.",
     "screenshotMobile": "SafetyHub home page on a mobile device",
     "screenshotWide": "SafetyHub home page on a computer"
@@ -18,7 +18,7 @@
       "home": "Home",
       "topics": "Courses",
       "blog": "Blog",
-      "contacts": "Contacts",
+      "contacts": "Contact",
       "faq": "FAQ"
     },
     "account": {
@@ -54,8 +54,7 @@
     "theme": {
       "light": "Light",
       "dark": "Dark",
-      "switchToLight": "Dark theme. Switch to light theme",
-      "switchToDark": "Light theme. Switch to dark theme"
+      "darkMode": "Dark theme"
     },
     "userMenu": {
       "label": "User menu{suffix}",
@@ -78,28 +77,19 @@
     "installing": "Opening…",
     "dismiss": "Dismiss installation suggestion",
     "iosHint": "In Safari tap <share>Share</share>, then <add>Add to Home Screen</add>.",
-    "howTo": "How to install",
     "gotIt": "Got it",
     "later": "Later"
   },
   "Offline": {
     "title": "You’re offline",
-    "description": "Check your internet connection and try again. Open tests are not saved while offline.",
-    "home": "Go to home"
+    "description": "Check your connection and try again. A test can’t be started or submitted offline.",
+    "home": "Back to home"
   },
   "Common": {
     "loading": "Loading…",
-    "saving": "Saving…",
-    "cancel": "Cancel",
     "retry": "Try again",
-    "home": "Go to home",
-    "back": "Back",
-    "next": "Next",
-    "open": "Open",
-    "download": "Download",
+    "home": "Back to home",
     "correlationId": "Reference code: {id}",
-    "correlationIdPlain": "Reference code",
-    "userFallback": "User",
     "carousel": {
       "item": "Card",
       "previous": "Previous: {item}",
@@ -112,22 +102,20 @@
       "network": "Could not reach the server. Check your connection and try again.",
       "aborted": "The request was cancelled. Try again.",
       "rateLimited": "Too many requests. Please try again shortly.",
-      "temporarilyUnavailable": "The service is temporarily unavailable. Try again later.",
-      "generic": "Something went wrong. Try again."
-    }
+      "temporarilyUnavailable": "The service is temporarily unavailable. Try again later."
+    },
+    "opensInNewTab": "(opens in a new tab)"
   },
   "Home": {
     "metadataTitle": "Occupational safety and health training online, Almaty",
     "metadataDescription": "Online training and knowledge checks in occupational safety and health, fire safety and industrial safety. A presentation, a {count}-question test, {pass} to pass. Almaty, Mon–Fri 09:00–18:00.",
-    "loadingCourses": "Loading courses",
-    "loadingResources": "Loading resources",
     "hero": {
       "imageAlt": "Safety professionals review information at an industrial site",
       "eyebrow": "Almaty · online across Kazakhstan",
       "title": "Occupational safety and health training and knowledge checks online",
       "description": "A presentation, a {count}-question test and a certificate — online, with no trip to a training centre.",
       "courses": "Choose a course",
-      "contact": "Contacts"
+      "contact": "Contact"
     },
     "courses": {
       "eyebrow": "Training programmes",
@@ -166,12 +154,12 @@
     },
     "resources": {
       "eyebrow": "Useful before a test or shift",
-      "title": "Workplace guidance: PPE, fire, first aid",
+      "title": "Occupational safety guidance: PPE, fire, first aid",
       "description": "Short guides: PPE, fire, first aid, test preparation.",
-      "all": "Open all articles",
+      "all": "View all articles",
       "slider": "Useful safety articles",
       "item": "Article",
-      "empty": "There are no articles in this language yet. Open the full blog — the Russian material is available."
+      "empty": "There are no articles in this language yet. Browse the blog to read them in Russian."
     },
     "cases": {
       "eyebrow": "Use cases",
@@ -184,10 +172,10 @@
       "employeeProblem": "Needs a quick refresher before the first working day.",
       "employeeAction": "Studies short, focused sections on a phone.",
       "employeeOutcome": "The test result is saved in the account immediately.",
-      "specialist": "Workplace safety specialist",
+      "specialist": "Occupational safety specialist",
       "specialistProblem": "Needs to see which topics participants have completed.",
       "specialistAction": "The best result for every course appears in one profile without paper records.",
-      "specialistOutcome": "Attestations and certificates remain available at any time.",
+      "specialistOutcome": "Assessment results and certificates are available at any time.",
       "manager": "Team manager",
       "managerProblem": "Employees find long mobile assessments inconvenient.",
       "managerAction": "Each test is limited to ten clear questions.",
@@ -230,8 +218,8 @@
       "rejectedTitle": "Your application needs clarification",
       "rejectedDescription": "Review the administrator’s comment and submit your details again.",
       "rejectedLabel": "Update details",
-      "lockedTitle": "Course not opened yet",
-      "lockedDescription": "Your account is approved, but this course is not open to you yet. Send a request and the administrator will open it.",
+      "lockedTitle": "Course not available yet",
+      "lockedDescription": "Your account is approved, but this course is not open to you yet. Send a request and an administrator will give you access.",
       "lockedLabel": "Request access",
       "requestedTitle": "Request sent",
       "requestedDescription": "The administrator has your request and will open the course, usually within 24 hours.",
@@ -258,9 +246,9 @@
     "relatedArticles": "Safety articles"
   },
   "Blog": {
-    "metadataTitle": "Workplace and industrial safety articles in Kazakhstan",
+    "metadataTitle": "Occupational and industrial safety articles in Kazakhstan",
     "metadataDescription": "Practical articles on occupational safety, industrial safety and fire safety in Kazakhstan: PPE, what to do in a fire, first aid and stopping dangerous work, with references to the regulations.",
-    "metadataKeyword1": "workplace safety blog",
+    "metadataKeyword1": "occupational safety blog",
     "metadataKeyword2": "industrial safety articles",
     "loading": "Loading articles",
     "emptyTitle": "No articles yet",
@@ -277,16 +265,13 @@
     "sourcesEmpty": "No regulatory sources are listed for this version of the material.",
     "continueEyebrow": "Keep reading",
     "relatedTitle": "More practical guidance",
-    "readTime": "{count, plural, one {# minute read} other {# minutes read}}",
-    "back": "Back to blog",
+    "readTime": "{count} min read",
     "allArticles": "All articles",
     "author": "Author",
     "published": "Publication date",
     "readTimeLabel": "Reading time",
     "toc": "Contents",
     "tocAria": "Article contents",
-    "call": "Call",
-    "whatsapp": "Message us on WhatsApp",
     "articleUnavailable": "The article is temporarily unavailable because its content format is invalid.",
     "info": "Information",
     "important": "Important",
@@ -299,7 +284,7 @@
     "source": "Source"
   },
   "Contacts": {
-    "metadataTitle": "Contacts: phone and WhatsApp, Almaty",
+    "metadataTitle": "Contact: phone and WhatsApp, Almaty",
     "metadataDescription": "SafetyHub contacts: phone and WhatsApp for questions about online occupational safety and health training, testing and the issuing of electronic certificates with QR verification.",
     "title": "Contact SafetyHub",
     "call": "Call",
@@ -316,7 +301,7 @@
     "countQuestion": "How many questions are in a test?",
     "countAnswer": "Every test contains exactly {questionCount} questions. You need at least {passScore} correct answers, or {passPercent}%, to pass.",
     "resultQuestion": "Where can I see my best result?",
-    "resultAnswer": "After signing in, open your profile. It shows your best score, attestation status and available certificates for each course without listing individual attempts."
+    "resultAnswer": "After signing in, open your profile. It shows your best score, assessment status and available certificates for each course, without listing individual attempts."
   },
   "AuthOtp": {
     "loginTitle": "Sign in or register",
@@ -348,13 +333,13 @@
     "verifyInvalid": "Enter your email and six-digit code.",
     "verifyUnavailable": "Could not verify the code. Try again later.",
     "contextUnavailable": "You’re signed in, but your profile hasn’t loaded yet. Refresh the page in a minute.",
-    "sentTo": "The code was sent to {email}. Check the spam folder too.",
+    "sentTo": "The code was sent to {email}. Check your spam folder too.",
     "serviceBusy": "Too many sign-in codes are being sent right now. Try again in {delay}.",
     "serviceBusyHint": "If a code has already arrived, enter it: it stays valid for one hour.",
     "addressCooldown": "A code was already sent to this address. You can request a new one in {delay}.",
     "legalPrefix": "By continuing, you accept the",
     "legalAnd": "and",
-    "legalRequired": "Confirm that you accept the terms and the privacy policy.",
+    "legalRequired": "Confirm that you accept the Terms of Use and the Privacy Policy.",
     "captchaAria": "Security check",
     "turnstile": {
       "error": "The Cloudflare check could not be completed.",
@@ -389,11 +374,11 @@
     "passwordConfirmationLabel": "Confirm password",
     "passwordConfirmationInvalid": "The passwords do not match.",
     "legalPrefix": "I have read and accept",
-    "legalTerms": "the terms of use",
+    "legalTerms": "the Terms of Use",
     "legalAnd": "and",
-    "legalPrivacy": "the privacy policy",
+    "legalPrivacy": "the Privacy Policy",
     "legalSuffix": ".",
-    "legalRequired": "Accept the terms of use and the privacy policy first.",
+    "legalRequired": "Accept the Terms of Use and the Privacy Policy first.",
     "submitBusy": "Please wait…",
     "submitRegister": "Create and continue",
     "submitLogin": "Sign in",
@@ -416,18 +401,17 @@
     "job": "Job title",
     "organization": "Company name",
     "organizationShort": "Company",
-    "organizationHint": "Choose a matching result or enter the name yourself.",
     "education": "Education",
-    "educationHint": "The protocol shows your level of education, not the name of your school.",
+    "educationHint": "The exam record shows your level of education, not the name of your school.",
     "educationPlaceholder": "Choose your level of education",
     "educationLevels": {
-      "higher": "Higher",
-      "incompleteHigher": "Incomplete higher",
-      "vocational": "Vocational (secondary specialised)",
-      "secondary": "Secondary"
+      "higher": "Higher education",
+      "incompleteHigher": "Incomplete higher education",
+      "vocational": "Vocational (specialised secondary)",
+      "secondary": "Secondary education"
     },
     "phone": "Phone number",
-    "phoneCountry": "Phone country",
+    "phoneCountry": "Country code",
     "phonePlaceholder": "Number after {code}",
     "phoneHint": "The number is only used to contact you about the application; no SMS codes are sent.",
     "avatar": "Profile photo",
@@ -443,7 +427,7 @@
       "controlCharacters": "Remove unsupported control characters.",
       "nameScript": "Enter the first and last name in Latin or Cyrillic letters.",
       "tooLong": "Use no more than {max} characters.",
-      "phoneCountry": "Choose the phone country.",
+      "phoneCountry": "Choose a country code.",
       "phoneInvalid": "Enter a valid phone number."
     },
     "edit": "Edit details",
@@ -464,7 +448,7 @@
     "approvalPending": "Under review",
     "approvalIncomplete": "Complete profile",
     "coursesTitle": "My courses",
-    "coursesSummary": "Passed {passed} of {total} · {certificates} certificates",
+    "coursesSummary": "Passed {passed} of {total} · {certificates, plural, one {# certificate} other {# certificates}}",
     "course": "Course",
     "result": "Result",
     "action": "Action",
@@ -483,12 +467,13 @@
     "certificateIssued": "Issued",
     "certificateRevoked": "Being reissued",
     "certificateUnavailable": "Unavailable",
+    "noAccess": "No access",
     "nextStep": "Next step",
     "testPassed": "Test passed — {score}/{total}",
     "certificatePreparing": "Certificate is being prepared",
     "actionRequired": "Action required:",
     "checkCompany": "check the company name in your profile.",
-    "fixData": "Correct details",
+    "fixData": "Fix details",
     "certificateAfterReview": "The PDF will appear here after administrator review.",
     "retryCourse": "Retake “{title}”",
     "score": "Result: {score}/{total}",
@@ -525,8 +510,7 @@
     "systemCamera": "System camera",
     "restart": "Restart",
     "capture": "Take photo",
-    "cameraUnavailable": "The direct camera is unavailable. Use your device’s system camera.",
-    "cameraDenied": "Camera access was denied. Allow camera access in browser settings or use the system camera.",
+    "cameraUnavailable": "The in-browser camera is unavailable. Use your device’s system camera.",
     "cameraFailed": "The camera could not be opened. Use the system camera or choose an existing photo.",
     "cameraNotReady": "The camera is not ready yet. Wait a second and try again.",
     "processing": "Processing and saving the photo…",
@@ -573,7 +557,6 @@
     "remaining": "Remaining",
     "deadline": "We’ll reply by {deadline}",
     "remainingValue": "{hours} h {minutes} min",
-    "call": "Call administrator",
     "callWithNumber": "Call: {phone}",
     "whatsapp": "Message us on WhatsApp"
   },
@@ -589,8 +572,8 @@
     "improveResult": "Improve result",
     "retake": "Retake test",
     "certificate": "Certificate",
-    "openAccount": "Open account",
-    "timerAria": "Time remaining {time}",
+    "openAccount": "Go to my account",
+    "timerAria": "Time remaining: {time}",
     "timerUrgentAria": "Less than five minutes remaining: {time}",
     "progressAria": "Answered {completed} of {total} questions",
     "checking": "Checking…",
@@ -633,7 +616,7 @@
       "failedTitle": "Pass mark not reached",
       "certificateAdminIssue": "The administrator is preparing your certificate — you will receive an email.",
       "savedNoAnswers": "Correct answers are hidden. Review the material and try again.",
-      "expiredServer": "Attempt closed on time-out",
+      "expiredServer": "Attempt closed: time ran out",
       "expiredDescription": "The allotted {minutes} minutes ended. No score was calculated and the correct answers stay hidden.",
       "failedDescription": "Your best score is saved in your account. Review the course before another attempt. The attempt limit resets after midnight."
     },
@@ -641,9 +624,9 @@
       "approvalRequired": "Your application is still awaiting administrator approval. Questions and tests remain unavailable until approval.",
       "onboardingRequired": "Before your first test, complete your name, job title and company, then add a photo.",
       "avatarRequired": "Upload the required profile photo before taking the test.",
-      "rollingLimitAt": "Another attempt will be available {availableAt}.",
+      "rollingLimitAt": "Your next attempt will be available on {availableAt}.",
       "rollingLimitUnknown": "The next attempt date is temporarily unavailable. Try opening the test later.",
-      "dailyLimitAt": "The new-attempt limit has been reached. Your next attempt will be available {availableAt}.",
+      "dailyLimitAt": "The new-attempt limit has been reached. Your next attempt will be available on {availableAt}.",
       "dailyLimitUnknown": "You have used all {count} attempts for this course today. Try again after midnight.",
       "notFound": "This attempt no longer exists. Start a new attempt.",
       "variantInvalid": "The test variant is unavailable. Start a new attempt or contact the administrator.",
@@ -667,7 +650,6 @@
     "downloadPdf": "Download PDF",
     "generating": "Preparing PDF…",
     "downloaded": "Downloaded",
-    "cancel": "Cancel",
     "downloadFailed": "The PDF could not be downloaded.",
     "cancelled": "PDF generation was cancelled.",
     "verifyMetadataTitle": "Verify certificate",
@@ -677,6 +659,8 @@
     "verification": "Certificate verification",
     "valid": "Certificate valid",
     "validDescription": "Authenticity is confirmed by the SafetyHub.kz record.",
+    "revoked": "Certificate revoked",
+    "revokedDescription": "According to the SafetyHub.kz record, this certificate is no longer valid.",
     "participant": "Participant",
     "program": "Programme",
     "result": "Result",
@@ -707,7 +691,7 @@
     "sourceProfile": "in profile",
     "openAccepted": "Open accepted version",
     "dateUnavailable": "date unavailable",
-    "timezone": "Oral",
+    "timezone": "Kazakhstan time, UTC+5",
     "saveFailed": "Could not record your consent. Refresh the page and try again.",
     "receiptMissing": "The consent could not be confirmed. Refresh the page before trying again.",
     "saved": "Current versions accepted and added to your history.",
@@ -728,15 +712,11 @@
     "deleteForever": "Delete permanently",
     "cancel": "Cancel",
     "failed": "Could not delete the account.",
-    "done": "Your account has been deleted. To use SafetyHub again, register anew.",
+    "done": "Your account has been deleted. To use SafetyHub again, create a new account.",
     "busy": "Another operation on this account is in progress. Try again in a minute.",
     "lastAdmin": "The last active administrator cannot be deleted."
   },
   "AppState": {
-    "loading": "Loading…",
-    "criticalTitle": "A critical error occurred",
-    "criticalDescription": "The application could not open completely. Refresh the page or return home.",
-    "digestId": "Error ID",
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The link may be outdated or the page may have moved.",
     "partialFailure": "Some data could not be loaded. Try again or return later.",

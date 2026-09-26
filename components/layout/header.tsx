@@ -85,15 +85,17 @@ export async function Header({
               aria-label={translations('quickContact')}
               className="hidden h-11 items-center overflow-visible lg:flex"
             >
+              {/* The tooltip repeats the aria-label for pointer users only. As
+                  an aria-describedby target it made a screen reader read the
+                  same words twice, as the name and again as the description. */}
               <ContactLink
                 kind="phone"
                 contacts={contacts}
                 aria-label={translations('call', { phone: contacts.phoneDisplay })}
-                aria-describedby="header-phone-tooltip"
                 className={`${contactActionClass} rounded-[var(--radius-control)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]`}
               >
                 <PhoneCall size={20} weight="regular" aria-hidden="true" />
-                <span id="header-phone-tooltip" role="tooltip" className={tooltipClass}>
+                <span aria-hidden="true" className={tooltipClass}>
                   {translations('call', { phone: contacts.phoneDisplay })}
                 </span>
               </ContactLink>
@@ -102,11 +104,10 @@ export async function Header({
                 kind="whatsapp"
                 contacts={contacts}
                 aria-label={translations('whatsapp')}
-                aria-describedby="header-whatsapp-tooltip"
                 className={`${contactActionClass} rounded-[var(--radius-control)] text-[var(--color-primary)] hover:bg-[var(--color-surface-muted)]`}
               >
                 <WhatsappLogo size={21} weight="regular" aria-hidden="true" />
-                <span id="header-whatsapp-tooltip" role="tooltip" className={tooltipClass}>
+                <span aria-hidden="true" className={tooltipClass}>
                   {translations('whatsapp')}
                 </span>
               </ContactLink>

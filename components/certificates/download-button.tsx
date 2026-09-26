@@ -13,6 +13,7 @@ import {
   type CertificateRenderMetadata,
 } from '@/lib/pdf/certificate-client-contract';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
+import { cn } from '@/lib/utils';
 
 /**
  * Deliberately twice the shared client default: this request resolves a
@@ -103,15 +104,35 @@ export function CertificateDownloadButton({
     }
   };
 
+  const busy = status === 'busy';
+
   return (
     <span className="inline-flex max-w-full flex-col gap-1">
+      {/* Spoken progress and failure, from regions present before their text:
+          one mounted together with its message is often not announced. The
+          visible line under the button is for the eye. */}
+      <span role="status" className="sr-only">
+        {busy ? t('generating') : status === 'downloaded' ? t('downloaded') : ''}
+      </span>
+      <span role="alert" className="sr-only">
+        {message}
+      </span>
+      {/* aria-disabled rather than disabled while the PDF is prepared: a
+          disabled button drops keyboard focus to the page, and the learner
+          had to find their place again. It looks and acts disabled all the
+          same. */}
       <Button
         type="button"
         variant={status === 'downloaded' ? 'outline' : variant}
         size={size}
-        className={className}
-        onClick={() => void download()}
-        disabled={status === 'busy'}
+        className={cn(
+          'aria-disabled:pointer-events-none aria-disabled:opacity-50',
+          className,
+        )}
+        onClick={() => {
+          if (!busy) void download();
+        }}
+        aria-disabled={busy || undefined}
       >
         {status === 'busy' ? (
           <SpinnerGap className="animate-spin" />
@@ -127,7 +148,7 @@ export function CertificateDownloadButton({
             : (children ?? t('downloadPdf'))}
       </Button>
       {message ? (
-        <span role="alert" className="text-xs text-[var(--color-danger)]">
+        <span aria-hidden="true" className="text-xs text-[var(--color-danger)]">
           {message}
         </span>
       ) : null}

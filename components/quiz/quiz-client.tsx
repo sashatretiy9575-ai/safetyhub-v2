@@ -37,10 +37,10 @@ import { Progress } from '@/components/ui/progress';
 import { localizedClientRequestMessage } from '@/i18n/client-errors';
 import {
   BUSINESS_TIME_ZONE,
-  HTML_LANGUAGE_BY_LOCALE,
   localizePathname,
   type AppLocale,
 } from '@/i18n/config';
+import { intlLocale } from '@/i18n/intl-locale';
 
 /**
  * Option letters are data, not character arithmetic. Deriving them from a code
@@ -58,7 +58,7 @@ type SaveState = 'idle' | 'saved' | 'error';
 
 function retryDate(value: string | undefined, locale: AppLocale) {
   if (!value || !Number.isFinite(Date.parse(value))) return null;
-  return new Date(value).toLocaleString(HTML_LANGUAGE_BY_LOCALE[locale], {
+  return new Date(value).toLocaleString(intlLocale(locale), {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -407,12 +407,36 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
     return () => window.removeEventListener('beforeunload', warnAboutUnsavedAnswers);
   }, [answers.length, attempt?.status, localBackupFailed, submissionLocked]);
 
-  const navigateToQuestion = (index: number) => {
+  // A new question replaces the old one in place, so a screen reader heard
+  // nothing: focus stayed on Next (or on Back, which then went disabled and
+  // dropped it). Back, Next and the review list now move focus to the
+  // question itself. The numbered strip keeps focus where it is — a keyboard
+  // user stepping through it should not be thrown out of it — and says which
+  // question opened instead.
+  const questionHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const focusQuestionRef = useRef(false);
+  const [questionAnnouncement, setQuestionAnnouncement] = useState('');
+  useEffect(() => {
+    if (!focusQuestionRef.current || reviewing) return;
+    focusQuestionRef.current = false;
+    questionHeadingRef.current?.focus();
+  }, [currentIndex, reviewing]);
+
+  const navigateToQuestion = (index: number, { moveFocus = true } = {}) => {
     const activeAttempt = attemptRef.current;
     currentIndexRef.current = index;
     setCurrentIndex(index);
     setReviewing(false);
     setReviewConfirmed(false);
+    if (moveFocus) {
+      focusQuestionRef.current = true;
+      setQuestionAnnouncement('');
+    } else {
+      const question = activeAttempt?.questions[index];
+      setQuestionAnnouncement(
+        question ? `${t('questionAria', { number: index + 1 })}. ${question.text}` : '',
+      );
+    }
     if (activeAttempt?.status === 'started') persistDraft(activeAttempt.attemptId);
   };
 
@@ -914,6 +938,9 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
           })}
           className="mb-4 h-2.5"
         />
+        <p role="status" className="sr-only">
+          {questionAnnouncement}
+        </p>
         {/* Five 44 px targets plus four 8 px gaps make 15.75rem: phones get a
             5 + 5 block instead of a ragged 7 + 3. From `sm` the cap lifts and
             all ten sit in one row. Keep the cap in step with `size-11`/`gap-2`. */}
@@ -934,7 +961,7 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
                     : t('questionAria', { number: index + 1 })
                 }
                 aria-current={current ? 'step' : undefined}
-                onClick={() => navigateToQuestion(index)}
+                onClick={() => navigateToQuestion(index, { moveFocus: false })}
                 className={`grid size-11 place-items-center rounded-full border-2 text-sm font-black transition-colors ${
                   current
                     ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-primary-foreground)]'
@@ -950,9 +977,22 @@ export function QuizClient({ slug, title }: { slug: string; title: string }) {
         </nav>
         <Card className="border-2">
           <CardContent className="space-y-6 p-5 md:p-8">
-            <h2 className="font-display text-xl leading-tight font-bold">{currentQuestion.text}</h2>
-            <fieldset className="space-y-3">
-              <legend className="sr-only">{t('chooseAnswer')}</legend>
+            <h2
+              id="quiz-question-title"
+              ref={questionHeadingRef}
+              tabIndex={-1}
+              className="font-display text-xl leading-tight font-bold outline-none"
+            >
+              {currentQuestion.text}
+            </h2>
+            <fieldset
+              aria-labelledby="quiz-question-title"
+              aria-describedby="quiz-question-hint"
+              className="space-y-3"
+            >
+              <legend id="quiz-question-hint" className="sr-only">
+                {t('chooseAnswer')}
+              </legend>
               {currentQuestion.options.map((option) => {
                 const selected = selectedOptionId === option.id;
                 return (

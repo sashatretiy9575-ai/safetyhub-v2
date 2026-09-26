@@ -18,7 +18,7 @@ export function Logo({ className, inverse = false }: LogoProps) {
             : 'border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-primary)]',
         )}
       >
-        <ShieldCheck size={19} weight="regular" className="lg:size-5" />
+        <ShieldCheck aria-hidden="true" size={19} weight="regular" className="lg:size-5" />
       </div>
       <span
         data-logo-wordmark
