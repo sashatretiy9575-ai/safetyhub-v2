@@ -40,6 +40,9 @@ export function NotFoundNotice() {
 
   return (
     <div className={`${EMERGENCY_CONTAINER} grid min-h-[60vh] place-items-center py-16 text-center`}>
+      {/* The metadata of the root 404 never reaches the document Next builds
+          for it, so the tab was left without a name; React hoists this one. */}
+      <title>{`${messages.AppState.notFoundTitle} — SafetyHub`}</title>
       <div className="space-y-4">
         <p className="font-mono text-sm tracking-widest text-[var(--color-text-muted)] uppercase">
           404

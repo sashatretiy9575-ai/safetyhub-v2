@@ -22,11 +22,12 @@ const MOBILE_SIZES = '100vw';
 const DESKTOP_SIZES = '56vw';
 
 function HeroPicture({ alt }: { alt: string }) {
-  // No `priority` (deprecated in Next 16) and no `preload()`: a preload
-  // called from a Server Component becomes a hint in the route tree that every
-  // Home link prefetches, so every other page downloaded the hero at high
-  // priority. The preload links below belong to this page's own tree instead,
-  // and the <img> carries the high fetch priority itself.
+  // No `priority` (deprecated in Next 16) and no preload of any kind: a
+  // preload rendered by a Server Component — `preload()` or a <link> element —
+  // becomes a hint in the route tree that every Home link prefetches, so every
+  // other page downloaded the hero at high priority. The <picture> sits in the
+  // first few kilobytes of the HTML, so the browser's preload scanner finds it
+  // as early, and the <img> carries the high fetch priority itself.
   const common = {
     alt,
     fill: true,
@@ -46,36 +47,16 @@ function HeroPicture({ alt }: { alt: string }) {
   });
 
   return (
-    <>
-      <link
-        rel="preload"
-        as="image"
-        href={mobileImageProps.src}
-        imageSrcSet={mobileImageProps.srcSet}
-        imageSizes={MOBILE_SIZES}
-        media="(max-width: 1023px)"
+    <picture>
+      <source media="(min-width: 1024px)" srcSet={desktopImageProps.srcSet} sizes={DESKTOP_SIZES} />
+      <img
+        {...mobileImageProps}
+        alt={alt}
+        sizes={MOBILE_SIZES}
         fetchPriority="high"
+        className="object-cover object-center"
       />
-      <link
-        rel="preload"
-        as="image"
-        href={desktopImageProps.src}
-        imageSrcSet={desktopImageProps.srcSet}
-        imageSizes={DESKTOP_SIZES}
-        media="(min-width: 1024px)"
-        fetchPriority="high"
-      />
-      <picture>
-        <source media="(min-width: 1024px)" srcSet={desktopImageProps.srcSet} sizes={DESKTOP_SIZES} />
-        <img
-          {...mobileImageProps}
-          alt={alt}
-          sizes={MOBILE_SIZES}
-          fetchPriority="high"
-          className="object-cover object-center"
-        />
-      </picture>
-    </>
+    </picture>
   );
 }
 

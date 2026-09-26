@@ -59,6 +59,8 @@ export function EditorActionBar({
         <Badge
           variant={statusTone ?? (published ? 'success' : 'default')}
           className="min-w-0 truncate"
+          // Narrow bars cut the label; the full wording stays one hover away.
+          title={statusLabel}
         >
           {statusLabel}
         </Badge>
