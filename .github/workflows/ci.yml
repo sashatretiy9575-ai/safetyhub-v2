@@ -187,11 +187,20 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+          # A production build keeps rollout surfaces closed unless told
+          # otherwise; the suite exercises the locale routes, the Chinese
+          # realm and the admin inbox, so all three are switched on here.
+          SAFETYHUB_LOCALE_ROUTES_ENABLED: 'true'
+          SAFETYHUB_ZH_USERNAME_PASSWORD_ENABLED: 'true'
+          SAFETYHUB_ADMIN_INBOX_ENABLED: 'true'
 
       - run: npm run test:e2e:release
         env:
           PLAYWRIGHT_SERVER_COMMAND: npx --no-install next start --hostname localhost --port 3100
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+          SAFETYHUB_LOCALE_ROUTES_ENABLED: 'true'
+          SAFETYHUB_ZH_USERNAME_PASSWORD_ENABLED: 'true'
+          SAFETYHUB_ADMIN_INBOX_ENABLED: 'true'
       - run: git diff --exit-code -- lib/supabase/database.generated.ts
 
       - name: Upload sanitized E2E summary
