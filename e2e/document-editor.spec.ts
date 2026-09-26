@@ -298,7 +298,7 @@ test('a slow navigation dims the viewport with a centred loader and clears on co
     .filter({ visible: true })
     .click({ noWaitAfter: true });
   try {
-    const overlay = page.getByRole('status', { name: 'Loading', exact: true }).first();
+    const overlay = page.getByRole('status', { name: 'Загрузка…', exact: true }).first();
     await expect(overlay).toBeVisible({ timeout: 1000 });
     for (const width of [1440, 375]) {
       await page.setViewportSize({ width, height: 900 });
@@ -336,7 +336,7 @@ test('a slow navigation dims the viewport with a centred loader and clears on co
     release();
   }
   await expect(page.getByRole('heading', { name: 'Сотрудники', exact: true })).toBeVisible();
-  await expect(page.getByRole('status', { name: 'Loading', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('status', { name: 'Загрузка…', exact: true })).toHaveCount(0);
 });
 
 test('anonymous and participant can neither read nor change documents', async ({

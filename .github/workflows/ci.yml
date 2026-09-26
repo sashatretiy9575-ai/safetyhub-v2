@@ -180,7 +180,18 @@ jobs:
       - name: Install Chromium
         run: npx --no-install playwright install --with-deps chromium
 
+      # The browser tests run against the production bundle, as users get it:
+      # under `next dev` first compiles timed out, and dev never showed
+      # production-only failures such as an unstyled 404.
+      - name: Build the production bundle for the browser tests
+        run: npm run build
+        env:
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+
       - run: npm run test:e2e:release
+        env:
+          PLAYWRIGHT_SERVER_COMMAND: npx --no-install next start --hostname localhost --port 3100
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
       - run: git diff --exit-code -- lib/supabase/database.generated.ts
 
       - name: Upload sanitized E2E summary
