@@ -17,6 +17,11 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
+      # Supabase CLI 2.118.0 emits unformatted types from `gen types`, so
+      # db:types:check fails on unchanged schemas. Stay on 2.117 until a
+      # release formats them again.
+      - dependency-name: supabase
+        versions: ['2.118.x']
     groups:
       production-updates:
         dependency-type: production
