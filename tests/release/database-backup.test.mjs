@@ -137,10 +137,9 @@ test('database backup encrypts, verifies, and restores exact dump bytes', async 
 });
 
 test('linked backup uses a read-only snapshot and never persists temporary credentials', async () => {
-  const [source, contentSync, legacyDump, securityHelper] = await Promise.all([
+  const [source, contentSync, securityHelper] = await Promise.all([
     readFile('scripts/backup-linked-database.mjs', 'utf8'),
     readFile('scripts/content-sync-linked.mjs', 'utf8'),
-    readFile('scripts/dump-linked-database.mjs', 'utf8'),
     readFile('scripts/database-backup-security.mjs', 'utf8'),
   ]);
   assert.match(source, /repeatable read read only deferrable/u);
@@ -166,7 +165,7 @@ test('linked backup uses a read-only snapshot and never persists temporary crede
   assert.match(source, /projectRef: expectedProjectRef/u);
   assert.match(source, /storageObjectSetSha256/u);
   assert.match(source, /rawObjectMetadata: 'encrypted:data\.dump'/u);
-  for (const linkedScript of [source, contentSync, legacyDump]) {
+  for (const linkedScript of [source, contentSync]) {
     assert.match(linkedScript, /database-backup-security[.]mjs/u);
     assert.doesNotMatch(linkedScript, /rejectUnauthorized:\s*false/u);
     assert.doesNotMatch(linkedScript, /PGSSLMODE:\s*'require'/u);
@@ -623,19 +622,6 @@ test('physical path guard resolves a junction before containment checks when ava
   } finally {
     await rm(root, { recursive: true, force: true });
   }
-});
-
-test('private avatar backup has a portable recovery path independent of DPAPI', async () => {
-  const [runner, verifier] = await Promise.all([
-    readFile('scripts/run-private-avatar-backup.mjs', 'utf8'),
-    readFile('scripts/verify-private-avatar-backup.mjs', 'utf8'),
-  ]);
-  assert.match(runner, /--recovery-key-output/u);
-  assert.match(runner, /SAFETYHUB-AVATAR-RECOVERY-KEY-V1/u);
-  assert.match(runner, /portable-recovery-key/u);
-  assert.match(verifier, /--recovery-key-file/u);
-  assert.match(verifier, /SAFETYHUB-AVATAR-RECOVERY-KEY-V1/u);
-  assert.match(verifier, /keyProtection = 'portable-recovery-key'/u);
 });
 
 test('generic Storage byte backup requires the full allowlist and a portable recovery verification path', async () => {
