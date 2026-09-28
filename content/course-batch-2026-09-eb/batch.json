@@ -1,5 +1,5 @@
 {
-  "slugs": ["elektrobezopasnost-i-raboty-na-vysote"],
-  "icons": { "elektrobezopasnost-i-raboty-na-vysote": "lightning" },
-  "pages": { "elektrobezopasnost-i-raboty-na-vysote": [55, 60] }
+  "slugs": ["elektrobezopasnost", "raboty-na-vysote"],
+  "icons": { "elektrobezopasnost": "lightning", "raboty-na-vysote": "ladder" },
+  "pages": { "elektrobezopasnost": [40, 46], "raboty-na-vysote": [22, 27] }
 }

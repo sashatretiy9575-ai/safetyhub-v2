@@ -1,0 +1,994 @@
+{
+  "schemaVersion": 1,
+  "slug": "elektrobezopasnost",
+  "locale": "zh",
+  "status": "draft-awaiting-independent-review",
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "variants": [
+    {
+      "id": "992269c6-3af2-5364-9999-d29e82014341",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "8f255529-9b77-5aff-aabb-d4c575307cc5",
+          "text": "多大的交流电流（50 Hz）称为“不可摆脱电流”，即人无法自行松开手？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "79d5a222-500a-59ba-9b56-218012c8cf41",
+              "text": "0.6–1.5 mA",
+              "displayOrder": 1
+            },
+            {
+              "id": "e2cf0e19-17e7-58ae-8495-97167445012d",
+              "text": "10–15 mA",
+              "displayOrder": 2
+            },
+            {
+              "id": "3d0f7223-b47f-5ba4-b125-7509203f8a72",
+              "text": "50–100 mA",
+              "displayOrder": 3
+            },
+            {
+              "id": "9a5e6776-5281-5363-8729-f2b286dc394e",
+              "text": "大于5 A",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "e2cf0e19-17e7-58ae-8495-97167445012d",
+          "explanation": "10–15 mA的电流会引起无法克服的肌肉痉挛：既无法松开手，也无法自行脱离。",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "431fd7d8-064c-5f95-b2f8-fc2a0db2fe9c",
+          "text": "“手—手”回路使多少比例的电流流经心脏？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "d958eff8-0c3a-587a-b67e-dcca5194fd0e",
+              "text": "约0.4%",
+              "displayOrder": 1
+            },
+            {
+              "id": "85934a05-b855-5752-a49d-2369e6b8034d",
+              "text": "约3.3%",
+              "displayOrder": 2
+            },
+            {
+              "id": "462e786d-9391-5f83-b304-d6c931e5aba0",
+              "text": "约12%",
+              "displayOrder": 3
+            },
+            {
+              "id": "c0252651-bc72-5aa4-8f6d-3ed5b14cd989",
+              "text": "约25%",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "85934a05-b855-5752-a49d-2369e6b8034d",
+          "explanation": "“手—手”回路约有3.3%的电流流经心脏，这仍是最常见的生产场景。",
+          "slideRefs": [
+            "slide-09"
+          ]
+        },
+        {
+          "id": "1019be00-eb6f-569a-82e7-ef9fe714c3cd",
+          "text": "应如何正确撤离跨步电压区？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "2a6861aa-8727-5e77-b6f3-e9b4e6bc0958",
+              "text": "跑步撤离，以便尽快离开该区域",
+              "displayOrder": 1
+            },
+            {
+              "id": "ce11d51b-7a18-50e0-88ba-a880efb8a5dd",
+              "text": "单脚跳跃前进",
+              "displayOrder": 2
+            },
+            {
+              "id": "8d0cf960-9291-5963-b1f8-a8a562bb6fa4",
+              "text": "以小碎步移动，双脚不离地",
+              "displayOrder": 3
+            },
+            {
+              "id": "9a02e151-f74e-569e-afb7-9f25e989ea44",
+              "text": "沿最短路线大步走出",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "8d0cf960-9291-5963-b1f8-a8a562bb6fa4",
+          "explanation": "应以小碎步（脚跟贴脚尖）缓慢走出电流扩散区，步长不超过脚长；严禁奔跑和跳跃——摔倒会致命。",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "d10d8e54-6507-50dc-a312-0f3fb92176ab",
+          "text": "电弧的温度可达多少？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "c7cfdefe-3b04-57fa-be5f-09e3faf49eac",
+              "text": "400–600 °C",
+              "displayOrder": 1
+            },
+            {
+              "id": "66f2063e-fee4-5e4e-b993-7010015a4141",
+              "text": "1000–1500 °C",
+              "displayOrder": 2
+            },
+            {
+              "id": "90d42e3b-62fc-54e8-9850-7a59f32170ff",
+              "text": "4000–6000 °C",
+              "displayOrder": 3
+            },
+            {
+              "id": "f1c5860f-bf48-5261-9133-6573fd12e958",
+              "text": "10000–15000 °C",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "90d42e3b-62fc-54e8-9850-7a59f32170ff",
+          "explanation": "电弧温度可达4000–6000 °C，因此不戴防护面罩、不穿防护服作业有致命危险。",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "703382b1-5b27-5294-8e4d-e16fae6e9b8f",
+          "text": "保护接地的作用是什么？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "4718243f-45d8-5e31-8d8a-a81e23f782c6",
+              "text": "在0.4 s内切断故障段",
+              "displayOrder": 1
+            },
+            {
+              "id": "5e6d5b8a-960d-5cf6-baae-d6ba2caf878c",
+              "text": "持续监测电网绝缘电阻",
+              "displayOrder": 2
+            },
+            {
+              "id": "bbf51935-beb0-5740-9d13-5231a7be0b1f",
+              "text": "防止电网过电流过载",
+              "displayOrder": 3
+            },
+            {
+              "id": "5c29f795-4062-58fb-bc9c-f4e98ededa32",
+              "text": "在绝缘击穿碰壳时降低接触电压",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5c29f795-4062-58fb-bc9c-f4e98ededa32",
+          "explanation": "接地把不带电的金属部分与接地体连接起来：故障电流流入大地。0.4 s内切断是保护接零的功能。",
+          "slideRefs": [
+            "slide-16"
+          ]
+        },
+        {
+          "id": "4c229c95-1251-5299-a21f-a9a9a61caf03",
+          "text": "为防止人员直接接触带电部分，应采用哪种剩余电流动作保护器（RCD）？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "09c95b2e-7f6c-51c0-9eeb-545bfacd637a",
+              "text": "剩余动作电流不大于100 mA的",
+              "displayOrder": 1
+            },
+            {
+              "id": "fd758cc2-742d-5e75-8af7-baa285dfb4f6",
+              "text": "剩余动作电流不大于30 mA的",
+              "displayOrder": 2
+            },
+            {
+              "id": "86401adf-351d-5a54-9dbb-b8a04f121747",
+              "text": "剩余动作电流不大于300 mA的",
+              "displayOrder": 3
+            },
+            {
+              "id": "1dfb8c1d-a206-5a51-a662-981bc0cdece7",
+              "text": "剩余动作电流不大于1 A的",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "fd758cc2-742d-5e75-8af7-baa285dfb4f6",
+          "explanation": "保护人身应采用IΔn不大于30 mA的RCD；它能在0.02–0.04 s内切断电路。",
+          "slideRefs": [
+            "slide-19"
+          ]
+        },
+        {
+          "id": "cc5bf556-984e-572e-aabb-1ff5636bbc11",
+          "text": "便携式保护接地线应按什么顺序装设？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "92eff637-5bcb-5c50-b659-900f30c5d9cb",
+              "text": "先接接地体，再接带电部分",
+              "displayOrder": 1
+            },
+            {
+              "id": "0970732b-2917-5055-a407-eed20e309701",
+              "text": "先接带电部分，再接接地体",
+              "displayOrder": 2
+            },
+            {
+              "id": "0080d28b-fe00-597f-b74d-a0401cffa9e0",
+              "text": "同时接接地体和带电部分",
+              "displayOrder": 3
+            },
+            {
+              "id": "5e39bf5d-40ba-5d77-9fa3-dd7f4ed4b76c",
+              "text": "戴绝缘手套作业时顺序任意",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "92eff637-5bcb-5c50-b659-900f30c5d9cb",
+          "explanation": "接地线按“先接地端、后接导体端”装设，拆除时顺序相反。违反顺序会致命。",
+          "slideRefs": [
+            "slide-24"
+          ]
+        },
+        {
+          "id": "a2d23b24-4e20-5356-9eb5-30d5ed8604d2",
+          "text": "提示类标示牌“已接地”悬挂在什么地方？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "73b22a0d-ca56-580e-abc6-729098a1f6fb",
+              "text": "设备的操作手柄上",
+              "displayOrder": 1
+            },
+            {
+              "id": "468b2af5-e1de-5fcb-81a4-e6341a01beaa",
+              "text": "配电装置的入口门上",
+              "displayOrder": 2
+            },
+            {
+              "id": "8770f5f9-b6f1-5b89-9bdd-9d1b00d5e6e0",
+              "text": "工作许可人的安全帽和工作服上",
+              "displayOrder": 3
+            },
+            {
+              "id": "f54066d3-6c60-55dd-85b2-42ced400d06d",
+              "text": "危险区域的遮栏上",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "73b22a0d-ca56-580e-abc6-729098a1f6fb",
+          "explanation": "提示类标示牌“已接地”悬挂在设备的操作钥匙和手柄上，以及电气装置的已接地部位。",
+          "slideRefs": [
+            "slide-25"
+          ]
+        },
+        {
+          "id": "6d9970b2-7ca4-56b5-8ddb-0080f3649ecb",
+          "text": "工作票的最长有效期是多久？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "f2098d14-57e8-5fd6-9b4e-6e5943712684",
+              "text": "一个工作班",
+              "displayOrder": 1
+            },
+            {
+              "id": "08d54df1-9eeb-5115-a636-7b25acbb48ab",
+              "text": "不超过30个日历日",
+              "displayOrder": 2
+            },
+            {
+              "id": "3fab23d5-6539-5ece-8ddd-ddc4c6119e31",
+              "text": "一年",
+              "displayOrder": 3
+            },
+            {
+              "id": "9323c032-83c0-535c-9acd-cc53b4e42d33",
+              "text": "不超过15个日历日",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "9323c032-83c0-535c-9acd-cc53b4e42d33",
+          "explanation": "工作票的有效期不超过15个日历日；而作业指令仅在一个工作班内有效。",
+          "slideRefs": [
+            "slide-28"
+          ]
+        },
+        {
+          "id": "80c165db-fb84-543d-adc8-77ca1a399ff5",
+          "text": "使触电者脱离电源应从哪一步开始？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "f327b660-3824-57ef-a8a1-f56dcc426adc",
+              "text": "断开电气装置的电源",
+              "displayOrder": 1
+            },
+            {
+              "id": "76937a7b-0ce7-5278-bd19-15adfb718a4f",
+              "text": "抓住伤员的手将其拖开",
+              "displayOrder": 2
+            },
+            {
+              "id": "74bf49b2-2135-5375-9be4-ad56f4c8ce3c",
+              "text": "就地进行人工呼吸",
+              "displayOrder": 3
+            },
+            {
+              "id": "b87afade-ce59-50d5-b37e-ac995a5d2bb7",
+              "text": "寻找事故目击者",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f327b660-3824-57ef-a8a1-f56dcc426adc",
+          "explanation": "第一步是切断电气装置的电源：断开最近的刀闸、断路器或开关。如果无法迅速断电，救援者应使用绝缘防护用具使自身绝缘。",
+          "slideRefs": [
+            "slide-40"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7d91c6b6-f2ea-52fc-aeea-11c540f04554",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "b1d6930c-d990-5bc7-8b9b-1f9fc1b04349",
+          "text": "对1 kV以下无遮栏的带电部分，允许靠近的最小距离是多少？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "e7136d4c-7db1-50fc-8066-e2a98dbde33a",
+              "text": "0.1 m",
+              "displayOrder": 1
+            },
+            {
+              "id": "1df12e9d-5482-550d-9fb4-aeb01f7c05c8",
+              "text": "0.3 m",
+              "displayOrder": 2
+            },
+            {
+              "id": "8a2f6dbc-c9f9-56c2-983a-dc67068fec8f",
+              "text": "0.6 m",
+              "displayOrder": 3
+            },
+            {
+              "id": "99f4f8e1-d5f9-510d-858b-a4f3a716118d",
+              "text": "2.0 m",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "8a2f6dbc-c9f9-56c2-983a-dc67068fec8f",
+          "explanation": "1 kV以下无遮栏带电部分的最小允许距离为0.6 m；110 kV为1.0 m，220 kV为2.0 m。",
+          "slideRefs": [
+            "slide-10"
+          ]
+        },
+        {
+          "id": "c26ecb5b-cad8-5625-947f-93a45b5d00fb",
+          "text": "多大的交流电流会引起心脏颤动？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "c3b9e928-f10d-5bd1-adcd-6ff3b8de51de",
+              "text": "0.6–1.5 mA",
+              "displayOrder": 1
+            },
+            {
+              "id": "1c6becbd-8e17-5318-8373-bba987d757ce",
+              "text": "10–15 mA",
+              "displayOrder": 2
+            },
+            {
+              "id": "3fcf7081-e700-51d8-ace0-18bbebd3f0eb",
+              "text": "50–100 mA",
+              "displayOrder": 3
+            },
+            {
+              "id": "e276f6e0-22fa-589c-ae7c-ae31c087ace8",
+              "text": "0.5 mA以下",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "3fcf7081-e700-51d8-ace0-18bbebd3f0eb",
+          "explanation": "50–100 mA的电流会引起心脏无序收缩（颤动）和血液循环停止。",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "96b42277-f306-52cb-af26-81efb35f907f",
+          "text": "户外配电装置区域属于哪一类场所？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "766386a2-bf6d-54db-ae0d-b0e75b5984a9",
+              "text": "特别危险场所",
+              "displayOrder": 1
+            },
+            {
+              "id": "334fe32e-b58f-53e6-a4c7-b285eed6e078",
+              "text": "无较大危险的场所",
+              "displayOrder": 2
+            },
+            {
+              "id": "f91d367e-c887-55d3-8b72-d36c2b557f13",
+              "text": "危险性较大的场所",
+              "displayOrder": 3
+            },
+            {
+              "id": "e7d4cd94-a69a-554a-9d38-a0205587fd8c",
+              "text": "不按危险程度分类",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "766386a2-bf6d-54db-ae0d-b0e75b5984a9",
+          "explanation": "户外配电装置区域始终等同于特别危险场所；任何露天作业都属于特别危险条件下的作业。",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "a0ff9db6-d1eb-53b9-971e-d21143843585",
+          "text": "新建和改建的电气装置禁止采用哪种接地系统？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "7919a393-9468-51ba-b859-5fe23f705385",
+              "text": "TN-S",
+              "displayOrder": 1
+            },
+            {
+              "id": "68aed548-0683-51be-a146-18bd886dfe49",
+              "text": "TN-C-S",
+              "displayOrder": 2
+            },
+            {
+              "id": "6c32b8fd-b8fd-5310-800c-8a2e86bb0b40",
+              "text": "IT",
+              "displayOrder": 3
+            },
+            {
+              "id": "f149ecbc-51c4-5eb3-ab61-7d9916bb334f",
+              "text": "TN-C",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f149ecbc-51c4-5eb3-ab61-7d9916bb334f",
+          "explanation": "整个电网采用PEN合一导体的TN-C系统已经过时，禁止用于新建和改建的电气装置。",
+          "slideRefs": [
+            "slide-17"
+          ]
+        },
+        {
+          "id": "bb8ea0d6-3589-58ed-9573-f1e3f81a4d0b",
+          "text": "采用保护接零时，220/380 V电网中的故障段应在多长时间内切除？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "c0d8dc21-dc4d-5654-92bb-72f33ffac7ee",
+              "text": "不超过2 s",
+              "displayOrder": 1
+            },
+            {
+              "id": "c75bb9dd-7d6b-5582-a5d6-3580083c6767",
+              "text": "不超过0.4 s",
+              "displayOrder": 2
+            },
+            {
+              "id": "1c87c302-7457-572f-95b5-f90ae806d416",
+              "text": "不超过5 s",
+              "displayOrder": 3
+            },
+            {
+              "id": "fc7f5925-73bf-5633-a3f8-a34747119628",
+              "text": "不超过10 s",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c75bb9dd-7d6b-5582-a5d6-3580083c6767",
+          "explanation": "按照PUE（电气装置规程），220/380 V电网中故障段的切除时间不得超过0.4 s。",
+          "slideRefs": [
+            "slide-18"
+          ]
+        },
+        {
+          "id": "76688ee4-c708-5d79-b683-91c9d41edbf9",
+          "text": "金属容器、锅炉和井内使用的灯具电压应为多少？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "7d43ab47-a95c-530c-b8e1-1938f6beec95",
+              "text": "不高于12 V",
+              "displayOrder": 1
+            },
+            {
+              "id": "e961fa86-b792-5da7-980d-33208a32bc21",
+              "text": "不高于42 V",
+              "displayOrder": 2
+            },
+            {
+              "id": "98e35570-1738-5a49-aa45-8e39c0e36ec1",
+              "text": "不高于127 V",
+              "displayOrder": 3
+            },
+            {
+              "id": "d9bf0ca4-eb39-5468-ae0b-1edc37b16291",
+              "text": "不高于220 V",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "7d43ab47-a95c-530c-b8e1-1938f6beec95",
+          "explanation": "在特别危险条件下——锅炉、储罐、井内——允许使用的电压不高于12 V。",
+          "slideRefs": [
+            "slide-20"
+          ]
+        },
+        {
+          "id": "0462d7ab-8b40-5ac2-b091-37c45706db80",
+          "text": "在1000 V以上的电气装置中，绝缘手套属于什么用具？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "b66b9342-3012-5820-8bd6-e74c5b84c913",
+              "text": "基本电气绝缘防护用具",
+              "displayOrder": 1
+            },
+            {
+              "id": "353795c5-f419-5918-8555-624944a3237a",
+              "text": "该场合不使用的用具",
+              "displayOrder": 2
+            },
+            {
+              "id": "067827c5-48b5-5218-855e-c069f179986c",
+              "text": "辅助电气绝缘防护用具",
+              "displayOrder": 3
+            },
+            {
+              "id": "ea158e4c-c4a4-5d50-9742-8b7ebcb8a954",
+              "text": "仅用于测量的用具",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "067827c5-48b5-5218-855e-c069f179986c",
+          "explanation": "在1 kV以上，绝缘手套只是辅助用具，须与基本用具（绝缘杆、绝缘钳、验电器）一起使用。",
+          "slideRefs": [
+            "slide-21"
+          ]
+        },
+        {
+          "id": "56a29343-718c-517d-85be-7e2d1ead363c",
+          "text": "哪一电气安全等级有权在1 kV以下的电气装置中单独巡视和作业？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "283802d6-813a-56f6-820d-d87de243b887",
+              "text": "I级",
+              "displayOrder": 1
+            },
+            {
+              "id": "4a975207-43bf-5858-9310-e5559af964aa",
+              "text": "III级",
+              "displayOrder": 2
+            },
+            {
+              "id": "60704616-a098-5048-9339-9f4d27edf3a6",
+              "text": "II级",
+              "displayOrder": 3
+            },
+            {
+              "id": "fc5dae19-696f-5532-a23c-87a5fe6c712c",
+              "text": "此项不需要等级",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "4a975207-43bf-5858-9310-e5559af964aa",
+          "explanation": "III级为电气技术人员，有权在1 kV以下单独巡视和作业。",
+          "slideRefs": [
+            "slide-29"
+          ]
+        },
+        {
+          "id": "0465281d-7d4a-59c4-a0f5-39a29b658443",
+          "text": "电气装置中工作地点的准备工作从哪一步开始？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "4685c100-9895-5885-b7a4-4361c8f6282a",
+              "text": "装设便携式接地线",
+              "displayOrder": 1
+            },
+            {
+              "id": "fcde7091-8b37-59d0-aad2-0fc6a3622814",
+              "text": "悬挂“已接地”标示牌",
+              "displayOrder": 2
+            },
+            {
+              "id": "9d7d4fe2-ab8c-55f8-91ab-133e5a612814",
+              "text": "用遮栏围住工作地点",
+              "displayOrder": 3
+            },
+            {
+              "id": "05297a65-5211-53f4-8b21-3137331c789e",
+              "text": "停电并形成明显的断开点",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "05297a65-5211-53f4-8b21-3137331c789e",
+          "explanation": "第一步是进行必要的停电并形成明显断开点；然后闭锁、验电、接地、悬挂标示牌和装设遮栏。",
+          "slideRefs": [
+            "slide-31"
+          ]
+        },
+        {
+          "id": "143c75a9-7e8c-50b4-b241-fdc61d37072f",
+          "text": "外派班组的首次许可由谁办理？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "b33b6b4b-9bcf-572a-b2af-ca842f8cadf1",
+              "text": "承包商的工作负责人",
+              "displayOrder": 1
+            },
+            {
+              "id": "0421364b-cb7d-5f07-9eff-59eff74b1790",
+              "text": "外派人员中的带队人",
+              "displayOrder": 2
+            },
+            {
+              "id": "168e72d3-aa15-5702-b3ff-6d9c81e45aa5",
+              "text": "承包商的劳动保护检查员",
+              "displayOrder": 3
+            },
+            {
+              "id": "e4d5b9e0-7aaf-538c-a6e0-df8852aa492e",
+              "text": "业主单位的运行人员",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "e4d5b9e0-7aaf-538c-a6e0-df8852aa492e",
+          "explanation": "外派班组的首次许可只能由业主单位的在编运行人员办理。",
+          "slideRefs": [
+            "slide-37"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "55d3576b-1ff0-50e9-bb84-1c51b7c6f4fa",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "0713bc2c-efd3-5a3b-a54a-c150d1475f46",
+          "text": "在未证明无电压并装设接地之前，任何电气装置都应视为哪种装置？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "b2519ede-98e8-5161-9c6e-49b0ab598e6a",
+              "text": "已停电的安全装置",
+              "displayOrder": 1
+            },
+            {
+              "id": "5e0462e9-4ea4-5e1a-a206-53449f400a98",
+              "text": "42 V以下即为安全的装置",
+              "displayOrder": 2
+            },
+            {
+              "id": "6d1bded7-51c7-52e5-af20-6d966327539b",
+              "text": "处于带电状态的装置",
+              "displayOrder": 3
+            },
+            {
+              "id": "e068570a-169f-54bc-bc17-be68ac3323c2",
+              "text": "只需外观检查的装置",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "6d1bded7-51c7-52e5-af20-6d966327539b",
+          "explanation": "首要规则：在未证明无电压并装设接地之前，任何电气装置都应视为带电。",
+          "slideRefs": [
+            "slide-05"
+          ]
+        },
+        {
+          "id": "ed7a0f9d-6cf1-53ee-8dd1-b7914aa3896c",
+          "text": "架空线路导线落地后，周围电流扩散危险区的半径是多少？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "9c6ef418-1d0d-51f2-aef2-f8c769b974e8",
+              "text": "1 m",
+              "displayOrder": 1
+            },
+            {
+              "id": "37d646e3-9629-5a14-b097-7162f98702b7",
+              "text": "3 m",
+              "displayOrder": 2
+            },
+            {
+              "id": "381ee6c5-20e3-5046-82b8-b58d8f80e261",
+              "text": "20 m",
+              "displayOrder": 3
+            },
+            {
+              "id": "93ea0688-541e-5c88-82de-75ff0995a8d7",
+              "text": "8 m",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "93ea0688-541e-5c88-82de-75ff0995a8d7",
+          "explanation": "落地导线周围的危险半径为8 m（室内为4–5 m）；不得靠近落在地上的导线。",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "48fa0e52-c60a-5809-b7ec-757234f25a81",
+          "text": "为手持式工具和移动式灯具供电的特低电压电网，允许通过什么设备供电？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "bcc84f21-6619-5d8f-b713-bada039006e1",
+              "text": "通过降压自耦变压器",
+              "displayOrder": 1
+            },
+            {
+              "id": "f6ebdea3-b216-53e1-a8e6-8caca5be4ba2",
+              "text": "通过隔离变压器",
+              "displayOrder": 2
+            },
+            {
+              "id": "4c01ca83-6ffa-5c41-9080-524de86418e1",
+              "text": "通过变阻器或分压器",
+              "displayOrder": 3
+            },
+            {
+              "id": "27d50dc1-3b2b-5f28-9cf0-5af803ac2aab",
+              "text": "通过带RCD的普通接线板",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "f6ebdea3-b216-53e1-a8e6-8caca5be4ba2",
+          "explanation": "特低电压只能由绕组相互绝缘的隔离降压变压器提供；禁止使用自耦变压器。",
+          "slideRefs": [
+            "slide-20"
+          ]
+        },
+        {
+          "id": "974deddc-e26c-522f-bf43-b88fcaae6938",
+          "text": "试验标签已过期的电气绝缘防护用具能否使用？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "4f3c1423-4067-56f2-b09c-407b09692f9a",
+              "text": "不能，严禁使用",
+              "displayOrder": 1
+            },
+            {
+              "id": "eb262590-4342-5b51-b073-53a703fc3b01",
+              "text": "可以，如果没有可见裂纹",
+              "displayOrder": 2
+            },
+            {
+              "id": "dba836ac-ab7e-5faf-b571-0687d59fd290",
+              "text": "可以，在1000 V以下的电气装置中",
+              "displayOrder": 3
+            },
+            {
+              "id": "7470b829-05f5-52f9-9033-f2af375d60b9",
+              "text": "可以，如果该用具通过了卷压试验",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "4f3c1423-4067-56f2-b09c-407b09692f9a",
+          "explanation": "首先要检查标签上的试验日期：禁止使用过期的用具。",
+          "slideRefs": [
+            "slide-22"
+          ]
+        },
+        {
+          "id": "0a23f961-cd31-53a0-86d8-c8cb3fa2cecd",
+          "text": "验明无电压应如何进行？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "f898d253-6417-566e-8848-e9efac0e9fad",
+              "text": "不使用防护用具，直接用验电器检查",
+              "displayOrder": 1
+            },
+            {
+              "id": "2d6295cb-2c2d-5ab5-89c6-6efb800953f9",
+              "text": "用手背触碰",
+              "displayOrder": 2
+            },
+            {
+              "id": "b4eac8ec-9983-5c9e-90fe-6381e6a791b0",
+              "text": "戴绝缘手套，用验电器检查",
+              "displayOrder": 3
+            },
+            {
+              "id": "359f347e-a8d3-5572-b42d-42d3d1749e75",
+              "text": "依据配电盘面板上的信号灯判断",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b4eac8ec-9983-5c9e-90fe-6381e6a791b0",
+          "explanation": "先在确知带电的部分上检验验电器，再逐相验明无电压——且必须戴绝缘手套。",
+          "slideRefs": [
+            "slide-23"
+          ]
+        },
+        {
+          "id": "b55b86f1-b431-5b70-a479-ff73161e7652",
+          "text": "在1000 V以上的电气装置中，便携式接地线铜导线的截面应为多少？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "c36ea308-0b92-5cf7-a4c1-d39c4a9849f6",
+              "text": "不小于4 mm²",
+              "displayOrder": 1
+            },
+            {
+              "id": "c0723e33-de44-58cb-9f67-09ef55c8933e",
+              "text": "不小于10 mm²",
+              "displayOrder": 2
+            },
+            {
+              "id": "e56bb02a-36c7-50a5-95b5-75d74b660c28",
+              "text": "不小于16 mm²",
+              "displayOrder": 3
+            },
+            {
+              "id": "59ee8484-fe13-593b-8590-8837a2a2a7f6",
+              "text": "不小于25 mm²",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "59ee8484-fe13-593b-8590-8837a2a2a7f6",
+          "explanation": "为保证热稳定性，便携式接地线采用软铜线：1000 V以下截面不小于16 mm²，1000 V以上不小于25 mm²。",
+          "slideRefs": [
+            "slide-24"
+          ]
+        },
+        {
+          "id": "69e00606-3393-504e-9726-496874968014",
+          "text": "谁有权取下“禁止合闸，有人工作！”标示牌？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "550e145f-eed6-5dc4-bed4-b4cc1e6dbe59",
+              "text": "任何班组成员",
+              "displayOrder": 1
+            },
+            {
+              "id": "9bed8c4a-5886-5810-8539-304d165cbb7c",
+              "text": "仅限挂牌人本人",
+              "displayOrder": 2
+            },
+            {
+              "id": "b006149d-45fb-5a2e-b92c-c9f323d4fcb1",
+              "text": "任何具有III级的工作人员",
+              "displayOrder": 3
+            },
+            {
+              "id": "110097ad-0107-583b-8be3-ac8725c02a86",
+              "text": "接到口头电话通知的值班员",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "9bed8c4a-5886-5810-8539-304d165cbb7c",
+          "explanation": "“禁止合闸”标示牌具有命令效力，只有挂牌人本人有权将其取下。",
+          "slideRefs": [
+            "slide-25"
+          ]
+        },
+        {
+          "id": "182df9d2-3cfe-5ba2-b36e-1957700ca946",
+          "text": "作业指令的有效期是多长？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "9e9f058f-49e5-5a3a-92b3-acdac0df8fbb",
+              "text": "不超过15个日历日",
+              "displayOrder": 1
+            },
+            {
+              "id": "02ab481b-9f29-5e08-8b0d-c7576e907b00",
+              "text": "一个工作班内",
+              "displayOrder": 2
+            },
+            {
+              "id": "e054e886-42a8-5c81-8fc8-7877e79a3807",
+              "text": "一个月内",
+              "displayOrder": 3
+            },
+            {
+              "id": "e32733e5-b031-5169-bc65-6da9b37e02d8",
+              "text": "直至现场全部工作结束",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "02ab481b-9f29-5e08-8b0d-c7576e907b00",
+          "explanation": "作业指令是口头下达的一次性简单作业任务：在一个工作班内有效，并登记在现场运行日志中。",
+          "slideRefs": [
+            "slide-28"
+          ]
+        },
+        {
+          "id": "f97ccc64-ec88-5206-8d53-94877cc674e3",
+          "text": "LOTO上锁挂牌系统基于什么原则？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "9d260b05-cedb-5a30-8ab9-c49187445216",
+              "text": "一个班组一把锁，钥匙由工长保管",
+              "displayOrder": 1
+            },
+            {
+              "id": "dcb72513-8d37-500d-844d-09443a12723d",
+              "text": "锁的钥匙由工作许可人保管",
+              "displayOrder": 2
+            },
+            {
+              "id": "ba08e6f7-d657-5132-a3fe-086f93c48b4d",
+              "text": "收工时由值班员统一摘锁",
+              "displayOrder": 3
+            },
+            {
+              "id": "86e06b5d-5278-50c9-852f-f852b917b9de",
+              "text": "一人——一锁——一钥匙",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "86e06b5d-5278-50c9-852f-f852b917b9de",
+          "explanation": "每名班组成员挂上个人锁并自行保管钥匙：在最后一名作业人员摘锁之前无法送电。",
+          "slideRefs": [
+            "slide-32"
+          ]
+        },
+        {
+          "id": "c9327c09-beb9-5cfc-b8b8-a49e262d2a92",
+          "text": "如果工作负责人需要暂时离开，应怎么办？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "29480f69-db3a-5571-a23d-fb89d5151ffc",
+              "text": "将班组全部撤出电气装置",
+              "displayOrder": 1
+            },
+            {
+              "id": "df5f850b-3c22-5761-ad32-aa4ec2fc0bdd",
+              "text": "把监护交给具有III级的班组成员",
+              "displayOrder": 2
+            },
+            {
+              "id": "617884c1-1494-5d04-98a8-e99adfd2ab1b",
+              "text": "锁上配电装置的门，班组继续作业",
+              "displayOrder": 3
+            },
+            {
+              "id": "580147a6-3d6b-50c4-803a-c74c99a1a7c5",
+              "text": "在现场运行日志中记录其离开",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "29480f69-db3a-5571-a23d-fb89d5151ffc",
+          "explanation": "没有工作负责人的监护，班组不得留在配电装置内或高处——应将其撤出电气装置。",
+          "slideRefs": [
+            "slide-34"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -32,7 +32,9 @@ test('profile signatures follow explicit signer identities and one protocol is o
   assert.equal(protocolColumns('ptm').length,8);
   assert.equal(protocolColumns('biot').length,6);
   assert.equal(protocolColumns('qualification').length,7);
-  for (const family of ['general','biot','ptm','industrial','qualification','first-aid'])
+  // Work at height is checked on the «БиОТ» form: the same six columns.
+  assert.deepEqual(protocolColumns('height'),protocolColumns('biot'));
+  for (const family of ['general','biot','ptm','industrial','qualification','first-aid','height'])
     assert.equal(protocolColumns(family).at(-1),'Примечание',family);
   assert.equal(protocolColumns('first-aid',2).at(-1),'Примечание');
 });
@@ -70,7 +72,7 @@ test('each protocol family renders its source columns and all three transparent 
     return new Response(await readFile(new URL('../../lib/pdf/assets/'+file,import.meta.url)));
   };
   try {
-    for(const family of ['general','ptm','biot','industrial','qualification','first-aid','first-aid-legacy']) {
+    for(const family of ['general','ptm','biot','industrial','qualification','first-aid','first-aid-legacy','height']) {
       const branding=applyDocumentProfile({...base,...(family === 'first-aid-legacy' ? {} : {protocolLayoutVersion:2})},{...profile,family:family === 'first-aid-legacy' ? 'first-aid' : family});
       const people=Array.from({length:7},(_,i)=>({userId:String(i),fullName:'Участник '+(i+1)+' Длиннаяфамилия',position:'Инженер по охране труда',education:'Высшее',status:'passed',score:9,total:10,certificateId:null,trainingReason:'Периодическое обучение',notes:'',qualificationDecision:'Решение № 7 от 19.09.2026'}));
       const bytes=await generateProtocolInBrowser({organization:'Проверочная организация',courseTitle:profile.programName,items:[],participants:people},branding,'/certificate-assets/font?locale=ru&v=1');
@@ -93,6 +95,7 @@ test('each protocol family renders its source columns and all three transparent 
       if(family==='first-aid') { assert.doesNotMatch(text,/Образование|Высшее/); assert.match(text,/Организация/); }
       if(family==='general' || family==='industrial' || family==='first-aid-legacy') assert.match(text,/Высшее/);
       if(family==='qualification') assert.match(text,/Решение № 7/);
+      if(family==='biot' || family==='height') assert.match(text,/Отметка о проверке знаний/);
       await task.destroy();
     }
   } finally {globalThis.fetch=original;}

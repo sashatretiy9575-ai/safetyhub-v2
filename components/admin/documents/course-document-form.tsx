@@ -34,6 +34,7 @@ import {
 } from '@/lib/pdf/document-preview-job';
 import {
   DOCUMENT_FAMILIES,
+  usesBiotForm,
   type BookletTexts,
   type DocumentFamily,
 } from '@/lib/pdf/document-profile';
@@ -124,7 +125,7 @@ export function CourseDocumentForm({
   const problem = draftProblem(draft);
   const defaults = documentFamilyDefaults(draft.family);
   const electrical = draft.family === 'electrical';
-  const biot = draft.family === 'biot';
+  const biot = usesBiotForm(draft.family);
   const audiences = draftAudiences(draft);
 
   const update = (patch: Partial<CourseDocumentDraft>) => {

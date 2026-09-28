@@ -1,0 +1,994 @@
+{
+  "schemaVersion": 1,
+  "slug": "raboty-na-vysote",
+  "locale": "zh",
+  "status": "draft-awaiting-independent-review",
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "variants": [
+    {
+      "id": "5a17aee6-9ec3-59ec-99e6-ef1c22521985",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "ec7e7734-18f5-50ed-8c8d-a4eccda94ab4",
+          "text": "按照哈萨克斯坦共和国规程，从多高起的作业属于高处作业？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "3e5d15be-9c31-5ee1-8344-d0cb21a039e0",
+              "text": "0.5 m 及以上",
+              "displayOrder": 1
+            },
+            {
+              "id": "4100667a-6ab5-5644-8bda-dec6ca8e3dcd",
+              "text": "1.3 m 及以上",
+              "displayOrder": 2
+            },
+            {
+              "id": "a3a4b114-a1d7-58ac-a40c-12c0fe1c5511",
+              "text": "3 m 及以上",
+              "displayOrder": 3
+            },
+            {
+              "id": "cfb1f352-bb53-5755-9636-8ccb16ab4e76",
+              "text": "5 m 及以上",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "4100667a-6ab5-5644-8bda-dec6ca8e3dcd",
+          "explanation": "按照哈萨克斯坦共和国规程，高处作业是指在距地面、楼板或作业铺板1.3 m及以上的高度、且距高差边缘不足2 m处进行的作业。",
+          "slideRefs": [
+            "slide-05"
+          ]
+        },
+        {
+          "id": "fd8bb32d-f051-5055-8e4e-3f30fc937eef",
+          "text": "按照防坠落措施层级，哪项措施应先于防坠落个人防护装备采用？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "26b877db-1988-5985-a0b7-86116c51b9cb",
+              "text": "防护遮栏、脚手架和安全平网",
+              "displayOrder": 1
+            },
+            {
+              "id": "5029498d-b84f-51c9-b4f4-cacb8569504e",
+              "text": "带缓冲器的坠落制动系统",
+              "displayOrder": 2
+            },
+            {
+              "id": "6ef87398-2ca3-5c95-87cb-c8fe9373f8e6",
+              "text": "班前进行追加安全交底",
+              "displayOrder": 3
+            },
+            {
+              "id": "70708ffe-3f38-56a6-a510-d4e1fc875161",
+              "text": "增加作业人员体检次数",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "26b877db-1988-5985-a0b7-86116c51b9cb",
+          "explanation": "防坠落个人防护装备是最后一道防线：应优先采用集体防护设施——防护遮栏、栏杆、脚手架和安全平网。",
+          "slideRefs": [
+            "slide-06"
+          ]
+        },
+        {
+          "id": "52f32caf-7fc3-5500-836b-911df0672a61",
+          "text": "高处作业应由什么样的人员组成来进行？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "2ceb85ba-7ed8-538e-bf71-1b2d045eb68a",
+              "text": "一名携带手机的作业人员",
+              "displayOrder": 1
+            },
+            {
+              "id": "8b15c2bf-de1e-5142-8c8c-73498a56f22a",
+              "text": "不少于5人的班组",
+              "displayOrder": 2
+            },
+            {
+              "id": "83a734b5-1c9e-5cc1-8f59-5c69e0bec825",
+              "text": "不少于2人的班组",
+              "displayOrder": 3
+            },
+            {
+              "id": "c01bde8d-ae95-5fde-bb8d-3166531c8d7a",
+              "text": "人数不限，自行决定",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "83a734b5-1c9e-5cc1-8f59-5c69e0bec825",
+          "explanation": "高处作业须凭工作票，由不少于2人的班组（小组）进行。",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "2531ae75-2c54-5426-95e6-4bd3390f8109",
+          "text": "坠落制动系统ABC规则中的字母B代表什么？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "24ed89d8-c269-5fde-9eeb-00d06b52f010",
+              "text": "锚固装置（Anchor）",
+              "displayOrder": 1
+            },
+            {
+              "id": "a61bf202-abbb-5b79-bc82-952863d56d2d",
+              "text": "连接件（Connector）",
+              "displayOrder": 2
+            },
+            {
+              "id": "6d91ea4d-42f4-5272-8ea2-fa22599b27f4",
+              "text": "安全带（Body wear）",
+              "displayOrder": 3
+            },
+            {
+              "id": "34d9dfee-4fc4-5653-88b0-27ba25a33002",
+              "text": "锁止装置（Block）",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "6d91ea4d-42f4-5272-8ea2-fa22599b27f4",
+          "explanation": "A——锚固装置，B——安全带（Body wear），C——连接件：带缓冲器的安全绳、速差自控器或抓绳器。",
+          "slideRefs": [
+            "slide-09"
+          ]
+        },
+        {
+          "id": "b9880ba5-958f-599f-81eb-e37a2cfb8319",
+          "text": "坠落系数如何计算？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "1cc46f01-c754-5cea-907c-43e629db6789",
+              "text": "安全绳长度乘以作业人员身高",
+              "displayOrder": 1
+            },
+            {
+              "id": "80cdc9bb-1dec-58e8-8922-ac7cf7a381ba",
+              "text": "坠落高度除以安全绳长度",
+              "displayOrder": 2
+            },
+            {
+              "id": "9f2a893c-4604-5ed5-b457-c3eeeb4b18aa",
+              "text": "作业高度除以1.8 m",
+              "displayOrder": 3
+            },
+            {
+              "id": "d5fde8f9-b113-52cb-99a5-a5493c1600fe",
+              "text": "作业人员体重除以锚点强度",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "80cdc9bb-1dec-58e8-8922-ac7cf7a381ba",
+          "explanation": "坠落系数 = 坠落高度 / 安全绳长度；它决定坠落时冲击的剧烈程度。",
+          "slideRefs": [
+            "slide-10"
+          ]
+        },
+        {
+          "id": "fc045619-c28e-58f5-8146-1eb55714ad01",
+          "text": "靠梯应高出上部出口平台多少？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "0cc2178d-3214-5301-a0f4-20c4aad48cae",
+              "text": "不少于0.3 m",
+              "displayOrder": 1
+            },
+            {
+              "id": "9a6ff73d-9364-5827-9743-00cf6ceb8b09",
+              "text": "不少于2 m",
+              "displayOrder": 2
+            },
+            {
+              "id": "ed537a5a-4d63-5591-b27d-bf8dc894016a",
+              "text": "不少于1 m",
+              "displayOrder": 3
+            },
+            {
+              "id": "8d40304c-647c-5fd1-a0c3-e706f990b302",
+              "text": "不得高出平台",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ed537a5a-4d63-5591-b27d-bf8dc894016a",
+          "explanation": "靠梯上端应高出上部出口平台至少1.0 m。",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "1b959108-1c70-58e5-9804-4b0cfba51c91",
+          "text": "承受过人员坠落冲击的安全带应如何处理？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "2d9e3169-e08f-5e86-9b88-a2e124683b16",
+              "text": "停用并销毁",
+              "displayOrder": 1
+            },
+            {
+              "id": "98de5cec-d592-514e-8c36-3c1f6dcabcb3",
+              "text": "检查后继续使用",
+              "displayOrder": 2
+            },
+            {
+              "id": "f04fee63-6965-5272-88a8-145ff7c906b0",
+              "text": "清洗后退回仓库",
+              "displayOrder": 3
+            },
+            {
+              "id": "5abd2d82-f81e-5ba7-8857-0d26834b930e",
+              "text": "仅用于培训",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "2d9e3169-e08f-5e86-9b88-a2e124683b16",
+          "explanation": "承受过人员坠落冲击的安全带必须立即停用并销毁；撕开的坠落指示器也说明了这一点。",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "f955f98f-390f-5c75-96d1-8a5e552b627b",
+          "text": "禁止从哪一侧攀登架空线路转角杆塔？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "5c2e4fc6-2e47-5b6a-a291-a53ba84f7b02",
+              "text": "导线外角一侧",
+              "displayOrder": 1
+            },
+            {
+              "id": "ebc63088-b7be-507b-8bbd-23b09d4f96a7",
+              "text": "通往杆塔的道路一侧",
+              "displayOrder": 2
+            },
+            {
+              "id": "6450cb78-ac9a-5463-9902-95589c20cdff",
+              "text": "导线内角一侧",
+              "displayOrder": 3
+            },
+            {
+              "id": "7816d844-7452-5604-92a5-ed89204b1ac7",
+              "text": "最近的锚点一侧",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "6450cb78-ac9a-5463-9902-95589c20cdff",
+          "explanation": "严禁从导线内角一侧攀登转角杆塔。",
+          "slideRefs": [
+            "slide-17"
+          ]
+        },
+        {
+          "id": "0c632662-675c-5103-a69e-e21f416c50ff",
+          "text": "按照救援与疏散计划，救下悬吊作业人员的时间为多少？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "0eb4d645-51f1-5fc0-8887-d767d273c400",
+              "text": "10分钟以内",
+              "displayOrder": 1
+            },
+            {
+              "id": "06440a89-35f0-5314-a545-6da43d919951",
+              "text": "1小时以内",
+              "displayOrder": 2
+            },
+            {
+              "id": "5c1a27b5-3336-5301-9846-951d9d8b1a62",
+              "text": "30分钟以内",
+              "displayOrder": 3
+            },
+            {
+              "id": "aa1a3532-74ae-5b25-bd1e-45d358204646",
+              "text": "2小时以内",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "0eb4d645-51f1-5fc0-8887-d767d273c400",
+          "explanation": "按照救援与疏散计划，救下悬吊人员的时间不超过10分钟：在安全带中悬吊更久会危及生命。",
+          "slideRefs": [
+            "slide-19"
+          ]
+        },
+        {
+          "id": "160e33f7-56fe-5cb3-a4f7-e8fd68af3fde",
+          "text": "对从安全带悬吊状态救下的清醒伤员应如何安置？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "e38c5071-7da9-547c-889e-ccb11bb852af",
+              "text": "半坐位，不得让其仰卧",
+              "displayOrder": 1
+            },
+            {
+              "id": "58862ac8-c7ed-507c-959c-1535a75f29c4",
+              "text": "仰卧并抬高双腿",
+              "displayOrder": 2
+            },
+            {
+              "id": "4123f423-233f-5c1d-b4db-70939b9159a4",
+              "text": "俯卧，头偏向一侧",
+              "displayOrder": 3
+            },
+            {
+              "id": "9fbfbbab-707f-5522-a4b0-878ce5756043",
+              "text": "站立，由救援人员搀扶",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "e38c5071-7da9-547c-889e-ccb11bb852af",
+          "explanation": "清醒的伤员应取半坐位：贸然仰卧有发生“回流综合征”的危险。若伤员昏迷，应使其平卧；呼吸停止时立即进行心肺复苏。",
+          "slideRefs": [
+            "slide-20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f4d8f385-b461-54f1-9f75-4cad59f88559",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "bed8a813-9dd8-557c-99d3-e17ee19aac24",
+          "text": "年满多少周岁方可从事高处作业？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "a82ce103-36c3-588c-b9fd-5e3dd51b67f9",
+              "text": "年满18周岁",
+              "displayOrder": 1
+            },
+            {
+              "id": "ffee55ad-d5d6-526a-b4c3-4c956ddd3c37",
+              "text": "年满16周岁",
+              "displayOrder": 2
+            },
+            {
+              "id": "10501766-f4e5-5f4a-8d3f-ba42aae3de77",
+              "text": "年满21周岁",
+              "displayOrder": 3
+            },
+            {
+              "id": "4e96e0d9-9f84-57f0-aaaa-93b2a59ad83f",
+              "text": "年满25周岁",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "a82ce103-36c3-588c-b9fd-5e3dd51b67f9",
+          "explanation": "年满18周岁、通过强制性体检并接受过安全与劳动保护培训的人员，方可从事高处作业。",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "30ebdf05-cd63-5eb9-9d9a-3d314b91bfbe",
+          "text": "首次从事高处作业的人员，接受现场指导的时间为几个工作班？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "0747222d-df11-57c1-80d4-119c26dd5674",
+              "text": "1个工作班",
+              "displayOrder": 1
+            },
+            {
+              "id": "34b1658f-3493-52d4-bc12-4948a7ed4799",
+              "text": "3个工作班",
+              "displayOrder": 2
+            },
+            {
+              "id": "6fbed59b-6b5a-5450-88ae-139600eb88d7",
+              "text": "5个工作班",
+              "displayOrder": 3
+            },
+            {
+              "id": "a810c985-7ef1-5087-a5c0-a11f5f56ce00",
+              "text": "10个工作班",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "6fbed59b-6b5a-5450-88ae-139600eb88d7",
+          "explanation": "首次从事高处作业的人员，须连续5个工作班接受负责人的现场指导。",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "006ce201-0aad-5adc-adb3-1abe50b9e4b8",
+          "text": "哪种系统从物理上阻止作业人员到达高差临边？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "cd892df9-4acd-5f83-a537-2d05b94196bd",
+              "text": "坠落制动系统",
+              "displayOrder": 1
+            },
+            {
+              "id": "637c1fd0-6abb-5879-a3cb-8d4de0dca167",
+              "text": "限位系统",
+              "displayOrder": 2
+            },
+            {
+              "id": "9ee614e7-472d-55b4-87c7-26734753af06",
+              "text": "救援系统",
+              "displayOrder": 3
+            },
+            {
+              "id": "19040396-a329-5e49-b758-194df8d549ef",
+              "text": "警戒带系统",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "637c1fd0-6abb-5879-a3cb-8d4de0dca167",
+          "explanation": "限位系统——安全带加固定长度的安全绳——使人无法走到临边，因此不会发生坠落。",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "404b9148-df90-55c6-8afb-983732eb4c96",
+          "text": "坠落制动系统的安全绳禁止系挂在什么上？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "5d138b7e-2519-5f57-b825-b8d2e9042810",
+              "text": "固定式锚点",
+              "displayOrder": 1
+            },
+            {
+              "id": "3ecc6c9d-25c3-5837-9d2e-443fba523d97",
+              "text": "柔性水平锚固线",
+              "displayOrder": 2
+            },
+            {
+              "id": "a29ace51-8536-5e77-b718-7482c5f9b24a",
+              "text": "工字梁上的梁夹",
+              "displayOrder": 3
+            },
+            {
+              "id": "435fddab-9d7a-51e0-b254-f139c3e496ce",
+              "text": "管道和电缆桥架",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "435fddab-9d7a-51e0-b254-f139c3e496ce",
+          "explanation": "安全绳只能系挂在经检验的承重构件上；禁止系挂在管道、电缆桥架、散热器和窗框上。",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "0e630aed-0302-585c-b7ba-068ba4814a52",
+          "text": "靠梯与水平面应成多大角度架设？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "ecc8dd90-c3a5-5c2a-878c-65d638870957",
+              "text": "45–50度",
+              "displayOrder": 1
+            },
+            {
+              "id": "92c02f6c-6d64-53a8-a465-53ec7ef5b7d1",
+              "text": "55–60度",
+              "displayOrder": 2
+            },
+            {
+              "id": "d086b4c4-8cbe-526f-8f17-18a055dac019",
+              "text": "70–75度",
+              "displayOrder": 3
+            },
+            {
+              "id": "36fe6c73-d04e-5db0-ae4c-607681d71fd3",
+              "text": "85–90度",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "d086b4c4-8cbe-526f-8f17-18a055dac019",
+          "explanation": "靠梯应以70–75°角架设（高度与底距之比约为4比1），并高出平台1 m。",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "68e78e12-e1ea-5013-81c4-a6660ed0df69",
+          "text": "如何检查安全带腿带是否调整合适？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "53abc221-e7a3-57f4-a155-2e90aef6efed",
+              "text": "拳头应能轻松插入腿带下方",
+              "displayOrder": 1
+            },
+            {
+              "id": "3f818a7b-524f-522a-8d06-7e8e659bd9a0",
+              "text": "腿带应松垂在大腿上",
+              "displayOrder": 2
+            },
+            {
+              "id": "03a25a32-dbc3-52cb-9520-9c590de8514c",
+              "text": "手掌应能紧贴着插入腿带下方",
+              "displayOrder": 3
+            },
+            {
+              "id": "7e3854a4-d79e-57c8-bcc3-580681147dd0",
+              "text": "腿带应勒紧到腿部麻木",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "03a25a32-dbc3-52cb-9520-9c590de8514c",
+          "explanation": "调整合适时，手掌应能紧贴着插入腿带下方：既不过紧，也不过松。",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "2e4c1c55-9592-5da3-a40d-bc5584d22162",
+          "text": "风速达到多少时应停止一般的高处作业？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "831180c0-23e3-5fa0-994e-2a13557d5c86",
+              "text": "5 m/s 及以上",
+              "displayOrder": 1
+            },
+            {
+              "id": "5fc3e37b-a4b1-59d6-84ef-764a989b3e8f",
+              "text": "15 m/s 及以上",
+              "displayOrder": 2
+            },
+            {
+              "id": "e26655ac-32a2-531e-b567-a21f4c7e0b13",
+              "text": "8 m/s 及以上",
+              "displayOrder": 3
+            },
+            {
+              "id": "a34f1eb8-811e-54c3-a8e5-8579cd03d3c0",
+              "text": "25 m/s 及以上",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5fc3e37b-a4b1-59d6-84ef-764a989b3e8f",
+          "explanation": "风速达15 m/s及以上时应停止高处作业；而安装封闭构件和墙板时，风速达到10 m/s即应停止。",
+          "slideRefs": [
+            "slide-15"
+          ]
+        },
+        {
+          "id": "a4995bd3-ad38-5a10-8633-e4cf2a0fa215",
+          "text": "在距架空线路边导线多远的范围内，使用高空作业车作业必须凭工作票进行？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "d7d161f3-e215-5eb6-ac18-00345ac55b3d",
+              "text": "不足3 m",
+              "displayOrder": 1
+            },
+            {
+              "id": "30f1d1dc-f880-5a03-b977-6b62b4c2ebcc",
+              "text": "不足30 m",
+              "displayOrder": 2
+            },
+            {
+              "id": "57e03214-681b-5bca-9451-42e923be15a6",
+              "text": "不足100 m",
+              "displayOrder": 3
+            },
+            {
+              "id": "283e1773-f88f-569d-8753-34fc2ae4fc05",
+              "text": "不足300 m",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "30f1d1dc-f880-5a03-b977-6b62b4c2ebcc",
+          "explanation": "在距架空线路边导线不足30 m的范围内作业，只能凭工作票并在负责人监护下进行。",
+          "slideRefs": [
+            "slide-18"
+          ]
+        },
+        {
+          "id": "3ca0d2b2-ec13-5486-83f0-f1d5d05ee8d5",
+          "text": "在安全带中静止悬吊多长时间后可能失去意识？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "f56224ef-1078-575e-bcb2-da28463138e4",
+              "text": "1–2小时后",
+              "displayOrder": 1
+            },
+            {
+              "id": "08d9b447-0323-58e8-87b5-ec85c09d0b27",
+              "text": "30–40分钟后",
+              "displayOrder": 2
+            },
+            {
+              "id": "9fd3722d-d5a1-5c30-901f-b1de4785f064",
+              "text": "3–4小时后",
+              "displayOrder": 3
+            },
+            {
+              "id": "c4aa0915-fb6e-5aad-b426-b304f2c3b07e",
+              "text": "5–10分钟后",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c4aa0915-fb6e-5aad-b426-b304f2c3b07e",
+          "explanation": "静止悬吊5–10分钟后，会出现脑缺氧、意识丧失和心脏骤停。",
+          "slideRefs": [
+            "slide-20"
+          ]
+        },
+        {
+          "id": "354b867a-8a90-544d-bd7d-b04c779ceabc",
+          "text": "高处作业中发现安全绳撕裂，应怎么办？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "cc06b706-c7f2-5667-812e-10bfc12e51f4",
+              "text": "完成任务后再报告",
+              "displayOrder": 1
+            },
+            {
+              "id": "057cea16-e7cc-59b3-97fa-efde1df46830",
+              "text": "立即停止高处作业",
+              "displayOrder": 2
+            },
+            {
+              "id": "c80ecc07-3373-57e7-bf1c-b23f44774397",
+              "text": "用绝缘胶带粘住裂口",
+              "displayOrder": 3
+            },
+            {
+              "id": "ca3570d5-b685-504b-9c03-c9431bf8431e",
+              "text": "重新扣挂同一根安全绳",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "057cea16-e7cc-59b3-97fa-efde1df46830",
+          "explanation": "发现安全带、安全绳、安全钩或锚固线有缺陷或撕裂，是必须无条件停止作业的情况。",
+          "slideRefs": [
+            "slide-23"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d09a0429-5019-5df3-b7c4-aff6bd27cb24",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "8e7a94be-8f73-5312-bf08-8b4df9b0a55a",
+          "text": "除年满18周岁外，从事高处作业还需要具备什么条件？",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "926e286b-a139-5006-81d1-4addb1d6bab2",
+              "text": "只需工长的口头同意",
+              "displayOrder": 1
+            },
+            {
+              "id": "b97ab8f6-f382-5d97-af0a-2468b69ea0a4",
+              "text": "通过体检并持有培训合格证",
+              "displayOrder": 2
+            },
+            {
+              "id": "5eeca4d3-67da-5ae7-aa9a-31487edb49fc",
+              "text": "高处作业工龄不少于三年",
+              "displayOrder": 3
+            },
+            {
+              "id": "cd628952-b685-5949-bf40-077b611564ff",
+              "text": "工种技术等级不低于4级",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b97ab8f6-f382-5d97-af0a-2468b69ea0a4",
+          "explanation": "作业人员须年满18周岁，通过强制性体检，并持有安全与劳动保护培训合格证。",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "377b725c-124a-5634-950b-c2862757cd15",
+          "text": "在防坠落措施层级中，排在首位的是哪项措施？",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "5550145e-9d6a-5847-9973-02ea282ba861",
+              "text": "设置集体防护遮栏",
+              "displayOrder": 1
+            },
+            {
+              "id": "4711dca8-0161-5c6d-9998-3ce9266218f5",
+              "text": "采用限位系统",
+              "displayOrder": 2
+            },
+            {
+              "id": "294b5628-8ed5-5e9a-888a-493efd04fc45",
+              "text": "消除高处作业",
+              "displayOrder": 3
+            },
+            {
+              "id": "7053a9c7-13d2-55fc-8eee-ed841c1f8247",
+              "text": "穿戴全身式安全带",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "294b5628-8ed5-5e9a-888a-493efd04fc45",
+          "explanation": "首先消除高处作业，然后采用集体防护和限位，最后才是坠落制动。个人防护装备是最后的手段。",
+          "slideRefs": [
+            "slide-06"
+          ]
+        },
+        {
+          "id": "ffeacb11-7ba4-5db8-bc79-28de2f091a66",
+          "text": "能否将不带肩带和腿带的安装用腰带用作坠落制动系统？",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "be5fe39b-0481-553a-95fc-a20b0c68fb99",
+              "text": "仅在5 m以上高度禁止",
+              "displayOrder": 1
+            },
+            {
+              "id": "84477434-d150-578a-adc3-8066907cefa3",
+              "text": "不可以，这是禁止的",
+              "displayOrder": 2
+            },
+            {
+              "id": "08a01a70-f1b8-50da-a31c-913fae8b2cb1",
+              "text": "可以，如果腰带上连接了缓冲器",
+              "displayOrder": 3
+            },
+            {
+              "id": "f72746c5-b905-5008-b41a-09e892bcbdb1",
+              "text": "可以，如果有可靠的锚点",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "84477434-d150-578a-adc3-8066907cefa3",
+          "explanation": "禁止将不带肩带和腿带的安装用腰带用作坠落制动系统：只有全身式安全带才能制止坠落。",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "c8642646-3b34-5007-aa1a-796ad3644f92",
+          "text": "坠落制动系统的缓冲器能将作用于人体的冲击力降至多少？",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "129e8362-d417-5600-b0a0-6e54eb5d8453",
+              "text": "6 kN 及以下",
+              "displayOrder": 1
+            },
+            {
+              "id": "4fd3e8bb-e9a4-5c01-9487-d948f61b43c2",
+              "text": "12 kN 及以下",
+              "displayOrder": 2
+            },
+            {
+              "id": "903fb0b9-525d-5eb2-b31d-e35ef4410229",
+              "text": "22 kN 及以下",
+              "displayOrder": 3
+            },
+            {
+              "id": "75e7ce1f-a747-57c6-8a80-a936f402354b",
+              "text": "1 kN 及以下",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "129e8362-d417-5600-b0a0-6e54eb5d8453",
+          "explanation": "缓冲器吸收冲击，将作用于人体的冲击力降至6 kN及以下。",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "ff34658d-a7b2-5a62-a16f-575c2c90b463",
+          "text": "在构件上移动时，如何遵守100%系挂规则？",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "3dbcbdb2-5c3e-522b-952a-f9a21be2f768",
+              "text": "只在平坦路段才解开安全钩",
+              "displayOrder": 1
+            },
+            {
+              "id": "5d39eeb2-b584-58da-bdc6-5f9e8cc730d7",
+              "text": "不用安全绳，用手抓住构件",
+              "displayOrder": 2
+            },
+            {
+              "id": "0f11e3ce-4ef1-5be9-bc84-dd45d4e0fd15",
+              "text": "每走一步都转挂唯一的安全绳",
+              "displayOrder": 3
+            },
+            {
+              "id": "c5ea8cac-e7c9-535d-9f5f-469c50e0b1fe",
+              "text": "用Y形安全绳，一个挂钩始终扣住",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c5ea8cac-e7c9-535d-9f5f-469c50e0b1fe",
+          "explanation": "为实现不间断防护，应使用双叉（Y形）安全绳：转挂其中一个挂钩时，另一个始终保持扣挂。",
+          "slideRefs": [
+            "slide-09"
+          ]
+        },
+        {
+          "id": "d9628462-5433-5d53-9242-2593e6791e8b",
+          "text": "锚点处于什么位置时坠落系数等于2？",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "63a9a055-5682-5009-a3d4-eceaa8c86fa5",
+              "text": "锚点高于头部",
+              "displayOrder": 1
+            },
+            {
+              "id": "a7990755-e561-5647-81de-558a724947e5",
+              "text": "锚点与脚齐平",
+              "displayOrder": 2
+            },
+            {
+              "id": "646fcba3-5ebb-5583-9efe-e06ecc90431a",
+              "text": "锚点与胸部或肩部齐平",
+              "displayOrder": 3
+            },
+            {
+              "id": "37589596-1ee4-50fd-866c-713880fa2d32",
+              "text": "锚点与相邻工人的腰部齐平",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "a7990755-e561-5647-81de-558a724947e5",
+          "explanation": "坠落系数2即锚点与脚齐平：自由坠落距离等于安全绳长度的两倍。安全绳应尽量挂在头顶上方。",
+          "slideRefs": [
+            "slide-10"
+          ]
+        },
+        {
+          "id": "1d69a824-b347-5d9a-9c39-c72a484bf7f6",
+          "text": "哪种装置属于C类锚固装置？",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "50283500-ab02-5a84-9e64-184325a9cc6a",
+              "text": "柔性水平钢丝绳锚固线",
+              "displayOrder": 1
+            },
+            {
+              "id": "02ea5875-3f2f-5296-93f9-da986134cd4c",
+              "text": "承重构件上的固定锚点",
+              "displayOrder": 2
+            },
+            {
+              "id": "c1fa0ebe-b9e2-5fea-9739-ce863ac8b690",
+              "text": "便携式三脚架和夹具",
+              "displayOrder": 3
+            },
+            {
+              "id": "d246c759-c440-5a02-bd3d-05f96b5194df",
+              "text": "带滑车的刚性轨道锚固线",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "50283500-ab02-5a84-9e64-184325a9cc6a",
+          "explanation": "C类为柔性水平钢丝绳锚固线；A类为固定式锚点，B类为便携式锚固装置，D类为刚性轨道锚固线。",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "7fd6d61d-3ffe-55e9-9129-a309d1871826",
+          "text": "禁止站在无扶手和无防护平台的人字梯哪几级上作业？",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "17ee5148-462d-57cf-be17-8abd46f0f997",
+              "text": "最下面两级",
+              "displayOrder": 1
+            },
+            {
+              "id": "1b147d3b-8f64-5d5c-bbbb-639b306a3f5d",
+              "text": "最上面两级",
+              "displayOrder": 2
+            },
+            {
+              "id": "17e4567f-5c2a-5207-8d8e-fd6a04752376",
+              "text": "中间几级",
+              "displayOrder": 3
+            },
+            {
+              "id": "70b95d21-9f1f-5c8e-8f0f-61699afa2259",
+              "text": "第一级以上任一级",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "1b147d3b-8f64-5d5c-bbbb-639b306a3f5d",
+          "explanation": "禁止站在无扶手和无防护平台的人字梯最上面两级上作业。",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "0b624a5d-2f10-5a32-ab49-55d4d1dbe66d",
+          "text": "作业斗内有人时，能否移动高空作业车？",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "f0a053ad-cfa4-55d6-8e59-99e74980e1d3",
+              "text": "可以，低速行驶即可",
+              "displayOrder": 1
+            },
+            {
+              "id": "38256525-d67f-566f-89a9-a7fcc7ab7861",
+              "text": "可以，只要臂架已降下",
+              "displayOrder": 2
+            },
+            {
+              "id": "1a85ac09-b92a-559d-8688-b30e1089b92d",
+              "text": "仅在人员未系挂时禁止",
+              "displayOrder": 3
+            },
+            {
+              "id": "5380ea39-a679-5c1c-9490-b1234f559d06",
+              "text": "不可以，这是禁止的",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5380ea39-a679-5c1c-9490-b1234f559d06",
+          "explanation": "斗内有人或臂架升起时，严禁移动高空作业车。",
+          "slideRefs": [
+            "slide-18"
+          ]
+        },
+        {
+          "id": "37feb015-3f73-5ce5-8920-07ebd9bd72cd",
+          "text": "心肺复苏时胸外按压与人工呼吸的比例是多少？",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "ebf94061-9e3a-5887-9cf0-57d9aeb54679",
+              "text": "15比1",
+              "displayOrder": 1
+            },
+            {
+              "id": "ba186fd7-78cc-5439-a59c-8d2ec88f3763",
+              "text": "5比1",
+              "displayOrder": 2
+            },
+            {
+              "id": "9298ccc4-37d3-5084-9cee-f8018b054053",
+              "text": "10比2",
+              "displayOrder": 3
+            },
+            {
+              "id": "5d945097-2094-52c7-9315-928de82a2784",
+              "text": "30比2",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5d945097-2094-52c7-9315-928de82a2784",
+          "explanation": "心肺复苏：在胸骨中部按压30次，深度5–6 cm，频率每分钟100–120次，然后进行2次人工呼吸。",
+          "slideRefs": [
+            "slide-22"
+          ]
+        }
+      ]
+    }
+  ]
+}

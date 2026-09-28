@@ -12,7 +12,7 @@ import {
   type DocumentParticipant,
 } from './document-editor.ts';
 import { completeParticipantFields } from './document-family-defaults.ts';
-import { protocolColumns } from './document-profile.ts';
+import { protocolColumns, usesBiotForm } from './document-profile.ts';
 
 export type ProtocolGroup = Readonly<{
   organization: string | null;
@@ -323,7 +323,7 @@ export async function generateProtocolInBrowser(
     const columns =
       family === 'ptm'
         ? [22, 82, 62, 80, 62, 52, 66, 75]
-        : family === 'biot'
+        : usesBiotForm(family)
           ? [26, 110, 95, 80, 85, 105]
           : family === 'qualification'
             ? [24, 95, 82, 70, 72, 88, 70]
@@ -389,7 +389,7 @@ export async function generateProtocolInBrowser(
           '',
           filled.notes,
         ]);
-      else if (family === 'biot')
+      else if (usesBiotForm(family))
         row([
           ...base,
           org,

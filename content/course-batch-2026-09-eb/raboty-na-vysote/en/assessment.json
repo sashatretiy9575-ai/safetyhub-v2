@@ -1,0 +1,994 @@
+{
+  "schemaVersion": 1,
+  "slug": "raboty-na-vysote",
+  "locale": "en",
+  "status": "draft-awaiting-independent-review",
+  "policy": {
+    "durationMinutes": 15,
+    "passScore": 7,
+    "questionCount": 10,
+    "variantCount": 3,
+    "attemptsPerCalendarDay": 8,
+    "resetTimezone": "Asia/Oral"
+  },
+  "variants": [
+    {
+      "id": "5a17aee6-9ec3-59ec-99e6-ef1c22521985",
+      "variantNumber": 1,
+      "questions": [
+        {
+          "id": "ec7e7734-18f5-50ed-8c8d-a4eccda94ab4",
+          "text": "From what height is work classed as work at height under the Rules of the RK?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "3e5d15be-9c31-5ee1-8344-d0cb21a039e0",
+              "text": "0.5 m or higher",
+              "displayOrder": 1
+            },
+            {
+              "id": "4100667a-6ab5-5644-8bda-dec6ca8e3dcd",
+              "text": "1.3 m or higher",
+              "displayOrder": 2
+            },
+            {
+              "id": "a3a4b114-a1d7-58ac-a40c-12c0fe1c5511",
+              "text": "3 m or higher",
+              "displayOrder": 3
+            },
+            {
+              "id": "cfb1f352-bb53-5755-9636-8ccb16ab4e76",
+              "text": "5 m or higher",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "4100667a-6ab5-5644-8bda-dec6ca8e3dcd",
+          "explanation": "Under the Rules of the RK, work at height is work at 1.3 m or more above the ground, a floor slab or a deck, and closer than 2 m to the edge of a drop.",
+          "slideRefs": [
+            "slide-05"
+          ]
+        },
+        {
+          "id": "fd8bb32d-f051-5055-8e4e-3f30fc937eef",
+          "text": "In the hierarchy of fall protection measures, what is applied before fall protection PPE?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "26b877db-1988-5985-a0b7-86116c51b9cb",
+              "text": "Guardrails, scaffolds and safety nets",
+              "displayOrder": 1
+            },
+            {
+              "id": "5029498d-b84f-51c9-b4f4-cacb8569504e",
+              "text": "A fall arrest system with an absorber",
+              "displayOrder": 2
+            },
+            {
+              "id": "6ef87398-2ca3-5c95-87cb-c8fe9373f8e6",
+              "text": "An extra briefing before the shift",
+              "displayOrder": 3
+            },
+            {
+              "id": "70708ffe-3f38-56a6-a510-d4e1fc875161",
+              "text": "More frequent medical checks for workers",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "26b877db-1988-5985-a0b7-86116c51b9cb",
+          "explanation": "Fall protection PPE is the last line of defence: priority goes to collective protection — guardrails, handrails, scaffolds and nets.",
+          "slideRefs": [
+            "slide-06"
+          ]
+        },
+        {
+          "id": "52f32caf-7fc3-5500-836b-911df0672a61",
+          "text": "What crew is required to carry out work at height?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "2ceb85ba-7ed8-538e-bf71-1b2d045eb68a",
+              "text": "One worker with a telephone",
+              "displayOrder": 1
+            },
+            {
+              "id": "8b15c2bf-de1e-5142-8c8c-73498a56f22a",
+              "text": "A crew of at least 5 people",
+              "displayOrder": 2
+            },
+            {
+              "id": "83a734b5-1c9e-5cc1-8f59-5c69e0bec825",
+              "text": "A crew of at least 2 people",
+              "displayOrder": 3
+            },
+            {
+              "id": "c01bde8d-ae95-5fde-bb8d-3166531c8d7a",
+              "text": "Any crew size, as decided on site",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "83a734b5-1c9e-5cc1-8f59-5c69e0bec825",
+          "explanation": "Work at height is done under a work permit by a crew (team) of at least 2 people.",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "2531ae75-2c54-5426-95e6-4bd3390f8109",
+          "text": "What does the letter B stand for in the ABC rule of a fall arrest system?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "24ed89d8-c269-5fde-9eeb-00d06b52f010",
+              "text": "Anchor device (Anchor)",
+              "displayOrder": 1
+            },
+            {
+              "id": "a61bf202-abbb-5b79-bc82-952863d56d2d",
+              "text": "Connecting element (Connector)",
+              "displayOrder": 2
+            },
+            {
+              "id": "6d91ea4d-42f4-5272-8ea2-fa22599b27f4",
+              "text": "Harness (Body wear)",
+              "displayOrder": 3
+            },
+            {
+              "id": "34d9dfee-4fc4-5653-88b0-27ba25a33002",
+              "text": "Blocking device (Block)",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "6d91ea4d-42f4-5272-8ea2-fa22599b27f4",
+          "explanation": "A is the anchor device, B is the harness (Body wear), C is the connector: a lanyard with an energy absorber, a self-retracting lifeline (SRL) or a rope grab.",
+          "slideRefs": [
+            "slide-09"
+          ]
+        },
+        {
+          "id": "b9880ba5-958f-599f-81eb-e37a2cfb8319",
+          "text": "How is the fall factor calculated?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "1cc46f01-c754-5cea-907c-43e629db6789",
+              "text": "Lanyard length times the worker's height",
+              "displayOrder": 1
+            },
+            {
+              "id": "80cdc9bb-1dec-58e8-8922-ac7cf7a381ba",
+              "text": "Fall height divided by the lanyard length",
+              "displayOrder": 2
+            },
+            {
+              "id": "9f2a893c-4604-5ed5-b457-c3eeeb4b18aa",
+              "text": "Working height divided by 1.8 m",
+              "displayOrder": 3
+            },
+            {
+              "id": "d5fde8f9-b113-52cb-99a5-a5493c1600fe",
+              "text": "Worker's weight divided by anchor strength",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "80cdc9bb-1dec-58e8-8922-ac7cf7a381ba",
+          "explanation": "Fall factor = fall height / lanyard length; it determines how hard the jolt is in a fall.",
+          "slideRefs": [
+            "slide-10"
+          ]
+        },
+        {
+          "id": "fc045619-c28e-58f5-8146-1eb55714ad01",
+          "text": "How far must a leaning ladder extend above the landing?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "0cc2178d-3214-5301-a0f4-20c4aad48cae",
+              "text": "By at least 0.3 m",
+              "displayOrder": 1
+            },
+            {
+              "id": "9a6ff73d-9364-5827-9743-00cf6ceb8b09",
+              "text": "By at least 2 m",
+              "displayOrder": 2
+            },
+            {
+              "id": "ed537a5a-4d63-5591-b27d-bf8dc894016a",
+              "text": "By at least 1 m",
+              "displayOrder": 3
+            },
+            {
+              "id": "8d40304c-647c-5fd1-a0c3-e706f990b302",
+              "text": "It must not extend above it",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "ed537a5a-4d63-5591-b27d-bf8dc894016a",
+          "explanation": "The top of a leaning ladder must extend at least 1.0 m above the landing.",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "1b959108-1c70-58e5-9804-4b0cfba51c91",
+          "text": "What is done with a harness that has arrested a person's fall?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "2d9e3169-e08f-5e86-9b88-a2e124683b16",
+              "text": "It is withdrawn and destroyed",
+              "displayOrder": 1
+            },
+            {
+              "id": "98de5cec-d592-514e-8c36-3c1f6dcabcb3",
+              "text": "It is inspected and used again",
+              "displayOrder": 2
+            },
+            {
+              "id": "f04fee63-6965-5272-88a8-145ff7c906b0",
+              "text": "It is washed and returned to the store",
+              "displayOrder": 3
+            },
+            {
+              "id": "5abd2d82-f81e-5ba7-8857-0d26834b930e",
+              "text": "It is used for training only",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "2d9e3169-e08f-5e86-9b88-a2e124683b16",
+          "explanation": "A harness that has arrested a fall is immediately withdrawn from use and destroyed; a torn fall indicator also shows this.",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "f955f98f-390f-5c75-96d1-8a5e552b627b",
+          "text": "From which side is it prohibited to climb an overhead line (OHL) angle pole?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "5c2e4fc6-2e47-5b6a-a291-a53ba84f7b02",
+              "text": "From the outside of the conductor angle",
+              "displayOrder": 1
+            },
+            {
+              "id": "ebc63088-b7be-507b-8bbd-23b09d4f96a7",
+              "text": "From the side of the access road",
+              "displayOrder": 2
+            },
+            {
+              "id": "6450cb78-ac9a-5463-9902-95589c20cdff",
+              "text": "From the inside of the conductor angle",
+              "displayOrder": 3
+            },
+            {
+              "id": "7816d844-7452-5604-92a5-ed89204b1ac7",
+              "text": "From the side of the nearest anchor",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "6450cb78-ac9a-5463-9902-95589c20cdff",
+          "explanation": "Climbing an angle pole from the inside of the conductor angle is strictly prohibited.",
+          "slideRefs": [
+            "slide-17"
+          ]
+        },
+        {
+          "id": "0c632662-675c-5103-a69e-e21f416c50ff",
+          "text": "Under the rescue and evacuation plan, how much time is allowed to rescue a suspended worker?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "0eb4d645-51f1-5fc0-8887-d767d273c400",
+              "text": "Up to 10 minutes",
+              "displayOrder": 1
+            },
+            {
+              "id": "06440a89-35f0-5314-a545-6da43d919951",
+              "text": "Up to 1 hour",
+              "displayOrder": 2
+            },
+            {
+              "id": "5c1a27b5-3336-5301-9846-951d9d8b1a62",
+              "text": "Up to 30 minutes",
+              "displayOrder": 3
+            },
+            {
+              "id": "aa1a3532-74ae-5b25-bd1e-45d358204646",
+              "text": "Up to 2 hours",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "0eb4d645-51f1-5fc0-8887-d767d273c400",
+          "explanation": "Under the rescue and evacuation plan, the time to rescue a suspended worker is up to 10 minutes: hanging in a harness any longer is life-threatening.",
+          "slideRefs": [
+            "slide-19"
+          ]
+        },
+        {
+          "id": "160e33f7-56fe-5cb3-a4f7-e8fd68af3fde",
+          "text": "How is a conscious casualty positioned after being lowered from suspension in a harness?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "e38c5071-7da9-547c-889e-ccb11bb852af",
+              "text": "Semi-sitting, not laid on their back",
+              "displayOrder": 1
+            },
+            {
+              "id": "58862ac8-c7ed-507c-959c-1535a75f29c4",
+              "text": "Horizontally on the back with the legs raised",
+              "displayOrder": 2
+            },
+            {
+              "id": "4123f423-233f-5c1d-b4db-70939b9159a4",
+              "text": "Face down, head turned to the side",
+              "displayOrder": 3
+            },
+            {
+              "id": "9fbfbbab-707f-5522-a4b0-878ce5756043",
+              "text": "Standing, supported by the rescuer",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "e38c5071-7da9-547c-889e-ccb11bb852af",
+          "explanation": "A conscious casualty is placed semi-sitting: laying them flat on their back risks “reflow syndrome”. If the casualty is unconscious, lay them flat, and start CPR if breathing stops.",
+          "slideRefs": [
+            "slide-20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f4d8f385-b461-54f1-9f75-4cad59f88559",
+      "variantNumber": 2,
+      "questions": [
+        {
+          "id": "bed8a813-9dd8-557c-99d3-e17ee19aac24",
+          "text": "From what age are people admitted to work at height?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "a82ce103-36c3-588c-b9fd-5e3dd51b67f9",
+              "text": "From age 18",
+              "displayOrder": 1
+            },
+            {
+              "id": "ffee55ad-d5d6-526a-b4c3-4c956ddd3c37",
+              "text": "From age 16",
+              "displayOrder": 2
+            },
+            {
+              "id": "10501766-f4e5-5f4a-8d3f-ba42aae3de77",
+              "text": "From age 21",
+              "displayOrder": 3
+            },
+            {
+              "id": "4e96e0d9-9f84-57f0-aaaa-93b2a59ad83f",
+              "text": "From age 25",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "a82ce103-36c3-588c-b9fd-5e3dd51b67f9",
+          "explanation": "Persons admitted to work at height must be at least 18, have passed a mandatory medical examination and be trained in occupational safety and health.",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "30ebdf05-cd63-5eb9-9d9a-3d314b91bfbe",
+          "text": "For how many work shifts does a worker admitted to work at height for the first time receive instruction?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "0747222d-df11-57c1-80d4-119c26dd5674",
+              "text": "1 shift",
+              "displayOrder": 1
+            },
+            {
+              "id": "34b1658f-3493-52d4-bc12-4948a7ed4799",
+              "text": "3 shifts",
+              "displayOrder": 2
+            },
+            {
+              "id": "6fbed59b-6b5a-5450-88ae-139600eb88d7",
+              "text": "5 shifts",
+              "displayOrder": 3
+            },
+            {
+              "id": "a810c985-7ef1-5087-a5c0-a11f5f56ce00",
+              "text": "10 shifts",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "6fbed59b-6b5a-5450-88ae-139600eb88d7",
+          "explanation": "Workers admitted to work at height for the first time receive instruction from the responsible work manager over 5 work shifts.",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "006ce201-0aad-5adc-adb3-1abe50b9e4b8",
+          "text": "Which system physically prevents a worker from reaching the edge of a drop?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "cd892df9-4acd-5f83-a537-2d05b94196bd",
+              "text": "A fall arrest system",
+              "displayOrder": 1
+            },
+            {
+              "id": "637c1fd0-6abb-5879-a3cb-8d4de0dca167",
+              "text": "A restraint system",
+              "displayOrder": 2
+            },
+            {
+              "id": "9ee614e7-472d-55b4-87c7-26734753af06",
+              "text": "A rescue system",
+              "displayOrder": 3
+            },
+            {
+              "id": "19040396-a329-5e49-b758-194df8d549ef",
+              "text": "A warning tape system",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "637c1fd0-6abb-5879-a3cb-8d4de0dca167",
+          "explanation": "A restraint system — a harness and a fixed-length lanyard — does not let the worker reach the edge, so a fall is ruled out.",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "404b9148-df90-55c6-8afb-983732eb4c96",
+          "text": "What must the lanyard of a fall arrest system never be attached to?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "5d138b7e-2519-5f57-b825-b8d2e9042810",
+              "text": "To fixed structural anchor points",
+              "displayOrder": 1
+            },
+            {
+              "id": "3ecc6c9d-25c3-5837-9d2e-443fba523d97",
+              "text": "To a flexible horizontal anchor line",
+              "displayOrder": 2
+            },
+            {
+              "id": "a29ace51-8536-5e77-b718-7482c5f9b24a",
+              "text": "To a beam clamp on an I-beam",
+              "displayOrder": 3
+            },
+            {
+              "id": "435fddab-9d7a-51e0-b254-f139c3e496ce",
+              "text": "To pipelines and cable trays",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "435fddab-9d7a-51e0-b254-f139c3e496ce",
+          "explanation": "The lanyard is attached only to verified load-bearing structures; pipelines, cable trays, radiators and window frames must not be used for this.",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "0e630aed-0302-585c-b7ba-068ba4814a52",
+          "text": "At what angle to the horizontal is a leaning ladder set up?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "ecc8dd90-c3a5-5c2a-878c-65d638870957",
+              "text": "45–50 degrees",
+              "displayOrder": 1
+            },
+            {
+              "id": "92c02f6c-6d64-53a8-a465-53ec7ef5b7d1",
+              "text": "55–60 degrees",
+              "displayOrder": 2
+            },
+            {
+              "id": "d086b4c4-8cbe-526f-8f17-18a055dac019",
+              "text": "70–75 degrees",
+              "displayOrder": 3
+            },
+            {
+              "id": "36fe6c73-d04e-5db0-ae4c-607681d71fd3",
+              "text": "85–90 degrees",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "d086b4c4-8cbe-526f-8f17-18a055dac019",
+          "explanation": "A leaning ladder is set at an angle of 70–75° (height to base about 4 to 1) and extends 1 m above the landing.",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "68e78e12-e1ea-5013-81c4-a6660ed0df69",
+          "text": "How do you check the fit of the harness thigh straps?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "53abc221-e7a3-57f4-a155-2e90aef6efed",
+              "text": "A fist should pass freely under the strap",
+              "displayOrder": 1
+            },
+            {
+              "id": "3f818a7b-524f-522a-8d06-7e8e659bd9a0",
+              "text": "The strap should hang loosely on the thigh",
+              "displayOrder": 2
+            },
+            {
+              "id": "03a25a32-dbc3-52cb-9520-9c590de8514c",
+              "text": "A flat hand should fit snugly under the strap",
+              "displayOrder": 3
+            },
+            {
+              "id": "7e3854a4-d79e-57c8-bcc3-580681147dd0",
+              "text": "The strap is tightened until the legs go numb",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "03a25a32-dbc3-52cb-9520-9c590de8514c",
+          "explanation": "With the correct fit, a flat hand fits snugly under the thigh strap: no tighter and no looser.",
+          "slideRefs": [
+            "slide-13"
+          ]
+        },
+        {
+          "id": "2e4c1c55-9592-5da3-a40d-bc5584d22162",
+          "text": "At what wind speed is ordinary work at height stopped?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "831180c0-23e3-5fa0-994e-2a13557d5c86",
+              "text": "5 m/s or more",
+              "displayOrder": 1
+            },
+            {
+              "id": "5fc3e37b-a4b1-59d6-84ef-764a989b3e8f",
+              "text": "15 m/s or more",
+              "displayOrder": 2
+            },
+            {
+              "id": "e26655ac-32a2-531e-b567-a21f4c7e0b13",
+              "text": "8 m/s or more",
+              "displayOrder": 3
+            },
+            {
+              "id": "a34f1eb8-811e-54c3-a8e5-8579cd03d3c0",
+              "text": "25 m/s or more",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5fc3e37b-a4b1-59d6-84ef-764a989b3e8f",
+          "explanation": "Work at height is stopped at a wind of 15 m/s or more, and when installing solid structures and panels — already at 10 m/s.",
+          "slideRefs": [
+            "slide-15"
+          ]
+        },
+        {
+          "id": "a4995bd3-ad38-5a10-8633-e4cf2a0fa215",
+          "text": "Within what distance of the outermost OHL conductor is work from an aerial work platform done only under a work permit?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "d7d161f3-e215-5eb6-ac18-00345ac55b3d",
+              "text": "Less than 3 m",
+              "displayOrder": 1
+            },
+            {
+              "id": "30f1d1dc-f880-5a03-b977-6b62b4c2ebcc",
+              "text": "Less than 30 m",
+              "displayOrder": 2
+            },
+            {
+              "id": "57e03214-681b-5bca-9451-42e923be15a6",
+              "text": "Less than 100 m",
+              "displayOrder": 3
+            },
+            {
+              "id": "283e1773-f88f-569d-8753-34fc2ae4fc05",
+              "text": "Less than 300 m",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "30f1d1dc-f880-5a03-b977-6b62b4c2ebcc",
+          "explanation": "Work less than 30 m from the outermost OHL conductor is done only under a work permit and a manager's supervision.",
+          "slideRefs": [
+            "slide-18"
+          ]
+        },
+        {
+          "id": "3ca0d2b2-ec13-5486-83f0-f1d5d05ee8d5",
+          "text": "After how long of motionless hanging in a harness can a person lose consciousness?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "f56224ef-1078-575e-bcb2-da28463138e4",
+              "text": "After 1–2 hours",
+              "displayOrder": 1
+            },
+            {
+              "id": "08d9b447-0323-58e8-87b5-ec85c09d0b27",
+              "text": "After 30–40 minutes",
+              "displayOrder": 2
+            },
+            {
+              "id": "9fd3722d-d5a1-5c30-901f-b1de4785f064",
+              "text": "After 3–4 hours",
+              "displayOrder": 3
+            },
+            {
+              "id": "c4aa0915-fb6e-5aad-b426-b304f2c3b07e",
+              "text": "After 5–10 minutes",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c4aa0915-fb6e-5aad-b426-b304f2c3b07e",
+          "explanation": "After 5–10 minutes of motionless hanging, brain hypoxia, loss of consciousness and cardiac arrest follow.",
+          "slideRefs": [
+            "slide-20"
+          ]
+        },
+        {
+          "id": "354b867a-8a90-544d-bd7d-b04c779ceabc",
+          "text": "What must be done if a tear in the lanyard is found during work at height?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "cc06b706-c7f2-5667-812e-10bfc12e51f4",
+              "text": "Finish the task and then report",
+              "displayOrder": 1
+            },
+            {
+              "id": "057cea16-e7cc-59b3-97fa-efde1df46830",
+              "text": "Stop the work immediately",
+              "displayOrder": 2
+            },
+            {
+              "id": "c80ecc07-3373-57e7-bf1c-b23f44774397",
+              "text": "Cover the tear with insulating tape",
+              "displayOrder": 3
+            },
+            {
+              "id": "ca3570d5-b685-504b-9c03-c9431bf8431e",
+              "text": "Re-clip onto the same lanyard",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "057cea16-e7cc-59b3-97fa-efde1df46830",
+          "explanation": "A defect or tear found in the harness, lanyard, carabiner or anchor line is a reason to stop work at once, with no exceptions.",
+          "slideRefs": [
+            "slide-23"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d09a0429-5019-5df3-b7c4-aff6bd27cb24",
+      "variantNumber": 3,
+      "questions": [
+        {
+          "id": "8e7a94be-8f73-5312-bf08-8b4df9b0a55a",
+          "text": "Apart from being 18, what does a worker need to be admitted to work at height?",
+          "displayOrder": 1,
+          "options": [
+            {
+              "id": "926e286b-a139-5006-81d1-4addb1d6bab2",
+              "text": "Only verbal permission from the foreman",
+              "displayOrder": 1
+            },
+            {
+              "id": "b97ab8f6-f382-5d97-af0a-2468b69ea0a4",
+              "text": "A medical check and a training certificate",
+              "displayOrder": 2
+            },
+            {
+              "id": "5eeca4d3-67da-5ae7-aa9a-31487edb49fc",
+              "text": "At least three years' experience at height",
+              "displayOrder": 3
+            },
+            {
+              "id": "cd628952-b685-5949-bf40-077b611564ff",
+              "text": "A trade skill grade of 4 or higher",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "b97ab8f6-f382-5d97-af0a-2468b69ea0a4",
+          "explanation": "The worker must be at least 18, pass a mandatory medical examination and hold a certificate of training in occupational safety and health.",
+          "slideRefs": [
+            "slide-07"
+          ]
+        },
+        {
+          "id": "377b725c-124a-5634-950b-c2862757cd15",
+          "text": "Which fall protection measure comes first in the hierarchy?",
+          "displayOrder": 2,
+          "options": [
+            {
+              "id": "5550145e-9d6a-5847-9973-02ea282ba861",
+              "text": "Install collective guards",
+              "displayOrder": 1
+            },
+            {
+              "id": "4711dca8-0161-5c6d-9998-3ce9266218f5",
+              "text": "Use a restraint system",
+              "displayOrder": 2
+            },
+            {
+              "id": "294b5628-8ed5-5e9a-888a-493efd04fc45",
+              "text": "Eliminate work at height",
+              "displayOrder": 3
+            },
+            {
+              "id": "7053a9c7-13d2-55fc-8eee-ed841c1f8247",
+              "text": "Put on a full body harness",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "294b5628-8ed5-5e9a-888a-493efd04fc45",
+          "explanation": "First work at height is eliminated, then collective protection and restraint are applied, and only then fall arrest. PPE is the last resort.",
+          "slideRefs": [
+            "slide-06"
+          ]
+        },
+        {
+          "id": "ffeacb11-7ba4-5db8-bc79-28de2f091a66",
+          "text": "May a waist installation belt without shoulder and thigh straps be used as a fall arrest system?",
+          "displayOrder": 3,
+          "options": [
+            {
+              "id": "be5fe39b-0481-553a-95fc-a20b0c68fb99",
+              "text": "Prohibited only at heights above 5 m",
+              "displayOrder": 1
+            },
+            {
+              "id": "84477434-d150-578a-adc3-8066907cefa3",
+              "text": "No, this is prohibited",
+              "displayOrder": 2
+            },
+            {
+              "id": "08a01a70-f1b8-50da-a31c-913fae8b2cb1",
+              "text": "Yes, if an energy absorber is attached to the belt",
+              "displayOrder": 3
+            },
+            {
+              "id": "f72746c5-b905-5008-b41a-09e892bcbdb1",
+              "text": "Yes, if there is a reliable anchor",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "84477434-d150-578a-adc3-8066907cefa3",
+          "explanation": "A waist belt without straps is prohibited as a fall arrest system: only a full body harness can stop a fall.",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "c8642646-3b34-5007-aa1a-796ad3644f92",
+          "text": "To what level does the energy absorber of a fall arrest system reduce the arrest force on the body?",
+          "displayOrder": 4,
+          "options": [
+            {
+              "id": "129e8362-d417-5600-b0a0-6e54eb5d8453",
+              "text": "To 6 kN or less",
+              "displayOrder": 1
+            },
+            {
+              "id": "4fd3e8bb-e9a4-5c01-9487-d948f61b43c2",
+              "text": "To 12 kN or less",
+              "displayOrder": 2
+            },
+            {
+              "id": "903fb0b9-525d-5eb2-b31d-e35ef4410229",
+              "text": "To 22 kN or less",
+              "displayOrder": 3
+            },
+            {
+              "id": "75e7ce1f-a747-57c6-8a80-a936f402354b",
+              "text": "To 1 kN or less",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "129e8362-d417-5600-b0a0-6e54eb5d8453",
+          "explanation": "The energy absorber softens the shock and reduces the arrest force on the body to 6 kN or less.",
+          "slideRefs": [
+            "slide-08"
+          ]
+        },
+        {
+          "id": "ff34658d-a7b2-5a62-a16f-575c2c90b463",
+          "text": "How is the 100% tie-off rule followed when moving along structures?",
+          "displayOrder": 5,
+          "options": [
+            {
+              "id": "3dbcbdb2-5c3e-522b-952a-f9a21be2f768",
+              "text": "By unclipping only on level sections",
+              "displayOrder": 1
+            },
+            {
+              "id": "5d39eeb2-b584-58da-bdc6-5f9e8cc730d7",
+              "text": "By holding structures by hand, no lanyard",
+              "displayOrder": 2
+            },
+            {
+              "id": "0f11e3ce-4ef1-5be9-bc84-dd45d4e0fd15",
+              "text": "By re-clipping one lanyard at every step",
+              "displayOrder": 3
+            },
+            {
+              "id": "c5ea8cac-e7c9-535d-9f5f-469c50e0b1fe",
+              "text": "With a Y-lanyard: one leg always clipped in",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "c5ea8cac-e7c9-535d-9f5f-469c50e0b1fe",
+          "explanation": "For continuous fall protection, a twin-leg (Y-shaped) lanyard is used: while one leg is being moved, the other stays clipped in.",
+          "slideRefs": [
+            "slide-09"
+          ]
+        },
+        {
+          "id": "d9628462-5433-5d53-9242-2593e6791e8b",
+          "text": "At what anchor position is the fall factor equal to 2?",
+          "displayOrder": 6,
+          "options": [
+            {
+              "id": "63a9a055-5682-5009-a3d4-eceaa8c86fa5",
+              "text": "Anchor above the head",
+              "displayOrder": 1
+            },
+            {
+              "id": "a7990755-e561-5647-81de-558a724947e5",
+              "text": "Anchor at foot level",
+              "displayOrder": 2
+            },
+            {
+              "id": "646fcba3-5ebb-5583-9efe-e06ecc90431a",
+              "text": "Anchor at chest or shoulder level",
+              "displayOrder": 3
+            },
+            {
+              "id": "37589596-1ee4-50fd-866c-713880fa2d32",
+              "text": "Anchor at a neighbouring worker's waist level",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "a7990755-e561-5647-81de-558a724947e5",
+          "explanation": "Fall factor 2 means the anchor is at foot level: the free fall equals twice the lanyard length. Attach the lanyard as high above the head as possible.",
+          "slideRefs": [
+            "slide-10"
+          ]
+        },
+        {
+          "id": "1d69a824-b347-5d9a-9c39-c72a484bf7f6",
+          "text": "Which anchor devices belong to Class C?",
+          "displayOrder": 7,
+          "options": [
+            {
+              "id": "50283500-ab02-5a84-9e64-184325a9cc6a",
+              "text": "Flexible horizontal cable lines",
+              "displayOrder": 1
+            },
+            {
+              "id": "02ea5875-3f2f-5296-93f9-da986134cd4c",
+              "text": "Fixed points on load-bearing structures",
+              "displayOrder": 2
+            },
+            {
+              "id": "c1fa0ebe-b9e2-5fea-9739-ce863ac8b690",
+              "text": "Portable tripods and clamps",
+              "displayOrder": 3
+            },
+            {
+              "id": "d246c759-c440-5a02-bd3d-05f96b5194df",
+              "text": "Rigid rail lines with a trolley",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "50283500-ab02-5a84-9e64-184325a9cc6a",
+          "explanation": "Class C covers flexible horizontal cable lines; Class A — fixed points, Class B — portable devices, Class D — rigid rail lines.",
+          "slideRefs": [
+            "slide-11"
+          ]
+        },
+        {
+          "id": "7fd6d61d-3ffe-55e9-9129-a309d1871826",
+          "text": "From which steps of a stepladder without handrails and a guarded platform is work prohibited?",
+          "displayOrder": 8,
+          "options": [
+            {
+              "id": "17ee5148-462d-57cf-be17-8abd46f0f997",
+              "text": "From the bottom two steps",
+              "displayOrder": 1
+            },
+            {
+              "id": "1b147d3b-8f64-5d5c-bbbb-639b306a3f5d",
+              "text": "From the top two steps",
+              "displayOrder": 2
+            },
+            {
+              "id": "17e4567f-5c2a-5207-8d8e-fd6a04752376",
+              "text": "From the middle steps",
+              "displayOrder": 3
+            },
+            {
+              "id": "70b95d21-9f1f-5c8e-8f0f-61699afa2259",
+              "text": "From any step above the first",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "1b147d3b-8f64-5d5c-bbbb-639b306a3f5d",
+          "explanation": "Working from the top two steps of stepladders without handrails and guarded platforms is prohibited.",
+          "slideRefs": [
+            "slide-12"
+          ]
+        },
+        {
+          "id": "0b624a5d-2f10-5a32-ab49-55d4d1dbe66d",
+          "text": "May an aerial work platform be moved while there are people in the basket?",
+          "displayOrder": 9,
+          "options": [
+            {
+              "id": "f0a053ad-cfa4-55d6-8e59-99e74980e1d3",
+              "text": "Yes, at low speed",
+              "displayOrder": 1
+            },
+            {
+              "id": "38256525-d67f-566f-89a9-a7fcc7ab7861",
+              "text": "Yes, if the boom is lowered",
+              "displayOrder": 2
+            },
+            {
+              "id": "1a85ac09-b92a-559d-8688-b30e1089b92d",
+              "text": "Prohibited only if the people are not clipped in",
+              "displayOrder": 3
+            },
+            {
+              "id": "5380ea39-a679-5c1c-9490-b1234f559d06",
+              "text": "No, this is prohibited",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5380ea39-a679-5c1c-9490-b1234f559d06",
+          "explanation": "Moving the platform with people in the basket or with the boom raised is strictly prohibited.",
+          "slideRefs": [
+            "slide-18"
+          ]
+        },
+        {
+          "id": "37feb015-3f73-5ce5-8920-07ebd9bd72cd",
+          "text": "What is the ratio of chest compressions to breaths in cardiopulmonary resuscitation?",
+          "displayOrder": 10,
+          "options": [
+            {
+              "id": "ebf94061-9e3a-5887-9cf0-57d9aeb54679",
+              "text": "15 to 1",
+              "displayOrder": 1
+            },
+            {
+              "id": "ba186fd7-78cc-5439-a59c-8d2ec88f3763",
+              "text": "5 to 1",
+              "displayOrder": 2
+            },
+            {
+              "id": "9298ccc4-37d3-5084-9cee-f8018b054053",
+              "text": "10 to 2",
+              "displayOrder": 3
+            },
+            {
+              "id": "5d945097-2094-52c7-9315-928de82a2784",
+              "text": "30 to 2",
+              "displayOrder": 4
+            }
+          ],
+          "correctOptionId": "5d945097-2094-52c7-9315-928de82a2784",
+          "explanation": "CPR: 30 compressions on the middle of the breastbone, 5–6 cm deep, at 100–120 per minute, then 2 breaths.",
+          "slideRefs": [
+            "slide-22"
+          ]
+        }
+      ]
+    }
+  ]
+}

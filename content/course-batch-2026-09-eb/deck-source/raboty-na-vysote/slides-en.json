@@ -1,0 +1,457 @@
+[
+  {
+    "slide_num": 1,
+    "layout": "cover",
+    "title": "Work at Height",
+    "subtitle": "TRAINING",
+    "description": "Practical basics of safe work at height, choosing fall arrest systems, rescue and first aid",
+    "audience": "Training course for workers who perform work at height and for line supervisors",
+    "norm": "Labour Code of the RK • Rules for Work at Height, Order No. 109",
+    "photo": "assets/photo_sec4.jpg"
+  },
+  {
+    "slide_num": 2,
+    "layout": "learning_objectives",
+    "title": "After the course you can",
+    "objectives": [
+      [
+        "01",
+        "Recognise the hazards of work at height, assess risks and meet the conditions for admission to work."
+      ],
+      [
+        "02",
+        "Correctly choose and use restraint and fall arrest systems, anchor devices and ladders."
+      ],
+      [
+        "03",
+        "Check the harness before work and follow the prohibitions for work at height."
+      ],
+      [
+        "04",
+        "Act instantly in incidents: evacuate a suspended worker and give first aid."
+      ]
+    ],
+    "callout_text": "The course's main goal —\nzero injuries\nand prevention\nof falls from height.",
+    "norm": "Labour Code of the RK • Rules for Work at Height, Order No. 109"
+  },
+  {
+    "slide_num": 3,
+    "layout": "course_parts",
+    "title": "Four course topics",
+    "parts": [
+      [
+        "01",
+        "Criteria for work at height and admission to it."
+      ],
+      [
+        "02",
+        "Fall protection systems, anchors, ladders and harnesses."
+      ],
+      [
+        "03",
+        "Risks and prohibitions in work at height."
+      ],
+      [
+        "04",
+        "Combined work, suspension rescue and first aid."
+      ]
+    ],
+    "badge_number": "4",
+    "callout_header": "COURSE",
+    "callout_text": "topics\nof safe\nwork\nat height",
+    "norm": "SafetyHUB curriculum • Company safety standard"
+  },
+  {
+    "slide_num": 4,
+    "layout": "section_divider",
+    "roman": "I",
+    "title": "Work at height and steeplejack work",
+    "subtitle": "Falls from height are the leading cause of fatal workplace injuries. The right choice of fall protection saves lives.",
+    "photo": "assets/photo_cover.jpg",
+    "norm": "Rules on occupational safety for work at height"
+  },
+  {
+    "slide_num": 5,
+    "layout": "content_with_mint_callout",
+    "title": "Work at height defined: regulatory criteria",
+    "bullets": [
+      "• Basic height criterion: work at a height of 1.3 m or more above the ground, a floor slab or a work deck.",
+      "• Guarding: work on platforms within 2 m of unguarded drops of 1.3 m or more, or where guardrails are lower than 1.1 m.",
+      "• Hazards below: work less than 1.3 m above machines, mechanisms, protruding objects, water or molten metal.",
+      "• High-level (steeplejack) work: work more than 5 m above the ground or a floor slab, done from erection fixtures or directly from structures."
+    ],
+    "callout_text": "Even an unprotected fall\nfrom a height of 1.3 metres\ncan end in severe\ninjury\nor death!",
+    "norm": "Rules on Occupational Safety and Health for Work at Height, Order No. 109"
+  },
+  {
+    "slide_num": 6,
+    "layout": "4step_process",
+    "title": "Fall protection hierarchy: 4 levels",
+    "steps": [
+      [
+        "1",
+        "Avoidance",
+        "Assemble units on\nthe ground before lifting\nthem by crane into position."
+      ],
+      [
+        "2",
+        "Collective guards",
+        "Install guardrails,\nhandrails, scaffolds, platforms\nand safety catch nets."
+      ],
+      [
+        "3",
+        "Restraint",
+        "Use a restraint system that\nphysically prevents reaching\nthe edge of a drop."
+      ],
+      [
+        "4",
+        "Fall arrest",
+        "A fall arrest system with\na harness and energy absorber\nto safely arrest a fall."
+      ]
+    ],
+    "bottom_banner": "Fall protection PPE is the last line of defence! Collective guards always come first!",
+    "norm": "GOST EN 363-2014 • Personal fall protection equipment"
+  },
+  {
+    "slide_num": 7,
+    "layout": "content_with_mint_callout",
+    "title": "Admission to work at height",
+    "bullets": [
+      "• Age and health: only persons aged 18 or over who have passed a mandatory medical examination are admitted to work at height.",
+      "• Training: the worker is trained in occupational safety and health and holds a knowledge test certificate; knowledge is tested at least once a year.",
+      "• First admission: a worker admitted to work at height for the first time receives instruction from the responsible work manager over 5 work shifts.",
+      "• Crew and permit: work at height is done under a work permit by a crew (team) of at least 2 people."
+    ],
+    "callout_text": "Working at height\nalone is prohibited —\nonly in a crew\nof at least 2 people\nand under a work permit!",
+    "norm": "Rules on Occupational Safety and Health for Work at Height, Order No. 109"
+  },
+  {
+    "slide_num": 8,
+    "layout": "two_card_comparison",
+    "title": "Two protection systems: Restraint vs Fall arrest",
+    "left_card_title": "RESTRAINT SYSTEM",
+    "left_card_badge": "1",
+    "left_card_bullets": [
+      "• Goal: physically PREVENT access to the edge of a drop.",
+      "• Components: a work belt or harness + a fixed-length lanyard.",
+      "• No fall: the fall factor is zero (no dynamic shock load).",
+      "• Load: no energy absorber needed, as a fall is impossible.",
+      "• Limitation: never use where a fall into a void is possible!"
+    ],
+    "right_card_title": "FALL ARREST SYSTEM",
+    "right_card_badge": "2",
+    "right_card_bullets": [
+      "• Goal: SAFELY ARREST a fall that has already begun.",
+      "• Components: full body harness + energy absorber + anchor line.",
+      "• Shock absorption: the absorber cuts the arrest force to 6 kN or less.",
+      "• Load distribution: the load is transferred to the thighs, pelvis and chest.",
+      "• Prerequisite: calculate the clearance below the worker."
+    ],
+    "bottom_banner": "A work positioning belt (without shoulder and thigh straps) is PROHIBITED as a fall arrest system!",
+    "norm": "GOST R EN 358 • GOST R EN 361 • Personal protective systems"
+  },
+  {
+    "slide_num": 9,
+    "layout": "content_with_image",
+    "title": "Fall arrest system components: The ABC rule",
+    "bullets": [
+      "• A (Anchor): a reliable anchor device (sling, clamp, beam clamp) with a strength of at least 22 kN (2.2 tonnes).",
+      "• B (Body wear): a full body harness with shoulder and thigh straps and a dorsal fall arrest D-ring.",
+      "• C (Connector): a lanyard with an energy absorber, a self-retracting lifeline (SRL) or a rope grab on a flexible line.",
+      "• 100% tie-off rule: when moving along structures, use a twin-leg (Y-shaped) lanyard — one leg is always clipped in!"
+    ],
+    "photo": "assets/photo_gear.jpg",
+    "callout_text": "Fall protection PPE works only with correct anchorage and a calculated clearance!",
+    "norm": "GOST R EN 362 • Carabiners and connectors • ABC rule"
+  },
+  {
+    "slide_num": 10,
+    "layout": "content_with_mint_callout",
+    "title": "Fall factor and clearance",
+    "bullets": [
+      "• Fall factor = Fall height / Lanyard length. It determines how hard the dynamic shock on the worker's body is in a fall.",
+      "• Factor 0 (anchor above head): the best option, minimal fall distance, gentle absorber deployment.",
+      "• Factor 1 (anchor at chest/shoulder level): a standard fall of the slack lanyard length; acceptable with an energy absorber.",
+      "• Factor 2 (anchor at foot level): CRITICAL risk! Free fall equals twice the lanyard length (up to 4 m); risk of hitting structures.",
+      "• Clearance: the calculated distance below the workplace (lanyard length + absorber extension 1.2 m + height 1.8 m + margin 1.0 m = 5.7–6.0 m)."
+    ],
+    "callout_text": "Clip the lanyard\nAS HIGH ABOVE YOUR HEAD\nAS POSSIBLE! Factor 2 —\nextreme load on\nthe anchor and spine!",
+    "norm": "Guide to fall protection PPE • Clearance calculation"
+  },
+  {
+    "slide_num": 11,
+    "layout": "content_with_mint_callout",
+    "title": "Anchor devices and rigid / flexible lines",
+    "bullets": [
+      "• Class A: fixed structural anchor points on concrete and steel load-bearing building structures.",
+      "• Class B: portable temporary anchor devices (textile slings, tripods, I-beam clamps).",
+      "• Class C: flexible horizontal cable anchor lines for free, continuous movement of the worker along the structure.",
+      "• Class D: rigid horizontal rail anchor lines with a sliding trolley for heavy-duty use.",
+      "• Never anchor to unreliable supports: process pipelines, cable trays, radiators and window frames!"
+    ],
+    "callout_text": "Never attach the lanyard\nto process pipes\nor cable trays —\nonly to verified\nload-bearing structures!",
+    "norm": "GOST EN 795-2014 • Anchor devices, requirements and testing"
+  },
+  {
+    "slide_num": 12,
+    "layout": "content_with_mint_callout",
+    "title": "Ladders, stepladders and access platforms",
+    "bullets": [
+      "• Three points of contact rule: when climbing up or down a ladder, always keep two hands and one foot (or two feet and one hand) on it.",
+      "• Leaning ladder angle: strictly 70–75 degrees to the horizontal (height-to-base ratio 4:1).",
+      "• Top end: a leaning ladder must extend at least 1.0 metre above the landing.",
+      "• Work ban: do not work from the top two steps of stepladders without handrails and guarded platforms.",
+      "• No heavy work: heavy erection and power electrical installation work must not be done from leaning ladders."
+    ],
+    "callout_text": "A leaning ladder\nis a means of access,\nnot a workplace!\nHeavy work is done only\nfrom scaffolds and platforms!",
+    "norm": "SNiP RK • Safe use of access platforms and scaffolds"
+  },
+  {
+    "slide_num": 13,
+    "layout": "4step_process",
+    "title": "4 steps of a pre-use harness check",
+    "steps": [
+      [
+        "1",
+        "Webbing",
+        "Check the webbing for cuts,\nburns, abrasion and intact\ncontrast stitching."
+      ],
+      [
+        "2",
+        "Metal hardware",
+        "Inspect D-rings and buckles\nfor deformation, cracks,\ncorrosion and secure latches."
+      ],
+      [
+        "3",
+        "Fall indicator",
+        "Make sure the fabric fall\nindicator is intact (the harness\nhas not arrested a fall)."
+      ],
+      [
+        "4",
+        "Body fit",
+        "Adjust the thigh and shoulder\nstraps: a flat hand should fit\nsnugly under the thigh strap."
+      ]
+    ],
+    "bottom_banner": "A harness that has arrested a fall is immediately withdrawn from use and destroyed!",
+    "norm": "Rules for periodic inspection and rejection of fall PPE"
+  },
+  {
+    "slide_num": 14,
+    "layout": "risk_table",
+    "title": "Risk matrix for erection work at height",
+    "headers": [
+      "RISK / SOURCE",
+      "CONSEQUENCE",
+      "CONTROL AND PROTECTION"
+    ],
+    "rows": [
+      [
+        "Person falling from height",
+        "Severe multiple trauma, spinal fractures, death",
+        "100% tie-off, Y-lanyard, horizontal anchor line"
+      ],
+      [
+        "Falling objects and tools",
+        "Injury to personnel at ground level",
+        "Helmets, protective canopies, tool lanyards, 15 cm toe boards"
+      ],
+      [
+        "Scaffold/platform instability",
+        "Collapse of the structure with people and materials",
+        "Anchoring to the facade, diagonal bracing, formal acceptance"
+      ],
+      [
+        "Weather (wind, thunderstorm, ice)",
+        "Blown off by a gust, loss of balance, slipping, lightning strike",
+        "Monitor forecasts, stop work at wind of 15 m/s or more (10 m/s for solid structures and panels)"
+      ]
+    ],
+    "bottom_banner": "The danger zone below work at height must be fenced off with warning tape and signs!",
+    "norm": "SNiP 12-03-2001 • Occupational safety in construction"
+  },
+  {
+    "slide_num": 15,
+    "layout": "stop_prohibition",
+    "title": "CRITICAL BAN: Violations during work at height",
+    "warning_title": "STOP WORK AT HEIGHT IMMEDIATELY IN CASE OF:",
+    "bullets": [
+      "• Being at height without a correctly worn and adjusted full body harness and a locked carabiner.",
+      "• Wind speed of 15 m/s or more, or 10 m/s or more when erecting solid structures and panels.",
+      "• Onset of a thunderstorm, squall, heavy rain or snowfall, fog (visibility under 50 m) or icing of structures and ladders.",
+      "• No approved work execution plan for work at height (WEP) or rescue and evacuation plan (REP).",
+      "• Using homemade, uncertified or damaged platforms, barrels or stands instead of scaffolding."
+    ],
+    "bottom_banner": "An unprotected fall gives no second chance — safety at height is absolute!",
+    "norm": "Rules for work at height • Stop-work conditions"
+  },
+  {
+    "slide_num": 16,
+    "layout": "section_divider",
+    "roman": "II",
+    "title": "Combined work, rescue and first aid",
+    "subtitle": "Specifics of electrical work at height, preventing suspension trauma, emergency evacuation and first aid for victims.",
+    "photo": "assets/photo_sec5.jpg",
+    "norm": "REP • Cross-industry first aid instruction"
+  },
+  {
+    "slide_num": 17,
+    "layout": "4step_process",
+    "title": "4 safety steps for work on OHL poles",
+    "steps": [
+      [
+        "1",
+        "Pole check",
+        "Check for wood rot or cracks\nin reinforced concrete, pole\nstability and guy wires."
+      ],
+      [
+        "2",
+        "100% tie-off",
+        "Use a flexible anchor line\nor a pole strap\nthroughout the climb."
+      ],
+      [
+        "3",
+        "Safety zone",
+        "Keep safe clearances to\nadjacent lines that are live\nor carry induced voltage."
+      ],
+      [
+        "4",
+        "Earth the line",
+        "Fit portable earths\non both sides of the worksite\non all phase conductors."
+      ]
+    ],
+    "bottom_banner": "Climbing angle poles from the inside of the conductor angle is strictly prohibited!",
+    "norm": "Safety Rules for OHL work • High-level work safety"
+  },
+  {
+    "slide_num": 18,
+    "layout": "content_with_mint_callout",
+    "title": "Aerial work platforms (AWP) near OHL",
+    "bullets": [
+      "• Work permit: work within 30 metres of the outermost OHL conductor is done only under a work permit and a manager's supervision.",
+      "• Chassis earthing: the AWP vehicle body must be earthed with a flexible copper conductor to a fixed earth electrode or the substation earth.",
+      "• 100% tie-off: an electrician in the basket must be clipped by the harness lanyard to the basket's dedicated certified anchor point.",
+      "• No travel: moving the AWP with people in the basket or with the boom raised is strictly prohibited!"
+    ],
+    "callout_text": "Earthing the AWP body\nand clipping into\nthe basket are mandatory\nbefore switching on\nthe boom hydraulics!",
+    "norm": "Rules for safe operation of lifts (aerial platforms)"
+  },
+  {
+    "slide_num": 19,
+    "layout": "4step_process",
+    "title": "4 stages of the rescue plan (REP)",
+    "steps": [
+      [
+        "1",
+        "Alarm and timer",
+        "Alert the supervisor at once\nand start timing.\nRescue time — up to 10 minutes!"
+      ],
+      [
+        "2",
+        "Rig rescue kit",
+        "Attach the rescue device\nto a secure anchor above the victim\nor on an adjacent structure."
+      ],
+      [
+        "3",
+        "Hook and lower",
+        "Clip the rescue line to\nthe suspended worker's harness,\ncut their lanyard, lower gently."
+      ],
+      [
+        "4",
+        "Shock control",
+        "Place them in the right position\n(sitting or semi-sitting!), call\nan ambulance."
+      ]
+    ],
+    "bottom_banner": "The rescue and evacuation plan (REP) and rescue kit must be on site before work starts!",
+    "norm": "GOST R EN 341 • Rescue devices and evacuation"
+  },
+  {
+    "slide_num": 20,
+    "layout": "content_with_mint_callout",
+    "title": "Suspension trauma in a harness",
+    "bullets": [
+      "• Injury mechanism: thigh straps compress the femoral veins and blood pools in the legs, causing acute venous congestion.",
+      "• Reduced blood return: after 5–10 minutes of motionless hanging, brain hypoxia, loss of consciousness and cardiac arrest follow.",
+      "• Self-help while suspended: if conscious, actively move the legs (“pedal a bicycle”) and stand in the foot-loop stirrups.",
+      "• GOLDEN RULE: if conscious, do not lay the victim flat — keep them semi-sitting; if unconscious, lay them down and start CPR once breathing stops."
+    ],
+    "callout_text": "If conscious — semi-sitting,\nnever flat on the back,\nand watched for at least\n30 minutes.\nIf unconscious — lay down\nand start resuscitation!",
+    "norm": "Medical emergency protocol for suspension trauma"
+  },
+  {
+    "slide_num": 21,
+    "layout": "content_with_mint_callout",
+    "title": "Releasing a victim from current at height",
+    "bullets": [
+      "• Step 1. De-energise the installation: switch off the nearest isolator, breaker or switch with the emergency stop.",
+      "• Step 2. Prevent a fall: remember that once the current is off, the victim will go limp and fall unless secured by fall protection!",
+      "• Step 3. Insulate the rescuer: if power cannot be cut quickly, use dielectric gloves, an insulating rod or an axe with a dry handle.",
+      "• Step 4. Separate the victim: pull the victim by dry clothing only, with one hand, without touching bare skin or metal."
+    ],
+    "callout_text": "When cutting the current\nto a victim at height,\nsecure them from falling:\nthe fall after a shock\nis deadlier than the current!",
+    "norm": "Cross-industry first aid instruction • Electrical injuries"
+  },
+  {
+    "slide_num": 22,
+    "layout": "content_with_mint_callout",
+    "title": "First aid: cardiopulmonary resuscitation (CPR)",
+    "bullets": [
+      "• Assessment: check consciousness (call out, shake the shoulders) and breathing (the “listen — look — feel” rule for 10 seconds).",
+      "• Chest compressions: 30 presses on the centre of the breastbone, 5–6 cm deep, at 100–120 per minute with the heel of the hand.",
+      "• Rescue breaths: 2 mouth-to-mouth breaths through a barrier face shield after tilting the head back and pinching the nose.",
+      "• Using an AED (defibrillator): apply the automated defibrillator pads and follow the device's voice prompts.",
+      "• Fractures and bleeding: apply a pressure bandage to bleeding, splint fractures, do not reset bone fragments!"
+    ],
+    "callout_text": "Start CPR immediately!\nEvery minute of delay\ncuts the brain's chance\nof survival by 10%!\nRatio: 30 to 2!",
+    "norm": "Basic CPR algorithm (BLS) • MoH RK Order"
+  },
+  {
+    "slide_num": 23,
+    "layout": "stop_prohibition",
+    "title": "CRITICAL STOP: 6 grounds for an absolute stop",
+    "warning_title": "STOP ALL WORK IMMEDIATELY, NO EXCEPTIONS, IN CASE OF:",
+    "bullets": [
+      "• 1. Sudden appearance of voltage on disconnected live parts or sparking at the worksite.",
+      "• 2. Worsening weather: onset of a thunderstorm, wind of 15 m/s or more (10 m/s for solid structures), snowstorm or dense fog.",
+      "• 3. Detection of a defect or tear in the harness, lanyard, carabiner or anchor line during work.",
+      "• 4. Sudden illness of any crew member (dizziness, nausea, weakness, chest pain).",
+      "• 5. Forced departure of the work supervisor or the person providing continuous supervision.",
+      "• 6. An emergency, or tools or structures falling near people."
+    ],
+    "bottom_banner": "The right to stop work (“STOP CARD”) is every worker's sacred right, with no risk of punishment!",
+    "norm": "SafetyHUB golden rules • Zero risk tolerance policy"
+  },
+  {
+    "slide_num": 24,
+    "layout": "checklist_summary",
+    "title": "Final admission checklist: 6 safety conditions",
+    "checklist": [
+      [
+        "Work permit issued",
+        "Permit for work at height signed, rescue plan approved, task briefing given."
+      ],
+      [
+        "Weather permits work",
+        "Wind below 15 m/s (below 10 m/s for solid structures), no thunderstorm, heavy precipitation or fog."
+      ],
+      [
+        "Harness and lanyards checked",
+        "Webbing, stitching, metal hardware and fall indicator inspected before the shift, no defects."
+      ],
+      [
+        "Full body harness fitted",
+        "100% continuous tie-off, anchor point reliable (≥22 kN), twin-leg lanyard connected."
+      ],
+      [
+        "Tools secured",
+        "Tools on tool lanyards, toe boards and protective canopies installed."
+      ],
+      [
+        "Rescue plan ready",
+        "Evacuation kit on site, communications working, danger zone below fenced off."
+      ]
+    ],
+    "button_text": "Press “Start knowledge test”",
+    "date_text": "Updated: 2026",
+    "norm": "Final work readiness standard • SafetyHUB"
+  }
+]

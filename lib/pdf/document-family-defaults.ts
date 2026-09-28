@@ -98,6 +98,19 @@ export const DOCUMENT_FAMILY_DEFAULTS: Record<DocumentFamily, DocumentFamilyDefa
     decisionText:
       'Комиссия присвоила группу допуска по электробезопасности и допустила к работе в электроустановках.',
   },
+  // Rules No. 109 on work at height set no form and no volume of their own: the
+  // knowledge is checked on the form of the rules on safety training, and the
+  // check is repeated every year.
+  height: {
+    hours: NO_HOURS,
+    validityMonths: { all: 12, itr: 12, worker: 12 },
+    verificationKind: 'периодический',
+    trainingReason: '',
+    protocolText:
+      'Проверка знаний по безопасности и охране труда при работе на высоте проведена по утверждённой программе «{program}» в соответствии с Правилами по обеспечению безопасности и охраны труда при работе на высоте (приказ Министра труда и социальной защиты населения Республики Казахстан от 31 марта 2022 года № 109).',
+    decisionText:
+      'Лица, прошедшие проверку знаний, допускаются к самостоятельному выполнению работ на высоте. Не прошедшие проверку подлежат повторной проверке знаний не позднее одного месяца.',
+  },
   'first-aid': {
     hours: { all: 8, itr: 8, worker: 8 },
     validityMonths: { all: 12, itr: 12, worker: 12 },

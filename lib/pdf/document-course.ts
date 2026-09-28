@@ -3,6 +3,7 @@ import type { DocumentDefaults } from './document-editor.ts';
 import { courseAdmission, type ElectricalAdmission } from './electrical.ts';
 import {
   applyDocumentProfile,
+  usesBiotForm,
   withDocumentCommission,
   type BookletTexts,
   type DocumentCommission,
@@ -63,6 +64,7 @@ export const DOCUMENT_FAMILY_LABELS: Readonly<Record<DocumentFamily, string>> = 
   qualification: 'Квалификационный',
   'first-aid': 'Первая помощь',
   electrical: 'Электробезопасность',
+  height: 'Работы на высоте',
 };
 export const AUDIENCE_LABELS: Readonly<Record<DocumentAudienceKey, string>> = {
   all: '',
@@ -132,8 +134,8 @@ export function courseDocumentPayload(draft: CourseDocumentDraft) {
     programName: draft.programName.trim(),
     protocolText: draft.protocolText.trim(),
     decisionText: draft.decisionText.trim(),
-    orderNumber: draft.family === 'biot' ? draft.orderNumber.trim() : '',
-    orderDate: draft.family === 'biot' ? draft.orderDate : '',
+    orderNumber: usesBiotForm(draft.family) ? draft.orderNumber.trim() : '',
+    orderDate: usesBiotForm(draft.family) ? draft.orderDate : '',
     verificationKind: draft.verificationKind.trim(),
     booklet:
       !electrical && draft.booklet ? { layout: 'standard' as const, texts: draft.booklet } : null,

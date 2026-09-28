@@ -1,6 +1,8 @@
 // Turns the owner's own deck into the files the publisher reads: one deck.json
-// per language beside the presentation it describes, the thumbnail of its first
-// page and the catalogue cover.
+// per course and language beside the presentation it describes, the thumbnail
+// of its first page and the catalogue cover. The deck was one course and is
+// now two — «Электробезопасность» and «Работы на высоте» — each built from its
+// own slide data in `deck-source/<course>`.
 //
 // All four are built by `scripts/content/decks/build_locale.py` from the
 // owner's own generator — Russian from his own slide data, the other three from
@@ -12,14 +14,14 @@ import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
 import sharp from 'sharp';
 import { contentSeoSchema } from '../../../../lib/validation/content-seo.ts';
-import { SLUG } from './author-assessment-ru.mjs';
+import { SLUGS } from './author-assessment-ru.mjs';
 
 const LOCALES = ['ru', 'kk', 'en', 'zh'];
 // The translated slide data is part of the release; the PowerPoint build that
 // turns it into PDFs runs in a working directory with the owner's photographs.
-const SOURCE_DIR = path.resolve('content/course-batch-2026-09-eb/deck-source');
-const BUILD_DIR = path.resolve(process.env.EB_DECK_BUILD ?? 'artifacts/eb-2026-09/deck');
-const CONTENT = path.resolve('content/course-batch-2026-09-eb', SLUG);
+const SOURCE_ROOT = path.resolve('content/course-batch-2026-09-eb/deck-source');
+const BUILD_ROOT = path.resolve(process.env.EB_DECK_BUILD ?? 'artifacts/eb-2026-09/deck');
+const CONTENT_ROOT = path.resolve('content/course-batch-2026-09-eb');
 const PDFS = {
   ru: 'deck-ru.pdf',
   kk: 'deck-kk.pdf',
@@ -84,12 +86,31 @@ const SOURCES = [
     url: 'https://old.adilet.zan.kz/rus/docs/V2200027349',
     title: {
       ru: 'Правила по обеспечению безопасности и охраны труда при работе на высоте, приказ № 109',
-      kk: 'Биіктікте жұмыс істеу кезінде еңбек қауіпсіздігі мен еңбекті қорғау қағидалары, № 109 бұйрық',
+      kk: 'Биіктікте жұмыс істеу кезінде еңбек қауіпсіздігін және оны қорғауды қамтамасыз ету қағидалары, № 109 бұйрық',
       en: 'Rules on Occupational Safety and Health for Work at Height, Order No. 109',
       zh: '《高处作业劳动安全与卫生保障规程》（第109号命令）',
     },
   },
 ];
+
+const SEO_TITLE_SUFFIX = {
+  ru: 'онлайн-обучение и аттестация',
+  kk: 'онлайн оқыту және аттестаттау',
+  en: 'online training and certification',
+  zh: '在线培训与考核',
+};
+
+/** The acts each course cites: work at height near overhead lines keeps the safety rules. */
+const COURSE_SOURCES = {
+  elektrobezopasnost: [
+    'labour-code',
+    'civil-protection',
+    'installation-code',
+    'safety-rules',
+    'personnel-rules',
+  ],
+  'raboty-na-vysote': ['labour-code', 'height-rules', 'safety-rules'],
+};
 
 /**
  * A manual line break becomes a space, except in Chinese, where a space between
@@ -124,7 +145,10 @@ function slideBody(slide, locale) {
   return lines;
 }
 
-async function build(locale) {
+async function build(SLUG, locale) {
+  const SOURCE_DIR = path.join(SOURCE_ROOT, SLUG);
+  const BUILD_DIR = path.join(BUILD_ROOT, SLUG);
+  const CONTENT = path.join(CONTENT_ROOT, SLUG);
   const slides = JSON.parse(await readFile(path.join(SOURCE_DIR, `slides-${locale}.json`), 'utf8'));
   const meta = JSON.parse(await readFile(path.join(CONTENT, locale, 'meta.json'), 'utf8'));
   const directory = path.join(CONTENT, locale);
@@ -135,10 +159,12 @@ async function build(locale) {
   const pageCount = (await PDFDocument.load(pdf)).getPageCount();
   if (pageCount !== slides.length) throw new Error(`DECK_LENGTH_MISMATCH:${locale}:${pageCount}`);
 
+  // The title a search result shows, worded as every other course in the catalogue.
+  const seoTitle = `${meta.title} — ${SEO_TITLE_SUFFIX[locale]}`;
   const seo = contentSeoSchema.parse({
-    title: `${meta.title} | SafetyHub`,
+    title: seoTitle,
     description: meta.description,
-    ogTitle: meta.title,
+    ogTitle: seoTitle,
     ogDescription: meta.description,
     ogImage: `/images/course-batch/${SLUG}-${locale}.webp`,
     indexable: true,
@@ -150,7 +176,13 @@ async function build(locale) {
     title: meta.title,
     description: meta.description,
     status: 'draft-awaiting-independent-review',
-    sources: SOURCES.map(({ id, url, title }) => ({ id, url, title: title[locale] })),
+    sources: SOURCES.filter(({ id }) => COURSE_SOURCES[SLUG].includes(id)).map(
+      ({ id, url, title }) => ({
+        id,
+        url,
+        title: title[locale],
+      }),
+    ),
     slides: slides.map((slide) => ({
       id: `slide-${String(slide.slide_num).padStart(2, '0')}`,
       title: slide.title ?? '',
@@ -163,11 +195,11 @@ async function build(locale) {
     seo,
   };
   await writeFile(path.join(directory, 'deck.json'), JSON.stringify(deck, null, 2) + '\n');
-  return { locale, pageCount, pdf };
+  return { slug: SLUG, locale, pageCount, pdf };
 }
 
 const built = [];
-for (const locale of LOCALES) built.push(await build(locale));
+for (const slug of SLUGS) for (const locale of LOCALES) built.push(await build(slug, locale));
 
 // The first page of the deck is the thumbnail of the presentation and, cropped
 // to the card, the cover of the course in the catalogue.
@@ -175,7 +207,8 @@ const { default: pdfjs } = await import('pdfjs-dist/legacy/build/pdf.mjs').then(
   default: module,
 }));
 const { createCanvas } = await import('@napi-rs/canvas');
-for (const { locale, pdf } of built) {
+for (const { slug: SLUG, locale, pdf } of built) {
+  const CONTENT = path.join(CONTENT_ROOT, SLUG);
   const document = await pdfjs.getDocument({ data: new Uint8Array(pdf), useSystemFonts: false })
     .promise;
   const page = await document.getPage(1);
@@ -203,7 +236,9 @@ for (const { locale, pdf } of built) {
 // The site offers a cover only for a course and language the manifest names.
 const manifestFile = path.resolve('lib/content/course-cover-manifest.json');
 const manifest = new Set(JSON.parse(await readFile(manifestFile, 'utf8')));
-for (const locale of LOCALES) manifest.add(`${SLUG}/${locale}`);
+for (const slug of SLUGS) for (const locale of LOCALES) manifest.add(`${slug}/${locale}`);
 await writeFile(manifestFile, JSON.stringify([...manifest].sort(), null, 2) + '\n');
 
-console.log(JSON.stringify(built.map(({ locale, pageCount }) => ({ locale, pageCount }))));
+console.log(
+  JSON.stringify(built.map(({ slug, locale, pageCount }) => ({ slug, locale, pageCount }))),
+);

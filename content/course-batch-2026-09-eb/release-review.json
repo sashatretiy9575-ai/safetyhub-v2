@@ -2,64 +2,100 @@
   "schemaVersion": 1,
   "status": "passed",
   "independentReviewer": "SafetyHub independent review, September 2026",
-  "reviewedAt": "2026-09-22T20:40:14.749Z",
-  "method": "Two reviewers who did not write the material: one read every question against the slide it cites and every translation against the Russian, the other rendered all 236 pages and looked at the flagged ones.",
+  "reviewedAt": "2026-09-28T09:05:01.106Z",
+  "method": "Two reviewers who did not write the material: one read every question against the slide it cites and every translation against the Russian, the other rendered all 268 pages and looked at the flagged ones.",
   "findings": {
     "semantic": {
       "verdict": "passed",
       "checked": {
-        "questions": 120,
-        "slides": 236,
-        "round": "corrections of 23 September, re-read against the whole batch"
+        "questions": 240,
+        "slides": 268,
+        "round": "split of the combined course, 28 September — third round"
       },
-      "findings": 3,
-      "openMinor": 3
+      "findings": 0,
+      "openMinor": 0
     },
     "visual": {
       "verdict": "passed",
       "checked": {
-        "pages": 236,
-        "looked": 28,
-        "round": "seven corrected pages in each of the four languages"
+        "pages": 268,
+        "looked": 51,
+        "round": "split of the combined course, 28 September — second round"
       },
-      "findings": 2,
-      "openMinor": 2
+      "findings": 32,
+      "openMinor": 32
     }
   },
   "entries": [
     {
-      "slug": "elektrobezopasnost-i-raboty-na-vysote",
+      "slug": "elektrobezopasnost",
       "locale": "ru",
-      "deckSha256": "b242c1a00d07edb6737235b3be6f9f72fee7fcb7a5b4a5ea6d8516fca923cb56",
-      "assessmentSha256": "b25ddd11b86185812d2bd0d1118d982b1bffdfb8c8a6ff66670e66ea9cb71602",
-      "pdfSha256": "c3b87d6b606ac7d59b0cdfacf0ab09d66825a46e5b01d3f1621b9203b1e1c545",
+      "deckSha256": "ad506a63c9e0aef4ec2cabad234e3e35990b48aad20d00e624ed66c14c10de3e",
+      "assessmentSha256": "ada131a407a44cf3133378f5413caa452d0b3aec28c85f42d30257ff75b88f94",
+      "pdfSha256": "b65c7f9fe204d9953ee679fd5e5d0299795495c71ce468d49732fe22b3bc8939",
       "visual": "passed",
       "semantic": "passed"
     },
     {
-      "slug": "elektrobezopasnost-i-raboty-na-vysote",
+      "slug": "elektrobezopasnost",
       "locale": "kk",
-      "deckSha256": "fd1ebc23088f036fbcac2aad13e0267ae8459cf9cb2406f9b42dc711964cab46",
-      "assessmentSha256": "60fb02da2c0f3783424ba6f135311c895361633c4a1d82f29d0d0495e9c7f4c0",
-      "pdfSha256": "315e418df11a25b48c79b0603681550733b2a84aa01ae13a4e6733c6fc0981f7",
+      "deckSha256": "1aa93be9d0871d64be1111a4f9e9920bf6b3bff70b06793db6b3dd476f3066fd",
+      "assessmentSha256": "89005d849931e1e04dc9f01ea0b1cdd739b6a7ebaab1bf1a718c3dce7da1b598",
+      "pdfSha256": "ac8be667022268a7fd969fd47c55e749dd527bf9b4ac99d5b047888b8661399c",
       "visual": "passed",
       "semantic": "passed"
     },
     {
-      "slug": "elektrobezopasnost-i-raboty-na-vysote",
+      "slug": "elektrobezopasnost",
       "locale": "en",
-      "deckSha256": "d2f24f0c497ad38d6923067545b27f8b41eed8faa1c01926e1968969d6a7bc22",
-      "assessmentSha256": "157dce40ee9e213534fafbaaa3032a524b94045e27a43dfd0f669b1670670ec7",
-      "pdfSha256": "452ae6bca2e439c1f4fbf4703cf5330773c64e6122bc277ee7969f45f25d58c5",
+      "deckSha256": "cda1204e131cc744cf6d5c59d7eeb8c98ebb825efb033be0e6e04e7c94918632",
+      "assessmentSha256": "995f0a2af580434645445b0a668f48936b6b81bf0db690f02da8e7608b4c9328",
+      "pdfSha256": "1c64175c3f2cf9536526ab9020035e165e1eec778368f22207036a632c605f1d",
       "visual": "passed",
       "semantic": "passed"
     },
     {
-      "slug": "elektrobezopasnost-i-raboty-na-vysote",
+      "slug": "elektrobezopasnost",
       "locale": "zh",
-      "deckSha256": "8262875fc30bd48cd1279e570513016c2d6229c29f1ace12c89a0924b7ddf8ef",
-      "assessmentSha256": "ce287b2f93b077ae1231af946604837fffc70d1de045dd3f09ba1849e7ec6a8c",
-      "pdfSha256": "88f11d383302b58d00cd8ac7f36af53c4581dbe2a20e0e4bd1b379ee331cb614",
+      "deckSha256": "6c58dc9f5e0c427768a2efe648128ba4b6798016e1158db137ff254fbfa3ee1a",
+      "assessmentSha256": "46d31737fdc34ad13e36da689806adc4bcad0bfe61c8fc689fc2eeafc5d862cd",
+      "pdfSha256": "16f219795f75fc20537f3ba0d960c4495f46e15424ff023075c0181a872b0930",
+      "visual": "passed",
+      "semantic": "passed"
+    },
+    {
+      "slug": "raboty-na-vysote",
+      "locale": "ru",
+      "deckSha256": "cdecc2aa2cbc0778cef5f77f715efc3fd67fb08aaba92b139e9da0d3560048a8",
+      "assessmentSha256": "0de044a11747dd3c44d0bf3edf44c395044d54df35d42e3158becdb3e2c75950",
+      "pdfSha256": "caa83909bd5ab79bf3ce58ab22e562dd9d80474e73fe164f8989feaef78246a7",
+      "visual": "passed",
+      "semantic": "passed"
+    },
+    {
+      "slug": "raboty-na-vysote",
+      "locale": "kk",
+      "deckSha256": "a9e7f449464e5655372a92151c43b19f834fb342e7d4745ac1f0064a2d7e5185",
+      "assessmentSha256": "b36c4f804a23315f6fd91abf2a9f6852a3e07410a11ab07c987ab94c64048b0d",
+      "pdfSha256": "8f4b756dcbfef80cf242e6baeac02c50d20c943aecae615399bc45a1f46b3a43",
+      "visual": "passed",
+      "semantic": "passed"
+    },
+    {
+      "slug": "raboty-na-vysote",
+      "locale": "en",
+      "deckSha256": "7aea83ead7c73c32304744215f987ab6fdaac938faef289ebb992a173216fd50",
+      "assessmentSha256": "ec2f8fc2755dfa836f750b32749922324ce73920dc5615f0a5e11d335277b4a9",
+      "pdfSha256": "8ff26823663032e2d9c9cfd81fbf6df802ddc6e5502c2bcfe85c3e1144f6823a",
+      "visual": "passed",
+      "semantic": "passed"
+    },
+    {
+      "slug": "raboty-na-vysote",
+      "locale": "zh",
+      "deckSha256": "00deb60f6fa724e3e851cc99e334b23c20451f156f049d66799f4e67750302a5",
+      "assessmentSha256": "f182d288c8ff0192c2b2cd8501bb8cf35b25e4318a1f3754aeee8afc2f3796c1",
+      "pdfSha256": "894246f96d7b540f0c7812268c62100b484efa2ee6c24799e7c65c051d8d40e8",
       "visual": "passed",
       "semantic": "passed"
     }

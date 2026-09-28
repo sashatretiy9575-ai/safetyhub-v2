@@ -10,8 +10,18 @@ export const DOCUMENT_FAMILIES = [
   'qualification',
   'first-aid',
   'electrical',
+  'height',
 ] as const;
 export type DocumentFamily = (typeof DOCUMENT_FAMILIES)[number];
+
+/**
+ * The protocol of the rules on training in safety and labour protection: an
+ * order, a kind of check and the bilingual table. Work at height is checked on
+ * the same form — the rules for it set no form of their own.
+ */
+export function usesBiotForm(family: DocumentFamily | null | undefined) {
+  return family === 'biot' || family === 'height';
+}
 export type DocumentSigner = {
   signerId: string;
   name: string;
@@ -151,7 +161,7 @@ export function protocolColumns(family: DocumentFamily, layoutVersion?: 2) {
       'Подпись',
       'Примечание',
     ];
-  if (family === 'biot')
+  if (usesBiotForm(family))
     return [
       '№ п/п',
       'Тегі, аты / Фамилия, инициалы',

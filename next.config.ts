@@ -96,6 +96,16 @@ const legacyTopicRedirects = [
   { source: '/topics/fire-safety', destination: '/topics/pozharnaya-bezopasnost' },
   { source: '/topics/occupational-health', destination: '/topics/biot' },
   { source: '/topics/industrial-safety', destination: '/topics/promyshlennaya-bezopasnost' },
+  // «Электробезопасность и работы на высоте» became two courses; its address
+  // leads to the first of them, which kept its documents.
+  {
+    source: '/topics/elektrobezopasnost-i-raboty-na-vysote',
+    destination: '/topics/elektrobezopasnost',
+  },
+  {
+    source: '/topics/elektrobezopasnost-i-raboty-na-vysote/test',
+    destination: '/topics/elektrobezopasnost/test',
+  },
 ] as const;
 
 const localizedPrivateSource = (pathname: string) =>

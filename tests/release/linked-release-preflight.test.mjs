@@ -118,19 +118,17 @@ test('reviewed migration gate accepts only the exact hosted prefix and pinned re
   const rows = migrationRows(localMigrations);
   const receipt = assertReviewedMigrationDelta({ migrationRows: rows, localMigrations });
   assert.equal(REVIEWED_APPLIED_RELEASE_MIGRATIONS.length, 27);
-  // Two migrations wait for the next release: certificate logic (a refused
-  // reissue is logged, access is rechecked on submit, protocol numbers follow
-  // the course, the verify page shows revoked documents) and security hardening
-  // (metered organization search, sign-out revokes the access token).
-  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 2);
-  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 114);
+  // One migration waits for the next release: the documents of work at height,
+  // checked on the form of the rules on safety training.
+  assert.equal(REVIEWED_PENDING_MIGRATIONS.length, 1);
+  assert.equal(REVIEWED_TOTAL_MIGRATION_COUNT, 115);
   assert.equal(inventory.length, REVIEWED_TOTAL_MIGRATION_COUNT);
   assert.equal(localMigrations.length, REVIEWED_TOTAL_MIGRATION_COUNT);
-  assert.equal(receipt.matchedCount, 112);
-  assert.equal(receipt.pendingCount, 2);
-  assert.equal(receipt.expectedBaseCount, 112);
-  assert.equal(receipt.expectedPendingCount, 2);
-  assert.equal(receipt.expectedTotalCount, 114);
+  assert.equal(receipt.matchedCount, 114);
+  assert.equal(receipt.pendingCount, 1);
+  assert.equal(receipt.expectedBaseCount, 114);
+  assert.equal(receipt.expectedPendingCount, 1);
+  assert.equal(receipt.expectedTotalCount, 115);
   assert.deepEqual(
     receipt.pendingMigrations,
     REVIEWED_PENDING_MIGRATIONS.map(({ filename }) => filename),
