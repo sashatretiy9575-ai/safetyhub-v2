@@ -144,3 +144,23 @@ test('the ПТМ protocol prints «Примечание» in its own cell', asyn
     await task.destroy();
   } finally {globalThis.fetch=original;}
 });
+
+test('the electrical protocol carries the seal beside the chairman, like every other protocol', async () => {
+  const original=globalThis.fetch;
+  const pixel=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==','base64');
+  globalThis.fetch=async input=>{
+    const url=String(input);
+    if(url.includes('/registered?')) return new Response(pixel);
+    const file=url.includes('face=serif')?`NotoSerif-${url.includes('weight=bold')?'Bold':'Regular'}.ttf`:url.includes('face=sans')?'NotoSans-Bold.ttf':'noto-sans-latin-cyrillic.ttf';
+    return new Response(await readFile(new URL('../../lib/pdf/assets/'+file,import.meta.url)));
+  };
+  try {
+    const branding=applyDocumentProfile({...base,protocolLayoutVersion:2},{...profile,family:'electrical',electrical:{group:'II',voltage:'up-to-1000',role:'electrotechnical'}});
+    const people=[{userId:'1',fullName:'Участник Первый',position:'Электромонтёр',status:'passed',score:9,total:10,certificateId:null}];
+    const bytes=await generateProtocolInBrowser({organization:'Проверочная организация',courseTitle:'Электробезопасность',items:[],participants:people},branding,'/certificate-assets/font?locale=ru&v=1');
+    const doc=await PDFDocument.load(bytes);
+    assert.equal(doc.getPageCount(),1);
+    // Three signatures and the seal.
+    assert.equal(doc.getPages()[0].node.Resources().lookupMaybe(PDFName.of('XObject'),PDFDict)?.keys().length,4);
+  } finally {globalThis.fetch=original;}
+});

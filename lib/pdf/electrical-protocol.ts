@@ -219,6 +219,7 @@ export function drawElectricalProtocol(
 
   y += 10 * scale;
   paragraph('Подписи:', 10);
+  const chairmanTop = y;
   signatureLine(
     'Председатель комиссии ',
     branding.chairmanName,
@@ -232,6 +233,18 @@ export function drawElectricalProtocol(
       options.signatures[index + 1] ?? null,
       '(подпись, Фамилия, имя, отчество (при наличии))',
     );
+  // The centre's 38 mm seal on the signature lines, left of the chairman's
+  // signature so neither hides the other, as every other protocol and the
+  // booklet carry it; the text under it stays readable.
+  const stampSize = 108 * scale;
+  drawFacsimile(
+    page,
+    options.stamp,
+    LEFT + 150 * scale,
+    chairmanTop - 24 * scale,
+    stampSize,
+    stampSize,
+  );
   y += 12 * scale;
   signatureLine(
     'С заключением комиссии ознакомлен ',
